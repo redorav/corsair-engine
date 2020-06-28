@@ -16,9 +16,6 @@
 [submodule "Dependencies/spirv-cross/Source"]
 	path = Dependencies/spirv-cross/Source
 	url = https://github.com/KhronosGroup/SPIRV-Cross
-[submodule "Dependencies/spirv-tools/Source"]
-	path = Dependencies/spirv-tools/Source
-	url = https://github.com/KhronosGroup/SPIRV-tools
 [submodule "Dependencies/stb/Source"]
 	path = Dependencies/stb/Source
 	url = https://github.com/nothings/stb

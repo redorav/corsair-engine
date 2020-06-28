@@ -1,0 +1,32 @@
+# version format
+version: 1.0.{build}
+
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      vsversion: 2017
+
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: "Workspace/vs2017/Corsair Engine.sln"
+
+install:
+  - git submodule update --init --recursive
+  - if %vsversion%==2017 start /B /W premake/premake5 --file=corsairengine.lua vs2017
+      
+platform:
+  - Vulkan Win64
+  
+#matrix:
+#  exclude:
+#    - image: Visual Studio 2015
+#      platform: MSVC ARM64
+  
+configuration:
+  - Release
+
+# Disable automatic tests
+test: off

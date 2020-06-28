@@ -1,0 +1,216 @@
+#include "CrRendering_pch.h"
+
+#include "CrSwapchain_vk.h"
+#include "CrCommandQueue_vk.h"
+#include "CrTexture_vk.h"
+#include "CrRenderDevice_vk.h"
+#include "CrGPUSynchronization_vk.h"
+#include "CrVulkan.h"
+
+#include "Core/Logging/ICrDebug.h"
+
+CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) : m_vkSwapChain(nullptr)
+{
+	renderDevice; requestedHeight; requestedWidth;
+	//CreatePS(renderDevice, requestedWidth, requestedHeight);
+}
+
+CrSwapchainVulkan::~CrSwapchainVulkan()
+{
+	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapChain, nullptr);
+}
+
+VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain()
+{
+	return m_vkSwapChain;
+}
+
+void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight)
+{
+	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+
+	m_vkDevice = vulkanDevice->GetVkDevice();
+	const VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
+	const VkSurfaceKHR vkSurface = vulkanDevice->GetVkSurface();
+	
+	VkResult result;
+	
+	m_format = cr3d::DataFormat::BGRA8_Unorm;
+	
+	// Get list of supported color formats and spaces for the surface (backbuffer)
+	{
+		uint32_t formatCount;
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, nullptr);
+		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, surfaceFormats.data());
+	
+		// If the format list includes just one entry of VK_FORMAT_UNDEFINED, the surface has no preferred format
+		if (formatCount == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED)
+		{
+			m_vkFormat = crvk::GetVkFormat(m_format);
+			m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+		}
+		else // Otherwise, at least one supported format will be returned
+		{
+			CrAssertMsg(formatCount >= 1, "Must have at least one preferred color space!");
+			// TODO select preferred format by looping and finding it
+			m_vkFormat = surfaceFormats[0].format;
+			m_vkColorSpace = surfaceFormats[0].colorSpace;
+
+			for (uint32_t i = 0; i < formatCount; ++i)
+			{
+				
+			}
+		}
+	}
+
+	VkSwapchainKHR oldSwapchain = m_vkSwapChain;
+
+	// Get physical device surface properties and formats
+	VkSurfaceCapabilitiesKHR surfCaps;
+	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, vkSurface, &surfCaps);
+
+	uint32_t presentModeCount;
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, nullptr);
+
+	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, presentModes.data());
+
+	VkExtent2D swapchainExtent;
+
+	// Width and height are either both -1, or both not -1.
+	if (surfCaps.currentExtent.width == -1)
+	{
+		// If the surface size is undefined, the size is set to the size of the images requested.
+		m_width = swapchainExtent.width = requestedWidth;
+		m_height = swapchainExtent.height = requestedHeight;
+	}
+	else
+	{
+		// If the surface size is defined, the swap chain size must match
+		swapchainExtent = surfCaps.currentExtent;
+		m_width = surfCaps.currentExtent.width;
+		m_height = surfCaps.currentExtent.height;
+	}
+
+	VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_MAX_ENUM_KHR;
+
+	bool hasMailbox = false;
+	bool hasImmediate = false;
+	bool hasRelaxedFifo = false;
+
+	for (size_t i = 0; i < presentModeCount; i++)
+	{
+		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) { hasMailbox = true; }
+		if (presentModes[i] == VK_PRESENT_MODE_FIFO_RELAXED_KHR) { hasRelaxedFifo = true; }
+		if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR) { hasImmediate = true; }
+	}
+
+	if (hasMailbox) // Try to use mailbox mode. Low latency and non-tearing
+	{
+		swapchainPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+	}
+	else if (hasRelaxedFifo)
+	{
+		swapchainPresentMode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+	}
+	else if (hasImmediate)
+	{
+		swapchainPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+	}
+	else
+	{
+		swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR; // FIFO is required so is always present as fallback
+	}
+
+	// Determine the number of images
+	uint32_t desiredNumberOfSwapchainImages = surfCaps.minImageCount + 1;
+	if (surfCaps.maxImageCount > 0)
+	{
+		desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfCaps.maxImageCount);
+	}
+
+	VkSurfaceTransformFlagsKHR preTransform;
+	if (surfCaps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
+	{
+		preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+	}
+	else
+	{
+		preTransform = surfCaps.currentTransform;
+	}
+
+	VkSwapchainCreateInfoKHR swapchainInfo;
+	swapchainInfo.sType						= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	swapchainInfo.pNext						= nullptr;
+	swapchainInfo.flags						= 0;
+	swapchainInfo.surface					= vkSurface;
+	swapchainInfo.minImageCount				= desiredNumberOfSwapchainImages;
+	swapchainInfo.imageFormat				= m_vkFormat;
+	swapchainInfo.imageColorSpace			= m_vkColorSpace;
+	swapchainInfo.imageExtent				= { swapchainExtent.width, swapchainExtent.height };
+	swapchainInfo.imageArrayLayers			= 1;
+	swapchainInfo.imageUsage				= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	swapchainInfo.imageSharingMode			= VK_SHARING_MODE_EXCLUSIVE;
+	swapchainInfo.queueFamilyIndexCount		= 0;
+	swapchainInfo.pQueueFamilyIndices		= nullptr;
+	swapchainInfo.preTransform				= (VkSurfaceTransformFlagBitsKHR)preTransform;
+	swapchainInfo.presentMode				= swapchainPresentMode;
+	swapchainInfo.oldSwapchain				= oldSwapchain;
+	swapchainInfo.clipped					= true;
+	swapchainInfo.compositeAlpha			= VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+
+	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapChain);
+
+	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
+	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
+	if (oldSwapchain != nullptr)
+	{
+		vkDestroySwapchainKHR(m_vkDevice, oldSwapchain, nullptr);
+	}
+
+	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapChain, &m_imageCount, nullptr);
+
+	CrVector<VkImage> images(m_imageCount);
+	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapChain, &m_imageCount, images.data());
+
+	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
+
+	CrTextureCreateParams swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
+
+	for (uint32_t i = 0; i < m_imageCount; i++)
+	{
+		swapchainTexParams.extraDataPtr = images[i]; // Swapchain texture
+		m_textures[i] = renderDevice->CreateTexture(swapchainTexParams);
+	}
+}
+
+CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
+{
+	VkResult res = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapChain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
+
+	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
+	{
+		return CrSwapchainResult::Invalid;
+	}
+
+	return CrSwapchainResult::Success;
+}
+
+void CrSwapchainVulkan::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
+{
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.pNext = nullptr;
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &m_vkSwapChain;
+	presentInfo.pImageIndices = &m_currentBufferIndex;
+
+	if (waitSemaphore)
+	{
+		presentInfo.pWaitSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
+		presentInfo.waitSemaphoreCount = 1;
+	}
+
+	vkQueuePresentKHR(static_cast<CrCommandQueueVulkan*>(queue)->GetVkQueue(), &presentInfo);
+}

@@ -1,3 +1,33 @@
 [submodule "Dependencies/argh/Source"]
 	path = Dependencies/argh/Source
 	url = https://github.com/adishavit/argh
+[submodule "Dependencies/eastl/Source"]
+	path = Dependencies/eastl/Source
+	url = https://github.com/electronicarts/EASTL
+[submodule "Dependencies/gainput/Source"]
+	path = Dependencies/gainput/Source
+	url = https://github.com/jkuhlmann/gainput
+[submodule "Dependencies/glslang/Source"]
+	path = Dependencies/glslang/Source
+	url = https://github.com/KhronosGroup/glslang
+[submodule "Dependencies/hlslpp/Source"]
+	path = Dependencies/hlslpp/Source
+	url = https://github.com/redorav/hlslpp
+[submodule "Dependencies/spirv-cross/Source"]
+	path = Dependencies/spirv-cross/Source
+	url = https://github.com/KhronosGroup/SPIRV-Cross
+[submodule "Dependencies/spirv-tools/Source"]
+	path = Dependencies/spirv-tools/Source
+	url = https://github.com/KhronosGroup/SPIRV-tools
+[submodule "Dependencies/stb/Source"]
+	path = Dependencies/stb/Source
+	url = https://github.com/nothings/stb
+[submodule "Dependencies/xxhash/Source"]
+	path = Dependencies/xxhash/Source
+	url = https://github.com/Cyan4973/xxHash
+[submodule "Dependencies/ddspp/Source"]
+	path = Dependencies/ddspp/Source
+	url = https://github.com/redorav/ddspp/
+[submodule "Premake/premake-qt"]
+	path = Premake/premake-qt
+	url = https://github.com/dcourtois/premake-qt

@@ -16,6 +16,9 @@ workspace(ProjectName)
 		system("macosx")
 	end
 	
+	filter("toolset:msc")
+		flags { "multiprocessorcompile" }
+	
 	targetdir("Binaries/")
 	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	

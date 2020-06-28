@@ -19,110 +19,112 @@
 
 static const TBuiltInResource s_resourceLimits =
 {
-	32,    // MaxLights
-	6,     // MaxClipPlanes
-	32,    // MaxTextureUnits
-	32,    // MaxTextureCoords
-	64,    // MaxVertexAttribs
-	4096,  // MaxVertexUniformComponents
-	64,    // MaxVaryingFloats
-	32,    // MaxVertexTextureImageUnits
-	80,    // MaxCombinedTextureImageUnits
-	32,    // MaxTextureImageUnits
-	4096,  // MaxFragmentUniformComponents
-	32,    // MaxDrawBuffers
-	128,   // MaxVertexUniformVectors
-	8,     // MaxVaryingVectors
-	16,    // MaxFragmentUniformVectors
-	16,    // MaxVertexOutputVectors
-	15,    // MaxFragmentInputVectors
-	-8,    // MinProgramTexelOffset
-	7,     // MaxProgramTexelOffset
-	8,     // MaxClipDistances
-	65535, // MaxComputeWorkGroupCountX
-	65535, // MaxComputeWorkGroupCountY
-	65535, // MaxComputeWorkGroupCountZ
-	1024,  // MaxComputeWorkGroupSizeX
-	1024,  // MaxComputeWorkGroupSizeY
-	64,    // MaxComputeWorkGroupSizeZ
-	1024,  // MaxComputeUniformComponents
-	16,    // MaxComputeTextureImageUnits
-	8,     // MaxComputeImageUniforms
-	8,     // MaxComputeAtomicCounters
-	1,     // MaxComputeAtomicCounterBuffers
-	60,    // MaxVaryingComponents
-	64,    // MaxVertexOutputComponents
-	64,    // MaxGeometryInputComponents
-	128,   // MaxGeometryOutputComponents
-	128,   // MaxFragmentInputComponents
-	8,     // MaxImageUnits
-	8,     // MaxCombinedImageUnitsAndFragmentOutputs
-	8,     // MaxCombinedShaderOutputResources
-	0,     // MaxImageSamples
-	0,     // MaxVertexImageUniforms
-	0,     // MaxTessControlImageUniforms
-	0,     // MaxTessEvaluationImageUniforms
-	0,     // MaxGeometryImageUniforms
-	8,     // MaxFragmentImageUniforms
-	8,     // MaxCombinedImageUniforms
-	16,    // MaxGeometryTextureImageUnits
-	256,   // MaxGeometryOutputVertices
-	1024,  // MaxGeometryTotalOutputComponents
-	1024,  // MaxGeometryUniformComponents
-	64,    // MaxGeometryVaryingComponents
-	128,   // MaxTessControlInputComponents
-	128,   // MaxTessControlOutputComponents
-	16,    // MaxTessControlTextureImageUnits
-	1024,  // MaxTessControlUniformComponents
-	4096,  // MaxTessControlTotalOutputComponents
-	128,   // MaxTessEvaluationInputComponents
-	128,   // MaxTessEvaluationOutputComponents
-	16,    // MaxTessEvaluationTextureImageUnits
-	1024,  // MaxTessEvaluationUniformComponents
-	120,   // MaxTessPatchComponents
-	32,    // MaxPatchVertices
-	64,    // MaxTessGenLevel
-	16,    // MaxViewports
-	0,     // MaxVertexAtomicCounters
-	0,     // MaxTessControlAtomicCounters
-	0,     // MaxTessEvaluationAtomicCounters
-	0,     // MaxGeometryAtomicCounters
-	8,     // MaxFragmentAtomicCounters
-	8,     // MaxCombinedAtomicCounters
-	1,     // MaxAtomicCounterBindings
-	0,     // MaxVertexAtomicCounterBuffers
-	0,     // MaxTessControlAtomicCounterBuffers
-	0,     // MaxTessEvaluationAtomicCounterBuffers
-	0,     // MaxGeometryAtomicCounterBuffers
-	1,     // MaxFragmentAtomicCounterBuffers
-	1,     // MaxCombinedAtomicCounterBuffers
-	16384, // MaxAtomicCounterBufferSize
-	4,     // MaxTransformFeedbackBuffers
-	64,    // MaxTransformFeedbackInterleavedComponents
-	8,     // MaxCullDistances
-	8,     // MaxCombinedClipAndCullDistances
-	4,     // MaxSamples
-	0,     // maxMeshOutputVerticesNV;
-	0,     // maxMeshOutputPrimitivesNV;
-	0,     // maxMeshWorkGroupSizeX_NV;
-	0,     // maxMeshWorkGroupSizeY_NV;
-	0,     // maxMeshWorkGroupSizeZ_NV;
-	0,     // maxTaskWorkGroupSizeX_NV;
-	0,     // maxTaskWorkGroupSizeY_NV;
-	0,     // maxTaskWorkGroupSizeZ_NV;
-	0,     // maxMeshViewCountNV
+    /* .MaxLights = */ 32,
+    /* .MaxClipPlanes = */ 6,
+    /* .MaxTextureUnits = */ 32,
+    /* .MaxTextureCoords = */ 32,
+    /* .MaxVertexAttribs = */ 64,
+    /* .MaxVertexUniformComponents = */ 4096,
+    /* .MaxVaryingFloats = */ 64,
+    /* .MaxVertexTextureImageUnits = */ 32,
+    /* .MaxCombinedTextureImageUnits = */ 80,
+    /* .MaxTextureImageUnits = */ 32,
+    /* .MaxFragmentUniformComponents = */ 4096,
+    /* .MaxDrawBuffers = */ 32,
+    /* .MaxVertexUniformVectors = */ 128,
+    /* .MaxVaryingVectors = */ 8,
+    /* .MaxFragmentUniformVectors = */ 16,
+    /* .MaxVertexOutputVectors = */ 16,
+    /* .MaxFragmentInputVectors = */ 15,
+    /* .MinProgramTexelOffset = */ -8,
+    /* .MaxProgramTexelOffset = */ 7,
+    /* .MaxClipDistances = */ 8,
+    /* .MaxComputeWorkGroupCountX = */ 65535,
+    /* .MaxComputeWorkGroupCountY = */ 65535,
+    /* .MaxComputeWorkGroupCountZ = */ 65535,
+    /* .MaxComputeWorkGroupSizeX = */ 1024,
+    /* .MaxComputeWorkGroupSizeY = */ 1024,
+    /* .MaxComputeWorkGroupSizeZ = */ 64,
+    /* .MaxComputeUniformComponents = */ 1024,
+    /* .MaxComputeTextureImageUnits = */ 16,
+    /* .MaxComputeImageUniforms = */ 8,
+    /* .MaxComputeAtomicCounters = */ 8,
+    /* .MaxComputeAtomicCounterBuffers = */ 1,
+    /* .MaxVaryingComponents = */ 60,
+    /* .MaxVertexOutputComponents = */ 64,
+    /* .MaxGeometryInputComponents = */ 64,
+    /* .MaxGeometryOutputComponents = */ 128,
+    /* .MaxFragmentInputComponents = */ 128,
+    /* .MaxImageUnits = */ 8,
+    /* .MaxCombinedImageUnitsAndFragmentOutputs = */ 8,
+    /* .MaxCombinedShaderOutputResources = */ 8,
+    /* .MaxImageSamples = */ 0,
+    /* .MaxVertexImageUniforms = */ 0,
+    /* .MaxTessControlImageUniforms = */ 0,
+    /* .MaxTessEvaluationImageUniforms = */ 0,
+    /* .MaxGeometryImageUniforms = */ 0,
+    /* .MaxFragmentImageUniforms = */ 8,
+    /* .MaxCombinedImageUniforms = */ 8,
+    /* .MaxGeometryTextureImageUnits = */ 16,
+    /* .MaxGeometryOutputVertices = */ 256,
+    /* .MaxGeometryTotalOutputComponents = */ 1024,
+    /* .MaxGeometryUniformComponents = */ 1024,
+    /* .MaxGeometryVaryingComponents = */ 64,
+    /* .MaxTessControlInputComponents = */ 128,
+    /* .MaxTessControlOutputComponents = */ 128,
+    /* .MaxTessControlTextureImageUnits = */ 16,
+    /* .MaxTessControlUniformComponents = */ 1024,
+    /* .MaxTessControlTotalOutputComponents = */ 4096,
+    /* .MaxTessEvaluationInputComponents = */ 128,
+    /* .MaxTessEvaluationOutputComponents = */ 128,
+    /* .MaxTessEvaluationTextureImageUnits = */ 16,
+    /* .MaxTessEvaluationUniformComponents = */ 1024,
+    /* .MaxTessPatchComponents = */ 120,
+    /* .MaxPatchVertices = */ 32,
+    /* .MaxTessGenLevel = */ 64,
+    /* .MaxViewports = */ 16,
+    /* .MaxVertexAtomicCounters = */ 0,
+    /* .MaxTessControlAtomicCounters = */ 0,
+    /* .MaxTessEvaluationAtomicCounters = */ 0,
+    /* .MaxGeometryAtomicCounters = */ 0,
+    /* .MaxFragmentAtomicCounters = */ 8,
+    /* .MaxCombinedAtomicCounters = */ 8,
+    /* .MaxAtomicCounterBindings = */ 1,
+    /* .MaxVertexAtomicCounterBuffers = */ 0,
+    /* .MaxTessControlAtomicCounterBuffers = */ 0,
+    /* .MaxTessEvaluationAtomicCounterBuffers = */ 0,
+    /* .MaxGeometryAtomicCounterBuffers = */ 0,
+    /* .MaxFragmentAtomicCounterBuffers = */ 1,
+    /* .MaxCombinedAtomicCounterBuffers = */ 1,
+    /* .MaxAtomicCounterBufferSize = */ 16384,
+    /* .MaxTransformFeedbackBuffers = */ 4,
+    /* .MaxTransformFeedbackInterleavedComponents = */ 64,
+    /* .MaxCullDistances = */ 8,
+    /* .MaxCombinedClipAndCullDistances = */ 8,
+    /* .MaxSamples = */ 4,
+    /* .maxMeshOutputVerticesNV = */ 256,
+    /* .maxMeshOutputPrimitivesNV = */ 512,
+    /* .maxMeshWorkGroupSizeX_NV = */ 32,
+    /* .maxMeshWorkGroupSizeY_NV = */ 1,
+    /* .maxMeshWorkGroupSizeZ_NV = */ 1,
+    /* .maxTaskWorkGroupSizeX_NV = */ 32,
+    /* .maxTaskWorkGroupSizeY_NV = */ 1,
+    /* .maxTaskWorkGroupSizeZ_NV = */ 1,
+    /* .maxMeshViewCountNV = */ 4,
+    /* .maxDualSourceDrawBuffersEXT = */ 1,
 
-	{ // limits
-		true, // nonInductiveForLoops
-		true, // whileLoops
-		true, // doWhileLoops
-		true, // generalUniformIndexing
-		true, // generalAttributeMatrixVectorIndexing
-		true, // generalVaryingIndexing
-		true, // generalSamplerIndexing
-		true, // generalVariableIndexing
-		true, // generalConstantMatrixVectorIndexing
-	},
+    /* .limits = */
+	{
+        /* .nonInductiveForLoops = */ 1,
+        /* .whileLoops = */ 1,
+        /* .doWhileLoops = */ 1,
+        /* .generalUniformIndexing = */ 1,
+        /* .generalAttributeMatrixVectorIndexing = */ 1,
+        /* .generalVaryingIndexing = */ 1,
+        /* .generalSamplerIndexing = */ 1,
+        /* .generalVariableIndexing = */ 1,
+        /* .generalConstantMatrixVectorIndexing = */ 1,
+    }
 };
 
 class BasicIncluder : public glslang::TShader::Includer

@@ -14,6 +14,9 @@ workspace(ProjectName)
 		--toolset("msc-llvm-vs2014") -- Use for Clang on VS
 	end
 	
+	filter("toolset:msc")
+		flags { "multiprocessorcompile" }
+	
 	targetdir("Binaries/")
 	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	
@@ -36,6 +39,7 @@ project (ProjectName)
 		"Source/glslang/GenericCodeGen/**.cpp", "Source/glslang/GenericCodeGen/**.h",
 		"Source/glslang/Include/**.cpp", "Source/glslang/Include/**.h",
 		"Source/glslang/MachineIndependent/**.cpp", "Source/glslang/MachineIndependent/**.h",
+		"Source/glslang/HLSL/**.cpp", "Source/glslang/HLSL/**.h",
 		"Source/glslang/Public/**.cpp", "Source/glslang/Public/**.h",
 		"Source/glslang/OSDependent/*.h",
 		"Source/hlsl/**.cpp", "Source/hlsl/**.h",

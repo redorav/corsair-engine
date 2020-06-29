@@ -95,6 +95,8 @@ private:
 
 	bool IsVkInstanceExtensionSupported(const CrString& extension);
 
+	bool IsVkInstanceLayerSupported(const CrString& layer);
+
 	// TODO Make platform-independent
 	bool IsDepthStencilFormatSupported(VkFormat depthFormat);
 
@@ -136,6 +138,7 @@ private:
 
 	// Supported extensions
 	CrSet<CrString> m_supportedInstanceExtensions;
+	CrSet<CrString> m_supportedInstanceLayers;
 	CrSet<CrString> m_supportedDeviceExtensions;
 
 	// Make this platform-independent

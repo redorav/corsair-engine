@@ -67,12 +67,6 @@ void CrRenderDeviceVulkan::InitPS
 	VkResult result;
 
 	bool enableValidationLayer = crcore::CommandLine["-debugGraphics"];
-	if (enableValidationLayer)
-	{
-		// This is a meta layer that enables all of the standard validation layers in the correct order :
-		// threading, parameter_validation, device_limits, object_tracker, image, core_validation, swapchain, and unique_objects
-		m_instanceLayers.push_back("VK_LAYER_LUNARG_standard_validation");
-	}
 
 	bool enableRenderdoc = crcore::CommandLine["-renderdoc"];
 	if (enableRenderdoc)
@@ -281,7 +275,23 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 		CrVector<VkExtensionProperties> instanceExtensions(numInstanceExtensions);
 		vkEnumerateInstanceExtensionProperties(nullptr, &numInstanceExtensions, instanceExtensions.data());
 
-		for (const VkExtensionProperties& extension : instanceExtensions) { m_supportedInstanceExtensions.insert(extension.extensionName); }
+		for (const VkExtensionProperties& extension : instanceExtensions)
+		{
+			m_supportedInstanceExtensions.insert(extension.extensionName);
+		}
+	}
+
+	// Enumerate instance layers
+	{
+		uint32_t numInstanceLayers;
+		vkEnumerateInstanceLayerProperties(&numInstanceLayers, nullptr);
+		CrVector<VkLayerProperties> instanceLayers(numInstanceLayers);
+		vkEnumerateInstanceLayerProperties(&numInstanceLayers, instanceLayers.data());
+
+		for (const VkLayerProperties& layer : instanceLayers)
+		{
+			m_supportedInstanceLayers.insert(layer.layerName);
+		}
 	}
 
 	CrVector<const char*> enabledExtensions;
@@ -322,11 +332,6 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	}
 #endif
 
-	uint32_t layerCount;
-	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-	CrVector<VkLayerProperties> layers(layerCount);
-	vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
-
 	VkInstanceCreateInfo instanceCreateInfo = {};
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
@@ -339,10 +344,19 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	instanceCreateInfo.enabledLayerCount = (uint32_t) m_instanceLayers.size();
+	CrVector<const char*> enabledLayers;
+
+	if (enableValidationLayer && IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
+	{
+		enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+	}
+
+	instanceCreateInfo.enabledLayerCount = (uint32_t)m_instanceLayers.size();
 	instanceCreateInfo.ppEnabledLayerNames = m_instanceLayers.data();
 
 	VkResult res = vkCreateInstance(&instanceCreateInfo, nullptr, &m_vkInstance);
+
+	CrAssertMsg(res == VK_SUCCESS, "Error creating vkInstance");
 
 	return res;
 }
@@ -560,12 +574,6 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice(bool enableValidation)
 		deviceCreateInfo.ppEnabledExtensionNames = enabledDeviceExtensions.data();
 	}
 
-	if (enableValidation)
-	{
-		deviceCreateInfo.enabledLayerCount = (uint32_t) m_instanceLayers.size();
-		deviceCreateInfo.ppEnabledLayerNames = m_instanceLayers.data();
-	}
-
 	return vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
 }
 
@@ -617,14 +625,19 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	vkDeviceWaitIdle(m_vkDevice);
 }
 
+bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)
+{
+	return m_supportedDeviceExtensions.count(extension) > 0;
+}
+
 bool CrRenderDeviceVulkan::IsVkInstanceExtensionSupported(const CrString& extension)
 {
 	return m_supportedInstanceExtensions.count(extension) > 0;
 }
 
-bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)
+bool CrRenderDeviceVulkan::IsVkInstanceLayerSupported(const CrString& layer)
 {
-	return m_supportedDeviceExtensions.count(extension) > 0;
+	return m_supportedInstanceLayers.count(layer) > 0;
 }
 
 bool CrRenderDeviceVulkan::IsDepthStencilFormatSupported(VkFormat depthFormat)

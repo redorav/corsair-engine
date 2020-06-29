@@ -473,6 +473,18 @@ enum TInterlockOrdering {
     EioCount,
 };
 
+enum TShaderInterface
+{
+    // Includes both uniform blocks and buffer blocks
+    EsiUniform = 0,
+    EsiInput,
+    EsiOutput,
+    EsiNone,
+
+    EsiCount
+};
+
+
 class TQualifier {
 public:
     static const int layoutNotSet = -1;
@@ -1223,6 +1235,7 @@ struct TShaderQualifiers {
     bool layoutDerivativeGroupQuads;    // true if layout derivative_group_quadsNV set
     bool layoutDerivativeGroupLinear;   // true if layout derivative_group_linearNV set
     int primitives;                     // mesh shader "max_primitives"DerivativeGroupLinear;   // true if layout derivative_group_linearNV set
+    bool layoutPrimitiveCulling;        // true if layout primitive_culling set
     TLayoutDepth getDepth() const { return layoutDepth; }
 #else
     TLayoutDepth getDepth() const { return EldNone; }
@@ -1256,6 +1269,7 @@ struct TShaderQualifiers {
         layoutOverrideCoverage      = false;
         layoutDerivativeGroupQuads  = false;
         layoutDerivativeGroupLinear = false;
+        layoutPrimitiveCulling      = false;
         primitives                  = TQualifier::layoutNotSet;
         interlockOrdering = EioNone;
 #endif
@@ -1319,6 +1333,8 @@ struct TShaderQualifiers {
             primitives = src.primitives;
         if (src.interlockOrdering != EioNone)
             interlockOrdering = src.interlockOrdering;
+        if (src.layoutPrimitiveCulling)
+            layoutPrimitiveCulling = src.layoutPrimitiveCulling;
 #endif
     }
 };
@@ -1615,6 +1631,23 @@ public:
     {
         assert(fieldName);
         return *fieldName;
+    }
+    TShaderInterface getShaderInterface() const
+    {
+        if (basicType != EbtBlock)
+            return EsiNone;
+
+        switch (qualifier.storage) {
+        default:
+            return EsiNone;
+        case EvqVaryingIn:
+            return EsiInput;
+        case EvqVaryingOut:
+            return EsiOutput;
+        case EvqUniform:
+        case EvqBuffer:
+            return EsiUniform;
+        }
     }
 
     virtual TBasicType getBasicType() const { return basicType; }

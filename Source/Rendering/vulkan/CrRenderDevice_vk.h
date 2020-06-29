@@ -91,10 +91,11 @@ private:
 
 	// Vulkan-specific support query functions
 
-	bool IsDeviceExtensionSupported(const CrString& extension);
+	bool IsVkDeviceExtensionSupported(const CrString& extension);
 
-	bool IsInstanceExtensionSupported(const CrString& extension);
+	bool IsVkInstanceExtensionSupported(const CrString& extension);
 
+	// TODO Make platform-independent
 	bool IsDepthStencilFormatSupported(VkFormat depthFormat);
 
 	void RecreateSwapchain(); // TODO This should be PS

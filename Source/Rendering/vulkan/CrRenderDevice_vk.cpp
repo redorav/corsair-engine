@@ -136,7 +136,7 @@ void CrRenderDeviceVulkan::InitPS
 
 	result = vkQueueWaitIdle(static_cast<CrCommandQueueVulkan*>(m_mainCommandQueue.get())->m_vkQueue); // TODO Make function and remove weird casts
 
-	if (IsDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
 		vkDebugMarkerSetObjectTag	= (PFN_vkDebugMarkerSetObjectTagEXT)	vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
 		vkDebugMarkerSetObjectName	= (PFN_vkDebugMarkerSetObjectNameEXT)	vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
@@ -285,38 +285,38 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	}
 
 	CrVector<const char*> enabledExtensions;
-	if (IsInstanceExtensionSupported(VK_KHR_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_KHR_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 	}
 
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-	if (IsInstanceExtensionSupported(VK_KHR_WIN32_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_KHR_WIN32_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 	}
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	if (IsInstanceExtensionSupported(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 	}
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
-	if (IsInstanceExtensionSupported(VK_KHR_XCB_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_KHR_XCB_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 	}
 #elif defined(VK_USE_PLATFORM_VI_NN)
-	if (IsInstanceExtensionSupported(VK_NN_VI_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_NN_VI_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_NN_VI_SURFACE_EXTENSION_NAME);
 	}
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
-	if (IsInstanceExtensionSupported(VK_MVK_MACOS_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_MVK_MACOS_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
 	}
 #elif defined(VK_USE_PLATFORM_IOS_MVK)
-	if (IsInstanceExtensionSupported(VK_MVK_IOS_SURFACE_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_MVK_IOS_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_MVK_IOS_SURFACE_EXTENSION_NAME);
 	}
@@ -331,7 +331,7 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 
-	if (enableValidationLayer && IsInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+	if (enableValidationLayer && IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 	}
@@ -519,17 +519,17 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice(bool enableValidation)
 {
 	CrVector<const char*> enabledDeviceExtensions;
 
-	if (IsDeviceExtensionSupported(VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+	if (IsVkDeviceExtensionSupported(VK_KHR_SWAPCHAIN_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
-	if (enableValidation && IsDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	if (enableValidation && IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 	}
 
-	if (IsDeviceExtensionSupported(VK_KHR_MAINTENANCE1_EXTENSION_NAME))
+	if (IsVkDeviceExtensionSupported(VK_KHR_MAINTENANCE1_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
 	}
@@ -617,12 +617,12 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	vkDeviceWaitIdle(m_vkDevice);
 }
 
-bool CrRenderDeviceVulkan::IsInstanceExtensionSupported(const CrString& extension)
+bool CrRenderDeviceVulkan::IsVkInstanceExtensionSupported(const CrString& extension)
 {
 	return m_supportedInstanceExtensions.count(extension) > 0;
 }
 
-bool CrRenderDeviceVulkan::IsDeviceExtensionSupported(const CrString& extension)
+bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)
 {
 	return m_supportedDeviceExtensions.count(extension) > 0;
 }

@@ -13,6 +13,8 @@ public:
 
 	~CrRenderPassVulkan();
 
+	VkRenderPass GetVkRenderPass() const;
+
 private:
 
 	static VkAttachmentDescription GetVkAttachmentDescription(const CrAttachmentDescriptor& attachmentDescriptor);
@@ -23,7 +25,10 @@ private:
 
 	VkDevice m_vkDevice;
 
-public: // TODO Delete this
-
 	VkRenderPass m_vkRenderPass;
 };
+
+inline VkRenderPass CrRenderPassVulkan::GetVkRenderPass() const
+{
+	return m_vkRenderPass;
+}

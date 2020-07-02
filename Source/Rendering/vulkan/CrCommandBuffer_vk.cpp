@@ -186,7 +186,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const ICrRenderPass* renderPass, c
 	VkRenderPassBeginInfo renderPassBeginInfo;
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = static_cast<const CrRenderPassVulkan*>(renderPass)->m_vkRenderPass;
+	renderPassBeginInfo.renderPass = static_cast<const CrRenderPassVulkan*>(renderPass)->GetVkRenderPass();
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
 	renderPassBeginInfo.renderArea.extent.width = renderPassParams.drawArea.width;

@@ -147,8 +147,6 @@ private:
 	CrSet<VkFormat> m_supportedDepthStencilFormats;
 	CrSet<VkFormat> m_supportedVertexBufferFormats;
 
-	CrTextureSharedHandle m_depthStencilTexture;
-
 	// Command buffers
 	ICrCommandBuffer* m_setupCmdBuffer; // Command buffer used for setting up different resources
 	CrVector<ICrCommandBuffer*> m_drawCmdBuffers; // Command buffers used for rendering

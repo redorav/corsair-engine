@@ -218,7 +218,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS(
 	// MASSIVE HACK TO GET CODE GOING
 	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout;
 	pipelineInfo.pVertexInputState		= &vertexInputState;				// TODO Create this pipeline layout first from the shader/vertex descriptor
-	pipelineInfo.renderPass				= graphicsShader->renderPass;		// TODO Create the render pass first (from a renderpass descriptor)
+	pipelineInfo.renderPass				= graphicsShader->m_vkRenderPass;		// TODO Create the render pass first (from a renderpass descriptor)
 	
 	pipelineInfo.pInputAssemblyState	= &inputAssemblyState;
 	pipelineInfo.pRasterizationState	= &rasterizerState;

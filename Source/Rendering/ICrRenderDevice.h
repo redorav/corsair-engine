@@ -128,6 +128,10 @@ public:
 
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 
+	const CrSwapchainSharedHandle& GetMainSwapchain() const;
+
+	const CrTextureSharedHandle& GetMainDepthBuffer() const;
+
 	static void Create(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi);
 
 protected:
@@ -157,6 +161,8 @@ protected:
 	CrRenderDeviceProperties m_renderDeviceProperties;
 
 	CrSwapchainSharedHandle m_swapChain;
+
+	CrTextureSharedHandle m_depthStencilTexture;
 
 	CrCommandQueueSharedHandle m_mainCommandQueue;
 

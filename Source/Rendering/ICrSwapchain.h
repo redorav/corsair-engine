@@ -31,19 +31,19 @@ public:
 
 	virtual ~ICrSwapchain() {}
 
-	cr3d::DataFormat::T GetFormat();
+	cr3d::DataFormat::T GetFormat() const;
 
-	cr3d::SampleCount GetSampleCount();
+	cr3d::SampleCount GetSampleCount() const;
 
-	uint32_t GetWidth();
+	uint32_t GetWidth() const;
 
-	uint32_t GetHeight();
+	uint32_t GetHeight() const;
 
-	uint32_t GetImageCount();
+	uint32_t GetImageCount() const;
 
-	uint32_t GetCurrentFrameIndex();
+	uint32_t GetCurrentFrameIndex() const;
 
-	const CrGPUFenceSharedHandle& GetCurrentWaitFence();
+	const CrGPUFenceSharedHandle& GetCurrentWaitFence() const;
 
 	CrSwapchainResult AcquireNextImage(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX);
 

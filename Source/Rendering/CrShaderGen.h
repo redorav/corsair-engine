@@ -159,7 +159,7 @@ public:
 	~CrGraphicsShader() {}
 
 	// TODO HACK to get stuff going delete soon
-	VkRenderPass renderPass;
+	VkRenderPass m_vkRenderPass;
 };
 
 class CrComputeShader : public CrShader

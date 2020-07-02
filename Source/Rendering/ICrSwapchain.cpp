@@ -29,37 +29,37 @@ void ICrSwapchain::Create(ICrRenderDevice* renderDevice, uint32_t requestedWidth
 	}
 }
 
-cr3d::DataFormat::T ICrSwapchain::GetFormat()
+cr3d::DataFormat::T ICrSwapchain::GetFormat() const
 {
 	return m_format;
 }
 
-cr3d::SampleCount ICrSwapchain::GetSampleCount()
+cr3d::SampleCount ICrSwapchain::GetSampleCount() const
 {
 	return m_sampleCount;
 }
 
-uint32_t ICrSwapchain::GetWidth()
+uint32_t ICrSwapchain::GetWidth() const
 {
 	return m_width;
 }
 
-uint32_t ICrSwapchain::GetHeight()
+uint32_t ICrSwapchain::GetHeight() const
 {
 	return m_height;
 }
 
-uint32_t ICrSwapchain::GetImageCount()
+uint32_t ICrSwapchain::GetImageCount() const
 {
 	return (uint32_t)m_textures.size();
 }
 
-uint32_t ICrSwapchain::GetCurrentFrameIndex()
+uint32_t ICrSwapchain::GetCurrentFrameIndex() const
 {
 	return m_currentBufferIndex;
 }
 
-const CrGPUFenceSharedHandle& ICrSwapchain::GetCurrentWaitFence()
+const CrGPUFenceSharedHandle& ICrSwapchain::GetCurrentWaitFence() const
 {
 	return m_waitFences[m_currentBufferIndex];
 }

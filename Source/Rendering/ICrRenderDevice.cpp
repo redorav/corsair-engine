@@ -109,6 +109,16 @@ CrRenderDeviceVulkan* ICrRenderDevice::GetRenderDevicePS() // TODO Remove
 	return static_cast<CrRenderDeviceVulkan*>(g_renderDevice);
 }
 
+const CrSwapchainSharedHandle& ICrRenderDevice::GetMainSwapchain() const
+{
+	return m_swapChain;
+}
+
+const CrTextureSharedHandle& ICrRenderDevice::GetMainDepthBuffer() const
+{
+	return m_depthStencilTexture;
+}
+
 void ICrRenderDevice::Create(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi)
 {
 	g_renderDevice = new CrRenderDeviceVulkan();

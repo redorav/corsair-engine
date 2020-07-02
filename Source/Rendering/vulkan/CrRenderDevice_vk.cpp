@@ -38,8 +38,8 @@ PFN_vkCmdDebugMarkerEndEXT			vkCmdDebugMarkerEnd = nullptr;
 PFN_vkCmdDebugMarkerInsertEXT		vkCmdDebugMarkerInsert = nullptr;
 
 // HACK Delete these
-CrGraphicsShaderCreate g_shaderCreateInfo;
-CrSamplerSharedHandle g_samplerHandle;
+static CrGraphicsShaderCreate g_shaderCreateInfo;
+static CrSamplerSharedHandle g_samplerHandle;
 
 // TODO Delete these
 CrCamera camera;
@@ -883,7 +883,7 @@ void CrRenderDeviceVulkan::preparePipelines()
 	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(g_shaderCreateInfo);
 	CrGraphicsPipelineDescriptor psoDescriptor;
 	psoDescriptor.Hash();
-	graphicsShader->renderPass			= static_cast<const CrRenderPassVulkan*>(m_renderPass.get())->m_vkRenderPass; // TODO Super hack
+	graphicsShader->m_vkRenderPass			= static_cast<const CrRenderPassVulkan*>(m_renderPass.get())->GetVkRenderPass(); // TODO Super hack
 
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline

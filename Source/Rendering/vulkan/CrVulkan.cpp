@@ -31,7 +31,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::BGRA8_Unorm:       return VK_FORMAT_B8G8R8A8_UNORM;
 		case cr3d::DataFormat::BGRA8_SRGB:        return VK_FORMAT_B8G8R8A8_SRGB;
 
-			// 16-bit integer formats
+		// 16-bit integer formats
 		case cr3d::DataFormat::R16_Unorm:         return VK_FORMAT_R16_UNORM;
 		case cr3d::DataFormat::R16_Snorm:         return VK_FORMAT_R16_SNORM;
 		case cr3d::DataFormat::R16_Uint:          return VK_FORMAT_R16_UINT;
@@ -47,7 +47,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::RGBA16_Uint:       return VK_FORMAT_R16G16B16A16_UINT;
 		case cr3d::DataFormat::RGBA16_Sint:       return VK_FORMAT_R16G16B16A16_SINT;
 
-			// 16-bit float formats
+		// 16-bit float formats
 		case cr3d::DataFormat::R16_Float:         return VK_FORMAT_R16_SFLOAT;
 		case cr3d::DataFormat::RG16_Float:        return VK_FORMAT_R16G16_SFLOAT;
 		case cr3d::DataFormat::RGBA16_Float:      return VK_FORMAT_R16G16B16A16_SFLOAT;
@@ -61,13 +61,13 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::RGBA32_Uint:       return VK_FORMAT_R32G32B32A32_UINT;
 		case cr3d::DataFormat::RGBA32_Sint:       return VK_FORMAT_R32G32B32A32_SINT;
 
-			// 32-bit float formats
+		// 32-bit float formats
 		case cr3d::DataFormat::R32_Float:         return VK_FORMAT_R32_SFLOAT;
 		case cr3d::DataFormat::RG32_Float:        return VK_FORMAT_R32G32_SFLOAT;
 		case cr3d::DataFormat::RGB32_Float:       return VK_FORMAT_R32G32B32_SFLOAT;
 		case cr3d::DataFormat::RGBA32_Float:      return VK_FORMAT_R32G32B32A32_SFLOAT;
 
-			// Compressed formats
+		// Compressed formats
 		case cr3d::DataFormat::BC1_RGB_Unorm:     return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
 		case cr3d::DataFormat::BC1_RGB_SRGB:      return VK_FORMAT_BC1_RGB_SRGB_BLOCK;
 		case cr3d::DataFormat::BC1_RGBA_Unorm:    return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
@@ -105,7 +105,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::EAC_R11G11_Unorm:  return VK_FORMAT_EAC_R11G11_UNORM_BLOCK;
 		case cr3d::DataFormat::EAC_R11G11_Snorm:  return VK_FORMAT_EAC_R11G11_SNORM_BLOCK;
 
-			// ASTC
+		// ASTC
 		case cr3d::DataFormat::ASTC_4x4_Unorm:    return VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
 		case cr3d::DataFormat::ASTC_4x4_SRGB:     return VK_FORMAT_ASTC_4x4_SRGB_BLOCK;
 		case cr3d::DataFormat::ASTC_5x4_Unorm:    return VK_FORMAT_ASTC_5x4_UNORM_BLOCK;
@@ -135,7 +135,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::ASTC_12x12_Unorm:  return VK_FORMAT_ASTC_12x12_UNORM_BLOCK;
 		case cr3d::DataFormat::ASTC_12x12_SRGB:   return VK_FORMAT_ASTC_12x12_SRGB_BLOCK;
 
-			// PVRTC
+		// PVRTC
 		case cr3d::DataFormat::PVRTC1_2BPP_Unorm: return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
 		case cr3d::DataFormat::PVRTC1_2BPP_SRGB:  return VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG;
 		case cr3d::DataFormat::PVRTC1_4BPP_Unorm: return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
@@ -145,13 +145,22 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::PVRTC2_4BPP_Unorm: return VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG;
 		case cr3d::DataFormat::PVRTC2_4BPP_SRGB:  return VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG;
 
-			// Depth-stencil formats
+		// Depth-stencil formats
 		case cr3d::DataFormat::D16_Unorm:         return VK_FORMAT_D16_UNORM;
 		case cr3d::DataFormat::D16_Unorm_S8_Uint: return VK_FORMAT_D16_UNORM_S8_UINT;
 		case cr3d::DataFormat::D24_Unorm_S8_Uint: return VK_FORMAT_D24_UNORM_S8_UINT;
 		case cr3d::DataFormat::D24_Unorm_X8:      return VK_FORMAT_X8_D24_UNORM_PACK32;
 		case cr3d::DataFormat::D32_Float:         return VK_FORMAT_D32_SFLOAT;
 		case cr3d::DataFormat::D32_Float_S8_Uint: return VK_FORMAT_D32_SFLOAT_S8_UINT;
+
+		// Packed Formats
+		case cr3d::DataFormat::RG11B10_Float:  return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+		case cr3d::DataFormat::RGB10A2_Unorm:  return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+		case cr3d::DataFormat::RGB10A2_Uint:   return VK_FORMAT_A2B10G10R10_UINT_PACK32;
+		case cr3d::DataFormat::B5G6R5_Unorm:   return VK_FORMAT_B5G6R5_UNORM_PACK16;
+		case cr3d::DataFormat::B5G5R5A1_Unorm: return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
+		case cr3d::DataFormat::BGRA4_Unorm:    return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
+		case cr3d::DataFormat::RGB9E5_Float:   return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
 
 		default:
 			CrAssertMsg(false, "Format not found!");

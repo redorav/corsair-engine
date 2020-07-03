@@ -23,7 +23,7 @@ private:
 
 	VkDevice			m_vkDevice;
 
-	VkSwapchainKHR		m_vkSwapChain;
+	VkSwapchainKHR		m_vkSwapchain;
 
 	VkFormat			m_vkFormat;
 

@@ -9,7 +9,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) : m_vkSwapChain(nullptr)
+CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) : m_vkSwapchain(nullptr)
 {
 	renderDevice; requestedHeight; requestedWidth;
 	//CreatePS(renderDevice, requestedWidth, requestedHeight);
@@ -17,12 +17,12 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t req
 
 CrSwapchainVulkan::~CrSwapchainVulkan()
 {
-	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapChain, nullptr);
+	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
 }
 
 VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain()
 {
-	return m_vkSwapChain;
+	return m_vkSwapchain;
 }
 
 void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight)
@@ -64,7 +64,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 		}
 	}
 
-	VkSwapchainKHR oldSwapchain = m_vkSwapChain;
+	VkSwapchainKHR oldSwapchain = m_vkSwapchain;
 
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfCaps;
@@ -160,7 +160,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 	swapchainInfo.clipped					= true;
 	swapchainInfo.compositeAlpha			= VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
-	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapChain);
+	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
 
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
 	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
@@ -169,10 +169,10 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 		vkDestroySwapchainKHR(m_vkDevice, oldSwapchain, nullptr);
 	}
 
-	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapChain, &m_imageCount, nullptr);
+	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 
 	CrVector<VkImage> images(m_imageCount);
-	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapChain, &m_imageCount, images.data());
+	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
@@ -187,7 +187,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
 {
-	VkResult res = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapChain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
+	VkResult res = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
 
 	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
 	{
@@ -203,7 +203,7 @@ void CrSwapchainVulkan::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore*
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.pNext = nullptr;
 	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &m_vkSwapChain;
+	presentInfo.pSwapchains = &m_vkSwapchain;
 	presentInfo.pImageIndices = &m_currentBufferIndex;
 
 	if (waitSemaphore)

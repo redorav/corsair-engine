@@ -162,6 +162,8 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 
 	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
 
+	CrAssertMsg(result == VK_SUCCESS, "Swapchain creation failed");
+
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
 	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
 	if (oldSwapchain != nullptr)

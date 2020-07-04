@@ -915,9 +915,9 @@ void CrRenderDeviceVulkan::QueryDeviceProperties()
 	// when determining availability and features.
 
 	VkFormatProperties formatProperties;
-	for (uint32_t i = VK_FORMAT_BEGIN_RANGE; i < VK_FORMAT_END_RANGE; ++i)
+	for(uint32_t dataFormat = 0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
 	{
-		VkFormat format = (VkFormat)i;
+		VkFormat format = crvk::GetVkFormat((cr3d::DataFormat::T)dataFormat);
 		vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, (VkFormat)format, &formatProperties);
 
 		// Format must support depth stencil attachment for optimal tiling

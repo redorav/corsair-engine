@@ -152,14 +152,26 @@ void CrRenderDeviceVulkan::InitPS
 	preparePipelines();
 }
 
-void CrRenderDeviceVulkan::WaitForFencePS(const CrGPUFenceVulkan* fence, uint64_t timeoutNanoseconds)
+cr3d::GPUWaitResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
-	vkWaitForFences(m_vkDevice, 1, &fence->GetVkFence(), true, timeoutNanoseconds);
+	VkResult result = vkWaitForFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence(), true, timeoutNanoseconds);
+
+	switch (result)
+	{
+		case VK_SUCCESS: return cr3d::GPUWaitResult::Success;
+		case VK_TIMEOUT: return cr3d::GPUWaitResult::Timeout;
+		default: return cr3d::GPUWaitResult::Error;
+	}
 }
 
-void CrRenderDeviceVulkan::ResetFencePS(const CrGPUFenceVulkan* fence)
+void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
 {
-	vkResetFences(m_vkDevice, 1, &fence->GetVkFence());
+	vkResetFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+}
+
+void CrRenderDeviceVulkan::WaitIdlePS()
+{
+	vkDeviceWaitIdle(m_vkDevice);
 }
 
 void CrRenderDeviceVulkan::PresentPS()
@@ -444,6 +456,11 @@ ICrFramebuffer* CrRenderDeviceVulkan::CreateFramebufferPS(const CrFramebufferCre
 ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()
 {
 	return new CrGPUFenceVulkan(this);
+}
+
+ICrGPUSemaphore* CrRenderDeviceVulkan::CreateGPUSemaphorePS()
+{
+	return new CrGPUSemaphoreVulkan(this);
 }
 
 ICrRenderPass* CrRenderDeviceVulkan::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)

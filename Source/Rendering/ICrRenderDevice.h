@@ -33,11 +33,14 @@ using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
 class CrVertexBufferCommon;
 using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
 
+class ICrSwapchain;
+using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
+
 class ICrGPUFence;
 using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;
 
-class ICrSwapchain;
-using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
+class ICrGPUSemaphore;
+using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 
 class ICrGPUStackAllocator;
 
@@ -94,8 +97,6 @@ public:
 
 	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferCreateParams& params);
 
-	CrGPUFenceSharedHandle CreateGPUFence();
-
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
 	CrRenderPassSharedHandle CreateRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
@@ -115,8 +116,18 @@ public:
 
 	CrUniquePtr<ICrGPUStackAllocator> CreateGPUMemoryStream();
 
-	// TODO Create GPU Semaphore and GPU fence from here. We can call them whatever we like, at the end of the day they are GPU-GPU and GPU-CPU
-	// synchronization primitives
+	CrGPUFenceSharedHandle CreateGPUFence();
+
+	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();
+
+	// GPU Synchronization functions
+
+	cr3d::GPUWaitResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
+
+	void ResetFence(ICrGPUFence* fence);
+
+	// Wait until all operations on all queues have completed
+	void WaitIdle();
 
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) = 0;
 
@@ -140,8 +151,6 @@ protected:
 
 	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) = 0;
 
-	virtual ICrGPUFence* CreateGPUFencePS() = 0;
-
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
@@ -152,11 +161,22 @@ protected:
 
 	virtual ICrGPUStackAllocator* CreateGPUMemoryStreamPS() = 0;
 
+	virtual ICrGPUFence* CreateGPUFencePS() = 0;
+
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
+
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params) = 0;
 
 	virtual void InitPS(void* platformHandle, void* platformWindow) = 0;
 
+	// TODO Remove this
 	virtual void PresentPS() = 0;
+
+	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
+
+	virtual void WaitIdlePS() = 0;
+
+	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 

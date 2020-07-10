@@ -826,7 +826,7 @@ namespace cr3d
 		};
 	}
 
-	enum class GPUFenceWaitResult : uint32_t
+	enum class GPUWaitResult : uint32_t
 	{
 		Success, // If this wait completed before the timeout
 		Timeout, // If this wait did not complete before the timeout

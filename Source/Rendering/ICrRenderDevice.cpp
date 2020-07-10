@@ -47,11 +47,6 @@ CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebuffer
 	return CrFramebufferSharedHandle(CreateFramebufferPS(params));
 }
 
-CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
-{
-	return CrGPUFenceSharedHandle(CreateGPUFencePS());
-}
-
 CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
 	return CrIndexBufferSharedHandle(new CrIndexBuffer(this, dataFormat, numIndices));
@@ -92,6 +87,31 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBuffer
 CrUniquePtr<ICrGPUStackAllocator> ICrRenderDevice::CreateGPUMemoryStream()
 {
 	return CrUniquePtr<ICrGPUStackAllocator>(CreateGPUMemoryStreamPS());
+}
+
+CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
+{
+	return CrGPUFenceSharedHandle(CreateGPUFencePS());
+}
+
+CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
+{
+	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS());
+}
+
+cr3d::GPUWaitResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+{
+	return WaitForFencePS(fence, timeoutNanoseconds);
+}
+
+void ICrRenderDevice::ResetFence(ICrGPUFence* fence)
+{
+	ResetFencePS(fence);
+}
+
+void ICrRenderDevice::WaitIdle()
+{
+	WaitIdlePS();
 }
 
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties()

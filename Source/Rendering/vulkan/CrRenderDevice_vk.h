@@ -35,11 +35,6 @@ public:
 
 	virtual void PresentPS() final override;
 
-	// TODO Actually make PS by making virtual
-	void WaitForFencePS(const CrGPUFenceVulkan* fence, uint64_t timeoutNanoseconds);
-
-	void ResetFencePS(const CrGPUFenceVulkan* fence);
-
 	const VkDevice GetVkDevice() const { return m_vkDevice; }
 
 	const VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
@@ -61,8 +56,6 @@ private:
 
 	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) final override;
 	
-	virtual ICrGPUFence* CreateGPUFencePS() final override;
-
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) final override;
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) final override;
@@ -74,6 +67,16 @@ private:
 	virtual ICrGPUStackAllocator* CreateGPUMemoryStreamPS() final override;
 
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params) final override;
+
+	virtual ICrGPUFence* CreateGPUFencePS() final override;
+
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() final override;
+
+	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) final override;
+
+	virtual void ResetFencePS(const ICrGPUFence* fence) final override;
+
+	virtual void WaitIdlePS() final override;
 
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) final override;
 

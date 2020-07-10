@@ -97,7 +97,7 @@ void CrRenderDeviceVulkan::InitPS
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
 	// 7. Create the swapchain
-	m_swapChain = CreateSwapchain(m_width, m_height);
+	m_swapchain = CreateSwapchain(m_width, m_height);
 
 	// Create one command buffer for submitting the post present image memory barrier
 	m_setupCmdBuffer = m_mainCommandQueue->CreateCommandBuffer();
@@ -105,8 +105,8 @@ void CrRenderDeviceVulkan::InitPS
 	m_setupCmdBuffer->Begin();
 	{
 		CrTextureCreateParams depthTexParams;
-		depthTexParams.width = m_swapChain->GetWidth();
-		depthTexParams.height = m_swapChain->GetHeight();
+		depthTexParams.width = m_swapchain->GetWidth();
+		depthTexParams.height = m_swapchain->GetHeight();
 		depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;
 		depthTexParams.usage = cr3d::TextureUsage::Depth | cr3d::TextureUsage::RenderTarget;
 
@@ -116,8 +116,8 @@ void CrRenderDeviceVulkan::InitPS
 
 	m_setupCmdBuffer->Submit();
 
-	m_drawCmdBuffers.resize(m_swapChain->GetImageCount());
-	for (uint32_t i = 0; i < m_swapChain->GetImageCount(); ++i)
+	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
+	for (uint32_t i = 0; i < m_swapchain->GetImageCount(); ++i)
 	{
 		m_drawCmdBuffers[i] = m_mainCommandQueue->CreateCommandBuffer();
 	}
@@ -164,26 +164,26 @@ void CrRenderDeviceVulkan::ResetFencePS(const CrGPUFenceVulkan* fence)
 
 void CrRenderDeviceVulkan::PresentPS()
 {
-	CrSwapchainResult scResult = m_swapChain->AcquireNextImage(m_presentCompleteSemaphore, UINT64_MAX);
+	CrSwapchainResult scResult = m_swapchain->AcquireNextImage(m_presentCompleteSemaphore, UINT64_MAX);
 
 	if (scResult == CrSwapchainResult::Invalid)
 	{
 		RecreateSwapchain();
-		scResult = m_swapChain->AcquireNextImage(m_presentCompleteSemaphore, UINT64_MAX);
+		scResult = m_swapchain->AcquireNextImage(m_presentCompleteSemaphore, UINT64_MAX);
 	}
 
-	CrGPUFenceVulkan* swapchainFence = static_cast<CrGPUFenceVulkan*>(m_swapChain->GetCurrentWaitFence().get());
+	CrGPUFenceVulkan* swapchainFence = static_cast<CrGPUFenceVulkan*>(m_swapchain->GetCurrentWaitFence().get());
 
 	WaitForFencePS(swapchainFence, UINT64_MAX);
 
 	ResetFencePS(swapchainFence);
 
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapChain->GetCurrentFrameIndex()];
+	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()];
 
 	{
 		drawCommandBuffer->Begin();
-		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapChain->GetWidth(), (float)m_swapChain->GetHeight()));
-		drawCommandBuffer->SetScissor(0, 0, m_swapChain->GetWidth(), m_swapChain->GetHeight());
+		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
+		drawCommandBuffer->SetScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight());
 		
 		CrRenderPassBeginParams renderPassParams;
 		renderPassParams.clear = true;
@@ -192,12 +192,12 @@ void CrRenderDeviceVulkan::PresentPS()
 		renderPassParams.stencilClearValue = 0;
 		renderPassParams.drawArea.x = 0;
 		renderPassParams.drawArea.y = 0;
-		renderPassParams.drawArea.width = m_swapChain->GetWidth();
-		renderPassParams.drawArea.height = m_swapChain->GetHeight();
+		renderPassParams.drawArea.width = m_swapchain->GetWidth();
+		renderPassParams.drawArea.height = m_swapchain->GetHeight();
 
 		drawCommandBuffer->BeginDebugEvent("RenderPass 1", float4(1.0f, 0.0, 1.0f, 1.0f));
 		{
-			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_frameBuffers[m_swapChain->GetCurrentFrameIndex()].get(), renderPassParams);
+			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_frameBuffers[m_swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
 			{
 				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState);
 				
@@ -255,9 +255,9 @@ void CrRenderDeviceVulkan::PresentPS()
 		drawCommandBuffer->End();
 	}
 
-	drawCommandBuffer->Submit(m_presentCompleteSemaphore, m_renderCompleteSemaphore, m_swapChain->GetCurrentWaitFence().get());
+	drawCommandBuffer->Submit(m_presentCompleteSemaphore, m_renderCompleteSemaphore, m_swapchain->GetCurrentWaitFence().get());
 
-	m_swapChain->Present(m_mainCommandQueue.get(), m_renderCompleteSemaphore);
+	m_swapchain->Present(m_mainCommandQueue.get(), m_renderCompleteSemaphore);
 }
 
 VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
@@ -586,15 +586,15 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 
 	// We must destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
 	// that becomes available after (once the pointer assignment happens and the resource is destroyed)
-	m_swapChain = nullptr;
+	m_swapchain = nullptr;
 
-	m_swapChain = CreateSwapchain(m_width, m_height);
+	m_swapchain = CreateSwapchain(m_width, m_height);
 
 	// 2. Recreate depth stencil texture
 
 	CrTextureCreateParams depthTexParams;
-	depthTexParams.width = m_swapChain->GetWidth();
-	depthTexParams.height = m_swapChain->GetHeight();
+	depthTexParams.width = m_swapchain->GetWidth();
+	depthTexParams.height = m_swapchain->GetHeight();
 	depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;
 	depthTexParams.usage = cr3d::TextureUsage::Depth | cr3d::TextureUsage::RenderTarget;
 
@@ -613,8 +613,8 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 
 	m_mainCommandQueue->DestroyCommandBuffer(m_setupCmdBuffer);
 
-	m_drawCmdBuffers.resize(m_swapChain->GetImageCount());
-	for (uint32_t i = 0; i < m_swapChain->GetImageCount(); ++i)
+	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
+	for (uint32_t i = 0; i < m_swapchain->GetImageCount(); ++i)
 	{
 		m_drawCmdBuffers[i] = m_mainCommandQueue->CreateCommandBuffer();
 	}
@@ -648,7 +648,7 @@ bool CrRenderDeviceVulkan::IsDepthStencilFormatSupported(VkFormat depthFormat)
 void CrRenderDeviceVulkan::SetupRenderPass()
 {
 	CrRenderPassDescriptor renderPassDescriptor;
-	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(m_swapChain->GetFormat(), m_swapChain->GetSampleCount(), 
+	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(m_swapchain->GetFormat(), m_swapchain->GetSampleCount(), 
 																		CrAttachmentLoadOp::Clear, CrAttachmentStoreOp::Store,
 																		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare, 
 																		cr3d::ResourceState::Undefined, cr3d::ResourceState::Present);
@@ -663,11 +663,11 @@ void CrRenderDeviceVulkan::SetupRenderPass()
 
 void CrRenderDeviceVulkan::SetupSwapchainFramebuffer()
 {
-	m_frameBuffers.resize(m_swapChain->GetImageCount());
+	m_frameBuffers.resize(m_swapchain->GetImageCount());
 
 	for (uint32_t i = 0; i < m_frameBuffers.size(); i++)
 	{
-		CrFramebufferCreateParams frameBufferParams(m_swapChain->GetTexture(i).get(), m_depthStencilTexture.get());
+		CrFramebufferCreateParams frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
 		m_frameBuffers[i] = CreateFramebuffer(frameBufferParams);
 	}
 }
@@ -789,7 +789,7 @@ void CrRenderDeviceVulkan::prepareVertices()
 
 void CrRenderDeviceVulkan::updateCamera()
 {
-	camera.SetupPerspective((float)m_swapChain->GetWidth(), (float)m_swapChain->GetHeight(), 1.0f, 1000.0f);
+	camera.SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
 
 	float3 currentLookAt = camera.m_lookAt;
 	float3 currentRight = camera.m_right;

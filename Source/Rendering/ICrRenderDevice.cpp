@@ -111,7 +111,7 @@ CrRenderDeviceVulkan* ICrRenderDevice::GetRenderDevicePS() // TODO Remove
 
 const CrSwapchainSharedHandle& ICrRenderDevice::GetMainSwapchain() const
 {
-	return m_swapChain;
+	return m_swapchain;
 }
 
 const CrTextureSharedHandle& ICrRenderDevice::GetMainDepthBuffer() const

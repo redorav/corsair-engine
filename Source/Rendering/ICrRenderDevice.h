@@ -160,7 +160,7 @@ protected:
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 
-	CrSwapchainSharedHandle m_swapChain;
+	CrSwapchainSharedHandle m_swapchain;
 
 	CrTextureSharedHandle m_depthStencilTexture;
 

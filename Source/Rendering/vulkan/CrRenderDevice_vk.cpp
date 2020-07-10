@@ -83,22 +83,19 @@ void CrRenderDeviceVulkan::InitPS
 	// 2. Create the physical devices (can be multi-GPU)
 	CreatePhysicalDevice();
 
-	// 3. Create the rendering surface
-	CreateSurface(platformHandle, platformWindow);
-
-	// 4. Query queue families
+	// 3. Query queue families
 	RetrieveQueueFamilies();
 	
-	// 5. Create logical device. Connects the physical device to a vkDevice.
+	// 4. Create logical device. Connects the physical device to a vkDevice.
 	// Also specifies desired queues.
 	CreateLogicalDevice(enableValidationLayer);
 
-	// 6. Create main command queue. This will take care of the main command buffers and present
+	// 5. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
-	// 7. Create the swapchain
+	// 6. Create the swapchain
 	CrSwapchainDescriptor swapchainDescriptor = {};
-	swapchainDescriptor.plaftormWindow = m_platformWindow;
+	swapchainDescriptor.platformWindow = m_platformWindow;
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
@@ -143,9 +140,6 @@ void CrRenderDeviceVulkan::InitPS
 		vkCmdDebugMarkerEnd			= (PFN_vkCmdDebugMarkerEndEXT)			vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
 		vkCmdDebugMarkerInsert		= (PFN_vkCmdDebugMarkerInsertEXT)		vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
 	}
-
-	//vkFreeCommandBuffers(m_device, m_cmdPool, 1, &m_setupCmdBufferCr->m_commandBuffer);
-	//m_setupCmdBufferCr->m_commandBuffer = nullptr; // todo : check if still necessary
 
 	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 	m_renderCompleteSemaphore = new CrGPUSemaphoreVulkan(this);
@@ -376,60 +370,6 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	CrAssertMsg(res == VK_SUCCESS, "Error creating vkInstance");
 
 	return res;
-}
-
-VkResult CrRenderDeviceVulkan::CreateSurface(void* platformHandle, void* platformWindow)
-{
-	VkResult result;
-	// Create a surface for the supplied window handle
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.hinstance = (HINSTANCE)platformHandle;
-	surfaceCreateInfo.hwnd = (HWND)platformWindow;
-	result = vkCreateWin32SurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.window = (ANativeWindow*)platformWindow;
-	result = vkCreateAndroidSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(VK_USE_PLATFORM_XCB_KHR)
-	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.connection = connection;
-	surfaceCreateInfo.window = *(xcb_window_t*)platformWindow;
-	surfaceCreateInfo.connection = (xcb_connection_t*)platformHandle;
-	result = vkCreateXcbSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
-	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
-	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)platformWindow;
-	result = vkCreateViSurfaceNN(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(VK_USE_PLATFORM_MACOS_MVK)
-	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
-	surfaceCreateInfo.pView = platformWindow;
-	result = vkCreateMacOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(VK_USE_PLATFORM_IOS_MVK)
-	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
-	surfaceCreateInfo.pView = platformWindow;
-	result = vkCreateIOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#endif
-
-	uint32_t queueFamilyCount;
-	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
-
-	// We make an assumption here that Graphics queues can always present. The reason is that
-	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
-	// Vulkaninfo.org seems to validate this assumption, but the validation layers will complain if we don't call this.
-	CrVector<VkBool32> supportsPresent(queueFamilyCount);
-	for (uint32_t i = 0; i < queueFamilyCount; i++)
-	{
-		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
-	}
-
-	return result;
 }
 
 VkResult CrRenderDeviceVulkan::CreatePhysicalDevice()
@@ -687,7 +627,7 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	m_swapchain = nullptr;
 
 	CrSwapchainDescriptor swapchainDescriptor = {};
-	swapchainDescriptor.plaftormWindow = m_platformWindow;
+	swapchainDescriptor.platformWindow = m_platformWindow;
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;

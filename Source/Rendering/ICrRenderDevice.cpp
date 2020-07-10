@@ -64,7 +64,7 @@ CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& 
 
 CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CrAssertMsg(swapchainDescriptor.plaftormWindow, "Cannot be null");
+	CrAssertMsg(swapchainDescriptor.platformWindow, "Cannot be null");
 	CrAssertMsg(swapchainDescriptor.platformHandle, "Cannot be null");
 
 	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));

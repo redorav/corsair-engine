@@ -35,6 +35,9 @@ public:
 
 	virtual void PresentPS() final override;
 
+	// TODO Move to the RenderSystem singleton
+	const VkInstance GetVkInstance() const { return m_vkInstance; }
+
 	const VkDevice GetVkDevice() const { return m_vkDevice; }
 
 	const VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
@@ -83,8 +86,6 @@ private:
 	void RetrieveQueueFamilies();
 
 	VkResult CreateInstance(bool enableValidationLayer);
-
-	VkResult CreateSurface(void* platformHandle, void* platformWindow);
 
 	VkResult CreatePhysicalDevice();
 

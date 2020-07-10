@@ -9,7 +9,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : m_vkSwapchain(nullptr)
+CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 {
 	renderDevice; swapchainDescriptor;
 	//CreatePS(renderDevice, requestedWidth, requestedHeight);
@@ -18,6 +18,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 CrSwapchainVulkan::~CrSwapchainVulkan()
 {
 	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
+
+	vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
 }
 
 VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain()
@@ -29,20 +31,70 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
+	m_vkInstance = vulkanDevice->GetVkInstance();
 	m_vkDevice = vulkanDevice->GetVkDevice();
-	const VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
-	const VkSurfaceKHR vkSurface = vulkanDevice->GetVkSurface();
-	
+	m_vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
+
 	VkResult result;
+
+	// Create a surface for the supplied window handle
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.platformHandle;
+	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.platformWindow;
+	result = vkCreateWin32SurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
+	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.platformWindow;
+	result = vkCreateAndroidSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#elif defined(VK_USE_PLATFORM_XCB_KHR)
+	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.connection = connection;
+	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.platformHandle;
+	result = vkCreateXcbSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
+	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
+	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.platformWindow;
+	result = vkCreateViSurfaceNN(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#elif defined(VK_USE_PLATFORM_MACOS_MVK)
+	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
+	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
+	result = vkCreateMacOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#elif defined(VK_USE_PLATFORM_IOS_MVK)
+	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
+	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
+	result = vkCreateIOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+#endif
+
+	CrAssertMsg(result == VK_SUCCESS, "Surface creation failed");
+
+	uint32_t queueFamilyCount;
+	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
+
+	// We make an assumption here that Graphics queues can always present. The reason is that
+	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
+	// Vulkaninfo.org seems to validate this assumption, but the validation layers will complain if we don't call this.
+	CrVector<VkBool32> supportsPresent(queueFamilyCount);
+	for (uint32_t i = 0; i < queueFamilyCount; i++)
+	{
+		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
+	}
 	
 	m_format = cr3d::DataFormat::BGRA8_Unorm;
 	
 	// Get list of supported color formats and spaces for the surface (backbuffer)
 	{
 		uint32_t formatCount;
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, nullptr);
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, surfaceFormats.data());
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
 	
 		// If the format list includes just one entry of VK_FORMAT_UNDEFINED, the surface has no preferred format
 		if (formatCount == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED)
@@ -52,7 +104,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		}
 		else // Otherwise, at least one supported format will be returned
 		{
-			CrAssertMsg(formatCount >= 1, "Must have at least one preferred color space!");
+			CrAssertMsg(formatCount >= 1, "Must have at least one preferred color space");
 			// TODO select preferred format by looping and finding it
 			m_vkFormat = surfaceFormats[0].format;
 			m_vkColorSpace = surfaceFormats[0].colorSpace;
@@ -67,19 +119,20 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 	VkSwapchainKHR oldSwapchain = m_vkSwapchain;
 
 	// Get physical device surface properties and formats
-	VkSurfaceCapabilitiesKHR surfCaps;
-	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, vkSurface, &surfCaps);
+	VkSurfaceCapabilitiesKHR surfaceCapabilities;
+	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
 
 	uint32_t presentModeCount;
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, nullptr);
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
 
 	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, presentModes.data());
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
 
 	VkExtent2D swapchainExtent;
 
-	// Width and height are either both -1, or both not -1.
-	if (surfCaps.currentExtent.width == -1)
+	// currentExtent is the current width and height of the surface, or the special value (0xFFFFFFFF, 0xFFFFFFFF) 
+	// indicating that the surface size will be determined by the extent of a swapchain targeting the surface.
+	if (surfaceCapabilities.currentExtent.width == 0xffffffff)
 	{
 		// If the surface size is undefined, the size is set to the size of the images requested.
 		m_width = swapchainExtent.width = swapchainDescriptor.requestedWidth;
@@ -88,9 +141,9 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 	else
 	{
 		// If the surface size is defined, the swap chain size must match
-		swapchainExtent = surfCaps.currentExtent;
-		m_width = surfCaps.currentExtent.width;
-		m_height = surfCaps.currentExtent.height;
+		swapchainExtent = surfaceCapabilities.currentExtent;
+		m_width = surfaceCapabilities.currentExtent.width;
+		m_height = surfaceCapabilities.currentExtent.height;
 	}
 
 	VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_MAX_ENUM_KHR;
@@ -124,27 +177,27 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 	}
 
 	// Determine the number of images
-	uint32_t desiredNumberOfSwapchainImages = surfCaps.minImageCount + 1;
-	if (surfCaps.maxImageCount > 0)
+	uint32_t desiredNumberOfSwapchainImages = surfaceCapabilities.minImageCount + 1;
+	if (surfaceCapabilities.maxImageCount > 0)
 	{
-		desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfCaps.maxImageCount);
+		desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfaceCapabilities.maxImageCount);
 	}
 
 	VkSurfaceTransformFlagsKHR preTransform;
-	if (surfCaps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
+	if (surfaceCapabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
 	{
 		preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	}
 	else
 	{
-		preTransform = surfCaps.currentTransform;
+		preTransform = surfaceCapabilities.currentTransform;
 	}
 
 	VkSwapchainCreateInfoKHR swapchainInfo;
 	swapchainInfo.sType						= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapchainInfo.pNext						= nullptr;
 	swapchainInfo.flags						= 0;
-	swapchainInfo.surface					= vkSurface;
+	swapchainInfo.surface					= m_vkSurface;
 	swapchainInfo.minImageCount				= desiredNumberOfSwapchainImages;
 	swapchainInfo.imageFormat				= m_vkFormat;
 	swapchainInfo.imageColorSpace			= m_vkColorSpace;

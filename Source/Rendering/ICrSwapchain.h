@@ -25,7 +25,7 @@ enum class CrSwapchainResult : uint32_t
 
 struct CrSwapchainDescriptor
 {
-	void* plaftormWindow;
+	void* platformWindow;
 	void* platformHandle;
 	uint32_t requestedWidth;
 	uint32_t requestedHeight;

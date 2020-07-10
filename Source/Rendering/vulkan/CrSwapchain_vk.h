@@ -21,11 +21,17 @@ public:
 
 private:
 
-	VkDevice			m_vkDevice;
+	VkInstance			m_vkInstance = nullptr;
 
-	VkSwapchainKHR		m_vkSwapchain;
+	VkDevice			m_vkDevice = nullptr;
 
-	VkFormat			m_vkFormat;
+	VkPhysicalDevice	m_vkPhysicalDevice = nullptr;
 
-	VkColorSpaceKHR		m_vkColorSpace;
+	VkSurfaceKHR		m_vkSurface = nullptr;
+
+	VkSwapchainKHR		m_vkSwapchain = nullptr;
+
+	VkFormat			m_vkFormat = VK_FORMAT_UNDEFINED;
+
+	VkColorSpaceKHR		m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 };

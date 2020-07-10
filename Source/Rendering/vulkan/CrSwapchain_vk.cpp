@@ -87,7 +87,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
 	}
 	
-	m_format = cr3d::DataFormat::BGRA8_Unorm;
+	m_format = swapchainDescriptor.format;
 	
 	// Get list of supported color formats and spaces for the surface (backbuffer)
 	{

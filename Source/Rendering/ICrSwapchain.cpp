@@ -5,6 +5,16 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+CrSwapchainDescriptor::CrSwapchainDescriptor()
+	: platformWindow(nullptr)
+	, platformHandle(nullptr)
+	, requestedWidth(0)
+	, requestedHeight(0)
+	, format(cr3d::DataFormat::Invalid)
+{
+
+}
+
 ICrSwapchain::ICrSwapchain()
 	: m_format(cr3d::DataFormat::Invalid)
 	, m_sampleCount(cr3d::SampleCount::S1)

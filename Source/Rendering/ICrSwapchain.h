@@ -25,10 +25,13 @@ enum class CrSwapchainResult : uint32_t
 
 struct CrSwapchainDescriptor
 {
+	CrSwapchainDescriptor();
+
 	void* platformWindow;
 	void* platformHandle;
 	uint32_t requestedWidth;
 	uint32_t requestedHeight;
+	cr3d::DataFormat::T format;
 };
 
 class ICrSwapchain

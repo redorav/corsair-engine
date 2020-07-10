@@ -99,6 +99,7 @@ void CrRenderDeviceVulkan::InitPS
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
+	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
 	m_swapchain = CreateSwapchain(swapchainDescriptor);
 
 	// Create one command buffer for submitting the post present image memory barrier
@@ -631,6 +632,7 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
+	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
 	m_swapchain = CreateSwapchain(swapchainDescriptor);
 
 	// 2. Recreate depth stencil texture

@@ -66,6 +66,7 @@ CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescri
 {
 	CrAssertMsg(swapchainDescriptor.platformWindow, "Cannot be null");
 	CrAssertMsg(swapchainDescriptor.platformHandle, "Cannot be null");
+	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
 	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));
 	swapchain->Create(this, swapchainDescriptor);

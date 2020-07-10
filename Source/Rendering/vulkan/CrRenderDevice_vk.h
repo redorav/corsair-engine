@@ -31,9 +31,7 @@ public:
 
 	~CrRenderDeviceVulkan();
 
-	virtual void InitPS(void* platformHandle, void* platformWindow) final override;
-
-	virtual void PresentPS() final override;
+	virtual void InitPS() final override;
 
 	// TODO Move to the RenderSystem singleton
 	const VkInstance GetVkInstance() const { return m_vkInstance; }
@@ -41,8 +39,6 @@ public:
 	const VkDevice GetVkDevice() const { return m_vkDevice; }
 
 	const VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
-
-	const VkSurfaceKHR GetVkSurface() const { return m_vkSurface; }
 
 	uint32_t GetVkMemoryType(uint32_t typeBits, VkFlags properties) const;
 
@@ -102,30 +98,9 @@ private:
 	// TODO Make platform-independent
 	bool IsDepthStencilFormatSupported(VkFormat depthFormat);
 
-	void RecreateSwapchain(); // TODO This should be PS
-
-	// TODO Remove all the functions below after proper implementation
-	void SetupRenderPass();
-	void SetupSwapchainFramebuffer();
-	void prepareVertices();
-	void updateCamera();
-	void preparePipelines();
-
-	struct SimpleVertex
-	{
-		CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
-		CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
-		CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
-		CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
-
-		static CrVertexDescriptor GetVertexDescriptor()
-		{
-			return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
-		}
-	};
-
-	// TODO Move to render system
-	VkInstance m_vkInstance; // Global per-application state https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkInstance
+	// TODO Move to RenderSystem
+	// Global per-application state https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkInstance
+	VkInstance m_vkInstance;
 
 	// https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#devsandqueues
 	VkDevice m_vkDevice;					// Logical device
@@ -133,8 +108,6 @@ private:
 	VkPhysicalDevice m_vkPhysicalDevice;	// Physical device
 	
 	VkPhysicalDeviceFeatures m_vkDeviceSupportedFeatures;
-
-	VkSurfaceKHR m_vkSurface;
 
 	CrVector<const char*> m_instanceLayers;
 
@@ -149,38 +122,11 @@ private:
 	CrSet<VkFormat> m_supportedDepthStencilFormats;
 	CrSet<VkFormat> m_supportedVertexBufferFormats;
 
-	// Command buffers
-	ICrCommandBuffer* m_setupCmdBuffer; // Command buffer used for setting up different resources
-	CrVector<ICrCommandBuffer*> m_drawCmdBuffers; // Command buffers used for rendering
-
 	// Stores all available memory (type) properties for the physical device
 	VkPhysicalDeviceMemoryProperties m_vkPhysicalDeviceMemoryProperties;
 
 	// Stores the different hardware limits reported by this device, e.g. maximum buffer or texture sizes, queue priorities, etc
 	VkPhysicalDeviceProperties m_vkPhysicalDeviceProperties;
-
-	// TODO Pass as param
-	uint32_t m_width = 1280;
-	uint32_t m_height = 720;
-	void* m_platformWindow = nullptr;
-	void* m_platformHandle = nullptr;
-
-	// Semaphores
-	// Used to coordinate operations within the graphics queue and ensure correct command ordering
-	ICrGPUSemaphore* m_renderCompleteSemaphore;
-	CrGPUSemaphoreVulkan* m_presentCompleteSemaphore;
-
-	// TODO Temporary
-	CrGraphicsPipeline* m_pipelineTriangleState;
-	CrGraphicsPipeline* m_pipelineLineState;
-
-	CrRenderPassSharedHandle m_renderPass;
-	CrVector<CrFramebufferSharedHandle> m_frameBuffers;
-
-	CrVertexBufferSharedHandle m_triangleVertexBuffer;
-	CrIndexBufferSharedHandle m_triangleIndexBuffer;
-
-	CrRenderModelSharedHandle m_renderModel;
 
 	// Queues
 	uint32_t m_maxCommandQueues = 0;

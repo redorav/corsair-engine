@@ -32,11 +32,6 @@ void CrRenderDeviceD3D12::ResetFencePS(const CrGPUFenceD3D12* fence)
 	
 }
 
-void CrRenderDeviceD3D12::PresentPS()
-{
-	
-}
-
 ICrCommandQueue* CrRenderDeviceD3D12::CreateCommandQueuePS(CrCommandQueueType::T type)
 {
 	return new CrCommandQueueD3D12(this, type);

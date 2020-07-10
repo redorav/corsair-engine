@@ -24,16 +24,11 @@ ICrRenderDevice::~ICrRenderDevice()
 
 // TODO Create a factory here where we create the render device from the graphics API. From then on everything is created
 // through the render device so it should all have the proper platform
-void ICrRenderDevice::Init(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi)
+void ICrRenderDevice::Init(cr3d::GraphicsApi::T graphicsApi)
 {
 	m_renderDeviceProperties.m_graphicsApi = graphicsApi;
 
-	InitPS(platformHandle, platformWindow);
-}
-
-void ICrRenderDevice::Present()
-{
-	PresentPS();
+	InitPS();
 }
 
 CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueType::T type)
@@ -143,8 +138,8 @@ const CrTextureSharedHandle& ICrRenderDevice::GetMainDepthBuffer() const
 	return m_depthStencilTexture;
 }
 
-void ICrRenderDevice::Create(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi)
+void ICrRenderDevice::Create(cr3d::GraphicsApi::T graphicsApi)
 {
 	g_renderDevice = new CrRenderDeviceVulkan();
-	g_renderDevice->Init(platformHandle, platformWindow, graphicsApi);
+	g_renderDevice->Init(graphicsApi);
 }

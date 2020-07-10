@@ -2,6 +2,7 @@
 #include "CrMain.h"
 
 #include "Rendering/ICrRenderDevice.h"
+#include "Rendering/CrFrame.h"
 
 #include "Core/CrCommandLine.h"
 #include "Core/CrTime.h"
@@ -39,8 +40,10 @@ int main(int argc, char* argv[])
 	//HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
 	HINSTANCE hInstance = GetModuleHandle(nullptr); // Valid for the current executable (not valid for a dll) http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
 
-	ICrRenderDevice::Create(hInstance, hWnd, cr3d::GraphicsApi::Vulkan); // Need to make a window class here that abstracts these Windows-specific things
-	ICrRenderDevice* renderDevice = (ICrRenderDevice*)ICrRenderDevice::GetRenderDevice();
+	ICrRenderDevice::Create(cr3d::GraphicsApi::Vulkan); // Need to make a window class here that abstracts these Windows-specific things
+
+	CrFrame frame;
+	frame.Init(hInstance, hWnd, 1280, 720);
 
 	while(!g_appWasClosed)
 	{
@@ -51,7 +54,7 @@ int main(int argc, char* argv[])
 
 		// TODO Create proper frame
 
-		renderDevice->Present();
+		frame.Process();
 
 		CrTime::IncrementFrameCount();
 

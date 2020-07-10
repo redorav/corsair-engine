@@ -12,8 +12,6 @@ public:
 
 	virtual void InitPS(void* platformHandle, void* platformWindow) final override;
 
-	virtual void PresentPS() final override;
-
 	// TODO Actually make PS by making virtual
 	void WaitForFencePS(const CrGPUFenceD3D12* fence, uint64_t timeoutNanoseconds);
 

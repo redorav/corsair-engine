@@ -87,9 +87,7 @@ public:
 
 	~ICrRenderDevice();
 
-	void Init(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi);
-
-	void Present();
+	void Init(cr3d::GraphicsApi::T graphicsApi);
 
 	// Resource Creation Functions
 
@@ -143,7 +141,7 @@ public:
 
 	const CrTextureSharedHandle& GetMainDepthBuffer() const;
 
-	static void Create(void* platformHandle, void* platformWindow, cr3d::GraphicsApi::T graphicsApi);
+	static void Create(cr3d::GraphicsApi::T graphicsApi);
 
 protected:
 
@@ -167,10 +165,7 @@ protected:
 
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params) = 0;
 
-	virtual void InitPS(void* platformHandle, void* platformWindow) = 0;
-
-	// TODO Remove this
-	virtual void PresentPS() = 0;
+	virtual void InitPS() = 0;
 
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
 

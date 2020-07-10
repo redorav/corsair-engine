@@ -12,6 +12,8 @@ namespace crvk
 {
 	VkFormat GetVkFormat(cr3d::DataFormat::T format);
 
+	cr3d::DataFormat::T GetDataFormat(VkFormat vkFormat);
+
 	VkSamplerAddressMode GetVkAddressMode(cr3d::AddressMode addressMode);
 
 	VkFilter GetVkFilter(cr3d::Filter filter);

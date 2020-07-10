@@ -168,6 +168,93 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 	}
 }
 
+cr3d::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
+{
+	switch (vkFormat)
+	{
+		//-------------
+		// Uncompressed
+		//-------------
+
+		// 8-bit formats
+		case VK_FORMAT_R8_UNORM:          return cr3d::DataFormat::R8_Unorm;
+		case VK_FORMAT_R8_SNORM:          return cr3d::DataFormat::R8_Snorm;
+		case VK_FORMAT_R8_UINT:           return cr3d::DataFormat::R8_Uint;
+		case VK_FORMAT_R8_SINT:           return cr3d::DataFormat::R8_Sint;
+
+		case VK_FORMAT_R8G8_UNORM:        return cr3d::DataFormat::RG8_Unorm;
+		case VK_FORMAT_R8G8_SNORM:        return cr3d::DataFormat::RG8_Snorm;
+		case VK_FORMAT_R8G8_UINT:         return cr3d::DataFormat::RG8_Uint;
+		case VK_FORMAT_R8G8_SINT:         return cr3d::DataFormat::RG8_Sint;
+
+		case VK_FORMAT_R8G8B8A8_UNORM:    return cr3d::DataFormat::RGBA8_Unorm;
+		case VK_FORMAT_R8G8B8A8_SNORM:    return cr3d::DataFormat::RGBA8_Snorm;
+		case VK_FORMAT_R8G8B8A8_UINT:     return cr3d::DataFormat::RGBA8_Uint;
+		case VK_FORMAT_R8G8B8A8_SINT:     return cr3d::DataFormat::RGBA8_Sint;
+		case VK_FORMAT_R8G8B8A8_SRGB:     return cr3d::DataFormat::RGBA8_SRGB;
+
+		case VK_FORMAT_B8G8R8A8_UNORM:    return cr3d::DataFormat::BGRA8_Unorm;
+		case VK_FORMAT_B8G8R8A8_SRGB:     return cr3d::DataFormat::BGRA8_SRGB;
+
+		// 16-bit integer formats
+		case VK_FORMAT_R16_UNORM:         return cr3d::DataFormat::R16_Unorm;
+		case VK_FORMAT_R16_SNORM:         return cr3d::DataFormat::R16_Snorm;
+		case VK_FORMAT_R16_UINT:          return cr3d::DataFormat::R16_Uint;
+		case VK_FORMAT_R16_SINT:          return cr3d::DataFormat::R16_Sint;
+
+		case VK_FORMAT_R16G16_UNORM:      return cr3d::DataFormat::RG16_Unorm;
+		case VK_FORMAT_R16G16_SNORM:      return cr3d::DataFormat::RG16_Snorm;
+		case VK_FORMAT_R16G16_UINT:       return cr3d::DataFormat::RG16_Uint;
+		case VK_FORMAT_R16G16_SINT:       return cr3d::DataFormat::RG16_Sint;
+
+		case VK_FORMAT_R16G16B16A16_UNORM: return cr3d::DataFormat::RGBA16_Unorm;
+		case VK_FORMAT_R16G16B16A16_SNORM: return cr3d::DataFormat::RGBA16_Snorm;
+		case VK_FORMAT_R16G16B16A16_UINT:  return cr3d::DataFormat::RGBA16_Uint;
+		case VK_FORMAT_R16G16B16A16_SINT:  return cr3d::DataFormat::RGBA16_Sint;
+
+		// 16-bit float formats
+		case VK_FORMAT_R16_SFLOAT:          return cr3d::DataFormat::R16_Float;
+		case VK_FORMAT_R16G16_SFLOAT:       return cr3d::DataFormat::RG16_Float;
+		case VK_FORMAT_R16G16B16A16_SFLOAT: return cr3d::DataFormat::RGBA16_Float;
+
+		case VK_FORMAT_R32_UINT:            return cr3d::DataFormat::R32_Uint;
+		case VK_FORMAT_R32_SINT:            return cr3d::DataFormat::R32_Sint;
+		case VK_FORMAT_R32G32_UINT:         return cr3d::DataFormat::RG32_Uint;
+		case VK_FORMAT_R32G32_SINT:         return cr3d::DataFormat::RG32_Sint;
+		case VK_FORMAT_R32G32B32_UINT:      return cr3d::DataFormat::RGB32_Uint;
+		case VK_FORMAT_R32G32B32_SINT:      return cr3d::DataFormat::RGB32_Sint;
+		case VK_FORMAT_R32G32B32A32_UINT:   return cr3d::DataFormat::RGBA32_Uint;
+		case VK_FORMAT_R32G32B32A32_SINT:   return cr3d::DataFormat::RGBA32_Sint;
+
+		// 32-bit float formats
+		case VK_FORMAT_R32_SFLOAT:          return cr3d::DataFormat::R32_Float;
+		case VK_FORMAT_R32G32_SFLOAT:       return cr3d::DataFormat::RG32_Float;
+		case VK_FORMAT_R32G32B32_SFLOAT:    return cr3d::DataFormat::RGB32_Float;
+		case VK_FORMAT_R32G32B32A32_SFLOAT: return cr3d::DataFormat::RGBA32_Float;
+
+		// Depth-stencil formats
+		case VK_FORMAT_D16_UNORM:           return cr3d::DataFormat::D16_Unorm;
+		case VK_FORMAT_D16_UNORM_S8_UINT:   return cr3d::DataFormat::D16_Unorm_S8_Uint;
+		case VK_FORMAT_D24_UNORM_S8_UINT:   return cr3d::DataFormat::D24_Unorm_S8_Uint;
+		case VK_FORMAT_X8_D24_UNORM_PACK32: return cr3d::DataFormat::D24_Unorm_X8;
+		case VK_FORMAT_D32_SFLOAT:          return cr3d::DataFormat::D32_Float;
+		case VK_FORMAT_D32_SFLOAT_S8_UINT:  return cr3d::DataFormat::D32_Float_S8_Uint;
+
+		// Packed Formats
+		case VK_FORMAT_B10G11R11_UFLOAT_PACK32:   return cr3d::DataFormat::RG11B10_Float;
+		case VK_FORMAT_A2B10G10R10_UNORM_PACK32:  return cr3d::DataFormat::RGB10A2_Unorm;
+		case VK_FORMAT_A2B10G10R10_UINT_PACK32:   return cr3d::DataFormat::RGB10A2_Uint;
+		case VK_FORMAT_B5G6R5_UNORM_PACK16:       return cr3d::DataFormat::B5G6R5_Unorm;
+		case VK_FORMAT_B5G5R5A1_UNORM_PACK16:     return cr3d::DataFormat::B5G5R5A1_Unorm;
+		case VK_FORMAT_B4G4R4A4_UNORM_PACK16:     return cr3d::DataFormat::BGRA4_Unorm;
+		case VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:    return cr3d::DataFormat::RGB9E5_Float;
+
+		default:
+			CrAssertMsg(false, "Format not found!");
+			return cr3d::DataFormat::Invalid;
+	}
+}
+
 VkSamplerAddressMode crvk::GetVkAddressMode(cr3d::AddressMode addressMode)
 {
 	switch (addressMode)

@@ -82,13 +82,11 @@ private:
 
 	void RetrieveQueueFamilies();
 
-	void QueryDeviceProperties();
-
 	VkResult CreateInstance(bool enableValidationLayer);
 
 	VkResult CreateSurface(void* platformHandle, void* platformWindow);
 
-	VkResult CreatePhysicalDevices();
+	VkResult CreatePhysicalDevice();
 
 	VkResult CreateLogicalDevice(bool enableValidationLayer);
 

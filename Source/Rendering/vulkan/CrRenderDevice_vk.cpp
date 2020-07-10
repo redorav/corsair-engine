@@ -78,7 +78,7 @@ void CrRenderDeviceVulkan::InitPS
 	CreateInstance(enableValidationLayer);
 
 	// 2. Create the physical devices (can be multi-GPU)
-	CreatePhysicalDevices();
+	CreatePhysicalDevice();
 
 	// 3. Create the rendering surface
 	CreateSurface(platformHandle, platformWindow);
@@ -90,10 +90,7 @@ void CrRenderDeviceVulkan::InitPS
 	// Also specifies desired queues.
 	CreateLogicalDevice(enableValidationLayer);
 
-	// 6. Get the hardware supported formats, memory types, etc.
-	QueryDeviceProperties();
-
-	// 7. Create main command queue. This will take care of the main command buffers and present
+	// 6. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
 	// 7. Create the swapchain
@@ -386,35 +383,48 @@ VkResult CrRenderDeviceVulkan::CreateSurface(void* platformHandle, void* platfor
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.window = platformWindow;
+	surfaceCreateInfo.window = (ANativeWindow*)platformWindow;
 	result = vkCreateAndroidSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.connection = connection;
-	surfaceCreateInfo.window = platformWindow;
+	surfaceCreateInfo.window = *(xcb_window_t*)platformWindow;
+	surfaceCreateInfo.connection = (xcb_connection_t*)platformHandle;
 	result = vkCreateXcbSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
 	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
-	surfaceCreateInfo.window = platformWindow;
+	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)platformWindow;
 	result = vkCreateViSurfaceNN(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
-	VkMacOSSurfaceCreateFlagsMVK surfaceCreateInfo = {};
+	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = platformWindow;
 	result = vkCreateMacOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_IOS_MVK)
-	VkIOSSurfaceCreateFlagsMVK surfaceCreateInfo = {};
+	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = platformWindow;
 	result = vkCreateIOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #endif
 
+	uint32_t queueFamilyCount;
+	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
+
+	// We make an assumption here that Graphics queues can always present. The reason is that
+	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
+	// Vulkaninfo.org seems to validate this assumption, but the validation layers will complain if we don't call this.
+	CrVector<VkBool32> supportsPresent(queueFamilyCount);
+	for (uint32_t i = 0; i < queueFamilyCount; i++)
+	{
+		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
+	}
+
 	return result;
 }
 
-VkResult CrRenderDeviceVulkan::CreatePhysicalDevices()
+VkResult CrRenderDeviceVulkan::CreatePhysicalDevice()
 {
 	VkResult result;
 
@@ -424,8 +434,76 @@ VkResult CrRenderDeviceVulkan::CreatePhysicalDevices()
 
 	CrVector<VkPhysicalDevice> physicalDevices(gpuCount);
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, physicalDevices.data());
+	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found!");
 
-	m_vkPhysicalDevice = physicalDevices[0]; // TODO needs mutiple GPU handling
+	// Select from the list of available GPUs which one we want to use. A priority system will automatically select
+	// the best available from the list
+	uint32_t highestPriority = 0; highestPriority;
+	uint32_t highestPriorityIndex = 0;
+	for (uint32_t i = 0; i < physicalDevices.size(); ++i)
+	{
+		VkPhysicalDeviceProperties vkPhysicalDeviceProperties;
+		vkGetPhysicalDeviceProperties(physicalDevices[i], &vkPhysicalDeviceProperties);
+
+		VkPhysicalDeviceMemoryProperties vkPhysicalDeviceMemoryProperties;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevices[i], &vkPhysicalDeviceMemoryProperties);
+
+		uint32_t priority = 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU   ? (1 << 31) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ? (1 << 30) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU    ? (1 << 29) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU            ? (1 << 28) : 0;
+
+		if (priority > highestPriority)
+		{
+			highestPriority = priority;
+			highestPriorityIndex = i;
+		}
+	}
+
+	m_vkPhysicalDevice = physicalDevices[highestPriorityIndex];
+
+	// Query physical device properties
+	vkGetPhysicalDeviceMemoryProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceMemoryProperties);
+
+	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
+
+	// Populate the render device properties into the platform-independent structure
+	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties.limits.maxUniformBufferRange;
+	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;
+	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;
+	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties.limits.maxImageDimension3D;
+
+	// Loop through all available formats and add to supported lists. These will be useful later 
+	// when determining availability and features.
+
+	VkFormatProperties formatProperties;
+	for (uint32_t dataFormat = 0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
+	{
+		VkFormat format = crvk::GetVkFormat((cr3d::DataFormat::T)dataFormat);
+		vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, (VkFormat)format, &formatProperties);
+
+		// Format must support depth stencil attachment for optimal tiling
+		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+		{
+			m_supportedDepthStencilFormats.insert(format);
+		}
+
+		if (formatProperties.bufferFeatures & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)
+		{
+			m_supportedVertexBufferFormats.insert(format);
+		}
+
+		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
+		{
+			m_supportedTextureFormats.insert(format);
+		}
+
+		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT)
+		{
+			m_supportedRenderTargetFormats.insert(format);
+		}
+	}
 
 	// Enumerate device extensions
 	{
@@ -521,13 +599,8 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 		queueProperties[i].doesCompute = (flags & VK_QUEUE_COMPUTE_BIT) != 0;
 		queueProperties[i].doesCopy = (flags & VK_QUEUE_TRANSFER_BIT) != 0;
 		queueProperties[i].maxQueues = queueProperty.queueCount;
-	}
 
-	CrVector<VkBool32> supportsPresent(queueFamilyCount);
-	for (uint32_t i = 0; i < queueFamilyCount; i++)
-	{
-		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
-		queueProperties[i].doesPresent = supportsPresent[i] == VK_TRUE;
+		queueProperties[i].doesPresent = queueProperties[i].doesGraphics;
 	}
 
 	for (uint32_t i = 0; i < queueFamilyCount; ++i)
@@ -914,50 +987,6 @@ void CrRenderDeviceVulkan::preparePipelines()
 	psoDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	psoDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
-}
-
-void CrRenderDeviceVulkan::QueryDeviceProperties()
-{
-	vkGetPhysicalDeviceMemoryProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceMemoryProperties);
-
-	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
-
-	// Populate the render device properties into the platform-independent structure
-	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties.limits.maxUniformBufferRange;
-	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;
-	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;
-	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties.limits.maxImageDimension3D;
-
-	// Loop through all available formats and add to supported lists. These will be useful later 
-	// when determining availability and features.
-
-	VkFormatProperties formatProperties;
-	for(uint32_t dataFormat = 0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
-	{
-		VkFormat format = crvk::GetVkFormat((cr3d::DataFormat::T)dataFormat);
-		vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, (VkFormat)format, &formatProperties);
-
-		// Format must support depth stencil attachment for optimal tiling
-		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
-		{
-			m_supportedDepthStencilFormats.insert(format);
-		}
-
-		if (formatProperties.bufferFeatures & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)
-		{
-			m_supportedVertexBufferFormats.insert(format);
-		}
-
-		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
-		{
-			m_supportedTextureFormats.insert(format);
-		}
-
-		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT)
-		{
-			m_supportedRenderTargetFormats.insert(format);
-		}
-	}
 }
 
 bool CrRenderDeviceVulkan::GetIsFeatureSupported(CrRenderingFeature::T feature)

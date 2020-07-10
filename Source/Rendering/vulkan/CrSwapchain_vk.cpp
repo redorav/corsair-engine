@@ -80,39 +80,43 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 
 	// We make an assumption here that Graphics queues can always present. The reason is that
 	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
-	// Vulkaninfo.org seems to validate this assumption, but the validation layers will complain if we don't call this.
+	// https://vulkan.gpuinfo.org/ seems to validate this assumption, but the validation layers will complain if we don't call this.
 	CrVector<VkBool32> supportsPresent(queueFamilyCount);
 	for (uint32_t i = 0; i < queueFamilyCount; i++)
 	{
 		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
 	}
-	
-	m_format = swapchainDescriptor.format;
-	
+
 	// Get list of supported color formats and spaces for the surface (backbuffer)
 	{
 		uint32_t formatCount;
 		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
 		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
-	
-		// If the format list includes just one entry of VK_FORMAT_UNDEFINED, the surface has no preferred format
-		if (formatCount == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED)
-		{
-			m_vkFormat = crvk::GetVkFormat(m_format);
-			m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-		}
-		else // Otherwise, at least one supported format will be returned
-		{
-			CrAssertMsg(formatCount >= 1, "Must have at least one preferred color space");
-			// TODO select preferred format by looping and finding it
-			m_vkFormat = surfaceFormats[0].format;
-			m_vkColorSpace = surfaceFormats[0].colorSpace;
 
-			for (uint32_t i = 0; i < formatCount; ++i)
+		CrAssertMsg(formatCount > 0, "Must have at least one preferred color space");
+	
+		VkFormat desiredVkFormat = crvk::GetVkFormat(swapchainDescriptor.format);
+
+		bool foundMatchingFormat = false;
+
+		for (uint32_t i = 0; i < surfaceFormats.size(); ++i)
+		{
+			if (surfaceFormats[i].format == desiredVkFormat)
 			{
-				
+				m_format = swapchainDescriptor.format;
+				m_vkFormat = surfaceFormats[i].format;
+				m_vkColorSpace = surfaceFormats[i].colorSpace;
+				foundMatchingFormat = true;
+				break;
 			}
+		}
+
+		if (!foundMatchingFormat)
+		{
+			m_vkFormat = surfaceFormats[0].format;
+			m_format = crvk::GetDataFormat(m_vkFormat);
+			m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 		}
 	}
 

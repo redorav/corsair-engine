@@ -60,7 +60,7 @@ private:
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) final override;
 
-	virtual ICrSwapchain* CreateSwapchainPS(uint32_t requestedWidth, uint32_t requestedHeight) final override;
+	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) final override;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) final override;
 

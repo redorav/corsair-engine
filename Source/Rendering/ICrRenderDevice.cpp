@@ -62,10 +62,10 @@ CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& 
 	return CrSamplerSharedHandle(CreateSamplerPS(descriptor));
 }
 
-CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(uint32_t requestedWidth, uint32_t requestedHeight)
+CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(requestedWidth, requestedHeight));
-	swapchain->Create(this, requestedWidth, requestedHeight);
+	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));
+	swapchain->Create(this, swapchainDescriptor);
 	return swapchain;
 }
 

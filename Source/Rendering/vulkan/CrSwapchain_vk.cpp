@@ -9,9 +9,9 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) : m_vkSwapchain(nullptr)
+CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : m_vkSwapchain(nullptr)
 {
-	renderDevice; requestedHeight; requestedWidth;
+	renderDevice; swapchainDescriptor;
 	//CreatePS(renderDevice, requestedWidth, requestedHeight);
 }
 
@@ -25,7 +25,7 @@ VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain()
 	return m_vkSwapchain;
 }
 
-void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight)
+void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
@@ -82,8 +82,8 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, uint32_t request
 	if (surfCaps.currentExtent.width == -1)
 	{
 		// If the surface size is undefined, the size is set to the size of the images requested.
-		m_width = swapchainExtent.width = requestedWidth;
-		m_height = swapchainExtent.height = requestedHeight;
+		m_width = swapchainExtent.width = swapchainDescriptor.requestedWidth;
+		m_height = swapchainExtent.height = swapchainDescriptor.requestedHeight;
 	}
 	else
 	{

@@ -12,9 +12,9 @@ ICrSwapchain::ICrSwapchain()
 
 }
 
-void ICrSwapchain::Create(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight)
+void ICrSwapchain::Create(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CreatePS(renderDevice, requestedWidth, requestedHeight);
+	CreatePS(renderDevice, swapchainDescriptor);
 
 	CrAssertMsg(m_width > 0, "Swapchain must have a width!");
 	CrAssertMsg(m_height > 0, "Swapchain must have a height!");

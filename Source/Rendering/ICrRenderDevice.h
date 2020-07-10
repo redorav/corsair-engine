@@ -103,7 +103,7 @@ public:
 
 	CrSamplerSharedHandle CreateSampler(const CrSamplerDescriptor& descriptor);
 
-	CrSwapchainSharedHandle CreateSwapchain(uint32_t requestedWidth, uint32_t requestedHeight);
+	CrSwapchainSharedHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
 	CrTextureSharedHandle CreateTexture(const CrTextureCreateParams& params);
 
@@ -155,7 +155,7 @@ protected:
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
 
-	virtual ICrSwapchain* CreateSwapchainPS(uint32_t requestedWidth, uint32_t requestedHeight) = 0;
+	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
 

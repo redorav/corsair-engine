@@ -7,11 +7,11 @@ class CrSwapchainVulkan final : public ICrSwapchain
 {
 public:
 
-	CrSwapchainVulkan(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight);
+	CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
 
 	~CrSwapchainVulkan();
 
-	virtual void CreatePS(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) final override;
+	virtual void CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) final override;
 
 	virtual void PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore) final override;
 

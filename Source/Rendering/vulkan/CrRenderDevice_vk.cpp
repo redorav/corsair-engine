@@ -94,7 +94,10 @@ void CrRenderDeviceVulkan::InitPS
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
 	// 7. Create the swapchain
-	m_swapchain = CreateSwapchain(m_width, m_height);
+	CrSwapchainDescriptor swapchainDescriptor = {};
+	swapchainDescriptor.requestedWidth = m_width;
+	swapchainDescriptor.requestedHeight = m_height;
+	m_swapchain = CreateSwapchain(swapchainDescriptor);
 
 	// Create one command buffer for submitting the post present image memory barrier
 	m_setupCmdBuffer = m_mainCommandQueue->CreateCommandBuffer();
@@ -551,9 +554,9 @@ ICrSampler* CrRenderDeviceVulkan::CreateSamplerPS(const CrSamplerDescriptor& des
 	return new CrSamplerVulkan(this, descriptor);
 }
 
-ICrSwapchain* CrRenderDeviceVulkan::CreateSwapchainPS(uint32_t requestedWidth, uint32_t requestedHeight)
+ICrSwapchain* CrRenderDeviceVulkan::CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	return new CrSwapchainVulkan(this, requestedWidth, requestedHeight);
+	return new CrSwapchainVulkan(this, swapchainDescriptor);
 }
 
 ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureCreateParams& params)
@@ -678,7 +681,10 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	// that becomes available after (once the pointer assignment happens and the resource is destroyed)
 	m_swapchain = nullptr;
 
-	m_swapchain = CreateSwapchain(m_width, m_height);
+	CrSwapchainDescriptor swapchainDescriptor = {};
+	swapchainDescriptor.requestedWidth = m_width;
+	swapchainDescriptor.requestedHeight = m_height;
+	m_swapchain = CreateSwapchain(swapchainDescriptor);
 
 	// 2. Recreate depth stencil texture
 

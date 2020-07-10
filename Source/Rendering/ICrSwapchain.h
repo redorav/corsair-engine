@@ -23,6 +23,14 @@ enum class CrSwapchainResult : uint32_t
 	Invalid
 };
 
+struct CrSwapchainDescriptor
+{
+	void* plaftormWindow;
+	void* platformHandle;
+	uint32_t requestedWidth;
+	uint32_t requestedHeight;
+};
+
 class ICrSwapchain
 {
 	friend class ICrRenderDevice;
@@ -55,9 +63,9 @@ protected:
 
 	ICrSwapchain();
 
-	void Create(ICrRenderDevice* renderDevice, uint32_t width, uint32_t height);
+	void Create(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
 
-	virtual void CreatePS(ICrRenderDevice* renderDevice, uint32_t requestedWidth, uint32_t requestedHeight) = 0;
+	virtual void CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual void PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore) = 0;
 

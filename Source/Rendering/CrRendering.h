@@ -825,6 +825,13 @@ namespace cr3d
 			Owning
 		};
 	}
+
+	enum class GPUFenceWaitResult : uint32_t
+	{
+		Success, // If this wait completed before the timeout
+		Timeout, // If this wait did not complete before the timeout
+		Error // If some error occurred
+	};
 }
 
 struct CrViewport

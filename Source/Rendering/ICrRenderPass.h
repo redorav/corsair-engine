@@ -73,6 +73,4 @@ protected:
 	ICrRenderPass() {}
 
 private:
-
-	CrRenderPassBeginParams m_runtime;
 };

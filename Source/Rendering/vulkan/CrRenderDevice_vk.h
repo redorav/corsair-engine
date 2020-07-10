@@ -161,6 +161,8 @@ private:
 	// TODO Pass as param
 	uint32_t m_width = 1280;
 	uint32_t m_height = 720;
+	void* m_platformWindow = nullptr;
+	void* m_platformHandle = nullptr;
 
 	// Semaphores
 	// Used to coordinate operations within the graphics queue and ensure correct command ordering

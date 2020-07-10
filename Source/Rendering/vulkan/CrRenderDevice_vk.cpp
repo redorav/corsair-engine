@@ -62,6 +62,9 @@ void CrRenderDeviceVulkan::InitPS
 	void* platformHandle, void* platformWindow
 )
 {
+	m_platformWindow = platformWindow;
+	m_platformHandle = platformHandle;
+
 	// TODO All of this code needs to be separated into PS functions so that we can have a common flow between different platforms
 
 	VkResult result;
@@ -95,6 +98,8 @@ void CrRenderDeviceVulkan::InitPS
 
 	// 7. Create the swapchain
 	CrSwapchainDescriptor swapchainDescriptor = {};
+	swapchainDescriptor.plaftormWindow = m_platformWindow;
+	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
 	m_swapchain = CreateSwapchain(swapchainDescriptor);
@@ -682,6 +687,8 @@ void CrRenderDeviceVulkan::RecreateSwapchain()
 	m_swapchain = nullptr;
 
 	CrSwapchainDescriptor swapchainDescriptor = {};
+	swapchainDescriptor.plaftormWindow = m_platformWindow;
+	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
 	m_swapchain = CreateSwapchain(swapchainDescriptor);

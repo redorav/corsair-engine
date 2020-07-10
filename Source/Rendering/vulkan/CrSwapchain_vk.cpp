@@ -93,6 +93,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
 		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
+		CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface formats");
 
 		CrAssertMsg(formatCount > 0, "Must have at least one preferred color space");
 	
@@ -125,12 +126,14 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
 	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
+	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface capabilities");
 
 	uint32_t presentModeCount;
 	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
 
 	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
 	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
+	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface present modes");
 
 	VkExtent2D swapchainExtent;
 

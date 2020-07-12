@@ -135,10 +135,6 @@ public:
 
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 
-	const CrSwapchainSharedHandle& GetMainSwapchain() const;
-
-	const CrTextureSharedHandle& GetMainDepthBuffer() const;
-
 	static void Create(cr3d::GraphicsApi::T graphicsApi);
 
 protected:
@@ -172,10 +168,6 @@ protected:
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
-
-	CrSwapchainSharedHandle m_swapchain;
-
-	CrTextureSharedHandle m_depthStencilTexture;
 
 	CrCommandQueueSharedHandle m_mainCommandQueue;
 

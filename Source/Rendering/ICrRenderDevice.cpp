@@ -125,16 +125,6 @@ ICrRenderDevice* ICrRenderDevice::GetRenderDevice()
 	return g_renderDevice;
 }
 
-const CrSwapchainSharedHandle& ICrRenderDevice::GetMainSwapchain() const
-{
-	return m_swapchain;
-}
-
-const CrTextureSharedHandle& ICrRenderDevice::GetMainDepthBuffer() const
-{
-	return m_depthStencilTexture;
-}
-
 void ICrRenderDevice::Create(cr3d::GraphicsApi::T graphicsApi)
 {
 	// TODO Treat this like a factory (on PC) through the API. That way the rest of the code

@@ -116,7 +116,7 @@ private:
 	CrSet<CrString> m_supportedInstanceLayers;
 	CrSet<CrString> m_supportedDeviceExtensions;
 
-	// Make this platform-independent
+	// TODO Make this platform-independent
 	CrSet<VkFormat> m_supportedRenderTargetFormats;
 	CrSet<VkFormat> m_supportedTextureFormats;
 	CrSet<VkFormat> m_supportedDepthStencilFormats;

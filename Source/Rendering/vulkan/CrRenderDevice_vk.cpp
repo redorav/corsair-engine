@@ -36,6 +36,7 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 
 void CrRenderDeviceVulkan::InitPS()
 {
+	// TODO Move this to platform-independent layer
 	bool enableValidationLayer = crcore::CommandLine["-debugGraphics"];
 
 	bool enableRenderdoc = crcore::CommandLine["-renderdoc"];

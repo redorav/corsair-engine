@@ -8,8 +8,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-uint32_t g_GPUMemory = 0;
-
 CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
 	: ICrTexture(params)
 	, m_vkBaseFramebuffer(nullptr)

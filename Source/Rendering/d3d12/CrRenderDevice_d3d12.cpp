@@ -1,10 +1,8 @@
 #include "CrRendering_pch.h"
 
-#include "CrRenderDevice_d3d12s.h"
+#include "CrRenderDevice_d3d12.h"
 
 CrRenderDeviceD3D12::CrRenderDeviceD3D12()
-	: m_setupCmdBuffer(nullptr)
-	, m_numCommandQueues(0)
 {
 
 }
@@ -14,12 +12,17 @@ CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 
 }
 
-void CrRenderDeviceD3D12::InitPS
-(
-	void* platformHandle, void* platformWindow
-)
+void CrRenderDeviceD3D12::InitPS()
 {
-	
+//	IDXGIFactory4 dxgiFactory;
+//
+//	UINT createFactoryFlags = 0;
+//#if defined(_DEBUG)
+//	createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+//#endif
+//
+//	HRESULT hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory));
+//
 }
 
 void CrRenderDeviceD3D12::WaitForFencePS(const CrGPUFenceD3D12* fence, uint64_t timeoutNanoseconds)

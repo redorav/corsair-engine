@@ -10,9 +10,9 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-void CrPipelineStateManagerVulkan::InitPS(CrRenderDeviceVulkan* renderDevice)
+void CrPipelineStateManagerVulkan::InitPS(ICrRenderDevice* renderDevice)
 {
-	m_vkDevice = renderDevice->GetVkDevice();
+	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);

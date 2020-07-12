@@ -5,7 +5,6 @@
 
 #include "Core/CrMacros.h"
 #include GRAPHICS_API_PATH(CrPipelineStateManager)
-#include GRAPHICS_API_PATH(CrRenderDevice)
 
 #include "Core/Containers/CrPair.h"
 
@@ -36,7 +35,7 @@ CrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphic
 	{
 		graphicsPipeline = new CrGraphicsPipeline;
 		graphicsPipeline->m_shader = graphicsShader;
-		static_cast<CrPipelineStateManagerVulkan*>(this)->CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor);
+		CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor);
 
 		// Insert in the hashmap
 		m_graphicsPipelines.insert({combinedHash.m_hash, graphicsPipeline});
@@ -47,5 +46,5 @@ CrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphic
 
 void ICrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
 {
-	static_cast<CrPipelineStateManagerVulkan*>(this)->InitPS(static_cast<CrRenderDeviceVulkan*>(renderDevice));
+	InitPS(renderDevice);
 }

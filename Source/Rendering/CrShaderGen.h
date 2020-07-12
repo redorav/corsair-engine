@@ -177,7 +177,8 @@ struct CrGraphicsShaderStageCreate
 {
 	CrGraphicsShaderStageCreate() {}
 
-	CrGraphicsShaderStageCreate(const CrPath& path, const CrFixedString64& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format) : path(path), entryPoint(entryPoint), stage(stage), format(format) {}
+	CrGraphicsShaderStageCreate(const CrPath& path, const CrFixedString64& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format) 
+		: path(path), entryPoint(entryPoint), stage(stage), format(format) {}
 
 	CrPath					path;
 	CrVector<char>			source;

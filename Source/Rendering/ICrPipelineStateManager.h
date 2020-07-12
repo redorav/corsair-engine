@@ -148,5 +148,12 @@ public:
 
 	static ICrPipelineStateManager* Get();
 
+private:
+
+	virtual void CreateGraphicsPipelinePS(CrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor,
+		const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+
+	virtual void InitPS(ICrRenderDevice* renderDevice) = 0;
+
 	CrHashMap<uint64_t, CrGraphicsPipeline*> m_graphicsPipelines;
 };

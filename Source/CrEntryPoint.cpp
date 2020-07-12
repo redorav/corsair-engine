@@ -47,22 +47,14 @@ int main(int argc, char* argv[])
 
 	while(!g_appWasClosed)
 	{
-		//float startTime;
 		CrInput.Update();
 
 		QApplication::processEvents();
 
-		// TODO Create proper frame
-
+		// Process the main loop
 		frame.Process();
 
 		CrTime::IncrementFrameCount();
-
-		//ProcessContinuousInput();
-
-		// TODO: Only process input if the main application is focused!
-
-		//Render(ourWindowHandleToDeviceContext);
 	}
 
 	return 0;

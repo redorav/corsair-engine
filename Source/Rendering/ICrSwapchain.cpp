@@ -81,7 +81,7 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(const ICrGPUSemaphore* signalSe
 
 void ICrSwapchain::Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
 {
-	CrAssertMsg(queue, "Must have a command queue to present!");
+	CrAssertMsg(queue != nullptr, "Must have a command queue to present!");
 	PresentPS(queue, waitSemaphore);
 }
 

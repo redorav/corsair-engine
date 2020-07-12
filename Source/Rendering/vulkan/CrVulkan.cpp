@@ -147,7 +147,6 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 
 		// Depth-stencil formats
 		case cr3d::DataFormat::D16_Unorm:         return VK_FORMAT_D16_UNORM;
-		case cr3d::DataFormat::D16_Unorm_S8_Uint: return VK_FORMAT_D16_UNORM_S8_UINT;
 		case cr3d::DataFormat::D24_Unorm_S8_Uint: return VK_FORMAT_D24_UNORM_S8_UINT;
 		case cr3d::DataFormat::D24_Unorm_X8:      return VK_FORMAT_X8_D24_UNORM_PACK32;
 		case cr3d::DataFormat::D32_Float:         return VK_FORMAT_D32_SFLOAT;
@@ -234,7 +233,6 @@ cr3d::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
 
 		// Depth-stencil formats
 		case VK_FORMAT_D16_UNORM:           return cr3d::DataFormat::D16_Unorm;
-		case VK_FORMAT_D16_UNORM_S8_UINT:   return cr3d::DataFormat::D16_Unorm_S8_Uint;
 		case VK_FORMAT_D24_UNORM_S8_UINT:   return cr3d::DataFormat::D24_Unorm_S8_Uint;
 		case VK_FORMAT_X8_D24_UNORM_PACK32: return cr3d::DataFormat::D24_Unorm_X8;
 		case VK_FORMAT_D32_SFLOAT:          return cr3d::DataFormat::D32_Float;
@@ -488,9 +486,11 @@ VkPrimitiveTopology crvk::GetVkPrimitiveTopology(cr3d::PrimitiveTopology primiti
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
 		case cr3d::PrimitiveTopology::TriangleStripAdjacency:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
-		case cr3d::PrimitiveTopology::PatchList: return VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
-		default: return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
+		case cr3d::PrimitiveTopology::PatchList:
+			return VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
 	}
+
+	return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 }
 
 VkPolygonMode crvk::GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode)
@@ -501,8 +501,6 @@ VkPolygonMode crvk::GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode)
 			return VK_POLYGON_MODE_FILL;
 		case cr3d::PolygonFillMode::Line:
 			return VK_POLYGON_MODE_LINE;
-		case cr3d::PolygonFillMode::Point:
-			return VK_POLYGON_MODE_POINT;
 		default:
 			return VK_POLYGON_MODE_MAX_ENUM;
 	}

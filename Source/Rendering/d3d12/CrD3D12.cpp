@@ -112,3 +112,222 @@ DXGI_FORMAT crd3d::GetD3DFormat(cr3d::DataFormat::T format)
 			return DXGI_FORMAT_UNKNOWN;
 	}
 }
+
+D3D12_TEXTURE_ADDRESS_MODE crd3d::GetD3DAddressMode(cr3d::AddressMode addressMode)
+{
+	switch (addressMode)
+	{
+		case cr3d::AddressMode::ClampToEdge:
+			return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		case cr3d::AddressMode::ClampToBorder:
+			return D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		case cr3d::AddressMode::Wrap:
+			return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		case cr3d::AddressMode::Mirror:
+			return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+		case cr3d::AddressMode::MirrorOnce:
+			return D3D12_TEXTURE_ADDRESS_MODE_MIRROR_ONCE;
+	}
+
+	return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+}
+
+D3D12_FILTER crd3d::GetD3DFilter(cr3d::Filter filter)
+{
+	switch (filter)
+	{
+		case cr3d::Filter::Point:
+			return D3D12_FILTER_MIN_MAG_MIP_POINT;
+		case cr3d::Filter::Linear:
+			return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	}
+
+	return D3D12_FILTER_MIN_MAG_MIP_POINT;
+}
+
+D3D12_BLEND_OP crd3d::GetD3DBlendOp(cr3d::BlendOp blendOp)
+{
+	switch (blendOp)
+	{
+		case cr3d::BlendOp::Add:
+			return D3D12_BLEND_OP_ADD;
+		case cr3d::BlendOp::Subtract:
+			return D3D12_BLEND_OP_SUBTRACT;
+		case cr3d::BlendOp::ReverseSubtract:
+			return D3D12_BLEND_OP_REV_SUBTRACT;
+		case cr3d::BlendOp::Min:
+			return D3D12_BLEND_OP_MIN;
+		case cr3d::BlendOp::Max:
+			return D3D12_BLEND_OP_MAX;
+	}
+	return D3D12_BLEND_OP_ADD;
+}
+
+D3D12_BLEND crd3d::GetD3DBlendFactor(cr3d::BlendFactor blendFactor)
+{
+	switch (blendFactor)
+	{
+		case cr3d::BlendFactor::Zero:
+			return D3D12_BLEND_ZERO;
+		case cr3d::BlendFactor::One:
+			return D3D12_BLEND_ONE;
+		case cr3d::BlendFactor::SrcColor:
+			return D3D12_BLEND_SRC_COLOR;
+		case cr3d::BlendFactor::OneMinusSrcColor:
+			return D3D12_BLEND_INV_SRC_COLOR;
+		case cr3d::BlendFactor::DstColor:
+			return D3D12_BLEND_DEST_COLOR;
+		case cr3d::BlendFactor::OneMinusDstColor:
+			return D3D12_BLEND_INV_DEST_COLOR;
+		case cr3d::BlendFactor::SrcAlpha:
+			return D3D12_BLEND_SRC_ALPHA;
+		case cr3d::BlendFactor::OneMinusSrcAlpha:
+			return D3D12_BLEND_INV_SRC_ALPHA;
+		case cr3d::BlendFactor::DstAlpha:
+			return D3D12_BLEND_DEST_ALPHA;
+		case cr3d::BlendFactor::OneMinusDstAlpha:
+			return D3D12_BLEND_INV_DEST_ALPHA;
+		case cr3d::BlendFactor::Constant:
+			return D3D12_BLEND_BLEND_FACTOR;
+		case cr3d::BlendFactor::OneMinusConstant:
+			return D3D12_BLEND_INV_BLEND_FACTOR;
+		case cr3d::BlendFactor::SrcAlphaSaturate:
+			return D3D12_BLEND_SRC_ALPHA_SAT;
+		case cr3d::BlendFactor::Src1Color:
+			return D3D12_BLEND_SRC1_COLOR;
+		case cr3d::BlendFactor::OneMinusSrc1Color:
+			return D3D12_BLEND_INV_SRC1_COLOR;
+		case cr3d::BlendFactor::Src1Alpha:
+			return D3D12_BLEND_SRC1_ALPHA;
+		case cr3d::BlendFactor::OneMinusSrc1Alpha:
+			return D3D12_BLEND_INV_SRC1_ALPHA;
+	}
+	return D3D12_BLEND_ONE;
+}
+
+D3D12_COMPARISON_FUNC crd3d::GetD3DCompareOp(cr3d::CompareOp compareOp)
+{
+	switch (compareOp)
+	{
+		case cr3d::CompareOp::Never:
+			return D3D12_COMPARISON_FUNC_NEVER;
+		case cr3d::CompareOp::Less:
+			return D3D12_COMPARISON_FUNC_LESS;
+		case cr3d::CompareOp::Equal:
+			return D3D12_COMPARISON_FUNC_EQUAL;
+		case cr3d::CompareOp::LessOrEqual:
+			return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		case cr3d::CompareOp::Greater:
+			return D3D12_COMPARISON_FUNC_GREATER;
+		case cr3d::CompareOp::NotEqual:
+			return D3D12_COMPARISON_FUNC_NOT_EQUAL;
+		case cr3d::CompareOp::GreaterOrEqual:
+			return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+		case cr3d::CompareOp::Always:
+			return D3D12_COMPARISON_FUNC_ALWAYS;
+	}
+	return D3D12_COMPARISON_FUNC_ALWAYS;
+}
+
+D3D12_STENCIL_OP crd3d::GetD3DStencilOp(cr3d::StencilOp stencilOp)
+{
+	switch (stencilOp)
+	{
+		case cr3d::StencilOp::Keep:
+			return D3D12_STENCIL_OP_KEEP;
+		case cr3d::StencilOp::Zero:
+			return D3D12_STENCIL_OP_ZERO;
+		case cr3d::StencilOp::Replace:
+			return D3D12_STENCIL_OP_REPLACE;
+		case cr3d::StencilOp::IncrementSaturate:
+			return D3D12_STENCIL_OP_INCR_SAT;
+		case cr3d::StencilOp::DecrementSaturate:
+			return D3D12_STENCIL_OP_DECR_SAT;
+		case cr3d::StencilOp::Invert:
+			return D3D12_STENCIL_OP_INVERT;
+		case cr3d::StencilOp::IncrementAndWrap:
+			return D3D12_STENCIL_OP_INCR;
+		case cr3d::StencilOp::DecrementAndWrap:
+			return D3D12_STENCIL_OP_DECR;
+	}
+	return D3D12_STENCIL_OP_KEEP;
+}
+
+uint32_t crd3d::GetD3D12SampleCount(cr3d::SampleCount sampleCount)
+{
+	switch (sampleCount)
+	{
+		case cr3d::SampleCount::S1:
+			return 1;
+		case cr3d::SampleCount::S2:
+			return 2;
+		case cr3d::SampleCount::S4:
+			return 4;
+		case cr3d::SampleCount::S8:
+			return 8;
+		case cr3d::SampleCount::S16:
+			return 16;
+		case cr3d::SampleCount::S32:
+			return 32;
+		case cr3d::SampleCount::S64:
+			return 64;
+	}
+	return 1;
+}
+
+D3D_PRIMITIVE_TOPOLOGY crd3d::GetD3D12PrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology)
+{
+	switch (primitiveTopology)
+	{
+		case cr3d::PrimitiveTopology::PointList:
+			return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+		case cr3d::PrimitiveTopology::LineList:
+			return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+		case cr3d::PrimitiveTopology::LineStrip:
+			return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+		case cr3d::PrimitiveTopology::TriangleList:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		case cr3d::PrimitiveTopology::TriangleStrip:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		case cr3d::PrimitiveTopology::LineListAdjacency:
+			return D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+		case cr3d::PrimitiveTopology::LineStripAdjacency:
+			return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+		case cr3d::PrimitiveTopology::TriangleListAdjacency:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+		case cr3d::PrimitiveTopology::TriangleStripAdjacency:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+		case cr3d::PrimitiveTopology::PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST; // TODO This is incorrect
+	}
+
+	return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+}
+
+D3D12_FILL_MODE crd3d::GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode)
+{
+	switch (fillMode)
+	{
+		case cr3d::PolygonFillMode::Fill:
+			return D3D12_FILL_MODE_SOLID;
+		case cr3d::PolygonFillMode::Line:
+			return D3D12_FILL_MODE_WIREFRAME;
+		default:
+			return D3D12_FILL_MODE_SOLID;
+	}
+}
+
+D3D12_CULL_MODE crd3d::GetD3D12PolygonCullMode(cr3d::PolygonCullMode cullMode)
+{
+	switch (cullMode)
+	{
+		case cr3d::PolygonCullMode::Back:
+			return D3D12_CULL_MODE_BACK;
+		case cr3d::PolygonCullMode::Front:
+			return D3D12_CULL_MODE_FRONT;
+		case cr3d::PolygonCullMode::None:
+			return D3D12_CULL_MODE_NONE;
+		default:
+			return D3D12_CULL_MODE_NONE;
+	}
+}

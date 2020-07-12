@@ -169,7 +169,6 @@ namespace cr3d
 
 			// Depth-stencil formats
 			D16_Unorm,
-			D16_Unorm_S8_Uint,
 			D24_Unorm_S8_Uint,
 			D24_Unorm_X8,
 			D32_Float,
@@ -463,7 +462,7 @@ namespace cr3d
 		PatchList
 	};
 
-	enum class PolygonFillMode : uint8_t { Fill, Line, Point };
+	enum class PolygonFillMode : uint8_t { Fill, Line };
 	enum class PolygonCullMode : uint8_t { None, Front, Back };
 	enum class FrontFace : uint8_t { Clockwise, CounterClockwise };
 	enum class BlendOp : uint8_t { Add, Subtract, ReverseSubtract, Min, Max, };
@@ -769,7 +768,6 @@ namespace cr3d
 		switch (format)
 		{
 			case cr3d::DataFormat::D16_Unorm:
-			case cr3d::DataFormat::D16_Unorm_S8_Uint:
 			case cr3d::DataFormat::D24_Unorm_S8_Uint:
 			case cr3d::DataFormat::D24_Unorm_X8:
 			case cr3d::DataFormat::D32_Float:

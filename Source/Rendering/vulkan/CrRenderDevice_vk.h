@@ -13,7 +13,7 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-class CrGraphicsPipeline;
+class ICrGraphicsPipeline;
 class CrGPUFenceVulkan;
 class CrGPUSemaphoreVulkan;
 class ICrCommandBuffer;

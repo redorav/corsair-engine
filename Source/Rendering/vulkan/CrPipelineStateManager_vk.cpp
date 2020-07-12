@@ -20,7 +20,7 @@ void CrPipelineStateManagerVulkan::InitPS(ICrRenderDevice* renderDevice)
 }
 
 void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS(
-	CrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
+	ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
 	const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;

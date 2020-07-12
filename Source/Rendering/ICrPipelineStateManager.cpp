@@ -15,7 +15,7 @@ ICrPipelineStateManager* ICrPipelineStateManager::Get()
 	return &g_pipelineStateManager;
 }
 
-CrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	const CrHash& psoHash = psoDescriptor.GetHash();
 	const CrHash& graphicsShaderHash = graphicsShader->GetHash();
@@ -24,16 +24,16 @@ CrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphic
 	const CrHash& combinedHash = psoHash << graphicsShaderHash;
 	//combinedHash <<= vertexInputHash;
 
-	eastl::hashtable_iterator<CrPair<const uint64_t, CrGraphicsPipeline*>, false, false> it = m_graphicsPipelines.find(combinedHash.m_hash);
+	eastl::hashtable_iterator<CrPair<const uint64_t, ICrGraphicsPipeline*>, false, false> it = m_graphicsPipelines.find(combinedHash.m_hash);
 
-	CrGraphicsPipeline* graphicsPipeline = nullptr;
+	ICrGraphicsPipeline* graphicsPipeline = nullptr;
 	if (it != m_graphicsPipelines.end())
 	{
 		graphicsPipeline = it->second;
 	}
 	else
 	{
-		graphicsPipeline = new CrGraphicsPipeline;
+		graphicsPipeline = new ICrGraphicsPipeline;
 		graphicsPipeline->m_shader = graphicsShader;
 		CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor);
 

@@ -73,7 +73,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
-	const CrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;
+	const ICrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;
 	const CrGraphicsShaderHandle& currentGraphicsShader = currentPipeline->m_shader;
 	const CrShaderResourceSet& resourceSet = currentGraphicsShader->GetResourceSet();
 

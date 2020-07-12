@@ -19,7 +19,7 @@ class ICrSampler;
 using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
 
 struct CrGraphicsPipelineDescriptor;
-class CrGraphicsPipeline;
+class ICrGraphicsPipeline;
 class CrComputePipeline;
 class CrConstantBufferBase;
 class ICrHardwareGPUBuffer;
@@ -57,7 +57,7 @@ public:
 
 	void BindGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor);
 
-	void BindGraphicsPipelineState(const CrGraphicsPipeline* pipelineState);
+	void BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState);
 
 	void ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount);
 
@@ -106,7 +106,7 @@ protected:
 
 	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) = 0;
 
-	virtual void BindGraphicsPipelineStatePS(const CrGraphicsPipeline* pipelineState) = 0;
+	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) = 0;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) = 0;
 
@@ -155,7 +155,7 @@ protected:
 		const CrVertexBufferCommon*		m_vertexBuffer;
 
 		CrGraphicsPipelineDescriptor	m_graphicsPipelineDescriptor;
-		const CrGraphicsPipeline*		m_graphicsPipeline;
+		const ICrGraphicsPipeline*		m_graphicsPipeline;
 		const CrComputePipeline*		m_computePipeline;
 
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][Textures::Count];
@@ -208,7 +208,7 @@ inline void ICrCommandBuffer::BindGraphicsPipeline(const CrGraphicsPipelineDescr
 	m_currentState.m_graphicsPipelineDescriptor = pipelineDescriptor;
 }
 
-inline void ICrCommandBuffer::BindGraphicsPipelineState(const CrGraphicsPipeline* pipelineState)
+inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState)
 {
 	m_currentState.m_graphicsPipeline = pipelineState;
 

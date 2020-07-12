@@ -109,7 +109,7 @@ using CrNativeGraphicsPipeline = VkPipeline;
 
 #endif
 
-class CrPipeline
+class ICrPipeline
 {
 public:
 	
@@ -119,14 +119,14 @@ public:
 class CrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
 
-class CrGraphicsPipeline : public CrPipeline
+class ICrGraphicsPipeline : public ICrPipeline
 {
 public: // TODO PRIVATE
 	CrNativeGraphicsPipeline m_pipeline;
 	CrGraphicsShaderHandle m_shader;
 };
 
-class CrComputePipeline : public CrPipeline
+class CrComputePipeline : public ICrPipeline
 {
 
 };
@@ -144,16 +144,16 @@ public:
 
 	void Init(ICrRenderDevice* renderDevice);
 
-	CrGraphicsPipeline* GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline* GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	static ICrPipelineStateManager* Get();
 
 private:
 
-	virtual void CreateGraphicsPipelinePS(CrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor,
+	virtual void CreateGraphicsPipelinePS(ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor,
 		const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
 
 	virtual void InitPS(ICrRenderDevice* renderDevice) = 0;
 
-	CrHashMap<uint64_t, CrGraphicsPipeline*> m_graphicsPipelines;
+	CrHashMap<uint64_t, ICrGraphicsPipeline*> m_graphicsPipelines;
 };

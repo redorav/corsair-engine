@@ -7,7 +7,7 @@
 
 class CrVertexBufferCommon;
 class CrIndexBufferCommon;
-class CrGraphicsPipeline;
+class ICrGraphicsPipeline;
 class CrTextureVulkan;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
@@ -36,7 +36,7 @@ private:
 
 	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) final override;
 
-	virtual void BindGraphicsPipelineStatePS(const CrGraphicsPipeline* pipelineState) final override;
+	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) final override;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) final override;
 
@@ -121,7 +121,7 @@ inline void CrCommandBufferVulkan::BindVertexBuffersPS(const ICrHardwareGPUBuffe
 	vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
 }
 
-inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const CrGraphicsPipeline* pipelineState)
+inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState)
 {
 	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineState->m_pipeline); // In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
 }

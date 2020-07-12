@@ -28,7 +28,7 @@ class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
 
 class ICrCommandBuffer;
-class CrGraphicsPipeline;
+class ICrGraphicsPipeline;
 
 class CrFrame
 {
@@ -56,8 +56,8 @@ private:
 	CrGPUSemaphoreSharedHandle m_presentCompleteSemaphore;
 	
 	// TODO Temporary
-	CrGraphicsPipeline* m_pipelineTriangleState;
-	CrGraphicsPipeline* m_pipelineLineState;
+	ICrGraphicsPipeline* m_pipelineTriangleState;
+	ICrGraphicsPipeline* m_pipelineLineState;
 
 	CrRenderPassSharedHandle m_renderPass;
 	

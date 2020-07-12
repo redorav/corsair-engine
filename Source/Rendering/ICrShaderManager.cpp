@@ -41,7 +41,7 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(CrGraphicsShaderCrea
 		CrHash bytecodeHash = CrHash(stageCreate.bytecode.data(), stageCreate.bytecode.size());
 		graphicsShader->m_hash <<= bytecodeHash;
 
-		graphicsShader->m_shaderStages.push_back(std::move(shaderStage));
+		graphicsShader->m_shaderStages.push_back(shaderStage);
 
 		// 4. Add to the reflection structure (we'll build the necessary resource tables using this later)
 		reflection.AddShaderStage(stageCreate.stage, stageCreate.bytecode);

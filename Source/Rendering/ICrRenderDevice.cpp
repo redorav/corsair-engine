@@ -8,7 +8,9 @@
 #include "ICrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
-#include GRAPHICS_API_PATH(CrRenderDevice)
+
+// Include all the necessary platforms here
+#include "vulkan/CrRenderDevice_vk.h"
 
 static ICrRenderDevice* g_renderDevice;
 
@@ -123,11 +125,6 @@ ICrRenderDevice* ICrRenderDevice::GetRenderDevice()
 	return g_renderDevice;
 }
 
-CrRenderDeviceVulkan* ICrRenderDevice::GetRenderDevicePS() // TODO Remove
-{
-	return static_cast<CrRenderDeviceVulkan*>(g_renderDevice);
-}
-
 const CrSwapchainSharedHandle& ICrRenderDevice::GetMainSwapchain() const
 {
 	return m_swapchain;
@@ -140,6 +137,16 @@ const CrTextureSharedHandle& ICrRenderDevice::GetMainDepthBuffer() const
 
 void ICrRenderDevice::Create(cr3d::GraphicsApi::T graphicsApi)
 {
-	g_renderDevice = new CrRenderDeviceVulkan();
+	// TODO Treat this like a factory (on PC) through the API. That way the rest of the code
+	// doesn't need to know about platform-specific code, only the render device.
+	if (graphicsApi == cr3d::GraphicsApi::Vulkan)
+	{
+		g_renderDevice = new CrRenderDeviceVulkan();
+	}
+	else if (graphicsApi == cr3d::GraphicsApi::D3D12)
+	{
+		//g_renderDevice = new CrRenderDeviceD3D12();
+	}
+
 	g_renderDevice->Init(graphicsApi);
 }

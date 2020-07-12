@@ -124,14 +124,12 @@ public:
 
 	CrFixedVector<CrShaderStageInfo, cr3d::ShaderStage::Count> m_shaderStages;
 
-	CrHash		m_hash; // TODO Make private
-
 	cr3d::ShaderStage::T shaderStageBegin;
 	cr3d::ShaderStage::T shaderStageEnd;
 
-private:
-public: // HACK
-	CrShaderResourceSet m_resourceSet;
+	CrShaderResourceSet m_resourceSet; // HACK Make private
+
+	CrHash		m_hash; // TODO Make private
 };
 
 inline cr3d::ShaderStage::T CrShader::ShaderStageBegin() const

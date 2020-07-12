@@ -174,7 +174,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-		ICrShaderManager::Get()->Init();
+		ICrShaderManager::Get()->Init(renderDevice);
 		ICrPipelineStateManager::Get()->Init(renderDevice);
 	}
 

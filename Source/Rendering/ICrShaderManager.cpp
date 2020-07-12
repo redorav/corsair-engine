@@ -154,8 +154,9 @@ void ICrShaderManager::CreateShaderResourceSet(const CrGraphicsShaderCreate& sha
 	CreateShaderResourceSetPS(shaderCreateInfo, reflection, resourceSet);
 }
 
-void ICrShaderManager::Init()
+void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)
 {
+	m_renderDevice = renderDevice;
 	InitPS();
 }
 

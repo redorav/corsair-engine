@@ -133,8 +133,6 @@ public:
 
 	static ICrRenderDevice* GetRenderDevice();
 
-	static CrRenderDeviceVulkan* GetRenderDevicePS(); // TODO Remove
-
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 
 	const CrSwapchainSharedHandle& GetMainSwapchain() const;

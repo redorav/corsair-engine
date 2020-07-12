@@ -4,6 +4,7 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
+class ICrRenderDevice;
 struct CrGraphicsShaderCreate;
 class CrShaderReflectionVulkan;
 class CrShaderResourceSet;
@@ -33,7 +34,7 @@ public:
 
 	static ICrShaderManager* Get();
 
-	void Init();
+	void Init(const ICrRenderDevice* renderDevice);
 
 	CrGraphicsShaderHandle LoadGraphicsShader(CrGraphicsShaderCreate& shaderCreateInfo);
 
@@ -68,4 +69,6 @@ protected:
 	virtual CrNativeShaderStage CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage) = 0;
 
 	virtual void CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) = 0;
+
+	const ICrRenderDevice* m_renderDevice;
 };

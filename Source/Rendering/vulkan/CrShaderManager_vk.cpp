@@ -302,7 +302,7 @@ void CrShaderManagerVulkan::CompileStagePS(CrGraphicsShaderStageCreate& shaderSt
 
 void CrShaderManagerVulkan::CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet)
 {
-	VkDevice vkDevice = CrRenderDeviceVulkan::GetRenderDevicePS()->GetVkDevice();
+	VkDevice vkDevice = static_cast<const CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 
@@ -342,7 +342,7 @@ CrNativeShaderStage CrShaderManagerVulkan::CreateGraphicsShaderStagePS(const uns
 {
 	CrAssert(byteCode != nullptr && codeSize > 0);
 
-	VkDevice vkDevice = CrRenderDeviceVulkan::GetRenderDevicePS()->GetVkDevice();
+	VkDevice vkDevice = static_cast<const CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	VkShaderModule shaderModule;
 	VkShaderModuleCreateInfo moduleCreateInfo;

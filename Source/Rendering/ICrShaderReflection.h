@@ -7,16 +7,15 @@ using bindpoint_t = uint8_t;
 class CrShaderResource
 {
 public:
-	const char* name;
-	bindpoint_t bindPoint;
+
+	const char* name = nullptr;
+	bindpoint_t bindPoint = 0;
 
 	static CrShaderResource Invalid;
 };
 
-/** 
- * Provides shader reflection functionality. After a shader has been compiled or loaded the shader reflection structure can
- * be queried for information regarding resource usage.
- */
+// Provides shader reflection functionality. After a shader has been compiled or loaded the shader reflection structure can
+// be queried for information regarding resource usage.
 
 class ICrShaderReflection
 {

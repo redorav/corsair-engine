@@ -7,10 +7,11 @@
 #include "ShaderResources.h"
 
 #include "Core/CrMacros.h"
-#include GRAPHICS_API_PATH(CrShaderReflection)
-#include GRAPHICS_API_PATH(CrShaderManager)
-
 #include "Core/SmartPointers/CrSharedPtr.h"
+
+// TODO Delete
+#include "vulkan/CrShaderReflection_vk.h"
+#include "vulkan/CrShaderManager_vk.h"
 
 static CrShaderManagerVulkan g_shaderManager;
 
@@ -23,7 +24,7 @@ ICrShaderManager* ICrShaderManager::Get()
 
 CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(CrGraphicsShaderCreate& shaderCreateInfo)
 {
-	CrGraphicsShaderHandle graphicsShader(new CrGraphicsShader);
+	CrGraphicsShaderHandle graphicsShader(new CrGraphicsShader());
 	CrShaderReflectionVulkan reflection;
 
 	for (CrGraphicsShaderStageCreate& stageCreate : shaderCreateInfo.m_stages)

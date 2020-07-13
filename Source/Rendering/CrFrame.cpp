@@ -12,6 +12,7 @@
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrCommandQueue.h"
 #include "Rendering/ICrFramebuffer.h"
+#include "Rendering/ICrRenderPass.h"
 
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
@@ -23,9 +24,6 @@
 #include "Core/CrTime.h"
 
 #include "CrResourceManager.h"
-
-// TODO Mega hack Delete
-#include "Rendering/vulkan/CrRenderPass_vk.h"
 
 struct SimpleVertex
 {

@@ -4,9 +4,9 @@
 #include "CrShaderGen.h"
 
 #include "Core/CrMacros.h"
-#include GRAPHICS_API_PATH(CrPipelineStateManager)
-
 #include "Core/Containers/CrPair.h"
+
+#include "vulkan/CrPipelineStateManager_vk.h" // TODO Remove
 
 static CrPipelineStateManagerVulkan g_pipelineStateManager;
 

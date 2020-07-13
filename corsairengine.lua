@@ -174,26 +174,21 @@ workspace "Corsair Engine"
 	
 	includedirs	{ src }
 
-	platformInfo = {}
-	
 	filter { "platforms:"..VulkanWin64 }
 		system("windows")
 		architecture("x64")
 		defines { "VULKAN_API", "VK_USE_PLATFORM_WIN32_KHR", "PC_TARGET" }
-		platformInfo[VulkanWin64] = { "vulkan", "vk" }
 		
 	filter { "platforms:"..D3D12 }
 		system("windows")
 		architecture "x64"
 		defines { "D3D12_API" }
-		platformInfo[D3D12] = { "d3d12", "d3d12" }
 		
 	filter { "platforms:"..VulkanOSX }
 		system("macosx")
 		architecture "x64"		
 		defines { "VULKAN_API", "VK_USE_PLATFORM_MACOS_MVK", "MAC_TARGET" }
 		includedirs	{ LibVulkan.."/Source/include" }
-		platformInfo[VulkanOSX] = { "vulkan", "vk" }
 		
 	--filter { "platforms:"..VulkanAndroid }
 		--system "android"
@@ -256,9 +251,6 @@ workspace "Corsair Engine"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 		
 	filter{}
-	
-	-- This allows the PATH macros to work
-	defines { "GRAPHICS_API_DIR=%{platformInfo[cfg.platform][1]}", "GRAPHICS_API_SUFFIX=%{platformInfo[cfg.platform][2]}" }
 	
 	configuration "Debug"
 		defines { "DEBUG" }

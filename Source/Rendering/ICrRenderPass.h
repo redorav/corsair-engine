@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrPipelineStateManager.h"
+#include "Core/CrHash.h"
 
 #include "Core/Containers/CrArray.h"
 

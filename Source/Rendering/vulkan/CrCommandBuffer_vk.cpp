@@ -83,7 +83,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	descriptorSetAllocInfo.pNext = nullptr;
 	descriptorSetAllocInfo.descriptorPool = m_vkDescriptorPool;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	descriptorSetAllocInfo.pSetLayouts = &resourceSet.descriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &resourceSet.m_vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
 	VkResult result = vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocInfo, &descriptorSet);
@@ -99,8 +99,10 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
 
-	for (cr3d::ShaderStage::T stage = currentGraphicsShader->ShaderStageBegin(); stage < currentGraphicsShader->ShaderStageEnd(); ++stage)
+	for(const CrShaderStageInfo& shaderStage : currentGraphicsShader->m_shaderStages)
 	{
+		cr3d::ShaderStage::T stage = shaderStage.m_stage;
+
 		uint32_t constantBufferCount = resourceSet.GetConstantBufferCount(stage);
 
 		for (uint32_t i = 0; i < constantBufferCount; ++i)

@@ -181,7 +181,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(g_shaderCreateInfo);
 	CrGraphicsPipelineDescriptor psoDescriptor;
 	psoDescriptor.Hash();
-	graphicsShader->m_vkRenderPass = static_cast<const CrRenderPassVulkan*>(m_renderPass.get())->GetVkRenderPass(); // TODO Super hack
 
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
@@ -189,12 +188,16 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor); // Test caching
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
 
 	psoDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	psoDescriptor.Hash();
-	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
+	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
 
 	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();

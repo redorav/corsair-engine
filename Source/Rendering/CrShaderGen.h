@@ -6,16 +6,7 @@
 #include "Core/CrHash.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
-#if defined(VULKAN_API)
-
-#include <vulkan/vulkan.h>
-
-using CrNativeShaderStage		= VkShaderModule;
-
-struct VkVertexInputAttributeDescription;
-using CrNativeInputLayout		= VkVertexInputAttributeDescription;
-
-#endif
+#include <vulkan/vulkan.h> // TODO Delete
 
 using bindpoint_t = uint8_t;
 
@@ -35,7 +26,7 @@ public:
 
 	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it. The layout is also needed when allocating
 	// descriptor sets from a pool.
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorSetLayout m_vkDescriptorSetLayout;
 
 #endif
 
@@ -79,6 +70,8 @@ public:
 
 	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
 
+private:
+
 	ConstantBuffers::T	m_usedConstantBuffers[cr3d::ShaderStage::GraphicsStageCount][MaxStageConstantBuffers]; // Buffer ID
 	Samplers::T			m_usedSamplers[cr3d::ShaderStage::GraphicsStageCount][MaxStageSamplers]; // IDs of the samplers this table uses
 	Textures::T			m_usedTextures[cr3d::ShaderStage::GraphicsStageCount][MaxStageTextures]; // IDs of the textures this table uses
@@ -103,7 +96,7 @@ class CrShaderStageInfo
 {
 public:
 	CrFixedString64 m_entryPointName;
-	CrNativeShaderStage m_shader;
+	VkShaderModule m_shader;
 	cr3d::ShaderStage::T m_stage;
 };
 
@@ -124,23 +117,10 @@ public:
 
 	CrFixedVector<CrShaderStageInfo, cr3d::ShaderStage::Count> m_shaderStages;
 
-	cr3d::ShaderStage::T shaderStageBegin;
-	cr3d::ShaderStage::T shaderStageEnd;
-
 	CrShaderResourceSet m_resourceSet; // HACK Make private
 
 	CrHash		m_hash; // TODO Make private
 };
-
-inline cr3d::ShaderStage::T CrShader::ShaderStageBegin() const
-{
-	return shaderStageBegin;
-}
-
-inline cr3d::ShaderStage::T CrShader::ShaderStageEnd() const
-{
-	return shaderStageEnd;
-}
 
 // This shader represents a full linked shader. Therefore it knows about number of stages,
 // and what these specific stages are. This is important to be able to pass it on to the PSO later on.
@@ -148,27 +128,9 @@ class CrGraphicsShader : public CrShader
 {
 public:
 
-	CrGraphicsShader()
-	{
-		shaderStageBegin = cr3d::ShaderStage::Vertex;
-		shaderStageEnd = cr3d::ShaderStage::GraphicsStageCount;
-	}
+	CrGraphicsShader() {}
 
 	~CrGraphicsShader() {}
-
-	// TODO HACK to get stuff going delete soon
-	VkRenderPass m_vkRenderPass;
-};
-
-class CrComputeShader : public CrShader
-{
-public:
-
-	CrComputeShader()
-	{
-		shaderStageBegin = cr3d::ShaderStage::Compute;
-		shaderStageEnd = cr3d::ShaderStage::Count;
-	}
 };
 
 struct CrGraphicsShaderStageCreate
@@ -189,13 +151,18 @@ struct CrGraphicsShaderStageCreate
 struct CrGraphicsShaderCreate
 {
 	friend class ICrShaderManager;
-	friend class CrShaderManagerVulkan;
 
-	void AddShaderStage(const CrGraphicsShaderStageCreate&& stage)
+	void AddShaderStage(const CrGraphicsShaderStageCreate& stage)
 	{
-		stages.push_back(stage);
+		m_stages.push_back(stage);
+	}
+
+	const CrVector<CrGraphicsShaderStageCreate>& GetStages() const
+	{
+		return m_stages;
 	}
 
 private:
-	CrVector<CrGraphicsShaderStageCreate> stages;
+
+	CrVector<CrGraphicsShaderStageCreate> m_stages;
 };

@@ -101,34 +101,28 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 	CrMultisampleState multisampleState = {};
 };
 
-#if defined(VULKAN_API)
-
+// TODO Delete
 #include <vulkan/vulkan.h>
-
-using CrNativeGraphicsPipeline = VkPipeline;
-
-#endif
 
 class ICrPipeline
 {
 public:
 	
+#if defined(VULKAN_API)
 	VkPipelineLayout m_pipelineLayout; // TODO Move to PS code
+#endif
 };
 
 class CrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
 
+struct CrRenderPassDescriptor;
+
 class ICrGraphicsPipeline : public ICrPipeline
 {
 public: // TODO PRIVATE
-	CrNativeGraphicsPipeline m_pipeline;
+	VkPipeline m_pipeline;
 	CrGraphicsShaderHandle m_shader;
-};
-
-class CrComputePipeline : public ICrPipeline
-{
-
 };
 
 class CrVertexDescriptor;
@@ -144,16 +138,30 @@ public:
 
 	void Init(ICrRenderDevice* renderDevice);
 
-	ICrGraphicsPipeline* GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline* GetGraphicsPipeline
+	(
+		const CrGraphicsPipelineDescriptor& psoDescriptor, 
+		const CrGraphicsShaderHandle& graphicsShader, 
+		const CrVertexDescriptor& vertexDescriptor,
+		const CrRenderPassDescriptor& renderPassDescriptor
+	);
 
 	static ICrPipelineStateManager* Get();
 
-private:
+protected:
 
-	virtual void CreateGraphicsPipelinePS(ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor,
-		const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+	virtual void CreateGraphicsPipelinePS
+	(
+		ICrGraphicsPipeline* graphicsPipeline,
+		const CrGraphicsPipelineDescriptor& psoDescriptor,
+		const CrGraphicsShader* graphicsShader, 
+		const CrVertexDescriptor& vertexDescriptor, 
+		const CrRenderPassDescriptor& renderPassDescriptor
+	) = 0;
 
-	virtual void InitPS(ICrRenderDevice* renderDevice) = 0;
+	virtual void InitPS() = 0;
 
 	CrHashMap<uint64_t, ICrGraphicsPipeline*> m_graphicsPipelines;
+
+	ICrRenderDevice* m_renderDevice = nullptr;
 };

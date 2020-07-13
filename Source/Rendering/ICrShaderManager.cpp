@@ -26,7 +26,7 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(CrGraphicsShaderCrea
 	CrGraphicsShaderHandle graphicsShader(new CrGraphicsShader);
 	CrShaderReflectionVulkan reflection;
 
-	for (CrGraphicsShaderStageCreate& stageCreate : shaderCreateInfo.stages)
+	for (CrGraphicsShaderStageCreate& stageCreate : shaderCreateInfo.m_stages)
 	{
 		// 1. Load the bytecode from disk
 		LoadShaderBytecode(stageCreate);
@@ -119,7 +119,7 @@ SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
 
 void ICrShaderManager::CreateShaderResourceSet(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet)
 {
-	for (const CrGraphicsShaderStageCreate& shaderStageCreate : shaderCreateInfo.stages)
+	for (const CrGraphicsShaderStageCreate& shaderStageCreate : shaderCreateInfo.m_stages)
 	{
 		cr3d::ShaderStage::T stage = shaderStageCreate.stage;
 
@@ -165,7 +165,7 @@ void ICrShaderManager::CompileStage(CrGraphicsShaderStageCreate& shaderStageInfo
 	CompileStagePS(shaderStageInfo);
 }
 
-CrNativeShaderStage ICrShaderManager::CreateGraphicsShaderStage(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage)
+VkShaderModule ICrShaderManager::CreateGraphicsShaderStage(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage)
 {
 	return CreateGraphicsShaderStagePS(byteCode, codeSize, stage);
 }

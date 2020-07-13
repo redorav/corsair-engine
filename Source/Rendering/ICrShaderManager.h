@@ -20,7 +20,6 @@ struct CrGraphicsShaderStageCreate;
 // TODO Delete all this
 struct VkShaderModule_T;
 typedef struct VkShaderModule_T* VkShaderModule;
-using CrNativeShaderStage = VkShaderModule;
 
 class CrShaderManagerVulkan;
 
@@ -57,7 +56,7 @@ protected:
 
 	void CompileStage(CrGraphicsShaderStageCreate& shaderStageInfo);
 
-	CrNativeShaderStage CreateGraphicsShaderStage(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage);
+	VkShaderModule CreateGraphicsShaderStage(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage);
 
 	// TODO Remove this reference to shader reflection vulkan
 	void CreateShaderResourceSet(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet);
@@ -66,7 +65,7 @@ protected:
 
 	virtual void CompileStagePS(CrGraphicsShaderStageCreate& shaderStageInfo) = 0;
 
-	virtual CrNativeShaderStage CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage) = 0;
+	virtual VkShaderModule CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage) = 0;
 
 	virtual void CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) = 0;
 

@@ -2,6 +2,7 @@
 
 #include "CrPipelineStateManager_vk.h"
 #include "CrRenderDevice_vk.h"
+#include "CrRenderPass_vk.h"
 #include "ICrShaderManager.h" // TODO remove
 #include "CrShaderGen.h" // TODO remove
 #include "CrVulkan.h"
@@ -10,19 +11,26 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-void CrPipelineStateManagerVulkan::InitPS(ICrRenderDevice* renderDevice)
+void CrPipelineStateManagerVulkan::InitPS()
 {
-	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
 	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache!");
 }
 
-void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS(
-	ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
-	const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
+(
+	ICrGraphicsPipeline* graphicsPipeline, 
+	const CrGraphicsPipelineDescriptor& psoDescriptor, 
+	const CrGraphicsShader* graphicsShader, 
+	const CrVertexDescriptor& vertexDescriptor,
+	const CrRenderPassDescriptor& renderPassDescriptor
+)
 {
+	renderPassDescriptor;
+
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.pNext = nullptr;
@@ -169,7 +177,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS(
 	pipelineLayoutCreateInfo.pNext = nullptr;
 	pipelineLayoutCreateInfo.flags = 0;
 	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Don't know what cases would warrant making this > 1
-	pipelineLayoutCreateInfo.pSetLayouts = &graphicsShader->GetResourceSet().descriptorSetLayout; // From shader
+	pipelineLayoutCreateInfo.pSetLayouts = &graphicsShader->GetResourceSet().m_vkDescriptorSetLayout; // From shader
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
@@ -210,15 +218,22 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS(
 	vertexInputState.vertexAttributeDescriptionCount	= (uint32_t)attributeDescriptions.size();
 	vertexInputState.pVertexAttributeDescriptions		= attributeDescriptions.data();
 	
+	// We don't need the real renderpass here to create pipeline state objects, a compatible one is enough
+	// to make it work. I suspect the only thing it really needs is the description of how we're going to
+	// be using the render pass. In D3D12 this is actually part of the psoDescriptor (RTVFormats, DSVFormat)
+	// TODO This should probably be optimized either by having another function that passes an actual render pass
+	// or by having a cache of render pass descriptors. The reason for using a dummy render pass is so that
+	// pipelines can be precreated without needing access to the actual draw commands.
+	CrRenderPassSharedHandle dummyRenderPass = m_renderDevice->CreateRenderPass(renderPassDescriptor);
+
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount				= (uint32_t) graphicsShader->m_shaderStages.size();
 	pipelineInfo.pStages				= shaderStages;
 	
-	// MASSIVE HACK TO GET CODE GOING
-	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout;
+	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout; // TODO Hack
 	pipelineInfo.pVertexInputState		= &vertexInputState;				// TODO Create this pipeline layout first from the shader/vertex descriptor
-	pipelineInfo.renderPass				= graphicsShader->m_vkRenderPass;		// TODO Create the render pass first (from a renderpass descriptor)
+	pipelineInfo.renderPass				= static_cast<CrRenderPassVulkan*>(dummyRenderPass.get())->GetVkRenderPass();
 	
 	pipelineInfo.pInputAssemblyState	= &inputAssemblyState;
 	pipelineInfo.pRasterizationState	= &rasterizerState;

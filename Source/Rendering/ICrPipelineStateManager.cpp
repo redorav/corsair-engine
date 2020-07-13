@@ -15,7 +15,13 @@ ICrPipelineStateManager* ICrPipelineStateManager::Get()
 	return &g_pipelineStateManager;
 }
 
-ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
+(
+	const CrGraphicsPipelineDescriptor& psoDescriptor, 
+	const CrGraphicsShaderHandle& graphicsShader, 
+	const CrVertexDescriptor& vertexDescriptor,
+	const CrRenderPassDescriptor& renderPassDescriptor
+)
 {
 	const CrHash& psoHash = psoDescriptor.GetHash();
 	const CrHash& graphicsShaderHash = graphicsShader->GetHash();
@@ -35,7 +41,7 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphi
 	{
 		graphicsPipeline = new ICrGraphicsPipeline;
 		graphicsPipeline->m_shader = graphicsShader;
-		CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor);
+		CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
 
 		// Insert in the hashmap
 		m_graphicsPipelines.insert({combinedHash.m_hash, graphicsPipeline});
@@ -46,5 +52,7 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline(const CrGraphi
 
 void ICrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
 {
-	InitPS(renderDevice);
+	m_renderDevice = renderDevice;
+
+	InitPS();
 }

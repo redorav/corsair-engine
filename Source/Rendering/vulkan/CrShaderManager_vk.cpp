@@ -300,13 +300,18 @@ void CrShaderManagerVulkan::CompileStagePS(CrGraphicsShaderStageCreate& shaderSt
 	glslang::FinalizeProcess();
 }
 
-void CrShaderManagerVulkan::CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet)
+void CrShaderManagerVulkan::CreateShaderResourceSetPS
+(
+	const CrGraphicsShaderCreate& shaderCreateInfo, 
+	const CrShaderReflectionVulkan& reflection, 
+	CrShaderResourceSet& resourceSet
+)
 {
 	VkDevice vkDevice = static_cast<const CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 
-	for (const CrGraphicsShaderStageCreate& shaderStageCreate : shaderCreateInfo.stages)
+	for (const CrGraphicsShaderStageCreate& shaderStageCreate : shaderCreateInfo.GetStages())
 	{
 		cr3d::ShaderStage::T stage = shaderStageCreate.stage;
 
@@ -334,11 +339,11 @@ void CrShaderManagerVulkan::CreateShaderResourceSetPS(const CrGraphicsShaderCrea
 	descriptorLayout.bindingCount = (uint32_t) layoutBindings.size();
 	descriptorLayout.pBindings = layoutBindings.data();
 
-	VkResult result = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &resourceSet.descriptorSetLayout);
+	VkResult result = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &resourceSet.m_vkDescriptorSetLayout);
 	CrAssert(result == VK_SUCCESS);
 }
 
-CrNativeShaderStage CrShaderManagerVulkan::CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T/* stage*/)
+VkShaderModule CrShaderManagerVulkan::CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T/* stage*/)
 {
 	CrAssert(byteCode != nullptr && codeSize > 0);
 

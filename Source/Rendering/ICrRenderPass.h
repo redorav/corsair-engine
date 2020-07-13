@@ -60,7 +60,7 @@ struct CrAttachmentDescriptor
 	cr3d::ResourceState::T finalState;
 };
 
-struct CrRenderPassDescriptor
+struct CrRenderPassDescriptor : CrAutoHashable<CrRenderPassDescriptor>
 {
 	CrArray<CrAttachmentDescriptor, cr3d::MaxRenderTargets> m_colorAttachments;
 	CrAttachmentDescriptor m_depthAttachment;

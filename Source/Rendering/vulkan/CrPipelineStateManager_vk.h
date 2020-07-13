@@ -22,10 +22,16 @@ public:
 
 private:
 
-	virtual void CreateGraphicsPipelinePS(ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
-		const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) final override;
+	virtual void CreateGraphicsPipelinePS
+	(
+		ICrGraphicsPipeline* graphicsPipeline, 
+		const CrGraphicsPipelineDescriptor& psoDescriptor, 
+		const CrGraphicsShader* graphicsShader, 
+		const CrVertexDescriptor& vertexDescriptor,
+		const CrRenderPassDescriptor& renderPassDescriptor
+	) final override;
 
-	virtual void InitPS(ICrRenderDevice* renderDevice) final override;
+	virtual void InitPS() final override;
 
 	VkDevice m_vkDevice;
 

@@ -102,11 +102,9 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 	return true;
 }
 
-// TODO Hack need an instance of this properly constructed/destructed
-Assimp::Importer importer;
-
 bool CrResourceManager::LoadModel(CrRenderModelSharedHandle& renderModel, const CrPath& relativePath)
 {
+	Assimp::Importer importer;
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
 
 	fullPath = fullPath.lexically_normal();

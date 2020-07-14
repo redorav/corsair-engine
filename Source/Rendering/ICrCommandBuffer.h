@@ -160,8 +160,6 @@ protected:
 
 	ICrCommandQueue*				m_ownerCommandQueue = nullptr;
 
-	CrUniquePtr<CrCPUStackAllocator> m_CPUStackAllocator;
-
 	CrUniquePtr<ICrGPUStackAllocator> m_constantBufferGPUStack;
 };
 

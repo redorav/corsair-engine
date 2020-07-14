@@ -82,4 +82,4 @@ void CrDebugWindows::PrintCurrentProcessMemory(const char* file, unsigned long l
 }
 
 // Create the global object for debug
-const ICrDebug& Debug = CrDebugWindows();
+const ICrDebug* Debug = new CrDebugWindows();

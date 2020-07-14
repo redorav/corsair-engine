@@ -16,6 +16,8 @@ public:
 
 	CrCommandBufferVulkan(ICrCommandQueue* commandQueue);
 
+	virtual ~CrCommandBufferVulkan() final override;
+
 	static void GetVkImageLayoutAndAccessFlags(bool isDepth, cr3d::ResourceState::T resourceState, VkImageLayout& imageLayout, VkAccessFlags& accessFlags);
 
 	const VkCommandBuffer& GetVkCommandBuffer() const;

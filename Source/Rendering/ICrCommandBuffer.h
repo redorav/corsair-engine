@@ -130,18 +130,6 @@ protected:
 
 	CrGPUBufferCreateParams AllocateConstantBufferParameters(uint32_t size);
 
-	void UpdateGraphicsPipelineState()
-	{
-		/*
-		CrHash pipelineHash = m_currentPipelineDesc.GetHash()
-		CrHash vertexInputHash = m_currentVertexBuffer.GetVertexInput().GetHash()
-		CrHash shaderHash = m_currentShader.GetHash()
-
-		CrGraphicsPipeline pipeline = CrPipelineManager.GetPipelineState(pipelineHash, vertexInputHash, shaderHash);
-		BindGraphicsPipeline(pipeline);
-		*/
-	}
-
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
 	{

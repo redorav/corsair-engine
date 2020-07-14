@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CrRenderingForwardDeclarations.h"
+
 class ICrGPUSemaphore;
 class ICrGPUFence;
 class ICrCommandBuffer;
@@ -34,9 +36,7 @@ public:
 
 	virtual ~ICrCommandQueue();
 
-	ICrCommandBuffer* CreateCommandBuffer();
-
-	void DestroyCommandBuffer(const ICrCommandBuffer* commandBuffer);
+	CrCommandBufferSharedHandle CreateCommandBuffer();
 
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
@@ -49,8 +49,6 @@ public:
 protected:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS() = 0;
-
-	virtual void DestroyCommandBufferPS(const ICrCommandBuffer* commandBuffer) = 0;
 
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
 

@@ -4,53 +4,7 @@
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrRendering.h"
 
-class ICrFramebuffer;
-using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
-using CrFramebufferUniqueHandle = CrUniquePtr<ICrFramebuffer>;
-struct CrFramebufferCreateParams;
-
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-struct CrTextureCreateParams;
-
-class ICrSampler;
-using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
-struct CrSamplerDescriptor;
-
-class ICrRenderPass;
-using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
-struct CrRenderPassDescriptor;
-
-class ICrCommandQueue;
-using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
-
-class ICrCommandBuffer;
-using CrCommandBufferUniqueHandle = CrUniquePtr<ICrCommandBuffer>;
-
-class CrIndexBufferCommon;
-using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
-
-class CrVertexBufferCommon;
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
-
-class ICrSwapchain;
-using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
-
-class ICrGPUFence;
-using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;
-
-class ICrGPUSemaphore;
-using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
-
-class ICrGPUStackAllocator;
-
-class ICrHardwareGPUBuffer;
-struct CrGPUBufferCreateParams;
-
-class CrGPUStackAllocatorVulkan;
-class CrRenderDeviceVulkan;
-
-class CrVertexDescriptor;
+#include "CrRenderingForwardDeclarations.h"
 
 struct CrRenderDeviceProperties
 {

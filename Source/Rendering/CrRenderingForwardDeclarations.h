@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/CrCoreForwardDeclarations.h"
+
 namespace cr3d
 {
 	namespace DataFormat { enum T : uint32_t; }
@@ -9,3 +11,49 @@ namespace cr3d
 	struct DataFormatInfo;
 	namespace ShaderStage { enum T : uint32_t; }
 }
+
+// Forward declare the necessary types for the rendering core
+
+class ICrFramebuffer;
+using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
+struct CrFramebufferCreateParams;
+
+class ICrTexture;
+using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
+struct CrTextureCreateParams;
+
+class ICrSampler;
+using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
+struct CrSamplerDescriptor;
+
+class ICrRenderPass;
+using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
+struct CrRenderPassDescriptor;
+
+class ICrCommandQueue;
+using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
+
+class CrIndexBufferCommon;
+using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
+
+class CrVertexBufferCommon;
+using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
+
+class ICrSwapchain;
+using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
+
+class ICrGPUFence;
+using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;
+
+class ICrGPUSemaphore;
+using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
+
+class ICrCommandBuffer;
+using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
+
+class ICrGPUStackAllocator;
+
+class ICrHardwareGPUBuffer;
+struct CrGPUBufferCreateParams;
+
+class CrVertexDescriptor;

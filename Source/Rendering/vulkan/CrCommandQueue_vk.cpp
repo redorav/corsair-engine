@@ -34,11 +34,6 @@ ICrCommandBuffer* CrCommandQueueVulkan::CreateCommandBufferPS()
 	return new CrCommandBufferVulkan(this);
 }
 
-void CrCommandQueueVulkan::DestroyCommandBufferPS(const ICrCommandBuffer* commandBuffer)
-{
-	vkFreeCommandBuffers(m_vkDevice, m_vkCommandBufferPool, 1, &static_cast<const CrCommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer());
-}
-
 void CrCommandQueueVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
 	VkSubmitInfo submitInfo = {};

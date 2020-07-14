@@ -313,8 +313,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 			// TODO Rework how this all works. We shouldn't be stalling here or creating new command buffers.
 			// However, changing this requires more framework to be in place
-			ICrCommandBuffer* cmdBuffer = renderDevice->GetMainCommandQueue()->CreateCommandBuffer();
-			CrCommandBufferVulkan* vulkanCmdBuffer = static_cast<CrCommandBufferVulkan*>(cmdBuffer);
+			CrCommandBufferSharedHandle cmdBuffer = renderDevice->GetMainCommandQueue()->CreateCommandBuffer();
+			CrCommandBufferVulkan* vulkanCmdBuffer = static_cast<CrCommandBufferVulkan*>(cmdBuffer.get());
 			cmdBuffer->Begin();
 
 			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
@@ -339,8 +339,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			cmdBuffer->End();
 			cmdBuffer->Submit();
 			renderDevice->GetMainCommandQueue()->WaitIdle();
-
-			renderDevice->GetMainCommandQueue()->DestroyCommandBuffer(cmdBuffer);
 
 			// Clean up staging resources
 			vkFreeMemory(m_vkDevice, stagingMemory, nullptr);

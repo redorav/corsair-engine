@@ -18,11 +18,6 @@ ICrCommandBuffer* CrCommandQueueD3D12::CreateCommandBufferPS()
 	return new CrCommandBufferD3D12(this);
 }
 
-void CrCommandQueueD3D12::DestroyCommandBufferPS(const ICrCommandBuffer* commandBuffer)
-{
-	
-}
-
 void CrCommandQueueD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
 	

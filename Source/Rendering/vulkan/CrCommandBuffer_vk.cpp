@@ -71,6 +71,15 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	CrAssert(result == VK_SUCCESS);
 }
 
+CrCommandBufferVulkan::~CrCommandBufferVulkan()
+{
+	CrCommandQueueVulkan* commandQueueVulkan = static_cast<CrCommandQueueVulkan*>(m_ownerCommandQueue);
+
+	vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
+
+	vkFreeCommandBuffers(m_vkDevice, commandQueueVulkan->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
+}
+
 void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
 	const ICrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;

@@ -3,6 +3,8 @@
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 
+#include "CrRenderingForwardDeclarations.h"
+
 class CrVertexBufferCommon;
 using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
 
@@ -12,22 +14,6 @@ using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
 class CrRenderModel;
 using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 
-class ICrRenderPass;
-using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
-
-class ICrFramebuffer;
-using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
-
-class ICrGPUSemaphore;
-using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
-
-class ICrSwapchain;
-using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
-
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-
-class ICrCommandBuffer;
 class ICrGraphicsPipeline;
 
 class CrFrame
@@ -44,7 +30,7 @@ public:
 
 private:
 
-	CrVector<ICrCommandBuffer*> m_drawCmdBuffers; // Command buffers used for rendering
+	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	CrVector<CrFramebufferSharedHandle> m_frameBuffers;
 	// TODO Pass as param
 	uint32_t m_width = 0;

@@ -16,17 +16,9 @@ ICrCommandQueue::~ICrCommandQueue()
 
 }
 
-ICrCommandBuffer* ICrCommandQueue::CreateCommandBuffer()
+CrCommandBufferSharedHandle ICrCommandQueue::CreateCommandBuffer()
 {
-	return CreateCommandBufferPS();
-}
-
-void ICrCommandQueue::DestroyCommandBuffer(const ICrCommandBuffer* commandBuffer)
-{
-	CrAssertMsg(commandBuffer->m_ownerCommandQueue == this, "Command buffer should be created and destroyed by the same command queue!");
-
-	DestroyCommandBufferPS(commandBuffer);
-	delete commandBuffer;
+	return CrCommandBufferSharedHandle(CreateCommandBufferPS());
 }
 
 void ICrCommandQueue::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)

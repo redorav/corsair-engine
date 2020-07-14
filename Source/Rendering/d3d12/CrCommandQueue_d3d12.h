@@ -17,8 +17,6 @@ public:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS() final override;
 
-	virtual void DestroyCommandBufferPS(const ICrCommandBuffer* commandBuffer) final override;
-
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) final override;
 
 	virtual void WaitIdlePS() final override;

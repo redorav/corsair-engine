@@ -224,7 +224,7 @@ void CrFrame::Process()
 
 	renderDevice->ResetFence(swapchainFence);
 
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()];
+	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()].get();
 
 	{
 		drawCommandBuffer->Begin();
@@ -407,11 +407,6 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	}
 
 	// 4. Recreate command buffers
-	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
-	{
-		mainCommandQueue->DestroyCommandBuffer(m_drawCmdBuffers[i]);
-	}
-
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{

@@ -5,12 +5,12 @@
 // For documentation on Visual Studio friendly output see the following
 // https://windowscecleaner.blogspot.com/2013/04/debug-output-tricks-for-visual-studio.html
 
-CrDebug::CrDebug()
+CrDebugWindows::CrDebugWindows()
 {
 
 }
 
-void CrDebug::Log(const char* file, unsigned long line, const char* func, const char* format...) const
+void CrDebugWindows::Log(const char* file, unsigned long line, const char* func, const char* format...) const
 {
 	// Expand variadic arguments
 	va_list args;
@@ -25,7 +25,7 @@ void CrDebug::Log(const char* file, unsigned long line, const char* func, const 
 	OutputDebugStringA(os.str().c_str());
 }
 
-void CrDebug::AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const
+void CrDebugWindows::AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const
 {
 	if (!condition)
 	{
@@ -42,4 +42,4 @@ void CrDebug::AssertMsg(bool condition, const char* file, unsigned long line, co
 }
 
 // Create the global object for debug
-const ICrDebug& Debug = CrDebug();
+const ICrDebug& Debug = CrDebugWindows();

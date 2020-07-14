@@ -2,11 +2,11 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-class CrDebug : public ICrDebug
+class CrDebugWindows : public ICrDebug
 {
 public:
 
-	CrDebug();
+	CrDebugWindows();
 
 	virtual void Log(const char* file, unsigned long line, const char* func, const char* format...) const override;
 

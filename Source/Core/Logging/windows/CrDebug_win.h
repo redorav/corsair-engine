@@ -8,7 +8,9 @@ public:
 
 	CrDebugWindows();
 
-	virtual void Log(const char* file, unsigned long line, const char* func, const char* format...) const override;
+	virtual void Log(const char* file, unsigned long line, const char* func, const char* format...) const final override;
 
-	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const override;
+	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const final override;
+
+	virtual void PrintCurrentProcessMemory(const char* file, unsigned long line, const char* func, const char* format...) const final override;
 };

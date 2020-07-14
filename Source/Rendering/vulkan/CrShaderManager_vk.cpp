@@ -286,9 +286,9 @@ void CrShaderManagerVulkan::CompileStagePS(CrGraphicsShaderStageCreate& shaderSt
 	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format
 	{
-		std::ostringstream outstr;
+		//std::ostringstream outstr;
 		//spv::Disassemble(outstr, spirvBytecode);
-		std::string spirvString = outstr.str();
+		//std::string spirvString = outstr.str();
 	}
 
 	// TODO Optimize SPIR-V bytecode

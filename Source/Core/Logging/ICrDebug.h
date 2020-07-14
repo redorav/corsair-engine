@@ -2,14 +2,29 @@
 
 #include "Core/CrMacros.h"
 
-#include <sstream>
+#include <cstdint>
 
 class ICrDebug
 {
 public:
+
 	virtual void Log(const char* file, unsigned long line, const char* func, const char* format...) const = 0;
 
 	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const = 0;
+
+	virtual void PrintCurrentProcessMemory(const char* file, unsigned long line, const char* func, const char* format...) const = 0;
+
+protected:
+
+	static uint64_t ConvertToKilobytes(uint64_t bytes)
+	{
+		return bytes / 1024;
+	}
+
+	static uint64_t ConvertToMegabytes(uint64_t bytes)
+	{
+		return bytes / (1024 * 1024);
+	}
 
 private:
 
@@ -44,3 +59,5 @@ extern const ICrDebug& Debug;
 #define CrAssertMsg(condition, message, ...) Debug.AssertMsg((condition), __FILE__, __LINE__, __func__, (message), __VA_ARGS__)
 
 #define CrAssert(condition)	CrAssertMsg((condition), "")
+
+#define CrPrintProcessMemory(message, ...) if(&Debug) Debug.PrintCurrentProcessMemory(__FILE__, __LINE__, __func__, (message), __VA_ARGS__)

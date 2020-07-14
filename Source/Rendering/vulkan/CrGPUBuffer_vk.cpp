@@ -36,6 +36,13 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 	CrAssert(result == VK_SUCCESS);
 }
 
+CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
+{
+	vkDestroyBuffer(m_vkDevice, m_vkBuffer, nullptr);
+
+	vkFreeMemory(m_vkDevice, m_vkMemory, nullptr);
+}
+
 VkMemoryPropertyFlags CrHardwareGPUBufferVulkan::GetVkMemoryPropertyFlags(cr3d::BufferAccess::T access)
 {
 	VkMemoryPropertyFlags memoryFlags = 0;

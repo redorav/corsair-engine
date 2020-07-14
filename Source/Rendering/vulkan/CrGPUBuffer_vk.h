@@ -13,6 +13,8 @@ public:
 
 	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferCreateParams& params);
 
+	virtual ~CrHardwareGPUBufferVulkan() final override;
+
 	static VkMemoryPropertyFlags GetVkMemoryPropertyFlags(cr3d::BufferAccess::T access);
 
 	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access);

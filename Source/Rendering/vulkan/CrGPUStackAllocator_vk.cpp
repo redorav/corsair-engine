@@ -57,20 +57,10 @@ void CrGPUStackAllocatorVulkan::InitPS(size_t size)
 
 void* CrGPUStackAllocatorVulkan::BeginPS()
 {
-	// TODO why are we passing the access flag?
 	return m_hardwareBuffer->Lock();
-	//return m_renderDevice->MapHardwareGPUBuffer(m_hardwareBuffer.get());
-	//return m_hardwareBuffer->Lock(cr3d::BufferAccess::CPUWrite);
-	//VkMemoryMapFlags mapFlags = 0;
-	//void* memoryPointer;
-	//vkMapMemory(m_vkDevice, m_vkDeviceMemory, 0, m_poolSize, mapFlags, &memoryPointer);
-	//return memoryPointer;
 }
 
 void CrGPUStackAllocatorVulkan::EndPS()
 {
 	m_hardwareBuffer->Unlock();
-	//m_renderDevice->UnmapHardwareGPUBuffer(m_hardwareBuffer.get());
-	//m_hardwareBuffer->Unlock(cr3d::BufferAccess::CPUWrite);
-	//vkUnmapMemory(m_vkDevice, m_vkDeviceMemory);
 }

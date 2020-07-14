@@ -16,8 +16,9 @@ CrEntity::CrEntity() : CrEntity("")
 
 }
 
-CrEntity::CrEntity(const CrString& name) : m_name(name)
-, m_qrotation(quaternion::identity())
+CrEntity::CrEntity(const CrString& name) 
+	: m_name(name)
+	, m_qrotation(quaternion::identity())
 {
 
 }

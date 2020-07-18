@@ -54,7 +54,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_height = height;
 
 	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
-	//const CrSwapchainSharedHandle& swapchain = renderDevice->GetMainSwapchain();
 
 	// Load vertex data for the frame
 

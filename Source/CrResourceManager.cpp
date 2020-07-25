@@ -17,6 +17,17 @@
 #include <iostream>
 #include <cstdint>
 
+#pragma warning(push, 0)
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#pragma warning(pop)
+
+#include "ddspp.h"
+#include <stb_image.h>
+
 using std::ios;
 
 // This define can only be added to a single cpp

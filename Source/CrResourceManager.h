@@ -1,17 +1,5 @@
 #pragma once
 
-#pragma warning(push, 0)
-
-#include "ddspp.h"
-
-#include <stb_image.h>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#pragma warning(pop)
-
 #include "Core/CrCoreForwardDeclarations.h"
 
 class CrShader;

@@ -44,11 +44,11 @@ void ICrGPUStackAllocator::Init()
 
 void ICrGPUStackAllocator::Begin()
 {
-	void* memoryPointer = BeginPS();
+	void* memoryPointer = m_hardwareBuffer->Lock();
 	m_currentPointer = m_memoryBasePointer = reinterpret_cast<uint8_t*>(memoryPointer);
 }
 
 void ICrGPUStackAllocator::End()
 {
-	EndPS();
+	m_hardwareBuffer->Unlock();
 }

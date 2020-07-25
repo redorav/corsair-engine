@@ -10,7 +10,6 @@
 #include "CrSwapchain_vk.h"
 #include "CrFramebuffer_vk.h"
 #include "CrRenderPass_vk.h"
-#include "CrGPUStackAllocator_vk.h"
 #include "CrGPUSynchronization_vk.h"
 
 #include "Core/CrCommandLine.h"
@@ -333,11 +332,6 @@ ICrSwapchain* CrRenderDeviceVulkan::CreateSwapchainPS(const CrSwapchainDescripto
 ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureCreateParams& params)
 {
 	return new CrTextureVulkan(this, params);
-}
-
-ICrGPUStackAllocator* CrRenderDeviceVulkan::CreateGPUMemoryStreamPS()
-{
-	return new CrGPUStackAllocatorVulkan(this);
 }
 
 ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)

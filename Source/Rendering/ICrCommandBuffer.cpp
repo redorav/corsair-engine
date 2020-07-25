@@ -18,7 +18,7 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 
 	m_renderDevice = commandQueue->GetRenderDevice();
 
-	m_constantBufferGPUStack = m_renderDevice->CreateGPUMemoryStream();
+	m_constantBufferGPUStack = m_renderDevice->CreateGPUStackAllocator();
 
 	m_constantBufferGPUStack->Init();
 }

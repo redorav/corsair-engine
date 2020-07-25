@@ -32,8 +32,6 @@ private:
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) final override;
 
-	virtual ICrGPUStackAllocator* CreateGPUMemoryStreamPS() final override;
-
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) final override;
 
 	ID3D12Device* m_d3d12Device;

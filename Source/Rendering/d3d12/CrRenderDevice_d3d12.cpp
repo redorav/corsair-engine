@@ -70,11 +70,6 @@ ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureCreateParams& pa
 	return new CrTextureD3D12(this, params);
 }
 
-ICrGPUStackAllocator* CrRenderDeviceD3D12::CreateGPUMemoryStreamPS()
-{
-	return new CrGPUStackAllocatorD3D12(this);
-}
-
 ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params)
 {
 	return new CrHardwareGPUBufferD3D12(this, params);

@@ -5,15 +5,6 @@
 class ICrRenderDevice;
 class ICrHardwareGPUBuffer;
 
-namespace CrGPUMemoryStreamUsage
-{
-	enum T
-	{
-		ConstantBuffer,
-		VertexBuffer
-	};
-}
-
 template<typename T>
 struct GPUStackAllocation
 {
@@ -46,12 +37,6 @@ public:
 	ICrHardwareGPUBuffer* GetHardwareGPUBuffer() const;
 
 protected:
-
-	virtual void InitPS(size_t size) = 0;
-
-	virtual void* BeginPS() = 0;
-
-	virtual void EndPS() = 0;
 
 	ICrRenderDevice* m_renderDevice = nullptr;
 

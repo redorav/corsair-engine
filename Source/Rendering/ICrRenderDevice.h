@@ -66,7 +66,7 @@ public:
 	template<typename Struct>
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices);
 
-	CrUniquePtr<ICrGPUStackAllocator> CreateGPUMemoryStream();
+	CrUniquePtr<ICrGPUStackAllocator> CreateGPUStackAllocator();
 
 	CrGPUFenceSharedHandle CreateGPUFence();
 
@@ -104,8 +104,6 @@ protected:
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
-
-	virtual ICrGPUStackAllocator* CreateGPUMemoryStreamPS() = 0;
 
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 

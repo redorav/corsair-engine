@@ -87,9 +87,9 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBuffer
 	return CreateHardwareGPUBufferPS(descriptor);
 }
 
-CrUniquePtr<ICrGPUStackAllocator> ICrRenderDevice::CreateGPUMemoryStream()
+CrUniquePtr<ICrGPUStackAllocator> ICrRenderDevice::CreateGPUStackAllocator()
 {
-	return CrUniquePtr<ICrGPUStackAllocator>(CreateGPUMemoryStreamPS());
+	return CrUniquePtr<ICrGPUStackAllocator>(new ICrGPUStackAllocator(this));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()

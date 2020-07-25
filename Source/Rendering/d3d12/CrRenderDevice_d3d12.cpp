@@ -75,7 +75,7 @@ ICrGPUStackAllocator* CrRenderDeviceD3D12::CreateGPUMemoryStreamPS()
 	return new CrGPUStackAllocatorD3D12(this);
 }
 
-ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params)
+ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params)
 {
 	return new CrHardwareGPUBufferD3D12(this, params);
 }

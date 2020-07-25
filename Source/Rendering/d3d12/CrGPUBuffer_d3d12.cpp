@@ -6,7 +6,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrGPUBufferCreateParams& params) : ICrHardwareGPUBuffer(params)
+CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrGPUBufferDescriptor& params) : ICrHardwareGPUBuffer(params)
 {
 	
 }

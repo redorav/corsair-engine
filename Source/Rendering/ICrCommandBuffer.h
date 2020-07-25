@@ -128,7 +128,7 @@ protected:
 
 	virtual void UpdateResourceTablesPS() = 0;
 
-	CrGPUBufferCreateParams AllocateConstantBufferParameters(uint32_t size);
+	CrGPUBufferDescriptor AllocateConstantBufferParameters(uint32_t size);
 
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding

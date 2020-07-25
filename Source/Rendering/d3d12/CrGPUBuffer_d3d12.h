@@ -11,7 +11,7 @@ class CrHardwareGPUBufferD3D12 final : public ICrHardwareGPUBuffer
 {
 public:
 
-	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrGPUBufferCreateParams& params);
+	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrGPUBufferDescriptor& params);
 
 	virtual void* LockPS() final override;
 

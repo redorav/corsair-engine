@@ -52,7 +52,7 @@ private:
 
 	virtual ICrGPUStackAllocator* CreateGPUMemoryStreamPS() final override;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params) final override;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) final override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() final override;
 

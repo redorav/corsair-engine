@@ -82,9 +82,9 @@ CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVerti
 	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor));
 }
 
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferCreateParams& params)
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
 {
-	return CreateHardwareGPUBufferPS(params);
+	return CreateHardwareGPUBufferPS(descriptor);
 }
 
 CrUniquePtr<ICrGPUStackAllocator> ICrRenderDevice::CreateGPUMemoryStream()

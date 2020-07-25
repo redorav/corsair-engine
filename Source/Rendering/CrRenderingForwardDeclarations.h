@@ -55,6 +55,6 @@ using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 class ICrGPUStackAllocator;
 
 class ICrHardwareGPUBuffer;
-struct CrGPUBufferCreateParams;
+struct CrGPUBufferDescriptor;
 
 class CrVertexDescriptor;

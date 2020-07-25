@@ -4,40 +4,40 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrGPUBufferCreateParams::CrGPUBufferCreateParams(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride)
+CrGPUBufferDescriptor::CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride)
 	: usage(usage), access(access), numElements(numElements), stride(stride), size(numElements * stride)
 {
 
 }
 
-CrGPUBufferCreateParams::CrGPUBufferCreateParams(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
+CrGPUBufferDescriptor::CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
 	: usage(usage), access(access), size(size), numElements(1), stride(size)
 {
 
 }
 
-ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrGPUBufferCreateParams& params)
+ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
 {
-	access = params.access;
-	usage = params.usage;
+	access = descriptor.access;
+	usage = descriptor.usage;
 	mapped = false;
 }
 
-CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferCreateParams& params)
-	: m_usage(params.usage), m_access(params.access), m_numElements(params.numElements), m_stride(params.stride)
+CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor)
+	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(descriptor.numElements), m_stride(descriptor.stride)
 {
-	CrAssertMsg((params.usage & cr3d::BufferUsage::Index) ? (params.stride == 2 || params.stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes!");
+	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (descriptor.stride == 2 || descriptor.stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes!");
 
-	if (params.existingHardwareGPUBuffer)
+	if (descriptor.existingHardwareGPUBuffer)
 	{
-		m_buffer = params.existingHardwareGPUBuffer;
-		m_memory = params.memory;
-		m_byteOffset = params.offset;
+		m_buffer = descriptor.existingHardwareGPUBuffer;
+		m_memory = descriptor.memory;
+		m_byteOffset = descriptor.offset;
 		m_ownership = cr3d::BufferOwnership::NonOwning;
 	}
 	else
 	{
-		m_buffer = renderDevice->CreateHardwareGPUBuffer(params);
+		m_buffer = renderDevice->CreateHardwareGPUBuffer(descriptor);
 		m_memory = nullptr;
 		m_byteOffset = 0;
 		m_ownership = cr3d::BufferOwnership::Owning;

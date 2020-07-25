@@ -61,7 +61,7 @@ public:
 
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor);
 
-	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrGPUBufferCreateParams& params);
+	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor);
 
 	template<typename Struct>
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices);
@@ -111,7 +111,7 @@ protected:
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params) = 0;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) = 0;
 
 	virtual void InitPS() = 0;
 

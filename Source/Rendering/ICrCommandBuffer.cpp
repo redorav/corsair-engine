@@ -45,11 +45,11 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore, const ICrGPU
 	m_ownerCommandQueue->SubmitCommandBuffer(this, waitSemaphore, signalSemaphore, signalFence);
 }
 
-CrGPUBufferCreateParams ICrCommandBuffer::AllocateConstantBufferParameters(uint32_t size)
+CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_t size)
 {
 	GPUStackAllocation<void> allocation = m_constantBufferGPUStack->Allocate(size);
 
-	CrGPUBufferCreateParams params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, size);
+	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, size);
 	params.existingHardwareGPUBuffer = m_constantBufferGPUStack->GetHardwareGPUBuffer();
 	params.memory = allocation.memory;
 	params.offset = allocation.offset;

@@ -6,18 +6,19 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferCreateParams& params) : ICrHardwareGPUBuffer(params)
+CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferDescriptor& descriptor) 
+	: ICrHardwareGPUBuffer(descriptor)
 {
-	if (params.usage & cr3d::BufferUsage::Index)
+	if (descriptor.usage & cr3d::BufferUsage::Index)
 	{
-		m_vkIndexType = params.stride == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+		m_vkIndexType = descriptor.stride == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
 	}
 
 	VkResult result = VK_SUCCESS;
 
 	m_vkDevice = renderDevice->GetVkDevice();
 
-	m_vkBuffer = crvk::CreateVkBuffer(m_vkDevice, 0, params.size, GetVkBufferUsageFlagBits(params.usage, params.access), 
+	m_vkBuffer = crvk::CreateVkBuffer(m_vkDevice, 0, descriptor.size, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
 		VK_SHARING_MODE_EXCLUSIVE, 0, nullptr);
 
 	// Warn about memory padding here. It seems as a general rule on PC there is a padding of 256 bytes
@@ -28,7 +29,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memAlloc.pNext = nullptr;
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = renderDevice->GetVkMemoryType(memReqs.memoryTypeBits, GetVkMemoryPropertyFlags(params.access));
+	memAlloc.memoryTypeIndex = renderDevice->GetVkMemoryType(memReqs.memoryTypeBits, GetVkMemoryPropertyFlags(descriptor.access));
 	result = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
 	CrAssert(result == VK_SUCCESS);
 

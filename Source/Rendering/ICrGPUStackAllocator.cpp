@@ -37,9 +37,9 @@ void ICrGPUStackAllocator::Init()
 	// TODO Configurable per platform
 	m_poolSize = 8 * 1024 * 1024; // 8 MB
 
-	CrGPUBufferCreateParams params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, m_poolSize);
+	CrGPUBufferDescriptor descriptor(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, m_poolSize);
 
-	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(params));
+	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(descriptor));
 }
 
 void ICrGPUStackAllocator::Begin()

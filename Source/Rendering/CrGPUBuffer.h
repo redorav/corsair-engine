@@ -14,13 +14,13 @@
 class ICrRenderDevice;
 class ICrHardwareGPUBuffer;
 
-struct CrGPUBufferCreateParams
+struct CrGPUBufferDescriptor
 {
-	CrGPUBufferCreateParams(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride);
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride);
 
-	CrGPUBufferCreateParams(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size);
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size);
 
-	CrGPUBufferCreateParams(const CrGPUBufferCreateParams& params) = default;
+	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
 
 	cr3d::BufferUsage::T usage;
 
@@ -44,7 +44,7 @@ class ICrHardwareGPUBuffer
 {
 public:
 
-	ICrHardwareGPUBuffer(const CrGPUBufferCreateParams& params);
+	ICrHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor);
 
 	virtual ~ICrHardwareGPUBuffer() {}
 
@@ -86,7 +86,7 @@ class CrGPUBuffer
 {
 public:
 
-	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferCreateParams& params);
+	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor);
 
 	~CrGPUBuffer();
 
@@ -162,7 +162,7 @@ class CrGPUBufferType : public CrGPUBuffer
 {
 public:
 
-	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferCreateParams& params);
+	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& params);
 
 	MetaType* Lock()
 	{
@@ -171,7 +171,7 @@ public:
 };
 
 template<typename MetaType>
-inline CrGPUBufferType<MetaType>::CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferCreateParams& params) 
+inline CrGPUBufferType<MetaType>::CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& params) 
 	: CrGPUBuffer(renderDevice, params)
 {
 	// TODO Fix this. The size needs to come from the Metatype and not the params structure that was passed in. This means
@@ -253,7 +253,7 @@ class CrVertexBufferCommon : public CrGPUBuffer
 public:
 
 	CrVertexBufferCommon(ICrRenderDevice* renderDevice, uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
-		: CrGPUBuffer(renderDevice, CrGPUBufferCreateParams(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite, numVertices, vertexDescriptor.GetDataSize()))
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite, numVertices, vertexDescriptor.GetDataSize()))
 	{
 		m_vertexDescriptor = vertexDescriptor;
 	}
@@ -287,7 +287,7 @@ class CrIndexBufferCommon : public CrGPUBuffer
 public:
 
 	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
-		: CrGPUBuffer(renderDevice, CrGPUBufferCreateParams(cr3d::BufferUsage::Index, cr3d::BufferAccess::CPUWrite, numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4)) {}
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, cr3d::BufferAccess::CPUWrite, numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4)) {}
 };
 
 using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;

@@ -340,9 +340,9 @@ ICrGPUStackAllocator* CrRenderDeviceVulkan::CreateGPUMemoryStreamPS()
 	return new CrGPUStackAllocatorVulkan(this);
 }
 
-ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferCreateParams& params)
+ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)
 {
-	return new CrHardwareGPUBufferVulkan(this, params);
+	return new CrHardwareGPUBufferVulkan(this, descriptor);
 }
 
 void CrRenderDeviceVulkan::RetrieveQueueFamilies()

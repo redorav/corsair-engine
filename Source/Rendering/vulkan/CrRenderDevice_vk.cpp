@@ -46,15 +46,19 @@ void CrRenderDeviceVulkan::InitPS()
 	}
 
 	// 1. Create the Vulkan instance
+	// TODO Move this to RenderSystem
 	CreateInstance(enableValidationLayer);
 
-	// 2. Create the physical devices (can be multi-GPU)
-	CreatePhysicalDevice();
+	// 2. Select the physical device (can be multi-GPU)
+	// TODO This needs to come from outside as part of the render device creation
+	// We select a physical device, and create as many logical devices as we need
+	SelectPhysicalDevice();
 
 	// 3. Query queue families
+	// TODO This also needs to live in the RenderSystem
 	RetrieveQueueFamilies();
 	
-	// 4. Create logical device. Connects the physical device to a vkDevice.
+	// 4. Create logical device. Connects the physical device to a logical vkDevice.
 	// Also specifies desired queues.
 	CreateLogicalDevice(enableValidationLayer);
 
@@ -194,7 +198,7 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	return res;
 }
 
-VkResult CrRenderDeviceVulkan::CreatePhysicalDevice()
+VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 {
 	VkResult result;
 

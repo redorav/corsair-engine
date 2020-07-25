@@ -83,7 +83,7 @@ private:
 
 	VkResult CreateInstance(bool enableValidationLayer);
 
-	VkResult CreatePhysicalDevice();
+	VkResult SelectPhysicalDevice();
 
 	VkResult CreateLogicalDevice(bool enableValidationLayer);
 

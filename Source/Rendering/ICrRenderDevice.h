@@ -66,8 +66,6 @@ public:
 	template<typename Struct>
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices);
 
-	CrUniquePtr<ICrGPUStackAllocator> CreateGPUStackAllocator();
-
 	CrGPUFenceSharedHandle CreateGPUFence();
 
 	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();

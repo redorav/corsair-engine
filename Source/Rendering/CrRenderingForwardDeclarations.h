@@ -52,7 +52,7 @@ using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 class ICrCommandBuffer;
 using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 
-class ICrGPUStackAllocator;
+class CrGPUStackAllocator;
 
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;

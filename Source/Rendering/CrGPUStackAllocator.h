@@ -15,13 +15,13 @@ struct GPUStackAllocation
 };
 
 // Manages transient memory allocated per frame for GPU resources
-class ICrGPUStackAllocator
+class CrGPUStackAllocator
 {
 public:
 
-	ICrGPUStackAllocator(ICrRenderDevice* renderDevice);
+	CrGPUStackAllocator(ICrRenderDevice* renderDevice);
 
-	virtual ~ICrGPUStackAllocator();
+	virtual ~CrGPUStackAllocator();
 
 	template<typename T, typename... Args>
 	GPUStackAllocation<T> Allocate(Args... args);
@@ -49,13 +49,13 @@ protected:
 	uint32_t m_poolSize = 0;
 };
 
-inline ICrHardwareGPUBuffer* ICrGPUStackAllocator::GetHardwareGPUBuffer() const
+inline ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
 {
 	return m_hardwareBuffer.get();
 }
 
 template<typename T, typename... Args>
-GPUStackAllocation<T> ICrGPUStackAllocator::Allocate(Args... args)
+GPUStackAllocation<T> CrGPUStackAllocator::Allocate(Args... args)
 {
 	GPUStackAllocation<T> allocation = Allocate(sizeof(T)); // Allocate memory off the stream
 	new(allocation.memory) T(args...); // Placement new on the memory owned by the stream

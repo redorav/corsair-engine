@@ -2,10 +2,10 @@
 
 #include "ICrCommandQueue.h"
 #include "ICrCommandBuffer.h"
-#include "CrShaderGen.h"
-#include "ICrGPUStackAllocator.h"
 #include "ICrRenderDevice.h"
 
+#include "CrShaderGen.h"
+#include "CrGPUStackAllocator.h"
 #include "CrCPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
@@ -18,7 +18,7 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 
 	m_renderDevice = commandQueue->GetRenderDevice();
 
-	m_constantBufferGPUStack = m_renderDevice->CreateGPUStackAllocator();
+	m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice));
 
 	m_constantBufferGPUStack->Init();
 }

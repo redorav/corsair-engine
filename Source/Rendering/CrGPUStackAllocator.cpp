@@ -2,7 +2,7 @@
 
 #include "CrRendering_pch.h"
 
-#include "ICrGPUStackAllocator.h"
+#include "CrGPUStackAllocator.h"
 
 #include "ICrRenderDevice.h"
 
@@ -10,19 +10,19 @@
 
 #include "Core/CrAlignment.h"
 
-ICrGPUStackAllocator::ICrGPUStackAllocator(ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice)
+CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice)
 {
 
 }
 
-ICrGPUStackAllocator::~ICrGPUStackAllocator()
+CrGPUStackAllocator::~CrGPUStackAllocator()
 {
 
 }
 
 // Reserve a memory chunk from the constant buffer allocation pool, with size equal to the buffer size
 // Then return the pointer. The calling code is responsible for filling in that memory.
-GPUStackAllocation<void> ICrGPUStackAllocator::Allocate(uint32_t bufferSize)
+GPUStackAllocation<void> CrGPUStackAllocator::Allocate(uint32_t bufferSize)
 {
 	void* bufferPointer = m_currentPointer;											// Take the current pointer
 	size_t alignedBufferSize = Align256(bufferSize);								// Align memory as required
@@ -32,7 +32,7 @@ GPUStackAllocation<void> ICrGPUStackAllocator::Allocate(uint32_t bufferSize)
 	return GPUStackAllocation<void>(bufferPointer, offsetInPool);
 }
 
-void ICrGPUStackAllocator::Init()
+void CrGPUStackAllocator::Init()
 {
 	// TODO Configurable per platform
 	m_poolSize = 8 * 1024 * 1024; // 8 MB
@@ -42,13 +42,13 @@ void ICrGPUStackAllocator::Init()
 	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(descriptor));
 }
 
-void ICrGPUStackAllocator::Begin()
+void CrGPUStackAllocator::Begin()
 {
 	void* memoryPointer = m_hardwareBuffer->Lock();
 	m_currentPointer = m_memoryBasePointer = reinterpret_cast<uint8_t*>(memoryPointer);
 }
 
-void ICrGPUStackAllocator::End()
+void CrGPUStackAllocator::End()
 {
 	m_hardwareBuffer->Unlock();
 }

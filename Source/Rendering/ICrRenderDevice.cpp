@@ -7,7 +7,7 @@
 #include "ICrFramebuffer.h"
 #include "ICrRenderPass.h"
 #include "CrGPUBuffer.h"
-#include "ICrGPUStackAllocator.h"
+#include "CrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
 
@@ -85,11 +85,6 @@ CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVerti
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
 {
 	return CreateHardwareGPUBufferPS(descriptor);
-}
-
-CrUniquePtr<ICrGPUStackAllocator> ICrRenderDevice::CreateGPUStackAllocator()
-{
-	return CrUniquePtr<ICrGPUStackAllocator>(new ICrGPUStackAllocator(this));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()

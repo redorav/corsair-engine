@@ -26,7 +26,7 @@ class ICrHardwareGPUBuffer;
 class ICrRenderPass;
 class ICrFramebuffer;
 struct CrRenderPassBeginParams;
-class ICrGPUStackAllocator;
+class CrGPUStackAllocator;
 class CrCPUStackAllocator;
 
 struct CrViewport;
@@ -160,7 +160,7 @@ protected:
 
 	ICrCommandQueue*				m_ownerCommandQueue = nullptr;
 
-	CrUniquePtr<ICrGPUStackAllocator> m_constantBufferGPUStack;
+	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
 };
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)

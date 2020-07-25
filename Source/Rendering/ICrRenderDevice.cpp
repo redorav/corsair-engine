@@ -4,6 +4,8 @@
 #include "ICrCommandQueue.h"
 #include "ICrSampler.h"
 #include "ICrTexture.h"
+#include "ICrFramebuffer.h"
+#include "ICrRenderPass.h"
 #include "CrGPUBuffer.h"
 #include "ICrGPUStackAllocator.h"
 

@@ -1,7 +1,8 @@
 #include "CrRendering_pch.h"
 
-#include "CrGPUStackAllocator_vk.h"
+#include "CrGPUBuffer.h"
 
+#include "CrGPUStackAllocator_vk.h"
 #include "CrRenderDevice_vk.h"
 
 #include "Core/Logging/ICrDebug.h"

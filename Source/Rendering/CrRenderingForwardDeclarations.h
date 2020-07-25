@@ -41,6 +41,7 @@ using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
 
 class ICrSwapchain;
 using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
+struct CrSwapchainDescriptor;
 
 class ICrGPUFence;
 using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;

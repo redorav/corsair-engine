@@ -6,6 +6,7 @@
 #include "ICrShaderManager.h" // TODO remove
 #include "CrShaderGen.h" // TODO remove
 #include "CrVulkan.h"
+#include "CrGPUBuffer.h"
 
 #include "Core/Containers/CrArray.h"
 

@@ -1,25 +1,12 @@
 #pragma once
 
+#include "Rendering/ICrRenderDevice.h"
+
 #include "Core/Containers/CrSet.h"
 #include "Core/Containers/CrVector.h"
 #include "Core/String/CrString.h"
 
-#include "ICrRenderDevice.h"
-
-#include "CrGPUBuffer.h" // todo hack
-#include "ICrShaderManager.h"
-#include "ICrFramebuffer.h"
-#include "ICrRenderPass.h"
-
 #include "Core/SmartPointers/CrSharedPtr.h"
-
-class ICrGraphicsPipeline;
-class CrGPUFenceVulkan;
-class CrGPUSemaphoreVulkan;
-class ICrCommandBuffer;
-
-class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 
 class CrRenderDeviceVulkan final : public ICrRenderDevice
 {

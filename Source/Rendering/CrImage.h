@@ -20,7 +20,7 @@ public:
 
 	const void* GetData();
 
-	uint32_t GetDataSize();
+	uint64_t GetDataSize();
 
 	// TODO need proper destruction
 	~CrImage();
@@ -34,7 +34,7 @@ public: // TODO remove
 
 	CrVector<unsigned char> m_data;
 	unsigned char* m_dataPointer;
-	uint32_t m_dataSize;
+	uint64_t m_dataSize;
 	cr3d::DataFormat::T m_format;
 	cr3d::TextureType m_type;
 };

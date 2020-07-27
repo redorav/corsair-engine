@@ -141,7 +141,7 @@ struct CrGraphicsShaderStageCreate
 		: path(path), entryPoint(entryPoint), stage(stage), format(format) {}
 
 	CrPath					path;
-	CrVector<char>			source;
+	CrString				source;
 	CrVector<unsigned char>	bytecode;
 	CrFixedString64			entryPoint;
 	cr3d::ShaderCodeFormat	format;

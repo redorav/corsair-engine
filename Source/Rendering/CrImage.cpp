@@ -31,7 +31,7 @@ const void* CrImage::GetData()
 	return m_dataPointer;
 }
 
-uint32_t CrImage::GetDataSize()
+uint64_t CrImage::GetDataSize()
 {
 	return m_dataSize;
 }

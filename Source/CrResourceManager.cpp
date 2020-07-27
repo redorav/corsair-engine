@@ -1,4 +1,5 @@
 #include "CrResourceManager.h"
+
 #include "Rendering/CrImage.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderModel.h"
@@ -10,11 +11,10 @@
 
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/CrFileSystem.h"
+#include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include <fstream>
-#include <iostream>
 #include <cstdint>
 
 #pragma warning(push, 0)
@@ -30,19 +30,11 @@
 
 using std::ios;
 
-// This define can only be added to a single cpp
-#if !defined(STB_IMAGE_IMPLEMENTATION)
-
+// TODO Move this into an stb cpp
 #define STB_IMAGE_IMPLEMENTATION
 #pragma warning(push, 0)
 #include <stb_image.h>
 #pragma warning(pop)
-
-#else
-
-#error Only define this in this cpp file!
-
-#endif
 
 // TODO Explore a better way to do this. Assigning a semantic to an input from Assimp doesn't seem the best solution
 Textures::T GetTextureSemantic(aiTextureType textureType)
@@ -223,56 +215,6 @@ CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
 	return CrPath(dataPath.c_str()) / relativePath;
 }
 
-void CrResourceManager::ReadTextFile(const CrPath& absolutePath, CrVector<char>& text)
-{
-	std::ifstream fileStream(absolutePath.string().c_str(), std::ios::in | std::ios::ate | std::ios::binary);
-	if (!fileStream.is_open())
-	{
-		printf("File %s not found\n", absolutePath.string().c_str());
-	}
-	else
-	{
-		text.resize(fileStream.tellg());
-		fileStream.seekg(0, ios::beg);
-		fileStream.read(text.data(), text.size());
-		fileStream.close();
-		text.push_back(0);
-	}
-}
-
-void CrResourceManager::ReadTextFile(const CrPath& absolutePath, CrString& text)
-{
-	std::ifstream fileStream(absolutePath.string().c_str(), std::ios::in | std::ios::ate | std::ios::binary);
-	if (!fileStream.is_open())
-	{
-		printf("File %s not found\n", absolutePath.string().c_str());
-	}
-	else
-	{
-		text.resize(fileStream.tellg());
-		fileStream.seekg(0, ios::beg);
-		fileStream.read(&text[0], text.size());
-		fileStream.close();
-		text.push_back(0);
-	}
-}
-
-void CrResourceManager::ReadBinaryFile(const CrPath& absolutePath, CrVector<unsigned char>& bytes)
-{
-	std::ifstream fileStream(absolutePath.string().c_str(), std::ios::in | std::ios::ate | std::ios::binary);
-	if (!fileStream.is_open())
-	{
-		printf("File %s not found\n", absolutePath.string().c_str());
-	}
-	else
-	{
-		bytes.resize(fileStream.tellg());
-		fileStream.seekg(0, ios::beg);
-		fileStream.read(reinterpret_cast<char*>(&bytes[0]), bytes.size());
-		fileStream.close();
-	}
-}
-
 cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 {
 	switch (format)
@@ -289,30 +231,59 @@ void CrResourceManager::LoadImageFromDisk(CrImageHandle& image, const CrPath& re
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
 	CrPath extension = fullPath.extension();
 
-	ReadBinaryFile(fullPath.string().c_str(), image->m_data);
+	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
 
 	if(CrString(".dds").comparei(extension.string().c_str()) == 0)
 	{
+		// Read in the header
+		unsigned char ddsHeaderData[ddspp::MAX_HEADER_SIZE];
+		file->Read(ddsHeaderData, ddspp::MAX_HEADER_SIZE);
+
+		// Decode the header
 		ddspp::Descriptor desc;
-		image->m_dataPointer = ddspp::decode_header(image->m_data.data(), desc);
+		ddspp::decode_header(ddsHeaderData, desc);
+
+		// Seek to the actual data
+		file->Seek(desc.headerSize);
+
+		// Read in actual data
+		uint64_t textureDataSize = file->GetSize() - desc.headerSize;
+		image->m_data.resize(textureDataSize);
+		file->Read(image->m_data.data(), image->m_data.size());
+
+		image->m_dataPointer = image->m_data.data();
 		image->m_format = DXGItoDataFormat(desc.format);
 		image->m_width = desc.width;
 		image->m_height = desc.height;
 		image->m_depth = desc.depth;
 		image->m_numMipmaps = desc.numMips;
-		image->m_dataSize = ICrTexture::GetMipSliceOffset(image->m_format, image->m_width, image->m_height, image->m_numMipmaps, false, image->m_numMipmaps, 0);
-		//image->m_type = desc.ty
+		image->m_dataSize = textureDataSize;
 	}
 	else
 	{
+		// Read file into memory
+		CrVector<unsigned char> fileData;
+		fileData.resize(file->GetSize());
+		file->Read(fileData.data(), fileData.size());
+
+		// Use stb to load image
 		int comp, w, h;
-		image->m_dataPointer = stbi_load_from_memory(image->m_data.data(), (int) image->m_data.size(), &w, &h, &comp, STBI_default);
+		unsigned char* dataPointer = stbi_load_from_memory(fileData.data(), (int) fileData.size(), &w, &h, &comp, STBI_default);
+
+		// Copy stb data into image
+		image->m_data.resize(file->GetSize());
+		memcpy(image->m_data.data(), dataPointer, image->m_data.size());
+
+		image->m_dataPointer = image->m_data.data();
 		image->m_width = w;
 		image->m_height = h;
 		image->m_numMipmaps = 1;
 		image->m_format = cr3d::DataFormat::RGBA8_Unorm;
 		image->m_type = cr3d::TextureType::Tex2D;
 		image->m_dataSize = w * h * comp;
+
+		// Free stb data
+		stbi_image_free(dataPointer);
 	}
 
 	if (!image->m_dataPointer)

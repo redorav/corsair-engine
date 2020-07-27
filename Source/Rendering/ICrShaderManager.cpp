@@ -8,6 +8,7 @@
 
 #include "Core/CrMacros.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/FileSystem/ICrFile.h"
 
 // TODO Delete
 #include "vulkan/CrShaderReflection_vk.h"
@@ -55,15 +56,23 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(CrGraphicsShaderCrea
 
 void ICrShaderManager::LoadShaderBytecode(CrGraphicsShaderStageCreate& shaderStage)
 {
+	CrFileSharedHandle file = ICrFile::Create(shaderStage.path, FileOpenFlags::Read);
+
 	switch (shaderStage.format)
 	{
 		case cr3d::ShaderCodeFormat::Binary:
-		CrResourceManager::ReadBinaryFile(shaderStage.path, shaderStage.bytecode);
-		break;
+		{
+			shaderStage.bytecode.resize(file->GetSize());
+			file->Read(shaderStage.bytecode.data(), shaderStage.bytecode.size());
+			break;
+		}
 		case cr3d::ShaderCodeFormat::Source:
-		CrResourceManager::ReadTextFile(shaderStage.path, shaderStage.source);
-		CompileStage(shaderStage);
-		break;
+		{
+			shaderStage.source.resize(file->GetSize());
+			file->Read(shaderStage.source.data(), shaderStage.source.size());
+			CompileStage(shaderStage);
+			break;
+		}
 	}
 }
 

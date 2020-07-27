@@ -283,6 +283,8 @@ void CrShaderManagerVulkan::CompileStagePS(CrGraphicsShaderStageCreate& shaderSt
 	
 	glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBytecode, &logger);
 
+	CrAssert(spirvBytecode.size() > 0);
+
 	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format
 	{

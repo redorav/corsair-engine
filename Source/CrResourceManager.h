@@ -30,15 +30,7 @@ public:
 
 	static CrPath GetFullResourcePath(const CrPath& relativePath);
 
-	static void ReadTextFile(const CrPath& absolutePath, CrString& text);
-
-	static void ReadTextFile(const CrPath& absolutePath, CrVector<char>& text);
-
-	static void ReadBinaryFile(const CrPath& absolutePath, CrVector<unsigned char>& bytes);
-
-	// TODO Change data to some image container
-	// Also allow image loading to take a data pointer, so we can do the upload
-	// directly via the map
+	// Also allow image loading to take a data pointer, so we can do the upload directly via the map
 	static void LoadImageFromDisk(CrImageHandle& image, const CrPath& relativePath);
 
 private:

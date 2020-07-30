@@ -16,7 +16,7 @@ public:
 
 	virtual size_t Read(void* memory, size_t bytes) final override;
 
-	virtual void Seek(size_t bytes) final override;
+	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) final override;
 
 	virtual void Rewind() final override;
 

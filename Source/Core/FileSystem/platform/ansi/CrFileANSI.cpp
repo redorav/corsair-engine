@@ -57,7 +57,7 @@ size_t CrFileANSI::Read(void* memory, size_t bytes)
 	return fread(memory, 1, bytes, m_file);
 }
 
-void CrFileANSI::Seek(size_t bytes)
+void CrFileANSI::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)
 {
 #if defined(_WIN32)
 	_fseeki64(m_file, bytes, SEEK_SET);

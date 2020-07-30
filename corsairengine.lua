@@ -117,6 +117,12 @@ function AddQtLibrary()
 
 end
 
+function ExcludePlatformSpecificCode(rootPath)
+
+	excludes { rootPath.."**/platform/**" }
+
+end
+
 -- Keep in mind many platforms can have different OSs
 -- LinuxVulkan
 -- AndroidVulkan
@@ -423,12 +429,23 @@ srcCore = src.."/Core"
 
 project(ProjectCrCore)
 	kind("StaticLib")
+	
 	files
 	{
 		srcCore.."/**.h",
 		srcCore.."/**.cpp",
 		LibxxHash.."/Source/xxhash.h"
 	}
+
+	ExcludePlatformSpecificCode(srcCore)
+	
+	filter { "system:windows" }
+		files { srcCore.."/**/windows/**" }
+
+	filter { "system:linux" }
+		files { srcCore.."/**/ansi/**" }
+
+	filter {}
 	
 	includedirs	{ srcCore }
 

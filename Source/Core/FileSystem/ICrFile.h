@@ -11,9 +11,20 @@ namespace FileOpenFlags
 {
 	enum T : uint8_t
 	{
-		Read = 1 << 0,
-		Write = 1 << 1,
-		Append = 1 << 2,
+		Read   = 1 << 0, // Read from the file
+		Write  = 1 << 1, // Write to the file
+		Append = 1 << 2, // Append to the file
+		Create = 1 << 3, // Create file
+	};
+}
+
+namespace SeekOrigin
+{
+	enum T : uint8_t
+	{
+		Begin,
+		Current,
+		End,
 	};
 }
 
@@ -21,9 +32,11 @@ class ICrFile
 {
 public:
 
+	virtual ~ICrFile() {}
+
 	virtual size_t Read(void* memory, size_t bytes) = 0;
 
-	virtual void Seek(size_t bytes) = 0;
+	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) = 0;
 
 	virtual void Rewind() = 0;
 

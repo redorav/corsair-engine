@@ -244,7 +244,7 @@ void CrResourceManager::LoadImageFromDisk(CrImageHandle& image, const CrPath& re
 		ddspp::decode_header(ddsHeaderData, desc);
 
 		// Seek to the actual data
-		file->Seek(desc.headerSize);
+		file->Seek(SeekOrigin::Begin, desc.headerSize);
 
 		// Read in actual data
 		uint64_t textureDataSize = file->GetSize() - desc.headerSize;

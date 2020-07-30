@@ -30,8 +30,8 @@ public:
 
 	static CrPath GetFullResourcePath(const CrPath& relativePath);
 
-	// Also allow image loading to take a data pointer, so we can do the upload directly via the map
-	static void LoadImageFromDisk(CrImageHandle& image, const CrPath& relativePath);
+	// TODO Also allow image loading to take a data pointer, so we can do the upload directly via the map
+	static CrImageHandle LoadImageFromDisk(const CrPath& relativePath);
 
 private:
 

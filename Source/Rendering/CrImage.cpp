@@ -28,12 +28,12 @@ cr3d::DataFormat::T CrImage::GetFormat()
 
 const void* CrImage::GetData()
 {
-	return m_dataPointer;
+	return m_data.data();
 }
 
 uint64_t CrImage::GetDataSize()
 {
-	return m_dataSize;
+	return m_data.size();
 }
 
 CrImage::~CrImage()

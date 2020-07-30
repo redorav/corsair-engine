@@ -26,12 +26,15 @@
 #pragma warning(pop)
 
 #include "ddspp.h"
+
+#define STBI_NO_STDIO
 #include <stb_image.h>
 
 using std::ios;
 
 // TODO Move this into an stb cpp
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_NO_STDIO
 #pragma warning(push, 0)
 #include <stb_image.h>
 #pragma warning(pop)
@@ -84,8 +87,7 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 			mat->GetTexture(textureType, 0, &aiTexturePath);
 
 			CrPath fullPath = relativePath.parent_path() / aiTexturePath.C_Str();
-			CrImageHandle image;
-			CrResourceManager::LoadImageFromDisk(image, fullPath);
+			CrImageHandle image = CrResourceManager::LoadImageFromDisk(fullPath);
 
 			CrTextureCreateParams textureParams;
 			textureParams.width = image->GetWidth();
@@ -219,19 +221,21 @@ cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 {
 	switch (format)
 	{
-		case ddspp::BC1_UNORM: return cr3d::DataFormat::BC1_RGB_Unorm;
+		case ddspp::BC1_UNORM: return cr3d::DataFormat::BC1_RGBA_Unorm;
 		default: return cr3d::DataFormat::RGBA8_Unorm;
 	}
 }
 
-void CrResourceManager::LoadImageFromDisk(CrImageHandle& image, const CrPath& relativePath)
+CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
 {
-	image = CrImageHandle(new CrImage);
+	CrImageHandle image = CrImageHandle(new CrImage);
 
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
 	CrPath extension = fullPath.extension();
 
 	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
+
+	bool success = false;
 
 	if(CrString(".dds").comparei(extension.string().c_str()) == 0)
 	{
@@ -241,23 +245,26 @@ void CrResourceManager::LoadImageFromDisk(CrImageHandle& image, const CrPath& re
 
 		// Decode the header
 		ddspp::Descriptor desc;
-		ddspp::decode_header(ddsHeaderData, desc);
+		ddspp::Result result = ddspp::decode_header(ddsHeaderData, desc);
 
-		// Seek to the actual data
-		file->Seek(SeekOrigin::Begin, desc.headerSize);
+		if (result == ddspp::Success)
+		{
+			// Seek to the actual data
+			file->Seek(SeekOrigin::Begin, desc.headerSize);
 
-		// Read in actual data
-		uint64_t textureDataSize = file->GetSize() - desc.headerSize;
-		image->m_data.resize(textureDataSize);
-		file->Read(image->m_data.data(), image->m_data.size());
+			// Read in actual data
+			uint64_t textureDataSize = file->GetSize() - desc.headerSize;
+			image->m_data.resize(textureDataSize);
+			file->Read(image->m_data.data(), image->m_data.size());
 
-		image->m_dataPointer = image->m_data.data();
-		image->m_format = DXGItoDataFormat(desc.format);
-		image->m_width = desc.width;
-		image->m_height = desc.height;
-		image->m_depth = desc.depth;
-		image->m_numMipmaps = desc.numMips;
-		image->m_dataSize = textureDataSize;
+			image->m_format = DXGItoDataFormat(desc.format);
+			image->m_width = desc.width;
+			image->m_height = desc.height;
+			image->m_depth = desc.depth;
+			image->m_numMipmaps = desc.numMips;
+
+			success = true;
+		}
 	}
 	else
 	{
@@ -268,26 +275,38 @@ void CrResourceManager::LoadImageFromDisk(CrImageHandle& image, const CrPath& re
 
 		// Use stb to load image
 		int comp, w, h;
-		unsigned char* dataPointer = stbi_load_from_memory(fileData.data(), (int) fileData.size(), &w, &h, &comp, STBI_default);
+		unsigned char* dataPointer = stbi_load_from_memory(fileData.data(), (int) fileData.size(), &w, &h, &comp, STBI_rgb_alpha);
 
-		// Copy stb data into image
-		image->m_data.resize(file->GetSize());
-		memcpy(image->m_data.data(), dataPointer, image->m_data.size());
+		if (dataPointer)
+		{
+			uint32_t imageDataSize = w * h * STBI_rgb_alpha;
 
-		image->m_dataPointer = image->m_data.data();
-		image->m_width = w;
-		image->m_height = h;
-		image->m_numMipmaps = 1;
-		image->m_format = cr3d::DataFormat::RGBA8_Unorm;
-		image->m_type = cr3d::TextureType::Tex2D;
-		image->m_dataSize = w * h * comp;
+			// Copy stb data into image
+			image->m_data.resize(imageDataSize);
+			memcpy(image->m_data.data(), dataPointer, image->m_data.size());
 
-		// Free stb data
-		stbi_image_free(dataPointer);
+			image->m_width = w;
+			image->m_height = h;
+			image->m_numMipmaps = 1;
+
+			// This format does not work for textures with 3 channels, so we tell stb to create an alpha channel
+			// because stb can return data with different number of channels depending on the image
+			image->m_format = cr3d::DataFormat::RGBA8_Unorm;
+			image->m_type = cr3d::TextureType::Tex2D;
+
+			// Free stb data if the allocation was successful
+			stbi_image_free(dataPointer);
+
+			success = true;
+		}
 	}
 
-	if (!image->m_dataPointer)
+	if (success)
 	{
-		// Error
+		return image;
+	}
+	else
+	{
+		return nullptr;
 	}
 }

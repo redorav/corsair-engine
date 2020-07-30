@@ -33,8 +33,6 @@ public: // TODO remove
 	uint32_t m_numMipmaps;
 
 	CrVector<unsigned char> m_data;
-	unsigned char* m_dataPointer;
-	uint64_t m_dataSize;
 	cr3d::DataFormat::T m_format;
 	cr3d::TextureType m_type;
 };

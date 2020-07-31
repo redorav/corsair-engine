@@ -2,10 +2,6 @@
 
 #include "ICrShaderReflection.h"
 
-#pragma warning (push, 0)
-#include <spirv_cross.hpp>
-#pragma warning (pop)
-
 #include "Core/SmartPointers/CrUniquePtr.h"
 
 class CrShaderReflectionD3D12 final : public ICrShaderReflection

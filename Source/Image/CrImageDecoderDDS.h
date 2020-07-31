@@ -2,8 +2,6 @@
 
 #include "ICrImageDecoder.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-
 class CrImageDecoderDDS final : public ICrImageDecoder
 {
 public:

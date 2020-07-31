@@ -40,3 +40,6 @@ namespace std
 using CrPath = std::filesystem::path;
 
 class CrHash;
+
+class ICrFile;
+using CrFileSharedHandle = CrSharedPtr<ICrFile>;

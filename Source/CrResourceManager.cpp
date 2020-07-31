@@ -15,6 +15,8 @@
 #include "Core/Containers/CrPair.h"
 #include "Core/Logging/ICrDebug.h"
 
+#include "Image/CrImageDecoderDDS.h"
+
 #include <cstdint>
 
 #pragma warning(push, 0)
@@ -238,34 +240,12 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
 
 	bool success = false;
 
+	CrSharedPtr<ICrImageDecoder> imageDecoder;
+
 	if(CrString(".dds").comparei(extension.string().c_str()) == 0)
 	{
-		// Read in the header
-		unsigned char ddsHeaderData[ddspp::MAX_HEADER_SIZE];
-		file->Read(ddsHeaderData, ddspp::MAX_HEADER_SIZE);
-
-		// Decode the header
-		ddspp::Descriptor desc;
-		ddspp::Result result = ddspp::decode_header(ddsHeaderData, desc);
-
-		if (result == ddspp::Success)
-		{
-			// Seek to the actual data
-			file->Seek(SeekOrigin::Begin, desc.headerSize);
-
-			// Read in actual data
-			uint64_t textureDataSize = file->GetSize() - desc.headerSize;
-			image->m_data.resize(textureDataSize);
-			file->Read(image->m_data.data(), image->m_data.size());
-
-			image->m_format = DXGItoDataFormat(desc.format);
-			image->m_width = desc.width;
-			image->m_height = desc.height;
-			image->m_depth = desc.depth;
-			image->m_numMipmaps = desc.numMips;
-
-			success = true;
-		}
+		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
+		return imageDecoder->Decode(file);
 	}
 	else
 	{

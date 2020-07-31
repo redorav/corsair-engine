@@ -2,6 +2,8 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
+#include <cstdint>
+
 namespace cr3d
 {
 	namespace DataFormat { enum T : uint32_t; }

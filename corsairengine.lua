@@ -25,8 +25,7 @@ ProjectShaderCompiler	= "CrShaderCompiler"
 ProjectShaders			= "CrShaders"
 ProjectCrCore 			= "CrCore"
 ProjectCrDebug 			= "CrDebug"
-ProjectCrResource		= "CrResource"
-ProjectCrImport			= "CrImport"
+ProjectCrImage			= "CrImage"
 
 -- Main executable folder
 MainBuildFolder = path.getabsolute(Workspace.."/Build")
@@ -333,7 +332,9 @@ project(ProjectCrRendering)
 		shaderGenDir.."/ShaderResources.h",
 		shaderGenDir.."/ShaderResources.cpp"
 	}
-			
+	
+	links { ProjectCrImage } -- TODO Delete
+
 	includedirs	{ srcRendering }
 
 	AddAssimpLibrary()
@@ -419,21 +420,13 @@ project(ProjectCrMath)
 		LibHlslpp.."/Source/include/"
 	}	
 
-group("Resource")
+group("Image")
 
-srcResource = src.."/Resource"
+srcImage= src.."/Image"
 
-project(ProjectCrResource)
+project(ProjectCrImage)
 	kind("StaticLib")
-	files{ 	srcResource.."/**" }
-
-srcImport = src.."/Import"
-	
-project(ProjectCrImport)
-	kind("StaticLib")
-	files{ 	srcImport.."/**" }
-	
-	AddAssimpLibrary()
+	files{ 	srcImage.."/**" }
 	
 group("Core")
 

@@ -29,9 +29,9 @@ private:
 		const CrGraphicsShader* graphicsShader, 
 		const CrVertexDescriptor& vertexDescriptor,
 		const CrRenderPassDescriptor& renderPassDescriptor
-	) final override;
+	) override;
 
-	virtual void InitPS() final override;
+	virtual void InitPS() override;
 
 	VkDevice m_vkDevice;
 

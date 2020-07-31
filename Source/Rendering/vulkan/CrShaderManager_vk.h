@@ -6,13 +6,13 @@ class CrShaderManagerVulkan final : public ICrShaderManager
 {
 public:
 	
-	virtual void InitPS() final override;
+	virtual void InitPS() override;
 	
 private:
 
-	virtual VkShaderModule CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage) final override;
+	virtual VkShaderModule CreateGraphicsShaderStagePS(const unsigned char* byteCode, size_t codeSize, cr3d::ShaderStage::T stage) override;
 
-	virtual void CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) final override;
+	virtual void CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) override;
 
-	virtual void CompileStagePS(CrGraphicsShaderStageCreate& shaderStageCreateInfo) final override;
+	virtual void CompileStagePS(CrGraphicsShaderStageCreate& shaderStageCreateInfo) override;
 };

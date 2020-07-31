@@ -18,45 +18,45 @@ public:
 
 private:
 
-	virtual void BeginPS() final override;
+	virtual void BeginPS() override;
 
-	virtual void EndPS() final override;
+	virtual void EndPS() override;
 
-	virtual void SetViewportPS(const CrViewport& viewport) final override;
+	virtual void SetViewportPS(const CrViewport& viewport) override;
 
-	virtual void SetScissorPS(uint32_t topLeftX, uint32_t topLeftY, uint32_t width, uint32_t height) final override;
+	virtual void SetScissorPS(uint32_t topLeftX, uint32_t topLeftY, uint32_t width, uint32_t height) override;
 
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) final override;
+	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) override;
 
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) final override;
+	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) override;
 
-	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) final override;
+	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) override;
 
-	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) final override;
+	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) override;
 
-	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) final override;
+	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
 
-	//void DrawIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) final override;
+	//void DrawIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
 
-	virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) final override;
+	virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
 
-	//void DrawIndexedIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) final override;
+	//void DrawIndexedIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
 
-	virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) final override;
+	virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) override;
 
-	//void DispatchIndirectPS(CrIndirectArgs* indirectArgs) final override;
+	//void DispatchIndirectPS(CrIndirectArgs* indirectArgs) override;
 
-	virtual void BeginDebugEventPS(const char* eventName, const float4& color) final override;
+	virtual void BeginDebugEventPS(const char* eventName, const float4& color) override;
 
-	virtual void EndDebugEventPS() final override;
+	virtual void EndDebugEventPS() override;
 
-	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) final override;
+	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
 
-	virtual void UpdateResourceTablesPS() final override;
+	virtual void UpdateResourceTablesPS() override;
 
-	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) final override;
+	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) final override;
+	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) override;
 };
 
 inline void CrCommandBufferD3D12::SetViewportPS(const CrViewport& viewport)

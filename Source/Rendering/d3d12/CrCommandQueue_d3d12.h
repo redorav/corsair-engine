@@ -15,11 +15,11 @@ public:
 
 	CrCommandQueueD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T type);
 
-	virtual ICrCommandBuffer* CreateCommandBufferPS() final override;
+	virtual ICrCommandBuffer* CreateCommandBufferPS() override;
 
-	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) final override;
+	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
-	virtual void WaitIdlePS() final override;
+	virtual void WaitIdlePS() override;
 
 private:
 

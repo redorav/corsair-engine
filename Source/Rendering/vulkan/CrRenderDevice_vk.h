@@ -18,7 +18,7 @@ public:
 
 	~CrRenderDeviceVulkan();
 
-	virtual void InitPS() final override;
+	virtual void InitPS() override;
 
 	// TODO Move to the RenderSystem singleton
 	const VkInstance GetVkInstance() const { return m_vkInstance; }
@@ -38,31 +38,31 @@ public:
 
 private:
 
-	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) final override;
+	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) override;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) final override;
+	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) override;
 	
-	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) final override;
+	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
 
-	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) final override;
+	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
 
-	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) final override;
+	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
-	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) final override;
+	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) final override;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
 
-	virtual ICrGPUFence* CreateGPUFencePS() final override;
+	virtual ICrGPUFence* CreateGPUFencePS() override;
 
-	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() final override;
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
 
-	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) final override;
+	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
-	virtual void ResetFencePS(const ICrGPUFence* fence) final override;
+	virtual void ResetFencePS(const ICrGPUFence* fence) override;
 
-	virtual void WaitIdlePS() final override;
+	virtual void WaitIdlePS() override;
 
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) final override;
+	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) override;
 
 	void RetrieveQueueFamilies();
 

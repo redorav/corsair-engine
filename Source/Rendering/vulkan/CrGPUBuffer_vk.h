@@ -13,7 +13,7 @@ public:
 
 	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferDescriptor& descriptor);
 
-	virtual ~CrHardwareGPUBufferVulkan() final override;
+	virtual ~CrHardwareGPUBufferVulkan() override;
 
 	static VkMemoryPropertyFlags GetVkMemoryPropertyFlags(cr3d::BufferAccess::T access);
 
@@ -25,9 +25,9 @@ public:
 
 	VkDeviceMemory GetVkMemory() const;
 	
-	virtual void* LockPS() final override;
+	virtual void* LockPS() override;
 
-	virtual void UnlockPS() final override;
+	virtual void UnlockPS() override;
 
 private:
 

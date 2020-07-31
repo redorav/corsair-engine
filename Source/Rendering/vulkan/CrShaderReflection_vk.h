@@ -12,11 +12,11 @@ class CrShaderReflectionVulkan final : public ICrShaderReflection
 {
 private:
 
-	virtual void AddShaderStagePS(cr3d::ShaderStage::T stage, const CrVector<unsigned char>& bytecode) final override;
+	virtual void AddShaderStagePS(cr3d::ShaderStage::T stage, const CrVector<unsigned char>& bytecode) override;
 
-	virtual CrShaderResource GetResourcePS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const final override;
+	virtual CrShaderResource GetResourcePS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const override;
 
-	virtual uint32_t GetResourceCountPS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const final override;
+	virtual uint32_t GetResourceCountPS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const override;
 
 private:
 

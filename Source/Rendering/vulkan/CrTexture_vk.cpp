@@ -285,6 +285,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 				bufferCopyRegion.imageSubresource.layerCount = 1;
 				bufferCopyRegion.imageExtent = { CrMax(m_width >> mip, 1u), CrMax(m_height >> mip, 1u), CrMax(m_depth >> mip, 1u) };
 				bufferCopyRegion.imageOffset = { 0, 0, 0 };
+
+				// TODO Fix this is dds-specific
 				bufferCopyRegion.bufferOffset = GetMipSliceOffset(mip, 0);
 				bufferCopyRegion.bufferRowLength = 0;
 				bufferCopyRegion.bufferImageHeight = 0;

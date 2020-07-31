@@ -13,9 +13,9 @@ public:
 
 	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrGPUBufferDescriptor& params);
 
-	virtual void* LockPS() final override;
+	virtual void* LockPS() override;
 
-	virtual void UnlockPS() final override;
+	virtual void UnlockPS() override;
 
 private:
 

@@ -317,6 +317,7 @@ group("Rendering")
 
 srcRendering = src.."/Rendering"
 srcShaders = srcRendering.."/Shaders"
+srcShaderCompiler = srcRendering.."/ShaderCompiler"
 
 project(ProjectCrRendering)	
 	kind("StaticLib")
@@ -356,7 +357,7 @@ project(ProjectCrRendering)
 
 project(ProjectShaders)
 	kind("StaticLib")
-	files { srcShaders.."/**.glsl", srcShaders.."/**.spv", srcShaders.."/**.hlsl" }
+	files { srcShaders.."/**" }
 	dependson { ProjectShaderCompiler }
 
 	local shaderGenDirAbsolute = path.getabsolute(shaderGenDir)
@@ -396,8 +397,7 @@ project(ProjectShaderCompiler)
 	kind("ConsoleApp")
 	files
 	{
-		srcShaders.."/*.cpp",
-		srcShaders.."/*.h"
+		srcShaderCompiler.."/**",
 	}
 	
 	AddSpirvCrossLibrary()

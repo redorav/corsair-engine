@@ -56,6 +56,9 @@ private:
 
 	CrTextureSharedHandle m_depthStencilTexture;
 
+	CrSamplerSharedHandle m_linearClampSamplerHandle;
+	CrSamplerSharedHandle m_linearWrapSamplerHandle;
+
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;
 };

@@ -40,7 +40,6 @@ struct SimpleVertex
 
 // TODO Delete these
 static CrGraphicsShaderCreate g_shaderCreateInfo;
-static CrSamplerSharedHandle g_samplerHandle;
 
 static CrCamera camera;
 static Camera cameraConstantData;
@@ -132,7 +131,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
 
 	CrSamplerDescriptor descriptor;
-	g_samplerHandle = renderDevice->CreateSampler(descriptor);
+	m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
+
+	descriptor.addressModeU = cr3d::AddressMode::Wrap;
+	descriptor.addressModeV = cr3d::AddressMode::Wrap;
+	descriptor.addressModeW = cr3d::AddressMode::Wrap;
+	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
 	RecreateSwapchainAndFramebuffers();
 
@@ -274,7 +278,8 @@ void CrFrame::Process()
 				cameraDataBuffer.Unlock();
 				drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
 	
-				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, g_samplerHandle.get());
+				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
+				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
 	
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{

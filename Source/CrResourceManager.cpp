@@ -16,6 +16,7 @@
 #include "Core/Logging/ICrDebug.h"
 
 #include "Image/CrImageDecoderDDS.h"
+#include "Image/CrImageDecoderSTB.h"
 
 #include <cstdint>
 
@@ -25,20 +26,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#pragma warning(pop)
-
-#include "ddspp.h"
-
-#define STBI_NO_STDIO
-#include <stb_image.h>
-
-using std::ios;
-
-// TODO Move this into an stb cpp
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_NO_STDIO
-#pragma warning(push, 0)
-#include <stb_image.h>
 #pragma warning(pop)
 
 // TODO Explore a better way to do this. Assigning a semantic to an input from Assimp doesn't seem the best solution
@@ -219,16 +206,6 @@ CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
 	return CrPath(dataPath.c_str()) / relativePath;
 }
 
-cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
-{
-	switch (format)
-	{
-		case ddspp::BC1_UNORM: return cr3d::DataFormat::BC1_RGBA_Unorm;
-		case ddspp::BC3_UNORM: return cr3d::DataFormat::BC3_Unorm;
-		default: return cr3d::DataFormat::RGBA8_Unorm;
-	}
-}
-
 CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
 {
 	CrImageHandle image = CrImageHandle(new CrImage);
@@ -238,56 +215,16 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
 
 	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
 
-	bool success = false;
-
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
 	if(CrString(".dds").comparei(extension.string().c_str()) == 0)
 	{
 		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
-		return imageDecoder->Decode(file);
 	}
 	else
 	{
-		// Read file into memory
-		CrVector<unsigned char> fileData;
-		fileData.resize(file->GetSize());
-		file->Read(fileData.data(), fileData.size());
-
-		// Use stb to load image
-		int comp, w, h;
-		unsigned char* dataPointer = stbi_load_from_memory(fileData.data(), (int) fileData.size(), &w, &h, &comp, STBI_rgb_alpha);
-
-		if (dataPointer)
-		{
-			uint32_t imageDataSize = w * h * STBI_rgb_alpha;
-
-			// Copy stb data into image
-			image->m_data.resize(imageDataSize);
-			memcpy(image->m_data.data(), dataPointer, image->m_data.size());
-
-			image->m_width = w;
-			image->m_height = h;
-			image->m_numMipmaps = 1;
-
-			// This format does not work for textures with 3 channels, so we tell stb to create an alpha channel
-			// because stb can return data with different number of channels depending on the image
-			image->m_format = cr3d::DataFormat::RGBA8_Unorm;
-			image->m_type = cr3d::TextureType::Tex2D;
-
-			// Free stb data if the allocation was successful
-			stbi_image_free(dataPointer);
-
-			success = true;
-		}
+		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
 	}
 
-	if (success)
-	{
-		return image;
-	}
-	else
-	{
-		return nullptr;
-	}
+	return imageDecoder->Decode(file);
 }

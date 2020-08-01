@@ -9,8 +9,6 @@ class ICrRenderDevice;
 
 class CrCommandQueueD3D12 final : public ICrCommandQueue
 {
-	friend class CrRenderDeviceD3D12;
-
 public:
 
 	CrCommandQueueD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T type);

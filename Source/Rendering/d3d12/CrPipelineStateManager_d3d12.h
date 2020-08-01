@@ -6,8 +6,6 @@ class CrRenderDeviceD3D12;
 
 class CrPipelineStateManagerD3D12 final : public ICrPipelineStateManager
 {
-	friend class ICrPipelineStateManager;
-
 public:
 
 	CrPipelineStateManagerD3D12()

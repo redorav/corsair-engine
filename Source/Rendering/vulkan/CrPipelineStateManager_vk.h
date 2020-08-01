@@ -6,8 +6,6 @@ class CrRenderDeviceVulkan;
 
 class CrPipelineStateManagerVulkan final : public ICrPipelineStateManager
 {
-	friend class ICrPipelineStateManager;
-
 public:
 
 	CrPipelineStateManagerVulkan()

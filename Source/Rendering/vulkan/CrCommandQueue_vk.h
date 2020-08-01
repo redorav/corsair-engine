@@ -9,8 +9,6 @@ class ICrRenderDevice;
 
 class CrCommandQueueVulkan final : public ICrCommandQueue
 {
-	friend class CrRenderDeviceVulkan;
-
 public:
 
 	CrCommandQueueVulkan(ICrRenderDevice* renderDevice, CrCommandQueueType::T type);

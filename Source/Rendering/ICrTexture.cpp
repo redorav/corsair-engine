@@ -33,7 +33,8 @@ CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, cr
 }
 
 CrTextureCreateParams::CrTextureCreateParams()
-	: CrTextureCreateParams(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 0, "", nullptr, 0, nullptr)
+	: CrTextureCreateParams(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
+		cr3d::TextureUsage::Default, "", nullptr, 0, nullptr)
 {
 
 }

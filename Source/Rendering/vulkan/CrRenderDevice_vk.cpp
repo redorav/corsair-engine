@@ -59,7 +59,7 @@ void CrRenderDeviceVulkan::InitPS()
 	
 	// 4. Create logical device. Connects the physical device to a logical vkDevice.
 	// Also specifies desired queues.
-	CreateLogicalDevice(enableValidationLayer);
+	CreateLogicalDevice();
 
 	// 5. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
@@ -387,7 +387,7 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 	CrAssertMsg(m_maxCommandQueues > 0, "Couldn't find appropriate queue for the render device");
 }
 
-VkResult CrRenderDeviceVulkan::CreateLogicalDevice(bool enableValidation)
+VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 {
 	CrVector<const char*> enabledDeviceExtensions;
 
@@ -396,7 +396,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice(bool enableValidation)
 		enabledDeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
-	if (enableValidation && IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 	}

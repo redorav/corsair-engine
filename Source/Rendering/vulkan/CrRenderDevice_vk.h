@@ -70,7 +70,7 @@ private:
 
 	VkResult SelectPhysicalDevice();
 
-	VkResult CreateLogicalDevice(bool enableValidationLayer);
+	VkResult CreateLogicalDevice();
 
 	// Vulkan-specific support query functions
 

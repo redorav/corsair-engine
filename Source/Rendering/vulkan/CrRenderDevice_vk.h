@@ -10,8 +10,6 @@
 
 class CrRenderDeviceVulkan final : public ICrRenderDevice
 {
-	template<typename BufferMetadata> friend class CrConstantBuffer;
-
 public:
 
 	CrRenderDeviceVulkan();

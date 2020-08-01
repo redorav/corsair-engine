@@ -33,8 +33,6 @@ struct CrViewport;
 
 class ICrCommandBuffer
 {
-	friend class ICrCommandQueue;
-
 public:
 
 	ICrCommandBuffer(ICrCommandQueue* commandQueue);

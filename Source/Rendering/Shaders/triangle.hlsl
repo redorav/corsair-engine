@@ -58,6 +58,10 @@ SamplerState AllPointClampSampler;
 SamplerState AllLinearClampSampler;
 SamplerState AllAnisotropicClampSampler;
 
+SamplerState AllPointWrapSampler;
+SamplerState AllLinearWrapSampler;
+SamplerState AllAnisotropicWrapSampler;
+
 Texture2D DiffuseTexture0;
 Texture2D NormalTexture0;
 Texture2D SpecularTexture0;
@@ -143,9 +147,9 @@ float4 main_ps(VS_OUT IN) : SV_Target0
 	float3x3 tbn = float3x3(surface.vertexTangentLocal, surface.vertexBitangentLocal, surface.vertexNormalLocal);
 	
 	// Texture reads
-	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearClampSampler, float2(IN.uv.x, IN.uv.y));
-	float4 normal0 = NormalTexture0.Sample(AllLinearClampSampler, float2(IN.uv.x, IN.uv.y));
-	float4 spec0 = SpecularTexture0.Sample(AllLinearClampSampler, float2(IN.uv.x, IN.uv.y));
+	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	
 	surface.roughness = 1.0 - spec0.a;
 	surface.F0 = spec0.rgb;

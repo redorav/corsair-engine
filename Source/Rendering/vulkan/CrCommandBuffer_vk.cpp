@@ -1,12 +1,12 @@
 #include "CrRendering_pch.h"
 
+#include "ICrShader.h" // TODO remove
 #include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrRenderDevice_vk.h"
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
 #include "CrShaderManager_vk.h"
-#include "CrShaderGen.h" // TODO remove
 #include "CrRenderPass_vk.h"
 #include "CrFramebuffer_vk.h"
 

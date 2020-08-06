@@ -4,7 +4,7 @@
 #include "CrRenderDevice_vk.h"
 #include "CrRenderPass_vk.h"
 #include "ICrShaderManager.h" // TODO remove
-#include "CrShaderGen.h" // TODO remove
+#include "ICrShader.h" // TODO remove
 #include "CrVulkan.h"
 #include "CrGPUBuffer.h"
 

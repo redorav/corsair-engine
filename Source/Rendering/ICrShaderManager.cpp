@@ -2,7 +2,7 @@
 
 #include "ICrShaderManager.h"
 #include "ICrShaderReflection.h"
-#include "CrShaderGen.h"
+#include "ICrShader.h"
 #include "CrResourceManager.h"
 #include "ShaderResources.h"
 

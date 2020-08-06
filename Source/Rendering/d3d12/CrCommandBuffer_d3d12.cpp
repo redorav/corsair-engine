@@ -6,7 +6,7 @@
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
 #include "CrShaderManager_d3d12.h"
-#include "CrShaderGen.h" // TODO remove
+#include "CrShader.h" // TODO remove
 #include "CrRenderPass_d3d12.h"
 #include "CrFramebuffer_d3d12.h"
 

@@ -1,7 +1,7 @@
 #include "CrRendering_pch.h"
 
 #include "ICrPipelineStateManager.h"
-#include "CrShaderGen.h"
+#include "ICrShader.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"

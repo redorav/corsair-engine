@@ -6,7 +6,7 @@
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
 #include "Rendering/ICrShaderManager.h"
-#include "Rendering/CrShaderGen.h"
+#include "Rendering/ICrShader.h"
 #include "Rendering/ICrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"

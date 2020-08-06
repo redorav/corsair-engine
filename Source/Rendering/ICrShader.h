@@ -103,17 +103,13 @@ public:
 class CrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
 
-class CrShader
+class ICrShader
 {
 public:
 
 	const CrHash& GetHash() const;
 
 	const CrShaderResourceSet& GetResourceSet() const;
-
-	cr3d::ShaderStage::T ShaderStageBegin() const;
-
-	cr3d::ShaderStage::T ShaderStageEnd() const;
 
 	CrFixedVector<CrShaderStageInfo, cr3d::ShaderStage::Count> m_shaderStages;
 
@@ -124,7 +120,7 @@ public:
 
 // This shader represents a full linked shader. Therefore it knows about number of stages,
 // and what these specific stages are. This is important to be able to pass it on to the PSO later on.
-class CrGraphicsShader : public CrShader
+class CrGraphicsShader : public ICrShader
 {
 public:
 

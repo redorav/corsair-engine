@@ -4,7 +4,7 @@
 #include "ICrCommandBuffer.h"
 #include "ICrRenderDevice.h"
 
-#include "CrShaderGen.h"
+#include "ICrShader.h"
 #include "CrGPUStackAllocator.h"
 #include "CrCPUStackAllocator.h"
 

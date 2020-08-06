@@ -1,6 +1,6 @@
 #include "CrRendering_pch.h"
 
-#include "CrShaderGen.h"
+#include "ICrShader.h"
 #include "ShaderResources.h"
 
 #include "Core/Logging/ICrDebug.h"
@@ -135,12 +135,12 @@ void CrShaderResourceSet::AddSampler(cr3d::ShaderStage::T stage, Samplers::T ind
 	m_usedImageTotalCount++;
 }
 
-const CrHash& CrShader::GetHash() const
+const CrHash& ICrShader::GetHash() const
 {
 	return m_hash;
 }
 
-const CrShaderResourceSet& CrShader::GetResourceSet() const
+const CrShaderResourceSet& ICrShader::GetResourceSet() const
 {
 	return m_resourceSet;
 }

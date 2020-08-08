@@ -12,7 +12,7 @@ CrFileSharedHandle ICrFile::Create(const char* filePath, FileOpenFlags::T openFl
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
-CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags)
+CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) : ICrFile(filePath, openFlags)
 {
 	DWORD dwDesiredAccess = 0;
 	DWORD dwShareMode = 0;
@@ -76,7 +76,7 @@ CrFileWindows::~CrFileWindows()
 	// Handle error
 }
 
-size_t CrFileWindows::Read(void* memory, size_t bytes)
+size_t CrFileWindows::Read(void* memory, size_t bytes) const
 {
 	DWORD numberOfBytesRead;
 	ReadFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesRead, nullptr);
@@ -122,7 +122,7 @@ void CrFileWindows::Rewind()
 	SetFilePointer(m_fileHandle, 0, nullptr, FILE_BEGIN);
 }
 
-uint64_t CrFileWindows::GetSize()
+uint64_t CrFileWindows::GetSize() const
 {
 	return m_fileSize;
 }

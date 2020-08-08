@@ -7,7 +7,7 @@ CrFileSharedHandle ICrFile::Create(const char* filePath, FileOpenFlags::T openFl
 	return CrFileSharedHandle(new CrFileANSI(filePath, openFlags));
 }
 
-CrFileANSI::CrFileANSI(const char* filePath, FileOpenFlags::T openFlags)
+CrFileANSI::CrFileANSI(const char* filePath, FileOpenFlags::T openFlags) : ICrFile(filePath, openFlags)
 {
 	const char* fopenFlags = "";
 
@@ -52,7 +52,7 @@ CrFileANSI::~CrFileANSI()
 	fclose(m_file);
 }
 
-size_t CrFileANSI::Read(void* memory, size_t bytes)
+size_t CrFileANSI::Read(void* memory, size_t bytes) const
 {
 	return fread(memory, 1, bytes, m_file);
 }
@@ -71,7 +71,7 @@ void CrFileANSI::Rewind()
 	rewind(m_file);
 }
 
-uint64_t CrFileANSI::GetSize()
+uint64_t CrFileANSI::GetSize() const
 {
 	return m_fileSize;
 }

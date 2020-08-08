@@ -10,3 +10,6 @@ using CrFixedString64 = eastl::fixed_string<char, 64>;
 using CrFixedString128 = eastl::fixed_string<char, 128>;
 using CrFixedString256 = eastl::fixed_string<char, 256>;
 using CrFixedString512 = eastl::fixed_string<char, 512>;
+
+template<int N>
+using CrFixedString = eastl::fixed_string<char, N>;

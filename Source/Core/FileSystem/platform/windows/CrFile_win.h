@@ -16,13 +16,13 @@ public:
 
 	~CrFileWindows();
 
-	virtual size_t Read(void* memory, size_t bytes) override;
+	virtual size_t Read(void* memory, size_t bytes) const override;
 
 	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) override;
 
 	virtual void Rewind() override;
 
-	virtual uint64_t GetSize() override;
+	virtual uint64_t GetSize() const override;
 
 private:
 

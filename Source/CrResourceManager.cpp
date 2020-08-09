@@ -55,9 +55,6 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 	aiString name;
 	mat->Get(AI_MATKEY_NAME, name);
 
-	aiString baseTexName;
-	mat->Get(AI_MATKEY_COLOR_DIFFUSE, baseTexName);
-
 	aiTextureType textureTypes[] =
 	{
 		aiTextureType_DIFFUSE,
@@ -88,6 +85,11 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 			textureParams.usage = cr3d::TextureUsage::Default;
 
 			CrTextureSharedHandle texture = ICrRenderDevice::GetRenderDevice()->CreateTexture(textureParams);
+
+			if (!texture)
+			{
+				CrAssertMsg(false, "Texture not loaded");
+			}
 
 			material->AddTexture(texture, GetTextureSemantic(textureType));
 		}

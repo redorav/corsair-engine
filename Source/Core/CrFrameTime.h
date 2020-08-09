@@ -2,16 +2,10 @@
 
 #include <cstdint>
 
-class CrTime
+class CrFrameTime
 {
 public:
 	
-	static long long GetNanoTime();
-
-	static long long GetMicroTime();
-
-	static long long GetMillisTime();
-
 	static double GetTime();
 
 	static void IncrementFrameCount();

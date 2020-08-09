@@ -1,4 +1,4 @@
-#include "CrTime.h"
+#include "CrFrameTime.h"
 #include "Core/String/CrString.h"
 #include "Core/Logging/ICrDebug.h"
 
@@ -7,38 +7,20 @@
 
 using namespace std::chrono;
 
-uint32_t CrTime::m_frameCount = 0;
-double CrTime::m_frameDelta;
-double CrTime::m_framePreviousEndTime;
+uint32_t CrFrameTime::m_frameCount = 0;
+double CrFrameTime::m_frameDelta;
+double CrFrameTime::m_framePreviousEndTime;
 
-uint32_t CrTime::m_lastUpdatedFrameCount;
-double CrTime::m_lastUpdatedTime;
+uint32_t CrFrameTime::m_lastUpdatedFrameCount;
+double CrFrameTime::m_lastUpdatedTime;
 
-long long CrTime::GetNanoTime()
-{
-	auto time = high_resolution_clock::now();
-	return time_point_cast<nanoseconds>(time).time_since_epoch().count();
-}
-
-long long CrTime::GetMicroTime()
-{
-	auto time = high_resolution_clock::now();
-	return time_point_cast<microseconds>(time).time_since_epoch().count();
-}
-
-long long CrTime::GetMillisTime()
-{
-	auto time = high_resolution_clock::now();
-	return time_point_cast<milliseconds>(time).time_since_epoch().count();
-}
-
-double CrTime::GetTime()
+double CrFrameTime::GetTime()
 {
 	auto time = high_resolution_clock::now();
 	return double(time_point_cast<nanoseconds>(time).time_since_epoch().count()) / double(secondNanos);
 }
 
-void CrTime::IncrementFrameCount()
+void CrFrameTime::IncrementFrameCount()
 {
 	double currentTime = GetTime();
 
@@ -50,6 +32,7 @@ void CrTime::IncrementFrameCount()
 
 		CrLog("FPS %d", frames);
 		CrLog("Delta %f", m_frameDelta);
+		CrPrintProcessMemory("Frame Memory");
 
 		m_lastUpdatedTime = currentTime;
 		m_lastUpdatedFrameCount = m_frameCount;
@@ -61,12 +44,12 @@ void CrTime::IncrementFrameCount()
 	m_frameCount = (m_frameCount + 1) % UINT32_MAX;
 }
 
-float CrTime::GetFrameDelta()
+float CrFrameTime::GetFrameDelta()
 {
 	return (float)m_frameDelta;
 }
 
-uint32_t CrTime::GetFrameCount()
+uint32_t CrFrameTime::GetFrameCount()
 {
 	return m_frameCount;
 }

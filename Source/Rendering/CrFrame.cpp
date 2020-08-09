@@ -21,7 +21,7 @@
 
 #include "CrInputManager.h"
 
-#include "Core/CrTime.h"
+#include "Core/CrFrameTime.h"
 
 #include "CrResourceManager.h"
 
@@ -320,38 +320,38 @@ void CrFrame::UpdateCamera()
 	// TODO Hack to get a bit of movement on the camera
 	if (CrInput.GetKey(KeyCode::A) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) < 0.0f)
 	{
-		camera.Translate(currentRight * -5.0f * CrTime::GetFrameDelta());
+		camera.Translate(currentRight * -5.0f * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetKey(KeyCode::D) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) > 0.0f)
 	{
-		camera.Translate(currentRight * 5.0f * CrTime::GetFrameDelta());
+		camera.Translate(currentRight * 5.0f * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetKey(KeyCode::W) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) > 0.0f)
 	{
-		camera.Translate(currentLookAt * 5.0f * CrTime::GetFrameDelta());
+		camera.Translate(currentLookAt * 5.0f * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetKey(KeyCode::S) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) < 0.0f)
 	{
-		camera.Translate(currentLookAt * -5.0f * CrTime::GetFrameDelta());
+		camera.Translate(currentLookAt * -5.0f * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetKey(KeyCode::Q) || CrInput.GetAxis(AxisCode::JoystickL2) > 0.0f)
 	{
-		camera.Translate(float3(0.0f, -5.0f, 0.0f) * CrTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, -5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetKey(KeyCode::E) || CrInput.GetAxis(AxisCode::JoystickR2) > 0.0f)
 	{
-		camera.Translate(float3(0.0f, 5.0f, 0.0f) * CrTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, 5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetAxis(AxisCode::JoystickRightAxisX) > 0.0f)
 	{
 		//CrLogWarning("Moving right");
-		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * CrTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
@@ -359,7 +359,7 @@ void CrFrame::UpdateCamera()
 	if (CrInput.GetAxis(AxisCode::JoystickRightAxisX) < 0.0f)
 	{
 		//CrLogWarning("Moving left");
-		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * CrTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}

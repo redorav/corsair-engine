@@ -5,7 +5,7 @@
 #include "Rendering/CrFrame.h"
 
 #include "Core/CrCommandLine.h"
-#include "Core/CrTime.h"
+#include "Core/CrFrameTime.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include <windows.h> // TODO Remove
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 		// Process the main loop
 		frame.Process();
 
-		CrTime::IncrementFrameCount();
+		CrFrameTime::IncrementFrameCount();
 	}
 
 	return 0;

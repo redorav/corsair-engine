@@ -25,19 +25,19 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	CrArray<VkDescriptorPoolSize, 5> typeCounts;
 
 	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	typeCounts[0].descriptorCount = 10000;
+	typeCounts[0].descriptorCount = 64;
 
 	typeCounts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	typeCounts[1].descriptorCount = 10000;
+	typeCounts[1].descriptorCount = 32;
 
 	typeCounts[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	typeCounts[2].descriptorCount = 10000;
+	typeCounts[2].descriptorCount = 32;
 
 	typeCounts[3].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-	typeCounts[3].descriptorCount = 10000;
+	typeCounts[3].descriptorCount = 32;
 
 	typeCounts[4].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-	typeCounts[4].descriptorCount = 10000;
+	typeCounts[4].descriptorCount = 64;
 
 	// For additional types you need to add new entries in the type count list
 	// typeCounts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;

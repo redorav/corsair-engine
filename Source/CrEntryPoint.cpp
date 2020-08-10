@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
 	if (dataPath.empty())
 	{
-		CrAssertMsg(false, "No root on the command line!");
+		CrAssertMsg(false, "No root on the command line");
 	}
 
 	HWND hWnd = crGUI->GetMainWindowHandle();

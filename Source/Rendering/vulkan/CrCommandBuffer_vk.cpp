@@ -455,7 +455,7 @@ void CrCommandBufferVulkan::TransitionTexturePS(const ICrTexture* texture, cr3d:
 
 void CrCommandBufferVulkan::BeginPS()
 {
-	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called Begin() on a null command buffer!");
+	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called Begin() on a null command buffer");
 
 	// Reset the descriptor pool on a Begin(). The same command buffer can never be used more than once per frame, so resetting here makes sense. All resources are sent
 	// back to the descriptor pool. Beware that the validation layer has a memory leak: https://github.com/KhronosGroup/Vulkan-ValidationLayers/issues/236
@@ -488,7 +488,7 @@ void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, 
 
 void CrCommandBufferVulkan::EndPS()
 {
-	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called End() on a null command buffer!");
+	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called End() on a null command buffer");
 
 	VkResult result = vkEndCommandBuffer(m_vkCommandBuffer);
 	CrAssert(result == VK_SUCCESS);

@@ -26,7 +26,7 @@ void* CrCPUStackAllocator::Allocate(uint32_t bufferSize)
 {
 	void* bufferPointer = m_currentPointer; // Take the current pointer
 	size_t alignedBufferSize = Align256(bufferSize); // Align memory as required
-	CrAssertMsg(m_currentPointer + alignedBufferSize < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream!");
+	CrAssertMsg(m_currentPointer + alignedBufferSize < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream");
 	m_currentPointer += alignedBufferSize; // Reserve as many bytes as needed by the buffer
 	return bufferPointer;
 }

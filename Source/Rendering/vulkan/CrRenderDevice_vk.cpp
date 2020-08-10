@@ -203,11 +203,11 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 
 	uint32_t gpuCount = 0; // TODO Put in header file of RenderSystem
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, nullptr);
-	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found!");
+	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
 	CrVector<VkPhysicalDevice> physicalDevices(gpuCount);
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, physicalDevices.data());
-	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found!");
+	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
 	// Select from the list of available GPUs which one we want to use. A priority system will automatically select
 	// the best available from the list
@@ -476,7 +476,7 @@ uint32_t CrRenderDeviceVulkan::ReserveVkQueueIndex()
 {
 	uint32_t queueIndex = m_numCommandQueues;
 
-	CrAssertMsg(queueIndex < m_maxCommandQueues, "No more command queues available!");
+	CrAssertMsg(queueIndex < m_maxCommandQueues, "No more command queues available");
 
 	m_numCommandQueues++;
 

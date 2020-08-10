@@ -108,7 +108,7 @@ DXGI_FORMAT crd3d::GetD3DFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::RGB9E5_Float:   return DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
 
 		default:
-			CrAssertMsg(false, "Format not found!");
+			CrAssertMsg(false, "Format not found");
 			return DXGI_FORMAT_UNKNOWN;
 	}
 }

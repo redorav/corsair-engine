@@ -26,10 +26,10 @@ void ICrSwapchain::Create(ICrRenderDevice* renderDevice, const CrSwapchainDescri
 {
 	CreatePS(renderDevice, swapchainDescriptor);
 
-	CrAssertMsg(m_width > 0, "Swapchain must have a width!");
-	CrAssertMsg(m_height > 0, "Swapchain must have a height!");
-	CrAssertMsg(m_imageCount > 0, "Swapchain must have at least one image!");
-	CrAssertMsg(m_format != cr3d::DataFormat::Invalid, "Swapchain must have a texture format!");
+	CrAssertMsg(m_width > 0, "Swapchain must have a width");
+	CrAssertMsg(m_height > 0, "Swapchain must have a height");
+	CrAssertMsg(m_imageCount > 0, "Swapchain must have at least one image");
+	CrAssertMsg(m_format != cr3d::DataFormat::Invalid, "Swapchain must have a texture format");
 
 	m_waitFences.resize(m_imageCount);
 
@@ -81,7 +81,7 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(const ICrGPUSemaphore* signalSe
 
 void ICrSwapchain::Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
 {
-	CrAssertMsg(queue != nullptr, "Must have a command queue to present!");
+	CrAssertMsg(queue != nullptr, "Must have a command queue to present");
 	PresentPS(queue, waitSemaphore);
 }
 

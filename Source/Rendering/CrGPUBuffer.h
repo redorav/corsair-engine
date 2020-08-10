@@ -70,14 +70,14 @@ public:
 
 inline void* ICrHardwareGPUBuffer::Lock()
 {
-	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot map a buffer with no CPU access!");
+	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot map a buffer with no CPU access");
 
 	return LockPS();
 }
 
 inline void ICrHardwareGPUBuffer::Unlock()
 {
-	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot unmap a buffer with no CPU access!");
+	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot unmap a buffer with no CPU access");
 
 	return UnlockPS();
 }
@@ -242,9 +242,9 @@ private:
 
 	void StaticAsserts()
 	{
-		static_assert(cr3d::CrTypeName<T>() == cr3d::DataFormats[F].name, "Type does not match!");
-		static_assert(F == cr3d::DataFormats[F].format, "Vertex format is in an incorrect position with respect to the enum!"); // Do not compile if the order in the array does not match the order in the enum
-		static_assert(sizeof(T) == cr3d::DataFormats[F].elementSizeR / 8, "Data type size does not match!");
+		static_assert(cr3d::CrTypeName<T>() == cr3d::DataFormats[F].name, "Type does not match");
+		static_assert(F == cr3d::DataFormats[F].format, "Vertex format is in an incorrect position with respect to the enum"); // Do not compile if the order in the array does not match the order in the enum
+		static_assert(sizeof(T) == cr3d::DataFormats[F].elementSizeR / 8, "Data type size does not match");
 	}
 };
 

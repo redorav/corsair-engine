@@ -26,7 +26,7 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrGPUBufferDescriptor& descript
 CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor)
 	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(descriptor.numElements), m_stride(descriptor.stride)
 {
-	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (descriptor.stride == 2 || descriptor.stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes!");
+	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (descriptor.stride == 2 || descriptor.stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes");
 
 	if (descriptor.existingHardwareGPUBuffer)
 	{

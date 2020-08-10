@@ -18,7 +18,7 @@ void CrPipelineStateManagerVulkan::InitPS()
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
-	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache!");
+	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
 }
 
 void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS

@@ -51,17 +51,17 @@ ICrTexture::ICrTexture(const CrTextureCreateParams& params) : m_usedMemory(0)
 	switch (params.type)
 	{
 		case cr3d::TextureType::Volume:
-		CrAssertMsg(m_depth > 1, "Depth must be > 1!");
+		CrAssertMsg(m_depth > 1, "Depth must be > 1");
 		break;
 		case cr3d::TextureType::Cubemap:
-		CrAssertMsg(m_width == m_height, "Width and height must be the same!");
-		CrAssertMsg(m_depth == 1, "Depth must be 1!");
+		CrAssertMsg(m_width == m_height, "Width and height must be the same");
+		CrAssertMsg(m_depth == 1, "Depth must be 1");
 		break;
 		case cr3d::TextureType::Tex2D:
-		CrAssertMsg(m_depth == 1, "Depth must be 1!");
+		CrAssertMsg(m_depth == 1, "Depth must be 1");
 		break;
 		case cr3d::TextureType::Tex1D:
-		CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1!");
+		CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
 		break;
 	}
 

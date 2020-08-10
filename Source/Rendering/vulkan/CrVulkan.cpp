@@ -162,7 +162,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		case cr3d::DataFormat::RGB9E5_Float:   return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
 
 		default:
-			CrAssertMsg(false, "Format not found!");
+			CrAssertMsg(false, "Format not found");
 			return VK_FORMAT_UNDEFINED;
 	}
 }
@@ -248,7 +248,7 @@ cr3d::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
 		case VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:    return cr3d::DataFormat::RGB9E5_Float;
 
 		default:
-			CrAssertMsg(false, "Format not found!");
+			CrAssertMsg(false, "Format not found");
 			return cr3d::DataFormat::Invalid;
 	}
 }

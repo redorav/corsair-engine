@@ -13,7 +13,7 @@ void CrPipelineStateManagerD3D12::InitPS(ICrRenderDevice* renderDevice)
 
 void CrPipelineStateManagerD3D12::CreateGraphicsPipelinePS(
 	ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
-	const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	
 }

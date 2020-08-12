@@ -21,7 +21,7 @@ public:
 private:
 
 	virtual void CreateGraphicsPipelinePS(ICrGraphicsPipeline* graphicsPipeline, const CrGraphicsPipelineDescriptor& psoDescriptor, 
-		const CrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+		const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
 	virtual void InitPS(ICrRenderDevice* renderDevice) override;
 };

@@ -6,7 +6,7 @@
 
 class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-class CrGraphicsShader;
+class ICrGraphicsShader;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
@@ -22,11 +22,11 @@ public:
 
 	}
 
-	CrMaterial(CrGraphicsShader* shader);
+	CrMaterial(ICrGraphicsShader* shader);
 
 	static void Create(CrMaterialSharedHandle& material);
 
-	CrGraphicsShader* GetShader();
+	ICrGraphicsShader* GetShader();
 
 	void AddTexture(const CrTextureSharedHandle& texture, Textures::T semantic);
 
@@ -38,6 +38,6 @@ public:
 		Textures::T semantic;
 	};
 
-	CrGraphicsShader* m_shader;
+	ICrGraphicsShader* m_shader;
 	CrVector<TextureBinding> m_textures;
 };

@@ -71,7 +71,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrFileSh
 
 CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrGraphicsShaderCreate& shaderCreateInfo) const
 {
-	CrGraphicsShaderHandle graphicsShader(new CrGraphicsShader());
+	CrGraphicsShaderHandle graphicsShader(new ICrGraphicsShader());
 	CrShaderReflectionVulkan reflection; // TODO Remove this
 
 	graphicsShader->m_bytecodes.reserve(shaderCreateInfo.GetBytecodeDescriptors().size());

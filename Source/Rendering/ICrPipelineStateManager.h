@@ -113,8 +113,8 @@ public:
 #endif
 };
 
-class CrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
+class ICrGraphicsShader;
+using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 
 struct CrRenderPassDescriptor;
 
@@ -154,7 +154,7 @@ protected:
 	(
 		ICrGraphicsPipeline* graphicsPipeline,
 		const CrGraphicsPipelineDescriptor& psoDescriptor,
-		const CrGraphicsShader* graphicsShader, 
+		const ICrGraphicsShader* graphicsShader, 
 		const CrVertexDescriptor& vertexDescriptor, 
 		const CrRenderPassDescriptor& renderPassDescriptor
 	) = 0;

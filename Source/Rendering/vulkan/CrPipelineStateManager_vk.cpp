@@ -25,7 +25,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 (
 	ICrGraphicsPipeline* graphicsPipeline, 
 	const CrGraphicsPipelineDescriptor& psoDescriptor, 
-	const CrGraphicsShader* graphicsShader, 
+	const ICrGraphicsShader* graphicsShader, 
 	const CrVertexDescriptor& vertexDescriptor,
 	const CrRenderPassDescriptor& renderPassDescriptor
 )

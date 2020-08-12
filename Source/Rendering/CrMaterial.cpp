@@ -2,7 +2,7 @@
 
 #include "CrMaterial.h"
 
-CrMaterial::CrMaterial(CrGraphicsShader* shader)
+CrMaterial::CrMaterial(ICrGraphicsShader* shader)
 {
 	m_shader = shader;
 }
@@ -12,7 +12,7 @@ void CrMaterial::Create(CrMaterialSharedHandle& material)
 	material = CrMakeShared<CrMaterial>();
 }
 
-CrGraphicsShader* CrMaterial::GetShader()
+ICrGraphicsShader* CrMaterial::GetShader()
 {
 	return m_shader;
 }

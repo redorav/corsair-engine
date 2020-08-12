@@ -56,8 +56,8 @@ using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 class ICrCommandBuffer;
 using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 
-class CrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
+class ICrGraphicsShader;
+using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 
 class ICrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<ICrShaderBytecode>;

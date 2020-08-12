@@ -440,7 +440,7 @@ namespace cr3d
 
 	enum class ShaderCodeFormat : uint8_t
 	{
-		Source,
+		SourceHLSL,
 		Binary,
 	};
 

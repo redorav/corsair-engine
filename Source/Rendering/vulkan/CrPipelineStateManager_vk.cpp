@@ -30,8 +30,6 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	const CrRenderPassDescriptor& renderPassDescriptor
 )
 {
-	renderPassDescriptor;
-
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.pNext = nullptr;
@@ -155,7 +153,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	dynamicState.pDynamicStates		= dynamicStateEnables.data();
 	dynamicState.dynamicStateCount	= (uint32_t)dynamicStateEnables.size();
 	
-	VkResult result;
+	VkResult vkResult;
 	
 	// Shader information
 	VkPipelineShaderStageCreateInfo shaderStages[cr3d::ShaderStage::GraphicsStageCount] = {};
@@ -163,12 +161,32 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	
 	uint32_t usedShaderStages = 0;
+
+	CrVector<VkShaderModule> vkShaderModules;
+	vkShaderModules.resize(graphicsShader->m_bytecodes.size());
 	
-	for (const CrShaderStageInfo& shaderStage : graphicsShader->m_shaderStages)
+	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShader->m_bytecodes)
 	{
-		shaderStageInfo.module = shaderStage.m_shader;
-		shaderStageInfo.stage = crvk::GetVkShaderStage(shaderStage.m_stage);
-		shaderStageInfo.pName = shaderStage.m_entryPointName.c_str();
+		// Create the VkShaderModule. This might need a cache if it turns out to be expensive
+		CrAssert(shaderBytecode->GetBytecode().size() > 0);
+
+		VkShaderModule vkShaderModule;
+		{
+			VkShaderModuleCreateInfo moduleCreateInfo;
+			moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			moduleCreateInfo.pNext = nullptr;
+			moduleCreateInfo.codeSize = shaderBytecode->GetBytecode().size();
+			moduleCreateInfo.pCode = (uint32_t*)shaderBytecode->GetBytecode().data();
+			moduleCreateInfo.flags = 0;
+			
+			vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
+			
+			CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create shader module");
+		}
+
+		shaderStageInfo.module = vkShaderModule;
+		shaderStageInfo.stage = crvk::GetVkShaderStage(shaderBytecode->GetShaderStage());
+		shaderStageInfo.pName = shaderBytecode->GetEntryPoint().c_str();
 		shaderStages[usedShaderStages++] = shaderStageInfo;
 	}
 	
@@ -183,8 +201,10 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
 	
-	result = vkCreatePipelineLayout(m_vkDevice, &pipelineLayoutCreateInfo, nullptr, &graphicsPipeline->m_pipelineLayout);
-	
+	vkResult = vkCreatePipelineLayout(m_vkDevice, &pipelineLayoutCreateInfo, nullptr, &graphicsPipeline->m_pipelineLayout);
+
+	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
+
 	// Binding description
 	CrVector<VkVertexInputBindingDescription> bindingDescriptions;
 	bindingDescriptions.resize(1);
@@ -229,7 +249,9 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	pipelineInfo.stageCount				= (uint32_t) graphicsShader->m_shaderStages.size();
+
+	// TODO Shouldn't rely on the bytecode being here
+	pipelineInfo.stageCount				= (uint32_t) graphicsShader->m_bytecodes.size();
 	pipelineInfo.pStages				= shaderStages;
 	
 	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout; // TODO Hack
@@ -244,5 +266,13 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.pDepthStencilState		= &depthStencilState;
 	pipelineInfo.pDynamicState			= &dynamicState;
 	
-	result = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
+	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
+
+	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
+	
+	// We can now destroy the VkShaderModules
+	for (VkShaderModule& vkShaderModule : vkShaderModules)
+	{
+		vkDestroyShaderModule(m_vkDevice, vkShaderModule, nullptr);
+	}
 }

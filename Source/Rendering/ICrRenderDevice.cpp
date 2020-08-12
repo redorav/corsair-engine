@@ -6,6 +6,7 @@
 #include "ICrTexture.h"
 #include "ICrFramebuffer.h"
 #include "ICrRenderPass.h"
+#include "ICrShader.h"
 #include "CrGPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 
@@ -13,6 +14,8 @@
 
 // Include all the necessary platforms here
 #include "vulkan/CrRenderDevice_vk.h"
+
+#include "d3d12/CrRenderDevice_d3d12.h"
 
 static ICrRenderDevice* g_renderDevice;
 

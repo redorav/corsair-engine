@@ -3,8 +3,11 @@
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/FileSystem/CrFileSystem.h"
+#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
 #include "Core/CrCoreForwardDeclarations.h"
+
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include <vulkan/vulkan.h> // TODO Delete
 
@@ -92,12 +95,51 @@ private:
 	uint8_t				m_usedImageTotalCount = 0; // Images, samplers, combined image samplers, etc.
 };
 
-class CrShaderStageInfo
+// Bytecode represents a compiled shader stage, e.g. vertex, pixel, etc
+// Platforms like D3D12 just need a pointer and a size, while Vulkan for instance contains a shader module
+class ICrShaderBytecode
 {
 public:
-	CrFixedString64 m_entryPointName;
-	VkShaderModule m_shader;
-	cr3d::ShaderStage::T m_stage;
+
+	// We take ownership of the bytecode to avoid all the coming and going of data
+	ICrShaderBytecode(const CrVector<unsigned char>&& bytecode, const CrFixedString128& entryPoint, cr3d::ShaderStage::T shaderStage)
+	{
+		m_bytecode = std::move(bytecode);
+		m_entryPoint = entryPoint;
+		m_shaderStage = shaderStage;
+	}
+
+	const CrVector<unsigned char>& GetBytecode() const
+	{
+		return m_bytecode;
+	}
+
+	const CrFixedString128& GetEntryPoint() const
+	{
+		return m_entryPoint;
+	}
+
+	cr3d::ShaderStage::T GetShaderStage() const
+	{
+		return m_shaderStage;
+	}
+
+private:
+
+	CrVector<unsigned char> m_bytecode;
+	CrFixedString128 m_entryPoint;
+	cr3d::ShaderStage::T m_shaderStage;
+};
+
+struct CrShaderBytecodeDescriptor
+{
+	CrShaderBytecodeDescriptor(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format)
+		: path(path), entryPoint(entryPoint), stage(stage), format(format) {}
+
+	const CrPath                 path;
+	const CrFixedString128       entryPoint;
+	const cr3d::ShaderCodeFormat format;
+	const cr3d::ShaderStage::T   stage;
 };
 
 class CrGraphicsShader;
@@ -111,7 +153,7 @@ public:
 
 	const CrShaderResourceSet& GetResourceSet() const;
 
-	CrFixedVector<CrShaderStageInfo, cr3d::ShaderStage::Count> m_shaderStages;
+	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
 
 	CrShaderResourceSet m_resourceSet; // HACK Make private
 
@@ -129,36 +171,21 @@ public:
 	~CrGraphicsShader() {}
 };
 
-struct CrGraphicsShaderStageCreate
-{
-	CrGraphicsShaderStageCreate() {}
-
-	CrGraphicsShaderStageCreate(const CrPath& path, const CrFixedString64& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format) 
-		: path(path), entryPoint(entryPoint), stage(stage), format(format) {}
-
-	CrPath					path;
-	CrString				source;
-	CrVector<unsigned char>	bytecode;
-	CrFixedString64			entryPoint;
-	cr3d::ShaderCodeFormat	format;
-	cr3d::ShaderStage::T	stage;
-};
-
 struct CrGraphicsShaderCreate
 {
 	friend class ICrShaderManager;
 
-	void AddShaderStage(const CrGraphicsShaderStageCreate& stage)
+	void AddBytecodeDescriptor(const CrShaderBytecodeDescriptor& bytecodeDescriptor)
 	{
-		m_stages.push_back(stage);
+		m_stageBytecodes.push_back(bytecodeDescriptor);
 	}
 
-	const CrVector<CrGraphicsShaderStageCreate>& GetStages() const
+	const CrVector<CrShaderBytecodeDescriptor>& GetBytecodeDescriptors() const
 	{
-		return m_stages;
+		return m_stageBytecodes;
 	}
 
 private:
 
-	CrVector<CrGraphicsShaderStageCreate> m_stages;
+	CrVector<CrShaderBytecodeDescriptor> m_stageBytecodes;
 };

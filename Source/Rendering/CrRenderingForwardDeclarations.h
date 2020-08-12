@@ -16,6 +16,8 @@ namespace cr3d
 
 // Forward declare the necessary types for the rendering core
 
+class ICrRenderDevice;
+
 class ICrFramebuffer;
 using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
 struct CrFramebufferCreateParams;
@@ -54,9 +56,14 @@ using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 class ICrCommandBuffer;
 using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 
-class CrGPUStackAllocator;
+class CrGraphicsShader;
+using CrGraphicsShaderHandle = CrSharedPtr<CrGraphicsShader>;
 
+class ICrShaderBytecode;
+using CrShaderBytecodeSharedHandle = CrSharedPtr<ICrShaderBytecode>;
+struct CrShaderBytecodeDescriptor;
+
+class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;
-
 class CrVertexDescriptor;

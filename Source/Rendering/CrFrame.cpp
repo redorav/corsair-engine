@@ -38,9 +38,6 @@ struct SimpleVertex
 	}
 };
 
-// TODO Delete these
-static CrGraphicsShaderCreate g_shaderCreateInfo;
-
 static CrCamera camera;
 static Camera cameraConstantData;
 
@@ -154,22 +151,25 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
 	
-	//#define USE_GLSL
+	CrGraphicsShaderCreate shaderCreateInfo;
+
 #define USE_HLSL
-#if defined(USE_GLSL)
 
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.vert").c_str()), "main", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Source));
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.frag").c_str()), "main", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::Source));
+#if defined(USE_HLSL)
 
-#elif defined(USE_HLSL)
+	shaderCreateInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
+		"main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL));
 
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), "main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Source));
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), "main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::Source));
+	shaderCreateInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
+		"main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL));
 
 #else
 
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.vert.spv").c_str()), "main", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary));
-	g_shaderCreateInfo.AddShaderStage(CrGraphicsShaderStageCreate(CrPath((SHADER_PATH + "triangle.frag.spv").c_str()), "main", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::Binary));
+	shaderCreateInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.vert.spv").c_str()),
+		"main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary));
+
+	shaderCreateInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.frag.spv").c_str()),
+		"main_ps", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary));
 
 #endif
 
@@ -179,7 +179,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 		ICrPipelineStateManager::Get()->Init(renderDevice);
 	}
 
-	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(g_shaderCreateInfo);
+	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(shaderCreateInfo);
+
 	CrGraphicsPipelineDescriptor psoDescriptor;
 	psoDescriptor.Hash();
 

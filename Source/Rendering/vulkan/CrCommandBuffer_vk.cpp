@@ -108,9 +108,10 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
 
-	for(const CrShaderStageInfo& shaderStage : currentGraphicsShader->m_shaderStages)
+	// TODO Shouldn't rely on the shader having the bytecodes as we only want the shader stages
+	for(const CrShaderBytecodeSharedHandle& shaderStage : currentGraphicsShader->m_bytecodes)
 	{
-		cr3d::ShaderStage::T stage = shaderStage.m_stage;
+		cr3d::ShaderStage::T stage = shaderStage->GetShaderStage();
 
 		uint32_t constantBufferCount = resourceSet.GetConstantBufferCount(stage);
 

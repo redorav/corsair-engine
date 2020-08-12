@@ -74,9 +74,10 @@ void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int
 
 	const CrGraphicsShaderHandle& currentShader = m_currentState.m_graphicsPipeline->m_shader;
 	
-	for (const CrShaderStageInfo& stageDesc : currentShader->m_shaderStages)
+	// TODO Do not depend on the bytecode being available as we only need the shader stages
+	for (const CrShaderBytecodeSharedHandle& bytecode : currentShader->m_bytecodes)
 	{
-		m_currentState.m_constantBuffers[stageDesc.m_stage][globalIndex].buffer = constantBuffer->GetHardwareBuffer();
-		m_currentState.m_constantBuffers[stageDesc.m_stage][globalIndex].byteOffset = constantBuffer->GetByteOffset();
+		m_currentState.m_constantBuffers[bytecode->GetShaderStage()][globalIndex].buffer = constantBuffer->GetHardwareBuffer();
+		m_currentState.m_constantBuffers[bytecode->GetShaderStage()][globalIndex].byteOffset = constantBuffer->GetByteOffset();
 	}
 }

@@ -1,6 +1,8 @@
 #include "CrRendering_pch.h"
 #include "CrShaderReflection_vk.h"
 
+#include "ICrShader.h"
+
 #pragma warning (push, 0)
 // Glslang
 #include <glslang/Public/ShaderLang.h>
@@ -12,12 +14,13 @@
 
 const spirv_cross::Resource CrShaderReflectionVulkan::defaultResource = { 0, 0, 0, "" };
 
-void CrShaderReflectionVulkan::AddShaderStagePS(cr3d::ShaderStage::T stage, const CrVector<unsigned char>& bytecode)
+void CrShaderReflectionVulkan::AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode)
 {
 	// Perform reflection on the shader
 	// SPIRV-Cross has several classes like CompilerGLSL that can translate from SPIR-V to other high level languages. For reflection we don't need them.
-	reflection[stage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode.data()), bytecode.size() / 4);
-	resources[stage] = reflection[stage]->get_shader_resources(reflection[stage]->get_active_interface_variables());
+	cr3d::ShaderStage::T shaderStage = bytecode->GetShaderStage();
+	reflection[shaderStage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode->GetBytecode().data()), bytecode->GetBytecode().size() / 4);
+	resources[shaderStage] = reflection[shaderStage]->get_shader_resources(reflection[shaderStage]->get_active_interface_variables());
 }
 
 const spirv_cross::Resource& CrShaderReflectionVulkan::GetSpvResource(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const

@@ -59,8 +59,8 @@ using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 
-class ICrShaderBytecode;
-using CrShaderBytecodeSharedHandle = CrSharedPtr<ICrShaderBytecode>;
+class CrShaderBytecode;
+using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrShaderBytecodeDescriptor;
 
 class CrGPUStackAllocator;

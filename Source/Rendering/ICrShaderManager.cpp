@@ -56,7 +56,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrFileSh
 				CrVector<unsigned char> bytecodeData;
 				bytecodeData.resize(file->GetSize());
 				file->Read(bytecodeData.data(), bytecodeData.size());
-				bytecode = CrShaderBytecodeSharedHandle(new ICrShaderBytecode(std::move(bytecodeData), bytecodeDescriptor.entryPoint, bytecodeDescriptor.stage));
+				bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode(std::move(bytecodeData), bytecodeDescriptor.entryPoint, bytecodeDescriptor.stage));
 			}
 			return bytecode;
 		}
@@ -469,7 +469,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrFil
 	CrVector<unsigned char> spirvBytecodeBytes;
 	spirvBytecodeBytes = CrVector<unsigned char>(bytes, bytes + spirvBytecode.size() * 4);
 
-	CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new ICrShaderBytecode
+	CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode
 	(
 		std::move(spirvBytecodeBytes),
 		bytecodeDescriptor.entryPoint,

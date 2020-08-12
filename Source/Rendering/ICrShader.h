@@ -97,12 +97,12 @@ private:
 
 // Bytecode represents a compiled shader stage, e.g. vertex, pixel, etc
 // Platforms like D3D12 just need a pointer and a size, while Vulkan for instance contains a shader module
-class ICrShaderBytecode
+class CrShaderBytecode
 {
 public:
 
 	// We take ownership of the bytecode to avoid all the coming and going of data
-	ICrShaderBytecode(const CrVector<unsigned char>&& bytecode, const CrFixedString128& entryPoint, cr3d::ShaderStage::T shaderStage)
+	CrShaderBytecode(const CrVector<unsigned char>&& bytecode, const CrFixedString128& entryPoint, cr3d::ShaderStage::T shaderStage)
 	{
 		m_bytecode = std::move(bytecode);
 		m_entryPoint = entryPoint;

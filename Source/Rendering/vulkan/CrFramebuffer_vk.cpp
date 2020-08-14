@@ -67,9 +67,29 @@ CrFramebufferVulkan::CrFramebufferVulkan(ICrRenderDevice* renderDevice, const Cr
 
 	VkSubpassDescription subpassDescription = { 0, VK_PIPELINE_BIND_POINT_GRAPHICS, 0, nullptr, colorReferenceCount, colorReferences.data(), nullptr, depthReferencePtr, 0, nullptr };
 
-	VkRenderPass dummyVkPass = crvk::CreateVkRenderPass(m_vkDevice, attachmentCount, attachmentDescriptions.data(), 1, &subpassDescription, 0, nullptr);
-	
-	m_vkFramebuffer = crvk::CreateVkFramebuffer(m_vkDevice, dummyVkPass, attachmentCount, attachmentImageViews.data(), width, height, 1);
+	VkResult vkResult = VK_SUCCESS;
+
+	VkRenderPassCreateInfo renderPassInfo =
+	{
+		VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		nullptr, 0, attachmentCount, attachmentDescriptions.data(),
+		1, &subpassDescription, 0,
+		nullptr
+	};
+
+	VkRenderPass dummyVkPass;
+	vkResult = vkCreateRenderPass(m_vkDevice, &renderPassInfo, nullptr, &dummyVkPass);
+	CrAssert(vkResult == VK_SUCCESS);
+
+	VkFramebufferCreateInfo frameBufferCreateInfo =
+	{
+		VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		nullptr, 0, dummyVkPass, attachmentCount,
+		attachmentImageViews.data(), width, height, 1
+	};
+
+	vkResult = vkCreateFramebuffer(m_vkDevice, &frameBufferCreateInfo, nullptr, &m_vkFramebuffer);
+	CrAssert(vkResult == VK_SUCCESS);
 
 	vkDestroyRenderPass(m_vkDevice, dummyVkPass, nullptr);
 }

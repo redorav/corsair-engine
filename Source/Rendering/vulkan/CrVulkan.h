@@ -44,13 +44,9 @@ namespace crvk
 
 	VkDescriptorType GetVkDescriptorType(cr3d::ShaderResourceType::T resourceType);
 
-	VkBuffer CreateVkBuffer(VkDevice vkDevice, VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage, VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices);
+	VkBufferCreateInfo CreateVkBufferCreateInfo(VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage, VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices);
 
 	VkMemoryAllocateInfo CreateVkMemoryAllocateInfo(VkDeviceSize allocationSize, uint32_t memoryTypeIndex, void* extension = nullptr);
-
-	VkRenderPass CreateVkRenderPass(VkDevice vkDevice, uint32_t attachmentCount, const VkAttachmentDescription* attachments, uint32_t subpassCount, const VkSubpassDescription* subpasses, uint32_t dependencyCount, const VkSubpassDependency* dependencies);
-
-	VkFramebuffer CreateVkFramebuffer(VkDevice vkDevice, VkRenderPass renderPass, uint32_t attachmentCount, const VkImageView* attachmentImageViews, uint32_t width, uint32_t height, uint32_t layers);
 
 	VkWriteDescriptorSet CreateVkWriteDescriptorSet(VkDescriptorSet descriptorSet, uint32_t binding, uint32_t arrayElement, uint32_t descriptorCount, VkDescriptorType descriptorType, const VkDescriptorImageInfo* imageInfo, const VkDescriptorBufferInfo* bufferInfo, const VkBufferView* texelBufferView);
 }

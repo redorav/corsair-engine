@@ -14,12 +14,18 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 		m_vkIndexType = descriptor.stride == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
 	}
 
-	VkResult result = VK_SUCCESS;
+	VkResult vkResult = VK_SUCCESS;
 
 	m_vkDevice = renderDevice->GetVkDevice();
 
-	m_vkBuffer = crvk::CreateVkBuffer(m_vkDevice, 0, descriptor.size, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
-		VK_SHARING_MODE_EXCLUSIVE, 0, nullptr);
+	VkBufferCreateInfo bufferCreateInfo = crvk::CreateVkBufferCreateInfo
+	(
+		0, descriptor.size, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
+		VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
+	);
+
+	vkResult = vkCreateBuffer(m_vkDevice, &bufferCreateInfo, nullptr, &m_vkBuffer);
+	CrAssert(vkResult == VK_SUCCESS);
 
 	// Warn about memory padding here. It seems as a general rule on PC there is a padding of 256 bytes
 	VkMemoryRequirements memReqs;
@@ -30,11 +36,11 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 	memAlloc.pNext = nullptr;
 	memAlloc.allocationSize = memReqs.size;
 	memAlloc.memoryTypeIndex = renderDevice->GetVkMemoryType(memReqs.memoryTypeBits, GetVkMemoryPropertyFlags(descriptor.access));
-	result = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
-	CrAssert(result == VK_SUCCESS);
+	vkResult = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
+	CrAssert(vkResult == VK_SUCCESS);
 
-	result = vkBindBufferMemory(m_vkDevice, m_vkBuffer, m_vkMemory, 0);
-	CrAssert(result == VK_SUCCESS);
+	vkResult = vkBindBufferMemory(m_vkDevice, m_vkBuffer, m_vkMemory, 0);
+	CrAssert(vkResult == VK_SUCCESS);
 }
 
 CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()

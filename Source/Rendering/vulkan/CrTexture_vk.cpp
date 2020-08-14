@@ -250,8 +250,17 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
+			VkBuffer stagingBuffer;
+
 			// Create a staging buffer
-			VkBuffer stagingBuffer = crvk::CreateVkBuffer(m_vkDevice, 0, imageMemoryRequirements.size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_SHARING_MODE_EXCLUSIVE, 0, nullptr);
+			VkBufferCreateInfo stagingBufferCreateInfo = crvk::CreateVkBufferCreateInfo
+			(
+				0, imageMemoryRequirements.size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+				VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
+			);
+
+			result = vkCreateBuffer(m_vkDevice, &stagingBufferCreateInfo, nullptr, &stagingBuffer);
+			CrAssert(result == VK_SUCCESS);
 
 			VkMemoryRequirements bufferMemoryRequirements;
 			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);

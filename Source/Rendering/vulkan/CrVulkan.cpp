@@ -563,7 +563,11 @@ VkDescriptorType crvk::GetVkDescriptorType(cr3d::ShaderResourceType::T resourceT
 	//VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT = 10,
 }
 
-VkBuffer crvk::CreateVkBuffer(VkDevice vkDevice, VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage, VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices)
+VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
+(
+	VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage,
+	VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices
+)
 {
 	VkBufferCreateInfo bufferCreateInfo =
 	{
@@ -577,35 +581,12 @@ VkBuffer crvk::CreateVkBuffer(VkDevice vkDevice, VkBufferCreateFlags flags, VkDe
 		pQueueFamilyIndices
 	};
 
-	VkBuffer vkBuffer;
-	VkResult result = vkCreateBuffer(vkDevice, &bufferCreateInfo, nullptr, &vkBuffer);
-	CrAssert(result == VK_SUCCESS);
-	return vkBuffer;
+	return bufferCreateInfo;
 }
 
 VkMemoryAllocateInfo crvk::CreateVkMemoryAllocateInfo(VkDeviceSize allocationSize, uint32_t memoryTypeIndex, void* extension /*= nullptr*/)
 {
-	VkMemoryAllocateInfo memoryAllocateInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, extension, allocationSize, memoryTypeIndex };
-	return memoryAllocateInfo;
-}
-
-VkRenderPass crvk::CreateVkRenderPass(VkDevice vkDevice, uint32_t attachmentCount, const VkAttachmentDescription* attachments, uint32_t subpassCount, const VkSubpassDescription* subpasses, uint32_t dependencyCount, const VkSubpassDependency* dependencies)
-{
-	VkRenderPassCreateInfo renderPassInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, nullptr, 0, attachmentCount, attachments, subpassCount, subpasses, dependencyCount, dependencies };
-
-	VkRenderPass vkRenderPass;
-	VkResult result = vkCreateRenderPass(vkDevice, &renderPassInfo, nullptr, &vkRenderPass);
-	CrAssert(result == VK_SUCCESS);
-	return vkRenderPass;
-}
-
-VkFramebuffer crvk::CreateVkFramebuffer(VkDevice vkDevice, VkRenderPass renderPass, uint32_t attachmentCount, const VkImageView* attachmentImageViews, uint32_t width, uint32_t height, uint32_t layers)
-{
-	VkFramebufferCreateInfo frameBufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO, nullptr, 0, renderPass, attachmentCount, attachmentImageViews, width, height, layers };
-	VkFramebuffer frameBuffer;
-	VkResult result = vkCreateFramebuffer(vkDevice, &frameBufferCreateInfo, nullptr, &frameBuffer);
-	CrAssert(result == VK_SUCCESS);
-	return frameBuffer;
+	return { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, extension, allocationSize, memoryTypeIndex };
 }
 
 VkWriteDescriptorSet crvk::CreateVkWriteDescriptorSet
@@ -617,7 +598,10 @@ VkWriteDescriptorSet crvk::CreateVkWriteDescriptorSet
 {
 	VkWriteDescriptorSet writeDescriptorSet =
 	{
-		VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr, descriptorSet, binding, arrayElement, descriptorCount, descriptorType, imageInfo, bufferInfo, texelBufferView
+		VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, 
+		nullptr, descriptorSet, binding, arrayElement, 
+		descriptorCount, descriptorType, imageInfo, 
+		bufferInfo, texelBufferView
 	};
 
 	return writeDescriptorSet;

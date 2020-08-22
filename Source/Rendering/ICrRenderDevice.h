@@ -61,6 +61,8 @@ public:
 
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor);
 
+	CrGraphicsShaderHandle CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const;
+
 	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor);
 
 	template<typename Struct>
@@ -95,6 +97,14 @@ protected:
 
 	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) = 0;
 
+	virtual ICrGPUFence* CreateGPUFencePS() = 0;
+
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
+
+	virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const = 0;
+
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) = 0;
+
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
@@ -102,12 +112,6 @@ protected:
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
-
-	virtual ICrGPUFence* CreateGPUFencePS() = 0;
-
-	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
-
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) = 0;
 
 	virtual void InitPS() = 0;
 

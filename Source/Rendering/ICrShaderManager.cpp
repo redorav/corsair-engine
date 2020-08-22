@@ -69,28 +69,29 @@ CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrFileSh
 	return nullptr;
 }
 
-CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrGraphicsShaderCreate& shaderCreateInfo) const
+CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const
 {
-	CrGraphicsShaderHandle graphicsShader(new ICrGraphicsShader());
-	CrShaderReflectionVulkan reflection; // TODO Remove this
+	CrShaderReflectionVulkan reflection; // TODO Remove this, make platform-independent
 
-	graphicsShader->m_bytecodes.reserve(shaderCreateInfo.GetBytecodeDescriptors().size());
+	// Create the graphics shader descriptor
+	CrGraphicsShaderDescriptor graphicsShaderDescriptor;
+	graphicsShaderDescriptor.m_bytecodes.reserve(bytecodeLoadDescriptor.GetBytecodeDescriptors().size());
 
-	for (const CrShaderBytecodeDescriptor& bytecodeDescriptor : shaderCreateInfo.GetBytecodeDescriptors())
+	// Load all the relevant shader bytecodes
+	for (const CrShaderBytecodeDescriptor& bytecodeDescriptor : bytecodeLoadDescriptor.GetBytecodeDescriptors())
 	{
 		CrShaderBytecodeSharedHandle bytecode = LoadShaderBytecode(bytecodeDescriptor.path, bytecodeDescriptor);
 
-		// Compute hashes based on bytecode
-		//CrHash bytecodeHash = CrHash(stageCreate.bytecode.data(), stageCreate.bytecode.size());
-		//graphicsShader->m_hash <<= bytecodeHash;
-
-		graphicsShader->m_bytecodes.push_back(bytecode);
+		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 
 		// 4. Add to the reflection structure (we'll build the necessary resource tables using this later)
 		reflection.AddBytecode(bytecode);
 	}
 
-	CreateShaderResourceSet(shaderCreateInfo, reflection, graphicsShader->m_resourceSet);
+	CrGraphicsShaderHandle graphicsShader = m_renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
+
+	// TODO the shader itself can create the shader resource set after we've mangled the SPIR-V bytecode
+	CreateShaderResourceSet(graphicsShader->GetStages(), reflection, graphicsShader->m_resourceSet);
 
 	return graphicsShader;
 }
@@ -146,11 +147,11 @@ SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
 	return SamplerMetaTable[id];
 }
 
-void ICrShaderManager::CreateShaderResourceSet(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const
+void ICrShaderManager::CreateShaderResourceSet(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const
 {
-	for (const CrShaderBytecodeDescriptor& bytecodeDescriptor : shaderCreateInfo.GetBytecodeDescriptors())
+	for (const CrShaderStageInfo& stageInfo : shaderStageInfo)
 	{
-		cr3d::ShaderStage::T stage = bytecodeDescriptor.stage;
+		cr3d::ShaderStage::T stage = stageInfo.stage;
 
 		uint32_t numConstantBuffers = reflection.GetResourceCount(stage, cr3d::ShaderResourceType::ConstantBuffer);
 
@@ -180,7 +181,7 @@ void ICrShaderManager::CreateShaderResourceSet(const CrGraphicsShaderCreate& sha
 		}
 	}
 
-	CreateShaderResourceSetPS(shaderCreateInfo, reflection, resourceSet);
+	CreateShaderResourceSetPS(shaderStageInfo, reflection, resourceSet);
 }
 
 void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)

@@ -49,6 +49,26 @@ CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebuffer
 	return CrFramebufferSharedHandle(CreateFramebufferPS(params));
 }
 
+CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
+{
+	return CrGPUFenceSharedHandle(CreateGPUFencePS());
+}
+
+CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
+{
+	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS());
+}
+
+CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+{
+	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
+}
+
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
+{
+	return CreateHardwareGPUBufferPS(descriptor);
+}
+
 CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
 	return CrIndexBufferSharedHandle(new CrIndexBuffer(this, dataFormat, numIndices));
@@ -83,21 +103,6 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureCreateParams
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
 {
 	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor));
-}
-
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
-{
-	return CreateHardwareGPUBufferPS(descriptor);
-}
-
-CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
-{
-	return CrGPUFenceSharedHandle(CreateGPUFencePS());
-}
-
-CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
-{
-	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS());
 }
 
 cr3d::GPUWaitResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)

@@ -11,6 +11,7 @@
 #include "CrFramebuffer_vk.h"
 #include "CrRenderPass_vk.h"
 #include "CrGPUSynchronization_vk.h"
+#include "CrShader_vk.h"
 
 #include "Core/CrCommandLine.h"
 
@@ -314,6 +315,16 @@ ICrGPUSemaphore* CrRenderDeviceVulkan::CreateGPUSemaphorePS()
 	return new CrGPUSemaphoreVulkan(this);
 }
 
+ICrGraphicsShader* CrRenderDeviceVulkan::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+{
+	return new CrGraphicsShaderVulkan(this, graphicsShaderDescriptor);
+}
+
+ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)
+{
+	return new CrHardwareGPUBufferVulkan(this, descriptor);
+}
+
 ICrRenderPass* CrRenderDeviceVulkan::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
 	return new CrRenderPassVulkan(this, renderPassDescriptor);
@@ -332,11 +343,6 @@ ICrSwapchain* CrRenderDeviceVulkan::CreateSwapchainPS(const CrSwapchainDescripto
 ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureCreateParams& params)
 {
 	return new CrTextureVulkan(this, params);
-}
-
-ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)
-{
-	return new CrHardwareGPUBufferVulkan(this, descriptor);
 }
 
 void CrRenderDeviceVulkan::RetrieveQueueFamilies()

@@ -3,6 +3,7 @@
 #include "CrPipelineStateManager_vk.h"
 #include "CrRenderDevice_vk.h"
 #include "CrRenderPass_vk.h"
+#include "CrShader_vk.h"
 #include "ICrShaderManager.h" // TODO remove
 #include "ICrShader.h" // TODO remove
 #include "CrVulkan.h"
@@ -162,31 +163,20 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	
 	uint32_t usedShaderStages = 0;
 
-	CrVector<VkShaderModule> vkShaderModules;
-	vkShaderModules.resize(graphicsShader->m_bytecodes.size());
-	
-	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShader->m_bytecodes)
-	{
-		// Create the VkShaderModule. This might need a cache if it turns out to be expensive
-		CrAssert(shaderBytecode->GetBytecode().size() > 0);
+	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader);
 
-		VkShaderModule vkShaderModule;
-		{
-			VkShaderModuleCreateInfo moduleCreateInfo;
-			moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-			moduleCreateInfo.pNext = nullptr;
-			moduleCreateInfo.codeSize = shaderBytecode->GetBytecode().size();
-			moduleCreateInfo.pCode = (uint32_t*)shaderBytecode->GetBytecode().data();
-			moduleCreateInfo.flags = 0;
-			
-			vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
-			
-			CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create shader module");
-		}
+	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
+
+	const CrVector<CrShaderStageInfo>& stageInfos = vulkanGraphicsShader->GetStages();
+
+	for (uint32_t i = 0; i < stageInfos.size(); ++i)
+	{
+		const CrShaderStageInfo& stageInfo = stageInfos[i];
+		const VkShaderModule vkShaderModule = vkShaderModules[i];
 
 		shaderStageInfo.module = vkShaderModule;
-		shaderStageInfo.stage = crvk::GetVkShaderStage(shaderBytecode->GetShaderStage());
-		shaderStageInfo.pName = shaderBytecode->GetEntryPoint().c_str();
+		shaderStageInfo.stage = crvk::GetVkShaderStage(stageInfo.stage);
+		shaderStageInfo.pName = stageInfo.entryPoint.c_str();
 		shaderStages[usedShaderStages++] = shaderStageInfo;
 	}
 	
@@ -251,7 +241,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 
 	// TODO Shouldn't rely on the bytecode being here
-	pipelineInfo.stageCount				= (uint32_t) graphicsShader->m_bytecodes.size();
+	pipelineInfo.stageCount				= (uint32_t) graphicsShader->GetStages().size();
 	pipelineInfo.pStages				= shaderStages;
 	
 	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout; // TODO Hack
@@ -269,10 +259,4 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
 
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
-	
-	// We can now destroy the VkShaderModules
-	for (VkShaderModule& vkShaderModule : vkShaderModules)
-	{
-		vkDestroyShaderModule(m_vkDevice, vkShaderModule, nullptr);
-	}
 }

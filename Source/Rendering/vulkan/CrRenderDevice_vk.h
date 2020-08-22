@@ -40,6 +40,14 @@ private:
 
 	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) override;
 	
+	virtual ICrGPUFence* CreateGPUFencePS() override;
+
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
+
+	virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const override;
+
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
+
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
@@ -47,12 +55,6 @@ private:
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
-
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
-
-	virtual ICrGPUFence* CreateGPUFencePS() override;
-
-	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
 
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 

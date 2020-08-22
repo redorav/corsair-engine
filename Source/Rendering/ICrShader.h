@@ -95,8 +95,13 @@ private:
 	uint8_t				m_usedImageTotalCount = 0; // Images, samplers, combined image samplers, etc.
 };
 
-// Bytecode represents a compiled shader stage, e.g. vertex, pixel, etc
-// Platforms like D3D12 just need a pointer and a size, while Vulkan for instance contains a shader module
+struct CrShaderStageInfo
+{
+	CrFixedString128 entryPoint;
+	cr3d::ShaderStage::T stage;
+};
+
+// Bytecode represents a shader code, e.g. vertex, pixel, etc
 class CrShaderBytecode
 {
 public:
@@ -131,6 +136,73 @@ private:
 	cr3d::ShaderStage::T m_shaderStage;
 };
 
+struct CrGraphicsShaderDescriptor
+{
+	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
+};
+
+class ICrGraphicsShader;
+using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
+
+class ICrShader
+{
+public:
+
+	// TODO We need a way to build the hash for a shader. The hash doesn't necessarily
+	// want to be the bytecode (perhaps a stripped version of the bytecode?) We need to
+	// give this some thought.
+
+	const CrHash& GetHash() const;
+
+	const CrShaderResourceSet& GetResourceSet() const;
+
+	CrShaderResourceSet m_resourceSet;
+
+private:
+
+	CrHash		m_hash;
+};
+
+// This shader represents a full linked shader. Therefore it knows about number of stages,
+// and what these specific stages are. This is important to be able to pass it on to the PSO later on.
+class ICrGraphicsShader : public ICrShader
+{
+public:
+
+	ICrGraphicsShader(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	{
+		renderDevice;
+
+		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
+		{
+			CrShaderStageInfo info;
+			info.entryPoint = bytecode->GetEntryPoint();
+			info.stage = bytecode->GetShaderStage();
+			m_stageInfos.push_back(info);
+		}
+	}
+
+	~ICrGraphicsShader() {}
+
+	const CrVector<CrShaderStageInfo>& GetStages() const
+	{
+		return m_stageInfos;
+	}
+
+private:
+
+	CrVector<CrShaderStageInfo> m_stageInfos;
+};
+
+class ICrComputeShader : public ICrShader
+{
+public:
+
+	ICrComputeShader() {}
+
+	~ICrComputeShader() {}
+};
+
 struct CrShaderBytecodeDescriptor
 {
 	CrShaderBytecodeDescriptor(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format)
@@ -142,50 +214,21 @@ struct CrShaderBytecodeDescriptor
 	const cr3d::ShaderStage::T   stage;
 };
 
-class ICrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
-
-class ICrShader
-{
-public:
-
-	const CrHash& GetHash() const;
-
-	const CrShaderResourceSet& GetResourceSet() const;
-
-	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
-
-	CrShaderResourceSet m_resourceSet; // HACK Make private
-
-	CrHash		m_hash; // TODO Make private
-};
-
-// This shader represents a full linked shader. Therefore it knows about number of stages,
-// and what these specific stages are. This is important to be able to pass it on to the PSO later on.
-class ICrGraphicsShader : public ICrShader
-{
-public:
-
-	ICrGraphicsShader() {}
-
-	~ICrGraphicsShader() {}
-};
-
-struct CrGraphicsShaderCreate
+struct CrBytecodeLoadDescriptor
 {
 	friend class ICrShaderManager;
 
 	void AddBytecodeDescriptor(const CrShaderBytecodeDescriptor& bytecodeDescriptor)
 	{
-		m_stageBytecodes.push_back(bytecodeDescriptor);
+		m_stageBytecodeDescriptors.push_back(bytecodeDescriptor);
 	}
 
 	const CrVector<CrShaderBytecodeDescriptor>& GetBytecodeDescriptors() const
 	{
-		return m_stageBytecodes;
+		return m_stageBytecodeDescriptors;
 	}
 
 private:
 
-	CrVector<CrShaderBytecodeDescriptor> m_stageBytecodes;
+	CrVector<CrShaderBytecodeDescriptor> m_stageBytecodeDescriptors;
 };

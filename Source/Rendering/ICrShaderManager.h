@@ -7,16 +7,15 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 class ICrRenderDevice;
-struct CrGraphicsShaderCreate;
-class CrShaderReflectionVulkan;
-class CrShaderResourceSet;
+
 struct ConstantBufferMetadata;
 struct TextureMetadata;
 struct SamplerMetadata;
 
-struct CrGraphicsShaderCreate;
-
+struct CrBytecodeLoadDescriptor;
 struct CrShaderBytecodeDescriptor;
+class CrShaderReflectionVulkan;
+class CrShaderResourceSet;
 
 class CrShaderManagerVulkan;
 
@@ -38,7 +37,7 @@ public:
 
 	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
 
-	CrGraphicsShaderHandle LoadGraphicsShader(const CrGraphicsShaderCreate& shaderCreateInfo) const;
+	CrGraphicsShaderHandle LoadGraphicsShader(const CrBytecodeLoadDescriptor& shaderCreateInfo) const;
 
 	// Metadata query functions
 
@@ -57,11 +56,11 @@ public:
 protected:
 
 	// TODO Remove this reference to shader reflection vulkan
-	void CreateShaderResourceSet(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const;
+	void CreateShaderResourceSet(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const;
 
 	virtual void InitPS() = 0;
 
-	virtual void CreateShaderResourceSetPS(const CrGraphicsShaderCreate& shaderCreateInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const = 0;
+	virtual void CreateShaderResourceSetPS(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const = 0;
 
 	const ICrRenderDevice* m_renderDevice;
 };

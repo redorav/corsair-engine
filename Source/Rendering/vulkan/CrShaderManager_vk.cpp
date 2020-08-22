@@ -31,7 +31,7 @@ void CrShaderManagerVulkan::InitPS()
 
 void CrShaderManagerVulkan::CreateShaderResourceSetPS
 (
-	const CrGraphicsShaderCreate& shaderCreateInfo, 
+	const CrVector<CrShaderStageInfo>& shaderStageInfo, 
 	const CrShaderReflectionVulkan& reflection, 
 	CrShaderResourceSet& resourceSet
 ) const
@@ -40,9 +40,9 @@ void CrShaderManagerVulkan::CreateShaderResourceSetPS
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 
-	for (const CrShaderBytecodeDescriptor& bytecode : shaderCreateInfo.GetBytecodeDescriptors())
+	for (const CrShaderStageInfo& stageInfo : shaderStageInfo)
 	{
-		cr3d::ShaderStage::T stage = bytecode.stage;
+		cr3d::ShaderStage::T stage = stageInfo.stage;
 
 		for (cr3d::ShaderResourceType::T resourceType = cr3d::ShaderResourceType::Start; resourceType < cr3d::ShaderResourceType::Count; ++resourceType)
 		{

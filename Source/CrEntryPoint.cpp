@@ -12,17 +12,6 @@
 
 bool g_appWasClosed = false; // TODO This global needs to go
 
-// TODO Put in a better place. Here for the sake of EASTL for now
-void* operator new[](size_t size, const char* /*pName*/, int /*flags*/, unsigned /*debugFlags*/, const char* /*file*/, int /*line*/)
-{
-	return malloc(size);
-}
-
-void* operator new[](size_t size, size_t /*alignment*/, size_t /*alignmentOffset*/, const char* /*pName*/, int /*flags*/, unsigned /*debugFlags*/, const char* /*file*/, int /*line*/)
-{
-	return malloc(size);
-}
-
 int main(int argc, char* argv[])
 {
 	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);

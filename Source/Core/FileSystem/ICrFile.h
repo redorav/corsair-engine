@@ -11,13 +11,18 @@ using CrFileSharedHandle = CrSharedPtr<ICrFile>;
 
 namespace FileOpenFlags
 {
-	enum T : uint8_t
+	enum T : uint32_t
 	{
 		Read   = 1 << 0, // Read from the file
 		Write  = 1 << 1, // Write to the file
 		Append = 1 << 2, // Append to the file
 		Create = 1 << 3, // Create file
 	};
+}
+
+inline FileOpenFlags::T operator | (FileOpenFlags::T a, FileOpenFlags::T b)
+{
+	return static_cast<FileOpenFlags::T>(static_cast<int>(a) | static_cast<int>(b));
 }
 
 namespace SeekOrigin

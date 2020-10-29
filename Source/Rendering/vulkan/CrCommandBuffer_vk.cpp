@@ -108,7 +108,6 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
 
-	// TODO Shouldn't rely on the shader having the bytecodes as we only want the shader stages
 	for(const CrShaderStageInfo& shaderStageInfo : currentGraphicsShader->GetStages())
 	{
 		cr3d::ShaderStage::T stage = shaderStageInfo.stage;

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "CrShaderCompiler.h"
 #include "CrSPIRVCompiler.h"
 
 #include "Rendering/CrRendering.h"
@@ -179,11 +180,11 @@ public:
 	}
 };
 
-bool CrSPIRVCompiler::HLSLtoSPIRV(const std::string& shaderPath, const std::string& entryPoint, const cr3d::ShaderStage::T shaderStage, std::vector<uint32_t>& spirvBytecode)
+bool CrSPIRVCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
 {
 	// TODO Move this higher up. We don't want file loading logic here
 	std::ifstream fileStream;
-	fileStream.open(shaderPath, std::ios::binary);
+	fileStream.open(compilationDescriptor.inputPath, std::ios::binary);
 
 	if (!fileStream.is_open())
 	{
@@ -201,7 +202,7 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const std::string& shaderPath, const std::stri
 	int defaultVersion = 450;
 
 	EShLanguage stage = EShLangCount;
-	switch (shaderStage)
+	switch (compilationDescriptor.shaderStage)
 	{
 		case cr3d::ShaderStage::Vertex:
 			stage = EShLangVertex;
@@ -234,10 +235,10 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const std::string& shaderPath, const std::stri
 	glslang::TShader* shader = new glslang::TShader(stage);
 
 	const char* shaderSources[] = { shaderSource.data() };
-	const char* shaderNames[] = { shaderPath.data() };
+	const char* shaderNames[] = { compilationDescriptor.inputPath.data() };
 
 	shader->setStringsWithLengthsAndNames(shaderSources, nullptr, shaderNames, 1);
-	shader->setEntryPoint(entryPoint.c_str());
+	shader->setEntryPoint(compilationDescriptor.entryPoint.c_str());
 
 	shader->setAutoMapBindings(true);
 
@@ -298,7 +299,7 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const std::string& shaderPath, const std::stri
 
 	glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBytecode, &logger);
 
-	static bool readableSpirv = true;
+	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format
 	{
 		std::ostringstream outstr;

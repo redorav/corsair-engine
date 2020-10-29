@@ -6,9 +6,8 @@ namespace cr
 	{
 		enum T
 		{
-			VulkanPC,
-			DX12_PC,
-			VulkanOSX,
+			PCVulkan,
+			PCDX12,
 			Count
 		};
 	};

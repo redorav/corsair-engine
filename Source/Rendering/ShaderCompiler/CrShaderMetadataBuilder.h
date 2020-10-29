@@ -17,11 +17,13 @@ namespace spirv_cross
 
 typedef spirv_cross::SmallVector<spirv_cross::Resource> SPIRVCrossResourceVector;
 
+struct CompilationDescriptor;
+
 class CrShaderMetadataBuilder
 {
 public:
 
-	static bool BuildMetadata(const CrPath& inputHLSL, const CrPath& outputFilename, const std::string& entryPoint);
+	static bool BuildMetadata(const CompilationDescriptor& compilationDescriptor);
 
 private:
 

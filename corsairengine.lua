@@ -401,6 +401,8 @@ project(ProjectShaderCompiler)
 		srcShaderCompiler.."/**",
 	}
 	
+	links { ProjectCrCore }
+
 	AddSpirvCrossLibrary()
 	AddGlslangLibrary()
 

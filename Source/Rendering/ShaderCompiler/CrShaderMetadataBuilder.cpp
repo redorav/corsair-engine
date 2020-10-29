@@ -1,4 +1,6 @@
 #include "CrShaderMetadataBuilder.h"
+
+#include "CrShaderCompiler.h"
 #include "CrSPIRVCompiler.h"
 
 #include "Core/FileSystem/CrFileSystem.h"
@@ -50,10 +52,10 @@ static const std::string StorageBufferSection = "\
 // Storage Buffers\n\
 //----------------\n\n";
 
-bool CrShaderMetadataBuilder::BuildMetadata(const CrPath& inputHLSL, const CrPath& outputFilename, const std::string& entryPoint)
+bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor)
 {
 	std::vector<uint32_t> spirvBytecode;
-	bool compiled = CrSPIRVCompiler::HLSLtoSPIRV(inputHLSL.string(), entryPoint, cr3d::ShaderStage::Pixel, spirvBytecode);
+	bool compiled = CrSPIRVCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
 
 	if (!compiled)
 	{
@@ -69,14 +71,14 @@ bool CrShaderMetadataBuilder::BuildMetadata(const CrPath& inputHLSL, const CrPat
 	}
 
 	// Create header and cpp filenames
-	CrPath headerPath = outputFilename;
+	CrPath headerPath = compilationDescriptor.outputPath;
 	WriteToFileIfChanged(headerPath.replace_extension("h").string(), metadataHeader);
 
-	CrPath cppPath = outputFilename;
+	CrPath cppPath = compilationDescriptor.outputPath;
 	WriteToFileIfChanged(cppPath.replace_extension("cpp").string(), metadataCpp);
 
 	// Write dummy file that tells the build system dependency tracker that files are up to date
-	CrPath uptodatePath = outputFilename;
+	CrPath uptodatePath = compilationDescriptor.outputPath;
 	WriteToFile(uptodatePath.replace_extension("uptodate").string(), "");
 
 	return true;

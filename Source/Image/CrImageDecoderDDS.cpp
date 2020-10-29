@@ -13,9 +13,16 @@ static cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 {
 	switch (format)
 	{
-		case ddspp::BC1_UNORM: return cr3d::DataFormat::BC1_RGBA_Unorm;
-		case ddspp::BC3_UNORM: return cr3d::DataFormat::BC3_Unorm;
-		default: return cr3d::DataFormat::RGBA8_Unorm;
+		case ddspp::BC1_UNORM: 
+			return cr3d::DataFormat::BC1_RGBA_Unorm;
+		case ddspp::BC3_UNORM: 
+			return cr3d::DataFormat::BC3_Unorm;
+		case ddspp::BC4_UNORM: 
+			return cr3d::DataFormat::BC4_Unorm;
+		case ddspp::BC7_UNORM: 
+			return cr3d::DataFormat::BC7_Unorm;
+		default:
+			return cr3d::DataFormat::RGBA8_Unorm;
 	}
 }
 

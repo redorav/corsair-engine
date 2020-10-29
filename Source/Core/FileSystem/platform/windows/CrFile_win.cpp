@@ -6,9 +6,9 @@
 
 #include <windows.h>
 
-CrFileSharedHandle ICrFile::Create(const char* filePath, FileOpenFlags::T openFlags)
+ICrFile* ICrFile::CreateRaw(const char* filePath, FileOpenFlags::T openFlags)
 {
-	return CrFileSharedHandle(new CrFileWindows(filePath, openFlags));
+	return new CrFileWindows(filePath, openFlags);
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
@@ -30,11 +30,24 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 	{
 		dwDesiredAccess |= GENERIC_WRITE;
 	}
+	
+	// https://stackoverflow.com/questions/14469607/difference-between-open-always-and-create-always-in-createfile-of-windows-api
+	if (openFlags & FileOpenFlags::Create)
+	{
+		dwCreationDisposition = OPEN_EXISTING;
+	}
+	else if (openFlags & FileOpenFlags::ForceCreate)
+	{
+		dwCreationDisposition = OPEN_ALWAYS;
+	}
+	else
+	{
+		dwCreationDisposition = OPEN_EXISTING;
+	}
 
 	// Allow other processes to access this file, but only for reading
 	dwShareMode = FILE_SHARE_READ;
 
-	dwCreationDisposition = OPEN_EXISTING;
 
 	dwFlagsAndAttributes = FILE_ATTRIBUTE_NORMAL;
 
@@ -81,6 +94,13 @@ size_t CrFileWindows::Read(void* memory, size_t bytes) const
 	DWORD numberOfBytesRead;
 	ReadFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesRead, nullptr);
 	return (size_t)numberOfBytesRead;
+}
+
+size_t CrFileWindows::Write(void* memory, size_t bytes) const
+{
+	DWORD numberOfBytesWritten;
+	WriteFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesWritten, nullptr);
+	return (size_t)numberOfBytesWritten;
 }
 
 void CrFileWindows::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)

@@ -1,10 +1,12 @@
 #include "CrFileANSI.h"
 
+#include "Core/Logging/ICrDebug.h"
+
 #include "SmartPointers/CrSharedPtr.h"
 
-CrFileSharedHandle ICrFile::Create(const char* filePath, FileOpenFlags::T openFlags)
+ICrFile* ICrFile::CreateRaw(const char* filePath, FileOpenFlags::T openFlags)
 {
-	return CrFileSharedHandle(new CrFileANSI(filePath, openFlags));
+	return new CrFileANSI(filePath, openFlags);
 }
 
 CrFileANSI::CrFileANSI(const char* filePath, FileOpenFlags::T openFlags) : ICrFile(filePath, openFlags)
@@ -57,12 +59,32 @@ size_t CrFileANSI::Read(void* memory, size_t bytes) const
 	return fread(memory, 1, bytes, m_file);
 }
 
+size_t CrFileANSI::Write(void* memory, size_t bytes) const
+{
+	return fwrite(memory, 1, bytes, m_file);
+}
+
 void CrFileANSI::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)
 {
-#if defined(_WIN32)
-	_fseeki64(m_file, bytes, SEEK_SET);
-#else
+	int fseekOrigin = SEEK_SET;
 
+	switch (seekOrigin)
+	{
+		case SeekOrigin::Begin:
+			fseekOrigin = SEEK_SET;
+			break;
+		case SeekOrigin::Current:
+			fseekOrigin = SEEK_CUR;
+			break;
+		case SeekOrigin::End:
+			fseekOrigin = SEEK_END;
+			break;
+	}
+
+#if defined(_WIN32)
+	_fseeki64(m_file, byteOffset, fseekOrigin);
+#else
+	#error implement
 #endif
 }
 

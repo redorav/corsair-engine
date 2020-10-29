@@ -4,8 +4,6 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include <cstdio>
-
 typedef void* HANDLE;
 
 class CrFileWindows final : public ICrFile
@@ -17,6 +15,8 @@ public:
 	~CrFileWindows();
 
 	virtual size_t Read(void* memory, size_t bytes) const override;
+
+	virtual size_t Write(void* memory, size_t bytes) const override;
 
 	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) override;
 

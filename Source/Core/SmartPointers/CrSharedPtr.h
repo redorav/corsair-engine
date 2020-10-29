@@ -2,8 +2,10 @@
 
 #include <EASTL/shared_ptr.h>
 
-template<typename T>
-using CrSharedPtr = eastl::shared_ptr<T>;
+#include "Core/CrCoreForwardDeclarations.h"
 
 template <typename T, typename... Args>
-inline CrSharedPtr<T> CrMakeShared(Args&&... args) { return eastl::make_shared<T>(eastl::forward<Args>(args)...); }
+inline CrSharedPtr<T> CrMakeShared(Args&&... args)
+{
+	return eastl::make_shared<T>(eastl::forward<Args>(args)...);
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrFile.h"
+#include "Core/FileSystem/ICrFile.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
 
@@ -15,6 +15,8 @@ public:
 	~CrFileANSI();
 
 	virtual size_t Read(void* memory, size_t bytes) const override;
+
+	virtual size_t Write(void* memory, size_t bytes) const override;
 
 	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) override;
 

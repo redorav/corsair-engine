@@ -8,15 +8,17 @@
 
 class ICrFile;
 using CrFileSharedHandle = CrSharedPtr<ICrFile>;
+using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 namespace FileOpenFlags
 {
 	enum T : uint32_t
 	{
-		Read   = 1 << 0, // Read from the file
-		Write  = 1 << 1, // Write to the file
-		Append = 1 << 2, // Append to the file
-		Create = 1 << 3, // Create file
+		Read        = 1 << 0, // Read from the file
+		Write       = 1 << 1, // Write to the file
+		Append      = 1 << 2, // Append to the file
+		Create      = 1 << 3, // Create file if it does not exist
+		ForceCreate = 1 << 4, // Always create file, overwriting previous contents
 	};
 }
 
@@ -47,6 +49,8 @@ public:
 
 	virtual size_t Read(void* memory, size_t bytes) const = 0;
 
+	virtual size_t Write(void* memory, size_t bytes) const = 0;
+
 	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) = 0;
 
 	virtual void Rewind() = 0;
@@ -55,6 +59,8 @@ public:
 
 	const char* GetFilePath() const;
 
+	static CrFileUniqueHandle CreateUnique(const char* filePath, FileOpenFlags::T openFlags);
+
 	static CrFileSharedHandle Create(const CrPath& filePath, FileOpenFlags::T openFlags);
 
 	// TODO Move this elsewhere when we have a FileDevice
@@ -62,6 +68,8 @@ public:
 	static CrFileSharedHandle Create(const char* filePath, FileOpenFlags::T openFlags);
 
 private:
+
+	static ICrFile* CreateRaw(const char* filePath, FileOpenFlags::T openFlags);
 
 	CrFixedString<MaxFileLength> m_filePath;
 
@@ -72,5 +80,3 @@ inline const char* ICrFile::GetFilePath() const
 {
 	return m_filePath.c_str();
 }
-
-CrFileSharedHandle Create(const CrPath& filePath, FileOpenFlags::T openFlags);

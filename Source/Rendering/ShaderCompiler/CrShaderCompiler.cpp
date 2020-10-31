@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
 	CrPath inputFilePath          = commandline("-input").str();
 	CrPath outputFilePath         = commandline("-output").str();
-	CrPath metadataFilePath       = commandline("-metadata").str();
+	bool buildMetadata            = commandline["-metadata"];
 	std::string entryPoint        = commandline("-entrypoint").str();
 	std::string shaderStageString = commandline("-stage").str();
 	std::string platformString    = commandline("-platform").str();
@@ -103,10 +103,8 @@ int main(int argc, char** argv)
 	compiler.Initialize();
 
 	// If we've been asked to create metadata
-	if (!metadataFilePath.empty())
+	if (buildMetadata)
 	{
-		entryPoint = "metadata";
-
 		CompilationDescriptor compilationDescriptor;
 		compilationDescriptor.inputPath = inputFilePath.string();
 		compilationDescriptor.outputPath = outputFilePath.string();

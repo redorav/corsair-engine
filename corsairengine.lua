@@ -2,17 +2,17 @@ require ('premake-qt/qt')
 
 -- Directories
 dependencies = "Dependencies"
-src = "Source"
+src  = "Source"
 data = "Data"
 
-srcMath = src.."/Math"
-srcQt = src.."/Qt"
+srcMath  = src.."/Math"
+srcQt    = src.."/Qt"
 
 -- Platforms
-VulkanWin64 	= "Vulkan Win64"
-VulkanARM 		= "Vulkan ARM"
-D3D12 			= "D3D12 Win64"
-VulkanOSX		= "Vulkan OSX"
+VulkanWin64 = "Vulkan Win64"
+VulkanARM   = "Vulkan ARM"
+D3D12       = "D3D12 Win64"
+VulkanOSX   = "Vulkan OSX"
 
 -- Make this configuration-dependent
 Workspace = "Workspace/".._ACTION
@@ -34,17 +34,17 @@ MainExecutableFolder = "%{cfg.buildtarget.directory}"
 -- Library Names
 
 LibVulkan 				= dependencies.."/vulkan"
-LibEASTL 				= dependencies.."/EASTL"
+LibEASTL 				= dependencies.."/eastl"
 LibGlslang				= dependencies.."/glslang"
 LibGainput 				= dependencies.."/gainput"
-LibSPIRVCross 			= dependencies.."/SPIRV-Cross"
-LibSPIRVTools 			= dependencies.."/SPIRV-Tools"
+LibSPIRVCross 			= dependencies.."/spirv-cross"
+LibSPIRVTools 			= dependencies.."/spirv-tools"
 LibHlslpp	 			= dependencies.."/hlslpp"
 LibStb					= dependencies.."/stb"
 LibxxHash				= dependencies.."/xxHash"
-LibAssimp				= dependencies.."/Assimp"
-LibArgh					= dependencies.."/Argh"
-LibHalf					= dependencies.."/Half"
+LibAssimp				= dependencies.."/assimp"
+LibArgh					= dependencies.."/argh"
+LibHalf					= dependencies.."/half"
 LibQt					= dependencies.."/qt"
 LibDdspp				= dependencies.."/ddspp"
 

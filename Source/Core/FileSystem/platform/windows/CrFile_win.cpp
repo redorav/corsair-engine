@@ -1,7 +1,5 @@
 #include "CrFile_win.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
-
 #include "Core/Logging/ICrDebug.h"
 
 #include <windows.h>

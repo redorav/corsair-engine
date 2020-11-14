@@ -10,22 +10,29 @@ CrProcessResult CrProcess::RunExecutable(const CrProcessDescriptor& processDescr
 
 	startupInfo.cb = sizeof(startupInfo);
 
+	// Convert to wchar_t
+	CrFixedWString512 convertedCommandLine;
+	convertedCommandLine.append_convert(processDescriptor.commandLine);
+
 	bool result = CreateProcess
 	(
 		(LPWSTR)processDescriptor.executablePath.wstring().c_str(),
-		(LPWSTR)processDescriptor.commandLine.c_str(),
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		FALSE,          // Set handle inheritance to FALSE
-		0,              // No creation flags
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
+		&convertedCommandLine[0], // Apparently CreateProcess can modify the incoming string
+		NULL,             // Process handle not inheritable
+		NULL,             // Thread handle not inheritable
+		FALSE,            // Set handle inheritance to FALSE
+		CREATE_NO_WINDOW, // Don't create a window
+		NULL,             // Use parent's environment block
+		NULL,             // Use parent's starting directory 
 		&startupInfo,
 		&processInfo
 	);
 
 	if (result)
 	{
+		// TODO If not wait for completion we can pass a callback in of some sort such that
+		// the code can get called in the background when it's done with it. For now we'll
+		// keep it simple
 		if (processDescriptor.waitForCompletion)
 		{
 			// If wait timeout is the maximum, we wait forever
@@ -45,7 +52,14 @@ CrProcessResult CrProcess::RunExecutable(const CrProcessDescriptor& processDescr
 	}
 	else
 	{
-		DWORD error = GetLastError(); error;
+		DWORD error = GetLastError();
+
+		LPTSTR lpMsgBuf;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+
+		LocalFree(lpMsgBuf);
+
 		return CrProcessResult::Error;
 	}
 }

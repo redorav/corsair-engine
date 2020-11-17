@@ -131,6 +131,7 @@ static const TBuiltInResource s_resourceLimits =
 class BasicIncluder : public glslang::TShader::Includer
 {
 public:
+
 	// For the "system" or <>-style includes; search the "system" paths.
 	virtual IncludeResult* includeSystem(const char* /*headerName*/, const char* /*includerName*/, size_t /*inclusionDepth*/) override
 	{
@@ -241,7 +242,9 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescri
 	shader->setEntryPoint(compilationDescriptor.entryPoint.c_str());
 
 	shader->setAutoMapBindings(true);
+	//shader->setHlslIoMapping(true);
 
+	// TODO This needs revisiting
 	shader->setShiftTextureBinding(10);
 	shader->setShiftSamplerBinding(20);
 
@@ -279,24 +282,29 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescri
 	bool linked = program.link((EShMessages)msg);
 	if (!linked)
 	{
-		//const char* infoLog = shader->getInfoLog();
-		//const char* infoDebugLog = shader->getInfoDebugLog();
+		const char* infoLog = shader->getInfoLog();
+		const char* infoDebugLog = shader->getInfoDebugLog();
+		printf("%s", infoLog);
+		printf("%s", infoDebugLog);
 		//CrLogError(infoLog);
 		//CrLogError(infoDebugLog);
 		return false;
 	}
 
-	//bool ioMapped = program.mapIO();
-	//if (!ioMapped)
-	//{
-	//	//CrLogError(shader->getInfoLog());
-	//	//CrLogError(shader->getInfoDebugLog());
-	//	return false;
-	//}
+	bool ioMapped = program.mapIO();
+	if (!ioMapped)
+	{
+		const char* infoLog = shader->getInfoLog();
+		const char* infoDebugLog = shader->getInfoDebugLog();
+		printf("%s", infoLog);
+		printf("%s", infoDebugLog);
+		//CrLogError(shader->getInfoLog());
+		//CrLogError(shader->getInfoDebugLog());
+		return false;
+	}
 
 	// Generate the SPIR-V bytecode
 	spv::SpvBuildLogger logger;
-
 	glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBytecode, &logger);
 
 	static bool readableSpirv = false;

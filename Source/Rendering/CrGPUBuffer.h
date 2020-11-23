@@ -186,7 +186,7 @@ inline CrGPUBufferType<MetaType>::CrGPUBufferType(ICrRenderDevice* renderDevice,
 // Vertex Buffer
 //--------------
 
-class CrVertexDescriptor : public CrHashable<CrVertexDescriptor>
+class CrVertexDescriptor
 {
 public:
 

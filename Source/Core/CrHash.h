@@ -22,10 +22,11 @@ public:
 		m_hash = ComputeHash(data, datatype);
 	}
 
-	CrHash(void* data, size_t dataSize)
-	{
-		m_hash = ComputeHash(data, dataSize);
-	}
+	// TODO This is broken
+	//CrHash(void* data, size_t dataSize)
+	//{
+	//	m_hash = ComputeHash(data, dataSize);
+	//}
 
 	CrHash& operator <<= (const CrHash& other)
 	{
@@ -95,11 +96,6 @@ protected:
 	CrHashable() {} // Don't allow instances of this type
 
 private:
-
-	CrHash ComputeHash()
-	{
-		static_assert(eastl::false_type::value, "Child class of CrHashable must implement ComputeHash");
-	}
 
 	CrHash m_hash;
 };

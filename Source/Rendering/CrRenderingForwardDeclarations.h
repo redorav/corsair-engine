@@ -11,7 +11,7 @@ namespace cr3d
 	using TextureUsageFlags = uint32_t;
 	enum class SampleCount :uint8_t;
 	struct DataFormatInfo;
-	namespace ShaderStage { enum T : uint32_t; }
+	namespace ShaderStage { enum T : uint8_t; }
 }
 
 // Forward declare the necessary types for the rendering core

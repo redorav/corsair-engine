@@ -35,7 +35,7 @@ public:
 
 	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
 
-	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
+	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
 
 	CrGraphicsShaderHandle LoadGraphicsShader(const CrBytecodeLoadDescriptor& shaderCreateInfo) const;
 

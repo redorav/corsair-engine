@@ -2,12 +2,12 @@
 
 namespace cr
 {
-	struct Platform
+	// Relevant platforms here. The platform and the graphics API are kept separate
+	namespace Platform
 	{
-		enum T
+		enum T : uint8_t
 		{
-			PCVulkan,
-			PCDX12,
+			Windows,
 			Count
 		};
 	};

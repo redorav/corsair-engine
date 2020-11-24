@@ -10,8 +10,9 @@ struct CompilationDescriptor
 	std::string inputPath;
 	std::string outputPath;
 	std::string entryPoint;
-	cr3d::ShaderStage::T shaderStage;
 	cr::Platform::T platform;
+	cr3d::GraphicsApi::T graphicsApi;
+	cr3d::ShaderStage::T shaderStage;
 };
 
 class CrShaderCompiler

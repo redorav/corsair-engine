@@ -326,7 +326,7 @@ namespace cr3d
 
 	namespace GraphicsApi
 	{
-		enum T : uint32_t
+		enum T : uint8_t
 		{
 			Vulkan,
 			D3D12,
@@ -337,7 +337,7 @@ namespace cr3d
 
 	namespace TextureContent
 	{
-		enum T : uint32_t
+		enum T : uint8_t
 		{
 			Diffuse,
 			Normals,
@@ -380,7 +380,7 @@ namespace cr3d
 	namespace ShaderStage
 	{
 		// Most shaders won't have Hull/Domain or Geometry, for performance we'll reorder them
-		enum T : uint32_t
+		enum T : uint8_t
 		{
 			Vertex,
 			Pixel,
@@ -400,7 +400,7 @@ namespace cr3d
 
 	namespace ResourceState
 	{
-		enum T : uint32_t
+		enum T : uint8_t
 		{
 			Undefined        = 0, // Never use this as the destination state in a resource transition operation
 			ShaderInput      = 1, // Use as input to a shader other than the pixel shader

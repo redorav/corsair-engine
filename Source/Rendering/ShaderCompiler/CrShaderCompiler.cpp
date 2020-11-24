@@ -1,4 +1,4 @@
-#include "CrShaderCompiler.h"
+﻿#include "CrShaderCompiler.h"
 #include "CrShaderMetadataBuilder.h"
 
 #include "Core/CrPlatform.h"
@@ -7,7 +7,14 @@
 
 #include "CrSPIRVCompiler.h"
 
+#include "GlobalVariables.h"
+
 #include <argh.h> // TODO Move to core
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <shellapi.h>
+#endif
 
 #pragma warning (push, 0)
 // Glslang
@@ -32,9 +39,13 @@ void CrShaderCompiler::Finalize()
 
 void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor)
 {
-	switch (compilationDescriptor.platform)
+	// The graphics API will tell us which compilation pipeline we want to use. The compilationDescriptor
+	// also includes which platform we want to be targeting so that we can make more informed decisions
+	// within (such as what level of support to expect e.g. in Vulkan, etc)
+	switch (compilationDescriptor.graphicsApi)
 	{
-		case cr::Platform::PCVulkan:
+		case cr3d::GraphicsApi::Vulkan:
+		{
 			std::vector<uint32_t> spirvBytecode;
 			CrSPIRVCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
 
@@ -44,6 +55,11 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 			auto file = ICrFile::CreateUnique(outputPath, FileOpenFlags::Write | FileOpenFlags::ForceCreate);
 			file->Write(spirvBytecode.data(), spirvBytecode.size() * sizeof(uint32_t));
 			break;
+		}
+		case cr3d::GraphicsApi::D3D12:
+		{
+			break;
+		}
 	}
 }
 
@@ -63,19 +79,91 @@ static cr3d::ShaderStage::T ParseShaderStage(const std::string& stageString)
 
 static cr::Platform::T ParsePlatform(const std::string& platformString)
 {
-	if (platformString == "pcvulkan")
+	if (platformString == "windows")
 	{
-		return cr::Platform::PCVulkan;
-	}
-	else if (platformString == "pcdx12")
-	{
-		return cr::Platform::PCDX12;
+		return cr::Platform::Windows;
 	}
 	else
 	{
 		return cr::Platform::Count;
 	}
 }
+
+static cr3d::GraphicsApi::T ParseGraphicsApi(const std::string& graphicsApiString)
+{
+	if (graphicsApiString == "vulkan")
+	{
+		return cr3d::GraphicsApi::Vulkan;
+	}
+	else if (graphicsApiString == "d3d12")
+	{
+		return cr3d::GraphicsApi::D3D12;
+	}
+	else
+	{
+		return cr3d::GraphicsApi::Count;
+	}
+}
+
+struct CommandLineArguments
+{
+	CommandLineArguments(int argcOriginal, char* argvOriginal[]) : argc(argcOriginal), argv(argvOriginal)
+	{
+		// Unix systems work in UTF-8 by default and have no problem inputting a properly encoded argv.
+		// On Windows, however, directories do not come in as UTF-8 so we need to translate the wchar
+		// version of the parameters to a Unicode (multibyte in Windows parlance) version. Because of
+		// that, we also need to manage the memory for that fixed command line
+		#if defined(_WIN32)
+
+			argv = new char* [argcOriginal + 1];
+			argv[argcOriginal] = nullptr;
+			m_managedMemory = true;
+
+			// Get the wide command line provided by Windows
+			int wargc;
+			wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+
+			// Convert to UTF-8 and store locally
+			for (int i = 0; i < wargc; ++i)
+			{
+				// Returns size required for the UTF-8 string
+				int size = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, nullptr, 0, nullptr, nullptr);
+
+				// Allocate new string (taking care to add the null terminator)
+				argv[i] = new char[size];
+				argv[i][size - 1] = 0;
+
+				// Convert wide char to multibyte
+				WideCharToMultiByte(CP_UTF8, 0, wargv[i], (int)wcslen(wargv[i]), argv[i], size, nullptr, nullptr);
+			}
+
+			LocalFree(wargv);
+
+		#endif
+	}
+
+	~CommandLineArguments()
+	{
+		if (m_managedMemory)
+		{
+			// Delete each string first
+			for (int i = 0; argv[i] != nullptr; ++i)
+			{
+				delete argv[i];
+			}
+
+			// Delete the array
+			delete[] argv;
+		}
+	}
+
+	int argc = 0;
+	char** argv = nullptr;
+
+private:
+
+	bool m_managedMemory = false;
+};
 
 // Usage:
 // -input sourceFile.hlsl	: Source file to be compiled
@@ -88,9 +176,11 @@ static cr::Platform::T ParsePlatform(const std::string& platformString)
 // 
 // Example: crshadercompiler.exe -input sourceFile.hlsl -output outputFile.bin -entryPoint main_px -metadata metadataPath -platform vulkan_pc -D DEFINE1
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-	argh::parser commandline(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+	CommandLineArguments commandLineArguments(argc, argv);
+
+	argh::parser commandline(commandLineArguments.argc, commandLineArguments.argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
 	CrPath inputFilePath          = commandline("-input").str();
 	CrPath outputFilePath         = commandline("-output").str();
@@ -98,6 +188,9 @@ int main(int argc, char** argv)
 	std::string entryPoint        = commandline("-entrypoint").str();
 	std::string shaderStageString = commandline("-stage").str();
 	std::string platformString    = commandline("-platform").str();
+	std::string graphicsApiString = commandline("-graphicsapi").str();
+
+	std::string inputPath = inputFilePath.string().c_str();inputPath;
 
 	CrShaderCompiler compiler;
 	compiler.Initialize();
@@ -118,7 +211,17 @@ int main(int argc, char** argv)
 
 		if (platform == cr::Platform::Count)
 		{
+			printf("No platform defined");
 			// No platform defined!
+			// TODO print an error message
+			return 1;
+		}
+
+		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+
+		if (graphicsApi == cr3d::GraphicsApi::Count)
+		{
+			// No graphics api defined!
 			// TODO print an error message
 			return 1;
 		}
@@ -133,11 +236,12 @@ int main(int argc, char** argv)
 		}
 
 		CompilationDescriptor compilationDescriptor;
-		compilationDescriptor.entryPoint = entryPoint;
-		compilationDescriptor.inputPath = inputFilePath.string();
-		compilationDescriptor.outputPath = outputFilePath.string();
+		compilationDescriptor.entryPoint  = entryPoint;
+		compilationDescriptor.inputPath   = inputFilePath.string();
+		compilationDescriptor.outputPath  = outputFilePath.string();
 		compilationDescriptor.shaderStage = shaderStage;
-		compilationDescriptor.platform = platform;
+		compilationDescriptor.platform    = platform;
+		compilationDescriptor.graphicsApi = graphicsApi;
 
 		compiler.Compile(compilationDescriptor);
 	}

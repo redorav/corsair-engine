@@ -17,6 +17,9 @@ namespace ConstantBuffers { enum T : uint8_t; }
 namespace Textures { enum T : uint8_t; }
 namespace Samplers { enum T : uint8_t; }
 
+namespace cr { namespace Platform { enum T : uint8_t; } }
+namespace cr3d { namespace GraphicsApi { enum T : uint8_t; } }
+
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
 class CrShaderResourceSet
@@ -160,7 +163,7 @@ public:
 
 private:
 
-	CrHash		m_hash;
+	CrHash m_hash;
 };
 
 // This shader represents a full linked shader. Therefore it knows about number of stages,
@@ -205,19 +208,23 @@ public:
 
 struct CrShaderBytecodeDescriptor
 {
-	CrShaderBytecodeDescriptor(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::ShaderCodeFormat format)
-		: path(path), entryPoint(entryPoint), stage(stage), format(format) {}
+	CrShaderBytecodeDescriptor
+	(
+		const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, 
+		cr3d::ShaderCodeFormat format, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform
+	)
+		: path(path), entryPoint(entryPoint), stage(stage), format(format), graphicsApi(graphicsApi), platform(platform) {}
 
 	const CrPath                 path;
 	const CrFixedString128       entryPoint;
 	const cr3d::ShaderCodeFormat format;
 	const cr3d::ShaderStage::T   stage;
+	const cr3d::GraphicsApi::T   graphicsApi;
+	const cr::Platform::T        platform;
 };
 
 struct CrBytecodeLoadDescriptor
 {
-	friend class ICrShaderManager;
-
 	void AddBytecodeDescriptor(const CrShaderBytecodeDescriptor& bytecodeDescriptor)
 	{
 		m_stageBytecodeDescriptors.push_back(bytecodeDescriptor);

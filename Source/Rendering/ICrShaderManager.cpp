@@ -189,8 +189,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
 	// want the shader compiler in a known directory, or several directories that we search
 	// The platform-specific compilers also need to be in directories relative to the main one
-	const char* shaderCompilerPath = ShaderCompilerPath;
-	processDescriptor.executablePath = shaderCompilerPath;
+	processDescriptor.executablePath = ShaderCompilerPath;
 	processDescriptor.waitForCompletion = true;
 
 	// Build command line for shader compiler

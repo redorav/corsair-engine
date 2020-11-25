@@ -10,19 +10,12 @@
 #include "Core/Logging/ICrDebug.h"
 
 #pragma warning (push, 0)
-// Glslang
-#include <glslang/Public/ShaderLang.h>
-#include <SPIRV/GlslangToSpv.h>
 
 // SPIRV-Cross
 #include <spirv_cross.hpp>
 #include <spirv_cpp.hpp>
 
-#include <fstream>
-
 #pragma warning (pop)
-
-
 
 void CrShaderManagerVulkan::InitPS()
 {

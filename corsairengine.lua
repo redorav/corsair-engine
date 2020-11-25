@@ -1,14 +1,13 @@
 require ('premake-qt/qt')
 
 -- Directories
-dependencies = 'Dependencies'
-src  = 'Source'
-data = 'Data'
-tools = 'Tools'
-shaderCompiler = tools..'/Shader Compiler'
+DependenciesDirectory   = 'Dependencies'
+SourceDirectory         = 'Source'
+ToolsDirectory          = 'Tools'
+ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
 
-srcMath  = src..'/Math'
-srcQt    = src..'/Qt'
+MathDirectory = SourceDirectory..'/Math'
+QtDirectory   = SourceDirectory..'/Qt'
 
 -- Platforms
 VulkanWin64 = 'Vulkan Win64'
@@ -17,46 +16,42 @@ D3D12       = 'D3D12 Win64'
 VulkanOSX   = 'Vulkan OSX'
 
 -- Make this configuration-dependent
-Workspace = 'Workspace/'.._ACTION
+WorkspaceDirectory = 'Workspace/'.._ACTION
 
 -- Project Names
-ProjectCorsairEngine 	= 'Corsair Engine'
-ProjectCrMath 			= 'CrMath'
-ProjectCrRendering 		= 'CrRendering'
-ProjectShaderCompiler	= 'CrShaderCompiler'
-ProjectShaders			= 'CrShaders'
-ProjectCrCore 			= 'CrCore'
-ProjectCrDebug 			= 'CrDebug'
-ProjectCrImage			= 'CrImage'
+ProjectCorsairEngine    = 'Corsair Engine'
+ProjectCrMath           = 'CrMath'
+ProjectCrRendering      = 'CrRendering'
+ProjectShaderCompiler   = 'CrShaderCompiler'
+ProjectShaders          = 'CrShaders'
+ProjectCrCore           = 'CrCore'
+ProjectCrDebug          = 'CrDebug'
+ProjectCrImage          = 'CrImage'
 
--- Main executable folder
-MainBuildFolder = path.getabsolute(Workspace..'/Build')
-MainExecutableFolder = '%{cfg.buildtarget.directory}'
+-- Library Directories
+LibVulkan     = DependenciesDirectory..'/vulkan'
+LibEASTL      = DependenciesDirectory..'/eastl'
+LibGlslang    = DependenciesDirectory..'/glslang'
+LibGainput    = DependenciesDirectory..'/gainput'
+LibSPIRVCross = DependenciesDirectory..'/spirv-cross'
+LibHlslpp     = DependenciesDirectory..'/hlslpp'
+LibStb        = DependenciesDirectory..'/stb'
+LibxxHash     = DependenciesDirectory..'/xxHash'
+LibAssimp     = DependenciesDirectory..'/assimp'
+LibArgh       = DependenciesDirectory..'/argh'
+LibHalf       = DependenciesDirectory..'/half'
+LibQt         = DependenciesDirectory..'/qt'
+LibDdspp      = DependenciesDirectory..'/ddspp'
 
--- Library Names
+LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
 
-LibVulkan 				= dependencies..'/vulkan'
-LibEASTL 				= dependencies..'/eastl'
-LibGlslang				= dependencies..'/glslang'
-LibGainput 				= dependencies..'/gainput'
-LibSPIRVCross 			= dependencies..'/spirv-cross'
-LibHlslpp	 			= dependencies..'/hlslpp'
-LibStb					= dependencies..'/stb'
-LibxxHash				= dependencies..'/xxHash'
-LibAssimp				= dependencies..'/assimp'
-LibArgh					= dependencies..'/argh'
-LibHalf					= dependencies..'/half'
-LibQt					= dependencies..'/qt'
-LibDdspp				= dependencies..'/ddspp'
+-- Generated Code Directories
+GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
+GeneratedCodeDirectory = WorkspaceDirectory..'/GeneratedCode'
 
-libConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
+BinaryDirectory = '/Binaries/'
 
-shaderGenDir = Workspace..'/GeneratedShaders'
-codeGenDir = Workspace..'/GeneratedCode'
-
-binaryDir = '/Binaries/'
-
-ShaderCompilerAbsolutePath = path.getabsolute(shaderCompiler)..'/'..ProjectShaderCompiler..'.exe'
+ShaderCompilerAbsolutePath = path.getabsolute(ShaderCompilerDirectory)..'/'..ProjectShaderCompiler..'.exe'
 
 -- todo put in common
 -- Adds a library to a project
@@ -69,11 +64,11 @@ function AddLibrary(includeDirs, libDirs, libNames)
 end
 
 function AddAssimpLibrary()
-	AddLibrary(LibAssimp..'/Source/include', LibAssimp..binaryDir, 'Assimp'..libConfig)
+	AddLibrary(LibAssimp..'/Source/include', LibAssimp..BinaryDirectory, 'Assimp'..LibConfig)
 end
 
 function AddVulkanLibrary()
-	AddLibrary(LibVulkan..'/Source/include', LibVulkan..binaryDir, 'vulkan-1')
+	AddLibrary(LibVulkan..'/Source/include', LibVulkan..BinaryDirectory, 'vulkan-1')
 end
 
 function AddXinputLibrary()
@@ -81,25 +76,21 @@ function AddXinputLibrary()
 end
 
 function AddSpirvCrossLibrary()
-	AddLibrary({ LibSPIRVCross..'/Source', LibSPIRVCross..'/Source/include' }, LibSPIRVCross..binaryDir, 'SPIRV-Cross'..libConfig)
+	AddLibrary({ LibSPIRVCross..'/Source', LibSPIRVCross..'/Source/include' }, LibSPIRVCross..BinaryDirectory, 'SPIRV-Cross'..LibConfig)
 	defines { 'SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS' }
 end
 
 function AddGlslangLibrary()
-	AddLibrary({ LibGlslang..'/Source/' }, LibGlslang..binaryDir, 'Glslang'..libConfig)
+	AddLibrary({ LibGlslang..'/Source/' }, LibGlslang..BinaryDirectory, 'Glslang'..LibConfig)
 end
 
 function AddGainputLibrary()
-	AddLibrary(LibGainput..'/Source/lib/include', LibGainput..binaryDir, 'Gainput'..libConfig)
-end
-
-function AddSPIRVToolsLibrary()
-	AddLibrary({ LibSPIRVTools..'/Source/source', LibSPIRVTools..'/Source/include' }, LibSPIRVTools..binaryDir, 'SPIRV-Tools'..libConfig)
+	AddLibrary(LibGainput..'/Source/lib/include', LibGainput..BinaryDirectory, 'Gainput'..LibConfig)
 end
 
 function AddEASTLLibrary()
 	AddLibrary({ LibEASTL..'/Source/include', LibEASTL..'/Source/test/packages/EAStdC/include', LibEASTL..'/Source/test/packages/EAAssert/include', LibEASTL..'/Source/test/packages/EABase/include/Common' },
-	LibEASTL..binaryDir, 'EASTL'..libConfig)
+	LibEASTL..BinaryDirectory, 'EASTL'..LibConfig)
 end
 
 function AddQtLibrary()
@@ -109,7 +100,7 @@ function AddQtLibrary()
 
 	qtpath (QT_PATH)
 
-	qtgenerateddir(srcQt..'/Generated')
+	qtgenerateddir(QtDirectory..'/Generated')
 	qtprefix('Qt5')
 	configuration 'Debug'
 		qtsuffix('d')
@@ -140,7 +131,7 @@ end
 workspace 'Corsair Engine'
 	configurations { 'Debug', 'Release' }
 	platforms { VulkanWin64, D3D12, VulkanOSX }
-	location (Workspace)
+	location (WorkspaceDirectory)
 	preferredtoolarchitecture('x86_64') -- Prefer this toolset on MSVC as it can handle more memory for multiprocessor compiles
 	toolset('msc') -- Use default VS toolset TODO do this platform specific
 	--toolset('msc-llvm') -- Use for Clang on VS
@@ -181,7 +172,7 @@ workspace 'Corsair Engine'
 		
 	filter{}
 	
-	includedirs	{ src }
+	includedirs	{ SourceDirectory }
 
 	filter { 'platforms:'..VulkanWin64 }
 		system('windows')
@@ -233,14 +224,14 @@ workspace 'Corsair Engine'
 		LibArgh..'/Source/',
 		LibHalf..'/Source',
 		LibDdspp..'/Source',
-		shaderGenDir,
-		codeGenDir
+		GeneratedShadersDirectory,
+		GeneratedCodeDirectory
 	}
 	
 	-- Set up defines
 	
 	-- TODO Make this command line based or something better basically
-	defines ('IN_SRC_PATH="'.. path.getabsolute(src)..'/"')
+	defines ('IN_SRC_PATH="'.. path.getabsolute(SourceDirectory)..'/"')
 
    -- All defines from different libraries that need exceptions disabled go here.
     defines
@@ -257,7 +248,7 @@ workspace 'Corsair Engine'
 	}
 	
 	-- Generate the global paths file
-	globalVariableHeader = io.open(path.getabsolute(codeGenDir)..'/GlobalVariables.h', 'wb');
+	globalVariableHeader = io.open(path.getabsolute(GeneratedCodeDirectory)..'/GlobalVariables.h', 'wb');
 	globalVariableHeader:write('static const char* ShaderCompilerPath = "'..ShaderCompilerAbsolutePath..'";');
 	globalVariableHeader:close();
 
@@ -290,8 +281,8 @@ project (ProjectCorsairEngine)
 	kind('WindowedApp')
 	files	
 	{	
-		src..'/*.h', src..'/*.cpp',
-		srcQt..'/**.ui', srcQt..'/**.cpp', srcQt..'/**.h', 
+		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp',
+		QtDirectory..'/**.ui', QtDirectory..'/**.cpp', QtDirectory..'/**.h', 
 	}
 
 	links { ProjectCrCore, ProjectCrRendering }
@@ -313,28 +304,28 @@ project (ProjectCorsairEngine)
 	
 group('Rendering')
 
-srcRendering = src..'/Rendering'
-srcShaders = srcRendering..'/Shaders'
-srcShaderCompiler = srcRendering..'/ShaderCompiler'
+SourceRenderingDirectory = SourceDirectory..'/Rendering'
+SourceShadersDirectory = SourceRenderingDirectory..'/Shaders'
+SourceShaderCompilerDirectory = SourceRenderingDirectory..'/ShaderCompiler'
 
 project(ProjectCrRendering)	
 	kind('StaticLib')
 	pchheader('CrRendering_pch.h')
-	pchsource(srcRendering..'/CrRendering_pch.cpp')
+	pchsource(SourceRenderingDirectory..'/CrRendering_pch.cpp')
 	dependson { ProjectShaders } -- This depends on the shaders. Shaders in turn depends on the shader compiler
 	
 	files	
 	{
-		srcRendering..'/*',
+		SourceRenderingDirectory..'/*',
 
 		-- The files below are autogenerated, but are manually specified so they take part in the build process
-		shaderGenDir..'/ShaderResources.h',
-		shaderGenDir..'/ShaderResources.cpp'
+		GeneratedShadersDirectory..'/ShaderResources.h',
+		GeneratedShadersDirectory..'/ShaderResources.cpp'
 	}
 	
 	links { ProjectCrImage } -- TODO Delete
 
-	includedirs	{ srcRendering }
+	includedirs	{ SourceRenderingDirectory }
 
 	AddAssimpLibrary()
 	AddSpirvCrossLibrary()
@@ -342,27 +333,27 @@ project(ProjectCrRendering)
 	AddGainputLibrary() -- TODO remove
 	
 	filter { 'platforms:'..VulkanWin64 }
-		files { srcRendering..'/vulkan/*' }
+		files { SourceRenderingDirectory..'/vulkan/*' }
 		AddVulkanLibrary()
 		
 	filter { 'platforms:'..VulkanOSX }
-		files	{ srcRendering..'/vulkan/*' }
-		includedirs	{ srcRendering..'/vulkan/' }
+		files	{ SourceRenderingDirectory..'/vulkan/*' }
+		includedirs	{ SourceRenderingDirectory..'/vulkan/' }
 		
 	filter { 'platforms:'..D3D12 }
-		files	{ srcRendering..'/d3d12/*' }
-		includedirs	{ srcRendering..'/d3d12/' }
+		files	{ SourceRenderingDirectory..'/d3d12/*' }
+		includedirs	{ SourceRenderingDirectory..'/d3d12/' }
 	
 	filter{}
 
 project(ProjectShaders)
 	kind('StaticLib')
-	files { srcShaders..'/**' }
+	files { SourceShadersDirectory..'/**' }
 	dependson { ProjectShaderCompiler }
 
-	local shaderGenDirAbsolute = path.getabsolute(shaderGenDir)
-	local metadataFile = path.getabsolute(srcShaders)..'/metadata.hlsl'
-	local outputFile = shaderGenDirAbsolute..'/ShaderResources'
+	local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
+	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/metadata.hlsl'
+	local outputFile = GeneratedShadersDirectoryAbsolute..'/ShaderResources'
 	local shaderGenCommandLine = 
 	'"%{cfg.buildtarget.directory}'..ProjectShaderCompiler..'.exe" '..
 	'-metadata ' ..
@@ -372,7 +363,7 @@ project(ProjectShaders)
 
 	buildcommands
 	{
-		'{mkdir} '..'"'..shaderGenDirAbsolute..'"', 	-- Create the output folder
+		'{mkdir} '..'"'..GeneratedShadersDirectoryAbsolute..'"', 	-- Create the output folder
 		'{echo} '..shaderGenCommandLine,				-- Echo the command line
 		shaderGenCommandLine,							-- Run
 	}
@@ -382,7 +373,7 @@ project(ProjectShaders)
 		outputFile..'.uptodate'
 	}
 	
-	local shaderFiles = os.matchfiles(srcShaders..'/*.hlsl')
+	local shaderFiles = os.matchfiles(SourceShadersDirectory..'/*.hlsl')
 	
 	buildinputs
 	{
@@ -402,7 +393,7 @@ project(ProjectShaderCompiler)
 	kind('ConsoleApp')
 	files
 	{
-		srcShaderCompiler..'/**',
+		SourceShaderCompilerDirectory..'/**',
 	}
 	
 	links { ProjectCrCore }
@@ -413,7 +404,7 @@ project(ProjectShaderCompiler)
 	postbuildcommands
 	{
 		-- Copy the shader compiler into a known directory
-		'{copyfile} "%{cfg.buildtarget.abspath}" "'..path.getabsolute(shaderCompiler)..'"'
+		'{copyfile} "%{cfg.buildtarget.abspath}" "'..path.getabsolute(ShaderCompilerDirectory)..'"'
 	}
 
 group('Math')
@@ -422,59 +413,59 @@ project(ProjectCrMath)
 	kind('StaticLib')
 	files
 	{
-		srcMath..'/**',
+		MathDirectory..'/**',
 		LibHlslpp..'/Source/include/**'
 	}
 
 	includedirs
 	{
-		srcMath,
+		MathDirectory,
 		LibHlslpp..'/Source/include/'
 	}	
 
 group('Image')
 
-srcImage= src..'/Image'
+SourceImageDirectory= SourceDirectory..'/Image'
 
 project(ProjectCrImage)
 	kind('StaticLib')
-	files{ 	srcImage..'/**' }
+	files{ 	SourceImageDirectory..'/**' }
 	
 group('Core')
 
-srcCore = src..'/Core'
+SourceCoreDirectory = SourceDirectory..'/Core'
 
 project(ProjectCrCore)
 	kind('StaticLib')
 	
 	files
 	{
-		srcCore..'/**',
+		SourceCoreDirectory..'/**',
 		LibxxHash..'/Source/xxhash.h'
 	}
 
-	ExcludePlatformSpecificCode(srcCore)
+	ExcludePlatformSpecificCode(SourceCoreDirectory)
 	
 	filter { 'system:windows' }
-		files { srcCore..'/**/windows/**' }
+		files { SourceCoreDirectory..'/**/windows/**' }
 
 	filter { 'system:linux' }
-		files { srcCore..'/**/ansi/**' }
+		files { SourceCoreDirectory..'/**/ansi/**' }
 
 	filter {}
 	
-	includedirs	{ srcCore }
+	includedirs	{ SourceCoreDirectory }
 
-srcDebug = src..'/Debug'
+SourceDebugDirectory = SourceDirectory..'/Debug'
 	
 project(ProjectCrDebug)
 	kind('StaticLib')
 	files
 	{
-		srcDebug..'/**'
+		SourceDebugDirectory..'/**'
 	}
 	
-	includedirs	{ srcDebug }
+	includedirs	{ SourceDebugDirectory }
 
 -- Create a dummy project for all the natvis files to be in, instead of the individual project folders
 project('Natvis')

@@ -220,23 +220,23 @@ std::string CrShaderMetadataBuilder::PrintResourceEnum(spirv_cross::Compiler& re
 std::string CrShaderMetadataBuilder::PrintResourceHashmap(spirv_cross::Compiler& reflection, const std::string& resourceType, const SPIRVCrossResourceVector& resources)
 {
 	std::string result;
-	result += "CrHashMap<CrString, " + resourceType + "Metadata&> " + resourceType + "Table = { ";
+	result += "CrHashMap<CrString, " + resourceType + "Metadata&> " + resourceType + "Table =\n{";
 	
 	for (const auto& resource : resources)
 	{
 		std::string resourceName = reflection.get_name(resource.id) == "" ? resource.name : reflection.get_name(resource.id);
-		result += "{\"" + resourceName + "\", " + resourceName + "MetaInstance }, ";
+		result += "\n\t{ \"" + resourceName + "\", " + resourceName + "MetaInstance },";
 	}
-	result += "};\n\n";
+	result += "\n};\n\n";
 
-	result += "CrArray<" + resourceType + "Metadata, " + std::to_string(resources.size()) + "> " + resourceType + "MetaTable = { ";
+	result += "CrArray<" + resourceType + "Metadata, " + std::to_string(resources.size()) + "> " + resourceType + "MetaTable =\n{";
 
 	for (const auto& resource : resources)
 	{
 		std::string resourceName = reflection.get_name(resource.id) == "" ? resource.name : reflection.get_name(resource.id);
-		result += resourceName + "MetaInstance, ";
+		result += "\n\t" + resourceName + "MetaInstance,";
 	}
-	result += "};\n\n";
+	result += "\n};\n\n";
 
 	return result;
 }

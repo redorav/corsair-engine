@@ -83,12 +83,12 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoad
 	CrGraphicsShaderHandle graphicsShader = m_renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 
 	// TODO the shader itself can create the shader resource set after we've mangled the SPIR-V bytecode
-	CreateShaderResourceSet(graphicsShader->GetStages(), reflection, graphicsShader->m_resourceSet);
+	CreateShaderResourceSet(reflection, graphicsShader->m_resourceSet);
 
 	return graphicsShader;
 }
 
-ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(const CrString& name)
+const ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(const CrString& name)
 {
 	auto cBuffer = ConstantBufferTable.find(name);
 
@@ -100,12 +100,12 @@ ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(const CrStri
 	return InvalidConstantBufferMetaInstance;
 }
 
-ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(ConstantBuffers::T id)
+const ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(ConstantBuffers::T id)
 {
 	return ConstantBufferMetaTable[id];
 }
 
-TextureMetadata& ICrShaderManager::GetTextureMetadata(const CrString& name)
+const TextureMetadata& ICrShaderManager::GetTextureMetadata(const CrString& name)
 {
 	auto textureMetadata = TextureTable.find(name);
 
@@ -117,12 +117,12 @@ TextureMetadata& ICrShaderManager::GetTextureMetadata(const CrString& name)
 	return InvalidTextureMetaInstance;
 }
 
-TextureMetadata& ICrShaderManager::GetTextureMetadata(Textures::T id)
+const TextureMetadata& ICrShaderManager::GetTextureMetadata(Textures::T id)
 {
 	return TextureMetaTable[id];
 }
 
-SamplerMetadata& ICrShaderManager::GetSamplerMetadata(const CrString& name)
+const SamplerMetadata& ICrShaderManager::GetSamplerMetadata(const CrString& name)
 {
 	auto samplerMetadata = SamplerTable.find(name);
 
@@ -134,46 +134,32 @@ SamplerMetadata& ICrShaderManager::GetSamplerMetadata(const CrString& name)
 	return InvalidSamplerMetaInstance;
 }
 
-SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
+const SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
 {
 	return SamplerMetaTable[id];
 }
 
-void ICrShaderManager::CreateShaderResourceSet(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const
+void ICrShaderManager::CreateShaderResourceSet(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const
 {
-	for (const CrShaderStageInfo& stageInfo : shaderStageInfo)
+	reflection.ForEachConstantBuffer([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
 	{
-		cr3d::ShaderStage::T stage = stageInfo.stage;
+		const ConstantBufferMetadata& metadata = GetConstantBufferMetadata(constantBuffer.name);
+		resourceSet.AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
+	});
 
-		uint32_t numConstantBuffers = reflection.GetResourceCount(stage, cr3d::ShaderResourceType::ConstantBuffer);
+	reflection.ForEachTexture([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
+	{
+		const TextureMetadata& metadata = GetTextureMetadata(texture.name);
+		resourceSet.AddTexture(stage, metadata.id, texture.bindPoint);
+	});
 
-		for (uint32_t i = 0; i < numConstantBuffers; ++i)
-		{
-			CrShaderResource res = reflection.GetResource(stage, cr3d::ShaderResourceType::ConstantBuffer, i);
-			ConstantBufferMetadata& metadata = GetConstantBufferMetadata(res.name);
-			resourceSet.AddConstantBuffer(stage, metadata.id, res.bindPoint);
-		}
+	reflection.ForEachSampler([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
+	{
+		const SamplerMetadata& metadata = GetSamplerMetadata(sampler.name);
+		resourceSet.AddSampler(stage, metadata.id, sampler.bindPoint);
+	});
 
-		uint32_t numTextures = reflection.GetResourceCount(stage, cr3d::ShaderResourceType::Texture);
-
-		for (uint32_t i = 0; i < numTextures; ++i)
-		{
-			CrShaderResource res = reflection.GetResource(stage, cr3d::ShaderResourceType::Texture, i);
-			TextureMetadata& metadata = GetTextureMetadata(res.name);
-			resourceSet.AddTexture(stage, metadata.id, res.bindPoint);
-		}
-
-		uint32_t numSamplers = reflection.GetResourceCount(stage, cr3d::ShaderResourceType::Sampler);
-
-		for (uint32_t i = 0; i < numSamplers; ++i)
-		{
-			CrShaderResource res = reflection.GetResource(stage, cr3d::ShaderResourceType::Sampler, i);
-			SamplerMetadata& metadata = GetSamplerMetadata(res.name);
-			resourceSet.AddSampler(stage, metadata.id, res.bindPoint);
-		}
-	}
-
-	CreateShaderResourceSetPS(shaderStageInfo, reflection, resourceSet);
+	CreateShaderResourceSetPS(reflection, resourceSet);
 }
 
 void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)

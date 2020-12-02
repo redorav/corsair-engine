@@ -12,8 +12,6 @@
 #include <spirv_cross.hpp>
 #pragma warning (pop)
 
-const spirv_cross::Resource CrShaderReflectionVulkan::defaultResource = { 0, 0, 0, "" };
-
 void CrShaderReflectionVulkan::AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode)
 {
 	// Perform reflection on the shader
@@ -22,55 +20,48 @@ void CrShaderReflectionVulkan::AddBytecodePS(const CrShaderBytecodeSharedHandle&
 	m_reflection[shaderStage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode->GetBytecode().data()), bytecode->GetBytecode().size() / 4);
 	m_resources[shaderStage] = m_reflection[shaderStage]->get_shader_resources(m_reflection[shaderStage]->get_active_interface_variables());
 }
-}
 
-const spirv_cross::Resource& CrShaderReflectionVulkan::GetSpvResource(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const
+void CrShaderReflectionVulkan::ForEachConstantBuffer(ShaderReflectionFn fn) const
 {
-	switch (resourceType)
+	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::Count; ++stage)
 	{
-		case cr3d::ShaderResourceType::ConstantBuffer:
-			return m_resources[stage].uniform_buffers[index];
-		case cr3d::ShaderResourceType::Texture:
-			return m_resources[stage].separate_images[index];
-		case cr3d::ShaderResourceType::Sampler:
-			return m_resources[stage].separate_samplers[index];
-		case cr3d::ShaderResourceType::ROStructuredBuffer:
-		case cr3d::ShaderResourceType::RWStructuredBuffer:
-			return m_resources[stage].storage_buffers[index];
-		case cr3d::ShaderResourceType::RWTexture:
-			return m_resources[stage].storage_images[index];
-		default:
-			return defaultResource;
+		for (uint32_t i = 0; i < m_resources[stage].uniform_buffers.size(); ++i)
+		{
+			const spirv_cross::Resource& constantBuffer = m_resources[stage].uniform_buffers[i];
+			CrShaderResource resource;
+			resource.name = constantBuffer.name.c_str();
+			resource.bindPoint = (bindpoint_t)m_reflection[stage]->get_decoration(constantBuffer.id, spv::DecorationBinding);
+			fn(stage, resource);
+		}
 	}
 }
 
-CrShaderResource CrShaderReflectionVulkan::GetResourcePS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const
+void CrShaderReflectionVulkan::ForEachTexture(ShaderReflectionFn fn) const
 {
-	CrShaderResource resource = CrShaderResource::Invalid;
-	const spirv_cross::Resource& spvResource = GetSpvResource(stage, resourceType, index);
-
-	resource.name = spvResource.name.c_str();
-	resource.bindPoint = (bindpoint_t)m_reflection[stage]->get_decoration(spvResource.id, spv::DecorationBinding);
-
-	return resource;
+	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::Count; ++stage)
+	{
+		for (uint32_t i = 0; i < m_resources[stage].separate_images.size(); ++i)
+		{
+			const spirv_cross::Resource& texture = m_resources[stage].separate_images[i];
+			CrShaderResource resource;
+			resource.name = texture.name.c_str();
+			resource.bindPoint = (bindpoint_t)m_reflection[stage]->get_decoration(texture.id, spv::DecorationBinding);
+			fn(stage, resource);
+		}
+	}
 }
 
-uint32_t CrShaderReflectionVulkan::GetResourceCountPS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const
+void CrShaderReflectionVulkan::ForEachSampler(ShaderReflectionFn fn) const
 {
-	switch (resourceType)
+	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::Count; ++stage)
 	{
-		case cr3d::ShaderResourceType::ConstantBuffer:
-			return (uint32_t)m_resources[stage].uniform_buffers.size();
-		case cr3d::ShaderResourceType::Texture:
-			return (uint32_t)m_resources[stage].separate_images.size();
-		case cr3d::ShaderResourceType::Sampler:
-			return (uint32_t)m_resources[stage].separate_samplers.size();
-		case cr3d::ShaderResourceType::ROStructuredBuffer:
-		case cr3d::ShaderResourceType::RWStructuredBuffer:
-			return (uint32_t)m_resources[stage].storage_buffers.size();
-		case cr3d::ShaderResourceType::RWTexture:
-			return (uint32_t)m_resources[stage].storage_images.size();
-		default:
-			return 0;
+		for (uint32_t i = 0; i < m_resources[stage].separate_samplers.size(); ++i)
+		{
+			const spirv_cross::Resource& sampler = m_resources[stage].separate_samplers[i];
+			CrShaderResource resource;
+			resource.name = sampler.name.c_str();
+			resource.bindPoint = (bindpoint_t)m_reflection[stage]->get_decoration(sampler.id, spv::DecorationBinding);
+			fn(stage, resource);
+		}
 	}
 }

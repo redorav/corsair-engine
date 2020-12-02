@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Core/CrCoreForwardDeclarations.h"
 
 #include "Core/Containers/CrVector.h"
+#include "Core/String/CrFixedString.h"
+#include <EASTL/fixed_function.h> // TODO Create platform-independent header CrFixedFunction
 
 using bindpoint_t = uint8_t;
+using CrShaderResourceName = CrFixedString128;
 
 class CrShaderResource
 {
@@ -15,6 +19,9 @@ public:
 
 	static CrShaderResource Invalid;
 };
+
+// Make sure we don't allocate any memory on the heap
+using ShaderReflectionFn = eastl::fixed_function<4, void(cr3d::ShaderStage::T stage, const CrShaderResource&)>; // TODO Create platform-independent header
 
 // Provides shader reflection functionality. After a shader has been compiled or loaded the shader reflection structure can
 // be queried for information regarding resource usage.
@@ -27,22 +34,14 @@ public:
 	{
 		AddBytecodePS(bytecode);
 	}
-	
-	CrShaderResource GetResource(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const
-	{
-		return GetResourcePS(stage, resourceType, index);
-	}
 
-	uint32_t GetResourceCount(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const
-	{
-		return GetResourceCountPS(stage, resourceType);
-	}
+	virtual void ForEachConstantBuffer(ShaderReflectionFn fn) const = 0;
+
+	virtual void ForEachTexture(ShaderReflectionFn fn) const = 0;
+
+	virtual void ForEachSampler(ShaderReflectionFn fn) const = 0;
 
 protected:
 
 	virtual void AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode) = 0;
-
-	virtual CrShaderResource GetResourcePS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const = 0;
-
-	virtual uint32_t GetResourceCountPS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const = 0;
 };

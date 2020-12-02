@@ -24,7 +24,6 @@ void CrShaderManagerVulkan::InitPS()
 
 void CrShaderManagerVulkan::CreateShaderResourceSetPS
 (
-	const CrVector<CrShaderStageInfo>& shaderStageInfo, 
 	const CrShaderReflectionVulkan& reflection, 
 	CrShaderResourceSet& resourceSet
 ) const
@@ -33,26 +32,38 @@ void CrShaderManagerVulkan::CreateShaderResourceSetPS
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 
-	for (const CrShaderStageInfo& stageInfo : shaderStageInfo)
+	reflection.ForEachConstantBuffer([&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
 	{
-		cr3d::ShaderStage::T stage = stageInfo.stage;
+		VkDescriptorSetLayoutBinding layoutBinding;
+		layoutBinding.binding = constantBuffer.bindPoint;
+		layoutBinding.descriptorType = crvk::GetVkDescriptorType(cr3d::ShaderResourceType::ConstantBuffer);
+		layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+		layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+		layoutBinding.pImmutableSamplers = nullptr;
+		layoutBindings.push_back(layoutBinding);
+	});
 
-		for (cr3d::ShaderResourceType::T resourceType = cr3d::ShaderResourceType::Start; resourceType < cr3d::ShaderResourceType::Count; ++resourceType)
-		{
-			for (uint32_t i = 0; i < reflection.GetResourceCount(stage, resourceType); ++i)
-			{
-				CrShaderResource resource = reflection.GetResource(stage, resourceType, i);
+	reflection.ForEachTexture([&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
+	{
+		VkDescriptorSetLayoutBinding layoutBinding;
+		layoutBinding.binding = texture.bindPoint;
+		layoutBinding.descriptorType = crvk::GetVkDescriptorType(cr3d::ShaderResourceType::Texture);
+		layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+		layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+		layoutBinding.pImmutableSamplers = nullptr;
+		layoutBindings.push_back(layoutBinding);
+	});
 
-				VkDescriptorSetLayoutBinding layoutBinding;
-				layoutBinding.binding = resource.bindPoint;
-				layoutBinding.descriptorType = crvk::GetVkDescriptorType(resourceType);
-				layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
-				layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
-				layoutBinding.pImmutableSamplers = nullptr;
-				layoutBindings.push_back(layoutBinding);
-			}
-		}
-	}
+	reflection.ForEachSampler([&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
+	{
+		VkDescriptorSetLayoutBinding layoutBinding;
+		layoutBinding.binding = sampler.bindPoint;
+		layoutBinding.descriptorType = crvk::GetVkDescriptorType(cr3d::ShaderResourceType::Sampler);
+		layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+		layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+		layoutBinding.pImmutableSamplers = nullptr;
+		layoutBindings.push_back(layoutBinding);
+	});
 
 	VkDescriptorSetLayoutCreateInfo descriptorLayout;
 	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

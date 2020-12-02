@@ -41,26 +41,26 @@ public:
 
 	// Metadata query functions
 
-	static ConstantBufferMetadata& GetConstantBufferMetadata(const CrString& name);
+	static const ConstantBufferMetadata& GetConstantBufferMetadata(const CrString& name);
 
-	static ConstantBufferMetadata& GetConstantBufferMetadata(ConstantBuffers::T id);
+	static const ConstantBufferMetadata& GetConstantBufferMetadata(ConstantBuffers::T id);
 
-	static TextureMetadata& GetTextureMetadata(const CrString& name);
+	static const TextureMetadata& GetTextureMetadata(const CrString& name);
 
-	static TextureMetadata& GetTextureMetadata(Textures::T id);
+	static const TextureMetadata& GetTextureMetadata(Textures::T id);
 
-	static SamplerMetadata& GetSamplerMetadata(const CrString& name);
+	static const SamplerMetadata& GetSamplerMetadata(const CrString& name);
 
-	static SamplerMetadata& GetSamplerMetadata(Samplers::T id);
+	static const SamplerMetadata& GetSamplerMetadata(Samplers::T id);
 
 protected:
 
 	// TODO Remove this reference to shader reflection vulkan
-	void CreateShaderResourceSet(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const;
+	void CreateShaderResourceSet(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const;
 
 	virtual void InitPS() = 0;
 
-	virtual void CreateShaderResourceSetPS(const CrVector<CrShaderStageInfo>& shaderStageInfo, const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const = 0;
+	virtual void CreateShaderResourceSetPS(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const = 0;
 
 	const ICrRenderDevice* m_renderDevice;
 };

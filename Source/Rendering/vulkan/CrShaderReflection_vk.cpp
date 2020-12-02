@@ -19,8 +19,9 @@ void CrShaderReflectionVulkan::AddBytecodePS(const CrShaderBytecodeSharedHandle&
 	// Perform reflection on the shader
 	// SPIRV-Cross has several classes like CompilerGLSL that can translate from SPIR-V to other high level languages. For reflection we don't need them.
 	cr3d::ShaderStage::T shaderStage = bytecode->GetShaderStage();
-	reflection[shaderStage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode->GetBytecode().data()), bytecode->GetBytecode().size() / 4);
-	resources[shaderStage] = reflection[shaderStage]->get_shader_resources(reflection[shaderStage]->get_active_interface_variables());
+	m_reflection[shaderStage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode->GetBytecode().data()), bytecode->GetBytecode().size() / 4);
+	m_resources[shaderStage] = m_reflection[shaderStage]->get_shader_resources(m_reflection[shaderStage]->get_active_interface_variables());
+}
 }
 
 const spirv_cross::Resource& CrShaderReflectionVulkan::GetSpvResource(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const
@@ -28,16 +29,16 @@ const spirv_cross::Resource& CrShaderReflectionVulkan::GetSpvResource(cr3d::Shad
 	switch (resourceType)
 	{
 		case cr3d::ShaderResourceType::ConstantBuffer:
-			return resources[stage].uniform_buffers[index];
+			return m_resources[stage].uniform_buffers[index];
 		case cr3d::ShaderResourceType::Texture:
-			return resources[stage].separate_images[index];
+			return m_resources[stage].separate_images[index];
 		case cr3d::ShaderResourceType::Sampler:
-			return resources[stage].separate_samplers[index];
+			return m_resources[stage].separate_samplers[index];
 		case cr3d::ShaderResourceType::ROStructuredBuffer:
 		case cr3d::ShaderResourceType::RWStructuredBuffer:
-			return resources[stage].storage_buffers[index];
+			return m_resources[stage].storage_buffers[index];
 		case cr3d::ShaderResourceType::RWTexture:
-			return resources[stage].storage_images[index];
+			return m_resources[stage].storage_images[index];
 		default:
 			return defaultResource;
 	}
@@ -49,7 +50,7 @@ CrShaderResource CrShaderReflectionVulkan::GetResourcePS(cr3d::ShaderStage::T st
 	const spirv_cross::Resource& spvResource = GetSpvResource(stage, resourceType, index);
 
 	resource.name = spvResource.name.c_str();
-	resource.bindPoint = (bindpoint_t)reflection[stage]->get_decoration(spvResource.id, spv::DecorationBinding);
+	resource.bindPoint = (bindpoint_t)m_reflection[stage]->get_decoration(spvResource.id, spv::DecorationBinding);
 
 	return resource;
 }
@@ -59,16 +60,16 @@ uint32_t CrShaderReflectionVulkan::GetResourceCountPS(cr3d::ShaderStage::T stage
 	switch (resourceType)
 	{
 		case cr3d::ShaderResourceType::ConstantBuffer:
-			return (uint32_t)resources[stage].uniform_buffers.size();
+			return (uint32_t)m_resources[stage].uniform_buffers.size();
 		case cr3d::ShaderResourceType::Texture:
-			return (uint32_t)resources[stage].separate_images.size();
+			return (uint32_t)m_resources[stage].separate_images.size();
 		case cr3d::ShaderResourceType::Sampler:
-			return (uint32_t)resources[stage].separate_samplers.size();
+			return (uint32_t)m_resources[stage].separate_samplers.size();
 		case cr3d::ShaderResourceType::ROStructuredBuffer:
 		case cr3d::ShaderResourceType::RWStructuredBuffer:
-			return (uint32_t)resources[stage].storage_buffers.size();
+			return (uint32_t)m_resources[stage].storage_buffers.size();
 		case cr3d::ShaderResourceType::RWTexture:
-			return (uint32_t)resources[stage].storage_images.size();
+			return (uint32_t)m_resources[stage].storage_images.size();
 		default:
 			return 0;
 	}

@@ -18,13 +18,11 @@ private:
 
 	virtual uint32_t GetResourceCountPS(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType) const override;
 
-private:
-
 	const spirv_cross::Resource& GetSpvResource(cr3d::ShaderStage::T stage, cr3d::ShaderResourceType::T resourceType, uint32_t index) const;
 	
 	static const spirv_cross::Resource defaultResource;
 
-	CrUniquePtr<spirv_cross::Compiler> reflection[cr3d::ShaderStage::Count];
+	CrUniquePtr<spirv_cross::Compiler> m_reflection[cr3d::ShaderStage::Count];
 
-	spirv_cross::ShaderResources resources[cr3d::ShaderStage::Count];
+	spirv_cross::ShaderResources m_resources[cr3d::ShaderStage::Count];
 };

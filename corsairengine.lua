@@ -188,7 +188,6 @@ workspace 'Corsair Engine'
 		system('macosx')
 		architecture 'x64'		
 		defines { 'VULKAN_API', 'VK_USE_PLATFORM_MACOS_MVK', 'MAC_TARGET' }
-		includedirs	{ LibVulkan..'/Source/include' }
 		
 	--filter { 'platforms:'..VulkanAndroid }
 		--system 'android'
@@ -327,7 +326,6 @@ project(ProjectCrRendering)
 
 	AddAssimpLibrary()
 	AddSpirvCrossLibrary()
-	AddGlslangLibrary()
 	AddGainputLibrary() -- TODO remove
 	
 	filter { 'platforms:'..VulkanWin64 }
@@ -336,11 +334,9 @@ project(ProjectCrRendering)
 		
 	filter { 'platforms:'..VulkanOSX }
 		files	{ SourceRenderingDirectory..'/vulkan/*' }
-		includedirs	{ SourceRenderingDirectory..'/vulkan/' }
 		
 	filter { 'platforms:'..D3D12 }
 		files	{ SourceRenderingDirectory..'/d3d12/*' }
-		includedirs	{ SourceRenderingDirectory..'/d3d12/' }
 	
 	filter{}
 

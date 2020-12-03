@@ -4,10 +4,6 @@
 #include "Rendering/ICrShader.h"
 
 #pragma warning (push, 0)
-// Glslang
-#include <glslang/Public/ShaderLang.h>
-#include <SPIRV/GlslangToSpv.h>
-
 // SPIR-V
 #include <spirv_cross.hpp>
 #pragma warning (pop)

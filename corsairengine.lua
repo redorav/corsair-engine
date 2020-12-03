@@ -451,8 +451,6 @@ project(ProjectCrCore)
 		files { SourceCoreDirectory..'/**/ansi/**' }
 
 	filter {}
-	
-	includedirs	{ SourceCoreDirectory }
 
 SourceDebugDirectory = SourceDirectory..'/Debug'
 	
@@ -462,8 +460,6 @@ project(ProjectCrDebug)
 	{
 		SourceDebugDirectory..'/**'
 	}
-	
-	includedirs	{ SourceDebugDirectory }
 
 -- Create a dummy project for all the natvis files to be in, instead of the individual project folders
 project('Natvis')

@@ -1,7 +1,7 @@
 #include "CrRendering_pch.h"
 #include "CrShaderReflection_vk.h"
 
-#include "ICrShader.h"
+#include "Rendering/ICrShader.h"
 
 #pragma warning (push, 0)
 // Glslang

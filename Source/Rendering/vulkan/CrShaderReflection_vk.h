@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrShaderReflection.h"
+#include "Rendering/ICrShaderReflection.h"
 
 #pragma warning (push, 0)
 #include <spirv_cross.hpp>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ICrCommandBuffer.h"
+#include "Rendering/ICrCommandBuffer.h"
 #include "CrGPUBuffer_vk.h"
 #include "CrVulkan.h"
-#include "CrRendering.h"
+#include "Rendering/CrRendering.h"
 
 class CrVertexBufferCommon;
 class CrIndexBufferCommon;

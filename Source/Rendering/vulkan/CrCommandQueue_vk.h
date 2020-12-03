@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrCommandQueue.h"
+#include "Rendering/ICrCommandQueue.h"
 #include <vulkan/vulkan.h>
 
 class ICrGPUSemaphore;

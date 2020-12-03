@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CrGPUBuffer.h"
+#include "Rendering/CrGPUBuffer.h"
 #include <vulkan/vulkan.h>
 
 #include "Core/Logging/ICrDebug.h"

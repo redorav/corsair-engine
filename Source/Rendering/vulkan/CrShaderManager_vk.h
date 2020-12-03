@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrShaderManager.h"
+#include "Rendering/ICrShaderManager.h"
 
 class CrShaderManagerVulkan final : public ICrShaderManager
 {

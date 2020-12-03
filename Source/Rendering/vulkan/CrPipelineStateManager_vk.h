@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrPipelineStateManager.h"
+#include "Rendering/ICrPipelineStateManager.h"
 
 class CrRenderDeviceVulkan;
 

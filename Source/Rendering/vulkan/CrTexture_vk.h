@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrTexture.h"
+#include "Rendering/ICrTexture.h"
 
 #include "Core/Containers/CrArray.h"
 #include "Core/Containers/CrVector.h"

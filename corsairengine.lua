@@ -325,8 +325,6 @@ project(ProjectCrRendering)
 	
 	links { ProjectCrImage } -- TODO Delete
 
-	includedirs	{ SourceRenderingDirectory }
-
 	AddAssimpLibrary()
 	AddSpirvCrossLibrary()
 	AddGlslangLibrary()

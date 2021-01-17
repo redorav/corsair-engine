@@ -81,7 +81,7 @@ public:
 	// Wait until all operations on all queues have completed
 	void WaitIdle();
 
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) = 0;
+	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const = 0;
 
 	const CrRenderDeviceProperties& GetProperties();
 

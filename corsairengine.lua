@@ -1,5 +1,3 @@
-require ('premake-qt/qt')
-
 -- Directories
 DependenciesDirectory   = 'Dependencies'
 SourceDirectory         = 'Source'
@@ -7,7 +5,6 @@ ToolsDirectory          = 'Tools'
 ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
 
 MathDirectory = SourceDirectory..'/Math'
-QtDirectory   = SourceDirectory..'/Qt'
 
 -- Platforms
 VulkanWin64 = 'Vulkan Win64'
@@ -40,8 +37,8 @@ LibxxHash     = DependenciesDirectory..'/xxHash'
 LibAssimp     = DependenciesDirectory..'/assimp'
 LibArgh       = DependenciesDirectory..'/argh'
 LibHalf       = DependenciesDirectory..'/half'
-LibQt         = DependenciesDirectory..'/qt'
 LibDdspp      = DependenciesDirectory..'/ddspp'
+LibSDL2       = DependenciesDirectory..'/sdl2'
 
 LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
 
@@ -94,26 +91,12 @@ function AddEASTLLibrary()
 end
 
 function AddHlslppLibrary()
-	
 	defines { 'HLSLPP_FEATURE_TRANSFORM' }
 end
 
-function AddQtLibrary()
-	
-	local qt = premake.extensions.qt
-	QT_PATH = LibQt
-
-	qtpath (QT_PATH)
-
-	qtgenerateddir(QtDirectory..'/Generated')
-	qtprefix('Qt5')
-	configuration 'Debug'
-		qtsuffix('d')
-	configuration {}
-	qt.enable() -- TODO Enable only in appropriate (non-master) configuration
-
-	qtmodules { 'core', 'gui', 'widgets' }
-
+function AddSDL2Library()
+	AddLibrary(LibSDL2..'/Source/include', LibSDL2..BinaryDirectory, 'SDL2')
+	defines { 'SDL_MAIN_HANDLED' }
 end
 
 function ExcludePlatformSpecificCode(rootPath)
@@ -286,16 +269,14 @@ project (ProjectCorsairEngine)
 	kind('WindowedApp')
 	files	
 	{	
-		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp',
-		QtDirectory..'/**.ui', QtDirectory..'/**.cpp', QtDirectory..'/**.h', 
+		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
 	links { ProjectCrCore, ProjectCrRendering }
 	
 	AddAssimpLibrary()
 	AddGainputLibrary()
-	
-	AddQtLibrary() -- TODO move
+	AddSDL2Library()
 	
 	filter('system:windows')
 		AddXinputLibrary() -- Needed for gainput on Windows
@@ -304,7 +285,7 @@ project (ProjectCorsairEngine)
 	
 	postbuildcommands 
 	{
-		-- TODO Copy necessary dlls from the lib folder (qt, assimp, etc)
+		-- TODO Copy necessary dlls from the lib folder
 	}
 	
 group('Rendering')

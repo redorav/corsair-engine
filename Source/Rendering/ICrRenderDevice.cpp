@@ -91,7 +91,12 @@ CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescri
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
 	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));
-	swapchain->Create(this, swapchainDescriptor);
+
+	CrAssertMsg(swapchain->GetWidth() > 0, "Swapchain must have a width");
+	CrAssertMsg(swapchain->GetHeight() > 0, "Swapchain must have a height");
+	CrAssertMsg(swapchain->GetImageCount() > 0, "Swapchain must have at least one image");
+	CrAssertMsg(swapchain->GetFormat() != cr3d::DataFormat::Invalid, "Swapchain must have a texture format");
+
 	return swapchain;
 }
 

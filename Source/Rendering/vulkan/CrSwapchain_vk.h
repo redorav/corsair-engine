@@ -11,13 +11,11 @@ public:
 
 	~CrSwapchainVulkan();
 
-	virtual void CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) override;
-
 	virtual void PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore) override;
 
 	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) override;
 
-	VkSwapchainKHR GetVkSwapchain();
+	VkSwapchainKHR GetVkSwapchain() const;
 
 private:
 
@@ -35,3 +33,8 @@ private:
 
 	VkColorSpaceKHR		m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 };
+
+inline VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain() const
+{
+	return m_vkSwapchain;
+}

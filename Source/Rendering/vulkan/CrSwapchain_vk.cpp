@@ -10,24 +10,7 @@
 #include "Core/Logging/ICrDebug.h"
 
 CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
-{
-	renderDevice; swapchainDescriptor;
-	//CreatePS(renderDevice, requestedWidth, requestedHeight);
-}
-
-CrSwapchainVulkan::~CrSwapchainVulkan()
-{
-	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
-
-	vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
-}
-
-VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain()
-{
-	return m_vkSwapchain;
-}
-
-void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
+	: ICrSwapchain(renderDevice, swapchainDescriptor)
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
@@ -96,7 +79,7 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface formats");
 
 		CrAssertMsg(formatCount > 0, "Must have at least one preferred color space");
-	
+
 		VkFormat desiredVkFormat = crvk::GetVkFormat(swapchainDescriptor.format);
 
 		bool foundMatchingFormat = false;
@@ -153,6 +136,9 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		m_height = surfaceCapabilities.currentExtent.height;
 	}
 
+	CrAssertMsg(m_width > 0, "Must have a width greater than 0!");
+	CrAssertMsg(m_height > 0, "Must have a height greater than 0!");
+
 	VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_MAX_ENUM_KHR;
 
 	bool hasMailbox = false;
@@ -201,24 +187,24 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 	}
 
 	VkSwapchainCreateInfoKHR swapchainInfo;
-	swapchainInfo.sType						= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	swapchainInfo.pNext						= nullptr;
-	swapchainInfo.flags						= 0;
-	swapchainInfo.surface					= m_vkSurface;
-	swapchainInfo.minImageCount				= desiredNumberOfSwapchainImages;
-	swapchainInfo.imageFormat				= m_vkFormat;
-	swapchainInfo.imageColorSpace			= m_vkColorSpace;
-	swapchainInfo.imageExtent				= { swapchainExtent.width, swapchainExtent.height };
-	swapchainInfo.imageArrayLayers			= 1;
-	swapchainInfo.imageUsage				= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	swapchainInfo.imageSharingMode			= VK_SHARING_MODE_EXCLUSIVE;
-	swapchainInfo.queueFamilyIndexCount		= 0;
-	swapchainInfo.pQueueFamilyIndices		= nullptr;
-	swapchainInfo.preTransform				= (VkSurfaceTransformFlagBitsKHR)preTransform;
-	swapchainInfo.presentMode				= swapchainPresentMode;
-	swapchainInfo.oldSwapchain				= oldSwapchain;
-	swapchainInfo.clipped					= true;
-	swapchainInfo.compositeAlpha			= VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	swapchainInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	swapchainInfo.pNext                 = nullptr;
+	swapchainInfo.flags                 = 0;
+	swapchainInfo.surface               = m_vkSurface;
+	swapchainInfo.minImageCount         = desiredNumberOfSwapchainImages;
+	swapchainInfo.imageFormat           = m_vkFormat;
+	swapchainInfo.imageColorSpace       = m_vkColorSpace;
+	swapchainInfo.imageExtent           = { swapchainExtent.width, swapchainExtent.height };
+	swapchainInfo.imageArrayLayers      = 1;
+	swapchainInfo.imageUsage            = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	swapchainInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
+	swapchainInfo.queueFamilyIndexCount = 0;
+	swapchainInfo.pQueueFamilyIndices   = nullptr;
+	swapchainInfo.preTransform          = (VkSurfaceTransformFlagBitsKHR)preTransform;
+	swapchainInfo.presentMode           = swapchainPresentMode;
+	swapchainInfo.oldSwapchain          = oldSwapchain;
+	swapchainInfo.clipped               = true;
+	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
 	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
 
@@ -245,6 +231,15 @@ void CrSwapchainVulkan::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchai
 		swapchainTexParams.extraDataPtr = images[i]; // Swapchain texture
 		m_textures[i] = renderDevice->CreateTexture(swapchainTexParams);
 	}
+
+	CreateWaitFences(m_imageCount);
+}
+
+CrSwapchainVulkan::~CrSwapchainVulkan()
+{
+	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
+
+	vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
 }
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)

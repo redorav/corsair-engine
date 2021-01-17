@@ -15,27 +15,19 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain()
-	: m_format(cr3d::DataFormat::Invalid)
-	, m_sampleCount(cr3d::SampleCount::S1)
+ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/)
+	: m_renderDevice(renderDevice)
 {
 
 }
 
-void ICrSwapchain::Create(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
+void ICrSwapchain::CreateWaitFences(uint32_t imageCount)
 {
-	CreatePS(renderDevice, swapchainDescriptor);
-
-	CrAssertMsg(m_width > 0, "Swapchain must have a width");
-	CrAssertMsg(m_height > 0, "Swapchain must have a height");
-	CrAssertMsg(m_imageCount > 0, "Swapchain must have at least one image");
-	CrAssertMsg(m_format != cr3d::DataFormat::Invalid, "Swapchain must have a texture format");
-
-	m_waitFences.resize(m_imageCount);
+	m_waitFences.resize(imageCount);
 
 	for (auto& waitFence : m_waitFences)
 	{
-		waitFence = renderDevice->CreateGPUFence();
+		waitFence = m_renderDevice->CreateGPUFence();
 	}
 }
 

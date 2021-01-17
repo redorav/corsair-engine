@@ -40,6 +40,8 @@ class ICrSwapchain
 
 public:
 
+	ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
+
 	virtual ~ICrSwapchain() {}
 
 	cr3d::DataFormat::T GetFormat() const;
@@ -64,15 +66,13 @@ public:
 
 protected:
 
-	ICrSwapchain();
-
-	void Create(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
-
-	virtual void CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) = 0;
-
 	virtual void PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore) = 0;
 
 	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
+
+	void CreateWaitFences(uint32_t imageCount);
+
+	ICrRenderDevice*					m_renderDevice = nullptr;
 
 	CrVector<CrTextureSharedHandle>		m_textures;
 

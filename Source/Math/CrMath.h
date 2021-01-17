@@ -12,10 +12,9 @@ using namespace half_float::literal;
 
 namespace CrMath
 {
-	constexpr static float PI = 3.14159265359f;
-	constexpr static float Rad2Deg = 180.0f / CrMath::PI;
-	constexpr static float Deg2Rad = CrMath::PI / 180.0f;
-	constexpr static float TWO_PI = 2.0f * CrMath::PI;
+	constexpr static float Pi = 3.14159265359f;
+	constexpr static float Rad2Deg = 180.0f / CrMath::Pi;
+	constexpr static float Deg2Rad = CrMath::Pi / 180.0f;
 };
 
 template<typename T>

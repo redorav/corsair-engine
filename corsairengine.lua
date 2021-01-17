@@ -93,6 +93,11 @@ function AddEASTLLibrary()
 	LibEASTL..BinaryDirectory, 'EASTL'..LibConfig)
 end
 
+function AddHlslppLibrary()
+	
+	defines { 'HLSLPP_FEATURE_TRANSFORM' }
+end
+
 function AddQtLibrary()
 	
 	local qt = premake.extensions.qt
@@ -212,6 +217,7 @@ workspace 'Corsair Engine'
 	filter{}
 	
 	AddEASTLLibrary()
+	AddHlslppLibrary()
 			
 	-- Setup include directories
 			
@@ -413,9 +419,8 @@ project(ProjectCrMath)
 
 	includedirs
 	{
-		MathDirectory,
-		LibHlslpp..'/Source/include/'
-	}	
+		MathDirectory
+	}
 
 group('Image')
 

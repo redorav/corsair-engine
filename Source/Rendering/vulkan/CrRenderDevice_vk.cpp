@@ -181,11 +181,9 @@ VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	CrVector<const char*> enabledLayers;
-
 	if (enableValidationLayer && IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
 	{
-		enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+		m_instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
 	}
 
 	instanceCreateInfo.enabledLayerCount = (uint32_t)m_instanceLayers.size();

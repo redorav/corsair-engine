@@ -60,9 +60,4 @@ private:
 	float4x4 m_view2WorldMatrix;
 	float4x4 m_world2ViewMatrix;
 	float4x4 m_view2ProjectionMatrix;
-
-	// Sets up the actual hardware perspective matrix by specifying the base parameters. Not intended for outside use.
-	float4x4 CreateProjectionMatrix(float left, float right, float top, float bottom, float nearPlane, float farPlane);
-
-	float4x4 CreateProjectionMatrix(float verticalFovY, float aspectRatio, float nearPlane, float farPlane);
 };

@@ -62,7 +62,7 @@ private:
 
 	virtual void WaitIdlePS() override;
 
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) override;
+	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
 
 	void RetrieveQueueFamilies();
 

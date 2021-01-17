@@ -502,7 +502,7 @@ uint32_t CrRenderDeviceVulkan::GetVkQueueFamilyIndex() const
 	return m_commandQueueFamilyIndex;
 }
 
-bool CrRenderDeviceVulkan::GetIsFeatureSupported(CrRenderingFeature::T feature)
+bool CrRenderDeviceVulkan::GetIsFeatureSupported(CrRenderingFeature::T feature) const
 {
 	switch (feature)
 	{

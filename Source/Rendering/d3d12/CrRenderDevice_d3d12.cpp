@@ -75,7 +75,7 @@ ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrGPU
 	return new CrHardwareGPUBufferD3D12(this, params);
 }
 
-bool CrRenderDeviceD3D12::GetIsFeatureSupported(CrRenderingFeature::T feature)
+bool CrRenderDeviceD3D12::GetIsFeatureSupported(CrRenderingFeature::T feature) const
 {
 	switch (feature)
 	{

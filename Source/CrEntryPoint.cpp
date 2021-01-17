@@ -1,5 +1,4 @@
 #include "CrGUI.h"
-#include "CrMain.h"
 
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrFrame.h"

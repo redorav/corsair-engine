@@ -436,7 +436,10 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		deviceCreateInfo.ppEnabledExtensionNames = enabledDeviceExtensions.data();
 	}
 
-	return vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
+	VkResult result = vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
+	CrAssertMsg(result == VK_SUCCESS, "Could not create vkDevice");
+
+	return result;
 }
 
 bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)

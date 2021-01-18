@@ -36,11 +36,6 @@ cr3d::DataFormat::T ICrSwapchain::GetFormat() const
 	return m_format;
 }
 
-cr3d::SampleCount ICrSwapchain::GetSampleCount() const
-{
-	return m_sampleCount;
-}
-
 uint32_t ICrSwapchain::GetWidth() const
 {
 	return m_width;

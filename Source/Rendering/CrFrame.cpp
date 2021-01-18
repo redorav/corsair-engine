@@ -141,7 +141,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// Create main renderpass
 	CrRenderPassDescriptor renderPassDescriptor;
-	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(m_swapchain->GetFormat(), m_swapchain->GetSampleCount(),
+	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(m_swapchain->GetFormat(), cr3d::SampleCount::S1,
 		CrAttachmentLoadOp::Clear, CrAttachmentStoreOp::Store,
 		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
 		cr3d::ResourceState::Undefined, cr3d::ResourceState::Present);

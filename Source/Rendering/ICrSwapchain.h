@@ -46,8 +46,6 @@ public:
 
 	cr3d::DataFormat::T GetFormat() const;
 
-	cr3d::SampleCount GetSampleCount() const;
-
 	uint32_t GetWidth() const;
 
 	uint32_t GetHeight() const;
@@ -81,8 +79,6 @@ protected:
 	uint32_t							m_imageCount	= 0;
 
 	cr3d::DataFormat::T					m_format;
-
-	cr3d::SampleCount					m_sampleCount;
 
 	uint32_t m_width					= 0;
 

@@ -20,12 +20,12 @@ uint32_t screenHeight = 720;
 
 int main(int argc, char* argv[])
 {
-	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
-
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		return 1;
 	}
+
+	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
 	CrString dataPath = crcore::CommandLine("-root").str().c_str();
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 	ICrOSWindow* mainWindow = new ICrOSWindow(1280, 720);
 
-	HWND hWnd = (HWND)mainWindow->GetNativeWindowHandle();
+	void* hWnd = mainWindow->GetNativeWindowHandle();
 
 	//HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
 	HINSTANCE hInstance = GetModuleHandle(nullptr); // Valid for the current executable (not valid for a dll) http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
@@ -71,11 +71,8 @@ int main(int argc, char* argv[])
 
 		if (!mainWindow->GetIsMinimized())
 		{
-			// Process the main loop
-			frame.Process();
+			frame.Process(); // Process the main loop
 		}
-
-		CrFrameTime::IncrementFrameCount();
 	}
 
 	return 0;

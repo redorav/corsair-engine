@@ -371,6 +371,8 @@ void CrFrame::UpdateCamera()
 
 	cameraConstantData.world2View = transpose(camera.GetWorld2ViewMatrix());
 	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
+
+	CrFrameTime::IncrementFrameCount();
 }
 
 void CrFrame::RecreateSwapchainAndFramebuffers()

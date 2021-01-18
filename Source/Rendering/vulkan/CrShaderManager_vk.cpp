@@ -22,10 +22,10 @@ void CrShaderManagerVulkan::InitPS()
 
 }
 
-void CrShaderManagerVulkan::CreateShaderResourceSetPS
+void CrShaderManagerVulkan::CreateShaderResourceTablePS
 (
 	const CrShaderReflectionVulkan& reflection, 
-	CrShaderResourceSet& resourceSet
+	CrShaderResourceTable& resourceTable
 ) const
 {
 	VkDevice vkDevice = static_cast<const CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
@@ -72,6 +72,6 @@ void CrShaderManagerVulkan::CreateShaderResourceSetPS
 	descriptorLayout.bindingCount = (uint32_t) layoutBindings.size();
 	descriptorLayout.pBindings = layoutBindings.data();
 
-	VkResult result = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &resourceSet.m_vkDescriptorSetLayout);
+	VkResult result = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &resourceTable.m_vkDescriptorSetLayout);
 	CrAssert(result == VK_SUCCESS);
 }

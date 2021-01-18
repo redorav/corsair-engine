@@ -84,7 +84,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
 	const ICrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;
 	const CrGraphicsShaderHandle& currentGraphicsShader = currentPipeline->m_shader;
-	const CrShaderResourceSet& resourceSet = currentGraphicsShader->GetResourceSet();
+	const CrShaderResourceTable& resourceTable = currentGraphicsShader->GetResourceTable();
 
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
@@ -92,7 +92,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	descriptorSetAllocInfo.pNext = nullptr;
 	descriptorSetAllocInfo.descriptorPool = m_vkDescriptorPool;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	descriptorSetAllocInfo.pSetLayouts = &resourceSet.m_vkDescriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &resourceTable.m_vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
 	VkResult result = vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocInfo, &descriptorSet);
@@ -112,12 +112,12 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	{
 		cr3d::ShaderStage::T stage = shaderStageInfo.stage;
 
-		uint32_t constantBufferCount = resourceSet.GetConstantBufferCount(stage);
+		uint32_t constantBufferCount = resourceTable.GetConstantBufferCount(stage);
 
 		for (uint32_t i = 0; i < constantBufferCount; ++i)
 		{
-			const ConstantBuffers::T id = resourceSet.GetConstantBufferID(stage, i);
-			const bindpoint_t bindPoint = resourceSet.GetConstantBufferBindPoint(stage, i);
+			const ConstantBuffers::T id = resourceTable.GetConstantBufferID(stage, i);
+			const bindpoint_t bindPoint = resourceTable.GetConstantBufferBindPoint(stage, i);
 			const ConstantBufferMetadata& constantBufferMetadata = CrShaderManagerVulkan::GetConstantBufferMetadata(id);
 			const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][constantBufferMetadata.id];
 			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -139,12 +139,12 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 			bufferCount++;
 		}
 
-		uint32_t textureCount = resourceSet.GetTextureCount(stage);
+		uint32_t textureCount = resourceTable.GetTextureCount(stage);
 	
 		for (uint32_t i = 0; i < textureCount; ++i)
 		{
-			Textures::T id = resourceSet.GetTextureID(stage, i);
-			bindpoint_t bindPoint = resourceSet.GetTextureBindPoint(stage, i);
+			Textures::T id = resourceTable.GetTextureID(stage, i);
+			bindpoint_t bindPoint = resourceTable.GetTextureBindPoint(stage, i);
 			const TextureMetadata& textureMeta = CrShaderManagerVulkan::GetTextureMetadata(id);
 			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][textureMeta.id]);
 	
@@ -160,12 +160,12 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 			imageCount++;
 		}
 
-		uint32_t samplerCount = resourceSet.GetSamplerCount(stage);
+		uint32_t samplerCount = resourceTable.GetSamplerCount(stage);
 
 		for (uint32_t i = 0; i < samplerCount; ++i)
 		{
-			Samplers::T id = resourceSet.GetSamplerID(stage, i);
-			bindpoint_t bindPoint = resourceSet.GetSamplerBindPoint(stage, i);
+			Samplers::T id = resourceTable.GetSamplerID(stage, i);
+			bindpoint_t bindPoint = resourceTable.GetSamplerBindPoint(stage, i);
 			const SamplerMetadata& samplerMeta = CrShaderManagerVulkan::GetSamplerMetadata(id);
 			const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][samplerMeta.id]);
 

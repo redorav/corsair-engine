@@ -185,7 +185,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineLayoutCreateInfo.pNext = nullptr;
 	pipelineLayoutCreateInfo.flags = 0;
 	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Don't know what cases would warrant making this > 1
-	pipelineLayoutCreateInfo.pSetLayouts = &graphicsShader->GetResourceSet().m_vkDescriptorSetLayout; // From shader
+	pipelineLayoutCreateInfo.pSetLayouts = &graphicsShader->GetResourceTable().m_vkDescriptorSetLayout; // From shader
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?

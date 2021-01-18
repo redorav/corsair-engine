@@ -5,7 +5,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrShaderResourceSet::CrShaderResourceSet()
+CrShaderResourceTable::CrShaderResourceTable()
 {
 	for (uint32_t i = 0; i < cr3d::ShaderStage::GraphicsStageCount; ++i)
 	{
@@ -26,83 +26,83 @@ CrShaderResourceSet::CrShaderResourceSet()
 	}
 }
 
-uint32_t CrShaderResourceSet::GetConstantBufferTotalCount() const
+uint32_t CrShaderResourceTable::GetConstantBufferTotalCount() const
 {
 	return m_usedConstantBufferTotalCount;
 }
 
-uint32_t CrShaderResourceSet::GetConstantBufferCount(cr3d::ShaderStage::T stage) const
+uint32_t CrShaderResourceTable::GetConstantBufferCount(cr3d::ShaderStage::T stage) const
 {
 	return m_usedConstantBufferCount[stage];
 }
 
-ConstantBuffers::T CrShaderResourceSet::GetConstantBufferID(cr3d::ShaderStage::T stage, uint32_t index) const
+ConstantBuffers::T CrShaderResourceTable::GetConstantBufferID(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageConstantBuffers);
+	CrAssert(index < CrShaderResourceTable::MaxStageConstantBuffers);
 	return m_usedConstantBuffers[stage][index];
 }
 
-bindpoint_t CrShaderResourceSet::GetConstantBufferBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
+bindpoint_t CrShaderResourceTable::GetConstantBufferBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageConstantBuffers);
+	CrAssert(index < CrShaderResourceTable::MaxStageConstantBuffers);
 	return m_usedConstantBufferBindPoints[stage][index];
 }
 
-uint32_t CrShaderResourceSet::GetTextureTotalCount() const
+uint32_t CrShaderResourceTable::GetTextureTotalCount() const
 {
 	return m_usedTextureTotalCount;
 }
 
-uint32_t CrShaderResourceSet::GetTextureCount(cr3d::ShaderStage::T stage) const
+uint32_t CrShaderResourceTable::GetTextureCount(cr3d::ShaderStage::T stage) const
 {
 	return m_usedTextureCount[stage];
 }
 
-Textures::T CrShaderResourceSet::GetTextureID(cr3d::ShaderStage::T stage, uint32_t index) const
+Textures::T CrShaderResourceTable::GetTextureID(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageConstantBuffers);
+	CrAssert(index < CrShaderResourceTable::MaxStageConstantBuffers);
 	return m_usedTextures[stage][index];
 }
 
-bindpoint_t CrShaderResourceSet::GetTextureBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
+bindpoint_t CrShaderResourceTable::GetTextureBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageTextures);
+	CrAssert(index < CrShaderResourceTable::MaxStageTextures);
 	return m_usedTextureBindPoints[stage][index];
 }
 
-uint32_t CrShaderResourceSet::GetSamplerTotalCount() const
+uint32_t CrShaderResourceTable::GetSamplerTotalCount() const
 {
 	return m_usedSamplerTotalCount;
 }
 
-uint32_t CrShaderResourceSet::GetSamplerCount(cr3d::ShaderStage::T stage) const
+uint32_t CrShaderResourceTable::GetSamplerCount(cr3d::ShaderStage::T stage) const
 {
 	return m_usedSamplerCount[stage];
 }
 
-Samplers::T CrShaderResourceSet::GetSamplerID(cr3d::ShaderStage::T stage, uint32_t index) const
+Samplers::T CrShaderResourceTable::GetSamplerID(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageConstantBuffers);
+	CrAssert(index < CrShaderResourceTable::MaxStageConstantBuffers);
 	return m_usedSamplers[stage][index];
 }
 
-bindpoint_t CrShaderResourceSet::GetSamplerBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
+bindpoint_t CrShaderResourceTable::GetSamplerBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const
 {
-	CrAssert(index < CrShaderResourceSet::MaxStageSamplers);
+	CrAssert(index < CrShaderResourceTable::MaxStageSamplers);
 	return m_usedSamplerBindPoints[stage][index];
 }
 
-uint32_t CrShaderResourceSet::GetBufferCount() const
+uint32_t CrShaderResourceTable::GetBufferCount() const
 {
 	return m_usedBufferTotalCount;
 }
 
-uint32_t CrShaderResourceSet::GetImageCount() const
+uint32_t CrShaderResourceTable::GetImageCount() const
 {
 	return m_usedImageTotalCount;
 }
 
-void CrShaderResourceSet::AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+void CrShaderResourceTable::AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 {
 	CrAssert(m_usedConstantBufferCount[stage] < MaxStageConstantBuffers);
 
@@ -113,7 +113,7 @@ void CrShaderResourceSet::AddConstantBuffer(cr3d::ShaderStage::T stage, Constant
 	m_usedBufferTotalCount++;
 }
 
-void CrShaderResourceSet::AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+void CrShaderResourceTable::AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 {
 	CrAssert(m_usedTextureCount[stage] < MaxStageTextures);
 
@@ -124,7 +124,7 @@ void CrShaderResourceSet::AddTexture(cr3d::ShaderStage::T stage, Textures::T id,
 	m_usedImageTotalCount++;
 }
 
-void CrShaderResourceSet::AddSampler(cr3d::ShaderStage::T stage, Samplers::T index, bindpoint_t bindPoint)
+void CrShaderResourceTable::AddSampler(cr3d::ShaderStage::T stage, Samplers::T index, bindpoint_t bindPoint)
 {
 	CrAssert(m_usedSamplerCount[stage] < MaxStageSamplers);
 
@@ -140,7 +140,7 @@ const CrHash& ICrShader::GetHash() const
 	return m_hash;
 }
 
-const CrShaderResourceSet& ICrShader::GetResourceSet() const
+const CrShaderResourceTable& ICrShader::GetResourceTable() const
 {
-	return m_resourceSet;
+	return m_resourceTable;
 }

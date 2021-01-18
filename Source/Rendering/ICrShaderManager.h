@@ -15,7 +15,7 @@ struct SamplerMetadata;
 struct CrBytecodeLoadDescriptor;
 struct CrShaderBytecodeDescriptor;
 class CrShaderReflectionVulkan;
-class CrShaderResourceSet;
+class CrShaderResourceTable;
 
 class CrShaderManagerVulkan;
 
@@ -56,11 +56,11 @@ public:
 protected:
 
 	// TODO Remove this reference to shader reflection vulkan
-	void CreateShaderResourceSet(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const;
+	void CreateShaderResourceTable(const CrShaderReflectionVulkan& reflection, CrShaderResourceTable& resourceTable) const;
 
 	virtual void InitPS() = 0;
 
-	virtual void CreateShaderResourceSetPS(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const = 0;
+	virtual void CreateShaderResourceTablePS(const CrShaderReflectionVulkan& reflection, CrShaderResourceTable& resourceTable) const = 0;
 
 	const ICrRenderDevice* m_renderDevice;
 };

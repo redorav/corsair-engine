@@ -7,7 +7,7 @@ void CrShaderManagerD3D12::InitPS()
 
 }
 
-void CrShaderManagerD3D12::CreateShaderResourceSetPS(const CrBytecodeLoadDescriptor& shaderCreateInfo, const CrShaderReflectionD3D12& reflection, CrShaderResourceSet& resourceSet)
+void CrShaderManagerD3D12::CreateShaderResourceTablePS(const CrBytecodeLoadDescriptor& shaderCreateInfo, const CrShaderReflectionD3D12& reflection, CrShaderResourceTable& resourceTable)
 {
 	
 }

@@ -22,11 +22,11 @@ namespace cr3d { namespace GraphicsApi { enum T : uint8_t; } }
 
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
-class CrShaderResourceSet
+class CrShaderResourceTable
 {
 public:
 
-	CrShaderResourceSet();
+	CrShaderResourceTable();
 
 #if defined(VULKAN_API)
 
@@ -157,9 +157,9 @@ public:
 
 	const CrHash& GetHash() const;
 
-	const CrShaderResourceSet& GetResourceSet() const;
+	const CrShaderResourceTable& GetResourceTable() const;
 
-	CrShaderResourceSet m_resourceSet;
+	CrShaderResourceTable m_resourceTable;
 
 private:
 

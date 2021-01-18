@@ -83,7 +83,7 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoad
 	CrGraphicsShaderHandle graphicsShader = m_renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 
 	// TODO the shader itself can create the shader resource set after we've mangled the SPIR-V bytecode
-	CreateShaderResourceSet(reflection, graphicsShader->m_resourceSet);
+	CreateShaderResourceTable(reflection, graphicsShader->m_resourceTable);
 
 	return graphicsShader;
 }
@@ -139,27 +139,27 @@ const SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
 	return SamplerMetaTable[id];
 }
 
-void ICrShaderManager::CreateShaderResourceSet(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const
+void ICrShaderManager::CreateShaderResourceTable(const CrShaderReflectionVulkan& reflection, CrShaderResourceTable& resourceTable) const
 {
-	reflection.ForEachConstantBuffer([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
+	reflection.ForEachConstantBuffer([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
 	{
 		const ConstantBufferMetadata& metadata = GetConstantBufferMetadata(constantBuffer.name);
-		resourceSet.AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
+		resourceTable.AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
 	});
 
-	reflection.ForEachTexture([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
+	reflection.ForEachTexture([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
 	{
 		const TextureMetadata& metadata = GetTextureMetadata(texture.name);
-		resourceSet.AddTexture(stage, metadata.id, texture.bindPoint);
+		resourceTable.AddTexture(stage, metadata.id, texture.bindPoint);
 	});
 
-	reflection.ForEachSampler([&resourceSet](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
+	reflection.ForEachSampler([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
 	{
 		const SamplerMetadata& metadata = GetSamplerMetadata(sampler.name);
-		resourceSet.AddSampler(stage, metadata.id, sampler.bindPoint);
+		resourceTable.AddSampler(stage, metadata.id, sampler.bindPoint);
 	});
 
-	CreateShaderResourceSetPS(reflection, resourceSet);
+	CreateShaderResourceTablePS(reflection, resourceTable);
 }
 
 void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)

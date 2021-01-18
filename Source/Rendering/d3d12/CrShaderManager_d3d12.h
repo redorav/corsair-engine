@@ -10,5 +10,5 @@ public:
 	
 private:
 
-	virtual void CreateShaderResourceSetPS(const CrBytecodeLoadDescriptor& shaderCreateInfo, const CrShaderReflectionD3D12& reflection, CrShaderResourceSet& resourceSet) override;
+	virtual void CreateShaderResourceTablePS(const CrBytecodeLoadDescriptor& shaderCreateInfo, const CrShaderReflectionD3D12& reflection, CrShaderResourceTable& resourceTable) override;
 };

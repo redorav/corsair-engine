@@ -10,5 +10,5 @@ public:
 	
 private:
 
-	virtual void CreateShaderResourceSetPS(const CrShaderReflectionVulkan& reflection, CrShaderResourceSet& resourceSet) const override;
+	virtual void CreateShaderResourceTablePS(const CrShaderReflectionVulkan& reflection, CrShaderResourceTable& resourceTable) const override;
 };

@@ -14,7 +14,7 @@ struct CrRasterizerState
 	uint32_t depthClipEnable			: 1;
 	uint32_t multisampleEnable			: 1;
 	uint32_t antialiasedLineEnable		: 1;
-	float depthBias; // TODO understand this better. Default is 0
+	float depthBias;
 	float depthBiasClamp;
 	float slopeScaledDepthBias;
 };
@@ -121,7 +121,7 @@ struct CrRenderPassDescriptor;
 class ICrGraphicsPipeline : public ICrPipeline
 {
 public: // TODO PRIVATE
-	VkPipeline m_pipeline;
+	VkPipeline m_pipeline; // TODO Move to PS code
 	CrGraphicsShaderHandle m_shader;
 };
 

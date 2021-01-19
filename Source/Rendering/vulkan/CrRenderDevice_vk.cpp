@@ -6,7 +6,6 @@
 #include "CrCommandBuffer_vk.h"
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
-#include "CrShaderManager_vk.h"
 #include "CrSwapchain_vk.h"
 #include "CrFramebuffer_vk.h"
 #include "CrRenderPass_vk.h"

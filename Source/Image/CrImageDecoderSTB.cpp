@@ -6,7 +6,6 @@
 #include "Rendering/CrImage.h" // TODO Move to Image folder
 #include "Rendering/CrRendering.h"
 
-// TODO Move this into an stb cpp
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
 #pragma warning(push, 0)

@@ -5,6 +5,15 @@
 
 class ICrRenderDevice;
 
+class CrShaderResourceTableVulkan final : public ICrShaderResourceTable
+{
+public:
+
+	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it. The layout is also needed when allocating
+	// descriptor sets from a pool.
+	VkDescriptorSetLayout m_vkDescriptorSetLayout;
+};
+
 class CrGraphicsShaderVulkan final : public ICrGraphicsShader
 {
 public:
@@ -33,7 +42,6 @@ inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModule
 
 class CrComputeShaderVulkan final : public ICrComputeShader
 {
-
 	VkShaderModule m_vkShaderModule;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;

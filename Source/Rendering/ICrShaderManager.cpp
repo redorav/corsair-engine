@@ -18,13 +18,7 @@
 #include "GlobalVariables.h"
 
 // TODO Delete
-#include "vulkan/CrShaderReflection_vk.h"
-#include "vulkan/CrShaderManager_vk.h"
-
-// TODO Delete
-static CrShaderManagerVulkan g_shaderManager;
-
-CrShaderResource CrShaderResource::Invalid = {};
+static ICrShaderManager g_shaderManager;
 
 ICrShaderManager* ICrShaderManager::Get()
 {
@@ -63,8 +57,6 @@ CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrFileSh
 
 CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const
 {
-	CrShaderReflectionVulkan reflection; // TODO Remove this, make platform-independent
-
 	// Create the graphics shader descriptor
 	CrGraphicsShaderDescriptor graphicsShaderDescriptor;
 	graphicsShaderDescriptor.m_bytecodes.reserve(bytecodeLoadDescriptor.GetBytecodeDescriptors().size());
@@ -75,97 +67,16 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoad
 		CrShaderBytecodeSharedHandle bytecode = LoadShaderBytecode(bytecodeDescriptor.path, bytecodeDescriptor);
 
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
-
-		// 4. Add to the reflection structure (we'll build the necessary resource tables using this later)
-		reflection.AddBytecode(bytecode);
 	}
 
 	CrGraphicsShaderHandle graphicsShader = m_renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 
-	// TODO the shader itself can create the shader resource set after we've mangled the SPIR-V bytecode
-	CreateShaderResourceTable(reflection, graphicsShader->m_resourceTable);
-
 	return graphicsShader;
-}
-
-const ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(const CrString& name)
-{
-	auto cBuffer = ConstantBufferTable.find(name);
-
-	if (cBuffer != ConstantBufferTable.end())
-	{
-		return (*cBuffer).second;
-	}
-
-	return InvalidConstantBufferMetaInstance;
-}
-
-const ConstantBufferMetadata& ICrShaderManager::GetConstantBufferMetadata(ConstantBuffers::T id)
-{
-	return ConstantBufferMetaTable[id];
-}
-
-const TextureMetadata& ICrShaderManager::GetTextureMetadata(const CrString& name)
-{
-	auto textureMetadata = TextureTable.find(name);
-
-	if (textureMetadata != TextureTable.end())
-	{
-		return (*textureMetadata).second;
-	}
-
-	return InvalidTextureMetaInstance;
-}
-
-const TextureMetadata& ICrShaderManager::GetTextureMetadata(Textures::T id)
-{
-	return TextureMetaTable[id];
-}
-
-const SamplerMetadata& ICrShaderManager::GetSamplerMetadata(const CrString& name)
-{
-	auto samplerMetadata = SamplerTable.find(name);
-
-	if (samplerMetadata != SamplerTable.end())
-	{
-		return (*samplerMetadata).second;
-	}
-
-	return InvalidSamplerMetaInstance;
-}
-
-const SamplerMetadata& ICrShaderManager::GetSamplerMetadata(Samplers::T id)
-{
-	return SamplerMetaTable[id];
-}
-
-void ICrShaderManager::CreateShaderResourceTable(const CrShaderReflectionVulkan& reflection, CrShaderResourceTable& resourceTable) const
-{
-	reflection.ForEachConstantBuffer([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
-	{
-		const ConstantBufferMetadata& metadata = GetConstantBufferMetadata(constantBuffer.name);
-		resourceTable.AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
-	});
-
-	reflection.ForEachTexture([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
-	{
-		const TextureMetadata& metadata = GetTextureMetadata(texture.name);
-		resourceTable.AddTexture(stage, metadata.id, texture.bindPoint);
-	});
-
-	reflection.ForEachSampler([&resourceTable](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
-	{
-		const SamplerMetadata& metadata = GetSamplerMetadata(sampler.name);
-		resourceTable.AddSampler(stage, metadata.id, sampler.bindPoint);
-	});
-
-	CreateShaderResourceTablePS(reflection, resourceTable);
 }
 
 void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
-	InitPS();
 }
 
 CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const

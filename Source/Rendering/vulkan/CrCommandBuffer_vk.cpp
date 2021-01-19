@@ -1,14 +1,15 @@
 #include "CrRendering_pch.h"
 
-#include "Rendering/ICrShader.h" // TODO remove
 #include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrRenderDevice_vk.h"
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
-#include "CrShaderManager_vk.h"
 #include "CrRenderPass_vk.h"
 #include "CrFramebuffer_vk.h"
+#include "CrShader_vk.h"
+
+#include "Rendering/CrShaderResourceMetadata.h"
 
 #include "Core/Containers/CrArray.h"
 
@@ -84,7 +85,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
 	const ICrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;
 	const CrGraphicsShaderHandle& currentGraphicsShader = currentPipeline->m_shader;
-	const CrShaderResourceTable& resourceTable = currentGraphicsShader->GetResourceTable();
+	const CrShaderResourceTableVulkan& resourceTable = static_cast<const CrShaderResourceTableVulkan&>(currentGraphicsShader->GetResourceTable());
 
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
@@ -118,7 +119,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 		{
 			const ConstantBuffers::T id = resourceTable.GetConstantBufferID(stage, i);
 			const bindpoint_t bindPoint = resourceTable.GetConstantBufferBindPoint(stage, i);
-			const ConstantBufferMetadata& constantBufferMetadata = CrShaderManagerVulkan::GetConstantBufferMetadata(id);
+			const ConstantBufferMetadata& constantBufferMetadata = CrShaderMetadata::GetConstantBuffer(id);
 			const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][constantBufferMetadata.id];
 			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
@@ -145,7 +146,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 		{
 			Textures::T id = resourceTable.GetTextureID(stage, i);
 			bindpoint_t bindPoint = resourceTable.GetTextureBindPoint(stage, i);
-			const TextureMetadata& textureMeta = CrShaderManagerVulkan::GetTextureMetadata(id);
+			const TextureMetadata& textureMeta = CrShaderMetadata::GetTexture(id);
 			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][textureMeta.id]);
 	
 			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
@@ -166,7 +167,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 		{
 			Samplers::T id = resourceTable.GetSamplerID(stage, i);
 			bindpoint_t bindPoint = resourceTable.GetSamplerBindPoint(stage, i);
-			const SamplerMetadata& samplerMeta = CrShaderManagerVulkan::GetSamplerMetadata(id);
+			const SamplerMetadata& samplerMeta = CrShaderMetadata::GetSampler(id);
 			const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][samplerMeta.id]);
 
 			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];

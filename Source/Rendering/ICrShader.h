@@ -9,8 +9,6 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include <vulkan/vulkan.h> // TODO Delete
-
 using bindpoint_t = uint8_t;
 
 namespace ConstantBuffers { enum T : uint8_t; }
@@ -22,19 +20,11 @@ namespace cr3d { namespace GraphicsApi { enum T : uint8_t; } }
 
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
-class CrShaderResourceTable
+class ICrShaderResourceTable
 {
 public:
 
-	CrShaderResourceTable();
-
-#if defined(VULKAN_API)
-
-	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it. The layout is also needed when allocating
-	// descriptor sets from a pool.
-	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-
-#endif
+	ICrShaderResourceTable();
 
 	uint32_t GetConstantBufferTotalCount() const;
 
@@ -148,13 +138,19 @@ public:
 	// want to be the bytecode (perhaps a stripped version of the bytecode?) We need to
 	// give this some thought.
 
-	const CrHash& GetHash() const;
+	const CrHash& GetHash() const
+	{
+		return m_hash;
+	}
 
-	const CrShaderResourceTable& GetResourceTable() const;
+	const ICrShaderResourceTable& GetResourceTable() const
+	{
+		return *m_resourceTable.get();
+	}	
 
-	CrShaderResourceTable m_resourceTable;
+protected:
 
-private:
+	CrUniquePtr<ICrShaderResourceTable> m_resourceTable;
 
 	CrHash m_hash;
 };

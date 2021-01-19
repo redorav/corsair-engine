@@ -21,7 +21,7 @@ public:
 };
 
 // Make sure we don't allocate any memory on the heap
-using ShaderReflectionFn = eastl::fixed_function<4, void(cr3d::ShaderStage::T stage, const CrShaderResource&)>; // TODO Create platform-independent header
+using ShaderReflectionFn = eastl::fixed_function<12, void(cr3d::ShaderStage::T stage, const CrShaderResource&)>; // TODO Create platform-independent header
 
 // Provides shader reflection functionality. After a shader has been compiled or loaded the shader reflection structure can
 // be queried for information regarding resource usage.

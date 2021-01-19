@@ -60,10 +60,6 @@ public:
 
 	bindpoint_t GetSamplerBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const;
 
-	uint32_t GetBufferCount() const;
-
-	uint32_t GetImageCount() const;
-
 	void AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint);
 
 	void AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint);
@@ -93,9 +89,6 @@ private:
 
 	uint8_t				m_usedSamplerCount[cr3d::ShaderStage::GraphicsStageCount] = {};
 	uint8_t				m_usedSamplerTotalCount = 0;
-
-	uint8_t				m_usedBufferTotalCount = 0; // Structured buffers, constant buffers, etc.
-	uint8_t				m_usedImageTotalCount = 0; // Images, samplers, combined image samplers, etc.
 };
 
 struct CrShaderStageInfo

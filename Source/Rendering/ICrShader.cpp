@@ -92,16 +92,6 @@ bindpoint_t CrShaderResourceTable::GetSamplerBindPoint(cr3d::ShaderStage::T stag
 	return m_usedSamplerBindPoints[stage][index];
 }
 
-uint32_t CrShaderResourceTable::GetBufferCount() const
-{
-	return m_usedBufferTotalCount;
-}
-
-uint32_t CrShaderResourceTable::GetImageCount() const
-{
-	return m_usedImageTotalCount;
-}
-
 void CrShaderResourceTable::AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 {
 	CrAssert(m_usedConstantBufferCount[stage] < MaxStageConstantBuffers);
@@ -110,7 +100,6 @@ void CrShaderResourceTable::AddConstantBuffer(cr3d::ShaderStage::T stage, Consta
 	m_usedConstantBufferBindPoints[stage][m_usedConstantBufferCount[stage]] = bindPoint;
 	m_usedConstantBufferCount[stage]++;
 	m_usedConstantBufferTotalCount++;
-	m_usedBufferTotalCount++;
 }
 
 void CrShaderResourceTable::AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
@@ -121,7 +110,6 @@ void CrShaderResourceTable::AddTexture(cr3d::ShaderStage::T stage, Textures::T i
 	m_usedTextureBindPoints[stage][m_usedTextureCount[stage]] = bindPoint;
 	m_usedTextureCount[stage]++;
 	m_usedTextureTotalCount++;
-	m_usedImageTotalCount++;
 }
 
 void CrShaderResourceTable::AddSampler(cr3d::ShaderStage::T stage, Samplers::T index, bindpoint_t bindPoint)
@@ -132,7 +120,6 @@ void CrShaderResourceTable::AddSampler(cr3d::ShaderStage::T stage, Samplers::T i
 	m_usedSamplerBindPoints[stage][m_usedSamplerCount[stage]] = bindPoint;
 	m_usedSamplerCount[stage]++;
 	m_usedSamplerTotalCount++;
-	m_usedImageTotalCount++;
 }
 
 const CrHash& ICrShader::GetHash() const

@@ -63,56 +63,56 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// Image type properties
 	//----------------------
 
-	VkImageType imageType;
-	VkImageViewType imageViewType;
-	VkImageCreateFlags createFlags = 0;
+	VkImageType vkImageType;
+	VkImageViewType vkImageViewType;
+	VkImageCreateFlags vkCreateFlags = 0;
 	uint32_t arrayLayers = params.arraySize;
 
 	if (IsCubemap())
 	{
-		imageType = VK_IMAGE_TYPE_2D;
+		vkImageType = VK_IMAGE_TYPE_2D;
 		if (arrayLayers > 1)
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
 		}
 		else
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_CUBE;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE;
 		}
-		createFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+		vkCreateFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 		arrayLayers = 6;
 	}
 	else if (IsVolumeTexture())
 	{
-		imageType = VK_IMAGE_TYPE_3D;
-		imageViewType = VK_IMAGE_VIEW_TYPE_3D;
+		vkImageType = VK_IMAGE_TYPE_3D;
+		vkImageViewType = VK_IMAGE_VIEW_TYPE_3D;
 	}
 	else if (m_type == cr3d::TextureType::Tex1D)
 	{
-		imageType = VK_IMAGE_TYPE_1D;
+		vkImageType = VK_IMAGE_TYPE_1D;
 
 		if (arrayLayers > 1)
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-			createFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+			vkCreateFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
 		}
 		else
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_1D;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_1D;
 		}
 	}
 	else
 	{
-		imageType = VK_IMAGE_TYPE_2D;
+		vkImageType = VK_IMAGE_TYPE_2D;
 
 		if (arrayLayers > 1)
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-			createFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+			vkCreateFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
 		}
 		else
 		{
-			imageViewType = VK_IMAGE_VIEW_TYPE_2D;
+			vkImageViewType = VK_IMAGE_VIEW_TYPE_2D;
 		}
 	}
 
@@ -138,8 +138,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageCreateInfo.arrayLayers = arrayLayers;
 		imageCreateInfo.samples = m_vkSamples;
 		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageCreateInfo.flags = createFlags;
-		imageCreateInfo.imageType = imageType;
+		imageCreateInfo.flags = vkCreateFlags;
+		imageCreateInfo.imageType = vkImageType;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		imageCreateInfo.pQueueFamilyIndices = nullptr;
 		imageCreateInfo.queueFamilyIndexCount = 0;
@@ -204,13 +204,13 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = m_vkFormat;
-		imageViewInfo.flags = createFlags;
+		imageViewInfo.flags = vkCreateFlags;
 		imageViewInfo.components = {}; // TODO Get from params
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
 		imageViewInfo.subresourceRange.levelCount = m_numMipmaps;
 		imageViewInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewInfo.subresourceRange.layerCount = arrayLayers;
-		imageViewInfo.viewType = imageViewType;
+		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
 
@@ -230,13 +230,13 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			imageViewInfo.pNext = nullptr;
 			imageViewInfo.format = m_vkFormat;
-			imageViewInfo.flags = createFlags;
+			imageViewInfo.flags = vkCreateFlags;
 			imageViewInfo.components = {}; // TODO Get from params
 			imageViewInfo.subresourceRange.baseMipLevel = mip;
 			imageViewInfo.subresourceRange.levelCount = 1;
 			imageViewInfo.subresourceRange.baseArrayLayer = slice;
 			imageViewInfo.subresourceRange.layerCount = 1;
-			imageViewInfo.viewType = imageViewType;
+			imageViewInfo.viewType = vkImageViewType;
 			imageViewInfo.image = m_vkImage;
 			imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
 			result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_vkImageViews[mip][slice]);

@@ -144,7 +144,7 @@ protected:
 		const ICrGraphicsPipeline*		m_graphicsPipeline;
 		const CrComputePipeline*		m_computePipeline;
 
-		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][Textures::Count];
+		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
 		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];

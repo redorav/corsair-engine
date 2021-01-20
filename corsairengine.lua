@@ -105,6 +105,10 @@ function ExcludePlatformSpecificCode(rootPath)
 
 end
 
+function CopyFileCommand(filePath, destinationPath)
+	return '{copyfile} "'..filePath..'" "'..destinationPath..'"'
+end
+
 -- Keep in mind many platforms can have different OSs
 -- LinuxVulkan
 -- AndroidVulkan
@@ -112,7 +116,7 @@ end
 -- etc.
 
 -- Note on precompiled header files
--- On Visual Studio, the header file needs to be the exact string as it appears in your include, 
+-- On Visual Studio, the header file needs to be the exact string as it appears in your include,
 -- e.g. if your cpp says #include 'Foo_pch.h' then pchheader('Foo_pch.h')
 -- However, the pchsource file has to be the exact path.
 
@@ -277,17 +281,18 @@ project (ProjectCorsairEngine)
 	AddAssimpLibrary()
 	AddGainputLibrary()
 	AddSDL2Library()
+
+	-- Copy necessary files or DLLs
+	postbuildcommands
+	{
+		CopyFileCommand(path.getabsolute(LibSDL2)..'/Binaries/SDL2.dll', '%{cfg.buildtarget.directory}')
+	}
 	
 	filter('system:windows')
 		AddXinputLibrary() -- Needed for gainput on Windows
-		
+
 	filter{}
-	
-	postbuildcommands 
-	{
-		-- TODO Copy necessary dlls from the lib folder
-	}
-	
+
 group('Rendering')
 
 SourceRenderingDirectory = SourceDirectory..'/Rendering'
@@ -382,11 +387,8 @@ project(ProjectShaderCompiler)
 	AddSpirvCrossLibrary()
 	AddGlslangLibrary()
 
-	postbuildcommands
-	{
-		-- Copy the shader compiler into a known directory
-		'{copyfile} "%{cfg.buildtarget.abspath}" "'..path.getabsolute(ShaderCompilerDirectory)..'"'
-	}
+	-- Copy the shader compiler into a known directory
+	postbuildcommands { CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory)) }
 
 group('Math')
 	

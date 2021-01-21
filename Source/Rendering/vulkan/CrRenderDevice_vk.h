@@ -25,6 +25,8 @@ public:
 
 	const VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
 
+	const VkPipelineCache GetVkPipelineCache() const { return m_vkPipelineCache; }
+
 	uint32_t GetVkMemoryType(uint32_t typeBits, VkFlags properties) const;
 
 	// In Vulkan, we create the queues up-front with the device so we reserve previously created queue indices
@@ -93,6 +95,8 @@ private:
 	VkPhysicalDevice m_vkPhysicalDevice;	// Physical device
 	
 	VkPhysicalDeviceFeatures m_vkDeviceSupportedFeatures;
+
+	VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
 	CrVector<const char*> m_instanceLayers;
 

@@ -12,15 +12,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-void CrPipelineStateManagerVulkan::InitPS()
-{
-	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
-	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
-	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
-}
-
 void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 (
 	ICrGraphicsPipeline* graphicsPipeline, 
@@ -30,6 +21,8 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	const CrRenderPassDescriptor& renderPassDescriptor
 )
 {
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.pNext = nullptr;
@@ -49,8 +42,8 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	// TODO Complete this section
 	rasterizerState.depthClampEnable = psoDescriptor.rasterizerState.depthClipEnable;
 	rasterizerState.lineWidth = 1.0f;
-	//rasterizerState.rasterizerDiscardEnable = VK_FALSE;
-	//rasterizerState.depthBiasEnable = VK_FALSE;
+	//rasterizerState.rasterizerDiscardEnable = false;
+	//rasterizerState.depthBiasEnable = false;
 	
 	VkPipelineColorBlendStateCreateInfo colorBlendState;
 	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -64,7 +57,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	CrVector<VkPipelineColorBlendAttachmentState> blendAttachments(numRenderTargets);
 	for (uint32_t i = 0; i < numRenderTargets; ++i)
 	{
-		const CrRenderTargetBlend& renderTargetBlend = psoDescriptor.blendState.renderTargetBlends[i];
+		const CrRenderTargetBlendDescriptor& renderTargetBlend = psoDescriptor.blendState.renderTargetBlends[i];
 		blendAttachments[i].colorWriteMask = renderTargetBlend.colorWriteMask; // TODO Careful with this, needs a platform-specific translation
 		blendAttachments[i].blendEnable = renderTargetBlend.enable;
 		if (renderTargetBlend.enable)
@@ -142,7 +135,8 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	viewportState.scissorCount	= 1; // One scissor rectangle
 	viewportState.pScissors		= nullptr;
 	
-	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines just for changing a viewport's dimensions or a scissor box
+	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines
+	// just for changing a viewport's dimensions or a scissor box
 	// The dynamic state properties themselves are stored in the command buffer
 	CrArray<VkDynamicState, 2> dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 	
@@ -159,14 +153,14 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	VkPipelineShaderStageCreateInfo shaderStages[cr3d::ShaderStage::GraphicsStageCount] = {};
 	VkPipelineShaderStageCreateInfo shaderStageInfo = {};
 	shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	
-	uint32_t usedShaderStages = 0;
 
 	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader);
 
 	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
 	const CrVector<CrShaderStageInfo>& stageInfos = vulkanGraphicsShader->GetStages();
+
+	uint32_t usedShaderStages = 0;
 
 	for (uint32_t i = 0; i < stageInfos.size(); ++i)
 	{
@@ -192,7 +186,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
 	
-	vkResult = vkCreatePipelineLayout(m_vkDevice, &pipelineLayoutCreateInfo, nullptr, &graphicsPipeline->m_pipelineLayout);
+	vkResult = vkCreatePipelineLayout(vulkanRenderDevice->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &graphicsPipeline->m_pipelineLayout);
 
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
@@ -236,18 +230,16 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	// TODO This should probably be optimized either by having another function that passes an actual render pass
 	// or by having a cache of render pass descriptors. The reason for using a dummy render pass is so that
 	// pipelines can be precreated without needing access to the actual draw commands.
-	CrRenderPassSharedHandle dummyRenderPass = m_renderDevice->CreateRenderPass(renderPassDescriptor);
+	CrRenderPassVulkan dummyRenderPass = CrRenderPassVulkan(m_renderDevice, renderPassDescriptor);
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-
-	// TODO Shouldn't rely on the bytecode being here
 	pipelineInfo.stageCount				= (uint32_t) graphicsShader->GetStages().size();
 	pipelineInfo.pStages				= shaderStages;
 	
 	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout; // TODO Hack
 	pipelineInfo.pVertexInputState		= &vertexInputState;				// TODO Create this pipeline layout first from the shader/vertex descriptor
-	pipelineInfo.renderPass				= static_cast<CrRenderPassVulkan*>(dummyRenderPass.get())->GetVkRenderPass();
+	pipelineInfo.renderPass				= dummyRenderPass.GetVkRenderPass();
 	
 	pipelineInfo.pInputAssemblyState	= &inputAssemblyState;
 	pipelineInfo.pRasterizationState	= &rasterizerState;
@@ -256,8 +248,8 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.pViewportState			= &viewportState;
 	pipelineInfo.pDepthStencilState		= &depthStencilState;
 	pipelineInfo.pDynamicState			= &dynamicState;
-	
-	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
+
+	vkResult = vkCreateGraphicsPipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
 
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 }

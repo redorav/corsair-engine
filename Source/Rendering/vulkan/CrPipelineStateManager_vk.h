@@ -28,12 +28,4 @@ private:
 		const CrVertexDescriptor& vertexDescriptor,
 		const CrRenderPassDescriptor& renderPassDescriptor
 	) override;
-
-	virtual void InitPS() override;
-
-	VkDevice m_vkDevice;
-
-	VkPipeline m_vkPipelineState;
-
-	VkPipelineCache m_vkPipelineCache;
 };

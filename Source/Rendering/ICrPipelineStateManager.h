@@ -71,7 +71,7 @@ struct CrDepthStencilStateDescriptor
 
 struct CrMultisampleStateDescriptor
 {
-	cr3d::SampleCount sampleCount : 8;
+	cr3d::SampleCount sampleCount : 4;
 };
 
 struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDescriptor>
@@ -109,6 +109,7 @@ class ICrPipeline
 public:
 	
 #if defined(VULKAN_API)
+	VkPipeline m_pipeline; // TODO Move to PS code
 	VkPipelineLayout m_pipelineLayout; // TODO Move to PS code
 #endif
 };
@@ -121,7 +122,7 @@ struct CrRenderPassDescriptor;
 class ICrGraphicsPipeline : public ICrPipeline
 {
 public: // TODO PRIVATE
-	VkPipeline m_pipeline; // TODO Move to PS code
+	
 	CrGraphicsShaderHandle m_shader;
 };
 
@@ -158,8 +159,6 @@ protected:
 		const CrVertexDescriptor& vertexDescriptor, 
 		const CrRenderPassDescriptor& renderPassDescriptor
 	) = 0;
-
-	virtual void InitPS() = 0;
 
 	CrHashMap<uint64_t, ICrGraphicsPipeline*> m_graphicsPipelines;
 

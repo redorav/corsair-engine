@@ -53,6 +53,4 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
 void ICrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
-
-	InitPS();
 }

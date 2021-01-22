@@ -388,7 +388,11 @@ project(ProjectShaderCompiler)
 	AddGlslangLibrary()
 
 	-- Copy the shader compiler into a known directory
-	postbuildcommands { CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory)) }
+	postbuildcommands
+	{
+		'{mkdir} '..path.getabsolute(ShaderCompilerDirectory),
+		CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory))
+	}
 
 group('Math')
 	

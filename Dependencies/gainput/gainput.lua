@@ -19,9 +19,6 @@ workspace(ProjectName)
 	filter("toolset:msc")
 		flags { "multiprocessorcompile" }
 	
-	targetdir("Binaries/")
-	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
-	
 	configuration "Debug"
 		--, "GAINPUT_DEBUG" 
 		defines { "DEBUG", "_DEBUG" }
@@ -34,6 +31,9 @@ workspace(ProjectName)
 project (ProjectName)
 	kind("StaticLib")
 	language("C++")
+
+	targetdir("Binaries/")
+	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	
 	files { "Source/lib/**.cpp", "Source/lib/**.hpp", "Source/lib/**.h" }
 	sysincludedirs { "Source/lib/include" }

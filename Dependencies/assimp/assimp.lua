@@ -15,9 +15,6 @@ workspace(ProjectName)
 		flags { "multiprocessorcompile" }
 		buildoptions { "/bigobj" } -- fails to compile on MSVC unless this is specified
 	
-	targetdir("Binaries/")
-	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
-	
 	configuration "Debug"
 		defines { "DEBUG", "_DEBUG" }
 		symbols "on"
@@ -31,6 +28,9 @@ workspace(ProjectName)
 project (ProjectName)
 	kind("StaticLib")
 	language("C++")
+
+	targetdir("Binaries/")
+	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	
 	-- Remove tons of importers/exporters we don't care about
 	-- I don't understand this negative logic. Let me add what

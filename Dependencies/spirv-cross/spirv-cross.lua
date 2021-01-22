@@ -13,9 +13,6 @@ workspace(ProjectName)
 		toolset("msc") -- Use default VS toolset TODO do this platform specific
 		--toolset("msc-llvm-vs2014") -- Use for Clang on VS
 	end
-	
-	targetdir("Binaries/")
-	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 
 	editandcontinue("off")
 	
@@ -31,6 +28,9 @@ project (ProjectName)
 	kind("StaticLib")
 	language("C++")
 	
+	targetdir("Binaries/")
+	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
+
 	files
 	{
 		"Source/*.cpp",

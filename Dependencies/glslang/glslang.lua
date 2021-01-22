@@ -30,8 +30,10 @@ workspace(ProjectName)
 project (ProjectName)
 	kind("StaticLib")
 	language("C++")
+
 	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	targetdir("Binaries/")
+
 	files
 	{
 		"Source/glslang/GenericCodeGen/**.cpp", "Source/glslang/GenericCodeGen/**.h",

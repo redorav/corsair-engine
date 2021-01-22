@@ -14,9 +14,6 @@ workspace(ProjectName)
 		--toolset("msc-llvm-vs2014") -- Use for Clang on VS
 	end
 	
-	targetdir("Binaries/")
-	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
-	
 	configuration "Debug"
 		defines { "DEBUG", "_DEBUG" }
 		symbols "on"
@@ -28,6 +25,9 @@ workspace(ProjectName)
 project (ProjectName)
 	kind("StaticLib")
 	language("C++")
+
+	targetdir("Binaries/")
+	targetname("%{wks.name}.".._ACTION..".%{cfg.buildcfg:lower()}")
 	
 	defines
 	{ 	

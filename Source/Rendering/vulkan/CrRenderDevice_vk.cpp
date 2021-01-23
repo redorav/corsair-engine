@@ -605,9 +605,11 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 	// them later via CreateCommandQueue(). This is different to what DX12/Metal do in that we need to allocate them ourselves up front.
 	uint32_t queueFamilyCount;
 	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
-	CrVector<QueueProperties> queueProperties(queueFamilyCount);
+
 	CrVector<VkQueueFamilyProperties> vkQueueProperties(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, vkQueueProperties.data());
+
+	CrVector<QueueProperties> queueProperties(queueFamilyCount);
 
 	for (uint32_t i = 0; i < queueFamilyCount; ++i)
 	{

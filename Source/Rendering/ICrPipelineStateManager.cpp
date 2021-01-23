@@ -2,20 +2,20 @@
 
 #include "ICrPipelineStateManager.h"
 #include "ICrShader.h"
+#include "ICrPipeline.h"
+#include "ICrRenderDevice.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"
 
-#include "vulkan/CrPipelineStateManager_vk.h" // TODO Remove
-
-static CrPipelineStateManagerVulkan g_pipelineStateManager;
+static ICrPipelineStateManager g_pipelineStateManager;
 
 ICrPipelineStateManager* ICrPipelineStateManager::Get()
 {
 	return &g_pipelineStateManager;
 }
 
-ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
+CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 (
 	const CrGraphicsPipelineDescriptor& psoDescriptor, 
 	const CrGraphicsShaderHandle& graphicsShader, 
@@ -30,16 +30,16 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
 	const CrHash& combinedHash = psoHash << graphicsShaderHash;
 	//combinedHash <<= vertexInputHash;
 
-	eastl::hashtable_iterator<CrPair<const uint64_t, ICrGraphicsPipeline*>, false, false> it = m_graphicsPipelines.find(combinedHash.m_hash);
+	eastl::hashtable_iterator<CrPair<const uint64_t, CrGraphicsPipelineHandle>, false, false> it = m_graphicsPipelines.find(combinedHash.m_hash);
 
-	ICrGraphicsPipeline* graphicsPipeline = nullptr;
+	CrGraphicsPipelineHandle graphicsPipeline = nullptr;
 	if (it != m_graphicsPipelines.end())
 	{
 		graphicsPipeline = it->second;
 	}
 	else
 	{
-		graphicsPipeline = CreateGraphicsPipelinePS(psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
+		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
 		graphicsPipeline->m_shader = graphicsShader;
 
 		// Insert in the hashmap

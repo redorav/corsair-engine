@@ -33,6 +33,7 @@ struct CrSamplerDescriptor;
 class ICrRenderPass;
 using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
 struct CrRenderPassDescriptor;
+struct CrRenderPassBeginParams;
 
 class ICrCommandQueue;
 using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
@@ -59,6 +60,12 @@ using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 struct CrGraphicsShaderDescriptor;
+
+class ICrGraphicsPipeline;
+using CrGraphicsPipelineHandle = CrSharedPtr<ICrGraphicsPipeline>;
+struct CrGraphicsPipelineDescriptor;
+
+class CrComputePipeline;
 
 class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;

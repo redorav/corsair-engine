@@ -1,35 +1,12 @@
 #pragma once
 
-#include "ICrPipelineStateManager.h"
+#include "Rendering/ICrPipeline.h"
 
-#include "CrGPUBuffer.h"
+#include "Rendering/CrGPUBuffer.h"
 
 #include "ShaderResources.h"
 
-class CrPipelineStateManagerVulkan;
-class ICrGPUSemaphore;
-class ICrGPUFence;
-class CrIndexBufferCommon;
-class CrVertexBufferCommon;
-
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-
-class ICrSampler;
-using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
-
-struct CrGraphicsPipelineDescriptor;
-class ICrGraphicsPipeline;
-class CrComputePipeline;
-class CrConstantBufferBase;
-class ICrHardwareGPUBuffer;
-class ICrRenderPass;
-class ICrFramebuffer;
-struct CrRenderPassBeginParams;
-class CrGPUStackAllocator;
-class CrCPUStackAllocator;
-
-struct CrViewport;
+#include "CrRenderingForwardDeclarations.h"
 
 class ICrCommandBuffer
 {
@@ -52,8 +29,6 @@ public:
 	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer);
 	
 	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint);
-
-	void BindGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor);
 
 	void BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState);
 
@@ -163,11 +138,13 @@ protected:
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
 {
+	// TODO Move to flush
 	SetViewportPS(viewport);
 }
 
 inline void ICrCommandBuffer::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
+	// TODO Move to flush
 	SetScissorPS(x, y, width, height);
 }
 
@@ -185,11 +162,6 @@ inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* verte
 
 	// TODO Move to flush
 	BindVertexBuffersPS(vertexBuffer->GetHardwareBuffer(), bindPoint);
-}
-
-inline void ICrCommandBuffer::BindGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor)
-{
-	m_currentState.m_graphicsPipelineDescriptor = pipelineDescriptor;
 }
 
 inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState)
@@ -273,7 +245,7 @@ inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
 }
 
 template<typename MetaType>
-CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
+inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
 	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateConstantBufferParameters(sizeof(MetaType)));
 }

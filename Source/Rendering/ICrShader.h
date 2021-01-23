@@ -148,9 +148,6 @@ struct CrGraphicsShaderDescriptor
 	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
 };
 
-class ICrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
-
 class ICrShader
 {
 public:

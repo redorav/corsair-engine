@@ -33,8 +33,6 @@ private:
 	CrVector<VkShaderModule> m_vkShaderModules;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-
-	VkPipelineLayout m_vkPipelineLayout;
 };
 
 inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModules() const
@@ -47,6 +45,4 @@ class CrComputeShaderVulkan final : public ICrComputeShader
 	VkShaderModule m_vkShaderModule;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-
-	VkPipelineLayout m_vkPipelineLayout;
 };

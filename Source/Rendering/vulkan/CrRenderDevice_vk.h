@@ -58,6 +58,9 @@ private:
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
 
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
+		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) override;
+
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;

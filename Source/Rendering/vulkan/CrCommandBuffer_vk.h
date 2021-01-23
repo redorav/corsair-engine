@@ -2,8 +2,8 @@
 
 #include "Rendering/ICrCommandBuffer.h"
 
-#include "CrPipelineStateManager_vk.h"
 #include "CrGPUBuffer_vk.h"
+#include "CrPipeline_vk.h"
 #include "CrVulkan.h"
 
 #include "Rendering/CrRendering.h"

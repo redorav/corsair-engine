@@ -8,15 +8,6 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-class ICrRenderDevice;
-class ICrCommandQueue;
-
-class ICrGPUFence;
-using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;
-
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-
 enum class CrSwapchainResult : uint32_t
 {
 	Success,

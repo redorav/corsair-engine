@@ -7,6 +7,7 @@
 #include "ICrFramebuffer.h"
 #include "ICrRenderPass.h"
 #include "ICrShader.h"
+#include "ICrPipeline.h"
 #include "CrGPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 
@@ -62,6 +63,11 @@ CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
 CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
 {
 	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
+}
+
+CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+{
+	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(psoDescriptor, graphicsShader, vertexDescriptor, renderPassDescriptor));
 }
 
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)

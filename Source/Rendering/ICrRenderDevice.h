@@ -63,6 +63,9 @@ public:
 
 	CrGraphicsShaderHandle CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const;
 
+	CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
+		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor);
+
 	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor);
 
 	template<typename Struct>
@@ -112,7 +115,10 @@ protected:
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
-
+	
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
+		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) = 0;
+	
 	virtual void InitPS() = 0;
 
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;

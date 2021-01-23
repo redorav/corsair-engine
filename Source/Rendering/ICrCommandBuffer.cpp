@@ -3,6 +3,7 @@
 #include "ICrCommandQueue.h"
 #include "ICrCommandBuffer.h"
 #include "ICrRenderDevice.h"
+#include "ICrPipeline.h"
 
 #include "ICrShader.h"
 #include "CrGPUStackAllocator.h"

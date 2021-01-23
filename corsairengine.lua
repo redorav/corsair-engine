@@ -390,7 +390,7 @@ project(ProjectShaderCompiler)
 	-- Copy the shader compiler into a known directory
 	postbuildcommands
 	{
-		'{mkdir} '..path.getabsolute(ShaderCompilerDirectory),
+		'{mkdir} \"'..path.getabsolute(ShaderCompilerDirectory).."\"",
 		CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory))
 	}
 

@@ -83,8 +83,8 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 
 void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
-	const ICrGraphicsPipeline* currentPipeline = m_currentState.m_graphicsPipeline;
-	const CrGraphicsShaderHandle& currentGraphicsShader = currentPipeline->m_shader;
+	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
+	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
 	const CrShaderResourceTableVulkan& resourceTable = static_cast<const CrShaderResourceTableVulkan&>(currentGraphicsShader->GetResourceTable());
 
 	// 1. Allocate an available descriptor set for this drawcall and update it
@@ -109,78 +109,59 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
 
-	for(const CrShaderStageInfo& shaderStageInfo : currentGraphicsShader->GetStages())
+	resourceTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		cr3d::ShaderStage::T stage = shaderStageInfo.stage;
+		const ConstantBufferMetadata& constantBufferMeta = CrShaderMetadata::GetConstantBuffer(id);
+		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][id];
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
-		uint32_t constantBufferCount = resourceTable.GetConstantBufferCount(stage);
+		// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
+		// in terms of functionality
+		// TODO There is a limit to the offset 
+		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+		bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
+		bufferInfo.range = (VkDeviceSize)constantBufferMeta.size; // TODO take this from bound buffer
 
-		for (uint32_t i = 0; i < constantBufferCount; ++i)
-		{
-			const ConstantBuffers::T id = resourceTable.GetConstantBufferID(stage, i);
-			const bindpoint_t bindPoint = resourceTable.GetConstantBufferBindPoint(stage, i);
-			const ConstantBufferMetadata& constantBufferMetadata = CrShaderMetadata::GetConstantBuffer(id);
-			const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][constantBufferMetadata.id];
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+		offsets[bufferCount] = binding.byteOffset;
 
-			// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
-			// in terms of functionality
-			// TODO There is a limit to the offset 
-			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-			bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
-			bufferInfo.range = (VkDeviceSize)constantBufferMetadata.size;
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
+		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
-			offsets[bufferCount] = binding.byteOffset;
-			
-			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
-			
-			descriptorCount++;
-			bufferCount++;
-		}
+		descriptorCount++;
+		bufferCount++;
+	});
 
-		uint32_t textureCount = resourceTable.GetTextureCount(stage);
+	resourceTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	{
+		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][id]);
+
+		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		imageInfo.sampler = vulkanSampler->GetVkSampler();
+
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+			VK_DESCRIPTOR_TYPE_SAMPLER, &imageInfo, nullptr, nullptr);
+
+		descriptorCount++;
+		imageCount++;
+	});
+
+	resourceTable.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	{
+		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id]);
 	
-		for (uint32_t i = 0; i < textureCount; ++i)
-		{
-			Textures::T id = resourceTable.GetTextureID(stage, i);
-			bindpoint_t bindPoint = resourceTable.GetTextureBindPoint(stage, i);
-			const TextureMetadata& textureMeta = CrShaderMetadata::GetTexture(id);
-			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][textureMeta.id]);
-	
-			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
-			imageInfo.imageView = vulkanTexture->GetVkImageViewAllMipsSlices();
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.sampler = nullptr;
+		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+		imageInfo.imageView = vulkanTexture->GetVkImageViewAllMipsSlices();
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.sampler = nullptr;
 
-			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, 
-				VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, &imageInfo, nullptr, nullptr);
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, 
+			VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, &imageInfo, nullptr, nullptr);
 
-			descriptorCount++;
-			imageCount++;
-		}
-
-		uint32_t samplerCount = resourceTable.GetSamplerCount(stage);
-
-		for (uint32_t i = 0; i < samplerCount; ++i)
-		{
-			Samplers::T id = resourceTable.GetSamplerID(stage, i);
-			bindpoint_t bindPoint = resourceTable.GetSamplerBindPoint(stage, i);
-			const SamplerMetadata& samplerMeta = CrShaderMetadata::GetSampler(id);
-			const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][samplerMeta.id]);
-
-			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-			imageInfo.sampler = vulkanSampler->GetVkSampler();
-
-			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, 
-				VK_DESCRIPTOR_TYPE_SAMPLER, &imageInfo, nullptr, nullptr);
-
-			descriptorCount++;
-			imageCount++;
-		}
-	}
+		descriptorCount++;
+		imageCount++;
+	});
 
 	CrAssert(descriptorCount < writeDescriptorSets.size());
 
@@ -189,8 +170,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	// Bind descriptor sets describing shader binding points
 	// TODO The bind point depends on the currently bound shader or pipeline, don't just assume graphics here!
 	// TODO We need an abstraction of a resource table, so that we can build it somewhere else, and simply bind it when we need to
-	vkCmdBindDescriptorSets(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, currentPipeline->m_pipelineLayout, 
-		0, 1, &descriptorSet, bufferCount, offsets.data());
+	vkCmdBindDescriptorSets(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout, 0, 1, &descriptorSet, bufferCount, offsets.data());
 }
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)

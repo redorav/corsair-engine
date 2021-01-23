@@ -104,24 +104,18 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 // TODO Delete
 #include <vulkan/vulkan.h>
 
-class ICrPipeline
-{
-public:
-	
-#if defined(VULKAN_API)
-	VkPipeline m_pipeline; // TODO Move to PS code
-	VkPipelineLayout m_pipelineLayout; // TODO Move to PS code
-#endif
-};
-
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 
 struct CrRenderPassDescriptor;
 
-class ICrGraphicsPipeline : public ICrPipeline
+class ICrGraphicsPipeline
 {
-public: // TODO PRIVATE
+public:
+
+	virtual ~ICrGraphicsPipeline() {}
+
+	// TODO PRIVATE
 	
 	CrGraphicsShaderHandle m_shader;
 };
@@ -151,9 +145,8 @@ public:
 
 protected:
 
-	virtual void CreateGraphicsPipelinePS
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS
 	(
-		ICrGraphicsPipeline* graphicsPipeline,
 		const CrGraphicsPipelineDescriptor& psoDescriptor,
 		const ICrGraphicsShader* graphicsShader, 
 		const CrVertexDescriptor& vertexDescriptor, 

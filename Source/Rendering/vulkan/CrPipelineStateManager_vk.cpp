@@ -12,9 +12,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
+ICrGraphicsPipeline* CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 (
-	ICrGraphicsPipeline* graphicsPipeline, 
 	const CrGraphicsPipelineDescriptor& psoDescriptor, 
 	const ICrGraphicsShader* graphicsShader, 
 	const CrVertexDescriptor& vertexDescriptor,
@@ -22,6 +21,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 )
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = new CrGraphicsPipelineVulkan();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -186,7 +186,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
 	
-	vkResult = vkCreatePipelineLayout(vulkanRenderDevice->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &graphicsPipeline->m_pipelineLayout);
+	vkResult = vkCreatePipelineLayout(vulkanRenderDevice->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipelineLayout);
 
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
@@ -237,7 +237,7 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.stageCount				= (uint32_t) graphicsShader->GetStages().size();
 	pipelineInfo.pStages				= shaderStages;
 	
-	pipelineInfo.layout					= graphicsPipeline->m_pipelineLayout; // TODO Hack
+	pipelineInfo.layout					= vulkanGraphicsPipeline->m_vkPipelineLayout; // TODO Hack
 	pipelineInfo.pVertexInputState		= &vertexInputState;				// TODO Create this pipeline layout first from the shader/vertex descriptor
 	pipelineInfo.renderPass				= dummyRenderPass.GetVkRenderPass();
 	
@@ -249,7 +249,9 @@ void CrPipelineStateManagerVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.pDepthStencilState		= &depthStencilState;
 	pipelineInfo.pDynamicState			= &dynamicState;
 
-	vkResult = vkCreateGraphicsPipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &pipelineInfo, nullptr, &graphicsPipeline->m_pipeline);
-
+	vkResult = vkCreateGraphicsPipelines
+	(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &pipelineInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
+
+	return vulkanGraphicsPipeline;
 }

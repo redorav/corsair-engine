@@ -4,6 +4,17 @@
 
 class CrRenderDeviceVulkan;
 
+class CrGraphicsPipelineVulkan : public ICrGraphicsPipeline
+{
+public:
+
+	// Describes the resource binding layout for this pipeline
+	// This is later used to bind the descriptor sets
+	VkPipelineLayout m_vkPipelineLayout;
+
+	VkPipeline m_vkPipeline;
+};
+
 class CrPipelineStateManagerVulkan final : public ICrPipelineStateManager
 {
 public:
@@ -20,9 +31,8 @@ public:
 
 private:
 
-	virtual void CreateGraphicsPipelinePS
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS
 	(
-		ICrGraphicsPipeline* graphicsPipeline, 
 		const CrGraphicsPipelineDescriptor& psoDescriptor, 
 		const ICrGraphicsShader* graphicsShader, 
 		const CrVertexDescriptor& vertexDescriptor,

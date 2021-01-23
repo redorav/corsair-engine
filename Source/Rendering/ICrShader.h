@@ -18,37 +18,37 @@ namespace Samplers { enum T : uint8_t; }
 namespace cr { namespace Platform { enum T : uint8_t; } }
 namespace cr3d { namespace GraphicsApi { enum T : uint8_t; } }
 
+struct CrShaderBinding
+{
+	CrShaderBinding() {}
+
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, ConstantBuffers::T constantBufferID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::ConstantBuffer), constantBufferID(constantBufferID) {}
+
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Samplers::T samplerID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Sampler), samplerID(samplerID) {}
+
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Textures::T textureID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Texture), textureID(textureID) {}
+
+	bindpoint_t bindPoint;
+	cr3d::ShaderStage::T stage : 4;
+	cr3d::ShaderResourceType::T type : 4;
+	union
+	{
+		ConstantBuffers::T constantBufferID;
+		Samplers::T samplerID;
+		Textures::T textureID;
+	};
+};
+
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
 class ICrShaderResourceTable
 {
 public:
 
-	ICrShaderResourceTable();
-
-	uint32_t GetConstantBufferTotalCount() const;
-
-	uint32_t GetConstantBufferCount(cr3d::ShaderStage::T stage) const;
-
-	ConstantBuffers::T GetConstantBufferID(cr3d::ShaderStage::T stage, uint32_t index) const;
-
-	bindpoint_t GetConstantBufferBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const;
-
-	uint32_t GetTextureTotalCount() const;
-
-	uint32_t GetTextureCount(cr3d::ShaderStage::T stage) const;
-
-	Textures::T GetTextureID(cr3d::ShaderStage::T stage, uint32_t index) const;
-
-	bindpoint_t GetTextureBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const;
-
-	uint32_t GetSamplerTotalCount() const;
-
-	uint32_t GetSamplerCount(cr3d::ShaderStage::T stage) const;
-
-	Samplers::T GetSamplerID(cr3d::ShaderStage::T stage, uint32_t index) const;
-
-	bindpoint_t GetSamplerBindPoint(cr3d::ShaderStage::T stage, uint32_t index) const;
+	ICrShaderResourceTable(const CrShaderResourceCount& resourceCount);
 
 	void AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint);
 
@@ -62,23 +62,44 @@ public:
 
 	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
 
+	template<typename Fn>
+	void ForEachConstantBuffer(const Fn& fn) const
+	{
+		for (uint8_t i = m_constantBufferOffset; i < m_constantBufferOffset + m_constantBufferCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].constantBufferID, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename Fn>
+	void ForEachSampler(const Fn& fn) const
+	{
+		for (uint8_t i = m_samplerOffset; i < m_samplerOffset + m_samplerCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].samplerID, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename Fn>
+	void ForEachTexture(const Fn& fn) const
+	{
+		for (uint8_t i = m_textureOffset; i < m_textureOffset + m_textureCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].textureID, m_bindings[i].bindPoint);
+		}
+	}
+
 private:
 
-	ConstantBuffers::T	m_usedConstantBuffers[cr3d::ShaderStage::GraphicsStageCount][MaxStageConstantBuffers]; // Buffer ID
-	Samplers::T			m_usedSamplers[cr3d::ShaderStage::GraphicsStageCount][MaxStageSamplers]; // IDs of the samplers this table uses
-	Textures::T			m_usedTextures[cr3d::ShaderStage::GraphicsStageCount][MaxStageTextures]; // IDs of the textures this table uses
+	uint8_t				m_constantBufferCount = 0;
+	uint8_t				m_textureCount = 0;
+	uint8_t				m_samplerCount = 0;
 
-	bindpoint_t			m_usedConstantBufferBindPoints[cr3d::ShaderStage::GraphicsStageCount][MaxStageConstantBuffers];
-	bindpoint_t			m_usedTextureBindPoints[cr3d::ShaderStage::GraphicsStageCount][MaxStageTextures];
-	bindpoint_t			m_usedSamplerBindPoints[cr3d::ShaderStage::GraphicsStageCount][MaxStageSamplers];
-	uint8_t				m_usedConstantBufferCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint8_t				m_usedConstantBufferTotalCount = 0;
+	uint8_t				m_constantBufferOffset = 0;
+	uint8_t				m_samplerOffset = 0;
+	uint8_t				m_textureOffset = 0;
 
-	uint8_t				m_usedTextureCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint8_t				m_usedTextureTotalCount = 0;
-
-	uint8_t				m_usedSamplerCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint8_t				m_usedSamplerTotalCount = 0;
+	CrFixedVector<CrShaderBinding, 64> m_bindings;
 };
 
 struct CrShaderStageInfo

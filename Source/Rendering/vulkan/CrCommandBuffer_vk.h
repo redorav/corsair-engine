@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Rendering/ICrCommandBuffer.h"
+
+#include "CrPipelineStateManager_vk.h"
 #include "CrGPUBuffer_vk.h"
 #include "CrVulkan.h"
+
 #include "Rendering/CrRendering.h"
 
 class CrVertexBufferCommon;
@@ -123,9 +126,10 @@ inline void CrCommandBufferVulkan::BindVertexBuffersPS(const ICrHardwareGPUBuffe
 	vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
 }
 
-inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState)
+inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline)
 {
-	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineState->m_pipeline); // In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+	// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(graphicsPipeline)->m_vkPipeline);
 }
 
 inline void CrCommandBufferVulkan::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)

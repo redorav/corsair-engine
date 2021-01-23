@@ -418,7 +418,7 @@ namespace cr3d
 
 	namespace ShaderResourceType
 	{
-		enum T : uint32_t
+		enum T : uint8_t
 		{
 			ConstantBuffer,
 			Texture,
@@ -429,13 +429,7 @@ namespace cr3d
 			DataBuffer,
 			RWDataBuffer,
 			Count,
-			Start = ConstantBuffer,
 		};
-		
-		inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; } // Pre-increment
-		inline T operator++(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; } // Post-increment
-		inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
-		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
 	};
 
 	enum class ShaderCodeFormat : uint8_t
@@ -831,6 +825,13 @@ namespace cr3d
 		Error // If some error occurred
 	};
 }
+
+struct CrShaderResourceCount
+{
+	uint8_t constantBuffers = 0;
+	uint8_t samplers = 0;
+	uint8_t textures = 0;
+};
 
 struct CrViewport
 {

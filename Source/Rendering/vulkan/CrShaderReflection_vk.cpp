@@ -7,13 +7,17 @@
 #include <spirv_cross.hpp>
 #pragma warning (pop)
 
-void CrShaderReflectionVulkan::AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode)
+void CrShaderReflectionVulkan::AddBytecode(const CrShaderBytecodeSharedHandle& bytecode)
 {
 	// Perform reflection on the shader
 	// SPIRV-Cross has several classes like CompilerGLSL that can translate from SPIR-V to other high level languages. For reflection we don't need them.
 	cr3d::ShaderStage::T shaderStage = bytecode->GetShaderStage();
 	m_reflection[shaderStage] = CrMakeUnique<spirv_cross::Compiler>(reinterpret_cast<const uint32_t*>(bytecode->GetBytecode().data()), bytecode->GetBytecode().size() / 4);
 	m_resources[shaderStage] = m_reflection[shaderStage]->get_shader_resources(m_reflection[shaderStage]->get_active_interface_variables());
+
+	m_resourceCounts.constantBuffers += (uint8_t)m_resources[shaderStage].uniform_buffers.size();
+	m_resourceCounts.samplers += (uint8_t)m_resources[shaderStage].separate_samplers.size();
+	m_resourceCounts.textures += (uint8_t)m_resources[shaderStage].separate_images.size();
 }
 
 void CrShaderReflectionVulkan::ForEachConstantBuffer(ShaderReflectionFn fn) const

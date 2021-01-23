@@ -12,6 +12,8 @@ class CrShaderReflectionVulkan final : public ICrShaderReflection
 {
 public:
 
+	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) override;
+
 	virtual void ForEachConstantBuffer(ShaderReflectionFn fn) const override;
 
 	virtual void ForEachTexture(ShaderReflectionFn fn) const override;
@@ -19,8 +21,6 @@ public:
 	virtual void ForEachSampler(ShaderReflectionFn fn) const override;
 
 private:
-
-	virtual void AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode) override;
 
 	CrUniquePtr<spirv_cross::Compiler> m_reflection[cr3d::ShaderStage::Count];
 

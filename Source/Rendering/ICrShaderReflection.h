@@ -30,10 +30,7 @@ class ICrShaderReflection
 {
 public:
 
-	void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode)
-	{
-		AddBytecodePS(bytecode);
-	}
+	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) = 0;
 
 	virtual void ForEachConstantBuffer(ShaderReflectionFn fn) const = 0;
 
@@ -41,7 +38,12 @@ public:
 
 	virtual void ForEachSampler(ShaderReflectionFn fn) const = 0;
 
+	const CrShaderResourceCount& GetShaderResourceCount()
+	{
+		return m_resourceCounts;
+	}
+
 protected:
 
-	virtual void AddBytecodePS(const CrShaderBytecodeSharedHandle& bytecode) = 0;
+	CrShaderResourceCount m_resourceCounts;
 };

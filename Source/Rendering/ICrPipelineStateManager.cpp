@@ -39,9 +39,8 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
 	}
 	else
 	{
-		graphicsPipeline = new ICrGraphicsPipeline;
+		graphicsPipeline = CreateGraphicsPipelinePS(psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
 		graphicsPipeline->m_shader = graphicsShader;
-		CreateGraphicsPipelinePS(graphicsPipeline, psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
 
 		// Insert in the hashmap
 		m_graphicsPipelines.insert({combinedHash.m_hash, graphicsPipeline});

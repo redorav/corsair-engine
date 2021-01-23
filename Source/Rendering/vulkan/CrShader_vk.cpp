@@ -14,7 +14,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 
 	CrShaderReflectionVulkan vulkanReflection;
 
-	// Create the shader modules
+	// Create the shader modules and parse reflection information
 	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		VkShaderModuleCreateInfo moduleCreateInfo;
@@ -33,7 +33,10 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 		vulkanReflection.AddBytecode(shaderBytecode);
 	}
 
-	m_resourceTable = CrUniquePtr<ICrShaderResourceTable>(new CrShaderResourceTableVulkan());
+	const CrShaderResourceCount& resourceCount = vulkanReflection.GetShaderResourceCount();
+
+	// Create the optimized shader resource table
+	m_resourceTable = CrUniquePtr<ICrShaderResourceTable>(new CrShaderResourceTableVulkan(resourceCount));
 
 	// TODO Use fixed vector
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
@@ -42,7 +45,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 	{
 		const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(constantBuffer.name);
 		m_resourceTable->AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
-		
+
 		VkDescriptorSetLayoutBinding layoutBinding;
 		layoutBinding.binding = constantBuffer.bindPoint;
 		layoutBinding.descriptorType = crvk::GetVkDescriptorType(cr3d::ShaderResourceType::ConstantBuffer);

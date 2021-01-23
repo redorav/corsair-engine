@@ -9,8 +9,10 @@ class CrShaderResourceTableVulkan final : public ICrShaderResourceTable
 {
 public:
 
-	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it. The layout is also needed when allocating
-	// descriptor sets from a pool.
+	CrShaderResourceTableVulkan(const CrShaderResourceCount& resourceCount) : ICrShaderResourceTable(resourceCount) {}
+
+	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
+	// The layout is also needed when allocating descriptor sets from a pool.
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
 };
 

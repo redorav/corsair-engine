@@ -70,3 +70,5 @@ class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;
 class CrVertexDescriptor;
+
+struct CrShaderResourceCount;

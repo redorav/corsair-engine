@@ -27,6 +27,10 @@
 
 #include "CrResourceManager.h"
 
+#include "UI/CrImGuiRenderer.h"
+
+#include "imgui.h"
+
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
@@ -208,10 +212,14 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// Semaphore used to ensures that image presentation is complete before starting to submit again
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
+
+	CrImGuiRenderer::GetImGuiRenderer()->Init(&renderPassDescriptor);
 }
 
 void CrFrame::Process()
 {
+	ImGui::NewFrame();
+
 	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
 	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
@@ -307,6 +315,9 @@ void CrFrame::Process()
 
 		drawCommandBuffer->End();
 	}
+
+	ImGui::Render();
+	// CrBackend render.
 
 	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
 

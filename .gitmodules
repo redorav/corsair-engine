@@ -28,3 +28,6 @@
 [submodule "Premake/premake-qt"]
 	path = Premake/premake-qt
 	url = https://github.com/dcourtois/premake-qt
+[submodule "Dependencies/imgui/Source"]
+	path = Dependencies/imgui/Source
+	url = https://github.com/ocornut/imgui.git

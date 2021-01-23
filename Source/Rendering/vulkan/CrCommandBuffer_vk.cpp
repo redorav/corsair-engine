@@ -208,7 +208,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const ICrRenderPass* renderPass, c
 	vkCmdBeginRenderPass(m_vkCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void CrCommandBufferVulkan::EndRenderPassPS(const ICrRenderPass* /* renderPass*/)
+void CrCommandBufferVulkan::EndRenderPassPS()
 {
 	vkCmdEndRenderPass(m_vkCommandBuffer);
 }

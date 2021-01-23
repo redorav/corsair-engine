@@ -56,7 +56,7 @@ private:
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) override;
+	virtual void EndRenderPassPS() override;
 };
 
 inline void CrCommandBufferD3D12::SetViewportPS(const CrViewport& viewport)

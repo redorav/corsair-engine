@@ -67,7 +67,7 @@ private:
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) override;
+	virtual void EndRenderPassPS() override;
 
 	VkDevice m_vkDevice;
 

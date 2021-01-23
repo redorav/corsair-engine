@@ -251,7 +251,7 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_frameBuffers[swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
 			{
-				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState);
+				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
 	
 				UpdateCamera();
 	
@@ -301,7 +301,7 @@ void CrFrame::Process()
 					drawCommandBuffer->DrawIndexed(renderMesh->m_indexBuffer->GetNumElements(), 1, 0, 0, 0);
 				}
 			}
-			drawCommandBuffer->EndRenderPass(m_renderPass.get());
+			drawCommandBuffer->EndRenderPass();
 		}
 		drawCommandBuffer->EndDebugEvent();
 

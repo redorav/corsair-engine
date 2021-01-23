@@ -61,7 +61,7 @@ public:
 
 	void BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams);
 
-	void EndRenderPass(const ICrRenderPass* renderPass);
+	void EndRenderPass();
 
 	const ICrCommandQueue* GetCommandQueue() const;
 
@@ -97,7 +97,7 @@ protected:
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) = 0;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) = 0;
+	virtual void EndRenderPassPS() = 0;
 
 	virtual void UpdateResourceTablesPS() = 0;
 
@@ -234,9 +234,9 @@ inline void ICrCommandBuffer::BeginRenderPass(const ICrRenderPass* renderPass, c
 	BeginRenderPassPS(renderPass, frameBuffer, renderPassParams);
 }
 
-inline void ICrCommandBuffer::EndRenderPass(const ICrRenderPass* renderPass)
+inline void ICrCommandBuffer::EndRenderPass()
 {
-	EndRenderPassPS(renderPass);
+	EndRenderPassPS();
 }
 
 inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const

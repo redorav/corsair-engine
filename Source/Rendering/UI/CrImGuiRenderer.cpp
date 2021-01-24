@@ -1,8 +1,8 @@
 #include "CrRendering_pch.h"
 
-#include "Core/CrPlatform.h"
-
 #include "CrImGuiRenderer.h"
+
+#include "Core/CrPlatform.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderPass.h"
 #include "Rendering/ICrShader.h"
@@ -10,15 +10,19 @@
 #include "Rendering/ICrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrRenderDevice.h"
+#include "Rendering/ICrCommandBuffer.h"
+#include "Rendering/ICrSampler.h"
+
+#include "ShaderResources.h" // TODO: Should this be included directly? 
 
 #include "imgui.h"
 
 // Based on ImDrawVert
 struct UIVertex
 {
-	CrVertexElement<float, cr3d::DataFormat::RG16_Float> m_Position;
-	CrVertexElement<float, cr3d::DataFormat::RG16_Float> m_UV;
-	CrVertexElement<uint32_t, cr3d::DataFormat::R32_Uint> m_Color;
+	CrVertexElement<float, cr3d::DataFormat::RG32_Float> m_Position;
+	CrVertexElement<float, cr3d::DataFormat::RG32_Float> m_UV;
+	CrVertexElement<uint32_t, cr3d::DataFormat::RGBA8_Unorm> m_Color;
 
 	static CrVertexDescriptor GetVertexDescriptor()
 	{
@@ -29,6 +33,8 @@ struct UIVertex
 CrImGuiRenderer* CrImGuiRenderer::k_Instance = nullptr;
 
 CrImGuiRenderer::CrImGuiRenderer()
+	: m_CurMaxIndexCount(0)
+	, m_CurMaxVertexCount(0)
 {
 }
 
@@ -46,16 +52,24 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
-	// Pipeline desc:
+	// Pipeline description:
 	CrGraphicsPipelineDescriptor psoDescriptor;
 	psoDescriptor.depthStencilState.depthTestEnable = false;
 	psoDescriptor.depthStencilState.depthWriteEnable = false;
+	psoDescriptor.blendState.renderTargetBlends[0].enable = true;
+	psoDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
+	psoDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+	psoDescriptor.blendState.renderTargetBlends[0].colorBlendOp= cr3d::BlendOp::Add;
+	psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+	psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
+	psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
 	psoDescriptor.Hash();
 
 	// TODO: This should be defined in one place only
 	CrString SHADER_PATH = IN_SRC_PATH;
 	SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
 
+	// TODO: Shaders don't seem to refresh after changing the hlsl code
 	// Load shaders:
 	CrBytecodeLoadDescriptor bytecodeDesc;
 	bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
@@ -82,15 +96,18 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 	fontParams.format = cr3d::DataFormat::RGBA8_Unorm;
 	fontParams.name = "ImGui Font Atlas";
 	fontParams.initialData = fontData;
-	fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from tex params?
+	fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
 
 	m_FontAtlas = ICrRenderDevice::GetRenderDevice()->CreateTexture(fontParams);
 	CrAssertMsg( m_FontAtlas.get(), "Failed to create the ImGui font atlas");
 	
 	io.Fonts->TexID = (ImTextureID)m_FontAtlas.get();
 
-	// Default res for the first frame, we need to query the real viewport
-	// during NewFrame()
+	// Default linear clamp sampler state:
+	CrSamplerDescriptor descriptor;
+	m_UISamplerState = ICrRenderDevice::GetRenderDevice()->CreateSampler(descriptor);
+
+	// Default res for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
 }
 
@@ -102,12 +119,132 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render()
+void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer)
 {
 	ImGui::Render();
+
+	// Query the draw data for this frame:
 	ImDrawData* data = ImGui::GetDrawData();
-	if (!data || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
+	if (!data || !data->Valid || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
 	{
 		return;
 	}
+
+	UpdateBuffers(data);
+
+	// Begin rendering the draw lists:
+	cmdBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
+	{
+		// Setup global config:
+		cmdBuffer->BindGraphicsPipelineState(m_UIGfxPipeline);
+		cmdBuffer->BindIndexBuffer(m_IndexBuffer.get());
+		cmdBuffer->BindVertexBuffer(m_VertexBuffer.get(), 0);
+		cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_UISamplerState.get());
+
+		// Projection matrix. TODO: this could be cached.
+		CrGPUBufferType<UIData> uiDataBuffer = cmdBuffer->AllocateConstantBuffer<UIData>();
+		UIDataData* uiData = uiDataBuffer.Lock();
+		{
+			uiData->projection = GetProjection(data);
+		}
+		uiDataBuffer.Unlock();
+		cmdBuffer->BindConstantBuffer(&uiDataBuffer);
+
+		// Iterate over each draw list -> draw command: 
+		ImVec2 clipOffset = data->DisplayPos;
+		uint32_t acumVtxOffset = 0;
+		uint32_t acumIdxOffset = 0;
+		for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+		{
+			const ImDrawList* drawList = data->CmdLists[listIdx];
+			for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
+			{
+				const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
+				if (!drawCmd->UserCallback)
+				{
+					// Generic rendering.
+					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
+					cmdBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
+					cmdBuffer->SetScissor(
+						(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
+						(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
+					);
+					cmdBuffer->DrawIndexed(
+						drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0
+					);
+				}
+				else
+				{
+					// Run user callback.
+					// TODO.
+				}
+			}	
+			acumIdxOffset += drawList->IdxBuffer.size();
+			acumVtxOffset += drawList->VtxBuffer.size();
+		}
+	}
+	cmdBuffer->EndDebugEvent();
+}
+
+float4x4 CrImGuiRenderer::GetProjection(ImDrawData* data)
+{
+	float L = data->DisplayPos.x;
+	float R = data->DisplayPos.x + data->DisplaySize.x;
+	float T = data->DisplayPos.y;
+	float B = data->DisplayPos.y + data->DisplaySize.y;
+	return float4x4(
+		float4(2.0f / (R - L),		0.0f,				0.0f, 0.0f),
+		float4(0.0f,				2.0f / (T - B),		0.0f, 0.0f),
+		float4(0.0f,				0.0f,				0.5f, 0.0f),
+		float4((R + L) / (L - R), (T + B) / (B - T),	0.5f, 1.0f)
+	);
+}
+
+void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
+{
+	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
+	uint32_t curIdxCount = data->TotalIdxCount;
+	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount)
+	{
+		if (m_IndexBuffer)
+		{
+			m_IndexBuffer.reset();
+		}
+		m_CurMaxIndexCount = curIdxCount * 2;
+		m_IndexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_CurMaxIndexCount);
+	}
+
+	// Check vertex buffer size:
+	uint32_t curVtxCount = data->TotalVtxCount;
+	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount)
+	{
+		if (m_VertexBuffer)
+		{
+			m_VertexBuffer.reset();
+		}
+		m_CurMaxVertexCount = curVtxCount * 2;
+		m_VertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_CurMaxVertexCount);
+	}
+
+	// Update contents:
+	ImDrawIdx* pIdx = (ImDrawIdx*)m_IndexBuffer->Lock();
+	UIVertex* pVtx = (UIVertex*)m_VertexBuffer->Lock();
+	for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+	{
+		ImDrawList* drawList = data->CmdLists[listIdx];
+		auto vtxSize = UIVertex::GetVertexDescriptor().GetDataSize();
+		
+#if 1
+		memset(pIdx, 0, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
+		memset(pVtx, 0, drawList->VtxBuffer.Size * vtxSize);
+#endif
+
+		memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
+		memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * vtxSize);
+
+		pIdx += drawList->IdxBuffer.Size;
+		pVtx += drawList->VtxBuffer.Size;
+	}
+	m_IndexBuffer->Unlock();
+	m_VertexBuffer->Unlock();
 }

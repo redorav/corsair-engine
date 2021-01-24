@@ -232,6 +232,8 @@ void CrFrame::Process()
 	
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
+	ImGui::Text("Hello ImGui!");
+
 	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
 
 	renderDevice->WaitForFence(swapchainFence, UINT64_MAX);
@@ -309,14 +311,16 @@ void CrFrame::Process()
 					drawCommandBuffer->DrawIndexed(renderMesh->m_indexBuffer->GetNumElements(), 1, 0, 0, 0);
 				}
 			}
+
+			// TODO: this needs its own render pass.
+			CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer);
+
 			drawCommandBuffer->EndRenderPass(m_renderPass.get());
 		}
 		drawCommandBuffer->EndDebugEvent();
 
 		drawCommandBuffer->End();
 	}
-
-	CrImGuiRenderer::GetImGuiRenderer()->Render();
 
 	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
 

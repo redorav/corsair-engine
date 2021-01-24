@@ -218,8 +218,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
-	ImGui::NewFrame();
-
 	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
 	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
@@ -231,6 +229,8 @@ void CrFrame::Process()
 		RecreateSwapchainAndFramebuffers();
 		swapchainResult = swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
 	}
+	
+	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
 	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
 
@@ -316,8 +316,7 @@ void CrFrame::Process()
 		drawCommandBuffer->End();
 	}
 
-	ImGui::Render();
-	// CrBackend render.
+	CrImGuiRenderer::GetImGuiRenderer()->Render();
 
 	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
 

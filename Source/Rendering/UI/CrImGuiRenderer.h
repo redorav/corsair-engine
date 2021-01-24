@@ -17,7 +17,8 @@ private:
 public:
 	static CrImGuiRenderer* GetImGuiRenderer();
 	void Init(CrRenderPassDescriptor* renderPassDesc);
-	void Render(ImDrawData* data);
+	void NewFrame(uint32_t width, uint32_t height);
+	void Render();
 
 private:
 	static CrImGuiRenderer* k_Instance;
@@ -25,4 +26,5 @@ private:
 	ICrGraphicsPipeline* m_UIGfxPipeline;
 	CrIndexBufferSharedHandle m_IndexBuffer;
 	CrVertexBufferSharedHandle m_VertexBuffer;
+	CrTextureSharedHandle m_FontAtlas;
 };

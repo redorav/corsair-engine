@@ -8,6 +8,8 @@
 #include "Rendering/ICrShader.h"
 #include "Rendering/ICrShaderManager.h"
 #include "Rendering/ICrPipelineStateManager.h"
+#include "Rendering/ICrTexture.h"
+#include "Rendering/ICrRenderDevice.h"
 
 #include "imgui.h"
 
@@ -42,6 +44,7 @@ CrImGuiRenderer* CrImGuiRenderer::GetImGuiRenderer()
 void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 {
 	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
 
 	// Pipeline desc:
 	CrGraphicsPipelineDescriptor psoDescriptor;
@@ -68,12 +71,41 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 		psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), *renderPassDesc
 	);
 
-	// TODO: Imgui display size (all the IO setup stuff)
+	// Font atlas:
+	unsigned char* fontData = nullptr;
+	int fontWidth, fontHeight;
+	io.Fonts->GetTexDataAsRGBA32(&fontData, &fontWidth, &fontHeight);
+	
+	CrTextureCreateParams fontParams;
+	fontParams.width = (uint32_t)fontWidth;
+	fontParams.height = (uint32_t)fontHeight;
+	fontParams.format = cr3d::DataFormat::RGBA8_Unorm;
+	fontParams.name = "ImGui Font Atlas";
+	fontParams.initialData = fontData;
+	fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from tex params?
 
+	m_FontAtlas = ICrRenderDevice::GetRenderDevice()->CreateTexture(fontParams);
+	CrAssertMsg( m_FontAtlas.get(), "Failed to create the ImGui font atlas");
+	
+	io.Fonts->TexID = (ImTextureID)m_FontAtlas.get();
+
+	// Default res for the first frame, we need to query the real viewport
+	// during NewFrame()
+	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
 }
 
-void CrImGuiRenderer::Render(ImDrawData* data)
+void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 {
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2((float)width, (float)height);
+
+	ImGui::NewFrame();
+}
+
+void CrImGuiRenderer::Render()
+{
+	ImGui::Render();
+	ImDrawData* data = ImGui::GetDrawData();
 	if (!data || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
 	{
 		return;

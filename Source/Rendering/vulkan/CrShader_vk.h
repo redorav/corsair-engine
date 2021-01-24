@@ -42,7 +42,20 @@ inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModule
 
 class CrComputeShaderVulkan final : public ICrComputeShader
 {
+public:
+
+	CrComputeShaderVulkan(const ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+
+	const VkShaderModule GetVkShaderModule() const;
+
+	VkDevice m_vkDevice;
+
 	VkShaderModule m_vkShaderModule;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
 };
+
+inline const VkShaderModule CrComputeShaderVulkan::GetVkShaderModule() const
+{
+	return m_vkShaderModule;
+}

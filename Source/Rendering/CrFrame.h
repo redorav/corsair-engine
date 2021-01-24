@@ -42,8 +42,9 @@ private:
 	CrGPUSemaphoreSharedHandle m_presentCompleteSemaphore;
 	
 	// TODO Temporary
-	ICrGraphicsPipeline* m_pipelineTriangleState;
-	ICrGraphicsPipeline* m_pipelineLineState;
+	CrGraphicsPipelineHandle m_pipelineTriangleState;
+	CrGraphicsPipelineHandle m_pipelineLineState;
+	CrComputePipelineHandle m_computePipelineState;
 
 	CrRenderPassSharedHandle m_renderPass;
 	

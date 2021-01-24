@@ -34,6 +34,8 @@ public:
 
 	CrGraphicsShaderHandle LoadGraphicsShader(const CrBytecodeLoadDescriptor& shaderCreateInfo) const;
 
+	CrComputeShaderHandle LoadComputeShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const;
+
 protected:
 
 	const ICrRenderDevice* m_renderDevice;

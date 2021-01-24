@@ -48,6 +48,8 @@ private:
 
 	virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const override;
 
+	virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const override;
+
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
 
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
@@ -58,8 +60,10 @@ private:
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
 
-	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader,
 		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) override;
+
+	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& psoDescriptor, const ICrComputeShader* computeShader) override;
 
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 

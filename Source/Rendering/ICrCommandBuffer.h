@@ -30,7 +30,9 @@ public:
 	
 	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint);
 
-	void BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState);
+	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
+
+	void BindComputePipelineState(const ICrComputePipeline* computePipeline);
 
 	void ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount);
 
@@ -79,7 +81,9 @@ protected:
 
 	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) = 0;
 
-	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) = 0;
+	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline) = 0;
+
+	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) = 0;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) = 0;
 
@@ -110,21 +114,27 @@ protected:
 		uint32_t byteOffset = 0;
 	};
 
+	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
+	// a resource and even bind a dummy one if we have a safe mode
+
 	struct CurrentState
 	{
+		const ConstantBufferBinding& GetConstantBufferBinding(cr3d::ShaderStage::T stage, ConstantBuffers::T id)
+		{
+			return m_constantBuffers[stage][id];
+		}
+
 		const CrIndexBufferCommon*		m_indexBuffer;
 		const CrVertexBufferCommon*		m_vertexBuffer;
 
 		CrGraphicsPipelineDescriptor	m_graphicsPipelineDescriptor;
 		const ICrGraphicsPipeline*		m_graphicsPipeline;
-		const CrComputePipeline*		m_computePipeline;
+		const ICrComputePipeline*		m_computePipeline;
 
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
 		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];
-
-		// Structured Buffers
 	};
 
 	CurrentState					m_currentState = {};
@@ -164,12 +174,20 @@ inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* verte
 	BindVertexBuffersPS(vertexBuffer->GetHardwareBuffer(), bindPoint);
 }
 
-inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState)
+inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
 {
-	m_currentState.m_graphicsPipeline = pipelineState;
+	m_currentState.m_graphicsPipeline = graphicsPipeline;
 
 	// TODO Move to flush
-	BindGraphicsPipelineStatePS(pipelineState);
+	BindGraphicsPipelineStatePS(graphicsPipeline);
+}
+
+inline void ICrCommandBuffer::BindComputePipelineState(const ICrComputePipeline* computePipeline)
+{
+	m_currentState.m_computePipeline = computePipeline;
+
+	// TODO Move to flush
+	BindComputePipelineStatePS(computePipeline);
 }
 
 inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)

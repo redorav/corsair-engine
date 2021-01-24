@@ -74,6 +74,18 @@ CrGraphicsShaderHandle ICrShaderManager::LoadGraphicsShader(const CrBytecodeLoad
 	return graphicsShader;
 }
 
+CrComputeShaderHandle ICrShaderManager::LoadComputeShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const
+{
+	const CrShaderBytecodeDescriptor& bytecodeDescriptor = bytecodeLoadDescriptor.GetBytecodeDescriptors()[0];
+
+	CrComputeShaderDescriptor computeShaderDescriptor;
+	computeShaderDescriptor.m_bytecode = LoadShaderBytecode(bytecodeDescriptor.path, bytecodeDescriptor);
+
+	CrComputeShaderHandle computeShader = m_renderDevice->CreateComputeShader(computeShaderDescriptor);
+
+	return computeShader;
+}
+
 void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;

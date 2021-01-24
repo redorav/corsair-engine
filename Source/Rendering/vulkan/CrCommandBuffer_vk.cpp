@@ -112,7 +112,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	resourceTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		const ConstantBufferMetadata& constantBufferMeta = CrShaderMetadata::GetConstantBuffer(id);
-		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][id];
+		const ConstantBufferBinding& binding = m_currentState.GetConstantBufferBinding(stage, id);
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
@@ -150,13 +150,13 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	resourceTable.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id]);
-	
+
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 		imageInfo.imageView = vulkanTexture->GetVkImageViewAllMipsSlices();
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.sampler = nullptr;
 
-		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, 
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
 			VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, &imageInfo, nullptr, nullptr);
 
 		descriptorCount++;

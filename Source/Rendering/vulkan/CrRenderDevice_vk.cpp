@@ -322,6 +322,11 @@ ICrGraphicsShader* CrRenderDeviceVulkan::CreateGraphicsShaderPS(const CrGraphics
 	return new CrGraphicsShaderVulkan(this, graphicsShaderDescriptor);
 }
 
+ICrComputeShader* CrRenderDeviceVulkan::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+{
+	return new CrComputeShaderVulkan(this, computeShaderDescriptor);
+}
+
 ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)
 {
 	return new CrHardwareGPUBufferVulkan(this, descriptor);
@@ -349,7 +354,7 @@ ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureCreateParams& p
 
 ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 (
-	const CrGraphicsPipelineDescriptor& psoDescriptor,
+	const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const ICrGraphicsShader* graphicsShader,
 	const CrVertexDescriptor& vertexDescriptor,
 	const CrRenderPassDescriptor& renderPassDescriptor
@@ -361,7 +366,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.pNext = nullptr;
 	inputAssemblyState.flags = 0;
-	inputAssemblyState.topology = crvk::GetVkPrimitiveTopology(psoDescriptor.primitiveTopology);
+	inputAssemblyState.topology = crvk::GetVkPrimitiveTopology(pipelineDescriptor.primitiveTopology);
 	inputAssemblyState.primitiveRestartEnable = false;
 
 	VkPipelineRasterizationStateCreateInfo rasterizerState = {};
@@ -369,12 +374,12 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	rasterizerState.pNext = nullptr;
 	rasterizerState.flags = 0;
 	rasterizerState.depthClampEnable = false;
-	rasterizerState.polygonMode = crvk::GetVkPolygonFillMode(psoDescriptor.rasterizerState.fillMode);
-	rasterizerState.cullMode = crvk::GetVkPolygonCullMode(psoDescriptor.rasterizerState.cullMode);
-	rasterizerState.frontFace = crvk::GetVkFrontFace(psoDescriptor.rasterizerState.frontFace);
+	rasterizerState.polygonMode = crvk::GetVkPolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
+	rasterizerState.cullMode = crvk::GetVkPolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
+	rasterizerState.frontFace = crvk::GetVkFrontFace(pipelineDescriptor.rasterizerState.frontFace);
 
 	// TODO Complete this section
-	rasterizerState.depthClampEnable = psoDescriptor.rasterizerState.depthClipEnable;
+	rasterizerState.depthClampEnable = pipelineDescriptor.rasterizerState.depthClipEnable;
 	rasterizerState.lineWidth = 1.0f;
 	//rasterizerState.rasterizerDiscardEnable = false;
 	//rasterizerState.depthBiasEnable = false;
@@ -386,12 +391,12 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	colorBlendState.logicOpEnable = false;
 	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
-	uint32_t numRenderTargets = psoDescriptor.blendState.numRenderTargets;
+	uint32_t numRenderTargets = pipelineDescriptor.blendState.numRenderTargets;
 
 	CrVector<VkPipelineColorBlendAttachmentState> blendAttachments(numRenderTargets);
 	for (uint32_t i = 0; i < numRenderTargets; ++i)
 	{
-		const CrRenderTargetBlendDescriptor& renderTargetBlend = psoDescriptor.blendState.renderTargetBlends[i];
+		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 		blendAttachments[i].colorWriteMask = renderTargetBlend.colorWriteMask; // TODO Careful with this, needs a platform-specific translation
 		blendAttachments[i].blendEnable = renderTargetBlend.enable;
 		if (renderTargetBlend.enable)
@@ -418,7 +423,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampleState.pNext = nullptr;
 	multisampleState.flags = 0;
-	multisampleState.rasterizationSamples = crvk::GetVkSampleCount(psoDescriptor.multisampleState.sampleCount);
+	multisampleState.rasterizationSamples = crvk::GetVkSampleCount(pipelineDescriptor.multisampleState.sampleCount);
 	multisampleState.sampleShadingEnable = false;
 	multisampleState.minSampleShading = 0.0f;
 	multisampleState.pSampleMask = nullptr;
@@ -432,29 +437,29 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	depthStencilState.flags = 0;
 
 	// Depth
-	depthStencilState.depthTestEnable = psoDescriptor.depthStencilState.depthTestEnable;
-	depthStencilState.depthWriteEnable = psoDescriptor.depthStencilState.depthWriteEnable;
-	depthStencilState.depthCompareOp = crvk::GetVkCompareOp(psoDescriptor.depthStencilState.depthCompareOp);
-	depthStencilState.depthBoundsTestEnable = psoDescriptor.depthStencilState.depthBoundsTestEnable;
+	depthStencilState.depthTestEnable = pipelineDescriptor.depthStencilState.depthTestEnable;
+	depthStencilState.depthWriteEnable = pipelineDescriptor.depthStencilState.depthWriteEnable;
+	depthStencilState.depthCompareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.depthCompareOp);
+	depthStencilState.depthBoundsTestEnable = pipelineDescriptor.depthStencilState.depthBoundsTestEnable;
 
 	// Stencil
-	depthStencilState.stencilTestEnable = psoDescriptor.depthStencilState.stencilTestEnable;
+	depthStencilState.stencilTestEnable = pipelineDescriptor.depthStencilState.stencilTestEnable;
 
-	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.front.depthFailOp);
-	depthStencilState.front.failOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.front.stencilFailOp);
-	depthStencilState.front.passOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.front.stencilPassOp);
-	depthStencilState.front.compareOp = crvk::GetVkCompareOp(psoDescriptor.depthStencilState.front.stencilCompareOp);
-	depthStencilState.front.compareMask = psoDescriptor.depthStencilState.front.stencilReadMask;
-	depthStencilState.front.writeMask = psoDescriptor.depthStencilState.front.stencilWriteMask;
-	depthStencilState.front.reference = psoDescriptor.depthStencilState.front.reference;
+	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.depthFailOp);
+	depthStencilState.front.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilFailOp);
+	depthStencilState.front.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilPassOp);
+	depthStencilState.front.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.front.stencilCompareOp);
+	depthStencilState.front.compareMask = pipelineDescriptor.depthStencilState.front.stencilReadMask;
+	depthStencilState.front.writeMask = pipelineDescriptor.depthStencilState.front.stencilWriteMask;
+	depthStencilState.front.reference = pipelineDescriptor.depthStencilState.front.reference;
 
-	depthStencilState.back.depthFailOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.back.depthFailOp);
-	depthStencilState.back.failOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.back.stencilFailOp);
-	depthStencilState.back.passOp = crvk::GetVkStencilOp(psoDescriptor.depthStencilState.back.stencilPassOp);
-	depthStencilState.back.compareOp = crvk::GetVkCompareOp(psoDescriptor.depthStencilState.back.stencilCompareOp);
-	depthStencilState.back.compareMask = psoDescriptor.depthStencilState.back.stencilReadMask;
-	depthStencilState.back.writeMask = psoDescriptor.depthStencilState.back.stencilWriteMask;
-	depthStencilState.back.reference = psoDescriptor.depthStencilState.back.reference;
+	depthStencilState.back.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.depthFailOp);
+	depthStencilState.back.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilFailOp);
+	depthStencilState.back.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilPassOp);
+	depthStencilState.back.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.back.stencilCompareOp);
+	depthStencilState.back.compareMask = pipelineDescriptor.depthStencilState.back.stencilReadMask;
+	depthStencilState.back.writeMask = pipelineDescriptor.depthStencilState.back.stencilWriteMask;
+	depthStencilState.back.reference = pipelineDescriptor.depthStencilState.back.reference;
 
 	depthStencilState.minDepthBounds = 0.0f;
 	depthStencilState.maxDepthBounds = 1.0f;
@@ -587,6 +592,49 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
 	return vulkanGraphicsPipeline;
+}
+
+ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
+(
+	const CrComputePipelineDescriptor& /*pipelineDescriptor*/,
+	const ICrComputeShader* computeShader
+)
+{
+	CrComputePipelineVulkan* vulkanComputePipeline = new CrComputePipelineVulkan();
+
+	VkPipelineShaderStageCreateInfo shaderStage = {};
+	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader)->GetVkShaderModule();
+	shaderStage.pName = computeShader->m_stageInfo.entryPoint.c_str();
+
+	const CrShaderResourceTableVulkan& resourceTable = static_cast<const CrShaderResourceTableVulkan&>(computeShader->GetResourceTable());
+
+	VkResult vkResult;
+
+	// Pipeline Resource Layout
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCreateInfo.pNext = nullptr;
+	pipelineLayoutCreateInfo.flags = 0;
+	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Handle when we have more than one layout
+	pipelineLayoutCreateInfo.pSetLayouts = &resourceTable.m_vkDescriptorSetLayout;
+	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
+	// TODO Push constants? Need to be part of the psoDescriptor?
+
+	vkResult = vkCreatePipelineLayout(m_vkDevice, &pipelineLayoutCreateInfo, nullptr, &vulkanComputePipeline->m_vkPipelineLayout);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline layout");
+
+	VkComputePipelineCreateInfo pipelineInfo = {};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	pipelineInfo.stage = shaderStage;
+	pipelineInfo.layout = vulkanComputePipeline->m_vkPipelineLayout;
+
+	vkResult = vkCreateComputePipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &vulkanComputePipeline->m_vkPipeline);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
+
+	return vulkanComputePipeline;
 }
 
 void CrRenderDeviceVulkan::RetrieveQueueFamilies()

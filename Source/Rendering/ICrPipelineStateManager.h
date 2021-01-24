@@ -16,17 +16,21 @@ public:
 
 	CrGraphicsPipelineHandle GetGraphicsPipeline
 	(
-		const CrGraphicsPipelineDescriptor& psoDescriptor, 
+		const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 		const CrGraphicsShaderHandle& graphicsShader, 
 		const CrVertexDescriptor& vertexDescriptor,
 		const CrRenderPassDescriptor& renderPassDescriptor
 	);
+
+	CrComputePipelineHandle GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader);
 
 	static ICrPipelineStateManager* Get();
 
 protected:
 
 	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
+
+	CrHashMap<uint64_t, CrComputePipelineHandle> m_computePipelines;
 
 	ICrRenderDevice* m_renderDevice = nullptr;
 };

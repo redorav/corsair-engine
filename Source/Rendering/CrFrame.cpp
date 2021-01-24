@@ -154,6 +154,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
 	
 	CrBytecodeLoadDescriptor bytecodeLoadInfo;
+	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
 
 #define USE_HLSL
 
@@ -164,6 +165,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
 		"main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+
+	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "compute.hlsl").c_str()),
+		"main_cs", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #else
 
@@ -183,8 +187,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeLoadInfo);
 
-	CrGraphicsPipelineDescriptor psoDescriptor;
-	psoDescriptor.Hash();
+	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
+
+	CrGraphicsPipelineDescriptor graphicsPipelineDescriptor;
+	graphicsPipelineDescriptor.Hash();
 
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
@@ -193,15 +199,19 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 4) After creation, put in table for next time
 
 	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
 
 	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
 
-	psoDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	psoDescriptor.Hash();
+	CrComputePipelineDescriptor computePipelineDescriptor;
+
+	m_computePipelineState = ICrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
+
+	graphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
+	graphicsPipelineDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
 
 	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();
@@ -302,6 +312,14 @@ void CrFrame::Process()
 				}
 			}
 			drawCommandBuffer->EndRenderPass();
+		}
+		drawCommandBuffer->EndDebugEvent();
+
+		drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
+		{
+			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
+
+			drawCommandBuffer->Dispatch(1, 1, 1);
 		}
 		drawCommandBuffer->EndDebugEvent();
 

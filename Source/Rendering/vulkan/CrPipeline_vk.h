@@ -12,3 +12,12 @@ public:
 
 	VkPipeline m_vkPipeline;
 };
+
+class CrComputePipelineVulkan : public ICrComputePipeline
+{
+public:
+
+	VkPipelineLayout m_vkPipelineLayout;
+
+	VkPipeline m_vkPipeline;
+};

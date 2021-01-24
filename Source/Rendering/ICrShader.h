@@ -179,10 +179,8 @@ class ICrGraphicsShader : public ICrShader
 {
 public:
 
-	ICrGraphicsShader(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	ICrGraphicsShader(const ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
-		renderDevice;
-
 		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 		{
 			CrShaderStageInfo info;
@@ -204,13 +202,24 @@ private:
 	CrVector<CrShaderStageInfo> m_stageInfos;
 };
 
+struct CrComputeShaderDescriptor
+{
+	CrShaderBytecodeSharedHandle m_bytecode;
+};
+
 class ICrComputeShader : public ICrShader
 {
 public:
 
-	ICrComputeShader() {}
+	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
+	{
+		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint();
+		m_stageInfo.stage = cr3d::ShaderStage::Compute;
+	}
 
 	~ICrComputeShader() {}
+
+	CrShaderStageInfo m_stageInfo;
 };
 
 struct CrShaderBytecodeDescriptor

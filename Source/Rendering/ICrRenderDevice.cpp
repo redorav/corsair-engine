@@ -65,9 +65,19 @@ CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsSha
 	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
 }
 
-CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor) const
 {
-	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(psoDescriptor, graphicsShader, vertexDescriptor, renderPassDescriptor));
+	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
+}
+
+CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+{
+	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor, renderPassDescriptor));
+}
+
+CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
+{
+	return CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
 }
 
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)

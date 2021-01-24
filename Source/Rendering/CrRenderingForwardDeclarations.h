@@ -61,11 +61,17 @@ class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 struct CrGraphicsShaderDescriptor;
 
+class ICrComputeShader;
+using CrComputeShaderHandle = CrSharedPtr<ICrComputeShader>;
+struct CrComputeShaderDescriptor;
+
 class ICrGraphicsPipeline;
 using CrGraphicsPipelineHandle = CrSharedPtr<ICrGraphicsPipeline>;
 struct CrGraphicsPipelineDescriptor;
 
-class CrComputePipeline;
+class ICrComputePipeline;
+using CrComputePipelineHandle = CrSharedPtr<ICrComputePipeline>;
+struct CrComputePipelineDescriptor;
 
 class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;

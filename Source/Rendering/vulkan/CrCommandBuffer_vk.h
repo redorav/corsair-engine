@@ -8,10 +8,10 @@
 
 #include "Rendering/CrRendering.h"
 
-class CrVertexBufferCommon;
-class CrIndexBufferCommon;
-class ICrGraphicsPipeline;
+#include "Rendering/CrRenderingForwardDeclarations.h"
+
 class CrTextureVulkan;
+class CrShaderResourceTableVulkan;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
 {
@@ -42,6 +42,8 @@ private:
 	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) override;
 
 	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) override;
+
+	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) override;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) override;
 
@@ -130,6 +132,12 @@ inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphics
 {
 	// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
 	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(graphicsPipeline)->m_vkPipeline);
+}
+
+inline void CrCommandBufferVulkan::BindComputePipelineStatePS(const ICrComputePipeline* computePipeline)
+{
+	// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(computePipeline)->m_vkPipeline);
 }
 
 inline void CrCommandBufferVulkan::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)

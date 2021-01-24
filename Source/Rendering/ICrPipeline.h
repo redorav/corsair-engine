@@ -111,3 +111,19 @@ public:
 	
 	CrGraphicsShaderHandle m_shader;
 };
+
+struct CrComputePipelineDescriptor : public CrAutoHashable<CrComputePipelineDescriptor>
+{
+
+};
+
+class ICrComputePipeline
+{
+public:
+
+	virtual ~ICrComputePipeline() {}
+
+	// TODO PRIVATE
+
+	CrComputeShaderHandle m_shader;
+};

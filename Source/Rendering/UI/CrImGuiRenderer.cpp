@@ -2,7 +2,9 @@
 
 #include "CrImGuiRenderer.h"
 
+#include "CrInputManager.h"
 #include "Core/CrPlatform.h"
+#include "Core/CrFrameTime.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderPass.h"
 #include "Rendering/ICrShader.h"
@@ -114,7 +116,22 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 {
 	ImGuiIO& io = ImGui::GetIO();
+
+	// Generic io:
 	io.DisplaySize = ImVec2((float)width, (float)height);
+	io.DeltaTime = CrFrameTime::GetFrameDelta();
+
+	// Update input:
+	// Doesn't work.
+	io.MouseDown[0] = CrInput.GetKey(KeyCode::MouseLeft);
+	io.MouseDown[1] = CrInput.GetKey(KeyCode::MouseRight);
+	io.MouseDown[2] = CrInput.GetKey(KeyCode::MouseMiddle);
+	
+	float mx = CrInput.GetAxis(AxisCode::MouseX);
+	float my = CrInput.GetAxis(AxisCode::MouseY);
+
+	CrLog("%f %f \n", mx, my);
+	CrLog("%s \n", io.MouseDown[0] ? "left" : "");
 
 	ImGui::NewFrame();
 }
@@ -202,9 +219,12 @@ float4x4 CrImGuiRenderer::GetProjection(ImDrawData* data)
 
 void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 {
+	static bool k_ForceReset = false;
+	// TODO: I don't think the reseting the buffer is safe? Its deleted inline.
+
 	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
 	uint32_t curIdxCount = data->TotalIdxCount;
-	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount)
+	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount || k_ForceReset)
 	{
 		if (m_IndexBuffer)
 		{
@@ -216,7 +236,7 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 
 	// Check vertex buffer size:
 	uint32_t curVtxCount = data->TotalVtxCount;
-	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount)
+	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount || k_ForceReset)
 	{
 		if (m_VertexBuffer)
 		{
@@ -234,7 +254,7 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 		ImDrawList* drawList = data->CmdLists[listIdx];
 		auto vtxSize = UIVertex::GetVertexDescriptor().GetDataSize();
 		
-#if 1
+#if 0
 		memset(pIdx, 0, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
 		memset(pVtx, 0, drawList->VtxBuffer.Size * vtxSize);
 #endif

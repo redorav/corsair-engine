@@ -85,7 +85,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 {
 	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
 	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
-	const CrShaderResourceTableVulkan& resourceTable = static_cast<const CrShaderResourceTableVulkan&>(currentGraphicsShader->GetResourceTable());
+	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
 
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
@@ -93,7 +93,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	descriptorSetAllocInfo.pNext = nullptr;
 	descriptorSetAllocInfo.descriptorPool = m_vkDescriptorPool;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	descriptorSetAllocInfo.pSetLayouts = &resourceTable.m_vkDescriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &bindingTable.m_vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
 	VkResult result = vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocInfo, &descriptorSet);
@@ -109,7 +109,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
 
-	resourceTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		const ConstantBufferMetadata& constantBufferMeta = CrShaderMetadata::GetConstantBuffer(id);
 		const ConstantBufferBinding& binding = m_currentState.GetConstantBufferBinding(stage, id);
@@ -132,7 +132,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 		bufferCount++;
 	});
 
-	resourceTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	bindingTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
 	{
 		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][id]);
 
@@ -147,7 +147,7 @@ void CrCommandBufferVulkan::UpdateResourceTablesPS()
 		imageCount++;
 	});
 
-	resourceTable.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	bindingTable.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id]);
 

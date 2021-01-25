@@ -11,7 +11,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrTextureVulkan;
-class CrShaderResourceTableVulkan;
+class CrShaderBindingTableVulkan;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
 {

@@ -38,12 +38,12 @@ public:
 
 	virtual void ForEachSampler(ShaderReflectionFn fn) const = 0;
 
-	const CrShaderResourceCount& GetShaderResourceCount()
+	const CrShaderBindingCount& GetShaderResourceCount()
 	{
 		return m_resourceCounts;
 	}
 
 protected:
 
-	CrShaderResourceCount m_resourceCounts;
+	CrShaderBindingCount m_resourceCounts;
 };

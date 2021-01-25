@@ -7,14 +7,14 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-static void CreateResourceTables(const ICrRenderDevice* renderDevice, const CrShaderReflectionVulkan& vulkanReflection, ICrShaderResourceTable* resourceTable)
+static void CreateBindingTable(const ICrRenderDevice* renderDevice, const CrShaderReflectionVulkan& vulkanReflection, ICrShaderBindingTable* bindingTable)
 {
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 
-	vulkanReflection.ForEachConstantBuffer([&resourceTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
+	vulkanReflection.ForEachConstantBuffer([&bindingTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& constantBuffer)
 	{
 		const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(constantBuffer.name);
-		resourceTable->AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
+		bindingTable->AddConstantBuffer(stage, metadata.id, constantBuffer.bindPoint);
 
 		VkDescriptorSetLayoutBinding layoutBinding;
 		layoutBinding.binding = constantBuffer.bindPoint;
@@ -25,10 +25,10 @@ static void CreateResourceTables(const ICrRenderDevice* renderDevice, const CrSh
 		layoutBindings.push_back(layoutBinding);
 	});
 
-	vulkanReflection.ForEachTexture([&resourceTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
+	vulkanReflection.ForEachTexture([&bindingTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& texture)
 	{
 		const TextureMetadata& metadata = CrShaderMetadata::GetTexture(texture.name);
-		resourceTable->AddTexture(stage, metadata.id, texture.bindPoint);
+		bindingTable->AddTexture(stage, metadata.id, texture.bindPoint);
 
 		VkDescriptorSetLayoutBinding layoutBinding;
 		layoutBinding.binding = texture.bindPoint;
@@ -39,10 +39,10 @@ static void CreateResourceTables(const ICrRenderDevice* renderDevice, const CrSh
 		layoutBindings.push_back(layoutBinding);
 	});
 
-	vulkanReflection.ForEachSampler([&resourceTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
+	vulkanReflection.ForEachSampler([&bindingTable, &layoutBindings](cr3d::ShaderStage::T stage, const CrShaderResource& sampler)
 	{
 		const SamplerMetadata& metadata = CrShaderMetadata::GetSampler(sampler.name);
-		resourceTable->AddSampler(stage, metadata.id, sampler.bindPoint);
+		bindingTable->AddSampler(stage, metadata.id, sampler.bindPoint);
 
 		VkDescriptorSetLayoutBinding layoutBinding;
 		layoutBinding.binding = sampler.bindPoint;
@@ -62,7 +62,7 @@ static void CreateResourceTables(const ICrRenderDevice* renderDevice, const CrSh
 
 	VkResult result = vkCreateDescriptorSetLayout(
 		static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), &descriptorLayout, nullptr, 
-		&static_cast<CrShaderResourceTableVulkan*>(resourceTable)->m_vkDescriptorSetLayout);
+		&static_cast<CrShaderBindingTableVulkan*>(bindingTable)->m_vkDescriptorSetLayout);
 	CrAssert(result == VK_SUCCESS);
 }
 
@@ -92,12 +92,12 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 		vulkanReflection.AddBytecode(shaderBytecode);
 	}
 
-	const CrShaderResourceCount& resourceCount = vulkanReflection.GetShaderResourceCount();
+	const CrShaderBindingCount& resourceCount = vulkanReflection.GetShaderResourceCount();
 
 	// Create the optimized shader resource table
-	m_resourceTable = CrUniquePtr<ICrShaderResourceTable>(new CrShaderResourceTableVulkan(resourceCount));
+	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(new CrShaderBindingTableVulkan(resourceCount));
 
-	CreateResourceTables(renderDevice, vulkanReflection, m_resourceTable.get());
+	CreateBindingTable(renderDevice, vulkanReflection, m_bindingTable.get());
 }
 
 CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
@@ -126,10 +126,10 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice
 	CrShaderReflectionVulkan vulkanReflection;
 	vulkanReflection.AddBytecode(computeShaderDescriptor.m_bytecode);
 
-	const CrShaderResourceCount& resourceCount = vulkanReflection.GetShaderResourceCount();
+	const CrShaderBindingCount& resourceCount = vulkanReflection.GetShaderResourceCount();
 
 	// Create the optimized shader resource table
-	m_resourceTable = CrUniquePtr<ICrShaderResourceTable>(new CrShaderResourceTableVulkan(resourceCount));
+	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(new CrShaderBindingTableVulkan(resourceCount));
 
-	CreateResourceTables(renderDevice, vulkanReflection, m_resourceTable.get());
+	CreateBindingTable(renderDevice, vulkanReflection, m_bindingTable.get());
 }

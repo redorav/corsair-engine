@@ -826,7 +826,7 @@ namespace cr3d
 	};
 }
 
-struct CrShaderResourceCount
+struct CrShaderBindingCount
 {
 	uint8_t constantBuffers = 0;
 	uint8_t samplers = 0;

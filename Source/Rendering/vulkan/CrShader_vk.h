@@ -5,11 +5,11 @@
 
 class ICrRenderDevice;
 
-class CrShaderResourceTableVulkan final : public ICrShaderResourceTable
+class CrShaderBindingTableVulkan final : public ICrShaderBindingTable
 {
 public:
 
-	CrShaderResourceTableVulkan(const CrShaderResourceCount& resourceCount) : ICrShaderResourceTable(resourceCount) {}
+	CrShaderBindingTableVulkan(const CrShaderBindingCount& resourceCount) : ICrShaderBindingTable(resourceCount) {}
 
 	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
 	// The layout is also needed when allocating descriptor sets from a pool.

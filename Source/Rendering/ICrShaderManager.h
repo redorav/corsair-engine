@@ -12,7 +12,7 @@ struct SamplerMetadata;
 
 struct CrBytecodeLoadDescriptor;
 struct CrShaderBytecodeDescriptor;
-class ICrShaderResourceTable;
+class ICrShaderBindingTable;
 
 namespace ConstantBuffers { enum T : uint8_t; }
 namespace Textures { enum T : uint8_t; }

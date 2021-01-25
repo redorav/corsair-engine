@@ -5,7 +5,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-ICrShaderResourceTable::ICrShaderResourceTable(const CrShaderResourceCount& resourceCount)
+ICrShaderBindingTable::ICrShaderBindingTable(const CrShaderBindingCount& resourceCount)
 {
 	// Resize bindings vector and compute relevant offsets
 	uint8_t totalResourceCount = 0;
@@ -26,19 +26,19 @@ ICrShaderResourceTable::ICrShaderResourceTable(const CrShaderResourceCount& reso
 	}
 }
 
-void ICrShaderResourceTable::AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+void ICrShaderBindingTable::AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 {
 	m_bindings[m_constantBufferOffset + m_constantBufferCount] = CrShaderBinding(bindPoint, stage, id);
 	m_constantBufferCount++;
 }
 
-void ICrShaderResourceTable::AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+void ICrShaderBindingTable::AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 {
 	m_bindings[m_textureOffset + m_textureCount] = CrShaderBinding(bindPoint, stage, id);
 	m_textureCount++;
 }
 
-void ICrShaderResourceTable::AddSampler(cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+void ICrShaderBindingTable::AddSampler(cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
 {
 	m_bindings[m_samplerOffset + m_samplerCount] = CrShaderBinding(bindPoint, stage, id);
 	m_samplerCount++;

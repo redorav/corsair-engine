@@ -44,11 +44,11 @@ struct CrShaderBinding
 
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
-class ICrShaderResourceTable
+class ICrShaderBindingTable
 {
 public:
 
-	ICrShaderResourceTable(const CrShaderResourceCount& resourceCount);
+	ICrShaderBindingTable(const CrShaderBindingCount& resourceCount);
 
 	void AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint);
 
@@ -161,14 +161,14 @@ public:
 		return m_hash;
 	}
 
-	const ICrShaderResourceTable& GetResourceTable() const
+	const ICrShaderBindingTable& GetBindingTable() const
 	{
-		return *m_resourceTable.get();
+		return *m_bindingTable.get();
 	}	
 
 protected:
 
-	CrUniquePtr<ICrShaderResourceTable> m_resourceTable;
+	CrUniquePtr<ICrShaderBindingTable> m_bindingTable;
 
 	CrHash m_hash;
 };

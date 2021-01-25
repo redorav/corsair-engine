@@ -183,7 +183,7 @@ private:
 		m_axisInputMap->MapFloat(AxisCode::JoystickR2, m_padId, gainput::PadButtonR2);
 
 		m_axisInputMap->MapFloat(AxisCode::MouseX, m_mouseId, gainput::MouseAxisX);
-		m_axisInputMap->MapFloat(AxisCode::MouseY, m_mouseId, gainput::MouseAxisX);
+		m_axisInputMap->MapFloat(AxisCode::MouseY, m_mouseId, gainput::MouseAxisY);
 	}
 
 	gainput::InputManager m_inputManager;

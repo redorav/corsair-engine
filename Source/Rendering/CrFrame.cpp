@@ -232,7 +232,9 @@ void CrFrame::Process()
 	
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
-	ImGui::Text("Hello ImGui!");
+	//ImGui::Text("Hello ImGui!");
+	static float testF = 0.5f;
+	ImGui::ShowDemoWindow();
 
 	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
 

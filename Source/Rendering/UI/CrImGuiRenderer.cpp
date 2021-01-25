@@ -71,7 +71,6 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 	CrString SHADER_PATH = IN_SRC_PATH;
 	SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
 
-	// TODO: Shaders don't seem to refresh after changing the hlsl code
 	// Load shaders:
 	CrBytecodeLoadDescriptor bytecodeDesc;
 	bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
@@ -122,16 +121,12 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	io.DeltaTime = CrFrameTime::GetFrameDelta();
 
 	// Update input:
-	// Doesn't work.
 	io.MouseDown[0] = CrInput.GetKey(KeyCode::MouseLeft);
 	io.MouseDown[1] = CrInput.GetKey(KeyCode::MouseRight);
 	io.MouseDown[2] = CrInput.GetKey(KeyCode::MouseMiddle);
-	
 	float mx = CrInput.GetAxis(AxisCode::MouseX);
 	float my = CrInput.GetAxis(AxisCode::MouseY);
-
-	CrLog("%f %f \n", mx, my);
-	CrLog("%s \n", io.MouseDown[0] ? "left" : "");
+	io.MousePos = ImVec2(mx * io.DisplaySize.x, my * io.DisplaySize.y);
 
 	ImGui::NewFrame();
 }

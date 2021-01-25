@@ -39,7 +39,6 @@ VS_OUT_UI main_vs(VS_IN_UI IN)
 
 float4 main_ps(VS_OUT_UI IN) : SV_Target0
 {
-	// TODO: gamma correction
 	return UITexture.Sample(UISampleState, IN.uv) * IN.color;
 }
 

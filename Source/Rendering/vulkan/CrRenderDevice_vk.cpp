@@ -512,7 +512,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 		shaderStages[usedShaderStages++] = shaderStageInfo;
 	}
 
-	const CrShaderBindingTableVulkan& resourceTable = static_cast<const CrShaderBindingTableVulkan&>(graphicsShader->GetBindingTable());
+	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(graphicsShader->GetBindingTable());
 
 	// Pipeline Resource Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -520,7 +520,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	pipelineLayoutCreateInfo.pNext = nullptr;
 	pipelineLayoutCreateInfo.flags = 0;
 	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Handle when we have more than one layout
-	pipelineLayoutCreateInfo.pSetLayouts = &resourceTable.m_vkDescriptorSetLayout;
+	pipelineLayoutCreateInfo.pSetLayouts = &bindingTable.m_vkDescriptorSetLayout;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?

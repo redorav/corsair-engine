@@ -32,11 +32,11 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 	// https://stackoverflow.com/questions/14469607/difference-between-open-always-and-create-always-in-createfile-of-windows-api
 	if (openFlags & FileOpenFlags::Create)
 	{
-		dwCreationDisposition = OPEN_EXISTING;
+		dwCreationDisposition = OPEN_ALWAYS;
 	}
 	else if (openFlags & FileOpenFlags::ForceCreate)
 	{
-		dwCreationDisposition = OPEN_ALWAYS;
+		dwCreationDisposition = CREATE_ALWAYS;
 	}
 	else
 	{

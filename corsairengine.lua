@@ -26,19 +26,20 @@ ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
 
 -- Library Directories
-LibVulkan     = DependenciesDirectory..'/vulkan'
-LibEASTL      = DependenciesDirectory..'/eastl'
-LibGlslang    = DependenciesDirectory..'/glslang'
-LibGainput    = DependenciesDirectory..'/gainput'
-LibSPIRVCross = DependenciesDirectory..'/spirv-cross'
-LibHlslpp     = DependenciesDirectory..'/hlslpp'
-LibStb        = DependenciesDirectory..'/stb'
-LibxxHash     = DependenciesDirectory..'/xxHash'
-LibAssimp     = DependenciesDirectory..'/assimp'
-LibArgh       = DependenciesDirectory..'/argh'
-LibHalf       = DependenciesDirectory..'/half'
-LibDdspp      = DependenciesDirectory..'/ddspp'
-LibSDL2       = DependenciesDirectory..'/sdl2'
+LibVulkan       = DependenciesDirectory..'/vulkan'
+LibEASTL        = DependenciesDirectory..'/eastl'
+LibGlslang      = DependenciesDirectory..'/glslang'
+LibGainput      = DependenciesDirectory..'/gainput'
+LibSPIRVCross   = DependenciesDirectory..'/spirv-cross'
+LibHlslpp       = DependenciesDirectory..'/hlslpp'
+LibStb          = DependenciesDirectory..'/stb'
+LibxxHash       = DependenciesDirectory..'/xxHash'
+LibAssimp       = DependenciesDirectory..'/assimp'
+LibArgh         = DependenciesDirectory..'/argh'
+LibHalf         = DependenciesDirectory..'/half'
+LibDdspp        = DependenciesDirectory..'/ddspp'
+LibSDL2         = DependenciesDirectory..'/sdl2'
+LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 
 LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
 
@@ -97,6 +98,10 @@ end
 function AddSDL2Library()
 	AddLibrary(LibSDL2..'/Source/include', LibSDL2..BinaryDirectory, 'SDL2')
 	defines { 'SDL_MAIN_HANDLED' }
+end
+
+function AddSpirvReflectLibrary()
+	AddLibrary(LibSPIRVReflect..'/Source', LibSPIRVReflect..BinaryDirectory, 'SPIRV-Reflect'..LibConfig)
 end
 
 function ExcludePlatformSpecificCode(rootPath)
@@ -317,8 +322,9 @@ project(ProjectCrRendering)
 	links { ProjectCrImage } -- TODO Delete
 
 	AddAssimpLibrary()
-	AddSpirvCrossLibrary()
-	AddGainputLibrary() -- TODO remove
+	AddSpirvCrossLibrary() -- TODO Remove
+	AddSpirvReflectLibrary()
+	AddGainputLibrary() -- TODO Remove
 	
 	filter { 'platforms:'..VulkanWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
@@ -385,6 +391,7 @@ project(ProjectShaderCompiler)
 	links { ProjectCrCore }
 
 	AddSpirvCrossLibrary()
+	AddSpirvReflectLibrary()
 	AddGlslangLibrary()
 
 	-- Copy the shader compiler into a known directory

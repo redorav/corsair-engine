@@ -303,9 +303,11 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescri
 		return false;
 	}
 
+	const glslang::TIntermediate* intermediate = program.getIntermediate(stage);
+
 	// Generate the SPIR-V bytecode
 	spv::SpvBuildLogger logger;
-	glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBytecode, &logger);
+	glslang::GlslangToSpv(*intermediate, spirvBytecode, &logger);
 
 	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format

@@ -33,17 +33,8 @@ project (ProjectName)
 
 	files
 	{
-		"Source/*.cpp",
-		"Source/*.hpp",
-		"Source/*.h",
-		"Source/include/**.hpp",
+		"Source/spirv_reflect.c",
+		"Source/spirv_reflect.h",
 	}
-	
-	removefiles
-	{
-		"Source/main.cpp" -- Remove main or it will 'run' in the background!
-	}
-	
-	defines { "SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS" }
-	
+
 	filter { "configurations:*" } -- Workaround for MacOS nil in cfg

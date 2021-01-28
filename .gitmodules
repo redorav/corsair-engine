@@ -13,9 +13,6 @@
 [submodule "Dependencies/hlslpp/Source"]
 	path = Dependencies/hlslpp/Source
 	url = https://github.com/redorav/hlslpp
-[submodule "Dependencies/spirv-cross/Source"]
-	path = Dependencies/spirv-cross/Source
-	url = https://github.com/KhronosGroup/SPIRV-Cross
 [submodule "Dependencies/stb/Source"]
 	path = Dependencies/stb/Source
 	url = https://github.com/nothings/stb

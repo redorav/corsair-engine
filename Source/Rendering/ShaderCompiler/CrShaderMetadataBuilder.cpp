@@ -139,12 +139,12 @@ struct HLSLResources
 				}
 				case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 				{
-					buffers.push_back(binding);
+					dataBuffers.push_back(binding);
 					break;
 				}
 				case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 				{
-					rwBuffers.push_back(binding);
+					rwDataBuffers.push_back(binding);
 					break;
 				}
 				default:
@@ -161,6 +161,8 @@ struct HLSLResources
 	std::vector<SpvReflectDescriptorBinding> rwTextures;
 	std::vector<SpvReflectDescriptorBinding> buffers;
 	std::vector<SpvReflectDescriptorBinding> rwBuffers;
+	std::vector<SpvReflectDescriptorBinding> dataBuffers;
+	std::vector<SpvReflectDescriptorBinding> rwDataBuffers;
 
 	//std::vector<SpvReflectDescriptorBinding> stageInputs;
 	//std::vector<SpvReflectDescriptorBinding> stageOutputs;
@@ -210,7 +212,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 
 	metadataHeader += BuildBufferMetadataHeader(resources);
 
-	//metadataHeader += BuildRWBufferMetadataHeader(resources);
+	metadataHeader += BuildRWBufferMetadataHeader(resources);
 
 	//metadataHeader += "}\n";
 
@@ -237,6 +239,10 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 	metadataCpp += BuildTextureMetadataCpp(resources);
 
 	metadataCpp += BuildRWTextureMetadataCpp(resources);
+
+	metadataCpp += BuildBufferMetadataCpp(resources);
+
+	metadataCpp += BuildRWBufferMetadataCpp(resources);
 
 	return true;
 }
@@ -654,12 +660,97 @@ std::string CrShaderMetadataBuilder::BuildBufferMetadataHeader(const HLSLResourc
 
 	result += PrintResourceEnum("Buffer", resources.buffers);
 
-	//result += PrintSamplerMetadataStructDeclaration();
+	result += PrintBufferMetadataStructDeclaration();
 
-	//result += PrintResourceMetadataInstanceDeclaration("Sampler", resources.separate_samplers);
+	result += PrintResourceMetadataInstanceDeclaration("Buffer", resources.buffers);
 
-	//result += "extern CrHashMap<CrString, SamplerMetadata&> SamplerTable;\n\n";
+	result += "extern CrHashMap<CrString, BufferMetadata&> BufferTable;\n\n";
 
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildBufferMetadataCpp(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += BufferSection;
+
+	result += PrintBufferMetadataInstanceDefinition(resources.buffers);
+
+	result += PrintResourceHashmap("Buffer", resources.buffers);
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::PrintBufferMetadataInstanceDefinition(const ResourceVector& buffers)
+{
+	std::string result;
+	for (const auto& buffer : buffers)
+	{
+		result += "BufferMetadata " + std::string(buffer.name) + "MetaInstance(" + "Buffers::" + std::string(buffer.name) + ");\n";
+	}
+	result += "BufferMetadata InvalidBufferMetaInstance(UINT32_MAX);\n";
+	return result + "\n";
+}
+
+std::string CrShaderMetadataBuilder::PrintBufferMetadataStructDeclaration()
+{
+	std::string result = "struct BufferMetadata" \
+		"\n{\n" \
+		"\tBufferMetadata(uint32_t id) : id(static_cast<Buffers::T>(id)) {}\n" \
+		"\tconst Buffers::T id;\n" \
+		"};\n\n";
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildRWBufferMetadataHeader(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += BufferSection;
+
+	result += PrintResourceEnum("RWBuffer", resources.rwBuffers);
+
+	result += PrintRWBufferMetadataStructDeclaration();
+
+	result += PrintResourceMetadataInstanceDeclaration("RWBuffer", resources.rwBuffers);
+
+	result += "extern CrHashMap<CrString, RWBufferMetadata&> RWBufferTable;\n\n";
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildRWBufferMetadataCpp(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += RWBufferSection;
+
+	result += PrintRWBufferMetadataInstanceDefinition(resources.rwBuffers);
+
+	result += PrintResourceHashmap("RWBuffer", resources.rwBuffers);
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::PrintRWBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers)
+{
+	std::string result;
+	for (const auto& rwBuffer : rwBuffers)
+	{
+		result += "RWBufferMetadata " + std::string(rwBuffer.name) + "MetaInstance(" + "RWBuffers::" + std::string(rwBuffer.name) + ");\n";
+	}
+	result += "RWBufferMetadata InvalidRWBufferMetaInstance(UINT32_MAX);\n";
+	return result + "\n";
+}
+
+std::string CrShaderMetadataBuilder::PrintRWBufferMetadataStructDeclaration()
+{
+	std::string result = "struct RWBufferMetadata" \
+		"\n{\n" \
+		"\tRWBufferMetadata(uint32_t id) : id(static_cast<RWBuffers::T>(id)) {}\n" \
+		"\tconst RWBuffers::T id;\n" \
+		"};\n\n";
 	return result;
 }
 

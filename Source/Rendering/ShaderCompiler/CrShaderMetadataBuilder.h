@@ -77,6 +77,18 @@ private:
 	//--------
 
 	static std::string BuildBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintBufferMetadataInstanceDefinition(const ResourceVector& buffers);
+	static std::string PrintBufferMetadataStructDeclaration();
+
+	//-----------
+	// RW Buffers
+	//-----------
+
+	static std::string BuildRWBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildRWBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintRWBufferMetadataInstanceDefinition(const ResourceVector& rwTextures);
+	static std::string PrintRWBufferMetadataStructDeclaration();
 
 	static void WriteToFile(const std::string& filename, const std::string& text);
 

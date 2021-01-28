@@ -73,11 +73,6 @@ function AddXinputLibrary()
 	AddLibrary('', '', 'Xinput9_1_0')
 end
 
-function AddSpirvCrossLibrary()
-	AddLibrary({ LibSPIRVCross..'/Source', LibSPIRVCross..'/Source/include' }, LibSPIRVCross..BinaryDirectory, 'SPIRV-Cross'..LibConfig)
-	defines { 'SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS' }
-end
-
 function AddGlslangLibrary()
 	AddLibrary({ LibGlslang..'/Source/' }, LibGlslang..BinaryDirectory, 'Glslang'..LibConfig)
 end
@@ -322,7 +317,6 @@ project(ProjectCrRendering)
 	links { ProjectCrImage } -- TODO Delete
 
 	AddAssimpLibrary()
-	AddSpirvCrossLibrary() -- TODO Remove
 	AddSpirvReflectLibrary()
 	AddGainputLibrary() -- TODO Remove
 	
@@ -390,7 +384,6 @@ project(ProjectShaderCompiler)
 	
 	links { ProjectCrCore }
 
-	AddSpirvCrossLibrary()
 	AddSpirvReflectLibrary()
 	AddGlslangLibrary()
 

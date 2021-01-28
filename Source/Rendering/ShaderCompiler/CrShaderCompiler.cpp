@@ -19,10 +19,6 @@
 #pragma warning (push, 0)
 // Glslang
 #include <glslang/Public/ShaderLang.h>
-
-// SPIR-V
-#include <spirv_cross.hpp>
-#include <spirv_cpp.hpp>
 #pragma warning (pop)
 
 #include "Core/FileSystem/CrFileSystem.h"

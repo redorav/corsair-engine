@@ -42,19 +42,26 @@ struct CrShaderBinding
 	};
 };
 
+struct CrShaderBindingTableResources
+{
+	CrFixedVector<CrShaderBinding, 64> constantBuffers;
+	CrFixedVector<CrShaderBinding, 64> samplers;
+	CrFixedVector<CrShaderBinding, 64> textures;
+	CrFixedVector<CrShaderBinding, 64> rwTextures;
+
+	CrFixedVector<CrShaderBinding, 64> storageBuffers;
+	CrFixedVector<CrShaderBinding, 64> rwStorageBuffers;
+	CrFixedVector<CrShaderBinding, 64> dataBuffers;
+	CrFixedVector<CrShaderBinding, 64> rwDataBuffers;
+};
+
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
 class ICrShaderBindingTable
 {
 public:
 
-	ICrShaderBindingTable(const CrShaderBindingCount& resourceCount);
-
-	void AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint);
-
-	void AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint);
-
-	void AddSampler(cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint);
+	ICrShaderBindingTable(const CrShaderBindingTableResources& resources);
 
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 

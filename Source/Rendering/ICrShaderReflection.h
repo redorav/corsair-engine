@@ -16,6 +16,7 @@ public:
 
 	const char* name = nullptr;
 	bindpoint_t bindPoint = 0;
+	cr3d::ShaderResourceType::T type = cr3d::ShaderResourceType::Count;
 
 	static CrShaderResource Invalid;
 };
@@ -32,18 +33,5 @@ public:
 
 	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) = 0;
 
-	virtual void ForEachConstantBuffer(ShaderReflectionFn fn) const = 0;
-
-	virtual void ForEachTexture(ShaderReflectionFn fn) const = 0;
-
-	virtual void ForEachSampler(ShaderReflectionFn fn) const = 0;
-
-	const CrShaderBindingCount& GetShaderResourceCount()
-	{
-		return m_resourceCounts;
-	}
-
-protected:
-
-	CrShaderBindingCount m_resourceCounts;
+	virtual void ForEachResource(ShaderReflectionFn fn) const = 0;
 };

@@ -10,10 +10,6 @@
 // Glslang
 #include <glslang/Public/ShaderLang.h>
 #include <SPIRV/GlslangToSpv.h>
-
-// SPIR-V
-#include <spirv_cross.hpp>
-#include <spirv_cpp.hpp>
 #pragma warning (pop)
 
 #include "Core/FileSystem/CrFileSystem.h"

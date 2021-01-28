@@ -416,16 +416,20 @@ namespace cr3d
 		};
 	};
 
+	// It's hard to map certain resources between different APIs, including the usage that is later done in the API
+	// so this list caters for things that are common enough that it isn't complicated to map either
+	// For example, the RW prefix caters for D3D's way of having resource views (SRV for read-only and UAV for RW)
+	// but this list doesn't cover ByteBuffers or Append as they fall under the umbrella of Storage Buffer
 	namespace ShaderResourceType
 	{
 		enum T : uint8_t
 		{
 			ConstantBuffer,
-			Texture,
 			Sampler,
-			RWStructuredBuffer,
-			ROStructuredBuffer,
+			Texture,
 			RWTexture,
+			StorageBuffer, // StorageBuffers include HLSL StructuredBuffer and ByteBuffer
+			RWStorageBuffer,
 			DataBuffer,
 			RWDataBuffer,
 			Count,
@@ -825,13 +829,6 @@ namespace cr3d
 		Error // If some error occurred
 	};
 }
-
-struct CrShaderBindingCount
-{
-	uint8_t constantBuffers = 0;
-	uint8_t samplers = 0;
-	uint8_t textures = 0;
-};
 
 struct CrViewport
 {

@@ -28,8 +28,8 @@ private:
 	static std::string PrintResourceMetadataInstanceDeclaration(const std::string& resourceType, const ResourceVector& uniformBuffers);
 
 	// Builds the enum with all the resources
-	static std::string PrintResourceEnum(const std::string& resourceType, const ResourceVector& resources);
-	static std::string PrintResourceHashmap(const std::string& resourceType, const ResourceVector& resources);
+	static std::string PrintResourceEnum(const std::string& resourceTypeName, const ResourceVector& resources);
+	static std::string PrintResourceHashmap(const std::string& resourceTypeName, const ResourceVector& resources);
 
 	// Prints out the struct or built-in as it comes from the reflection information
 	static std::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const std::string& memberName, const std::string& indentation);
@@ -46,15 +46,6 @@ private:
 	static std::string PrintConstantBufferMetadataInstanceDefinition(const ResourceVector& uniformBuffers);
 
 	//---------
-	// Textures
-	//---------
-
-	static std::string BuildTextureMetadataHeader(const HLSLResources& resources);
-	static std::string BuildTextureMetadataCpp(const HLSLResources& resources);
-	static std::string PrintTextureMetadataInstanceDefinition(const ResourceVector& textures);
-	static std::string PrintTextureMetadataStructDeclaration();
-
-	//---------
 	// Samplers
 	//---------
 
@@ -63,11 +54,23 @@ private:
 	static std::string PrintSamplerMetadataInstanceDefinition(const ResourceVector& samplers);
 	static std::string PrintSamplerMetadataStructDeclaration();
 
+	//---------
+	// Textures
+	//---------
+
+	static std::string BuildTextureMetadataHeader(const HLSLResources& resources);
+	static std::string BuildTextureMetadataCpp(const HLSLResources& resources);
+	static std::string PrintTextureMetadataInstanceDefinition(const ResourceVector& textures);
+	static std::string PrintTextureMetadataStructDeclaration();
+
 	//------------
 	// RW Textures
 	//------------
 
 	static std::string BuildRWTextureMetadataHeader(const HLSLResources& resources);
+	static std::string BuildRWTextureMetadataCpp(const HLSLResources& resources);
+	static std::string PrintRWTextureMetadataInstanceDefinition(const ResourceVector& rwTextures);
+	static std::string PrintRWTextureMetadataStructDeclaration();
 
 	//--------
 	// Buffers

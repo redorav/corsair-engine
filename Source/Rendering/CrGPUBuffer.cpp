@@ -4,18 +4,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrGPUBufferDescriptor::CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride)
-	: usage(usage), access(access), numElements(numElements), stride(stride), size(numElements * stride)
-{
-
-}
-
-CrGPUBufferDescriptor::CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
-	: usage(usage), access(access), size(size), numElements(1), stride(size)
-{
-
-}
-
 ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
 {
 	access = descriptor.access;

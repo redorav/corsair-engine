@@ -13,9 +13,11 @@
 
 struct CrGPUBufferDescriptor
 {
-	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride);
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride)
+		: usage(usage), access(access), numElements(numElements), stride(stride), size(numElements* stride) {}
 
-	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size);
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
+		: usage(usage), access(access), size(size), numElements(1), stride(size) {}
 
 	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
 
@@ -159,25 +161,22 @@ class CrGPUBufferType : public CrGPUBuffer
 {
 public:
 
-	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& params);
+	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor)
+		: CrGPUBuffer(renderDevice, descriptor)
+	{
+		// TODO Fix this. The size needs to come from the Metatype and not the params structure that was passed in. This means
+		// refactoring some stuff
+		//CrGPUBufferCreateParams bufferParams(params.usage, params.access, sizeof(MetaType));
+		//bufferParams.
+		//CrGPUBuffer(renderDevice, params);
+		m_globalIndex = MetaType::index;
+	}
 
 	MetaType* Lock()
 	{
 		return static_cast<MetaType*>(CrGPUBuffer::Lock());
 	}
 };
-
-template<typename MetaType>
-inline CrGPUBufferType<MetaType>::CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& params) 
-	: CrGPUBuffer(renderDevice, params)
-{
-	// TODO Fix this. The size needs to come from the Metatype and not the params structure that was passed in. This means
-	// refactoring some stuff
-	//CrGPUBufferCreateParams bufferParams(params.usage, params.access, sizeof(MetaType));
-	//bufferParams.
-	//CrGPUBuffer(renderDevice, params);
-	m_globalIndex = MetaType::index;
-}
 
 //--------------
 // Vertex Buffer

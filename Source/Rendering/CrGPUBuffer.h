@@ -11,9 +11,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-class ICrRenderDevice;
-class ICrHardwareGPUBuffer;
-
 struct CrGPUBufferDescriptor
 {
 	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride);
@@ -260,8 +257,6 @@ public:
 
 	CrVertexDescriptor m_vertexDescriptor;
 };
-
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
 
 template<typename Struct>
 class CrVertexBuffer : public CrVertexBufferCommon

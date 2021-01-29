@@ -81,62 +81,14 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 	vkFreeCommandBuffers(m_vkDevice, commandQueueVulkan->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
 }
 
-void CrCommandBufferVulkan::FlushRenderStatePS()
+// TODO This should become CreateShaderResourceTable and should be cached, reused, etc
+// The ShaderResourceTable is a collection of resources that can be instantly bound to
+// a shader without any checks or validation of any sort. This needs to be thought out
+// properly because if these tables persist across frames, they should have the same
+// lifetime as the resources they contain
+void CrCommandBufferVulkan::UpdateResourceTableVulkan
+(const CrShaderBindingTableVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout)
 {
-	if (m_currentState.m_indexBufferDirty)
-	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer->GetHardwareBuffer());
-		vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanGPUBuffer->GetVkIndexType());
-		m_currentState.m_indexBufferDirty = false;
-	}
-
-	if (m_currentState.m_vertexBufferDirty)
-	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_vertexBuffer->GetHardwareBuffer());
-
-		VkDeviceSize offsets[1] = { 0 };
-		uint32_t bindPoint = 0;
-		// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
-		// TODO Number of vertex shaders to be able to have several vertex streams ??
-		// TODO Make sure function accepts multiple vertex buffers
-		const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
-		vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
-
-		m_currentState.m_vertexBufferDirty = false;
-	}
-
-	if (m_currentState.m_scissorDirty)
-	{
-		const CrScissor& scissor = m_currentState.m_scissor;
-		VkRect2D vkRect2D = { { (int32_t)scissor.x, (int32_t)scissor.y }, { scissor.width, scissor.height } };
-		vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &vkRect2D);
-		m_currentState.m_scissorDirty = false;
-	}
-
-	if (m_currentState.m_viewportDirty)
-	{
-		const CrViewport& viewport = m_currentState.m_viewport;
-
-		// TODO Be able to set multiple viewports
-		VkViewport vkViewport =
-		{
-			viewport.x,
-			viewport.y + viewport.height,
-			viewport.width,
-			-viewport.height, // Requires VK_KHR_maintenance1. For easier compatibility with D3D
-			viewport.minDepth,
-			viewport.maxDepth
-		};
-
-		vkCmdSetViewport(m_vkCommandBuffer, 0, 1, &vkViewport);
-
-		m_currentState.m_viewportDirty = false;
-	}
-
-	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
-	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
-
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
 	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -218,9 +170,76 @@ void CrCommandBufferVulkan::FlushRenderStatePS()
 	vkUpdateDescriptorSets(m_vkDevice, descriptorCount, writeDescriptorSets.data(), 0, nullptr);
 
 	// Bind descriptor sets describing shader binding points
-	// TODO The bind point depends on the currently bound shader or pipeline, don't just assume graphics here!
 	// TODO We need an abstraction of a resource table, so that we can build it somewhere else, and simply bind it when we need to
-	vkCmdBindDescriptorSets(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout, 0, 1, &descriptorSet, bufferCount, offsets.data());
+	vkCmdBindDescriptorSets(m_vkCommandBuffer, vkPipelineBindPoint, vkPipelineLayout, 0, 1, &descriptorSet, bufferCount, offsets.data());
+}
+
+void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
+{
+	if (m_currentState.m_indexBufferDirty)
+	{
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer->GetHardwareBuffer());
+		vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanGPUBuffer->GetVkIndexType());
+		m_currentState.m_indexBufferDirty = false;
+	}
+
+	if (m_currentState.m_vertexBufferDirty)
+	{
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_vertexBuffer->GetHardwareBuffer());
+
+		VkDeviceSize offsets[1] = { 0 };
+		uint32_t bindPoint = 0;
+		// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
+		// TODO Number of vertex shaders to be able to have several vertex streams ??
+		// TODO Make sure function accepts multiple vertex buffers
+		const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
+		vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
+
+		m_currentState.m_vertexBufferDirty = false;
+	}
+
+	if (m_currentState.m_scissorDirty)
+	{
+		const CrScissor& scissor = m_currentState.m_scissor;
+		VkRect2D vkRect2D = { { (int32_t)scissor.x, (int32_t)scissor.y }, { scissor.width, scissor.height } };
+		vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &vkRect2D);
+		m_currentState.m_scissorDirty = false;
+	}
+
+	if (m_currentState.m_viewportDirty)
+	{
+		const CrViewport& viewport = m_currentState.m_viewport;
+
+		// TODO Be able to set multiple viewports
+		VkViewport vkViewport =
+		{
+			viewport.x,
+			viewport.y + viewport.height,
+			viewport.width,
+			-viewport.height, // Requires VK_KHR_maintenance1. For easier compatibility with D3D
+			viewport.minDepth,
+			viewport.maxDepth
+		};
+
+		vkCmdSetViewport(m_vkCommandBuffer, 0, 1, &vkViewport);
+
+		m_currentState.m_viewportDirty = false;
+	}
+
+	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
+	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
+	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
+
+	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);
+}
+
+void CrCommandBufferVulkan::FlushComputeRenderStatePS()
+{
+	const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
+	const CrComputeShaderHandle& currentComputeShader = vulkanComputePipeline->m_shader;
+	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentComputeShader->GetBindingTable());
+
+	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
 }
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)

@@ -57,11 +57,15 @@ private:
 
 	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
 
-	virtual void FlushRenderStatePS() override;
+	virtual void FlushGraphicsRenderStatePS() override;
+
+	virtual void FlushComputeRenderStatePS() override;
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
 	virtual void EndRenderPassPS() override;
+
+	void UpdateResourceTableVulkan(const CrShaderBindingTableVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout);
 
 	VkDevice m_vkDevice;
 

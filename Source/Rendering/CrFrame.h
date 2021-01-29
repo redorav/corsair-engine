@@ -5,12 +5,6 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-class CrVertexBufferCommon;
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
-
-class CrIndexBufferCommon;
-using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
-
 class CrRenderModel;
 using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 

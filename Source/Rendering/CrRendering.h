@@ -789,13 +789,13 @@ namespace cr3d
 	{
 		enum T : uint8_t
 		{
-			Constant = 1 << 0,
-			Vertex = 1 << 1,
-			Index = 1 << 2,
+			Constant   = 1 << 0,
+			Vertex     = 1 << 1,
+			Index      = 1 << 2,
 			Structured = 1 << 3,
-			Data = 1 << 4,
-			Byte = 1 << 5,
-			Indirect = 1 << 6,
+			Data       = 1 << 4,
+			Byte       = 1 << 5,
+			Indirect   = 1 << 6,
 
 			// Compound
 			Storage = Structured | Byte,

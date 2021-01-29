@@ -95,7 +95,9 @@ protected:
 
 	virtual void EndRenderPassPS() = 0;
 
-	virtual void FlushRenderStatePS() = 0;
+	virtual void FlushGraphicsRenderStatePS() = 0;
+
+	virtual void FlushComputeRenderStatePS() = 0;
 
 	CrGPUBufferDescriptor AllocateConstantBufferParameters(uint32_t size);
 
@@ -206,27 +208,21 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	//UpdateGraphicsPipelineState();
-
-	FlushRenderStatePS(); // TODO Put in platform-independent code
+	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	//UpdateGraphicsPipelineState();
-
-	FlushRenderStatePS(); // TODO Put in platform-independent code
+	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	//UpdateComputePipelineState();
-
-	FlushRenderStatePS(); // TODO Put in platform-independent code
+	FlushComputeRenderStatePS(); // TODO Put in platform-independent code
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }

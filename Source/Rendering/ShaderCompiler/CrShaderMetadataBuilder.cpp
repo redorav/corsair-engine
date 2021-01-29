@@ -214,6 +214,10 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 
 	metadataHeader += BuildRWBufferMetadataHeader(resources);
 
+	metadataHeader += BuildDataBufferMetadataHeader(resources);
+
+	metadataHeader += BuildRWDataBufferMetadataHeader(resources);
+
 	//metadataHeader += "}\n";
 
 	//---------------
@@ -243,6 +247,10 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 	metadataCpp += BuildBufferMetadataCpp(resources);
 
 	metadataCpp += BuildRWBufferMetadataCpp(resources);
+
+	metadataCpp += BuildDataBufferMetadataCpp(resources);
+
+	metadataCpp += BuildRWDataBufferMetadataCpp(resources);
 
 	return true;
 }
@@ -750,6 +758,108 @@ std::string CrShaderMetadataBuilder::PrintRWBufferMetadataStructDeclaration()
 		"\n{\n" \
 		"\tRWBufferMetadata(uint32_t id) : id(static_cast<RWBuffers::T>(id)) {}\n" \
 		"\tconst RWBuffers::T id;\n" \
+		"};\n\n";
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildDataBufferMetadataHeader(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += DataBufferSection;
+
+	result += PrintResourceEnum("DataBuffer", resources.dataBuffers);
+
+	result += PrintDataBufferMetadataStructDeclaration();
+
+	result += PrintResourceMetadataInstanceDeclaration("DataBuffer", resources.dataBuffers);
+
+	result += "extern CrHashMap<CrString, DataBufferMetadata&> DataBufferTable;\n\n";
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildDataBufferMetadataCpp(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += DataBufferSection;
+
+	result += PrintDataBufferMetadataInstanceDefinition(resources.dataBuffers);
+
+	result += PrintResourceHashmap("DataBuffer", resources.dataBuffers);
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers)
+{
+	std::string result;
+	for (const auto& dataBuffer : dataBuffers)
+	{
+		result += "DataBufferMetadata " + std::string(dataBuffer.name) + "MetaInstance(" + "DataBuffers::" + std::string(dataBuffer.name) + ");\n";
+	}
+	result += "DataBufferMetadata InvalidDataBufferMetaInstance(UINT32_MAX);\n";
+	return result + "\n";
+}
+
+std::string CrShaderMetadataBuilder::PrintDataBufferMetadataStructDeclaration()
+{
+	std::string result = "struct DataBufferMetadata" \
+		"\n{\n" \
+		"\tDataBufferMetadata(uint32_t id) : id(static_cast<DataBuffers::T>(id)) {}\n" \
+		"\tconst DataBuffers::T id;\n" \
+		"};\n\n";
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildRWDataBufferMetadataHeader(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += RWDataBufferSection;
+
+	result += PrintResourceEnum("RWDataBuffer", resources.rwDataBuffers);
+
+	result += PrintRWDataBufferMetadataStructDeclaration();
+
+	result += PrintResourceMetadataInstanceDeclaration("RWDataBuffer", resources.rwDataBuffers);
+
+	result += "extern CrHashMap<CrString, RWDataBufferMetadata&> RWDataBufferTable;\n\n";
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::BuildRWDataBufferMetadataCpp(const HLSLResources& resources)
+{
+	std::string result;
+
+	result += RWDataBufferSection;
+
+	result += PrintRWDataBufferMetadataInstanceDefinition(resources.rwDataBuffers);
+
+	result += PrintResourceHashmap("RWDataBuffer", resources.rwDataBuffers);
+
+	return result;
+}
+
+std::string CrShaderMetadataBuilder::PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers)
+{
+	std::string result;
+	for (const auto& rwDataBuffer : rwDataBuffers)
+	{
+		result += "RWDataBufferMetadata " + std::string(rwDataBuffer.name) + "MetaInstance(" + "RWDataBuffers::" + std::string(rwDataBuffer.name) + ");\n";
+	}
+	result += "RWDataBufferMetadata InvalidRWDataBufferMetaInstance(UINT32_MAX);\n";
+	return result + "\n";
+}
+
+std::string CrShaderMetadataBuilder::PrintRWDataBufferMetadataStructDeclaration()
+{
+	std::string result = "struct RWDataBufferMetadata" \
+		"\n{\n" \
+		"\tRWDataBufferMetadata(uint32_t id) : id(static_cast<RWDataBuffers::T>(id)) {}\n" \
+		"\tconst RWDataBuffers::T id;\n" \
 		"};\n\n";
 	return result;
 }

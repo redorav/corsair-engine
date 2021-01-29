@@ -81,8 +81,58 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 	vkFreeCommandBuffers(m_vkDevice, commandQueueVulkan->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
 }
 
-void CrCommandBufferVulkan::UpdateResourceTablesPS()
+void CrCommandBufferVulkan::FlushRenderStatePS()
 {
+	if (m_currentState.m_indexBufferDirty)
+	{
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer->GetHardwareBuffer());
+		vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanGPUBuffer->GetVkIndexType());
+		m_currentState.m_indexBufferDirty = false;
+	}
+
+	if (m_currentState.m_vertexBufferDirty)
+	{
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_vertexBuffer->GetHardwareBuffer());
+
+		VkDeviceSize offsets[1] = { 0 };
+		uint32_t bindPoint = 0;
+		// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
+		// TODO Number of vertex shaders to be able to have several vertex streams ??
+		// TODO Make sure function accepts multiple vertex buffers
+		const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
+		vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
+
+		m_currentState.m_vertexBufferDirty = false;
+	}
+
+	if (m_currentState.m_scissorDirty)
+	{
+		const CrScissor& scissor = m_currentState.m_scissor;
+		VkRect2D vkRect2D = { { (int32_t)scissor.x, (int32_t)scissor.y }, { scissor.width, scissor.height } };
+		vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &vkRect2D);
+		m_currentState.m_scissorDirty = false;
+	}
+
+	if (m_currentState.m_viewportDirty)
+	{
+		const CrViewport& viewport = m_currentState.m_viewport;
+
+		// TODO Be able to set multiple viewports
+		VkViewport vkViewport =
+		{
+			viewport.x,
+			viewport.y + viewport.height,
+			viewport.width,
+			-viewport.height, // Requires VK_KHR_maintenance1. For easier compatibility with D3D
+			viewport.minDepth,
+			viewport.maxDepth
+		};
+
+		vkCmdSetViewport(m_vkCommandBuffer, 0, 1, &vkViewport);
+
+		m_currentState.m_viewportDirty = false;
+	}
+
 	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
 	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());

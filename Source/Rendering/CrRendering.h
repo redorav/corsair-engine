@@ -830,14 +830,48 @@ namespace cr3d
 	};
 }
 
+struct CrScissor
+{
+	CrScissor() : x(0), y(0), width(0), height(0) {}
+
+	CrScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
+
+	bool operator == (const CrScissor& scissor)
+	{
+		return x == scissor.x && y == scissor.y && width == scissor.width && height == scissor.height;
+	}
+
+	bool operator != (const CrScissor& scissor)
+	{
+		return !(*this == scissor);
+	}
+
+	uint32_t x;
+	uint32_t y;
+	uint32_t width;
+	uint32_t height;
+};
+
 struct CrViewport
 {
+	CrViewport() : x(0.0f), y(0.0f), width(1.0f), height(1.0f), minDepth(0.0f), maxDepth(1.0f) {}
+
 	CrViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
 		: x(x), y(y), width(width), height(height), minDepth(minDepth), maxDepth(maxDepth)
 	{}
 
 	CrViewport(float x, float y, float width, float height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
 	{}
+
+	bool operator == (const CrViewport& viewport)
+	{
+		return x == viewport.x && y == viewport.y && width == viewport.width && height == viewport.height;
+	}
+
+	bool operator != (const CrViewport& viewport)
+	{
+		return !(*this == viewport);
+	}
 
 	float x;
 	float y;

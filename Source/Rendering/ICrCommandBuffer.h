@@ -24,7 +24,7 @@ public:
 
 	void SetViewport(const CrViewport& viewport);
 
-	void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+	void SetScissor(const CrScissor& scissor);
 
 	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer);
 	
@@ -73,14 +73,6 @@ protected:
 
 	virtual void EndPS() = 0;
 
-	virtual void SetViewportPS(const CrViewport& viewport) = 0;
-
-	virtual void SetScissorPS(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
-
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) = 0;
-
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) = 0;
-
 	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline) = 0;
 
 	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) = 0;
@@ -103,7 +95,7 @@ protected:
 
 	virtual void EndRenderPassPS() = 0;
 
-	virtual void UpdateResourceTablesPS() = 0;
+	virtual void FlushRenderStatePS() = 0;
 
 	CrGPUBufferDescriptor AllocateConstantBufferParameters(uint32_t size);
 
@@ -124,12 +116,21 @@ protected:
 			return m_constantBuffers[stage][id];
 		}
 
-		const CrIndexBufferCommon*		m_indexBuffer;
-		const CrVertexBufferCommon*		m_vertexBuffer;
+		const CrIndexBufferCommon*      m_indexBuffer;
+		bool                            m_indexBufferDirty = true;
 
-		CrGraphicsPipelineDescriptor	m_graphicsPipelineDescriptor;
-		const ICrGraphicsPipeline*		m_graphicsPipeline;
-		const ICrComputePipeline*		m_computePipeline;
+		const CrVertexBufferCommon*     m_vertexBuffer;
+		bool                            m_vertexBufferDirty = true;
+
+		CrScissor                       m_scissor;
+		bool                            m_scissorDirty = true;
+
+		CrViewport                      m_viewport;
+		bool                            m_viewportDirty = true;
+
+		CrGraphicsPipelineDescriptor    m_graphicsPipelineDescriptor;
+		const ICrGraphicsPipeline*      m_graphicsPipeline;
+		const ICrComputePipeline*       m_computePipeline;
 
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
@@ -148,30 +149,38 @@ protected:
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
 {
-	// TODO Move to flush
-	SetViewportPS(viewport);
+	if (m_currentState.m_viewport != viewport)
+	{
+		m_currentState.m_viewport = viewport;
+		m_currentState.m_viewportDirty = true;
+	}
 }
 
-inline void ICrCommandBuffer::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
 {
-	// TODO Move to flush
-	SetScissorPS(x, y, width, height);
+	if (m_currentState.m_scissor != scissor)
+	{
+		m_currentState.m_scissor = scissor;
+		m_currentState.m_scissorDirty = true;
+	}
 }
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBuffer)
 {
-	m_currentState.m_indexBuffer = indexBuffer;
-
-	// TODO Move to flush
-	BindIndexBufferPS(indexBuffer->GetHardwareBuffer());
+	if (m_currentState.m_indexBuffer != indexBuffer)
+	{
+		m_currentState.m_indexBuffer = indexBuffer;
+		m_currentState.m_indexBufferDirty = true;
+	}
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint)
+inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t /*bindPoint*/)
 {
-	m_currentState.m_vertexBuffer = vertexBuffer;
-
-	// TODO Move to flush
-	BindVertexBuffersPS(vertexBuffer->GetHardwareBuffer(), bindPoint);
+	if (m_currentState.m_vertexBuffer != vertexBuffer)
+	{
+		m_currentState.m_vertexBuffer = vertexBuffer;
+		m_currentState.m_vertexBufferDirty = true;
+	}
 }
 
 inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
@@ -199,7 +208,7 @@ inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount,
 {
 	//UpdateGraphicsPipelineState();
 
-	UpdateResourceTablesPS();
+	FlushRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
 }
@@ -208,7 +217,7 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 {
 	//UpdateGraphicsPipelineState();
 
-	UpdateResourceTablesPS();
+	FlushRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
@@ -217,7 +226,7 @@ inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t thre
 {
 	//UpdateComputePipelineState();
 
-	UpdateResourceTablesPS();
+	FlushRenderStatePS(); // TODO Put in platform-independent code
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }

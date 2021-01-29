@@ -245,7 +245,7 @@ void CrFrame::Process()
 	{
 		drawCommandBuffer->Begin();
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)swapchain->GetWidth(), (float)swapchain->GetHeight()));
-		drawCommandBuffer->SetScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight());
+		drawCommandBuffer->SetScissor(CrScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 	
 		CrRenderPassBeginParams renderPassParams;
 		renderPassParams.clear = true;

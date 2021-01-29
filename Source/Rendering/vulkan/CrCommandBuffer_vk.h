@@ -33,14 +33,6 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void SetViewportPS(const CrViewport& viewport) override;
-
-	virtual void SetScissorPS(uint32_t topLeftX, uint32_t topLeftY, uint32_t width, uint32_t height) override;
-
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) override;
-
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) override;
-
 	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) override;
 
 	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) override;
@@ -65,7 +57,7 @@ private:
 
 	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
 
-	virtual void UpdateResourceTablesPS() override;
+	virtual void FlushRenderStatePS() override;
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
@@ -86,46 +78,6 @@ inline const VkCommandBuffer& CrCommandBufferVulkan::GetVkCommandBuffer() const
 inline VkCommandBuffer& CrCommandBufferVulkan::GetVkCommandBuffer()
 {
 	return m_vkCommandBuffer;
-}
-
-inline void CrCommandBufferVulkan::SetViewportPS(const CrViewport& viewport)
-{
-	// TODO Be able to set multiple viewports
-	VkViewport vkViewport =
-	{
-		viewport.x, 
-		viewport.y + viewport.height,
-		viewport.width,
-		-viewport.height, // Requires VK_KHR_maintenance1
-		viewport.minDepth,
-		viewport.maxDepth
-	};
-
-	vkCmdSetViewport(m_vkCommandBuffer, 0, 1, &vkViewport);
-}
-
-inline void CrCommandBufferVulkan::SetScissorPS(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-{
-	VkRect2D scissor = { { (int32_t) x, (int32_t) y }, { width, height } };
-	vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &scissor);
-}
-
-inline void CrCommandBufferVulkan::BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer)
-{
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indexBuffer);
-	vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanGPUBuffer->GetVkIndexType());
-}
-
-inline void CrCommandBufferVulkan::BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint)
-{
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vertexBuffer);
-
-	VkDeviceSize offsets[1] = { 0 };
-	// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
-	// TODO Number of vertex shaders to be able to have several vertex streams ??
-	// TODO Make sure function accepts multiple vertex buffers
-	const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
-	vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
 }
 
 inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline)

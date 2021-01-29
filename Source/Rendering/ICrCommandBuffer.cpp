@@ -31,6 +31,9 @@ ICrCommandBuffer::~ICrCommandBuffer()
 
 void ICrCommandBuffer::Begin()
 {
+	// Reset current state. When beginning a new command buffer 
+	// any bound state is also reset, and our tracking must match
+	m_currentState = CurrentState();
 	m_constantBufferGPUStack->Begin();
 	BeginPS();
 }

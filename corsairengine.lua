@@ -341,7 +341,7 @@ project(ProjectShaders)
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/ShaderResources'
 	local shaderGenCommandLine = 
-	'"%{cfg.buildtarget.directory}'..ProjectShaderCompiler..'.exe" '..
+	'"'..ShaderCompilerAbsolutePath..'" '..
 	'-metadata ' ..
 	'-input "'..metadataFile..'" ' ..
 	'-output "'..outputFile..'" ' ..
@@ -363,7 +363,8 @@ project(ProjectShaders)
 	
 	buildinputs
 	{
-		shaderFiles
+		shaderFiles,
+		ShaderCompilerAbsolutePath
 	}
 	
 	buildmessage('')

@@ -27,6 +27,9 @@
 
 #include "CrResourceManager.h"
 
+#include "Rendering/UI/CrImGuiRenderer.h"
+#include "imgui.h"
+
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
@@ -218,6 +221,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// Semaphore used to ensures that image presentation is complete before starting to submit again
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
+
+	// ImGui renderer init:
+	CrImGuiRendererInitParams imguiInitParams = {};
+	imguiInitParams.m_Format = m_swapchain->GetFormat();
+	imguiInitParams.m_SampleCount = cr3d::SampleCount::S1;
+	CrImGuiRenderer::GetImGuiRenderer()->Init(imguiInitParams);
 }
 
 void CrFrame::Process()
@@ -241,6 +250,9 @@ void CrFrame::Process()
 	renderDevice->ResetFence(swapchainFence);
 
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()].get();
+	
+	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(swapchain->GetWidth(), swapchain->GetHeight());
+	ImGui::ShowDemoWindow();
 
 	{
 		drawCommandBuffer->Begin();
@@ -322,6 +334,9 @@ void CrFrame::Process()
 			drawCommandBuffer->Dispatch(1, 1, 1);
 		}
 		drawCommandBuffer->EndDebugEvent();
+
+		// Render ImGui:
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_frameBuffers[swapchain->GetCurrentFrameIndex()].get());
 
 		drawCommandBuffer->End();
 	}

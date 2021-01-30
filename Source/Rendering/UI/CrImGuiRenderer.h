@@ -34,7 +34,7 @@ private:
 	static CrImGuiRenderer* k_Instance;
 
 	CrRenderPassSharedHandle m_RenderPass;
-	ICrGraphicsPipeline* m_UIGfxPipeline;
+	CrGraphicsPipelineHandle m_UIGfxPipeline;
 	CrIndexBufferSharedHandle m_IndexBuffer;
 	CrVertexBufferSharedHandle m_VertexBuffer;
 	CrTextureSharedHandle m_FontAtlas;

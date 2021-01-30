@@ -175,7 +175,7 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 	cmdBuffer->BeginRenderPass(m_RenderPass.get(), output, passParams);
 	{
 		// Setup global config:
-		cmdBuffer->BindGraphicsPipelineState(m_UIGfxPipeline);
+		cmdBuffer->BindGraphicsPipelineState(m_UIGfxPipeline.get());
 		cmdBuffer->BindIndexBuffer(m_IndexBuffer.get());
 		cmdBuffer->BindVertexBuffer(m_VertexBuffer.get(), 0);
 		cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_UISamplerState.get());
@@ -199,15 +199,17 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 			for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
 			{
 				const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
+				CrScissor scissorRect = CrScissor(
+					(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
+					(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
+				);
+
 				if (!drawCmd->UserCallback)
 				{
 					// Generic rendering.
 					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
 					cmdBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
-					cmdBuffer->SetScissor(
-						(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
-						(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
-					);
+					cmdBuffer->SetScissor(scissorRect);
 					cmdBuffer->DrawIndexed(
 						drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0
 					);
@@ -230,7 +232,7 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
 	}
-	cmdBuffer->EndRenderPass(m_RenderPass.get());
+	cmdBuffer->EndRenderPass();
 	cmdBuffer->EndDebugEvent();
 }
 

@@ -20,6 +20,7 @@
 #include "imgui.h"
 
 // Based on ImDrawVert
+// sizeof(UIVertex) != UIVertex::GetVertexDescriptor().GetDataSize(). Bad things happen.
 struct UIVertex
 {
 	CrVertexElement<float, cr3d::DataFormat::RG32_Float> m_Position;
@@ -110,6 +111,8 @@ void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
 
 	// Default res for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
+
+	CrAssertMsg(sizeof(ImDrawVert) == UIVertex::GetVertexDescriptor().GetDataSize(), "ImGui vertex decl doesn't match");
 }
 
 void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
@@ -127,6 +130,8 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	float mx = CrInput.GetAxis(AxisCode::MouseX);
 	float my = CrInput.GetAxis(AxisCode::MouseY);
 	io.MousePos = ImVec2(mx * io.DisplaySize.x, my * io.DisplaySize.y);
+
+	io.KeysDown[ImGuiKey_A];
 
 	ImGui::NewFrame();
 }
@@ -187,12 +192,20 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer)
 				}
 				else
 				{
-					// Run user callback.
-					// TODO.
+					// Handle user callback:
+					if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
+					{
+						// This is a special case to reset the render state.. What should we do here?
+						CrAssertMsg(false, "Not implemented");
+					}
+					else
+					{
+						drawCmd->UserCallback(drawList, drawCmd);
+					}
 				}
 			}	
-			acumIdxOffset += drawList->IdxBuffer.size();
-			acumVtxOffset += drawList->VtxBuffer.size();
+			acumIdxOffset += drawList->IdxBuffer.Size;
+			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
 	}
 	cmdBuffer->EndDebugEvent();
@@ -243,19 +256,13 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 
 	// Update contents:
 	ImDrawIdx* pIdx = (ImDrawIdx*)m_IndexBuffer->Lock();
-	UIVertex* pVtx = (UIVertex*)m_VertexBuffer->Lock();
+	ImDrawVert* pVtx = (ImDrawVert*)m_VertexBuffer->Lock();
 	for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
 	{
 		ImDrawList* drawList = data->CmdLists[listIdx];
-		auto vtxSize = UIVertex::GetVertexDescriptor().GetDataSize();
-		
-#if 0
-		memset(pIdx, 0, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
-		memset(pVtx, 0, drawList->VtxBuffer.Size * vtxSize);
-#endif
 
 		memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
-		memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * vtxSize);
+		memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert));
 
 		pIdx += drawList->IdxBuffer.Size;
 		pVtx += drawList->VtxBuffer.Size;

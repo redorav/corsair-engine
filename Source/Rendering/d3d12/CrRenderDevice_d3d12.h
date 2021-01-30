@@ -32,7 +32,7 @@ private:
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) override;
 
 	ID3D12Device* m_d3d12Device;
 

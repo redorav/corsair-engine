@@ -327,7 +327,7 @@ ICrComputeShader* CrRenderDeviceVulkan::CreateComputeShaderPS(const CrComputeSha
 	return new CrComputeShaderVulkan(this, computeShaderDescriptor);
 }
 
-ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& descriptor)
+ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)
 {
 	return new CrHardwareGPUBufferVulkan(this, descriptor);
 }

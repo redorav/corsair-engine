@@ -82,4 +82,5 @@ struct CrShaderStageInfo;
 class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;
+struct CrHardwareGPUBufferDescriptor;
 class CrVertexDescriptor;

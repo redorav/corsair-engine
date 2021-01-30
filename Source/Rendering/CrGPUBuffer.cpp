@@ -4,17 +4,17 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
+ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
 	access = descriptor.access;
 	usage = descriptor.usage;
 	mapped = false;
 }
 
-CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor)
-	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(descriptor.numElements), m_stride(descriptor.stride)
+CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride)
+	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride)
 {
-	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (descriptor.stride == 2 || descriptor.stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes");
+	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (stride == 2 || stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes");
 
 	if (descriptor.existingHardwareGPUBuffer)
 	{
@@ -25,7 +25,9 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 	}
 	else
 	{
-		m_buffer = renderDevice->CreateHardwareGPUBuffer(descriptor);
+		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
+
+		m_buffer = renderDevice->CreateHardwareGPUBuffer(hardwareGPUBufferDescriptor);
 		m_memory = nullptr;
 		m_byteOffset = 0;
 		m_ownership = cr3d::BufferOwnership::Owning;

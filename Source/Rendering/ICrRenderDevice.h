@@ -70,7 +70,7 @@ public:
 	
 	CrComputePipelineHandle CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader);
 
-	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor);
+	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
 	template<typename Struct>
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices);
@@ -112,7 +112,7 @@ protected:
 
 	virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const = 0;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) = 0;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
 
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 

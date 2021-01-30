@@ -80,7 +80,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 	return CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
 }
 
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
 	return CreateHardwareGPUBufferPS(descriptor);
 }

@@ -50,7 +50,7 @@ private:
 
 	virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const override;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrGPUBufferDescriptor& params) override;
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
 
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
 

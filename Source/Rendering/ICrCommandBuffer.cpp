@@ -53,7 +53,7 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_
 {
 	GPUStackAllocation<void> allocation = m_constantBufferGPUStack->Allocate(size);
 
-	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, size);
+	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite);
 	params.existingHardwareGPUBuffer = m_constantBufferGPUStack->GetHardwareGPUBuffer();
 	params.memory = allocation.memory;
 	params.offset = allocation.offset;
@@ -62,7 +62,7 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_
 
 CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateConstantBufferParameters(size));
+	return CrGPUBuffer(m_renderDevice, AllocateConstantBufferParameters(size), size);
 }
 
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)

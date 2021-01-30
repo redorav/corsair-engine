@@ -33,26 +33,26 @@ struct UIVertex
 	}
 };
 
-CrImGuiRenderer* CrImGuiRenderer::k_Instance = nullptr;
+CrImGuiRenderer* CrImGuiRenderer::k_instance = nullptr;
 
 CrImGuiRenderer::CrImGuiRenderer()
-	: m_CurMaxIndexCount(0)
-	, m_CurMaxVertexCount(0)
+	: m_curMaxIndexCount(0)
+	, m_curMaxVertexCount(0)
 {
 }
 
 CrImGuiRenderer* CrImGuiRenderer::GetImGuiRenderer()
 {
-	if (!k_Instance)
+	if (!k_instance)
 	{
-		k_Instance = new CrImGuiRenderer;
+		k_instance = new CrImGuiRenderer;
 	}
-	return k_Instance;
+	return k_instance;
 }
 
 void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 {
-	m_InitParams = initParams;
+	m_initParams = initParams;
 
 	// Generic ImGui setup:
 	ImGui::CreateContext();
@@ -70,7 +70,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		cr3d::ResourceState::Undefined, cr3d::ResourceState::Undefined
 	); // Do I need to set these states.. ??
 
-	m_RenderPass = renderDevice->CreateRenderPass(renderPassDesc);
+	m_renderPass = renderDevice->CreateRenderPass(renderPassDesc);
 
 	// Pipeline description:
 	{
@@ -100,7 +100,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_UIGfxPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		m_uiGfxPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
 			psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), renderPassDesc
 		);
 	}
@@ -119,14 +119,14 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		fontParams.initialData = fontData;
 		fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
 
-		m_FontAtlas = renderDevice->CreateTexture(fontParams);
-		CrAssertMsg(m_FontAtlas.get(), "Failed to create the ImGui font atlas");
-		io.Fonts->TexID = (ImTextureID)m_FontAtlas.get();
+		m_fontAtlas = renderDevice->CreateTexture(fontParams);
+		CrAssertMsg(m_fontAtlas.get(), "Failed to create the ImGui font atlas");
+		io.Fonts->TexID = (ImTextureID)m_fontAtlas.get();
 	}
 	
 	// Default linear clamp sampler state:
 	CrSamplerDescriptor descriptor;
-	m_UISamplerState = renderDevice->CreateSampler(descriptor);
+	m_uiSamplerState = renderDevice->CreateSampler(descriptor);
 
 	// Default res for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
@@ -172,13 +172,13 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 	passParams.drawArea = { 0, 0, (uint32_t)io.DisplaySize.x, (uint32_t)io.DisplaySize.y };
 
 	cmdBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
-	cmdBuffer->BeginRenderPass(m_RenderPass.get(), output, passParams);
+	cmdBuffer->BeginRenderPass(m_renderPass.get(), output, passParams);
 	{
 		// Setup global config:
-		cmdBuffer->BindGraphicsPipelineState(m_UIGfxPipeline.get());
-		cmdBuffer->BindIndexBuffer(m_IndexBuffer.get());
-		cmdBuffer->BindVertexBuffer(m_VertexBuffer.get(), 0);
-		cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_UISamplerState.get());
+		cmdBuffer->BindGraphicsPipelineState(m_uiGfxPipeline.get());
+		cmdBuffer->BindIndexBuffer(m_indexBuffer.get());
+		cmdBuffer->BindVertexBuffer(m_vertexBuffer.get(), 0);
+		cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
 
 		// Projection matrix. TODO: this could be cached.
 		CrGPUBufferType<UIData> uiDataBuffer = cmdBuffer->AllocateConstantBuffer<UIData>();
@@ -256,31 +256,31 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 
 	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
 	uint32_t curIdxCount = data->TotalIdxCount;
-	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount)
+	if (!m_indexBuffer || curIdxCount > m_curMaxIndexCount)
 	{
-		if (m_IndexBuffer)
+		if (m_indexBuffer)
 		{
-			m_IndexBuffer.reset();
+			m_indexBuffer.reset();
 		}
-		m_CurMaxIndexCount = curIdxCount * 2;
-		m_IndexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_CurMaxIndexCount);
+		m_curMaxIndexCount = curIdxCount * 2;
+		m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_curMaxIndexCount);
 	}
 
 	// Check vertex buffer size:
 	uint32_t curVtxCount = data->TotalVtxCount;
-	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount)
+	if (!m_vertexBuffer || curVtxCount > m_curMaxVertexCount)
 	{
-		if (m_VertexBuffer)
+		if (m_vertexBuffer)
 		{
-			m_VertexBuffer.reset();
+			m_vertexBuffer.reset();
 		}
-		m_CurMaxVertexCount = curVtxCount * 2;
-		m_VertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_CurMaxVertexCount);
+		m_curMaxVertexCount = curVtxCount * 2;
+		m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_curMaxVertexCount);
 	}
 
 	// Update contents:
-	ImDrawIdx* pIdx = (ImDrawIdx*)m_IndexBuffer->Lock();
-	ImDrawVert* pVtx = (ImDrawVert*)m_VertexBuffer->Lock();
+	ImDrawIdx* pIdx = (ImDrawIdx*)m_indexBuffer->Lock();
+	ImDrawVert* pVtx = (ImDrawVert*)m_vertexBuffer->Lock();
 	for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
 	{
 		ImDrawList* drawList = data->CmdLists[listIdx];
@@ -291,6 +291,6 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 		pIdx += drawList->IdxBuffer.Size;
 		pVtx += drawList->VtxBuffer.Size;
 	}
-	m_IndexBuffer->Unlock();
-	m_VertexBuffer->Unlock();
+	m_indexBuffer->Unlock();
+	m_vertexBuffer->Unlock();
 }

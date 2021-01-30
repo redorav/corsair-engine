@@ -31,17 +31,17 @@ private:
 	float4x4 GetProjection(ImDrawData* data);
 	void UpdateBuffers(ImDrawData* data);
 
-	static CrImGuiRenderer* k_Instance;
+	static CrImGuiRenderer* k_instance;
 
-	CrRenderPassSharedHandle m_RenderPass;
-	CrGraphicsPipelineHandle m_UIGfxPipeline;
-	CrIndexBufferSharedHandle m_IndexBuffer;
-	CrVertexBufferSharedHandle m_VertexBuffer;
-	CrTextureSharedHandle m_FontAtlas;
-	CrSamplerSharedHandle m_UISamplerState;
+	CrRenderPassSharedHandle m_renderPass;
+	CrGraphicsPipelineHandle m_uiGfxPipeline;
+	CrIndexBufferSharedHandle m_indexBuffer;
+	CrVertexBufferSharedHandle m_vertexBuffer;
+	CrTextureSharedHandle m_fontAtlas;
+	CrSamplerSharedHandle m_uiSamplerState;
 
-	uint32_t m_CurMaxIndexCount;
-	uint32_t m_CurMaxVertexCount;
+	uint32_t m_curMaxIndexCount;
+	uint32_t m_curMaxVertexCount;
 
-	CrImGuiRendererInitParams m_InitParams;
+	CrImGuiRendererInitParams m_initParams;
 };

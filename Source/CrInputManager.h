@@ -33,6 +33,9 @@ enum AxisCode
 	JoystickL2,
 	JoystickR1,
 	JoystickR2,
+
+	MouseX,
+	MouseY,
 };
 
 class CrInputManager
@@ -178,6 +181,9 @@ private:
 		m_axisInputMap->MapFloat(AxisCode::JoystickL2, m_padId, gainput::PadButtonL2);
 		m_axisInputMap->MapFloat(AxisCode::JoystickR1, m_padId, gainput::PadButtonR1);
 		m_axisInputMap->MapFloat(AxisCode::JoystickR2, m_padId, gainput::PadButtonR2);
+
+		m_axisInputMap->MapFloat(AxisCode::MouseX, m_mouseId, gainput::MouseAxisX);
+		m_axisInputMap->MapFloat(AxisCode::MouseY, m_mouseId, gainput::MouseAxisY);
 	}
 
 	gainput::InputManager m_inputManager;

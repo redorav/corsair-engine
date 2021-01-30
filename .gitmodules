@@ -28,3 +28,6 @@
 [submodule "Dependencies/spirv-reflect/Source"]
 	path = Dependencies/spirv-reflect/Source
 	url = https://github.com/KhronosGroup/SPIRV-Reflect.git
+[submodule "Dependencies/imgui/Source"]
+	path = Dependencies/imgui/Source
+	url = https://github.com/ocornut/imgui.git

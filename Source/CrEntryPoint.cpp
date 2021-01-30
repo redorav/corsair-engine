@@ -12,6 +12,7 @@
 #include "ICrOSWindow.h"
 
 #include <SDL.h>
+#include <SDL_syswm.h>
 
 bool g_appWasClosed = false; // TODO This global needs to go
 
@@ -24,6 +25,7 @@ int main(int argc, char* argv[])
 	{
 		return 1;
 	}
+	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
 	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
@@ -63,7 +65,17 @@ int main(int argc, char* argv[])
 				case SDL_QUIT:
 					exit(0);
 					break;
-
+				case SDL_SYSWMEVENT:
+				{
+					SDL_SysWMmsg wMsg = *event.syswm.msg;
+					MSG msg = {};
+					msg.hwnd = wMsg.msg.win.hwnd;
+					msg.message = wMsg.msg.win.msg;
+					msg.wParam = wMsg.msg.win.wParam;
+					msg.lParam = wMsg.msg.win.lParam;
+					CrInput.HandleMessage((void*)&msg);
+					break;
+				}
 				default:
 					break;
 			}

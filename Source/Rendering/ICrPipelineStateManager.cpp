@@ -2,44 +2,45 @@
 
 #include "ICrPipelineStateManager.h"
 #include "ICrShader.h"
+#include "ICrPipeline.h"
+#include "ICrRenderDevice.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"
 
-#include "vulkan/CrPipelineStateManager_vk.h" // TODO Remove
-
-static CrPipelineStateManagerVulkan g_pipelineStateManager;
+static ICrPipelineStateManager g_pipelineStateManager;
 
 ICrPipelineStateManager* ICrPipelineStateManager::Get()
 {
 	return &g_pipelineStateManager;
 }
 
-ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
+CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 (
-	const CrGraphicsPipelineDescriptor& psoDescriptor, 
+	const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 	const CrGraphicsShaderHandle& graphicsShader, 
 	const CrVertexDescriptor& vertexDescriptor,
 	const CrRenderPassDescriptor& renderPassDescriptor
 )
 {
-	const CrHash& psoHash = psoDescriptor.GetHash();
+	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
 	const CrHash& graphicsShaderHash = graphicsShader->GetHash();
 	//CrHash vertexInputHash = 0; // TODO Create a Vertex Input Layout Hash
 
-	const CrHash& combinedHash = psoHash << graphicsShaderHash;
+	const CrHash& combinedHash = pipelineHash << graphicsShaderHash;
 	//combinedHash <<= vertexInputHash;
 
-	eastl::hashtable_iterator<CrPair<const uint64_t, ICrGraphicsPipeline*>, false, false> it = m_graphicsPipelines.find(combinedHash.m_hash);
+	const auto& it = m_graphicsPipelines.find(combinedHash.m_hash);
 
-	ICrGraphicsPipeline* graphicsPipeline = nullptr;
+	CrGraphicsPipelineHandle graphicsPipeline;
+
 	if (it != m_graphicsPipelines.end())
 	{
 		graphicsPipeline = it->second;
 	}
 	else
 	{
-		graphicsPipeline = CreateGraphicsPipelinePS(psoDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
+		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
 		graphicsPipeline->m_shader = graphicsShader;
 
 		// Insert in the hashmap
@@ -47,6 +48,32 @@ ICrGraphicsPipeline* ICrPipelineStateManager::GetGraphicsPipeline
 	}
 
 	return graphicsPipeline;
+}
+
+CrComputePipelineHandle ICrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
+{
+	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
+	const CrHash& computeShaderHash = computeShader->GetHash();
+
+	const CrHash& combinedHash = pipelineHash << computeShaderHash;
+
+	const auto& it = m_computePipelines.find(combinedHash.m_hash);
+	CrComputePipelineHandle computePipeline;
+
+	if (it != m_computePipelines.end())
+	{
+		computePipeline = it->second;
+	}
+	else
+	{
+		computePipeline = m_renderDevice->CreateComputePipeline(pipelineDescriptor, computeShader.get());
+		computePipeline->m_shader = computeShader;
+
+		// Insert in the hashmap
+		m_computePipelines.insert({ combinedHash.m_hash, computePipeline });
+	}
+
+	return computePipeline;
 }
 
 void ICrPipelineStateManager::Init(ICrRenderDevice* renderDevice)

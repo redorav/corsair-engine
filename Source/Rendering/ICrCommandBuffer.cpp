@@ -3,6 +3,7 @@
 #include "ICrCommandQueue.h"
 #include "ICrCommandBuffer.h"
 #include "ICrRenderDevice.h"
+#include "ICrPipeline.h"
 
 #include "ICrShader.h"
 #include "CrGPUStackAllocator.h"
@@ -30,6 +31,9 @@ ICrCommandBuffer::~ICrCommandBuffer()
 
 void ICrCommandBuffer::Begin()
 {
+	// Reset current state. When beginning a new command buffer 
+	// any bound state is also reset, and our tracking must match
+	m_currentState = CurrentState();
 	m_constantBufferGPUStack->Begin();
 	BeginPS();
 }
@@ -49,7 +53,7 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_
 {
 	GPUStackAllocation<void> allocation = m_constantBufferGPUStack->Allocate(size);
 
-	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, size);
+	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite);
 	params.existingHardwareGPUBuffer = m_constantBufferGPUStack->GetHardwareGPUBuffer();
 	params.memory = allocation.memory;
 	params.offset = allocation.offset;
@@ -58,7 +62,7 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_
 
 CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateConstantBufferParameters(size));
+	return CrGPUBuffer(m_renderDevice, AllocateConstantBufferParameters(size), size);
 }
 
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)

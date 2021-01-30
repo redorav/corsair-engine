@@ -7,6 +7,7 @@
 #include "ICrFramebuffer.h"
 #include "ICrRenderPass.h"
 #include "ICrShader.h"
+#include "ICrPipeline.h"
 #include "CrGPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 
@@ -64,7 +65,22 @@ CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsSha
 	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
 }
 
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrGPUBufferDescriptor& descriptor)
+CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+{
+	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
+}
+
+CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+{
+	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor, renderPassDescriptor));
+}
+
+CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
+{
+	return CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
+}
+
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
 	return CreateHardwareGPUBufferPS(descriptor);
 }

@@ -13,9 +13,6 @@
 [submodule "Dependencies/hlslpp/Source"]
 	path = Dependencies/hlslpp/Source
 	url = https://github.com/redorav/hlslpp
-[submodule "Dependencies/spirv-cross/Source"]
-	path = Dependencies/spirv-cross/Source
-	url = https://github.com/KhronosGroup/SPIRV-Cross
 [submodule "Dependencies/stb/Source"]
 	path = Dependencies/stb/Source
 	url = https://github.com/nothings/stb
@@ -28,6 +25,9 @@
 [submodule "Premake/premake-qt"]
 	path = Premake/premake-qt
 	url = https://github.com/dcourtois/premake-qt
+[submodule "Dependencies/spirv-reflect/Source"]
+	path = Dependencies/spirv-reflect/Source
+	url = https://github.com/KhronosGroup/SPIRV-Reflect.git
 [submodule "Dependencies/imgui/Source"]
 	path = Dependencies/imgui/Source
 	url = https://github.com/ocornut/imgui.git

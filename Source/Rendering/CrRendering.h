@@ -416,16 +416,20 @@ namespace cr3d
 		};
 	};
 
+	// It's hard to map certain resources between different APIs, including the usage that is later done in the API
+	// so this list caters for things that are common enough that it isn't complicated to map either
+	// For example, the RW prefix caters for D3D's way of having resource views (SRV for read-only and UAV for RW)
+	// but this list doesn't cover ByteBuffers or Append as they fall under the umbrella of Storage Buffer
 	namespace ShaderResourceType
 	{
 		enum T : uint8_t
 		{
 			ConstantBuffer,
-			Texture,
 			Sampler,
-			RWStructuredBuffer,
-			ROStructuredBuffer,
+			Texture,
 			RWTexture,
+			StorageBuffer, // StorageBuffers include HLSL StructuredBuffer and ByteBuffer
+			RWStorageBuffer,
 			DataBuffer,
 			RWDataBuffer,
 			Count,
@@ -785,13 +789,13 @@ namespace cr3d
 	{
 		enum T : uint8_t
 		{
-			Constant = 1 << 0,
-			Vertex = 1 << 1,
-			Index = 1 << 2,
+			Constant   = 1 << 0,
+			Vertex     = 1 << 1,
+			Index      = 1 << 2,
 			Structured = 1 << 3,
-			Data = 1 << 4,
-			Byte = 1 << 5,
-			Indirect = 1 << 6,
+			Data       = 1 << 4,
+			Byte       = 1 << 5,
+			Indirect   = 1 << 6,
 
 			// Compound
 			Storage = Structured | Byte,
@@ -826,21 +830,48 @@ namespace cr3d
 	};
 }
 
-struct CrShaderResourceCount
+struct CrScissor
 {
-	uint8_t constantBuffers = 0;
-	uint8_t samplers = 0;
-	uint8_t textures = 0;
+	CrScissor() : x(0), y(0), width(0), height(0) {}
+
+	CrScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
+
+	bool operator == (const CrScissor& scissor)
+	{
+		return x == scissor.x && y == scissor.y && width == scissor.width && height == scissor.height;
+	}
+
+	bool operator != (const CrScissor& scissor)
+	{
+		return !(*this == scissor);
+	}
+
+	uint32_t x;
+	uint32_t y;
+	uint32_t width;
+	uint32_t height;
 };
 
 struct CrViewport
 {
+	CrViewport() : x(0.0f), y(0.0f), width(1.0f), height(1.0f), minDepth(0.0f), maxDepth(1.0f) {}
+
 	CrViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
 		: x(x), y(y), width(width), height(height), minDepth(minDepth), maxDepth(maxDepth)
 	{}
 
 	CrViewport(float x, float y, float width, float height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
 	{}
+
+	bool operator == (const CrViewport& viewport)
+	{
+		return x == viewport.x && y == viewport.y && width == viewport.width && height == viewport.height;
+	}
+
+	bool operator != (const CrViewport& viewport)
+	{
+		return !(*this == viewport);
+	}
 
 	float x;
 	float y;

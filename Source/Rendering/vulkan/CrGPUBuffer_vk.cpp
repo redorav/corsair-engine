@@ -6,7 +6,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferDescriptor& descriptor) 
+CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) 
 	: ICrHardwareGPUBuffer(descriptor)
 {
 	if (descriptor.usage & cr3d::BufferUsage::Index)
@@ -20,7 +20,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 
 	VkBufferCreateInfo bufferCreateInfo = crvk::CreateVkBufferCreateInfo
 	(
-		0, descriptor.size, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
+		0, descriptor.numElements * descriptor.stride, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
 		VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
 	);
 

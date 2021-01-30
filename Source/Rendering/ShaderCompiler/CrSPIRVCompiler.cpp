@@ -10,10 +10,6 @@
 // Glslang
 #include <glslang/Public/ShaderLang.h>
 #include <SPIRV/GlslangToSpv.h>
-
-// SPIR-V
-#include <spirv_cross.hpp>
-#include <spirv_cpp.hpp>
 #pragma warning (pop)
 
 #include "Core/FileSystem/CrFileSystem.h"
@@ -303,9 +299,11 @@ bool CrSPIRVCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescri
 		return false;
 	}
 
+	const glslang::TIntermediate* intermediate = program.getIntermediate(stage);
+
 	// Generate the SPIR-V bytecode
 	spv::SpvBuildLogger logger;
-	glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBytecode, &logger);
+	glslang::GlslangToSpv(*intermediate, spirvBytecode, &logger);
 
 	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format

@@ -33,6 +33,7 @@ struct CrSamplerDescriptor;
 class ICrRenderPass;
 using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
 struct CrRenderPassDescriptor;
+struct CrRenderPassBeginParams;
 
 class ICrCommandQueue;
 using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
@@ -60,6 +61,18 @@ class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 struct CrGraphicsShaderDescriptor;
 
+class ICrComputeShader;
+using CrComputeShaderHandle = CrSharedPtr<ICrComputeShader>;
+struct CrComputeShaderDescriptor;
+
+class ICrGraphicsPipeline;
+using CrGraphicsPipelineHandle = CrSharedPtr<ICrGraphicsPipeline>;
+struct CrGraphicsPipelineDescriptor;
+
+class ICrComputePipeline;
+using CrComputePipelineHandle = CrSharedPtr<ICrComputePipeline>;
+struct CrComputePipelineDescriptor;
+
 class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrBytecodeLoadDescriptor;
@@ -69,6 +82,5 @@ struct CrShaderStageInfo;
 class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;
+struct CrHardwareGPUBufferDescriptor;
 class CrVertexDescriptor;
-
-struct CrShaderResourceCount;

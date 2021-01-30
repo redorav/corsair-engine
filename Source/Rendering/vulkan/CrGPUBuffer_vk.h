@@ -11,7 +11,7 @@ class CrHardwareGPUBufferVulkan final : public ICrHardwareGPUBuffer
 {
 public:
 
-	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrGPUBufferDescriptor& descriptor);
+	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
 

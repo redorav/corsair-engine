@@ -22,14 +22,6 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void SetViewportPS(const CrViewport& viewport) override;
-
-	virtual void SetScissorPS(uint32_t topLeftX, uint32_t topLeftY, uint32_t width, uint32_t height) override;
-
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) override;
-
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) override;
-
 	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) override;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) override;
@@ -56,28 +48,8 @@ private:
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) override;
+	virtual void EndRenderPassPS() override;
 };
-
-inline void CrCommandBufferD3D12::SetViewportPS(const CrViewport& viewport)
-{
-	
-}
-
-inline void CrCommandBufferD3D12::SetScissorPS(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-{
-	
-}
-
-inline void CrCommandBufferD3D12::BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer)
-{
-	
-}
-
-inline void CrCommandBufferD3D12::BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint)
-{
-	
-}
 
 inline void CrCommandBufferD3D12::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState)
 {

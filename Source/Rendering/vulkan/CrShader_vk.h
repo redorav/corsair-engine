@@ -5,11 +5,11 @@
 
 class ICrRenderDevice;
 
-class CrShaderResourceTableVulkan final : public ICrShaderResourceTable
+class CrShaderBindingTableVulkan final : public ICrShaderBindingTable
 {
 public:
 
-	CrShaderResourceTableVulkan(const CrShaderResourceCount& resourceCount) : ICrShaderResourceTable(resourceCount) {}
+	CrShaderBindingTableVulkan(const CrShaderBindingTableResources& resources) : ICrShaderBindingTable(resources) {}
 
 	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
 	// The layout is also needed when allocating descriptor sets from a pool.
@@ -33,8 +33,6 @@ private:
 	CrVector<VkShaderModule> m_vkShaderModules;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-
-	VkPipelineLayout m_vkPipelineLayout;
 };
 
 inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModules() const
@@ -44,9 +42,20 @@ inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModule
 
 class CrComputeShaderVulkan final : public ICrComputeShader
 {
+public:
+
+	CrComputeShaderVulkan(const ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+
+	const VkShaderModule GetVkShaderModule() const;
+
+	VkDevice m_vkDevice;
+
 	VkShaderModule m_vkShaderModule;
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-
-	VkPipelineLayout m_vkPipelineLayout;
 };
+
+inline const VkShaderModule CrComputeShaderVulkan::GetVkShaderModule() const
+{
+	return m_vkShaderModule;
+}

@@ -1,35 +1,12 @@
 #pragma once
 
-#include "ICrPipelineStateManager.h"
+#include "Rendering/ICrPipeline.h"
 
-#include "CrGPUBuffer.h"
+#include "Rendering/CrGPUBuffer.h"
 
 #include "ShaderResources.h"
 
-class CrPipelineStateManagerVulkan;
-class ICrGPUSemaphore;
-class ICrGPUFence;
-class CrIndexBufferCommon;
-class CrVertexBufferCommon;
-
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-
-class ICrSampler;
-using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
-
-struct CrGraphicsPipelineDescriptor;
-class ICrGraphicsPipeline;
-class CrComputePipeline;
-class CrConstantBufferBase;
-class ICrHardwareGPUBuffer;
-class ICrRenderPass;
-class ICrFramebuffer;
-struct CrRenderPassBeginParams;
-class CrGPUStackAllocator;
-class CrCPUStackAllocator;
-
-struct CrViewport;
+#include "CrRenderingForwardDeclarations.h"
 
 class ICrCommandBuffer
 {
@@ -47,15 +24,15 @@ public:
 
 	void SetViewport(const CrViewport& viewport);
 
-	void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+	void SetScissor(const CrScissor& scissor);
 
 	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer);
 	
 	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint);
 
-	void BindGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor);
+	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
 
-	void BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState);
+	void BindComputePipelineState(const ICrComputePipeline* computePipeline);
 
 	void ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount);
 
@@ -86,7 +63,7 @@ public:
 
 	void BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams);
 
-	void EndRenderPass(const ICrRenderPass* renderPass);
+	void EndRenderPass();
 
 	const ICrCommandQueue* GetCommandQueue() const;
 
@@ -96,15 +73,9 @@ protected:
 
 	virtual void EndPS() = 0;
 
-	virtual void SetViewportPS(const CrViewport& viewport) = 0;
+	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline) = 0;
 
-	virtual void SetScissorPS(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
-
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) = 0;
-
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) = 0;
-
-	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) = 0;
+	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) = 0;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) = 0;
 
@@ -122,9 +93,11 @@ protected:
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) = 0;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) = 0;
+	virtual void EndRenderPassPS() = 0;
 
-	virtual void UpdateResourceTablesPS() = 0;
+	virtual void FlushGraphicsRenderStatePS() = 0;
+
+	virtual void FlushComputeRenderStatePS() = 0;
 
 	CrGPUBufferDescriptor AllocateConstantBufferParameters(uint32_t size);
 
@@ -135,21 +108,36 @@ protected:
 		uint32_t byteOffset = 0;
 	};
 
+	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
+	// a resource and even bind a dummy one if we have a safe mode
+
 	struct CurrentState
 	{
-		const CrIndexBufferCommon*		m_indexBuffer;
-		const CrVertexBufferCommon*		m_vertexBuffer;
+		const ConstantBufferBinding& GetConstantBufferBinding(cr3d::ShaderStage::T stage, ConstantBuffers::T id)
+		{
+			return m_constantBuffers[stage][id];
+		}
 
-		CrGraphicsPipelineDescriptor	m_graphicsPipelineDescriptor;
-		const ICrGraphicsPipeline*		m_graphicsPipeline;
-		const CrComputePipeline*		m_computePipeline;
+		const CrIndexBufferCommon*      m_indexBuffer;
+		bool                            m_indexBufferDirty = true;
+
+		const CrVertexBufferCommon*     m_vertexBuffer;
+		bool                            m_vertexBufferDirty = true;
+
+		CrScissor                       m_scissor;
+		bool                            m_scissorDirty = true;
+
+		CrViewport                      m_viewport;
+		bool                            m_viewportDirty = true;
+
+		CrGraphicsPipelineDescriptor    m_graphicsPipelineDescriptor;
+		const ICrGraphicsPipeline*      m_graphicsPipeline;
+		const ICrComputePipeline*       m_computePipeline;
 
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
 		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];
-
-		// Structured Buffers
 	};
 
 	CurrentState					m_currentState = {};
@@ -163,41 +151,54 @@ protected:
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
 {
-	SetViewportPS(viewport);
+	if (m_currentState.m_viewport != viewport)
+	{
+		m_currentState.m_viewport = viewport;
+		m_currentState.m_viewportDirty = true;
+	}
 }
 
-inline void ICrCommandBuffer::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
 {
-	SetScissorPS(x, y, width, height);
+	if (m_currentState.m_scissor != scissor)
+	{
+		m_currentState.m_scissor = scissor;
+		m_currentState.m_scissorDirty = true;
+	}
 }
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBuffer)
 {
-	m_currentState.m_indexBuffer = indexBuffer;
-
-	// TODO Move to flush
-	BindIndexBufferPS(indexBuffer->GetHardwareBuffer());
+	if (m_currentState.m_indexBuffer != indexBuffer)
+	{
+		m_currentState.m_indexBuffer = indexBuffer;
+		m_currentState.m_indexBufferDirty = true;
+	}
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint)
+inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t /*bindPoint*/)
 {
-	m_currentState.m_vertexBuffer = vertexBuffer;
-
-	// TODO Move to flush
-	BindVertexBuffersPS(vertexBuffer->GetHardwareBuffer(), bindPoint);
+	if (m_currentState.m_vertexBuffer != vertexBuffer)
+	{
+		m_currentState.m_vertexBuffer = vertexBuffer;
+		m_currentState.m_vertexBufferDirty = true;
+	}
 }
 
-inline void ICrCommandBuffer::BindGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor)
+inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
 {
-	m_currentState.m_graphicsPipelineDescriptor = pipelineDescriptor;
-}
-
-inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* pipelineState)
-{
-	m_currentState.m_graphicsPipeline = pipelineState;
+	m_currentState.m_graphicsPipeline = graphicsPipeline;
 
 	// TODO Move to flush
-	BindGraphicsPipelineStatePS(pipelineState);
+	BindGraphicsPipelineStatePS(graphicsPipeline);
+}
+
+inline void ICrCommandBuffer::BindComputePipelineState(const ICrComputePipeline* computePipeline)
+{
+	m_currentState.m_computePipeline = computePipeline;
+
+	// TODO Move to flush
+	BindComputePipelineStatePS(computePipeline);
 }
 
 inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)
@@ -207,27 +208,21 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	//UpdateGraphicsPipelineState();
-
-	UpdateResourceTablesPS();
+	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	//UpdateGraphicsPipelineState();
-
-	UpdateResourceTablesPS();
+	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	//UpdateComputePipelineState();
-
-	UpdateResourceTablesPS();
+	FlushComputeRenderStatePS(); // TODO Put in platform-independent code
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
@@ -262,9 +257,9 @@ inline void ICrCommandBuffer::BeginRenderPass(const ICrRenderPass* renderPass, c
 	BeginRenderPassPS(renderPass, frameBuffer, renderPassParams);
 }
 
-inline void ICrCommandBuffer::EndRenderPass(const ICrRenderPass* renderPass)
+inline void ICrCommandBuffer::EndRenderPass()
 {
-	EndRenderPassPS(renderPass);
+	EndRenderPassPS();
 }
 
 inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
@@ -273,7 +268,7 @@ inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
 }
 
 template<typename MetaType>
-CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
+inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
 	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateConstantBufferParameters(sizeof(MetaType)));
 }

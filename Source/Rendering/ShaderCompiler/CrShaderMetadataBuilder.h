@@ -6,18 +6,13 @@
 
 using CrPath = std::filesystem::path;
 
-namespace spirv_cross
-{
-	class Compiler;
-	struct Resource;
-	struct SPIRType;
+struct SpvReflectDescriptorBinding;
+struct SpvReflectTypeDescription;
 
-	template <typename T, size_t N = 8> class SmallVector;
-}
-
-typedef spirv_cross::SmallVector<spirv_cross::Resource> SPIRVCrossResourceVector;
+typedef std::vector<SpvReflectDescriptorBinding> ResourceVector;
 
 struct CompilationDescriptor;
+struct HLSLResources;
 
 class CrShaderMetadataBuilder
 {
@@ -30,63 +25,88 @@ private:
 	// Takes SPIRV as input and creates two text files, one for the header and one for the cpp
 	static bool BuildSPIRVMetadata(const std::vector<uint32_t>& spirvBytecode, std::string& metadataHeader, std::string& metadataCpp);
 
-	static std::string PrintResourceMetadataInstanceDeclaration(const std::string& resourceType, const SPIRVCrossResourceVector& uniformBuffers);
+	static std::string PrintResourceMetadataInstanceDeclaration(const std::string& resourceType, const ResourceVector& uniformBuffers);
 
 	// Builds the enum with all the resources
-	static std::string PrintResourceEnum(spirv_cross::Compiler& reflection, const std::string& resourceType, const SPIRVCrossResourceVector& resources);
+	static std::string PrintResourceEnum(const std::string& resourceTypeName, const ResourceVector& resources);
+	static std::string PrintResourceHashmap(const std::string& resourceTypeName, const ResourceVector& resources);
 
-	static std::string PrintResourceHashmap(spirv_cross::Compiler& reflection, const std::string& resourceType, const SPIRVCrossResourceVector& resources);
+	// Prints out the struct or built-in as it comes from the reflection information
+	static std::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const std::string& memberName, const std::string& indentation);
+	static std::string PrintMemberStruct(const SpvReflectTypeDescription& type, const std::string& structTypeName, const std::string& structName, uint32_t indentationLevel);
 
 	//-----------------
 	// Constant Buffers
 	//-----------------
 
-	static std::string BuildConstantBufferMetadataHeader(spirv_cross::Compiler& reflection);
-	static std::string BuildConstantBufferMetadataCpp(spirv_cross::Compiler& reflection);
-
-	// Prints out the struct or built-in as it comes from the reflection information
-	static std::string PrintConstantBufferMemberBuiltIn(spirv_cross::SPIRType builtinType, const std::string& memberName, const std::string& indentation);
-	static std::string PrintConstantBufferMemberStruct(const spirv_cross::Compiler& reflection, const spirv_cross::SPIRType& type, const std::string& structTypeName, const std::string& structName, uint32_t indentationLevel);
-
+	static std::string BuildConstantBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildConstantBufferMetadataCpp(const HLSLResources& resources);
 	static std::string PrintConstantBufferStructMetadata(const std::string& name, int index);
-	static std::string PrintConstantBufferMetadataStructDeclaration();
-	
-	static std::string PrintConstantBufferMetadataInstanceDefinition(const SPIRVCrossResourceVector& uniformBuffers);
-
-	static std::string PrintConstantBufferGlobalGroupDeclaration(const SPIRVCrossResourceVector& uniformBuffers);
-	static std::string PrintConstantBufferGlobalGroupDefinition(const SPIRVCrossResourceVector& uniformBuffers);
-
-	//---------
-	// Textures
-	//---------
-
-	static std::string BuildTextureMetadataHeader(spirv_cross::Compiler& reflection);
-	static std::string BuildTextureMetadataCpp(spirv_cross::Compiler& reflection);
-
-	static std::string PrintTextureMetadataStructDeclaration();
-	static std::string PrintTextureMetadataInstanceDefinition(const SPIRVCrossResourceVector& textures);
+	static std::string PrintConstantBufferMetadataStructDeclaration();	
+	static std::string PrintConstantBufferMetadataInstanceDefinition(const ResourceVector& uniformBuffers);
 
 	//---------
 	// Samplers
 	//---------
 
-	static std::string BuildSamplerMetadataHeader(spirv_cross::Compiler& reflection);
-	static std::string BuildSamplerMetadataCpp(spirv_cross::Compiler& reflection);
-
+	static std::string BuildSamplerMetadataHeader(const HLSLResources& resources);
+	static std::string BuildSamplerMetadataCpp(const HLSLResources& resources);
+	static std::string PrintSamplerMetadataInstanceDefinition(const ResourceVector& samplers);
 	static std::string PrintSamplerMetadataStructDeclaration();
-	static std::string PrintSamplerMetadataInstanceDefinition(const SPIRVCrossResourceVector& samplers);
 
-	//---------------
-	// Storage Images
-	//---------------
+	//---------
+	// Textures
+	//---------
 
-	static std::string BuildStorageImageMetadataHeader(spirv_cross::Compiler& reflection);
+	static std::string BuildTextureMetadataHeader(const HLSLResources& resources);
+	static std::string BuildTextureMetadataCpp(const HLSLResources& resources);
+	static std::string PrintTextureMetadataInstanceDefinition(const ResourceVector& textures);
+	static std::string PrintTextureMetadataStructDeclaration();
+
+	//------------
+	// RW Textures
+	//------------
+
+	static std::string BuildRWTextureMetadataHeader(const HLSLResources& resources);
+	static std::string BuildRWTextureMetadataCpp(const HLSLResources& resources);
+	static std::string PrintRWTextureMetadataInstanceDefinition(const ResourceVector& rwTextures);
+	static std::string PrintRWTextureMetadataStructDeclaration();
+
+	//--------
+	// Buffers
+	//--------
+
+	static std::string BuildBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintBufferMetadataInstanceDefinition(const ResourceVector& buffers);
+	static std::string PrintBufferMetadataStructDeclaration();
+
+	//-----------
+	// RW Buffers
+	//-----------
+
+	static std::string BuildRWBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildRWBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintRWBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers);
+	static std::string PrintRWBufferMetadataStructDeclaration();
+
+	//-------------
+	// Data Buffers
+	//-------------
+
+	static std::string BuildDataBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildDataBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers);
+	static std::string PrintDataBufferMetadataStructDeclaration();
 
 	//----------------
-	// Storage Buffers
+	// RW Data Buffers
 	//----------------
 
-	static std::string BuildStorageBufferMetadataHeader(spirv_cross::Compiler& reflection);
+	static std::string BuildRWDataBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildRWDataBufferMetadataCpp(const HLSLResources& resources);
+	static std::string PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers);
+	static std::string PrintRWDataBufferMetadataStructDeclaration();
 
 	static void WriteToFile(const std::string& filename, const std::string& text);
 

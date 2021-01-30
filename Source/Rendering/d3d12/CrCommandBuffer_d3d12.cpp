@@ -30,7 +30,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const ICrRenderPass* renderPass, co
 	
 }
 
-void CrCommandBufferD3D12::EndRenderPassPS(const ICrRenderPass* /* renderPass*/)
+void CrCommandBufferD3D12::EndRenderPassPS()
 {
 	
 }

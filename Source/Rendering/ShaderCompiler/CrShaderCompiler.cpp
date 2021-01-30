@@ -19,10 +19,6 @@
 #pragma warning (push, 0)
 // Glslang
 #include <glslang/Public/ShaderLang.h>
-
-// SPIR-V
-#include <spirv_cross.hpp>
-#include <spirv_cpp.hpp>
 #pragma warning (pop)
 
 #include "Core/FileSystem/CrFileSystem.h"
@@ -65,13 +61,29 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 
 static cr3d::ShaderStage::T ParseShaderStage(const std::string& stageString)
 {
-	if (stageString == "pixel")
+	if (stageString == "vertex")
+	{
+		return cr3d::ShaderStage::Vertex;
+	}
+	else if (stageString == "pixel")
 	{
 		return cr3d::ShaderStage::Pixel;
 	}
-	else if (stageString == "vertex")
+	else if (stageString == "hull")
 	{
-		return cr3d::ShaderStage::Vertex;
+		return cr3d::ShaderStage::Hull;
+	}
+	else if (stageString == "domain")
+	{
+		return cr3d::ShaderStage::Domain;
+	}
+	else if (stageString == "geometry")
+	{
+		return cr3d::ShaderStage::Geometry;
+	}
+	else if (stageString == "compute")
+	{
+		return cr3d::ShaderStage::Compute;
 	}
 
 	return cr3d::ShaderStage::Count;

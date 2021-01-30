@@ -2,16 +2,16 @@
 
 #include "Rendering/ICrCommandBuffer.h"
 
-#include "CrPipelineStateManager_vk.h"
 #include "CrGPUBuffer_vk.h"
+#include "CrPipeline_vk.h"
 #include "CrVulkan.h"
 
 #include "Rendering/CrRendering.h"
 
-class CrVertexBufferCommon;
-class CrIndexBufferCommon;
-class ICrGraphicsPipeline;
+#include "Rendering/CrRenderingForwardDeclarations.h"
+
 class CrTextureVulkan;
+class CrShaderBindingTableVulkan;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
 {
@@ -33,15 +33,9 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void SetViewportPS(const CrViewport& viewport) override;
-
-	virtual void SetScissorPS(uint32_t topLeftX, uint32_t topLeftY, uint32_t width, uint32_t height) override;
-
-	virtual void BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer) override;
-
-	virtual void BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint) override;
-
 	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* pipelineState) override;
+
+	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) override;
 
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) override;
 
@@ -63,11 +57,15 @@ private:
 
 	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
 
-	virtual void UpdateResourceTablesPS() override;
+	virtual void FlushGraphicsRenderStatePS() override;
+
+	virtual void FlushComputeRenderStatePS() override;
 
 	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
 
-	virtual void EndRenderPassPS(const ICrRenderPass* renderPass) override;
+	virtual void EndRenderPassPS() override;
+
+	void UpdateResourceTableVulkan(const CrShaderBindingTableVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout);
 
 	VkDevice m_vkDevice;
 
@@ -86,50 +84,16 @@ inline VkCommandBuffer& CrCommandBufferVulkan::GetVkCommandBuffer()
 	return m_vkCommandBuffer;
 }
 
-inline void CrCommandBufferVulkan::SetViewportPS(const CrViewport& viewport)
-{
-	// TODO Be able to set multiple viewports
-	VkViewport vkViewport =
-	{
-		viewport.x, 
-		viewport.y + viewport.height,
-		viewport.width,
-		-viewport.height, // Requires VK_KHR_maintenance1
-		viewport.minDepth,
-		viewport.maxDepth
-	};
-
-	vkCmdSetViewport(m_vkCommandBuffer, 0, 1, &vkViewport);
-}
-
-inline void CrCommandBufferVulkan::SetScissorPS(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-{
-	VkRect2D scissor = { { (int32_t) x, (int32_t) y }, { width, height } };
-	vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &scissor);
-}
-
-inline void CrCommandBufferVulkan::BindIndexBufferPS(const ICrHardwareGPUBuffer* indexBuffer)
-{
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indexBuffer);
-	vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanGPUBuffer->GetVkIndexType());
-}
-
-inline void CrCommandBufferVulkan::BindVertexBuffersPS(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t bindPoint)
-{
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vertexBuffer);
-
-	VkDeviceSize offsets[1] = { 0 };
-	// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
-	// TODO Number of vertex shaders to be able to have several vertex streams ??
-	// TODO Make sure function accepts multiple vertex buffers
-	const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
-	vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
-}
-
 inline void CrCommandBufferVulkan::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline)
 {
 	// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
 	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(graphicsPipeline)->m_vkPipeline);
+}
+
+inline void CrCommandBufferVulkan::BindComputePipelineStatePS(const ICrComputePipeline* computePipeline)
+{
+	// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+	vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(computePipeline)->m_vkPipeline);
 }
 
 inline void CrCommandBufferVulkan::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)

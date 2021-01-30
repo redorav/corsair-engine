@@ -42,19 +42,26 @@ struct CrShaderBinding
 	};
 };
 
+struct CrShaderBindingTableResources
+{
+	CrFixedVector<CrShaderBinding, 64> constantBuffers;
+	CrFixedVector<CrShaderBinding, 64> samplers;
+	CrFixedVector<CrShaderBinding, 64> textures;
+	CrFixedVector<CrShaderBinding, 64> rwTextures;
+
+	CrFixedVector<CrShaderBinding, 64> storageBuffers;
+	CrFixedVector<CrShaderBinding, 64> rwStorageBuffers;
+	CrFixedVector<CrShaderBinding, 64> dataBuffers;
+	CrFixedVector<CrShaderBinding, 64> rwDataBuffers;
+};
+
 // A class that represents both the input layout for the vertex shader
 // and the constant resources needed by every stage
-class ICrShaderResourceTable
+class ICrShaderBindingTable
 {
 public:
 
-	ICrShaderResourceTable(const CrShaderResourceCount& resourceCount);
-
-	void AddConstantBuffer(cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint);
-
-	void AddTexture(cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint);
-
-	void AddSampler(cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint);
+	ICrShaderBindingTable(const CrShaderBindingTableResources& resources);
 
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 
@@ -148,9 +155,6 @@ struct CrGraphicsShaderDescriptor
 	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
 };
 
-class ICrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
-
 class ICrShader
 {
 public:
@@ -164,14 +168,14 @@ public:
 		return m_hash;
 	}
 
-	const ICrShaderResourceTable& GetResourceTable() const
+	const ICrShaderBindingTable& GetBindingTable() const
 	{
-		return *m_resourceTable.get();
+		return *m_bindingTable.get();
 	}	
 
 protected:
 
-	CrUniquePtr<ICrShaderResourceTable> m_resourceTable;
+	CrUniquePtr<ICrShaderBindingTable> m_bindingTable;
 
 	CrHash m_hash;
 };
@@ -182,10 +186,8 @@ class ICrGraphicsShader : public ICrShader
 {
 public:
 
-	ICrGraphicsShader(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	ICrGraphicsShader(const ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
-		renderDevice;
-
 		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 		{
 			CrShaderStageInfo info;
@@ -207,13 +209,24 @@ private:
 	CrVector<CrShaderStageInfo> m_stageInfos;
 };
 
+struct CrComputeShaderDescriptor
+{
+	CrShaderBytecodeSharedHandle m_bytecode;
+};
+
 class ICrComputeShader : public ICrShader
 {
 public:
 
-	ICrComputeShader() {}
+	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
+	{
+		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint();
+		m_stageInfo.stage = cr3d::ShaderStage::Compute;
+	}
 
 	~ICrComputeShader() {}
+
+	CrShaderStageInfo m_stageInfo;
 };
 
 struct CrShaderBytecodeDescriptor

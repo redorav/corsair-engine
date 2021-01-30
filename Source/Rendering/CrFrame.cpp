@@ -27,10 +27,6 @@
 
 #include "CrResourceManager.h"
 
-#include "UI/CrImGuiRenderer.h"
-
-#include "imgui.h"
-
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
@@ -158,6 +154,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
 	
 	CrBytecodeLoadDescriptor bytecodeLoadInfo;
+	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
 
 #define USE_HLSL
 
@@ -168,6 +165,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
 		"main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+
+	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "compute.hlsl").c_str()),
+		"main_cs", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #else
 
@@ -187,8 +187,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeLoadInfo);
 
-	CrGraphicsPipelineDescriptor psoDescriptor;
-	psoDescriptor.Hash();
+	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
+
+	CrGraphicsPipelineDescriptor graphicsPipelineDescriptor;
+	graphicsPipelineDescriptor.Hash();
 
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
@@ -197,27 +199,25 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 4) After creation, put in table for next time
 
 	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
 
 	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
 
-	psoDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	psoDescriptor.Hash();
+	CrComputePipelineDescriptor computePipelineDescriptor;
+
+	m_computePipelineState = ICrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
+
+	graphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
+	graphicsPipelineDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
 
 	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
 	// Semaphore used to ensures that image presentation is complete before starting to submit again
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
-
-	// Init the ImGui renderer:
-	CrImGuiRendererInitParams imguiParams = {};
-	imguiParams.m_Format = m_swapchain->GetFormat();
-	imguiParams.m_SampleCount = cr3d::SampleCount::S1;
-	CrImGuiRenderer::GetImGuiRenderer()->Init(imguiParams);
 }
 
 void CrFrame::Process()
@@ -233,12 +233,6 @@ void CrFrame::Process()
 		RecreateSwapchainAndFramebuffers();
 		swapchainResult = swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
 	}
-	
-	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
-
-	//ImGui::Text("Hello ImGui!");
-	static float testF = 0.5f;
-	ImGui::ShowDemoWindow();
 
 	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
 
@@ -251,7 +245,7 @@ void CrFrame::Process()
 	{
 		drawCommandBuffer->Begin();
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)swapchain->GetWidth(), (float)swapchain->GetHeight()));
-		drawCommandBuffer->SetScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight());
+		drawCommandBuffer->SetScissor(CrScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 	
 		CrRenderPassBeginParams renderPassParams;
 		renderPassParams.clear = true;
@@ -267,7 +261,7 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_frameBuffers[swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
 			{
-				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState);
+				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
 	
 				UpdateCamera();
 	
@@ -317,13 +311,17 @@ void CrFrame::Process()
 					drawCommandBuffer->DrawIndexed(renderMesh->m_indexBuffer->GetNumElements(), 1, 0, 0, 0);
 				}
 			}
-
-			drawCommandBuffer->EndRenderPass(m_renderPass.get());
+			drawCommandBuffer->EndRenderPass();
 		}
 		drawCommandBuffer->EndDebugEvent();
-		
-		// Render ImGui:
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_frameBuffers[swapchain->GetCurrentFrameIndex()].get());
+
+		drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
+		{
+			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
+
+			drawCommandBuffer->Dispatch(1, 1, 1);
+		}
+		drawCommandBuffer->EndDebugEvent();
 
 		drawCommandBuffer->End();
 	}
@@ -331,6 +329,8 @@ void CrFrame::Process()
 	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
 
 	swapchain->Present(mainCommandQueue.get(), m_renderCompleteSemaphore.get());
+
+	CrFrameTime::IncrementFrameCount();
 }
 
 void CrFrame::UpdateCamera()
@@ -391,8 +391,6 @@ void CrFrame::UpdateCamera()
 
 	cameraConstantData.world2View = transpose(camera.GetWorld2ViewMatrix());
 	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
-
-	CrFrameTime::IncrementFrameCount();
 }
 
 void CrFrame::RecreateSwapchainAndFramebuffers()

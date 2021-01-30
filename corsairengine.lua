@@ -26,19 +26,20 @@ ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
 
 -- Library Directories
-LibVulkan     = DependenciesDirectory..'/vulkan'
-LibEASTL      = DependenciesDirectory..'/eastl'
-LibGlslang    = DependenciesDirectory..'/glslang'
-LibGainput    = DependenciesDirectory..'/gainput'
-LibSPIRVCross = DependenciesDirectory..'/spirv-cross'
-LibHlslpp     = DependenciesDirectory..'/hlslpp'
-LibStb        = DependenciesDirectory..'/stb'
-LibxxHash     = DependenciesDirectory..'/xxHash'
-LibAssimp     = DependenciesDirectory..'/assimp'
-LibArgh       = DependenciesDirectory..'/argh'
-LibHalf       = DependenciesDirectory..'/half'
-LibDdspp      = DependenciesDirectory..'/ddspp'
-LibSDL2       = DependenciesDirectory..'/sdl2'
+LibVulkan       = DependenciesDirectory..'/vulkan'
+LibEASTL        = DependenciesDirectory..'/eastl'
+LibGlslang      = DependenciesDirectory..'/glslang'
+LibGainput      = DependenciesDirectory..'/gainput'
+LibSPIRVCross   = DependenciesDirectory..'/spirv-cross'
+LibHlslpp       = DependenciesDirectory..'/hlslpp'
+LibStb          = DependenciesDirectory..'/stb'
+LibxxHash       = DependenciesDirectory..'/xxHash'
+LibAssimp       = DependenciesDirectory..'/assimp'
+LibArgh         = DependenciesDirectory..'/argh'
+LibHalf         = DependenciesDirectory..'/half'
+LibDdspp        = DependenciesDirectory..'/ddspp'
+LibSDL2         = DependenciesDirectory..'/sdl2'
+LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibImGui      = DependenciesDirectory..'/imgui'
 
 LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
@@ -73,11 +74,6 @@ function AddXinputLibrary()
 	AddLibrary('', '', 'Xinput9_1_0')
 end
 
-function AddSpirvCrossLibrary()
-	AddLibrary({ LibSPIRVCross..'/Source', LibSPIRVCross..'/Source/include' }, LibSPIRVCross..BinaryDirectory, 'SPIRV-Cross'..LibConfig)
-	defines { 'SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS' }
-end
-
 function AddGlslangLibrary()
 	AddLibrary({ LibGlslang..'/Source/' }, LibGlslang..BinaryDirectory, 'Glslang'..LibConfig)
 end
@@ -102,6 +98,10 @@ end
 
 function AddImGuiLibrary()
 	AddLibrary(LibImGui..'/Source/', LibImGui..BinaryDirectory, 'ImGui'..LibConfig)
+end
+
+function AddSpirvReflectLibrary()
+	AddLibrary(LibSPIRVReflect..'/Source', LibSPIRVReflect..BinaryDirectory, 'SPIRV-Reflect'..LibConfig)
 end
 
 function ExcludePlatformSpecificCode(rootPath)
@@ -324,8 +324,8 @@ project(ProjectCrRendering)
 	links { ProjectCrImage } -- TODO Delete
 
 	AddAssimpLibrary()
-	AddSpirvCrossLibrary()
-	AddGainputLibrary() -- TODO remove
+	AddSpirvReflectLibrary()
+	AddGainputLibrary() -- TODO Remove
 	
 	filter { 'platforms:'..VulkanWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
@@ -348,7 +348,7 @@ project(ProjectShaders)
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/ShaderResources'
 	local shaderGenCommandLine = 
-	'"%{cfg.buildtarget.directory}'..ProjectShaderCompiler..'.exe" '..
+	'"'..ShaderCompilerAbsolutePath..'" '..
 	'-metadata ' ..
 	'-input "'..metadataFile..'" ' ..
 	'-output "'..outputFile..'" ' ..
@@ -370,7 +370,8 @@ project(ProjectShaders)
 	
 	buildinputs
 	{
-		shaderFiles
+		shaderFiles,
+		ShaderCompilerAbsolutePath
 	}
 	
 	buildmessage('')
@@ -391,7 +392,7 @@ project(ProjectShaderCompiler)
 	
 	links { ProjectCrCore }
 
-	AddSpirvCrossLibrary()
+	AddSpirvReflectLibrary()
 	AddGlslangLibrary()
 
 	-- Copy the shader compiler into a known directory

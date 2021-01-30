@@ -33,6 +33,10 @@ public:
 		{
 			case cr3d::ShaderStage::Vertex: return "vertex";
 			case cr3d::ShaderStage::Pixel: return "pixel";
+			case cr3d::ShaderStage::Hull: return "hull";
+			case cr3d::ShaderStage::Domain: return "domain";
+			case cr3d::ShaderStage::Geometry: return "geometry";
+			case cr3d::ShaderStage::Compute: return "compute";
 			default: return "invalid";
 		}
 	}

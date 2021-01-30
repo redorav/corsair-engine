@@ -29,7 +29,7 @@ struct CrTextureCreateParams
 	cr3d::TextureUsageFlags usage;
 	CrString name;
 	const void* initialData; // TODO do better
-	uint64_t initialDataSize;
+	uint64_t initialDataSize; // TODO delete from here
 	// This extra data exists to be able to pass platform-specific information
 	// such as swapchain information, etc.
 	uint32_t extraData;

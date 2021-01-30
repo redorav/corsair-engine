@@ -26,7 +26,7 @@ cbuffer UIData : register(b0)
 }
 
 Texture2D UITexture;
-SamplerState UISampleState; // Using same name as in other files makes the metadata file. But removing it makes spirv gen fail.
+SamplerState UISampleState;
 
 VS_OUT_UI main_vs(VS_IN_UI IN)
 {

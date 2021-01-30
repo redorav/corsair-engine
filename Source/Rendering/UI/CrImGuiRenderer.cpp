@@ -14,22 +14,20 @@
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrSampler.h"
-
-#include "ShaderResources.h" // TODO: Should this be included directly? 
+#include "ShaderResources.h"
 
 #include "imgui.h"
 
 // Based on ImDrawVert
-// sizeof(UIVertex) != UIVertex::GetVertexDescriptor().GetDataSize(). Bad things happen.
 struct UIVertex
 {
-	CrVertexElement<float, cr3d::DataFormat::RG32_Float> m_Position;
-	CrVertexElement<float, cr3d::DataFormat::RG32_Float> m_UV;
-	CrVertexElement<uint32_t, cr3d::DataFormat::RGBA8_Unorm> m_Color;
+	CrVertexElement<float, cr3d::DataFormat::RG32_Float> position;
+	CrVertexElement<float, cr3d::DataFormat::RG32_Float> uv;
+	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
 
 	static CrVertexDescriptor GetVertexDescriptor()
 	{
-		return { decltype(m_Position)::GetFormat(), decltype(m_UV)::GetFormat(),decltype(m_Color)::GetFormat() };
+		return { decltype(position)::GetFormat(), decltype(uv)::GetFormat(), decltype(color)::GetFormat() };
 	}
 };
 
@@ -57,7 +55,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	// Generic ImGui setup:
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	CrAssertMsg(sizeof(ImDrawVert) == UIVertex::GetVertexDescriptor().GetDataSize(), "ImGui vertex decl doesn't match");
+	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex decl doesn't match");
 
 	const auto renderDevice = ICrRenderDevice::GetRenderDevice();
 
@@ -68,7 +66,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
 		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
 		cr3d::ResourceState::Undefined, cr3d::ResourceState::Undefined
-	); // Do I need to set these states.. ??
+	);
 
 	m_renderPass = renderDevice->CreateRenderPass(renderPassDesc);
 

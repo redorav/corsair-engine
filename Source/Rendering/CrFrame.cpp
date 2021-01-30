@@ -329,6 +329,8 @@ void CrFrame::Process()
 	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
 
 	swapchain->Present(mainCommandQueue.get(), m_renderCompleteSemaphore.get());
+
+	CrFrameTime::IncrementFrameCount();
 }
 
 void CrFrame::UpdateCamera()
@@ -389,8 +391,6 @@ void CrFrame::UpdateCamera()
 
 	cameraConstantData.world2View = transpose(camera.GetWorld2ViewMatrix());
 	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
-
-	CrFrameTime::IncrementFrameCount();
 }
 
 void CrFrame::RecreateSwapchainAndFramebuffers()

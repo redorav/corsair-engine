@@ -35,7 +35,7 @@ enum AxisCode
 	JoystickR2,
 
 	MouseX,
-	MouseY
+	MouseY,
 };
 
 class CrInputManager

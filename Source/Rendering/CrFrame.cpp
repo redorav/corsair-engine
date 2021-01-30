@@ -213,7 +213,11 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// Semaphore used to ensures that image presentation is complete before starting to submit again
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
-	CrImGuiRenderer::GetImGuiRenderer()->Init(&renderPassDescriptor);
+	// Init the ImGui renderer:
+	CrImGuiRendererInitParams imguiParams = {};
+	imguiParams.m_Format = m_swapchain->GetFormat();
+	imguiParams.m_SampleCount = cr3d::SampleCount::S1;
+	CrImGuiRenderer::GetImGuiRenderer()->Init(imguiParams);
 }
 
 void CrFrame::Process()
@@ -314,12 +318,12 @@ void CrFrame::Process()
 				}
 			}
 
-			// TODO: this needs its own render pass.
-			CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer);
-
 			drawCommandBuffer->EndRenderPass(m_renderPass.get());
 		}
 		drawCommandBuffer->EndDebugEvent();
+		
+		// Render ImGui:
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_frameBuffers[swapchain->GetCurrentFrameIndex()].get());
 
 		drawCommandBuffer->End();
 	}

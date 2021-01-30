@@ -50,69 +50,86 @@ CrImGuiRenderer* CrImGuiRenderer::GetImGuiRenderer()
 	return k_Instance;
 }
 
-void CrImGuiRenderer::Init(CrRenderPassDescriptor* renderPassDesc)
+void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 {
+	m_InitParams = initParams;
+
+	// Generic ImGui setup:
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	CrAssertMsg(sizeof(ImDrawVert) == UIVertex::GetVertexDescriptor().GetDataSize(), "ImGui vertex decl doesn't match");
+
+	const auto renderDevice = ICrRenderDevice::GetRenderDevice();
+
+	// Setup render pass used to blit the UI:
+	CrRenderPassDescriptor renderPassDesc;
+	renderPassDesc.m_colorAttachments[0] = CrAttachmentDescriptor(
+		initParams.m_Format, initParams.m_SampleCount,
+		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
+		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
+		cr3d::ResourceState::Undefined, cr3d::ResourceState::Undefined
+	); // Do I need to set these states.. ??
+
+	m_RenderPass = renderDevice->CreateRenderPass(renderPassDesc);
 
 	// Pipeline description:
-	CrGraphicsPipelineDescriptor psoDescriptor;
-	psoDescriptor.depthStencilState.depthTestEnable = false;
-	psoDescriptor.depthStencilState.depthWriteEnable = false;
-	psoDescriptor.blendState.renderTargetBlends[0].enable = true;
-	psoDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
-	psoDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-	psoDescriptor.blendState.renderTargetBlends[0].colorBlendOp= cr3d::BlendOp::Add;
-	psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-	psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
-	psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
-	psoDescriptor.Hash();
+	{
+		CrGraphicsPipelineDescriptor psoDescriptor;
+		psoDescriptor.depthStencilState.depthTestEnable = false;
+		psoDescriptor.depthStencilState.depthWriteEnable = false;
+		psoDescriptor.blendState.renderTargetBlends[0].enable = true;
+		psoDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
+		psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
+		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
+		psoDescriptor.Hash();
 
-	// TODO: This should be defined in one place only
-	CrString SHADER_PATH = IN_SRC_PATH;
-	SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
+		CrString SHADER_PATH = IN_SRC_PATH;
+		SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
 
-	// Load shaders:
-	CrBytecodeLoadDescriptor bytecodeDesc;
-	bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
-		CrPath((SHADER_PATH + "ui.hlsl").c_str()), "main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
-	));
-	bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
-		CrPath((SHADER_PATH + "ui.hlsl").c_str()), "main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
-	));
-	CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
+		// Load shaders:
+		CrBytecodeLoadDescriptor bytecodeDesc;
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
+			CrPath((SHADER_PATH + "ui.hlsl").c_str()), "main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
+		));
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
+			CrPath((SHADER_PATH + "ui.hlsl").c_str()), "main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
+		));
+		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
-	// Create it:
-	m_UIGfxPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), *renderPassDesc
-	);
+		// Create it:
+		m_UIGfxPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+			psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), renderPassDesc
+		);
+	}
 
 	// Font atlas:
-	unsigned char* fontData = nullptr;
-	int fontWidth, fontHeight;
-	io.Fonts->GetTexDataAsRGBA32(&fontData, &fontWidth, &fontHeight);
-	
-	CrTextureCreateParams fontParams;
-	fontParams.width = (uint32_t)fontWidth;
-	fontParams.height = (uint32_t)fontHeight;
-	fontParams.format = cr3d::DataFormat::RGBA8_Unorm;
-	fontParams.name = "ImGui Font Atlas";
-	fontParams.initialData = fontData;
-	fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
+	{
+		unsigned char* fontData = nullptr;
+		int fontWidth, fontHeight;
+		io.Fonts->GetTexDataAsRGBA32(&fontData, &fontWidth, &fontHeight);
 
-	m_FontAtlas = ICrRenderDevice::GetRenderDevice()->CreateTexture(fontParams);
-	CrAssertMsg( m_FontAtlas.get(), "Failed to create the ImGui font atlas");
-	
-	io.Fonts->TexID = (ImTextureID)m_FontAtlas.get();
+		CrTextureCreateParams fontParams;
+		fontParams.width = (uint32_t)fontWidth;
+		fontParams.height = (uint32_t)fontHeight;
+		fontParams.format = cr3d::DataFormat::RGBA8_Unorm;
+		fontParams.name = "ImGui Font Atlas";
+		fontParams.initialData = fontData;
+		fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
 
+		m_FontAtlas = renderDevice->CreateTexture(fontParams);
+		CrAssertMsg(m_FontAtlas.get(), "Failed to create the ImGui font atlas");
+		io.Fonts->TexID = (ImTextureID)m_FontAtlas.get();
+	}
+	
 	// Default linear clamp sampler state:
 	CrSamplerDescriptor descriptor;
-	m_UISamplerState = ICrRenderDevice::GetRenderDevice()->CreateSampler(descriptor);
+	m_UISamplerState = renderDevice->CreateSampler(descriptor);
 
 	// Default res for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
-
-	CrAssertMsg(sizeof(ImDrawVert) == UIVertex::GetVertexDescriptor().GetDataSize(), "ImGui vertex decl doesn't match");
 }
 
 void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
@@ -122,7 +139,7 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	// Generic io:
 	io.DisplaySize = ImVec2((float)width, (float)height);
 	io.DeltaTime = CrFrameTime::GetFrameDelta();
-
+		
 	// Update input:
 	io.MouseDown[0] = CrInput.GetKey(KeyCode::MouseLeft);
 	io.MouseDown[1] = CrInput.GetKey(KeyCode::MouseRight);
@@ -131,12 +148,10 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	float my = CrInput.GetAxis(AxisCode::MouseY);
 	io.MousePos = ImVec2(mx * io.DisplaySize.x, my * io.DisplaySize.y);
 
-	io.KeysDown[ImGuiKey_A];
-
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer)
+void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* output)
 {
 	ImGui::Render();
 
@@ -147,10 +162,17 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer)
 		return;
 	}
 
+	const ImGuiIO& io = ImGui::GetIO();
+
 	UpdateBuffers(data);
 
 	// Begin rendering the draw lists:
+	CrRenderPassBeginParams passParams = {};
+	passParams.clear = false;
+	passParams.drawArea = { 0, 0, (uint32_t)io.DisplaySize.x, (uint32_t)io.DisplaySize.y };
+
 	cmdBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
+	cmdBuffer->BeginRenderPass(m_RenderPass.get(), output, passParams);
 	{
 		// Setup global config:
 		cmdBuffer->BindGraphicsPipelineState(m_UIGfxPipeline);
@@ -203,11 +225,12 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer)
 						drawCmd->UserCallback(drawList, drawCmd);
 					}
 				}
-			}	
+			}
 			acumIdxOffset += drawList->IdxBuffer.Size;
 			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
 	}
+	cmdBuffer->EndRenderPass(m_RenderPass.get());
 	cmdBuffer->EndDebugEvent();
 }
 
@@ -227,12 +250,11 @@ float4x4 CrImGuiRenderer::GetProjection(ImDrawData* data)
 
 void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 {
-	static bool k_ForceReset = false;
 	// TODO: I don't think the reseting the buffer is safe? Its deleted inline.
 
 	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
 	uint32_t curIdxCount = data->TotalIdxCount;
-	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount || k_ForceReset)
+	if (!m_IndexBuffer || curIdxCount > m_CurMaxIndexCount)
 	{
 		if (m_IndexBuffer)
 		{
@@ -244,7 +266,7 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 
 	// Check vertex buffer size:
 	uint32_t curVtxCount = data->TotalVtxCount;
-	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount || k_ForceReset)
+	if (!m_VertexBuffer || curVtxCount > m_CurMaxVertexCount)
 	{
 		if (m_VertexBuffer)
 		{

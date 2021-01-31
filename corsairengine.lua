@@ -40,7 +40,7 @@ LibHalf         = DependenciesDirectory..'/half'
 LibDdspp        = DependenciesDirectory..'/ddspp'
 LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
-LibImGui      = DependenciesDirectory..'/imgui'
+LibImGui        = DependenciesDirectory..'/imgui'
 
 LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
 

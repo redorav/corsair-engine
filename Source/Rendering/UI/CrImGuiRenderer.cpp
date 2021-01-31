@@ -34,8 +34,8 @@ struct UIVertex
 CrImGuiRenderer* CrImGuiRenderer::k_instance = nullptr;
 
 CrImGuiRenderer::CrImGuiRenderer()
-	: m_curMaxIndexCount(0)
-	, m_curMaxVertexCount(0)
+	: m_currentMaxIndexCount(0)
+	, m_currentMaxVertexCount(0)
 {
 }
 
@@ -57,7 +57,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	ImGuiIO& io = ImGui::GetIO();
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	const ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
+	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
 
 	// Setup render pass used to blit the UI:
 	CrRenderPassDescriptor renderPassDescriptor;
@@ -252,27 +252,27 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 	// TODO: I don't think the reseting the buffer is safe? Its deleted inline.
 
 	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-	uint32_t curIdxCount = data->TotalIdxCount;
-	if (!m_indexBuffer || curIdxCount > m_curMaxIndexCount)
+	uint32_t currentIndexCount = data->TotalIdxCount;
+	if (!m_indexBuffer || currentIndexCount > m_currentMaxIndexCount)
 	{
-		m_curMaxIndexCount = curIdxCount * 2;
-		m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_curMaxIndexCount);
+		m_currentMaxIndexCount = currentIndexCount * 2;
+		m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_currentMaxIndexCount);
 	}
 
 	// Check vertex buffer size:
-	uint32_t curVtxCount = data->TotalVtxCount;
-	if (!m_vertexBuffer || curVtxCount > m_curMaxVertexCount)
+	uint32_t currentVertexCount = data->TotalVtxCount;
+	if (!m_vertexBuffer || currentVertexCount > m_currentMaxVertexCount)
 	{
-		m_curMaxVertexCount = curVtxCount * 2;
-		m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_curMaxVertexCount);
+		m_currentMaxVertexCount = currentVertexCount * 2;
+		m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_currentMaxVertexCount);
 	}
 
 	// Update contents:
 	ImDrawIdx* pIdx = (ImDrawIdx*)m_indexBuffer->Lock();
 	ImDrawVert* pVtx = (ImDrawVert*)m_vertexBuffer->Lock();
-	for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+	for (int i = 0; i < data->CmdListsCount; ++i)
 	{
-		ImDrawList* drawList = data->CmdLists[listIdx];
+		ImDrawList* drawList = data->CmdLists[i];
 
 		memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
 		memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert));

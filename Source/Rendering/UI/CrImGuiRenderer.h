@@ -16,32 +16,47 @@ struct CrImGuiRendererInitParams
 
 class CrImGuiRenderer
 {
-private:
-	CrImGuiRenderer();
-	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
-	~CrImGuiRenderer() = delete;
-
 public:
+
 	static CrImGuiRenderer* GetImGuiRenderer();
+
 	void Init(const CrImGuiRendererInitParams& initParams);
+
 	void NewFrame(uint32_t width, uint32_t height);
+
 	void Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* output);
 
 private:
-	float4x4 GetProjection(ImDrawData* data);
+
+	CrImGuiRenderer();
+
+	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
+
+	~CrImGuiRenderer() = delete;
+
+	float4x4 ComputeProjectionMatrix(ImDrawData* data);
+
 	void UpdateBuffers(ImDrawData* data);
 
 	static CrImGuiRenderer* k_instance;
 
 	CrRenderPassSharedHandle m_renderPass;
-	CrGraphicsPipelineHandle m_uiGfxPipeline;
+
+	CrGraphicsPipelineHandle m_uiGraphicsPipeline;
+
 	CrIndexBufferSharedHandle m_indexBuffer;
+
 	CrVertexBufferSharedHandle m_vertexBuffer;
+
 	CrTextureSharedHandle m_fontAtlas;
+
 	CrSamplerSharedHandle m_uiSamplerState;
 
-	uint32_t m_curMaxIndexCount;
-	uint32_t m_curMaxVertexCount;
+	// Imgui's vertex and index buffers grow if more vertices
+	// are needed, but never shrink
+	uint32_t m_currentMaxIndexCount;
+
+	uint32_t m_currentMaxVertexCount;
 
 	CrImGuiRendererInitParams m_initParams;
 };

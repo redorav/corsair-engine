@@ -65,7 +65,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		initParams.m_Format, initParams.m_SampleCount,
 		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
 		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
-		cr3d::ResourceState::Undefined, cr3d::ResourceState::Undefined
+		cr3d::ResourceState::Present, cr3d::ResourceState::Present
 	);
 
 	m_renderPass = renderDevice->CreateRenderPass(renderPassDesc);

@@ -104,12 +104,14 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	// 2. Get current resources and update the descriptor set
 	CrArray<VkDescriptorBufferInfo, 64> bufferInfos;
 	CrArray<VkDescriptorImageInfo, 64> imageInfos;
+	CrArray<VkBufferView, 64> bufferViews;
 	CrArray<VkWriteDescriptorSet, 64> writeDescriptorSets;
 	CrArray<uint32_t, 64> offsets;
 
 	uint32_t descriptorCount = 0;
 	uint32_t bufferCount = 0;
 	uint32_t imageCount = 0;
+	uint32_t texelBufferCount = 0;
 
 	bindingTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
@@ -163,6 +165,19 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 		descriptorCount++;
 		imageCount++;
+	});
+
+	bindingTable.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
+	{
+		const CrHardwareGPUBufferVulkan* vulkanDataBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id]->GetHardwareBuffer());
+
+		bufferViews[texelBufferCount] = vulkanDataBuffer->GetVkBufferView();
+
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+			VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, nullptr, nullptr, &bufferViews[texelBufferCount]);
+
+		descriptorCount++;
+		texelBufferCount++;
 	});
 
 	CrAssert(descriptorCount < writeDescriptorSets.size());

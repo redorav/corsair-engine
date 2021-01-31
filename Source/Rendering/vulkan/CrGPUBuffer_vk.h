@@ -23,6 +23,8 @@ public:
 
 	VkBuffer GetVkBuffer() const;
 
+	VkBufferView GetVkBufferView() const;
+
 	VkDeviceMemory GetVkMemory() const;
 	
 	virtual void* LockPS() override;
@@ -34,6 +36,8 @@ private:
 	VkDevice m_vkDevice;
 
 	VkBuffer m_vkBuffer;
+
+	VkBufferView m_vkBufferView = nullptr;
 
 	VkDeviceMemory m_vkMemory;
 
@@ -48,6 +52,11 @@ inline VkIndexType CrHardwareGPUBufferVulkan::GetVkIndexType() const
 inline VkBuffer CrHardwareGPUBufferVulkan::GetVkBuffer() const
 {
 	return m_vkBuffer;
+}
+
+inline VkBufferView CrHardwareGPUBufferVulkan::GetVkBufferView() const
+{
+	return m_vkBufferView;
 }
 
 inline VkDeviceMemory CrHardwareGPUBufferVulkan::GetVkMemory() const

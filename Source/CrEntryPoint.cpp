@@ -63,8 +63,10 @@ int main(int argc, char* argv[])
 			switch (event.type)
 			{
 				case SDL_QUIT:
+				{
 					exit(0);
 					break;
+				}
 				case SDL_SYSWMEVENT:
 				{
 					SDL_SysWMmsg wMsg = *event.syswm.msg;

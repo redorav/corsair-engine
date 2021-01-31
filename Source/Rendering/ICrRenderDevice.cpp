@@ -126,6 +126,11 @@ CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVerti
 	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor));
 }
 
+CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+{
+	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements));
+}
+
 cr3d::GPUWaitResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	return WaitForFencePS(fence, timeoutNanoseconds);

@@ -23,6 +23,24 @@ public:
 		return ConstantBufferMetaTable[id];
 	}
 
+
+	static const SamplerMetadata& GetSampler(const CrString& name)
+	{
+		auto samplerMetadata = SamplerTable.find(name);
+
+		if (samplerMetadata != SamplerTable.end())
+		{
+			return (*samplerMetadata).second;
+		}
+
+		return InvalidSamplerMetaInstance;
+	}
+
+	static const SamplerMetadata& GetSampler(Samplers::T id)
+	{
+		return SamplerMetaTable[id];
+	}
+
 	static const TextureMetadata& GetTexture(const CrString& name)
 	{
 		auto textureMetadata = TextureTable.find(name);
@@ -40,20 +58,20 @@ public:
 		return TextureMetaTable[id];
 	}
 
-	static const SamplerMetadata& GetSampler(const CrString& name)
+	static const RWDataBufferMetadata& GetRWDataBuffer(const CrString& name)
 	{
-		auto samplerMetadata = SamplerTable.find(name);
+		auto rwDataBufferMetadata = RWDataBufferTable.find(name);
 
-		if (samplerMetadata != SamplerTable.end())
+		if (rwDataBufferMetadata != RWDataBufferTable.end())
 		{
-			return (*samplerMetadata).second;
+			return (*rwDataBufferMetadata).second;
 		}
 
-		return InvalidSamplerMetaInstance;
+		return InvalidRWDataBufferMetaInstance;
 	}
 
-	static const SamplerMetadata& GetSampler(Samplers::T id)
+	static const RWDataBufferMetadata& GetRWDataBuffer(RWDataBuffers::T id)
 	{
-		return SamplerMetaTable[id];
+		return RWDataBufferMetaTable[id];
 	}
 };

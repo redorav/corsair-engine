@@ -20,8 +20,12 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 
 	VkBufferCreateInfo bufferCreateInfo = crvk::CreateVkBufferCreateInfo
 	(
-		0, descriptor.numElements * descriptor.stride, GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access), 
-		VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
+		0, 
+		descriptor.numElements * descriptor.stride, 
+		GetVkBufferUsageFlagBits(descriptor.usage, descriptor.access),
+		VK_SHARING_MODE_EXCLUSIVE, 
+		0,
+		nullptr
 	);
 
 	vkResult = vkCreateBuffer(m_vkDevice, &bufferCreateInfo, nullptr, &m_vkBuffer);
@@ -31,7 +35,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 	VkMemoryRequirements memReqs;
 	vkGetBufferMemoryRequirements(m_vkDevice, m_vkBuffer, &memReqs);
 
-	VkMemoryAllocateInfo memAlloc = {};
+	VkMemoryAllocateInfo memAlloc;
 	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memAlloc.pNext = nullptr;
 	memAlloc.allocationSize = memReqs.size;
@@ -41,6 +45,23 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 
 	vkResult = vkBindBufferMemory(m_vkDevice, m_vkBuffer, m_vkMemory, 0);
 	CrAssert(vkResult == VK_SUCCESS);
+
+	if (descriptor.usage & cr3d::BufferUsage::Data)
+	{
+		CrAssert(descriptor.dataFormat != cr3d::DataFormat::Count);
+
+		VkBufferViewCreateInfo vkBufferViewCreateInfo;
+		vkBufferViewCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+		vkBufferViewCreateInfo.pNext = nullptr;
+		vkBufferViewCreateInfo.flags = 0;
+		vkBufferViewCreateInfo.buffer = m_vkBuffer;
+		vkBufferViewCreateInfo.format = crvk::GetVkFormat(descriptor.dataFormat);
+		vkBufferViewCreateInfo.offset = 0;
+		vkBufferViewCreateInfo.range = memReqs.size;
+
+		vkResult = vkCreateBufferView(m_vkDevice, &vkBufferViewCreateInfo, nullptr, &m_vkBufferView);
+		CrAssert(vkResult == VK_SUCCESS);
+	}
 }
 
 CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()

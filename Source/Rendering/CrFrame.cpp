@@ -140,6 +140,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	descriptor.addressModeW = cr3d::AddressMode::Wrap;
 	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
+	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
+
 	RecreateSwapchainAndFramebuffers();
 
 	// Create main renderpass
@@ -330,6 +332,8 @@ void CrFrame::Process()
 		drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
 		{
 			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
+
+			drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
 
 			drawCommandBuffer->Dispatch(1, 1, 1);
 		}

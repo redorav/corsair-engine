@@ -61,6 +61,8 @@ public:
 
 	void BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler);
 
+	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer);
+
 	void BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams);
 
 	void EndRenderPass();
@@ -138,6 +140,8 @@ protected:
 
 		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];
+
+		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
 	};
 
 	CurrentState					m_currentState = {};
@@ -250,6 +254,11 @@ inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, cons
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
+}
+
+inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
+{
+	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
 }
 
 inline void ICrCommandBuffer::BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)

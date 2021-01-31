@@ -11,8 +11,8 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& 
 	mapped = false;
 }
 
-CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride)
-	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride)
+CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat)
+	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride), m_dataFormat(dataFormat)
 {
 	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (stride == 2 || stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes");
 
@@ -26,6 +26,7 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 	else
 	{
 		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
+		hardwareGPUBufferDescriptor.dataFormat = dataFormat;
 
 		m_buffer = renderDevice->CreateHardwareGPUBuffer(hardwareGPUBufferDescriptor);
 		m_memory = nullptr;

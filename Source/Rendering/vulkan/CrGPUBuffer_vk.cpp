@@ -66,6 +66,11 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* rende
 
 CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
 {
+	if (m_vkBufferView)
+	{
+		vkDestroyBufferView(m_vkDevice, m_vkBufferView, nullptr);
+	}
+
 	vkDestroyBuffer(m_vkDevice, m_vkBuffer, nullptr);
 
 	vkFreeMemory(m_vkDevice, m_vkMemory, nullptr);

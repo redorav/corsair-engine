@@ -224,10 +224,11 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// Semaphore used to ensures that image presentation is complete before starting to submit again
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
+
 	// ImGui renderer init:
 	CrImGuiRendererInitParams imguiInitParams = {};
-	imguiInitParams.m_Format = m_swapchain->GetFormat();
-	imguiInitParams.m_SampleCount = cr3d::SampleCount::S1;
+	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
+	imguiInitParams.m_sampleCount = cr3d::SampleCount::S1;
 	CrImGuiRenderer::GetImGuiRenderer()->Init(imguiInitParams);
 }
 
@@ -340,7 +341,7 @@ void CrFrame::Process()
 		drawCommandBuffer->EndDebugEvent();
 
 		// Render ImGui:
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_frameBuffers[swapchain->GetCurrentFrameIndex()].get());
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchainFrameBuffersNoDepth[swapchain->GetCurrentFrameIndex()].get());
 
 		drawCommandBuffer->End();
 	}
@@ -444,12 +445,16 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 
 	// 3. Recreate framebuffers
 
-	m_frameBuffers.resize(m_swapchain->GetImageCount());
+	m_swapchainFrameBuffers.resize(m_swapchain->GetImageCount());
+	m_swapchainFrameBuffersNoDepth.resize(m_swapchain->GetImageCount());
 
-	for (uint32_t i = 0; i < m_frameBuffers.size(); i++)
+	for (uint32_t i = 0; i < m_swapchainFrameBuffers.size(); i++)
 	{
 		CrFramebufferCreateParams frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
-		m_frameBuffers[i] = renderDevice->CreateFramebuffer(frameBufferParams);
+		m_swapchainFrameBuffers[i] = renderDevice->CreateFramebuffer(frameBufferParams);
+
+		CrFramebufferCreateParams frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
+		m_swapchainFrameBuffersNoDepth[i] = renderDevice->CreateFramebuffer(frameBufferParamsNoDepth);
 	}
 
 	// 4. Recreate command buffers

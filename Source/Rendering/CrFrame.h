@@ -25,7 +25,9 @@ public:
 private:
 
 	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
-	CrVector<CrFramebufferSharedHandle> m_frameBuffers;
+	CrVector<CrFramebufferSharedHandle> m_swapchainFrameBuffers;
+	CrVector<CrFramebufferSharedHandle> m_swapchainFrameBuffersNoDepth;
+
 	// TODO Pass as param
 	uint32_t m_width = 0;
 	uint32_t m_height = 0;

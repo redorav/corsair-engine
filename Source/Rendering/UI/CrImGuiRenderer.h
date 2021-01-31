@@ -10,8 +10,8 @@ struct ImDrawData;
 
 struct CrImGuiRendererInitParams
 {
-	cr3d::DataFormat::T m_Format;
-	cr3d::SampleCount m_SampleCount;
+	cr3d::DataFormat::T m_swapchainFormat;
+	cr3d::SampleCount m_sampleCount;
 };
 
 class CrImGuiRenderer

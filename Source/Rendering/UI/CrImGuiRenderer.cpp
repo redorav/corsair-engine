@@ -61,8 +61,9 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 
 	// Setup render pass used to blit the UI:
 	CrRenderPassDescriptor renderPassDescriptor;
+
 	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(
-		initParams.m_Format, initParams.m_SampleCount,
+		initParams.m_swapchainFormat, initParams.m_sampleCount,
 		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
 		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
 		cr3d::ResourceState::Present, cr3d::ResourceState::Present

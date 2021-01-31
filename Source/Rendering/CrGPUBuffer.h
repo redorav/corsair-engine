@@ -57,10 +57,6 @@ public:
 	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
 
 	bool mapped : 1;
-
-	void* memory = nullptr;
-
-	uint32_t offset = 0;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()

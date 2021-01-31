@@ -55,20 +55,20 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	// Generic ImGui setup:
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex decl doesn't match");
+	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	const auto renderDevice = ICrRenderDevice::GetRenderDevice();
+	const ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
 
 	// Setup render pass used to blit the UI:
-	CrRenderPassDescriptor renderPassDesc;
-	renderPassDesc.m_colorAttachments[0] = CrAttachmentDescriptor(
+	CrRenderPassDescriptor renderPassDescriptor;
+	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(
 		initParams.m_Format, initParams.m_SampleCount,
 		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
 		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
 		cr3d::ResourceState::Present, cr3d::ResourceState::Present
 	);
 
-	m_renderPass = renderDevice->CreateRenderPass(renderPassDesc);
+	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
 
 	// Pipeline description:
 	{
@@ -84,6 +84,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
 		psoDescriptor.Hash();
 
+		// TODO Rework shader paths
 		CrString SHADER_PATH = IN_SRC_PATH;
 		SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
 
@@ -98,9 +99,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_uiGfxPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-			psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), renderPassDesc
-		);
+		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), renderPassDescriptor);
 	}
 
 	// Font atlas:
@@ -126,7 +125,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	CrSamplerDescriptor descriptor;
 	m_uiSamplerState = renderDevice->CreateSampler(descriptor);
 
-	// Default res for the first frame, we need to query the real viewport during NewFrame()
+	// Default resolution for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
 }
 
@@ -170,71 +169,71 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 	passParams.drawArea = { 0, 0, (uint32_t)io.DisplaySize.x, (uint32_t)io.DisplaySize.y };
 
 	cmdBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
-	cmdBuffer->BeginRenderPass(m_renderPass.get(), output, passParams);
 	{
-		// Setup global config:
-		cmdBuffer->BindGraphicsPipelineState(m_uiGfxPipeline.get());
-		cmdBuffer->BindIndexBuffer(m_indexBuffer.get());
-		cmdBuffer->BindVertexBuffer(m_vertexBuffer.get(), 0);
-		cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
-
-		// Projection matrix. TODO: this could be cached.
-		CrGPUBufferType<UIData> uiDataBuffer = cmdBuffer->AllocateConstantBuffer<UIData>();
-		UIDataData* uiData = uiDataBuffer.Lock();
+		cmdBuffer->BeginRenderPass(m_renderPass.get(), output, passParams);
 		{
-			uiData->projection = GetProjection(data);
-		}
-		uiDataBuffer.Unlock();
-		cmdBuffer->BindConstantBuffer(&uiDataBuffer);
+			// Setup global config:
+			cmdBuffer->BindGraphicsPipelineState(m_uiGraphicsPipeline.get());
+			cmdBuffer->BindIndexBuffer(m_indexBuffer.get());
+			cmdBuffer->BindVertexBuffer(m_vertexBuffer.get(), 0);
+			cmdBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
 
-		// Iterate over each draw list -> draw command: 
-		ImVec2 clipOffset = data->DisplayPos;
-		uint32_t acumVtxOffset = 0;
-		uint32_t acumIdxOffset = 0;
-		for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
-		{
-			const ImDrawList* drawList = data->CmdLists[listIdx];
-			for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
+			// Projection matrix. TODO: this could be cached.
+			CrGPUBufferType<UIData> uiDataBuffer = cmdBuffer->AllocateConstantBuffer<UIData>();
+			UIDataData* uiData = uiDataBuffer.Lock();
 			{
-				const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
-				CrScissor scissorRect = CrScissor(
-					(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
-					(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
-				);
+				uiData->projection = ComputeProjectionMatrix(data);
+			}
+			uiDataBuffer.Unlock();
+			cmdBuffer->BindConstantBuffer(&uiDataBuffer);
 
-				if (!drawCmd->UserCallback)
+			// Iterate over each draw list -> draw command: 
+			ImVec2 clipOffset = data->DisplayPos;
+			uint32_t acumVtxOffset = 0;
+			uint32_t acumIdxOffset = 0;
+			for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+			{
+				const ImDrawList* drawList = data->CmdLists[listIdx];
+				for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
 				{
-					// Generic rendering.
-					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
-					cmdBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
-					cmdBuffer->SetScissor(scissorRect);
-					cmdBuffer->DrawIndexed(
-						drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0
+					const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
+					CrScissor scissorRect = CrScissor(
+						(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
+						(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
 					);
-				}
-				else
-				{
-					// Handle user callback:
-					if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
+
+					if (!drawCmd->UserCallback)
 					{
-						// This is a special case to reset the render state.. What should we do here?
-						CrAssertMsg(false, "Not implemented");
+						// Generic rendering.
+						ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
+						cmdBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
+						cmdBuffer->SetScissor(scissorRect);
+						cmdBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
 					}
 					else
 					{
-						drawCmd->UserCallback(drawList, drawCmd);
+						// Handle user callback:
+						if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
+						{
+							// This is a special case to reset the render state.. What should we do here?
+							CrAssertMsg(false, "Not implemented");
+						}
+						else
+						{
+							drawCmd->UserCallback(drawList, drawCmd);
+						}
 					}
 				}
+				acumIdxOffset += drawList->IdxBuffer.Size;
+				acumVtxOffset += drawList->VtxBuffer.Size;
 			}
-			acumIdxOffset += drawList->IdxBuffer.Size;
-			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
+		cmdBuffer->EndRenderPass();
 	}
-	cmdBuffer->EndRenderPass();
 	cmdBuffer->EndDebugEvent();
 }
 
-float4x4 CrImGuiRenderer::GetProjection(ImDrawData* data)
+float4x4 CrImGuiRenderer::ComputeProjectionMatrix(ImDrawData* data)
 {
 	float L = data->DisplayPos.x;
 	float R = data->DisplayPos.x + data->DisplaySize.x;
@@ -256,10 +255,6 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 	uint32_t curIdxCount = data->TotalIdxCount;
 	if (!m_indexBuffer || curIdxCount > m_curMaxIndexCount)
 	{
-		if (m_indexBuffer)
-		{
-			m_indexBuffer.reset();
-		}
 		m_curMaxIndexCount = curIdxCount * 2;
 		m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_curMaxIndexCount);
 	}
@@ -268,10 +263,6 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 	uint32_t curVtxCount = data->TotalVtxCount;
 	if (!m_vertexBuffer || curVtxCount > m_curMaxVertexCount)
 	{
-		if (m_vertexBuffer)
-		{
-			m_vertexBuffer.reset();
-		}
 		m_curMaxVertexCount = curVtxCount * 2;
 		m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_curMaxVertexCount);
 	}

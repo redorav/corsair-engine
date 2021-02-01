@@ -27,28 +27,30 @@ static ICrShaderBindingTable* CreateBindingTable(const ICrRenderDevice* renderDe
 			{
 				const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(resource.name);
 				resources.constantBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				//resources.AddConstantBuffer(stage, metadata.id, resource.bindPoint);
 				break;
 			}
 			case cr3d::ShaderResourceType::Sampler:
 			{
 				const SamplerMetadata& metadata = CrShaderMetadata::GetSampler(resource.name);
 				resources.samplers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				//resources.AddSampler(stage, metadata.id, resource.bindPoint);
 				break;
 			}
 			case cr3d::ShaderResourceType::Texture:
 			{
 				const TextureMetadata& metadata = CrShaderMetadata::GetTexture(resource.name);
 				resources.textures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				//resources.AddTexture(stage, metadata.id, resource.bindPoint);
+				break;
+			}
+			case cr3d::ShaderResourceType::RWTexture:
+			{
+				const RWTextureMetadata& metadata = CrShaderMetadata::GetRWTexture(resource.name);
+				resources.rwTextures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
 				break;
 			}
 			case cr3d::ShaderResourceType::RWDataBuffer:
 			{
 				const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
 				resources.rwDataBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				//resources.AddTexture(stage, metadata.id, resource.bindPoint);
 				break;
 			}
 		};

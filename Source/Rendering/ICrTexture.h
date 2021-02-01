@@ -46,7 +46,9 @@ public:
 
 	bool IsRenderTarget() const;
 
-	bool IsUAV() const;
+	bool IsUnorderedAccess() const;
+
+	bool IsSwapchain() const;
 
 	bool IsVolumeTexture() const;
 
@@ -62,6 +64,8 @@ public:
 
 	uint32_t GetDepth() const;
 
+	uint32_t GetMipmapCount() const;
+
 	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
 	uint32_t GetMipSliceOffset(uint32_t mip, uint32_t slice) const;
@@ -72,6 +76,11 @@ public:
 	// Unlock()
 
 protected:
+
+	bool NeedsAdditionalImageViews()
+	{
+		return IsRenderTarget() || IsUnorderedAccess() || IsSwapchain();
+	}
 
 	// We don't allow the constructor externally
 	ICrTexture(const CrTextureCreateParams& params);

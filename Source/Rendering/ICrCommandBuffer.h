@@ -4,6 +4,8 @@
 
 #include "Rendering/CrGPUBuffer.h"
 
+#include "Rendering/ICrTexture.h"
+
 #include "ShaderResources.h"
 
 #include "CrRenderingForwardDeclarations.h"
@@ -57,9 +59,11 @@ public:
 
 	void BindConstantBuffer(const CrGPUBuffer* constantBuffer, int32_t globalIndex);
 
+	void BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler);
+
 	void BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture);
 
-	void BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler);
+	void BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T textureIndex, const ICrTexture* texture, uint32_t mip);
 
 	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer);
 
@@ -106,8 +110,22 @@ protected:
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
 	{
+		ConstantBufferBinding() = default;
+
+		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t byteOffset) : buffer(buffer), byteOffset(byteOffset) {}
+
 		const ICrHardwareGPUBuffer* buffer = nullptr;
 		uint32_t byteOffset = 0;
+	};
+
+	struct RWTextureBinding
+	{
+		RWTextureBinding() = default;
+
+		RWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
+
+		const ICrTexture* texture = nullptr;
+		uint32_t mip = 0;
 	};
 
 	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
@@ -139,6 +157,9 @@ protected:
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
 		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
+
+		RWTextureBinding				m_rwTextures[cr3d::ShaderStage::Count][RWTextures::Count];
+
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];
 
 		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
@@ -246,14 +267,22 @@ inline void ICrCommandBuffer::TransitionTexture(const ICrTexture* texture, cr3d:
 	TransitionTexturePS(texture, initialState, destinationState);
 }
 
+inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
+{
+	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
+}
+
 inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture)
 {
 	m_currentState.m_textures[shaderStage][textureIndex] = texture;
 }
 
-inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
+inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T textureIndex, const ICrTexture* texture, uint32_t mip)
 {
-	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
+	CrAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag!");
+	CrAssertMsg(texture->GetMipmapCount() > mip, "Texture doesn't have enough mipmaps!");
+
+	m_currentState.m_rwTextures[shaderStage][textureIndex] = RWTextureBinding(texture, mip);
 }
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)

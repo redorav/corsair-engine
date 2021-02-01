@@ -12,8 +12,9 @@
 using bindpoint_t = uint8_t;
 
 namespace ConstantBuffers { enum T : uint8_t; }
-namespace Textures { enum T : uint8_t; }
 namespace Samplers { enum T : uint8_t; }
+namespace Textures { enum T : uint8_t; }
+namespace RWTextures { enum T : uint8_t; }
 namespace RWDataBuffers { enum T : uint8_t; }
 
 namespace cr { namespace Platform { enum T : uint8_t; } }
@@ -32,6 +33,9 @@ struct CrShaderBinding
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Textures::T textureID)
 		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Texture), textureID(textureID) {}
 
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTextures::T rwTextureID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
+
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWDataBuffers::T rwDataBufferID)
 		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Texture), rwDataBufferID(rwDataBufferID) {}
 
@@ -43,6 +47,7 @@ struct CrShaderBinding
 		ConstantBuffers::T constantBufferID;
 		Samplers::T samplerID;
 		Textures::T textureID;
+		RWTextures::T rwTextureID;
 		RWDataBuffers::T rwDataBufferID;
 	};
 };
@@ -102,6 +107,15 @@ public:
 	}
 
 	template<typename Fn>
+	void ForEachRWTexture(const Fn& fn) const
+	{
+		for (uint8_t i = m_rwTextureOffset; i < m_rwTextureOffset + m_rwTextureCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].rwTextureID, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename Fn>
 	void ForEachRWDataBuffer(const Fn& fn) const
 	{
 		for (uint8_t i = m_rwDataBufferOffset; i < m_rwDataBufferOffset + m_rwDataBufferCount; ++i)
@@ -120,6 +134,9 @@ private:
 
 	uint8_t				m_textureOffset = 0;
 	uint8_t				m_textureCount = 0;
+
+	uint8_t				m_rwTextureOffset = 0;
+	uint8_t				m_rwTextureCount = 0;
 
 	uint8_t				m_rwDataBufferOffset = 0;
 	uint8_t				m_rwDataBufferCount = 0;

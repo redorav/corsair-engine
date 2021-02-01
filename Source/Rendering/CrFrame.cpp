@@ -140,6 +140,14 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	descriptor.addressModeW = cr3d::AddressMode::Wrap;
 	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
+	CrTextureCreateParams rwTextureParams;
+	rwTextureParams.width = 64;
+	rwTextureParams.height = 64;
+	rwTextureParams.format = cr3d::DataFormat::RGBA16_Unorm;
+	rwTextureParams.usage = cr3d::TextureUsage::UnorderedAccess;
+	rwTextureParams.name = "Colors RW Texture";
+	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
+
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
 	RecreateSwapchainAndFramebuffers();
@@ -274,7 +282,7 @@ void CrFrame::Process()
 	
 		drawCommandBuffer->BeginDebugEvent("RenderPass 1", float4(1.0f, 0.0, 1.0f, 1.0f));
 		{
-			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_frameBuffers[swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
+			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_swapchainFrameBuffers[swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
 			{
 				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
 	
@@ -335,6 +343,8 @@ void CrFrame::Process()
 			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
 
 			drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
+
+			drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
 
 			drawCommandBuffer->Dispatch(1, 1, 1);
 		}

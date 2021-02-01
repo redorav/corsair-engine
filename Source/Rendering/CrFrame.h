@@ -56,6 +56,7 @@ private:
 	CrSamplerSharedHandle m_linearClampSamplerHandle;
 	CrSamplerSharedHandle m_linearWrapSamplerHandle;
 
+	CrTextureSharedHandle m_colorsRWTexture;
 	CrDataBufferSharedHandle m_colorsRWDataBuffer;
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;

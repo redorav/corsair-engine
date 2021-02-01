@@ -156,9 +156,14 @@ bool ICrTexture::IsRenderTarget() const
 	return (m_usage & cr3d::TextureUsage::RenderTarget) != 0;
 }
 
-bool ICrTexture::IsUAV() const
+bool ICrTexture::IsUnorderedAccess() const
 {
 	return (m_usage & cr3d::TextureUsage::UnorderedAccess) != 0;
+}
+
+bool ICrTexture::IsSwapchain() const
+{
+	return (m_usage & cr3d::TextureUsage::SwapChain) != 0;
 }
 
 bool ICrTexture::IsVolumeTexture() const
@@ -194,4 +199,9 @@ uint32_t ICrTexture::GetHeight() const
 uint32_t ICrTexture::GetDepth() const
 {
 	return m_depth;
+}
+
+uint32_t ICrTexture::GetMipmapCount() const
+{
+	return m_numMipmaps;
 }

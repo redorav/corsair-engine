@@ -58,6 +58,23 @@ public:
 		return TextureMetaTable[id];
 	}
 
+	static const RWTextureMetadata& GetRWTexture(const CrString& name)
+	{
+		auto rwTextureMetadata = RWTextureTable.find(name);
+
+		if (rwTextureMetadata != RWTextureTable.end())
+		{
+			return (*rwTextureMetadata).second;
+		}
+
+		return InvalidRWTextureMetaInstance;
+	}
+
+	static const RWTextureMetadata& GetRWTexture(RWTextures::T id)
+	{
+		return RWTextureMetaTable[id];
+	}
+
 	static const RWDataBufferMetadata& GetRWDataBuffer(const CrString& name)
 	{
 		auto rwDataBufferMetadata = RWDataBufferTable.find(name);

@@ -167,6 +167,23 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
+	bindingTable.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
+	{
+		const RWTextureBinding& binding = m_currentState.m_rwTextures[stage][id];
+		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
+
+		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+		imageInfo.imageView = vulkanTexture->GetVkImageViewSingleMipAllSlices(binding.mip);
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		imageInfo.sampler = nullptr;
+
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+			VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, &imageInfo, nullptr, nullptr);
+
+		descriptorCount++;
+		imageCount++;
+	});
+
 	bindingTable.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanDataBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id]->GetHardwareBuffer());

@@ -9,6 +9,15 @@
 
 class ICrRenderDevice;
 
+// TODO Create platform-independent so sync between platforms
+// Perhaps by storing void* as the view?
+struct AdditionalTextureViews
+{
+	CrArray<CrVector<VkImageView>, 14>	m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
+
+	CrArray<VkImageView, 14>			m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
+};
+
 class CrTextureVulkan final : public ICrTexture
 {
 public:
@@ -27,6 +36,8 @@ public:
 
 	VkImageView GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const;
 
+	VkImageView GetVkImageViewSingleMipAllSlices(uint32_t mip) const;
+
 	VkImageAspectFlags GetVkImageAspectFlags() const;
 
 	VkAttachmentDescription GetVkAttachmentDescription() const;
@@ -41,9 +52,12 @@ private:
 
 	VkImage								m_vkImage;
 
-	VkImageView							m_vkImageView; // Main view, can see all mips and slices
+	// Main view, can access all mips and slices
+	VkImageView							m_vkImageView;
 
-	CrArray<CrVector<VkImageView>, 14>	m_vkImageViews; // Each mipmap can have a variable amount of slices. TODO Create platform-independent and dynamically
+	// This is optional as only render targets and RW textures need them, but can take up
+	// some memory per texture (almost 512 bytes)
+	CrUniquePtr<AdditionalTextureViews>	m_additionalTextureViews;
 
 	VkDeviceMemory						m_vkMemory;
 

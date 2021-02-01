@@ -47,7 +47,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 	}
 	
-	if (IsUAV())
+	if (IsUnorderedAccess())
 	{
 		usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
 	}
@@ -137,7 +137,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageCreateInfo.mipLevels = m_numMipmaps;
 		imageCreateInfo.arrayLayers = arrayLayers;
 		imageCreateInfo.samples = m_vkSamples;
-		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT; // TODO revise this usage
 		imageCreateInfo.flags = vkCreateFlags;
 		imageCreateInfo.imageType = vkImageType;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -188,6 +188,11 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// Create the image views
 	//-----------------------
 
+	if (NeedsAdditionalImageViews())
+	{
+		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
+	}
+
 	if (IsDepth()) // TODO sparse textures
 	{
 		m_vkAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
@@ -220,26 +225,38 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 	// Create views that can only see a single mip or slice. We can use this to either bind a single
 	// mip/slice as a texture, or to bind texture as a render target.
-	for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
+	if (m_additionalTextureViews)
 	{
-		m_vkImageViews[mip].resize(m_depth);
+		VkImageViewCreateInfo imageViewInfo;
+		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		imageViewInfo.pNext = nullptr;
+		imageViewInfo.format = m_vkFormat;
+		imageViewInfo.flags = vkCreateFlags;
+		imageViewInfo.components = {}; // TODO Get from params
+		imageViewInfo.viewType = vkImageViewType;
+		imageViewInfo.image = m_vkImage;
+		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
 
-		for (uint32_t slice = 0; slice < m_depth; ++slice)
+		for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
 		{
-			VkImageViewCreateInfo imageViewInfo;
-			imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			imageViewInfo.pNext = nullptr;
-			imageViewInfo.format = m_vkFormat;
-			imageViewInfo.flags = vkCreateFlags;
-			imageViewInfo.components = {}; // TODO Get from params
 			imageViewInfo.subresourceRange.baseMipLevel = mip;
 			imageViewInfo.subresourceRange.levelCount = 1;
-			imageViewInfo.subresourceRange.baseArrayLayer = slice;
-			imageViewInfo.subresourceRange.layerCount = 1;
-			imageViewInfo.viewType = vkImageViewType;
-			imageViewInfo.image = m_vkImage;
-			imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
-			result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_vkImageViews[mip][slice]);
+			imageViewInfo.subresourceRange.baseArrayLayer = 0;
+			imageViewInfo.subresourceRange.layerCount = m_depth;
+			result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip]);
+			CrAssertMsg(result == VK_SUCCESS, "Failed creating VkImageView");
+
+			m_additionalTextureViews->m_vkImageSingleMipSlice[mip].resize(m_depth);
+
+			for (uint32_t slice = 0; slice < m_depth; ++slice)
+			{
+				imageViewInfo.subresourceRange.baseMipLevel = mip;
+				imageViewInfo.subresourceRange.levelCount = 1;
+				imageViewInfo.subresourceRange.baseArrayLayer = slice;
+				imageViewInfo.subresourceRange.layerCount = 1;
+				result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice]);
+				CrAssertMsg(result == VK_SUCCESS, "Failed creating VkImageView");
+			}
 		}
 	}
 
@@ -260,7 +277,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			);
 
 			result = vkCreateBuffer(m_vkDevice, &stagingBufferCreateInfo, nullptr, &stagingBuffer);
-			CrAssert(result == VK_SUCCESS);
+			CrAssertMsg(result == VK_SUCCESS, "Failed creating VkBuffer");
 
 			VkMemoryRequirements bufferMemoryRequirements;
 			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);
@@ -473,11 +490,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 		result = vkCreateFramebuffer(m_vkDevice, &frameBufferCreateInfo, nullptr, &m_vkBaseFramebuffer);
 	}
-
-	if (IsUAV())
-	{
-
-	}
 }
 
 CrTextureVulkan::~CrTextureVulkan()
@@ -495,11 +507,19 @@ CrTextureVulkan::~CrTextureVulkan()
 
 	vkDestroyImageView(m_vkDevice, m_vkImageView, nullptr);
 
-	for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
+	if (m_additionalTextureViews)
 	{
-		for (uint32_t slice = 0; slice < m_depth; ++slice)
+		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageViewSingleMipAllSlices.size(); ++mip)
 		{
-			vkDestroyImageView(m_vkDevice, m_vkImageViews[mip][slice], nullptr);
+			vkDestroyImageView(m_vkDevice, m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip], nullptr);
+		}
+
+		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageSingleMipSlice.size(); ++mip)
+		{
+			for (uint32_t slice = 0; slice < m_additionalTextureViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
+			{
+				vkDestroyImageView(m_vkDevice, m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
+			}
 		}
 	}
 
@@ -538,7 +558,12 @@ VkImageView CrTextureVulkan::GetVkImageViewAllMipsSlices() const
 
 VkImageView CrTextureVulkan::GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const
 {
-	return m_vkImageViews[mip][slice];
+	return m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice];
+}
+
+VkImageView CrTextureVulkan::GetVkImageViewSingleMipAllSlices(uint32_t mip) const
+{
+	return m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip];
 }
 
 VkImageAspectFlags CrTextureVulkan::GetVkImageAspectFlags() const

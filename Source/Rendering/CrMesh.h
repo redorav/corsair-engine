@@ -2,11 +2,7 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-class CrVertexBufferCommon;
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
-
-class CrIndexBufferCommon;
-using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrMesh
 {

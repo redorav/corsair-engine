@@ -668,24 +668,6 @@ std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSL
 
 	result += PrintResourceEnum("StorageBuffer", resources.storageBuffers);
 
-	// 2. For every constant buffer, print the data that defines it
-	for (uint32_t storageBufferIndex = 0; storageBufferIndex < resources.storageBuffers.size(); ++storageBufferIndex)
-	{
-		const SpvReflectDescriptorBinding& storageBuffer = resources.storageBuffers[storageBufferIndex];
-
-		uint32_t indentationLevel = 0;
-
-		std::string storageBufferName = storageBuffer.name;
-
-		for (uint32_t memberIndex = 0; memberIndex < storageBuffer.type_description->member_count; ++memberIndex)
-		{
-			const SpvReflectTypeDescription& member = storageBuffer.type_description->members[memberIndex];
-			result += PrintMemberStruct(member, storageBufferName + "Data", "", indentationLevel);
-		}
-
-		result += PrintStructMetadata(storageBufferName, storageBufferIndex);
-	}
-
 	result += PrintStorageBufferMetadataStructDeclaration();
 
 	result += PrintResourceMetadataInstanceDeclaration("StorageBuffer", resources.storageBuffers);

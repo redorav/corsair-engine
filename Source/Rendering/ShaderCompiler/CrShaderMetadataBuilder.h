@@ -34,6 +34,7 @@ private:
 	// Prints out the struct or built-in as it comes from the reflection information
 	static std::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const std::string& memberName, const std::string& indentation);
 	static std::string PrintMemberStruct(const SpvReflectTypeDescription& type, const std::string& structTypeName, const std::string& structName, uint32_t indentationLevel);
+	static std::string PrintStructMetadata(const std::string& name, int index);
 
 	//-----------------
 	// Constant Buffers
@@ -41,7 +42,6 @@ private:
 
 	static std::string BuildConstantBufferMetadataHeader(const HLSLResources& resources);
 	static std::string BuildConstantBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintConstantBufferStructMetadata(const std::string& name, int index);
 	static std::string PrintConstantBufferMetadataStructDeclaration();	
 	static std::string PrintConstantBufferMetadataInstanceDefinition(const ResourceVector& uniformBuffers);
 
@@ -76,10 +76,10 @@ private:
 	// Buffers
 	//--------
 
-	static std::string BuildBufferMetadataHeader(const HLSLResources& resources);
+	static std::string BuildStorageBufferMetadataHeader(const HLSLResources& resources);
 	static std::string BuildBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintBufferMetadataInstanceDefinition(const ResourceVector& buffers);
-	static std::string PrintBufferMetadataStructDeclaration();
+	static std::string PrintStorageBufferMetadataInstanceDefinition(const ResourceVector& buffers);
+	static std::string PrintStorageBufferMetadataStructDeclaration();
 
 	//-----------
 	// RW Buffers
@@ -87,8 +87,8 @@ private:
 
 	static std::string BuildRWBufferMetadataHeader(const HLSLResources& resources);
 	static std::string BuildRWBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintRWBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers);
-	static std::string PrintRWBufferMetadataStructDeclaration();
+	static std::string PrintRWStorageBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers);
+	static std::string PrintRWStorageBufferMetadataStructDeclaration();
 
 	//-------------
 	// Data Buffers

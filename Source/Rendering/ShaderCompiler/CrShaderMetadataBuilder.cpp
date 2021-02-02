@@ -41,15 +41,15 @@ static const std::string RWTextureSection =
 "// RW Textures\n"
 "//------------\n\n";
 
-static const std::string BufferSection =
-"//--------\n"
-"// Buffers\n"
-"//--------\n\n";
+static const std::string StorageBufferSection =
+"//----------------\n"
+"// Storage Buffers\n"
+"//----------------\n\n";
 
-static const std::string RWBufferSection =
-"//-----------\n"
-"// RW Buffers\n"
-"//-----------\n\n";
+static const std::string RWStorageBufferSection =
+"//-------------------\n"
+"// RW Storage Buffers\n"
+"//-------------------\n\n";
 
 static const std::string DataBufferSection =
 "//-------------\n"
@@ -124,11 +124,11 @@ struct HLSLResources
 				{
 					if (binding.resource_type == SPV_REFLECT_RESOURCE_FLAG_UAV)
 					{
-						rwBuffers.push_back(binding);
+						rwStorageBuffers.push_back(binding);
 					}
 					else
 					{
-						buffers.push_back(binding);
+						storageBuffers.push_back(binding);
 					}
 					break;
 				}
@@ -159,8 +159,8 @@ struct HLSLResources
 	std::vector<SpvReflectDescriptorBinding> samplers;
 	std::vector<SpvReflectDescriptorBinding> textures;
 	std::vector<SpvReflectDescriptorBinding> rwTextures;
-	std::vector<SpvReflectDescriptorBinding> buffers;
-	std::vector<SpvReflectDescriptorBinding> rwBuffers;
+	std::vector<SpvReflectDescriptorBinding> storageBuffers;
+	std::vector<SpvReflectDescriptorBinding> rwStorageBuffers;
 	std::vector<SpvReflectDescriptorBinding> dataBuffers;
 	std::vector<SpvReflectDescriptorBinding> rwDataBuffers;
 
@@ -210,7 +210,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 
 	metadataHeader += BuildRWTextureMetadataHeader(resources);
 
-	metadataHeader += BuildBufferMetadataHeader(resources);
+	metadataHeader += BuildStorageBufferMetadataHeader(resources);
 
 	metadataHeader += BuildRWBufferMetadataHeader(resources);
 
@@ -267,9 +267,7 @@ std::string CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLS
 	// 2. For every constant buffer, print the data that defines it
 	for (uint32_t uniformBufferIndex = 0; uniformBufferIndex < resources.constantBuffers.size(); ++uniformBufferIndex)
 	{
-		const SpvReflectDescriptorBinding& uniformBuffer = resources.constantBuffers[uniformBufferIndex];uniformBuffer;
-		
-		bool flattenStruct = uniformBuffer.count == 1;flattenStruct;
+		const SpvReflectDescriptorBinding& uniformBuffer = resources.constantBuffers[uniformBufferIndex];
 		
 		uint32_t indentationLevel = 0;
 
@@ -281,7 +279,7 @@ std::string CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLS
 			result += PrintMemberStruct(member, constantBufferName + "Data", "", indentationLevel);
 		}
 
-		result += PrintConstantBufferStructMetadata(constantBufferName, uniformBufferIndex);
+		result += PrintStructMetadata(constantBufferName, uniformBufferIndex);
 	}
 
 	result += PrintConstantBufferMetadataStructDeclaration();
@@ -471,7 +469,7 @@ std::string CrShaderMetadataBuilder::PrintResourceMetadataInstanceDeclaration(co
 	return result + "\n";
 }
 
-std::string CrShaderMetadataBuilder::PrintConstantBufferStructMetadata(const std::string& name, int index)
+std::string CrShaderMetadataBuilder::PrintStructMetadata(const std::string& name, int index)
 {
 	std::string result;
 	result += "struct " + name + " : public " + name + "Data\n{\n";
@@ -662,21 +660,39 @@ std::string CrShaderMetadataBuilder::PrintRWTextureMetadataStructDeclaration()
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::BuildBufferMetadataHeader(const HLSLResources& resources)
+std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSLResources& resources)
 {
 	std::string result;
 
-	result += BufferSection;
+	result += StorageBufferSection;
 
-	result += PrintResourceEnum("Buffer", resources.buffers);
+	result += PrintResourceEnum("StorageBuffer", resources.storageBuffers);
 
-	result += PrintBufferMetadataStructDeclaration();
+	// 2. For every constant buffer, print the data that defines it
+	for (uint32_t storageBufferIndex = 0; storageBufferIndex < resources.storageBuffers.size(); ++storageBufferIndex)
+	{
+		const SpvReflectDescriptorBinding& storageBuffer = resources.storageBuffers[storageBufferIndex];
 
-	result += PrintResourceMetadataInstanceDeclaration("Buffer", resources.buffers);
+		uint32_t indentationLevel = 0;
 
-	result += "extern CrHashMap<CrString, BufferMetadata&> BufferTable;\n\n";
+		std::string storageBufferName = storageBuffer.name;
 
-	result += "extern CrArray<BufferMetadata, " + std::to_string(resources.buffers.size()) + "> BufferMetaTable;\n\n";
+		for (uint32_t memberIndex = 0; memberIndex < storageBuffer.type_description->member_count; ++memberIndex)
+		{
+			const SpvReflectTypeDescription& member = storageBuffer.type_description->members[memberIndex];
+			result += PrintMemberStruct(member, storageBufferName + "Data", "", indentationLevel);
+		}
+
+		result += PrintStructMetadata(storageBufferName, storageBufferIndex);
+	}
+
+	result += PrintStorageBufferMetadataStructDeclaration();
+
+	result += PrintResourceMetadataInstanceDeclaration("StorageBuffer", resources.storageBuffers);
+
+	result += "extern CrHashMap<CrString, StorageBufferMetadata&> StorageBufferTable;\n\n";
+
+	result += "extern CrArray<StorageBufferMetadata, " + std::to_string(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -685,32 +701,32 @@ std::string CrShaderMetadataBuilder::BuildBufferMetadataCpp(const HLSLResources&
 {
 	std::string result;
 
-	result += BufferSection;
+	result += StorageBufferSection;
 
-	result += PrintBufferMetadataInstanceDefinition(resources.buffers);
+	result += PrintStorageBufferMetadataInstanceDefinition(resources.storageBuffers);
 
-	result += PrintResourceHashmap("Buffer", resources.buffers);
+	result += PrintResourceHashmap("StorageBuffer", resources.storageBuffers);
 
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::PrintBufferMetadataInstanceDefinition(const ResourceVector& buffers)
+std::string CrShaderMetadataBuilder::PrintStorageBufferMetadataInstanceDefinition(const ResourceVector& storageBuffers)
 {
 	std::string result;
-	for (const auto& buffer : buffers)
+	for (const auto& storageBuffer : storageBuffers)
 	{
-		result += "BufferMetadata " + std::string(buffer.name) + "MetaInstance(" + "Buffers::" + std::string(buffer.name) + ");\n";
+		result += "StorageBufferMetadata " + std::string(storageBuffer.name) + "MetaInstance(" + "StorageBuffers::" + std::string(storageBuffer.name) + ");\n";
 	}
-	result += "BufferMetadata InvalidBufferMetaInstance(UINT32_MAX);\n";
+	result += "StorageBufferMetadata InvalidStorageBufferMetaInstance(UINT32_MAX);\n";
 	return result + "\n";
 }
 
-std::string CrShaderMetadataBuilder::PrintBufferMetadataStructDeclaration()
+std::string CrShaderMetadataBuilder::PrintStorageBufferMetadataStructDeclaration()
 {
-	std::string result = "struct BufferMetadata" \
+	std::string result = "struct StorageBufferMetadata" \
 		"\n{\n" \
-		"\tBufferMetadata(uint32_t id) : id(static_cast<Buffers::T>(id)) {}\n" \
-		"\tconst Buffers::T id;\n" \
+		"\tStorageBufferMetadata(uint32_t id) : id(static_cast<StorageBuffers::T>(id)) {}\n" \
+		"\tconst StorageBuffers::T id;\n" \
 		"};\n\n";
 	return result;
 }
@@ -719,17 +735,17 @@ std::string CrShaderMetadataBuilder::BuildRWBufferMetadataHeader(const HLSLResou
 {
 	std::string result;
 
-	result += BufferSection;
+	result += StorageBufferSection;
 
-	result += PrintResourceEnum("RWBuffer", resources.rwBuffers);
+	result += PrintResourceEnum("RWStorageBuffer", resources.rwStorageBuffers);
 
-	result += PrintRWBufferMetadataStructDeclaration();
+	result += PrintRWStorageBufferMetadataStructDeclaration();
 
-	result += PrintResourceMetadataInstanceDeclaration("RWBuffer", resources.rwBuffers);
+	result += PrintResourceMetadataInstanceDeclaration("RWStorageBuffer", resources.rwStorageBuffers);
 
-	result += "extern CrHashMap<CrString, RWBufferMetadata&> RWBufferTable;\n\n";
+	result += "extern CrHashMap<CrString, RWStorageBufferMetadata&> RWStorageBufferTable;\n\n";
 
-	result += "extern CrArray<RWBufferMetadata, " + std::to_string(resources.rwBuffers.size()) + "> RWBufferMetaTable;\n\n";
+	result += "extern CrArray<RWStorageBufferMetadata, " + std::to_string(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -738,32 +754,32 @@ std::string CrShaderMetadataBuilder::BuildRWBufferMetadataCpp(const HLSLResource
 {
 	std::string result;
 
-	result += RWBufferSection;
+	result += RWStorageBufferSection;
 
-	result += PrintRWBufferMetadataInstanceDefinition(resources.rwBuffers);
+	result += PrintRWStorageBufferMetadataInstanceDefinition(resources.rwStorageBuffers);
 
-	result += PrintResourceHashmap("RWBuffer", resources.rwBuffers);
+	result += PrintResourceHashmap("RWStorageBuffer", resources.rwStorageBuffers);
 
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::PrintRWBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers)
+std::string CrShaderMetadataBuilder::PrintRWStorageBufferMetadataInstanceDefinition(const ResourceVector& rwStorageBuffers)
 {
 	std::string result;
-	for (const auto& rwBuffer : rwBuffers)
+	for (const auto& rwStorageBuffer : rwStorageBuffers)
 	{
-		result += "RWBufferMetadata " + std::string(rwBuffer.name) + "MetaInstance(" + "RWBuffers::" + std::string(rwBuffer.name) + ");\n";
+		result += "RWStorageBufferMetadata " + std::string(rwStorageBuffer.name) + "MetaInstance(" + "RWStorageBuffers::" + std::string(rwStorageBuffer.name) + ");\n";
 	}
-	result += "RWBufferMetadata InvalidRWBufferMetaInstance(UINT32_MAX);\n";
+	result += "RWStorageBufferMetadata InvalidRWStorageBufferMetaInstance(UINT32_MAX);\n";
 	return result + "\n";
 }
 
-std::string CrShaderMetadataBuilder::PrintRWBufferMetadataStructDeclaration()
+std::string CrShaderMetadataBuilder::PrintRWStorageBufferMetadataStructDeclaration()
 {
-	std::string result = "struct RWBufferMetadata" \
+	std::string result = "struct RWStorageBufferMetadata" \
 		"\n{\n" \
-		"\tRWBufferMetadata(uint32_t id) : id(static_cast<RWBuffers::T>(id)) {}\n" \
-		"\tconst RWBuffers::T id;\n" \
+		"\tRWStorageBufferMetadata(uint32_t id) : id(static_cast<RWStorageBuffers::T>(id)) {}\n" \
+		"\tconst RWStorageBuffers::T id;\n" \
 		"};\n\n";
 	return result;
 }

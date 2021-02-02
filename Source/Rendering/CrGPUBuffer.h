@@ -181,9 +181,6 @@ class CrGPUBufferType : public CrGPUBuffer
 {
 public:
 
-	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor)
-		: CrGPUBufferType(renderDevice, descriptor, 1) {}
-
 	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements)
 		: CrGPUBuffer(renderDevice, descriptor, numElements, sizeof(MetaType))
 	{

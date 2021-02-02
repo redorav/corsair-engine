@@ -308,5 +308,5 @@ inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
 template<typename MetaType>
 inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
-	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateConstantBufferParameters(sizeof(MetaType)));
+	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateConstantBufferParameters(sizeof(MetaType)), 1);
 }

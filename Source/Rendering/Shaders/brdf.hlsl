@@ -5,8 +5,6 @@ RWTexture2D<float4> BRDFTexture;
 
 StructuredBuffer<float4> ExampleStructuredBufferFloat;
 
-AppendStructuredBuffer<float4> ExampleAppendBufferFloat;
-
 Texture2D BRDF_GGX_Texture;
 
 //struct Surface

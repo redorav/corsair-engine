@@ -82,9 +82,6 @@ struct SBStruct
 StructuredBuffer<SBStruct> ExampleStructuredBuffer;
 RWStructuredBuffer<SBStruct> ExampleRWStructuredBuffer;
 
-AppendStructuredBuffer<SBStruct> ExampleAppendBuffer;
-ConsumeStructuredBuffer<SBStruct> ExampleConsumeBuffer;
-
 Buffer<int> ExampleBuffer;
 RWBuffer<int> ExampleRWBuffer;
 

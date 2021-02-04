@@ -27,8 +27,6 @@ struct CrSwapchainDescriptor
 
 class ICrSwapchain
 {
-	friend class ICrRenderDevice;
-
 public:
 
 	ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);

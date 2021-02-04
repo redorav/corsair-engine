@@ -113,6 +113,8 @@ public:
 
 	uint32_t GetStride() const;
 
+	uint32_t GetSize() const;
+
 	uint32_t GetByteOffset() const;
 
 	bool HasUsage(cr3d::BufferUsage::T usage) const;
@@ -164,6 +166,11 @@ inline bool CrGPUBuffer::HasUsage(cr3d::BufferUsage::T usage) const
 inline uint32_t CrGPUBuffer::GetStride() const
 {
 	return m_stride;
+}
+
+inline uint32_t CrGPUBuffer::GetSize() const
+{
+	return m_stride * m_numElements;
 }
 
 inline uint32_t CrGPUBuffer::GetByteOffset() const
@@ -324,6 +331,24 @@ public:
 };
 
 : ICrGPUBuffer(renderDevice, cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite, numVertices, vertexDescriptor.GetDataSize())*/
+
+//------------------
+// Structured Buffer
+//------------------
+
+template<typename Metadata>
+class CrStructuredBuffer : public CrGPUBufferType<Metadata>
+{
+public:
+
+	CrStructuredBuffer(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T bufferAccess, uint32_t numElements) 
+		: CrGPUBufferType<Metadata>(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Structured, bufferAccess), numElements) {}
+
+	Metadata* Lock()
+	{
+		return static_cast<Metadata*>(CrGPUBuffer::Lock());
+	}
+};
 
 //------------
 // Data Buffer

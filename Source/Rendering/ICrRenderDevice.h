@@ -4,7 +4,7 @@
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrRendering.h"
 
-#include "CrRenderingForwardDeclarations.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 struct CrRenderDeviceProperties
 {
@@ -60,6 +60,9 @@ public:
 	CrTextureSharedHandle CreateTexture(const CrTextureCreateParams& params);
 
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor);
+
+	template<typename Metadata>
+	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements);
 
 	CrDataBufferSharedHandle CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
 
@@ -148,6 +151,12 @@ template<typename Struct>
 inline CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices)
 {
 	return CreateVertexBuffer(numVertices, Struct::GetVertexDescriptor());
+}
+
+template<typename Metadata>
+CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements)
+{
+	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
 }
 
 inline const CrCommandQueueSharedHandle& ICrRenderDevice::GetMainCommandQueue() const

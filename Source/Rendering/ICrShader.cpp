@@ -36,6 +36,10 @@ ICrShaderBindingTable::ICrShaderBindingTable(const CrShaderBindingTableResources
 		m_rwTextureCount = (uint8_t)resources.rwTextures.size();
 		m_bindings.insert(m_bindings.end(), resources.rwTextures.begin(), resources.rwTextures.end());
 
+		m_rwStorageBufferOffset = (uint8_t)m_bindings.size();
+		m_rwStorageBufferCount = (uint8_t)resources.rwStorageBuffers.size();
+		m_bindings.insert(m_bindings.end(), resources.rwStorageBuffers.begin(), resources.rwStorageBuffers.end());
+
 		m_rwDataBufferOffset = (uint8_t)m_bindings.size();
 		m_rwDataBufferCount = (uint8_t)resources.rwDataBuffers.size();
 		m_bindings.insert(m_bindings.end(), resources.rwDataBuffers.begin(), resources.rwDataBuffers.end());

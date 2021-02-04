@@ -106,10 +106,11 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	CrArray<VkDescriptorImageInfo, 64> imageInfos;
 	CrArray<VkBufferView, 64> bufferViews;
 	CrArray<VkWriteDescriptorSet, 64> writeDescriptorSets;
-	CrArray<uint32_t, 64> offsets;
+	CrArray<uint32_t, 64> dynamicOffsets;
 
 	uint32_t descriptorCount = 0;
 	uint32_t bufferCount = 0;
+	uint32_t dynamicOffsetCount = 0;
 	uint32_t imageCount = 0;
 	uint32_t texelBufferCount = 0;
 
@@ -127,13 +128,14 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
 		bufferInfo.range = (VkDeviceSize)constantBufferMeta.size; // TODO take this from bound buffer
 
-		offsets[bufferCount] = binding.byteOffset;
+		dynamicOffsets[dynamicOffsetCount] = binding.byteOffset;
 
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
 		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
 		descriptorCount++;
 		bufferCount++;
+		dynamicOffsetCount++;
 	});
 
 	bindingTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
@@ -184,11 +186,28 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
+	bindingTable.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	{
+		const RWStorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[stage][id];
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+	
+		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = (VkDeviceSize)binding.size;
+	
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
+		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
+
+		descriptorCount++;
+		bufferCount++;
+	});
+
 	bindingTable.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
 	{
-		const CrHardwareGPUBufferVulkan* vulkanDataBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id]->GetHardwareBuffer());
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id]->GetHardwareBuffer());
 
-		bufferViews[texelBufferCount] = vulkanDataBuffer->GetVkBufferView();
+		bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
 
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
 			VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, nullptr, nullptr, &bufferViews[texelBufferCount]);
@@ -203,7 +222,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	// Bind descriptor sets describing shader binding points
 	// TODO We need an abstraction of a resource table, so that we can build it somewhere else, and simply bind it when we need to
-	vkCmdBindDescriptorSets(m_vkCommandBuffer, vkPipelineBindPoint, vkPipelineLayout, 0, 1, &descriptorSet, bufferCount, offsets.data());
+	vkCmdBindDescriptorSets(m_vkCommandBuffer, vkPipelineBindPoint, vkPipelineLayout, 0, 1, &descriptorSet, dynamicOffsetCount, dynamicOffsets.data());
 }
 
 void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()

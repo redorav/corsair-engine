@@ -233,6 +233,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
 
+	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
+
 	// ImGui renderer init:
 	CrImGuiRendererInitParams imguiInitParams = {};
 	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
@@ -342,15 +344,17 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
 
+			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_structuredBuffer.get());
+
 			drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
-
+		
 			drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
-
+		
 			drawCommandBuffer->Dispatch(1, 1, 1);
 		}
 		drawCommandBuffer->EndDebugEvent();
 
-		// Render ImGui:
+		// Render ImGui
 		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchainFrameBuffersNoDepth[swapchain->GetCurrentFrameIndex()].get());
 
 		drawCommandBuffer->End();

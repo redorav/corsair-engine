@@ -44,6 +44,12 @@ using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
 class CrVertexBufferCommon;
 using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
 
+template<typename Metadata>
+class CrStructuredBuffer;
+
+template<typename Metadata>
+using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
+
 class CrDataBuffer;
 using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
 

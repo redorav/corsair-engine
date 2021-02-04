@@ -212,7 +212,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 
 	metadataHeader += BuildStorageBufferMetadataHeader(resources);
 
-	metadataHeader += BuildRWBufferMetadataHeader(resources);
+	metadataHeader += BuildRWStorageBufferMetadataHeader(resources);
 
 	metadataHeader += BuildDataBufferMetadataHeader(resources);
 
@@ -244,9 +244,9 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 
 	metadataCpp += BuildRWTextureMetadataCpp(resources);
 
-	metadataCpp += BuildBufferMetadataCpp(resources);
+	metadataCpp += BuildStorageBufferMetadataCpp(resources);
 
-	metadataCpp += BuildRWBufferMetadataCpp(resources);
+	metadataCpp += BuildRWStorageBufferMetadataCpp(resources);
 
 	metadataCpp += BuildDataBufferMetadataCpp(resources);
 
@@ -279,7 +279,7 @@ std::string CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLS
 			result += PrintMemberStruct(member, constantBufferName + "Data", "", indentationLevel);
 		}
 
-		result += PrintStructMetadata(constantBufferName, uniformBufferIndex);
+		result += PrintConstantBufferStructMetadata(constantBufferName, uniformBufferIndex);
 	}
 
 	result += PrintConstantBufferMetadataStructDeclaration();
@@ -348,66 +348,42 @@ std::string CrShaderMetadataBuilder::PrintResourceHashmap(const std::string& res
 	return result;
 }
 
+std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
+{
+	std::string result;
+
+	if (type.type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)
+	{
+		result += "float";
+	}
+	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_INT)
+	{
+		result += "int";
+	}
+	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_BOOL)
+	{
+		result += "bool";
+	}
+
+	if (type.traits.numeric.matrix.row_count > 0)
+	{
+		result += std::to_string(type.traits.numeric.matrix.row_count) + "x" + std::to_string(type.traits.numeric.matrix.column_count);
+	}
+	else if (type.traits.numeric.vector.component_count > 0)
+	{
+		result += std::to_string(type.traits.numeric.vector.component_count);
+	}
+
+	return result;
+}
+
 std::string CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const std::string& memberName, const std::string& indentation)
 {
 	std::string result;
-	switch (type.op)
-	{
-		case SpvOpTypeStruct:
-			break;
-		case SpvOpTypeVector:
-		{
-			if (type.type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)
-			{
-				result += indentation + "float";
-			}
-			else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_INT)
-			{
-				result += indentation + "int";
-			}
-			else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_BOOL)
-			{
-				result += indentation + "bool";
-			}
 
-			result += std::to_string(type.traits.numeric.vector.component_count);
-			break;
-		}
-		case SpvOpTypeMatrix:
-		{
-			if (type.type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)
-			{
-				result += indentation + "float";
-			}
-			else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_INT)
-			{
-				result += indentation + "int";
-			}
-			else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_BOOL)
-			{
-				result += indentation + "bool";
-			}
+	result += indentation;
 
-			result += std::to_string(type.traits.numeric.matrix.row_count) + "x" + std::to_string(type.traits.numeric.matrix.column_count);
-			break;
-		}
-		case SpvOpTypeFloat:
-		{
-			result += indentation + "float";
-			break;
-		}
-		case SpvOpTypeInt:
-		{
-			result += indentation + "int";
-			break;
-		}
-		case SpvOpTypeBool:
-		{
-			result += indentation + "bool";
-			break;
-		}
-		default: break;
-	}
+	result += GetBuiltinTypeString(type);
 
 	result += " " + memberName + ";\n";
 	return result;
@@ -469,13 +445,13 @@ std::string CrShaderMetadataBuilder::PrintResourceMetadataInstanceDeclaration(co
 	return result + "\n";
 }
 
-std::string CrShaderMetadataBuilder::PrintStructMetadata(const std::string& name, int index)
+std::string CrShaderMetadataBuilder::PrintConstantBufferStructMetadata(const std::string& name, int index)
 {
 	std::string result;
 	result += "struct " + name + " : public " + name + "Data\n{\n";
-	result += "\tenum { index = " + std::to_string(index) + " };\n";
-	result += "\tenum { size = sizeof(" + name + "Data) };\n";
 	result += "\tusing Data = " + name + "Data;\n";
+	result += "\tenum { size = sizeof(" + name + "Data) };\n";
+	result += "\tenum { index = " + std::to_string(index) + " };\n";
 	result += "};\n\n";
 	return result;
 }
@@ -660,6 +636,45 @@ std::string CrShaderMetadataBuilder::PrintRWTextureMetadataStructDeclaration()
 	return result;
 }
 
+std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const std::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool rw)
+{
+	std::string result;
+
+	const std::string rwString = rw ? "RW" : "";
+
+	bool isMemberStruct = member.type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT;
+
+	// Print the struct we are going to derive from that contains the relevant members
+	if (isMemberStruct)
+	{
+		uint32_t indentationLevel = 0;
+		result += PrintMemberStruct(member, bufferName + "Data", "", indentationLevel);
+	}
+
+	// Print the struct that contains the metadata and is actually used in engine
+	result += "template<>\n";
+	result += "struct " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + ">";
+
+	if (isMemberStruct)
+	{
+		result += " : public " + bufferName + "Data\n{\n";
+		result += "\tusing Data = " + bufferName + "Data;\n";
+		result += "\tenum { stride = sizeof(" + bufferName + "Data) };\n";
+	}
+	else
+	{
+		std::string typeString = GetBuiltinTypeString(member);
+		result += "\n{\n";
+		result += "\tusing Data = " + typeString + ";\n";
+		result += "\tenum { stride = sizeof(" + typeString + ") };\n";
+	}
+
+	result += "\tenum { index = " + std::to_string(index) + " };\n";
+	result += "}; typedef " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + "> " + bufferName + ";\n\n";
+
+	return result;
+}
+
 std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSLResources& resources)
 {
 	std::string result;
@@ -667,6 +682,15 @@ std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSL
 	result += StorageBufferSection;
 
 	result += PrintResourceEnum("StorageBuffer", resources.storageBuffers);
+
+	// Print the template
+	result += "template<enum StorageBuffers::T index>\nstruct StorageBufferDataStruct {};\n\n";
+
+	for (uint32_t storageBufferIndex = 0; storageBufferIndex < resources.storageBuffers.size(); ++storageBufferIndex)
+	{
+		const SpvReflectDescriptorBinding& storageBuffer = resources.storageBuffers[storageBufferIndex];
+		result += BuildStorageBufferMetadataStruct(storageBuffer.name, storageBufferIndex, storageBuffer.type_description->members[0], false);
+	}
 
 	result += PrintStorageBufferMetadataStructDeclaration();
 
@@ -679,7 +703,7 @@ std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSL
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::BuildBufferMetadataCpp(const HLSLResources& resources)
+std::string CrShaderMetadataBuilder::BuildStorageBufferMetadataCpp(const HLSLResources& resources)
 {
 	std::string result;
 
@@ -697,29 +721,41 @@ std::string CrShaderMetadataBuilder::PrintStorageBufferMetadataInstanceDefinitio
 	std::string result;
 	for (const auto& storageBuffer : storageBuffers)
 	{
-		result += "StorageBufferMetadata " + std::string(storageBuffer.name) + "MetaInstance(" + "StorageBuffers::" + std::string(storageBuffer.name) + ");\n";
+		std::string name = std::string(storageBuffer.name);
+		auto scopedMeta = [&](const std::string& member) { return name + "::" + member; }; // Convenience lambda
+		result += "StorageBufferMetadata " + name + "MetaInstance(" + scopedMeta("index, ") + scopedMeta("stride") + ");\n";
 	}
-	result += "StorageBufferMetadata InvalidStorageBufferMetaInstance(UINT32_MAX);\n";
+	result += "StorageBufferMetadata InvalidStorageBufferMetaInstance(UINT32_MAX, 0);\n";
 	return result + "\n";
 }
 
 std::string CrShaderMetadataBuilder::PrintStorageBufferMetadataStructDeclaration()
 {
-	std::string result = "struct StorageBufferMetadata" \
-		"\n{\n" \
-		"\tStorageBufferMetadata(uint32_t id) : id(static_cast<StorageBuffers::T>(id)) {}\n" \
-		"\tconst StorageBuffers::T id;\n" \
+	std::string result = "struct StorageBufferMetadata"
+		"\n{\n"
+		"\tStorageBufferMetadata(uint32_t id, uint32_t stride) : id(static_cast<StorageBuffers::T>(id)), stride(stride) {}\n"
+		"\tconst StorageBuffers::T id;\n"
+		"\tconst uint32_t stride;\n"
 		"};\n\n";
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::BuildRWBufferMetadataHeader(const HLSLResources& resources)
+std::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const HLSLResources& resources)
 {
 	std::string result;
 
-	result += StorageBufferSection;
+	result += RWStorageBufferSection;
 
 	result += PrintResourceEnum("RWStorageBuffer", resources.rwStorageBuffers);
+
+	// Print the template
+	result += "template<enum RWStorageBuffers::T index>\nstruct RWStorageBufferDataStruct {};\n\n";
+
+	for (uint32_t rwStorageBufferIndex = 0; rwStorageBufferIndex < resources.rwStorageBuffers.size(); ++rwStorageBufferIndex)
+	{
+		const SpvReflectDescriptorBinding& rwStorageBuffer = resources.rwStorageBuffers[rwStorageBufferIndex];
+		result += BuildStorageBufferMetadataStruct(rwStorageBuffer.name, rwStorageBufferIndex, rwStorageBuffer.type_description->members[0], true);
+	}
 
 	result += PrintRWStorageBufferMetadataStructDeclaration();
 
@@ -732,7 +768,7 @@ std::string CrShaderMetadataBuilder::BuildRWBufferMetadataHeader(const HLSLResou
 	return result;
 }
 
-std::string CrShaderMetadataBuilder::BuildRWBufferMetadataCpp(const HLSLResources& resources)
+std::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataCpp(const HLSLResources& resources)
 {
 	std::string result;
 
@@ -750,9 +786,11 @@ std::string CrShaderMetadataBuilder::PrintRWStorageBufferMetadataInstanceDefinit
 	std::string result;
 	for (const auto& rwStorageBuffer : rwStorageBuffers)
 	{
-		result += "RWStorageBufferMetadata " + std::string(rwStorageBuffer.name) + "MetaInstance(" + "RWStorageBuffers::" + std::string(rwStorageBuffer.name) + ");\n";
+		std::string name = std::string(rwStorageBuffer.name);
+		auto scopedMeta = [&](const std::string& member) { return name + "::" + member; }; // Convenience lambda
+		result += "RWStorageBufferMetadata " + name + "MetaInstance(" + scopedMeta("index, ") + scopedMeta("stride") + ");\n";
 	}
-	result += "RWStorageBufferMetadata InvalidRWStorageBufferMetaInstance(UINT32_MAX);\n";
+	result += "RWStorageBufferMetadata InvalidRWStorageBufferMetaInstance(UINT32_MAX, 0);\n";
 	return result + "\n";
 }
 
@@ -760,8 +798,9 @@ std::string CrShaderMetadataBuilder::PrintRWStorageBufferMetadataStructDeclarati
 {
 	std::string result = "struct RWStorageBufferMetadata" \
 		"\n{\n" \
-		"\tRWStorageBufferMetadata(uint32_t id) : id(static_cast<RWStorageBuffers::T>(id)) {}\n" \
+		"\tRWStorageBufferMetadata(uint32_t id, uint32_t stride) : id(static_cast<RWStorageBuffers::T>(id)), stride(stride) {}\n" \
 		"\tconst RWStorageBuffers::T id;\n" \
+		"\tconst uint32_t stride;\n" \
 		"};\n\n";
 	return result;
 }

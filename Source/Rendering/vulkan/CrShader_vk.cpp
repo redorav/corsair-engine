@@ -47,6 +47,12 @@ static ICrShaderBindingTable* CreateBindingTable(const ICrRenderDevice* renderDe
 				resources.rwTextures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
 				break;
 			}
+			case cr3d::ShaderResourceType::RWStorageBuffer:
+			{
+				const RWStorageBufferMetadata& metadata = CrShaderMetadata::GetRWStorageBuffer(resource.name);
+				resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
+				break;
+			}
 			case cr3d::ShaderResourceType::RWDataBuffer:
 			{
 				const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);

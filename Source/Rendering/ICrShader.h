@@ -11,10 +11,12 @@
 
 using bindpoint_t = uint8_t;
 
+// TODO Move to a forward declaration file ShaderResourcesForwardDeclarations.h
 namespace ConstantBuffers { enum T : uint8_t; }
 namespace Samplers { enum T : uint8_t; }
 namespace Textures { enum T : uint8_t; }
 namespace RWTextures { enum T : uint8_t; }
+namespace RWStorageBuffers { enum T : uint8_t; }
 namespace RWDataBuffers { enum T : uint8_t; }
 
 namespace cr { namespace Platform { enum T : uint8_t; } }
@@ -36,8 +38,11 @@ struct CrShaderBinding
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTextures::T rwTextureID)
 		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
 
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWStorageBuffers::T rwStorageBufferID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
+
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWDataBuffers::T rwDataBufferID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Texture), rwDataBufferID(rwDataBufferID) {}
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWDataBuffer), rwDataBufferID(rwDataBufferID) {}
 
 	bindpoint_t bindPoint;
 	cr3d::ShaderStage::T stage : 4;
@@ -48,6 +53,7 @@ struct CrShaderBinding
 		Samplers::T samplerID;
 		Textures::T textureID;
 		RWTextures::T rwTextureID;
+		RWStorageBuffers::T rwStorageBufferID;
 		RWDataBuffers::T rwDataBufferID;
 	};
 };
@@ -116,6 +122,15 @@ public:
 	}
 
 	template<typename Fn>
+	void ForEachRWStorageBuffer(const Fn& fn) const
+	{
+		for (uint8_t i = m_rwStorageBufferOffset; i < m_rwStorageBufferOffset + m_rwStorageBufferCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].rwStorageBufferID, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename Fn>
 	void ForEachRWDataBuffer(const Fn& fn) const
 	{
 		for (uint8_t i = m_rwDataBufferOffset; i < m_rwDataBufferOffset + m_rwDataBufferCount; ++i)
@@ -137,6 +152,9 @@ private:
 
 	uint8_t				m_rwTextureOffset = 0;
 	uint8_t				m_rwTextureCount = 0;
+
+	uint8_t				m_rwStorageBufferOffset = 0;
+	uint8_t				m_rwStorageBufferCount = 0;
 
 	uint8_t				m_rwDataBufferOffset = 0;
 	uint8_t				m_rwDataBufferCount = 0;

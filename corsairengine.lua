@@ -7,10 +7,8 @@ ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
 MathDirectory = SourceDirectory..'/Math'
 
 -- Platforms
-VulkanWin64 = 'Vulkan Win64'
-VulkanARM   = 'Vulkan ARM'
-D3D12       = 'D3D12 Win64'
-VulkanOSX   = 'Vulkan OSX'
+DesktopWin64 = 'Desktop Win64'
+VulkanOSX    = 'Vulkan OSX'
 
 -- Make this configuration-dependent
 WorkspaceDirectory = 'Workspace/'.._ACTION
@@ -127,7 +125,7 @@ end
 
 workspace 'Corsair Engine'
 	configurations { 'Debug', 'Release' }
-	platforms { VulkanWin64, D3D12, VulkanOSX }
+	platforms { DesktopWin64 }
 	location (WorkspaceDirectory)
 	preferredtoolarchitecture('x86_64') -- Prefer this toolset on MSVC as it can handle more memory for multiprocessor compiles
 	toolset('msc') -- Use default VS toolset TODO do this platform specific
@@ -171,16 +169,13 @@ workspace 'Corsair Engine'
 	
 	includedirs	{ SourceDirectory }
 
-	filter { 'platforms:'..VulkanWin64 }
+	filter { 'platforms:'..DesktopWin64 }
 		system('windows')
 		architecture('x64')
-		defines { 'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR', 'WINDOWS_TARGET' }
-		
-	filter { 'platforms:'..D3D12 }
-		system('windows')
-		architecture 'x64'
+		defines { 'WINDOWS_TARGET' }
+		defines { 'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR' }
 		defines { 'D3D12_API' }
-		
+
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
 		architecture 'x64'		
@@ -331,15 +326,13 @@ project(ProjectCrRendering)
 	AddSpirvReflectLibrary()
 	AddGainputLibrary() -- TODO Remove
 	
-	filter { 'platforms:'..VulkanWin64 }
+	filter { 'platforms:'..DesktopWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
+		files { SourceRenderingDirectory..'/d3d12/*' }
 		AddVulkanLibrary()
 		
 	filter { 'platforms:'..VulkanOSX }
 		files { SourceRenderingDirectory..'/vulkan/*' }
-		
-	filter { 'platforms:'..D3D12 }
-		files { SourceRenderingDirectory..'/d3d12/*' }
 	
 	filter{}
 

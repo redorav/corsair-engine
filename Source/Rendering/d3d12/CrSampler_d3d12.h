@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrSampler.h"
+#include "Rendering/ICrSampler.h"
 #include <d3d12.h>
 
 class ICrRenderDevice;

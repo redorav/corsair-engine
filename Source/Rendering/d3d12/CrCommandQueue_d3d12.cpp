@@ -20,7 +20,10 @@ ICrCommandBuffer* CrCommandQueueD3D12::CreateCommandBufferPS()
 
 void CrCommandQueueD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
-	
+	unused_parameter(commandBuffer);
+	unused_parameter(waitSemaphore);
+	unused_parameter(signalSemaphore);
+	unused_parameter(signalFence);
 }
 
 void CrCommandQueueD3D12::WaitIdlePS()

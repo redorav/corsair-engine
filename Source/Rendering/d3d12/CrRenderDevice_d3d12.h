@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrRenderDevice.h"
+#include "Rendering/ICrRenderDevice.h"
 
 #include <d3d12.h>
 
@@ -34,7 +34,11 @@ private:
 
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) override;
 
+	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
+
+	virtual void ResetFencePS(const ICrGPUFence* fence) override;
+
+	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
+
 	ID3D12Device* m_d3d12Device;
-
-
 };

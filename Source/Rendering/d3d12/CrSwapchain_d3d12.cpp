@@ -9,9 +9,9 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
+CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : ICrSwapchain(renderDevice, swapchainDescriptor)
 {
-	renderDevice; swapchainDescriptor;
+
 }
 
 CrSwapchainD3D12::~CrSwapchainD3D12()
@@ -19,17 +19,15 @@ CrSwapchainD3D12::~CrSwapchainD3D12()
 
 }
 
-void CrSwapchainD3D12::CreatePS(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
-{
-
-}
-
 CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
 {
+	unused_parameter(signalSemaphore);
+	unused_parameter(timeoutNanoseconds);
 	return CrSwapchainResult::Success;
 }
 
 void CrSwapchainD3D12::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
 {
-	
+	unused_parameter(queue);
+	unused_parameter(waitSemaphore);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrRenderPass.h"
+#include "Rendering/ICrRenderPass.h"
 #include <d3d12.h>
 
 class ICrRenderDevice;

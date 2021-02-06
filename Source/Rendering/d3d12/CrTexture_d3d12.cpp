@@ -11,7 +11,8 @@
 CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
 	: ICrTexture(params)
 {
-
+	unused_parameter(renderDevice);
+	unused_parameter(params);
 }
 
 CrTextureD3D12::~CrTextureD3D12()

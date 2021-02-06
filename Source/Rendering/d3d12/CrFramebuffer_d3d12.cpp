@@ -14,5 +14,6 @@ CrFramebufferD3D12::~CrFramebufferD3D12()
 
 CrFramebufferD3D12::CrFramebufferD3D12(ICrRenderDevice* renderDevice, const CrFramebufferCreateParams& params) : ICrFramebuffer(params)
 {
-	
+	unused_parameter(renderDevice);
+	unused_parameter(params);
 }

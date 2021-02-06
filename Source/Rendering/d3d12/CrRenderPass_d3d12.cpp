@@ -8,7 +8,8 @@
 
 CrRenderPassD3D12::CrRenderPassD3D12(ICrRenderDevice* renderDevice, const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	
+	unused_parameter(renderDevice);
+	unused_parameter(renderPassDescriptor);
 }
 
 CrRenderPassD3D12::~CrRenderPassD3D12()

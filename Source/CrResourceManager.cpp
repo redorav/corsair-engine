@@ -7,7 +7,7 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderDevice.h"
-#include "ShaderResources.h" // TODO Hack - delete from the .lua
+#include "GeneratedShaders/ShaderMetadata.h" // TODO Hack - delete from the .lua
 
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/CrFileSystem.h"

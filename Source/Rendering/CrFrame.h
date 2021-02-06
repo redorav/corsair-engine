@@ -5,7 +5,7 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "ShaderResources.h"
+#include "GeneratedShaders/ShaderMetadata.h"
 
 class CrRenderModel;
 using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;

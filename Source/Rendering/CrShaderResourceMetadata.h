@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderResources.h"
+#include "GeneratedShaders/ShaderMetadata.h"
 
 class CrShaderMetadata
 {

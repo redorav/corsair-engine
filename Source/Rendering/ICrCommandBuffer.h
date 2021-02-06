@@ -6,7 +6,7 @@
 
 #include "Rendering/ICrTexture.h"
 
-#include "ShaderResources.h"
+#include "GeneratedShaders/ShaderMetadata.h"
 
 #include "CrRenderingForwardDeclarations.h"
 

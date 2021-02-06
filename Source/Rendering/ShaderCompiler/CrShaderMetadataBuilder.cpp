@@ -200,6 +200,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 	metadataHeader += "#include \"Core/Containers/CrHashMap.h\"\n";
 	metadataHeader += "#include \"Core/Containers/CrVector.h\"\n";
 	metadataHeader += "#include \"Core/String/CrString.h\"\n";
+	metadataHeader += "#include \"Rendering/CrRenderingVector.h\"\n";
 	metadataHeader += "\n";
 
 	metadataHeader += BuildConstantBufferMetadataHeader(resources);
@@ -229,11 +230,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& sp
 	// Maybe there is a better way of not writing these headers directly. They depend on the physical
 	// structure of the code which can change
 	metadataCpp += "#include \"CrRendering_pch.h\"\n";
-	metadataCpp += "#include \"ShaderResources.h\"\n\n";
-	metadataCpp += "#include \"Core/Containers/CrArray.h\"\n";
-	metadataCpp += "#include \"Core/Containers/CrHashMap.h\"\n";
-	metadataCpp += "#include \"Core/Containers/CrVector.h\"\n";
-	metadataCpp += "#include \"Core/String/CrString.h\"\n";
+	metadataCpp += "#include \"ShaderMetadata.h\"\n\n";
 	metadataCpp += "\n";
 
 	metadataCpp += BuildConstantBufferMetadataCpp(resources);
@@ -351,6 +348,13 @@ std::string CrShaderMetadataBuilder::PrintResourceHashmap(const std::string& res
 std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 {
 	std::string result;
+
+	bool isComplexType = type.traits.numeric.matrix.row_count > 0 || type.traits.numeric.vector.component_count > 0;
+
+	if (isComplexType)
+	{
+		result += "cr3d::";
+	}
 
 	if (type.type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)
 	{

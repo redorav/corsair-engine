@@ -14,7 +14,7 @@
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrSampler.h"
-#include "ShaderResources.h"
+#include "GeneratedShaders/ShaderMetadata.h"
 
 #include "imgui.h"
 

@@ -1,7 +1,6 @@
 #include "CrRendering_pch.h"
 
 #include "ICrShader.h"
-#include "ShaderResources.h"
 
 #include "Core/Logging/ICrDebug.h"
 

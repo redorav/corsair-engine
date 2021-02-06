@@ -6,7 +6,6 @@
 #include "Rendering/ICrShaderReflection.h"
 #include "Rendering/ICrShader.h"
 #include "CrResourceManager.h"
-#include "ShaderResources.h"
 
 #include "Core/CrMacros.h"
 #include "Core/SmartPointers/CrSharedPtr.h"

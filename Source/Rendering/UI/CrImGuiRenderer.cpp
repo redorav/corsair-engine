@@ -11,6 +11,7 @@
 #include "Rendering/ICrShaderManager.h"
 #include "Rendering/ICrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
+#include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrSampler.h"
@@ -57,7 +58,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	ImGuiIO& io = ImGui::GetIO();
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
+	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Setup render pass used to blit the UI:
 	CrRenderPassDescriptor renderPassDescriptor;
@@ -257,7 +258,7 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 	if (!m_indexBuffer || currentIndexCount > m_currentMaxIndexCount)
 	{
 		m_currentMaxIndexCount = currentIndexCount * 2;
-		m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_currentMaxIndexCount);
+		m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, m_currentMaxIndexCount);
 	}
 
 	// Check vertex buffer size:
@@ -265,7 +266,7 @@ void CrImGuiRenderer::UpdateBuffers(ImDrawData* data)
 	if (!m_vertexBuffer || currentVertexCount > m_currentMaxVertexCount)
 	{
 		m_currentMaxVertexCount = currentVertexCount * 2;
-		m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_currentMaxVertexCount);
+		m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<UIVertex>(m_currentMaxVertexCount);
 	}
 
 	// Update contents:

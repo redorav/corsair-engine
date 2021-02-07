@@ -1,5 +1,6 @@
 #include "CrInputManager.h"
 
+#include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrFrame.h"
 
@@ -44,25 +45,27 @@ int main(int argc, char* argv[])
 	void* hWnd = mainWindow->GetNativeWindowHandle();
 
 	//HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
-	HINSTANCE hInstance = GetModuleHandle(nullptr); // Valid for the current executable (not valid for a dll) http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
+	// Valid for the current executable (not valid for a dll) http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	CrPrintProcessMemory("Before Render Device");
 
-	CrRenderDeviceDescriptor renderDeviceDescriptor;
+	CrRenderSystemDescriptor renderSystemDescriptor;
 
 	if (graphicsApiString == "vulkan")
 	{
-		renderDeviceDescriptor.graphicsApi = cr3d::GraphicsApi::Vulkan;
+		renderSystemDescriptor.graphicsApi = cr3d::GraphicsApi::Vulkan;
 	}
 	else if (graphicsApiString == "d3d12")
 	{
-		renderDeviceDescriptor.graphicsApi = cr3d::GraphicsApi::D3D12;
+		renderSystemDescriptor.graphicsApi = cr3d::GraphicsApi::D3D12;
 	}
 
-	renderDeviceDescriptor.enableValidation = enableGraphicsValidation;
-	renderDeviceDescriptor.enableDebuggingTool = enableRenderdoc;
+	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
+	renderSystemDescriptor.enableDebuggingTool = enableRenderdoc;
 
-	ICrRenderDevice::Create(renderDeviceDescriptor);
+	ICrRenderSystem::Initialize(renderSystemDescriptor);
+	ICrRenderSystem::CreateRenderDevice();
 
 	CrPrintProcessMemory("After Render Device");
 

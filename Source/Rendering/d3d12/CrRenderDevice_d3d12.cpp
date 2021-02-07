@@ -11,28 +11,23 @@
 #include "CrGPUBuffer_d3d12.h"
 #include "CrGPUSynchronization_d3d12.h"
 
-CrRenderDeviceD3D12::CrRenderDeviceD3D12()
+CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
 {
-
+	unused_parameter(renderSystem);
+	//	IDXGIFactory4 dxgiFactory;
+	//
+	//	UINT createFactoryFlags = 0;
+	//#if defined(_DEBUG)
+	//	createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+	//#endif
+	//
+	//	HRESULT hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory));
+	//
 }
 
 CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 {
 
-}
-
-void CrRenderDeviceD3D12::InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
-{
-	unused_parameter(renderDeviceDescriptor);
-//	IDXGIFactory4 dxgiFactory;
-//
-//	UINT createFactoryFlags = 0;
-//#if defined(_DEBUG)
-//	createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-//#endif
-//
-//	HRESULT hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory));
-//
 }
 
 cr3d::GPUWaitResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)

@@ -5,6 +5,7 @@
 #include "Core/CrPlatform.h"
 
 #include "Rendering/CrGPUBuffer.h"
+#include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
 #include "Rendering/ICrShaderManager.h"
@@ -54,7 +55,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_width = width;
 	m_height = height;
 
-	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
+	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Load vertex data for the frame
 
@@ -194,8 +195,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-		ICrShaderManager::Get()->Init(renderDevice);
-		ICrPipelineStateManager::Get()->Init(renderDevice);
+		ICrShaderManager::Get()->Init(renderDevice.get());
+		ICrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
 
 	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeLoadInfo);
@@ -244,7 +245,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
-	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
+	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
@@ -429,7 +430,7 @@ void CrFrame::UpdateCamera()
 
 void CrFrame::RecreateSwapchainAndFramebuffers()
 {
-	ICrRenderDevice* renderDevice = ICrRenderDevice::GetRenderDevice();
+	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
 	// Ensure all operations on the device have been finished before destroying resources

@@ -12,13 +12,10 @@ class CrRenderDeviceVulkan final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceVulkan();
+	CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem);
 
 	~CrRenderDeviceVulkan();
 
-	virtual void InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor) override;
-
-	// TODO Move to the RenderSystem singleton
 	const VkInstance GetVkInstance() const { return m_vkInstance; }
 
 	const VkDevice GetVkDevice() const { return m_vkDevice; }
@@ -75,8 +72,6 @@ private:
 
 	void RetrieveQueueFamilies();
 
-	VkResult CreateInstance(bool enableValidationLayer);
-
 	VkResult SelectPhysicalDevice();
 
 	VkResult CreateLogicalDevice();
@@ -85,15 +80,10 @@ private:
 
 	bool IsVkDeviceExtensionSupported(const CrString& extension);
 
-	bool IsVkInstanceExtensionSupported(const CrString& extension);
-
-	bool IsVkInstanceLayerSupported(const CrString& layer);
-
 	// TODO Make platform-independent
 	bool IsDepthStencilFormatSupported(VkFormat depthFormat);
 
-	// TODO Move to RenderSystem
-	// Global per-application state https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkInstance
+	// Came from RenderSystem. This is the instance this device was created from
 	VkInstance m_vkInstance;
 
 	// https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#devsandqueues
@@ -105,11 +95,6 @@ private:
 
 	VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
-	CrVector<const char*> m_instanceLayers;
-
-	// Supported extensions
-	CrSet<CrString> m_supportedInstanceExtensions;
-	CrSet<CrString> m_supportedInstanceLayers;
 	CrSet<CrString> m_supportedDeviceExtensions;
 
 	// TODO Make this platform-independent

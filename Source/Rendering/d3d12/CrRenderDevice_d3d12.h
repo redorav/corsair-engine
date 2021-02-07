@@ -8,11 +8,9 @@ class CrRenderDeviceD3D12 final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceD3D12();
+	CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem);
 
 	~CrRenderDeviceD3D12();
-
-	virtual void InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor) override;
 
 	ID3D12Device* GetD3D12Device() { return m_d3d12Device; }
 

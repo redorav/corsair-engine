@@ -10,7 +10,6 @@
 class CrRenderModel;
 using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 
-class ICrGraphicsPipeline;
 
 class CrFrame
 {

@@ -20,7 +20,7 @@
 
 static ICrRenderDevice* g_renderDevice;
 
-ICrRenderDevice::ICrRenderDevice()
+ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
 {
 	
 }
@@ -28,13 +28,6 @@ ICrRenderDevice::ICrRenderDevice()
 ICrRenderDevice::~ICrRenderDevice()
 {
 
-}
-
-void ICrRenderDevice::Init(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
-{
-	m_renderDeviceProperties.m_graphicsApi = renderDeviceDescriptor.graphicsApi;
-
-	InitPS(renderDeviceDescriptor);
 }
 
 CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueType::T type)
@@ -147,25 +140,4 @@ void ICrRenderDevice::WaitIdle()
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties()
 {
 	return m_renderDeviceProperties;
-}
-
-ICrRenderDevice* ICrRenderDevice::GetRenderDevice()
-{
-	return g_renderDevice;
-}
-
-void ICrRenderDevice::Create(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
-{
-	// TODO Treat this like a factory (on PC) through the API. That way the rest of the code
-	// doesn't need to know about platform-specific code, only the render device.
-	if (renderDeviceDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
-	{
-		g_renderDevice = new CrRenderDeviceVulkan();
-	}
-	else if (renderDeviceDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12)
-	{
-		//g_renderDevice = new CrRenderDeviceD3D12();
-	}
-
-	g_renderDevice->Init(renderDeviceDescriptor);
 }

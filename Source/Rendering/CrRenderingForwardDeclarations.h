@@ -16,7 +16,10 @@ namespace cr3d
 
 // Forward declare the necessary types for the rendering core
 
+class ICrRenderSystem;
+
 class ICrRenderDevice;
+using CrRenderDeviceSharedHandle = CrSharedPtr<ICrRenderDevice>;
 
 class ICrFramebuffer;
 using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;

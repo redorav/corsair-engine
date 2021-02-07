@@ -2,6 +2,8 @@
 
 #include "CrRenderDevice_vk.h"
 
+#include "CrRenderSystem_vk.h"
+
 #include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrTexture_vk.h"
@@ -22,29 +24,11 @@ PFN_vkCmdDebugMarkerBeginEXT		vkCmdDebugMarkerBegin = nullptr;
 PFN_vkCmdDebugMarkerEndEXT			vkCmdDebugMarkerEnd = nullptr;
 PFN_vkCmdDebugMarkerInsertEXT		vkCmdDebugMarkerInsert = nullptr;
 
-CrRenderDeviceVulkan::CrRenderDeviceVulkan()
-	: m_numCommandQueues(0)
+CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
+	: ICrRenderDevice(renderSystem)
+	, m_numCommandQueues(0)
 {
-
-}
-
-CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
-{
-
-}
-
-void CrRenderDeviceVulkan::InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
-{
-	bool enableRenderdoc = renderDeviceDescriptor.enableDebuggingTool;
-
-	if (enableRenderdoc)
-	{
-		m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
-	}
-
-	// 1. Create the Vulkan instance
-	// TODO Move this to RenderSystem
-	CreateInstance(renderDeviceDescriptor.enableValidation);
+	m_vkInstance = static_cast<const CrRenderSystemVulkan*>(renderSystem)->GetVkInstance();
 
 	// 2. Select the physical device (can be multi-GPU)
 	// TODO This needs to come from outside as part of the render device creation
@@ -54,7 +38,7 @@ void CrRenderDeviceVulkan::InitPS(const CrRenderDeviceDescriptor& renderDeviceDe
 	// 3. Query queue families
 	// TODO This also needs to live in the RenderSystem
 	RetrieveQueueFamilies();
-	
+
 	// 4. Create logical device. Connects the physical device to a logical vkDevice.
 	// Also specifies desired queues.
 	CreateLogicalDevice();
@@ -64,17 +48,22 @@ void CrRenderDeviceVulkan::InitPS(const CrRenderDeviceDescriptor& renderDeviceDe
 
 	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
-		vkDebugMarkerSetObjectTag	= (PFN_vkDebugMarkerSetObjectTagEXT)	vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
-		vkDebugMarkerSetObjectName	= (PFN_vkDebugMarkerSetObjectNameEXT)	vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
-		vkCmdDebugMarkerBegin		= (PFN_vkCmdDebugMarkerBeginEXT)		vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerBeginEXT");
-		vkCmdDebugMarkerEnd			= (PFN_vkCmdDebugMarkerEndEXT)			vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
-		vkCmdDebugMarkerInsert		= (PFN_vkCmdDebugMarkerInsertEXT)		vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
+		vkDebugMarkerSetObjectTag = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
+		vkDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
+		vkCmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerBeginEXT");
+		vkCmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
+		vkCmdDebugMarkerInsert = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
 	}
 
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
 	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
+}
+
+CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
+{
+	
 }
 
 cr3d::GPUWaitResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
@@ -97,105 +86,6 @@ void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
 void CrRenderDeviceVulkan::WaitIdlePS()
 {
 	vkDeviceWaitIdle(m_vkDevice);
-}
-
-VkResult CrRenderDeviceVulkan::CreateInstance(bool enableValidationLayer)
-{
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Corsair Engine";		// TODO Come from application settings
-	appInfo.pEngineName = "Corsair Engine";				// TODO Come from engine settings
-	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
-
-	// Enumerate instance extensions
-	{
-		uint32_t numInstanceExtensions;
-		vkEnumerateInstanceExtensionProperties(nullptr, &numInstanceExtensions, nullptr);
-		CrVector<VkExtensionProperties> instanceExtensions(numInstanceExtensions);
-		vkEnumerateInstanceExtensionProperties(nullptr, &numInstanceExtensions, instanceExtensions.data());
-
-		for (const VkExtensionProperties& extension : instanceExtensions)
-		{
-			m_supportedInstanceExtensions.insert(extension.extensionName);
-		}
-	}
-
-	// Enumerate instance layers
-	{
-		uint32_t numInstanceLayers;
-		vkEnumerateInstanceLayerProperties(&numInstanceLayers, nullptr);
-		CrVector<VkLayerProperties> instanceLayers(numInstanceLayers);
-		vkEnumerateInstanceLayerProperties(&numInstanceLayers, instanceLayers.data());
-
-		for (const VkLayerProperties& layer : instanceLayers)
-		{
-			m_supportedInstanceLayers.insert(layer.layerName);
-		}
-	}
-
-	CrVector<const char*> enabledExtensions;
-	if (IsVkInstanceExtensionSupported(VK_KHR_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-	}
-
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-	if (IsVkInstanceExtensionSupported(VK_KHR_WIN32_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-	}
-#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	if (IsVkInstanceExtensionSupported(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-	}
-#elif defined(VK_USE_PLATFORM_XCB_KHR)
-	if (IsVkInstanceExtensionSupported(VK_KHR_XCB_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-	}
-#elif defined(VK_USE_PLATFORM_VI_NN)
-	if (IsVkInstanceExtensionSupported(VK_NN_VI_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_NN_VI_SURFACE_EXTENSION_NAME);
-	}
-#elif defined(VK_USE_PLATFORM_MACOS_MVK)
-	if (IsVkInstanceExtensionSupported(VK_MVK_MACOS_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
-	}
-#elif defined(VK_USE_PLATFORM_IOS_MVK)
-	if (IsVkInstanceExtensionSupported(VK_MVK_IOS_SURFACE_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_MVK_IOS_SURFACE_EXTENSION_NAME);
-	}
-#endif
-
-	VkInstanceCreateInfo instanceCreateInfo = {};
-	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCreateInfo.pApplicationInfo = &appInfo;
-
-	if (enableValidationLayer && IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
-	{
-		enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-	}
-
-	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
-	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
-
-	if (enableValidationLayer && IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
-	{
-		m_instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
-	}
-
-	instanceCreateInfo.enabledLayerCount = (uint32_t)m_instanceLayers.size();
-	instanceCreateInfo.ppEnabledLayerNames = m_instanceLayers.data();
-
-	VkResult res = vkCreateInstance(&instanceCreateInfo, nullptr, &m_vkInstance);
-
-	CrAssertMsg(res == VK_SUCCESS, "Error creating vkInstance");
-
-	return res;
 }
 
 VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
@@ -739,16 +629,6 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)
 {
 	return m_supportedDeviceExtensions.count(extension) > 0;
-}
-
-bool CrRenderDeviceVulkan::IsVkInstanceExtensionSupported(const CrString& extension)
-{
-	return m_supportedInstanceExtensions.count(extension) > 0;
-}
-
-bool CrRenderDeviceVulkan::IsVkInstanceLayerSupported(const CrString& layer)
-{
-	return m_supportedInstanceLayers.count(layer) > 0;
 }
 
 bool CrRenderDeviceVulkan::IsDepthStencilFormatSupported(VkFormat depthFormat)

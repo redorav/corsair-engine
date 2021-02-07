@@ -33,22 +33,13 @@ namespace CrRenderingFeature
 	};
 }
 
-struct CrRenderDeviceDescriptor
-{
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Vulkan;
-	bool enableValidation = false; // e.g. Vulkan layers
-	bool enableDebuggingTool = false; // e.g. renderdoc
-};
-
 class ICrRenderDevice
 {
 public:
 
-	ICrRenderDevice();
+	ICrRenderDevice(const ICrRenderSystem* renderSystem);
 
-	~ICrRenderDevice();
-
-	void Init(const CrRenderDeviceDescriptor& renderDeviceDescriptor);
+	virtual ~ICrRenderDevice();
 
 	// Resource Creation Functions
 
@@ -104,11 +95,7 @@ public:
 
 	const CrRenderDeviceProperties& GetProperties();
 
-	static ICrRenderDevice* GetRenderDevice();
-
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
-
-	static void Create(const CrRenderDeviceDescriptor& renderDeviceDescriptor);
 
 protected:
 
@@ -139,13 +126,13 @@ protected:
 
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& psoDescriptor, const ICrComputeShader* computeShader) = 0;
 	
-	virtual void InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor) = 0;
-
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
 
 	virtual void WaitIdlePS() = 0;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
+
+	const ICrRenderSystem* m_renderSystem;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 

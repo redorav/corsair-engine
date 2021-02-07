@@ -7,6 +7,7 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderDevice.h"
+#include "Rendering/ICrRenderSystem.h"
 #include "GeneratedShaders/ShaderMetadata.h" // TODO Hack - delete from the .lua
 
 #include "Core/CrCommandLine.h"
@@ -84,7 +85,7 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 			textureParams.numMipmaps = image->m_numMipmaps;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
-			CrTextureSharedHandle texture = ICrRenderDevice::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{
@@ -160,7 +161,7 @@ void CrResourceManager::LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh* m
 	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");
 	CrAssertMsg(mesh->HasTangentsAndBitangents(), "Error in mesh: no tangents available.");
 
-	renderMesh->m_vertexBuffer = ICrRenderDevice::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)mesh->mNumVertices);
+	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)mesh->mNumVertices);
 
 	SimpleVertex* vertex = (SimpleVertex*)renderMesh->m_vertexBuffer->Lock();
 	{
@@ -184,7 +185,7 @@ void CrResourceManager::LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh* m
 	}
 	renderMesh->m_vertexBuffer->Unlock();
 
-	renderMesh->m_indexBuffer = ICrRenderDevice::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	renderMesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
 	uint16_t* indexData = (uint16_t*)renderMesh->m_indexBuffer->Lock();

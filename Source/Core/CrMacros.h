@@ -21,3 +21,5 @@
 #define optimize_on
 
 #endif
+
+#define unused_parameter(x) (x)

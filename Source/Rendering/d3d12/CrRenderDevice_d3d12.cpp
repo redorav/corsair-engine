@@ -21,8 +21,9 @@ CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 
 }
 
-void CrRenderDeviceD3D12::InitPS()
+void CrRenderDeviceD3D12::InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
 {
+	unused_parameter(renderDeviceDescriptor);
 //	IDXGIFactory4 dxgiFactory;
 //
 //	UINT createFactoryFlags = 0;

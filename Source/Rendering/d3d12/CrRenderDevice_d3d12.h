@@ -12,7 +12,7 @@ public:
 
 	~CrRenderDeviceD3D12();
 
-	virtual void InitPS() override;
+	virtual void InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor) override;
 
 	ID3D12Device* GetD3D12Device() { return m_d3d12Device; }
 

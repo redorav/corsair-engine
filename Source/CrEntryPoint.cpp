@@ -29,7 +29,10 @@ int main(int argc, char* argv[])
 
 	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
-	CrString dataPath = crcore::CommandLine("-root").str().c_str();
+	CrString dataPath             = crcore::CommandLine("-root").str().c_str();
+	CrString graphicsApiString    = crcore::CommandLine("-graphicsapi").str().c_str();
+	bool enableGraphicsValidation = crcore::CommandLine["-debugGraphics"];
+	bool enableRenderdoc          = crcore::CommandLine["-renderdoc"];
 
 	if (dataPath.empty())
 	{
@@ -45,7 +48,21 @@ int main(int argc, char* argv[])
 
 	CrPrintProcessMemory("Before Render Device");
 
-	ICrRenderDevice::Create(cr3d::GraphicsApi::Vulkan); // Need to make a window class here that abstracts these Windows-specific things
+	CrRenderDeviceDescriptor renderDeviceDescriptor;
+
+	if (graphicsApiString == "vulkan")
+	{
+		renderDeviceDescriptor.graphicsApi = cr3d::GraphicsApi::Vulkan;
+	}
+	else if (graphicsApiString == "d3d12")
+	{
+		renderDeviceDescriptor.graphicsApi = cr3d::GraphicsApi::D3D12;
+	}
+
+	renderDeviceDescriptor.enableValidation = enableGraphicsValidation;
+	renderDeviceDescriptor.enableDebuggingTool = enableRenderdoc;
+
+	ICrRenderDevice::Create(renderDeviceDescriptor);
 
 	CrPrintProcessMemory("After Render Device");
 

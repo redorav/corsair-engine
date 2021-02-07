@@ -33,12 +33,10 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 
 }
 
-void CrRenderDeviceVulkan::InitPS()
+void CrRenderDeviceVulkan::InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor)
 {
-	// TODO Move this to platform-independent layer
-	bool enableValidationLayer = crcore::CommandLine["-debugGraphics"];
+	bool enableRenderdoc = renderDeviceDescriptor.enableDebuggingTool;
 
-	bool enableRenderdoc = crcore::CommandLine["-renderdoc"];
 	if (enableRenderdoc)
 	{
 		m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
@@ -46,7 +44,7 @@ void CrRenderDeviceVulkan::InitPS()
 
 	// 1. Create the Vulkan instance
 	// TODO Move this to RenderSystem
-	CreateInstance(enableValidationLayer);
+	CreateInstance(renderDeviceDescriptor.enableValidation);
 
 	// 2. Select the physical device (can be multi-GPU)
 	// TODO This needs to come from outside as part of the render device creation

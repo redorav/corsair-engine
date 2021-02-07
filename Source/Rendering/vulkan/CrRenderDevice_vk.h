@@ -16,7 +16,7 @@ public:
 
 	~CrRenderDeviceVulkan();
 
-	virtual void InitPS() override;
+	virtual void InitPS(const CrRenderDeviceDescriptor& renderDeviceDescriptor) override;
 
 	// TODO Move to the RenderSystem singleton
 	const VkInstance GetVkInstance() const { return m_vkInstance; }

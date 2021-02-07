@@ -13,13 +13,6 @@
 
 #include "Core/CrMacros.h"
 
-// Include all the necessary platforms here
-#include "vulkan/CrRenderDevice_vk.h"
-
-#include "d3d12/CrRenderDevice_d3d12.h"
-
-static ICrRenderDevice* g_renderDevice;
-
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
 {
 	

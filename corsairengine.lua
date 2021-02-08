@@ -195,7 +195,7 @@ project (ProjectCorsairEngine)
 		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
-	links { ProjectCrCore, ProjectCrRendering }
+	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage }
 	
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
@@ -254,8 +254,6 @@ project(ProjectCrRendering)
 		ShaderMetadataCpp
 	}
 	
-	links { ProjectCrImage } -- TODO Delete
-
 	AddLibraryHeaders(AssimpLibrary)
 	AddLibraryHeaders(SPIRVReflectLibrary)
 	AddLibraryHeaders(GainputLibrary) -- TODO Remove

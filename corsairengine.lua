@@ -1,9 +1,9 @@
+require("premake/corsairengine/dependencies")
+
 -- Directories
-DependenciesDirectory   = 'Dependencies'
 SourceDirectory         = 'Source'
 ToolsDirectory          = 'Tools'
 ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
-
 MathDirectory = SourceDirectory..'/Math'
 
 -- Platforms
@@ -23,100 +23,19 @@ ProjectCrCore           = 'CrCore'
 ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
 
--- Library Directories
-LibVulkan       = DependenciesDirectory..'/vulkan'
-LibEASTL        = DependenciesDirectory..'/eastl'
-LibGlslang      = DependenciesDirectory..'/glslang'
-LibGainput      = DependenciesDirectory..'/gainput'
-LibSPIRVCross   = DependenciesDirectory..'/spirv-cross'
-LibHlslpp       = DependenciesDirectory..'/hlslpp'
-LibStb          = DependenciesDirectory..'/stb'
-LibxxHash       = DependenciesDirectory..'/xxHash'
-LibAssimp       = DependenciesDirectory..'/assimp'
-LibArgh         = DependenciesDirectory..'/argh'
-LibHalf         = DependenciesDirectory..'/half'
-LibDdspp        = DependenciesDirectory..'/ddspp'
-LibSDL2         = DependenciesDirectory..'/sdl2'
-LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
-LibImGui        = DependenciesDirectory..'/imgui'
-
-LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}' -- Careful, the names are debug and release but this depends on this project's naming as well
-
 -- Generated Code Directories
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
 GeneratedCodeDirectory = WorkspaceDirectory..'/GeneratedCode'
 
-BinaryDirectory = '/Binaries/'
-
 ShaderCompilerAbsolutePath = path.getabsolute(ShaderCompilerDirectory)..'/'..ProjectShaderCompiler..'.exe'
 
--- todo put in common
--- Adds a library to a project
-function AddLibrary(includeDirs, libDirs, libNames)
-
-	includedirs(includeDirs)
-	libdirs (libDirs)
-	links(libNames)
-
-end
-
-function AddAssimpLibrary()
-	AddLibrary(LibAssimp..'/Source/include', LibAssimp..BinaryDirectory, 'Assimp'..LibConfig)
-end
-
-function AddVulkanLibrary()
-	AddLibrary(LibVulkan..'/Source/include', LibVulkan..BinaryDirectory, 'vulkan-1')
-end
-
-function AddXinputLibrary()
-	AddLibrary('', '', 'Xinput9_1_0')
-end
-
-function AddGlslangLibrary()
-	AddLibrary({ LibGlslang..'/Source/' }, LibGlslang..BinaryDirectory, 'Glslang'..LibConfig)
-end
-
-function AddGainputLibrary()
-	AddLibrary(LibGainput..'/Source/lib/include', LibGainput..BinaryDirectory, 'Gainput'..LibConfig)
-end
-
-function AddEASTLLibrary()
-	AddLibrary({ LibEASTL..'/Source/include', LibEASTL..'/Source/test/packages/EAStdC/include', LibEASTL..'/Source/test/packages/EAAssert/include', LibEASTL..'/Source/test/packages/EABase/include/Common' },
-	LibEASTL..BinaryDirectory, 'EASTL'..LibConfig)
-end
-
-function AddHlslppLibrary()
-	defines { 'HLSLPP_FEATURE_TRANSFORM' }
-end
-
-function AddSDL2Library()
-	AddLibrary(LibSDL2..'/Source/include', LibSDL2..BinaryDirectory, 'SDL2')
-	defines { 'SDL_MAIN_HANDLED' }
-end
-
-function AddImGuiLibrary()
-	AddLibrary(LibImGui..'/Source/', LibImGui..BinaryDirectory, 'ImGui'..LibConfig)
-end
-
-function AddSpirvReflectLibrary()
-	AddLibrary(LibSPIRVReflect..'/Source', LibSPIRVReflect..BinaryDirectory, 'SPIRV-Reflect'..LibConfig)
-end
-
 function ExcludePlatformSpecificCode(rootPath)
-
 	excludes { rootPath..'**/platform/**' }
-
 end
 
 function CopyFileCommand(filePath, destinationPath)
 	return '{copyfile} "'..filePath..'" "'..destinationPath..'"'
 end
-
--- Keep in mind many platforms can have different OSs
--- LinuxVulkan
--- AndroidVulkan
--- WinVulkan
--- etc.
 
 -- Note on precompiled header files
 -- On Visual Studio, the header file needs to be the exact string as it appears in your include,
@@ -203,17 +122,16 @@ workspace 'Corsair Engine'
 		
 	filter{}
 	
-	AddEASTLLibrary()
-	AddHlslppLibrary()
-	AddImGuiLibrary()
+	-- Global library includes. Very few things should go here, basically things
+	-- that are used in every possible project like math and containers
+	AddLibraryHeaders(EASTLLibrary)
+	AddLibraryHeaders(HlslppLibrary)
+	AddLibraryHeaders(xxHashLibrary)
 
 	-- Setup include directories
-			
+	-- TODO Move to dependencies
 	includedirs
 	{
-		LibHlslpp..'/Source/include',
-		LibStb..'/Source',
-		LibxxHash..'/Source',
 		LibArgh..'/Source/',
 		LibHalf..'/Source',
 		LibDdspp..'/Source',
@@ -279,9 +197,25 @@ project (ProjectCorsairEngine)
 
 	links { ProjectCrCore, ProjectCrRendering }
 	
-	AddAssimpLibrary()
-	AddGainputLibrary()
-	AddSDL2Library()
+	-- Only executables should link to any libraries
+	-- Otherwise we'll get bloated libs and slow link times
+	-- Project libraries have slimmed by about ~140MB
+	AddLibraryHeaders(AssimpLibrary)
+	LinkLibrary(AssimpLibrary)
+	
+	AddLibraryHeaders(GainputLibrary)
+	LinkLibrary(GainputLibrary)
+
+	AddLibraryHeaders(SDL2Library)
+	LinkLibrary(SDL2Library)
+	
+	LinkLibrary(EASTLLibrary)
+	LinkLibrary(ImguiLibrary)
+
+	-- todo platform filters
+	LinkLibrary(VulkanLibrary)
+	LinkLibrary(SPIRVReflectLibrary)
+	LinkLibrary(D3D12Library)
 
 	-- Copy necessary files or DLLs
 	postbuildcommands
@@ -290,7 +224,7 @@ project (ProjectCorsairEngine)
 	}
 	
 	filter('system:windows')
-		AddXinputLibrary() -- Needed for gainput on Windows
+		LinkLibrary(XInputLibrary) -- Needed for gainput on Windows
 
 	filter{}
 
@@ -322,14 +256,15 @@ project(ProjectCrRendering)
 	
 	links { ProjectCrImage } -- TODO Delete
 
-	AddAssimpLibrary()
-	AddSpirvReflectLibrary()
-	AddGainputLibrary() -- TODO Remove
+	AddLibraryHeaders(AssimpLibrary)
+	AddLibraryHeaders(SPIRVReflectLibrary)
+	AddLibraryHeaders(GainputLibrary) -- TODO Remove
+	AddLibraryHeaders(ImguiLibrary)
 	
 	filter { 'platforms:'..DesktopWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
 		files { SourceRenderingDirectory..'/d3d12/*' }
-		AddVulkanLibrary()
+		AddLibraryHeaders(VulkanLibrary)
 		
 	filter { 'platforms:'..VulkanOSX }
 		files { SourceRenderingDirectory..'/vulkan/*' }
@@ -389,8 +324,11 @@ project(ProjectShaderCompiler)
 	
 	links { ProjectCrCore }
 
-	AddSpirvReflectLibrary()
-	AddGlslangLibrary()
+	AddLibraryHeaders(SPIRVReflectLibrary)
+	LinkLibrary(SPIRVReflectLibrary)
+
+	AddLibraryHeaders(GlslangLibrary)
+	LinkLibrary(GlslangLibrary)
 
 	-- Copy the shader compiler into a known directory
 	postbuildcommands
@@ -416,11 +354,13 @@ project(ProjectCrMath)
 
 group('Image')
 
-SourceImageDirectory= SourceDirectory..'/Image'
+SourceImageDirectory = SourceDirectory..'/Image'
 
 project(ProjectCrImage)
 	kind('StaticLib')
 	files{ 	SourceImageDirectory..'/**' }
+
+	AddLibraryHeaders(StbLibrary)
 	
 group('Core')
 
@@ -432,7 +372,7 @@ project(ProjectCrCore)
 	files
 	{
 		SourceCoreDirectory..'/**',
-		LibxxHash..'/Source/xxhash.h'
+		xxHashLibrary.includeDirs..'/xxhash.h'
 	}
 
 	ExcludePlatformSpecificCode(SourceCoreDirectory)

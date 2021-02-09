@@ -37,6 +37,16 @@ void CrCommandBufferD3D12::TransitionTexturePS(const ICrTexture* texture, cr3d::
 	unused_parameter(destinationState);
 }
 
+void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
+{
+
+}
+
+void CrCommandBufferD3D12::FlushComputeRenderStatePS()
+{
+
+}
+
 void CrCommandBufferD3D12::BeginPS()
 {
 	

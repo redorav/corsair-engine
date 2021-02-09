@@ -18,4 +18,7 @@ public:
 
 private:
 
+	ID3D12Debug* m_d3d12DebugController;
+
+	IDXGIFactory4* m_dxgiFactory;
 };

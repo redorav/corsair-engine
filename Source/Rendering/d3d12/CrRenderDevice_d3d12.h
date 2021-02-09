@@ -22,6 +22,14 @@ private:
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 
+	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
+
+	virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const override;
+
+	virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const override;
+
+	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
+
 	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
 
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
@@ -30,11 +38,16 @@ private:
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
 
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) override;
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader,
+		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) override;
+
+	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader) override;
 
 	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;
+
+	virtual void WaitIdlePS() override;
 
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
 

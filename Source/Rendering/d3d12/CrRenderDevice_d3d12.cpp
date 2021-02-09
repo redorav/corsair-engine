@@ -14,32 +14,11 @@
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
 {
 	unused_parameter(renderSystem);
-	//	IDXGIFactory4 dxgiFactory;
-	//
-	//	UINT createFactoryFlags = 0;
-	//#if defined(_DEBUG)
-	//	createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-	//#endif
-	//
-	//	HRESULT hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory));
-	//
 }
 
 CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 {
 
-}
-
-cr3d::GPUWaitResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
-{
-	unused_parameter(fence);
-	unused_parameter(timeoutNanoseconds);
-	return cr3d::GPUWaitResult::Success;
-}
-
-void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
-{
-	unused_parameter(fence);
 }
 
 ICrCommandQueue* CrRenderDeviceD3D12::CreateCommandQueuePS(CrCommandQueueType::T type)
@@ -55,6 +34,28 @@ ICrFramebuffer* CrRenderDeviceD3D12::CreateFramebufferPS(const CrFramebufferCrea
 ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()
 {
 	return new CrGPUFenceD3D12(this);
+}
+
+ICrGPUSemaphore* CrRenderDeviceD3D12::CreateGPUSemaphorePS()
+{
+	return nullptr;
+}
+
+ICrGraphicsShader* CrRenderDeviceD3D12::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+{
+	unused_parameter(graphicsShaderDescriptor);
+	return nullptr;
+}
+
+ICrComputeShader* CrRenderDeviceD3D12::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+{
+	unused_parameter(computeShaderDescriptor);
+	return nullptr;
+}
+
+ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params)
+{
+	return new CrHardwareGPUBufferD3D12(this, params);
 }
 
 ICrRenderPass* CrRenderDeviceD3D12::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
@@ -77,9 +78,37 @@ ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureCreateParams& pa
 	return new CrTextureD3D12(this, params);
 }
 
-ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params)
+ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	return new CrHardwareGPUBufferD3D12(this, params);
+	unused_parameter(pipelineDescriptor);
+	unused_parameter(graphicsShader);
+	unused_parameter(vertexDescriptor);
+	unused_parameter(renderPassDescriptor);
+	return nullptr;
+}
+
+ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
+{
+	unused_parameter(pipelineDescriptor);
+	unused_parameter(computeShader);
+	return nullptr;
+}
+
+cr3d::GPUWaitResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+{
+	unused_parameter(fence);
+	unused_parameter(timeoutNanoseconds);
+	return cr3d::GPUWaitResult::Success;
+}
+
+void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
+{
+	unused_parameter(fence);
+}
+
+void CrRenderDeviceD3D12::WaitIdlePS()
+{
+
 }
 
 bool CrRenderDeviceD3D12::GetIsFeatureSupported(CrRenderingFeature::T feature) const

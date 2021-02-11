@@ -22,7 +22,7 @@ ProjectShaders          = 'CrShaders'
 ProjectCrCore           = 'CrCore'
 ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
-ProjectCrModel	        = 'CrModel'
+ProjectCrModel          = 'CrModel'
 
 -- Generated Code Directories
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
@@ -368,7 +368,7 @@ SourceModelDirectory = SourceDirectory..'/Model'
 project(ProjectCrModel)
 	kind('StaticLib')
 	files { SourceModelDirectory..'/**' }
-	
+
 	AddLibraryHeaders(AssimpLibrary)
 
 group('Core')

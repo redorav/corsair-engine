@@ -30,26 +30,28 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	VkImageUsageFlags usageFlags = 0;
 	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	if (IsRenderTarget())
+	if (IsSwapchain())
+	{
+		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	}
+	else
 	{
 		if (IsDepth())
 		{
 			usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
-		else
+
+		if (IsRenderTarget())
 		{
+			usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
-	}
-	else if (m_usage & cr3d::TextureUsage::SwapChain)
-	{
-		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	}
-	
-	if (IsUnorderedAccess())
-	{
-		usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+
+		if (IsUnorderedAccess())
+		{
+			usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+		}
 	}
 
 	// TODO Validate that the image format supports the usages and provide an alternative
@@ -80,7 +82,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE;
 		}
 		vkCreateFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-		arrayLayers = 6;
 	}
 	else if (IsVolumeTexture())
 	{
@@ -122,7 +123,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 	VkMemoryRequirements imageMemoryRequirements;
 
-	if (m_usage & cr3d::TextureUsage::SwapChain)
+	if (IsSwapchain())
 	{
 		m_vkImage = (VkImage)params.extraDataPtr;
 		vkGetImageMemoryRequirements(m_vkDevice, m_vkImage, &imageMemoryRequirements);

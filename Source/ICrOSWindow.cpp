@@ -10,7 +10,7 @@ ICrOSWindow::ICrOSWindow(uint32_t width, uint32_t height)
 
 	int windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
-	m_window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
+	m_window = SDL_CreateWindow("Corsair Engine 0.01", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
 }
 
 ICrOSWindow::~ICrOSWindow()

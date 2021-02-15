@@ -437,8 +437,9 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
 
-	// We must destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
-	// that becomes available after (once the pointer assignment happens and the resource is destroyed)
+	// 1. Destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
+	// that becomes available after (once the pointer assignment happens and the resource is destroyed). Right after, create
+	// the new swapchain
 	m_swapchain = nullptr;
 
 	CrSwapchainDescriptor swapchainDescriptor = {};

@@ -170,7 +170,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	}
 
 	// Determine the number of images
-	uint32_t desiredNumberOfSwapchainImages = surfaceCapabilities.minImageCount + 1;
+	uint32_t desiredNumberOfSwapchainImages = CrMax(surfaceCapabilities.minImageCount, swapchainDescriptor.requestedBufferCount);
 	if (surfaceCapabilities.maxImageCount > 0)
 	{
 		desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfaceCapabilities.maxImageCount);

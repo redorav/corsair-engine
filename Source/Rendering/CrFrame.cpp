@@ -447,6 +447,7 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
 	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
+	swapchainDescriptor.requestedBufferCount = 3;
 	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
 
 	// 2. Recreate depth stencil texture

@@ -15,7 +15,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	CrRenderDeviceD3D12* d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 
 	DXGI_SWAP_CHAIN_DESC1 d3d12SwapchainDescriptor = {};
-	d3d12SwapchainDescriptor.BufferCount = 3; // swapchainDescriptor.
+	d3d12SwapchainDescriptor.BufferCount = swapchainDescriptor.requestedBufferCount;
 	d3d12SwapchainDescriptor.Format = crd3d::GetD3DFormat(swapchainDescriptor.format);
 	d3d12SwapchainDescriptor.Width = swapchainDescriptor.requestedWidth;
 	d3d12SwapchainDescriptor.Height = swapchainDescriptor.requestedHeight;
@@ -47,7 +47,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 
 	m_width = swapchainDescriptor.requestedWidth;
 	m_height = swapchainDescriptor.requestedHeight;
-	m_imageCount = 3;
+	m_imageCount = swapchainDescriptor.requestedBufferCount; // In the case of D3D12, requesting too many fails
 	m_format = swapchainDescriptor.format;
 
 	CrTextureCreateParams swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");

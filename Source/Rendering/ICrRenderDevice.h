@@ -1,19 +1,33 @@
 #pragma once
 
-#include "ICrSwapchain.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Core/Containers/CrVector.h"
+#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/String/CrFixedString.h"
+
+namespace CrVendor
+{
+	enum T
+	{
+		Unknown,
+		NVIDIA,
+		AMD,
+		Intel
+	};
+}
+
 struct CrRenderDeviceProperties
 {
-	cr3d::GraphicsApi::T m_graphicsApi;
+	CrVendor::T vendor = CrVendor::Unknown;
+	CrFixedString128 description;
 
-	uint32_t maxConstantBufferRange;
-	uint32_t maxTextureDimension1D;
-	uint32_t maxTextureDimension2D;
-	uint32_t maxTextureDimension3D;
+	uint32_t maxConstantBufferRange = 0;
+	uint32_t maxTextureDimension1D = 0;
+	uint32_t maxTextureDimension2D = 0;
+	uint32_t maxTextureDimension3D = 0;
 };
 
 namespace CrCommandQueueType { enum T : uint8_t; }
@@ -31,6 +45,21 @@ namespace CrRenderingFeature
 		TextureCompressionETC,
 		TextureCompressionASTC,
 	};
+}
+
+inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
+{
+	switch (vendorID)
+	{
+		case 0x10DE:
+			return CrVendor::NVIDIA;
+		case 0x1002:
+			return CrVendor::AMD;
+		case 0x8086:
+			return CrVendor::Intel;
+		default:
+			return CrVendor::Unknown;
+	}
 }
 
 class ICrRenderDevice

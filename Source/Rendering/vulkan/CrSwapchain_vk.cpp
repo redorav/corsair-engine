@@ -207,7 +207,6 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
 	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
-
 	CrAssertMsg(result == VK_SUCCESS, "Swapchain creation failed");
 
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.

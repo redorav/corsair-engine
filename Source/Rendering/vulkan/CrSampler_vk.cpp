@@ -4,7 +4,7 @@
 #include "CrVulkan.h"
 
 // See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
-CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(descriptor)
+CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {
 	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
@@ -25,7 +25,7 @@ CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerD
 
 	if (descriptor.enableAnisotropy)
 	{
-		createInfo.maxAnisotropy = CrMax(1.0f, descriptor.maxAnisotropy); // TODO Clamp to hardware max limit
+		createInfo.maxAnisotropy = (float)CrMax(1u, descriptor.maxAnisotropy); // TODO Clamp to hardware max limit
 	}
 
 	createInfo.compareEnable = descriptor.enableCompare;

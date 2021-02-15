@@ -133,6 +133,8 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
 
 	// Populate the render device properties into the platform-independent structure
+	m_renderDeviceProperties.vendor = GetVendorFromVendorID(m_vkPhysicalDeviceProperties.vendorID);
+	m_renderDeviceProperties.description = m_vkPhysicalDeviceProperties.deviceName;
 	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties.limits.maxUniformBufferRange;
 	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;
 	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;

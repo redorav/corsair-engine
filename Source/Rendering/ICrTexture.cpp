@@ -39,30 +39,42 @@ CrTextureCreateParams::CrTextureCreateParams()
 
 }
 
-ICrTexture::ICrTexture(const CrTextureCreateParams& params) : m_usedMemory(0)
+ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params) : m_usedMemory(0)
 {
+	m_renderDevice = renderDevice;
+
 	m_width = params.width;
 	m_height = params.height;
 	m_depth = CrMax(params.depth, 1u);
 	m_numMipmaps = CrMax(params.numMipmaps, 1u);
 	m_type = params.type;
 	m_sampleCount = params.sampleCount;
+	m_arraySize = params.arraySize;
 
 	switch (params.type)
 	{
 		case cr3d::TextureType::Volume:
-		CrAssertMsg(m_depth > 1, "Depth must be > 1");
-		break;
+		{
+			CrAssertMsg(m_depth > 1, "Depth must be > 1");
+			CrAssertMsg(m_arraySize == 1, "Cannot create arrays of volumes");
+			break;
+		}
 		case cr3d::TextureType::Cubemap:
-		CrAssertMsg(m_width == m_height, "Width and height must be the same");
-		CrAssertMsg(m_depth == 1, "Depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_width == m_height, "Width and height must be the same");
+			CrAssertMsg(m_depth == 1, "Depth must be 1");
+			break;
+		}
 		case cr3d::TextureType::Tex2D:
-		CrAssertMsg(m_depth == 1, "Depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_depth == 1, "Depth must be 1");
+			break;
+		}
 		case cr3d::TextureType::Tex1D:
-		CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
+			break;
+		}
 	}
 
 	m_format = params.format;
@@ -144,64 +156,4 @@ ICrTexture::~ICrTexture()
 	// TODO Add to a list that'll eventually delete it, to avoid destroying something currently in use
 	// Do this via the shared_ptr deleter
 	//DestroyPS();
-}
-
-bool ICrTexture::IsCubemap() const
-{
-	return m_type == cr3d::TextureType::Cubemap;
-}
-
-bool ICrTexture::IsRenderTarget() const
-{
-	return (m_usage & cr3d::TextureUsage::RenderTarget) != 0;
-}
-
-bool ICrTexture::IsUnorderedAccess() const
-{
-	return (m_usage & cr3d::TextureUsage::UnorderedAccess) != 0;
-}
-
-bool ICrTexture::IsSwapchain() const
-{
-	return (m_usage & cr3d::TextureUsage::SwapChain) != 0;
-}
-
-bool ICrTexture::IsVolumeTexture() const
-{
-	return m_type == cr3d::TextureType::Volume;
-}
-
-bool ICrTexture::IsDepth() const
-{
-	return (m_usage & cr3d::TextureUsage::Depth) != 0;
-}
-
-cr3d::DataFormat::T ICrTexture::GetFormat() const
-{
-	return m_format;
-}
-
-cr3d::SampleCount ICrTexture::GetSampleCount() const
-{
-	return m_sampleCount;
-}
-
-uint32_t ICrTexture::GetWidth() const
-{
-	return m_width;
-}
-
-uint32_t ICrTexture::GetHeight() const
-{
-	return m_height;
-}
-
-uint32_t ICrTexture::GetDepth() const
-{
-	return m_depth;
-}
-
-uint32_t ICrTexture::GetMipmapCount() const
-{
-	return m_numMipmaps;
 }

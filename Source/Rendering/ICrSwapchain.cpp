@@ -10,6 +10,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 	, platformHandle(nullptr)
 	, requestedWidth(0)
 	, requestedHeight(0)
+	, requestedBufferCount(0)
 	, format(cr3d::DataFormat::Invalid)
 {
 

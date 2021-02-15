@@ -2,13 +2,15 @@
 
 #include <d3d12.h>
 
+#include "Core/Containers/CrVector.h"
+
 namespace crd3d
 {
 	DXGI_FORMAT GetD3DFormat(cr3d::DataFormat::T format);
 
 	D3D12_TEXTURE_ADDRESS_MODE GetD3DAddressMode(cr3d::AddressMode addressMode);
 	
-	D3D12_FILTER GetD3DFilter(cr3d::Filter filter);
+	D3D12_FILTER GetD3DFilter(cr3d::Filter minFilter, cr3d::Filter magFilter, cr3d::Filter mipFilter, bool anisotropic, bool comparison);
 
 	D3D12_BLEND_OP GetD3DBlendOp(cr3d::BlendOp blendOp);
 
@@ -25,4 +27,12 @@ namespace crd3d
 	D3D12_FILL_MODE GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode);
 
 	D3D12_CULL_MODE GetD3D12PolygonCullMode(cr3d::PolygonCullMode cullMode);
+
+	// A shader-visible heap will have two handles, CPU and GPU. The CPU handle is what we use to update
+	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer
+	struct DescriptorD3D12
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
+	};
 }

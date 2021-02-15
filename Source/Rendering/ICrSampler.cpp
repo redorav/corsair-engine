@@ -14,7 +14,7 @@ CrSamplerDescriptor::CrSamplerDescriptor()
 	, addressModeW(cr3d::AddressMode::ClampToEdge)
 	, mipLodBias(0.0f)
 	, enableAnisotropy(true)
-	, maxAnisotropy(1.0f)
+	, maxAnisotropy(1)
 	, enableCompare(false)
 	, compareOp(cr3d::CompareOp::Always)
 	, minLod(0.0f)
@@ -24,7 +24,7 @@ CrSamplerDescriptor::CrSamplerDescriptor()
 
 }
 
-ICrSampler::ICrSampler(const CrSamplerDescriptor&)
+ICrSampler::ICrSampler(ICrRenderDevice* renderDevice)
 {
-
+	m_renderDevice = renderDevice;
 }

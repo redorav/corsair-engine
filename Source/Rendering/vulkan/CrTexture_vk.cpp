@@ -9,7 +9,7 @@
 #include "Core/Logging/ICrDebug.h"
 
 CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
-	: ICrTexture(params)
+	: ICrTexture(renderDevice, params)
 	, m_vkBaseFramebuffer(nullptr)
 	, m_vkBaseRenderPass(nullptr)
 	, m_vkImage(nullptr)
@@ -88,7 +88,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		vkImageType = VK_IMAGE_TYPE_3D;
 		vkImageViewType = VK_IMAGE_VIEW_TYPE_3D;
 	}
-	else if (m_type == cr3d::TextureType::Tex1D)
+	else if (Is1DTexture())
 	{
 		vkImageType = VK_IMAGE_TYPE_1D;
 
@@ -189,7 +189,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// Create the image views
 	//-----------------------
 
-	if (NeedsAdditionalImageViews())
+	if (IsRenderTarget() || IsUnorderedAccess() || IsSwapchain())
 	{
 		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
 	}
@@ -211,7 +211,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = m_vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
-		imageViewInfo.components = {}; // TODO Get from params
+		imageViewInfo.components = {};
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
 		imageViewInfo.subresourceRange.levelCount = m_numMipmaps;
 		imageViewInfo.subresourceRange.baseArrayLayer = 0;
@@ -233,7 +233,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = m_vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
-		imageViewInfo.components = {}; // TODO Get from params
+		imageViewInfo.components = {};
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
@@ -498,7 +498,7 @@ CrTextureVulkan::~CrTextureVulkan()
 	CrAssert(m_vkImageView);
 	CrAssert(m_vkImage);
 
-	// We don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
+	// Don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
 	if (m_usage != cr3d::TextureUsage::SwapChain)
 	{
 		CrAssert(m_vkMemory);

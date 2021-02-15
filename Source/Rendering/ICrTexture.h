@@ -5,6 +5,7 @@
 #include "Core/String/CrString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
+#include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 struct CrTextureCreateParams
@@ -20,9 +21,9 @@ struct CrTextureCreateParams
 
 	uint32_t width;
 	uint32_t height;
-	uint32_t depth;
+	uint32_t depth; // Valid for volume textures
 	uint32_t numMipmaps;
-	uint32_t arraySize;
+	uint32_t arraySize; // Valid for texture or cubemap arrays
 	cr3d::DataFormat::T format;
 	cr3d::SampleCount sampleCount;
 	cr3d::TextureType type;
@@ -40,31 +41,37 @@ class ICrTexture
 {
 public:
 
+	static const uint32_t MaxMipmaps = 14;
+
 	~ICrTexture();
 
-	bool IsCubemap() const;
+	bool IsRenderTarget() const { return (m_usage & cr3d::TextureUsage::RenderTarget) != 0; }
 
-	bool IsRenderTarget() const;
+	bool IsUnorderedAccess() const { return (m_usage & cr3d::TextureUsage::UnorderedAccess) != 0; }
 
-	bool IsUnorderedAccess() const;
+	bool IsSwapchain() const { return (m_usage & cr3d::TextureUsage::SwapChain) != 0; }
 
-	bool IsSwapchain() const;
+	bool IsDepth() const { return (m_usage & cr3d::TextureUsage::Depth) != 0; }
 
-	bool IsVolumeTexture() const;
+	bool Is1DTexture() const { return m_type == cr3d::TextureType::Tex1D; }
 
-	bool IsDepth() const;
+	bool Is2DTexture() const { return m_type == cr3d::TextureType::Tex2D; }
 
-	cr3d::DataFormat::T GetFormat() const;
+	bool IsVolumeTexture() const { return m_type == cr3d::TextureType::Volume; }
 
-	cr3d::SampleCount GetSampleCount() const;
+	bool IsCubemap() const { return m_type == cr3d::TextureType::Cubemap; }
 
-	uint32_t GetWidth() const;
+	cr3d::DataFormat::T GetFormat() const { return m_format; }
 
-	uint32_t GetHeight() const;
+	cr3d::SampleCount GetSampleCount() const { return m_sampleCount; }
 
-	uint32_t GetDepth() const;
+	uint32_t GetWidth() const { return m_width; }
 
-	uint32_t GetMipmapCount() const;
+	uint32_t GetHeight() const { return m_height; }
+
+	uint32_t GetDepth() const { return m_depth; }
+
+	uint32_t GetMipmapCount() const { return m_numMipmaps; }
 
 	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
@@ -77,13 +84,10 @@ public:
 
 protected:
 
-	bool NeedsAdditionalImageViews()
-	{
-		return IsRenderTarget() || IsUnorderedAccess() || IsSwapchain();
-	}
-
 	// We don't allow the constructor externally
-	ICrTexture(const CrTextureCreateParams& params);
+	ICrTexture(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params);
+
+	ICrRenderDevice* m_renderDevice;
 
 	cr3d::DataFormat::T m_format;
 
@@ -97,9 +101,13 @@ protected:
 
 	uint32_t m_depth;
 
+	uint32_t m_arraySize;
+
 	uint32_t m_numMipmaps;
 
 	uint32_t m_usedMemory;
 
 	cr3d::TextureUsageFlags m_usage;
 };
+
+

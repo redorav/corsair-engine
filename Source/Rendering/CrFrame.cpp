@@ -8,6 +8,7 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
+#include "Rendering/ICrSwapchain.h"
 #include "Rendering/ICrShaderManager.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/ICrPipelineStateManager.h"

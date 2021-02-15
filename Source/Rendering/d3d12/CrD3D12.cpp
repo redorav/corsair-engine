@@ -132,17 +132,54 @@ D3D12_TEXTURE_ADDRESS_MODE crd3d::GetD3DAddressMode(cr3d::AddressMode addressMod
 	return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 }
 
-D3D12_FILTER crd3d::GetD3DFilter(cr3d::Filter filter)
+D3D12_FILTER crd3d::GetD3DFilter(cr3d::Filter minFilter, cr3d::Filter magFilter, cr3d::Filter mipFilter, bool anisotropic, bool comparison)
 {
-	switch (filter)
+	if (comparison)
 	{
-		case cr3d::Filter::Point:
-			return D3D12_FILTER_MIN_MAG_MIP_POINT;
-		case cr3d::Filter::Linear:
-			return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		if (anisotropic)
+		{
+			return D3D12_FILTER_COMPARISON_ANISOTROPIC;
+		}
+		else if (minFilter == cr3d::Filter::Point && magFilter == cr3d::Filter::Point)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_MAG_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+		}
+		else if (minFilter == cr3d::Filter::Linear)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		}
+		else if (magFilter == cr3d::Filter::Linear)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+		}
+		else
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		}
 	}
-
-	return D3D12_FILTER_MIN_MAG_MIP_POINT;
+	else
+	{
+		if (anisotropic)
+		{
+			return D3D12_FILTER_ANISOTROPIC;
+		}
+		else if (minFilter == cr3d::Filter::Point && magFilter == cr3d::Filter::Point)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_MAG_MIP_POINT : D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+		}
+		else if (minFilter == cr3d::Filter::Linear)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_LINEAR_MAG_MIP_POINT : D3D12_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		}
+		else if (magFilter == cr3d::Filter::Linear)
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT : D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+		}
+		else
+		{
+			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT : D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		}
+	}
 }
 
 D3D12_BLEND_OP crd3d::GetD3DBlendOp(cr3d::BlendOp blendOp)

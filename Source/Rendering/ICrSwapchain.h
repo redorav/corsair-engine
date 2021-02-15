@@ -22,6 +22,7 @@ struct CrSwapchainDescriptor
 	void* platformHandle;
 	uint32_t requestedWidth;
 	uint32_t requestedHeight;
+	uint32_t requestedBufferCount; // How many surfaces to request for this swapchain
 	cr3d::DataFormat::T format;
 };
 

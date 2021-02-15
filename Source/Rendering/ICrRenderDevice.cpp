@@ -2,6 +2,7 @@
 
 #include "ICrRenderDevice.h"
 #include "ICrCommandQueue.h"
+#include "ICrSwapchain.h"
 #include "ICrSampler.h"
 #include "ICrTexture.h"
 #include "ICrFramebuffer.h"
@@ -86,8 +87,8 @@ CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& 
 
 CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CrAssertMsg(swapchainDescriptor.platformWindow, "Cannot be null");
-	CrAssertMsg(swapchainDescriptor.platformHandle, "Cannot be null");
+	CrAssertMsg(swapchainDescriptor.platformWindow, "Platform window cannot be null");
+	CrAssertMsg(swapchainDescriptor.platformHandle, "Platform handle cannot be null");
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
 	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));

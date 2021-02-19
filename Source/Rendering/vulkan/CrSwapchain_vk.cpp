@@ -223,7 +223,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
-	CrTextureCreateParams swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
+	CrTextureDescriptor swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{

@@ -101,9 +101,9 @@ CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescri
 	return swapchain;
 }
 
-CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureCreateParams& params)
+CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 {
-	return CrTextureSharedHandle(CreateTexturePS(params));
+	return CrTextureSharedHandle(CreateTexturePS(descriptor));
 }
 
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)

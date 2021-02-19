@@ -8,13 +8,13 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
-	: ICrTexture(renderDevice, params)
+CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
+	: ICrTexture(renderDevice, descriptor)
 {
 	CrRenderDeviceD3D12* renderDeviceD3D12 = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = renderDeviceD3D12->GetD3D12Device();
 
-	DXGI_FORMAT dxgiFormat = crd3d::GetD3DFormat(params.format);
+	DXGI_FORMAT dxgiFormat = crd3d::GetD3DFormat(descriptor.format);
 
 	D3D12_RESOURCE_DESC resourceDescriptor = {};
 	resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -22,7 +22,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureCre
 	resourceDescriptor.Height = m_height;
 	resourceDescriptor.MipLevels = (UINT16)m_numMipmaps;
 	resourceDescriptor.Format = dxgiFormat;
-	resourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(params.sampleCount);
+	resourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
 	resourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
 	if (IsDepth())
@@ -63,7 +63,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureCre
 
 	if (IsSwapchain())
 	{
-		m_d3d12TextureResource = (ID3D12Resource*)params.extraDataPtr;
+		m_d3d12TextureResource = (ID3D12Resource*)descriptor.extraDataPtr;
 	}
 	else
 	{

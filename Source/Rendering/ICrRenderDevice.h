@@ -84,7 +84,7 @@ public:
 
 	CrSwapchainSharedHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
-	CrTextureSharedHandle CreateTexture(const CrTextureCreateParams& params);
+	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor);
 
@@ -148,7 +148,7 @@ protected:
 
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
-	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
+	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
 	
 	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
 		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) = 0;

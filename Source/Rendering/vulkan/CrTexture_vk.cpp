@@ -8,8 +8,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
-	: ICrTexture(renderDevice, params)
+CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
+	: ICrTexture(renderDevice, descriptor)
 	, m_vkBaseFramebuffer(nullptr)
 	, m_vkBaseRenderPass(nullptr)
 	, m_vkImage(nullptr)
@@ -58,7 +58,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 	usageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT; // All images can be sampled
 
-	m_sampleCount = params.sampleCount;
+	m_sampleCount = descriptor.sampleCount;
 	m_vkSamples = crvk::GetVkSampleCount(m_sampleCount);
 
 	//----------------------
@@ -68,7 +68,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	VkImageType vkImageType;
 	VkImageViewType vkImageViewType;
 	VkImageCreateFlags vkCreateFlags = 0;
-	uint32_t arrayLayers = params.arraySize;
+	uint32_t arrayLayers = descriptor.arraySize;
 
 	if (IsCubemap())
 	{
@@ -125,7 +125,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 	if (IsSwapchain())
 	{
-		m_vkImage = (VkImage)params.extraDataPtr;
+		m_vkImage = (VkImage)descriptor.extraDataPtr;
 		vkGetImageMemoryRequirements(m_vkDevice, m_vkImage, &imageMemoryRequirements);
 	}
 	else
@@ -147,7 +147,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 		VkMemoryPropertyFlags memoryFlags = 0;
 
-		if (params.usage & cr3d::TextureUsage::CPUReadable)
+		if (descriptor.usage & cr3d::TextureUsage::CPUReadable)
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED; // TODO Condition on initialData
@@ -264,7 +264,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// If we have initial data, copy it here via a staging buffer
 	// TODO An optimization to this is to use the Lock()/Unlock() pattern to get a pointer
 	// That way we can load the data directly into the buffer, avoiding one of the copies
-	if (params.initialData)
+	if (descriptor.initialData)
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
@@ -282,7 +282,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 			VkMemoryRequirements bufferMemoryRequirements;
 			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);
-			CrAssert(params.initialDataSize <= bufferMemoryRequirements.size);
+			CrAssert(descriptor.initialDataSize <= bufferMemoryRequirements.size);
 
 			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
@@ -297,7 +297,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			void* data;
 			result = vkMapMemory(m_vkDevice, stagingMemory, 0, bufferMemoryRequirements.size, 0, &data);
 			CrAssert(result == VK_SUCCESS);
-			memcpy(data, params.initialData, params.initialDataSize);
+			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
 			vkUnmapMemory(m_vkDevice, stagingMemory);
 
 			// Setup buffer copy regions for each mip level
@@ -378,7 +378,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			void* data;
 			result = vkMapMemory(m_vkDevice, m_vkMemory, 0, imageMemoryRequirements.size, 0, &data);
 			CrAssert(result == VK_SUCCESS);
-			memcpy(data, params.initialData, imageMemoryRequirements.size);
+			memcpy(data, descriptor.initialData, imageMemoryRequirements.size);
 			vkUnmapMemory(m_vkDevice, m_vkMemory);
 		}
 	}

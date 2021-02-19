@@ -22,7 +22,7 @@ class CrTextureVulkan final : public ICrTexture
 {
 public:
 
-	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params);
+	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureVulkan();
 

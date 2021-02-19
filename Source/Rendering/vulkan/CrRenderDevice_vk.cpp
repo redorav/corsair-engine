@@ -237,9 +237,9 @@ ICrSwapchain* CrRenderDeviceVulkan::CreateSwapchainPS(const CrSwapchainDescripto
 	return new CrSwapchainVulkan(this, swapchainDescriptor);
 }
 
-ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureCreateParams& params)
+ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureDescriptor& descriptor)
 {
-	return new CrTextureVulkan(this, params);
+	return new CrTextureVulkan(this, descriptor);
 }
 
 ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS

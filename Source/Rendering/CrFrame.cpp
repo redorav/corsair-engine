@@ -142,7 +142,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	descriptor.addressModeW = cr3d::AddressMode::Wrap;
 	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
-	CrTextureCreateParams rwTextureParams;
+	CrTextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
 	rwTextureParams.height = 64;
 	rwTextureParams.format = cr3d::DataFormat::RGBA16_Unorm;
@@ -453,7 +453,7 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 
 	// 2. Recreate depth stencil texture
 
-	CrTextureCreateParams depthTexParams;
+	CrTextureDescriptor depthTexParams;
 	depthTexParams.width = m_swapchain->GetWidth();
 	depthTexParams.height = m_swapchain->GetHeight();
 	depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;

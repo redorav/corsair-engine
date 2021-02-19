@@ -87,6 +87,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		m_d3d12DSVHeap.Initialize(this, dsvDescriptorHeapDescriptor);
 	}
 
+	// Descriptor pool for samplers
 	{
 		CrDescriptorHeapDescriptor samplerDescriptorHeapDescriptor;
 		samplerDescriptorHeapDescriptor.name = "Sampler Descriptor";
@@ -133,9 +134,9 @@ ICrComputeShader* CrRenderDeviceD3D12::CreateComputeShaderPS(const CrComputeShad
 	return nullptr;
 }
 
-ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params)
+ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)
 {
-	return new CrHardwareGPUBufferD3D12(this, params);
+	return new CrHardwareGPUBufferD3D12(this, descriptor);
 }
 
 ICrRenderPass* CrRenderDeviceD3D12::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
@@ -153,7 +154,7 @@ ICrSwapchain* CrRenderDeviceD3D12::CreateSwapchainPS(const CrSwapchainDescriptor
 	return new CrSwapchainD3D12(this, swapchainDescriptor);
 }
 
-ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureCreateParams& params)
+ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureDescriptor& params)
 {
 	return new CrTextureD3D12(this, params);
 }

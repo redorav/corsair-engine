@@ -58,7 +58,7 @@ private:
 
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
-	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) override;
+	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) override;
 
 	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader,
 		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) override;

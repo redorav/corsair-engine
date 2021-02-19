@@ -15,7 +15,7 @@ class CrTextureD3D12 final : public ICrTexture
 {
 public:
 
-	CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params);
+	CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureD3D12();
 

@@ -27,7 +27,7 @@ struct CrFramebufferCreateParams;
 
 class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-struct CrTextureCreateParams;
+struct CrTextureDescriptor;
 
 class ICrSampler;
 using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;

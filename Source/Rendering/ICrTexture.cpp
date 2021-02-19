@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, cr3d::DataFormat::T format, 
+CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, cr3d::DataFormat::T format, 
 	cr3d::SampleCount sampleCount, cr3d::TextureType type, cr3d::TextureUsageFlags usage, const CrString& name, void* initialData, uint32_t extraData, void* extraDataPtr) 
 	: width(width)
 	, height(height)
@@ -26,32 +26,32 @@ CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, ui
 
 }
 
-CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name)
-	: CrTextureCreateParams(width, height, 1, 1, 1, format, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, usage, name, nullptr, 0, nullptr)
+CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name)
+	: CrTextureDescriptor(width, height, 1, 1, 1, format, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, usage, name, nullptr, 0, nullptr)
 {
 
 }
 
-CrTextureCreateParams::CrTextureCreateParams()
-	: CrTextureCreateParams(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
+CrTextureDescriptor::CrTextureDescriptor()
+	: CrTextureDescriptor(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
 		cr3d::TextureUsage::Default, "", nullptr, 0, nullptr)
 {
 
 }
 
-ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params) : m_usedMemory(0)
+ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : m_usedMemory(0)
 {
 	m_renderDevice = renderDevice;
 
-	m_width = params.width;
-	m_height = params.height;
-	m_depth = CrMax(params.depth, 1u);
-	m_numMipmaps = CrMax(params.numMipmaps, 1u);
-	m_type = params.type;
-	m_sampleCount = params.sampleCount;
-	m_arraySize = params.arraySize;
+	m_width = descriptor.width;
+	m_height = descriptor.height;
+	m_depth = CrMax(descriptor.depth, 1u);
+	m_numMipmaps = CrMax(descriptor.numMipmaps, 1u);
+	m_type = descriptor.type;
+	m_sampleCount = descriptor.sampleCount;
+	m_arraySize = descriptor.arraySize;
 
-	switch (params.type)
+	switch (descriptor.type)
 	{
 		case cr3d::TextureType::Volume:
 		{
@@ -77,8 +77,8 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureCreateParam
 		}
 	}
 
-	m_format = params.format;
-	m_usage = params.usage;
+	m_format = descriptor.format;
+	m_usage = descriptor.usage;
 }
 
 uint32_t ICrTexture::GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)

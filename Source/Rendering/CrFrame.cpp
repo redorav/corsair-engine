@@ -457,7 +457,7 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	depthTexParams.width = m_swapchain->GetWidth();
 	depthTexParams.height = m_swapchain->GetHeight();
 	depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;
-	depthTexParams.usage = cr3d::TextureUsage::Depth | cr3d::TextureUsage::RenderTarget;
+	depthTexParams.usage = cr3d::TextureUsage::Depth;
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
 

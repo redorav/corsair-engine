@@ -189,7 +189,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// Create the image views
 	//-----------------------
 
-	if (IsRenderTarget() || IsUnorderedAccess() || IsSwapchain())
+	if (IsRenderTarget() || IsDepth() || IsUnorderedAccess() || IsSwapchain())
 	{
 		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
 	}
@@ -383,7 +383,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		}
 	}
 
-	if (IsRenderTarget() || m_usage & cr3d::TextureUsage::SwapChain)
+	if (IsRenderTarget() || IsDepth() || IsSwapchain())
 	{
 		// We create a dummy attachment description here that will be useful for creating
 		// the framebuffer objects later. This isn't useful per se but can be used as a helper
@@ -393,7 +393,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	}
 
 	// TODO Review all this once we've implemented renderpasses and framebuffers
-	if (IsRenderTarget())
+	if (IsRenderTarget() || IsDepth())
 	{
 		VkAttachmentReference attachmentReference = { 0, imageLayout }; // Bind to slot 0 always if this is the only render target
 

@@ -127,7 +127,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	}
 	m_triangleIndexBuffer->Unlock();
 
-	CrResourceManager::LoadModel(m_renderModel, "nyra/nyra_pose_mod.fbx");
+	m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
 	//"jaina/storm_hero_jaina.fbx"
 
 	CrString SHADER_PATH = IN_SRC_PATH;

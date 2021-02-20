@@ -196,14 +196,11 @@ project (ProjectCorsairEngine)
 		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
-	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage }
+	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrModel }
 	
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
-	-- Project libraries have slimmed by about ~140MB
-	AddLibraryHeaders(AssimpLibrary)
-	LinkLibrary(AssimpLibrary)
-	
+	-- Project libraries have slimmed by about ~140MB	
 	AddLibraryHeaders(GainputLibrary)
 	LinkLibrary(GainputLibrary)
 
@@ -370,6 +367,7 @@ project(ProjectCrModel)
 	files { SourceModelDirectory..'/**' }
 
 	AddLibraryHeaders(AssimpLibrary)
+	LinkLibrary(AssimpLibrary)
 
 group('Core')
 

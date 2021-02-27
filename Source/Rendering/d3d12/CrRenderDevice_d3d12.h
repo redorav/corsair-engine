@@ -40,7 +40,7 @@ private:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) override;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) override;
+	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferDescriptor& descriptor) override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 

@@ -107,9 +107,9 @@ ICrCommandQueue* CrRenderDeviceD3D12::CreateCommandQueuePS(CrCommandQueueType::T
 	return new CrCommandQueueD3D12(this, type);
 }
 
-ICrFramebuffer* CrRenderDeviceD3D12::CreateFramebufferPS(const CrFramebufferCreateParams& params)
+ICrFramebuffer* CrRenderDeviceD3D12::CreateFramebufferPS(const CrFramebufferDescriptor& descriptor)
 {
-	return new CrFramebufferD3D12(this, params);
+	return new CrFramebufferD3D12(this, descriptor);
 }
 
 ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()

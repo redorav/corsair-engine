@@ -23,7 +23,7 @@ using CrRenderDeviceSharedHandle = CrSharedPtr<ICrRenderDevice>;
 
 class ICrFramebuffer;
 using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
-struct CrFramebufferCreateParams;
+struct CrFramebufferDescriptor;
 
 class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;

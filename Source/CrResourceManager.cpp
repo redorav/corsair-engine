@@ -76,7 +76,7 @@ bool CrResourceManager::LoadMaterial(CrMaterialSharedHandle& material, const aiM
 			CrPath fullPath = relativePath.parent_path() / aiTexturePath.C_Str();
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(fullPath);
 
-			CrTextureCreateParams textureParams;
+			CrTextureDescriptor textureParams;
 			textureParams.width = image->GetWidth();
 			textureParams.height = image->GetHeight();
 			textureParams.format = image->GetFormat();

@@ -29,10 +29,10 @@ CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueTyp
 	return CrCommandQueueSharedHandle(CreateCommandQueuePS(type));
 }
 
-CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebufferCreateParams& params)
+CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebufferDescriptor& descriptor)
 {
 	// TODO Add validation rules here. All attachments must be the same size, etc.
-	return CrFramebufferSharedHandle(CreateFramebufferPS(params));
+	return CrFramebufferSharedHandle(CreateFramebufferPS(descriptor));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()

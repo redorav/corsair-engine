@@ -74,7 +74,7 @@ public:
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
-	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferCreateParams& params);
+	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferDescriptor& params);
 
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -130,7 +130,7 @@ protected:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) = 0;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) = 0;
+	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferDescriptor& params) = 0;
 
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 

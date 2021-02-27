@@ -4,7 +4,7 @@
 
 class ICrTexture;
 
-struct CrFramebufferCreateParams
+struct CrFramebufferDescriptor
 {
 	struct CrAttachmentProperties
 	{
@@ -13,13 +13,13 @@ struct CrFramebufferCreateParams
 		uint32_t slice = 0;
 	};
 
-	CrFramebufferCreateParams(const ICrTexture* colorTexture, const ICrTexture* depthTexture = nullptr);
+	CrFramebufferDescriptor(const ICrTexture* colorTexture, const ICrTexture* depthTexture = nullptr);
 
-	CrFramebufferCreateParams(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures);
+	CrFramebufferDescriptor(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures);
 
-	CrFramebufferCreateParams(const CrAttachmentProperties& depthTexture);
+	CrFramebufferDescriptor(const CrAttachmentProperties& depthTexture);
 
-	CrFramebufferCreateParams(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures, const CrAttachmentProperties& depthTexture);
+	CrFramebufferDescriptor(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures, const CrAttachmentProperties& depthTexture);
 
 	CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets> m_colorTargets;
 
@@ -34,7 +34,7 @@ public:
 
 	~ICrFramebuffer();
 
-	ICrFramebuffer(const CrFramebufferCreateParams& params);
+	ICrFramebuffer(const CrFramebufferDescriptor& descriptor);
 
 private:
 

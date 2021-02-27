@@ -192,9 +192,9 @@ ICrCommandQueue* CrRenderDeviceVulkan::CreateCommandQueuePS(CrCommandQueueType::
 	return new CrCommandQueueVulkan(this, type);
 }
 
-ICrFramebuffer* CrRenderDeviceVulkan::CreateFramebufferPS(const CrFramebufferCreateParams& params)
+ICrFramebuffer* CrRenderDeviceVulkan::CreateFramebufferPS(const CrFramebufferDescriptor& descriptor)
 {
-	return new CrFramebufferVulkan(this, params);
+	return new CrFramebufferVulkan(this, descriptor);
 }
 
 ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()

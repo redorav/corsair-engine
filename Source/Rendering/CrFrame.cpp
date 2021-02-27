@@ -468,10 +468,10 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 
 	for (uint32_t i = 0; i < m_swapchainFrameBuffers.size(); i++)
 	{
-		CrFramebufferCreateParams frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
+		CrFramebufferDescriptor frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
 		m_swapchainFrameBuffers[i] = renderDevice->CreateFramebuffer(frameBufferParams);
 
-		CrFramebufferCreateParams frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
+		CrFramebufferDescriptor frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
 		m_swapchainFrameBuffersNoDepth[i] = renderDevice->CreateFramebuffer(frameBufferParamsNoDepth);
 	}
 

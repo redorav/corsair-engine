@@ -80,11 +80,11 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	}
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
+	const CrPath filePath(file->GetFilePath());
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
 		CrMaterialSharedHandle material;
-		CrPath todo;
-		LoadMaterial(material, scene->mMaterials[m], todo); /*EHHHHHH*/ 
+		LoadMaterial(material, scene->mMaterials[m], filePath);
 		renderModel->m_materials.push_back(material);
 	}
 

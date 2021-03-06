@@ -20,8 +20,12 @@
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include "tiny_gltf.h"
 
+#include <string.h>
+
 CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
 {
+	//bool binaryGLTF = strstr(file->GetFilePath(), ".glb") != nullptr;
+	
 	if (file)
 		return nullptr;
 	return nullptr;

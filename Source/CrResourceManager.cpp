@@ -16,17 +16,24 @@
 
 #include "Model/ICrModelDecoder.h"
 #include "Model/CrModelDecoderASSIMP.h"
+#include "Model/CrModelDecoderGLTF.h"
 
-//#include <cstdint>
 
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePath)
 {
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
 	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
 
-
 	CrSharedPtr<ICrModelDecoder> modelDecoder;
-	modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
+	const std::string extension = fullPath.extension().string();
+	if (extension == ".gltf" || extension == ".glb")
+	{
+		modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
+	}
+	else
+	{
+		modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
+	}
 
 	return modelDecoder->Decode(file);
 }

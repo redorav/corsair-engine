@@ -52,7 +52,7 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	void* fileRawData = malloc(fileSize);
 	if (file->Read(fileRawData, fileSize) != fileSize)
 	{
-		free(fileRawData);;
+		free(fileRawData);
 		return nullptr;
 	}
 

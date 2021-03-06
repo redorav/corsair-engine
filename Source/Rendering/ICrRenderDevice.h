@@ -1,19 +1,33 @@
 #pragma once
 
-#include "ICrSwapchain.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Core/Containers/CrVector.h"
+#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/String/CrFixedString.h"
+
+namespace CrVendor
+{
+	enum T
+	{
+		Unknown,
+		NVIDIA,
+		AMD,
+		Intel
+	};
+}
+
 struct CrRenderDeviceProperties
 {
-	cr3d::GraphicsApi::T m_graphicsApi;
+	CrVendor::T vendor = CrVendor::Unknown;
+	CrFixedString128 description;
 
-	uint32_t maxConstantBufferRange;
-	uint32_t maxTextureDimension1D;
-	uint32_t maxTextureDimension2D;
-	uint32_t maxTextureDimension3D;
+	uint32_t maxConstantBufferRange = 0;
+	uint32_t maxTextureDimension1D = 0;
+	uint32_t maxTextureDimension2D = 0;
+	uint32_t maxTextureDimension3D = 0;
 };
 
 namespace CrCommandQueueType { enum T : uint8_t; }
@@ -33,6 +47,21 @@ namespace CrRenderingFeature
 	};
 }
 
+inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
+{
+	switch (vendorID)
+	{
+		case 0x10DE:
+			return CrVendor::NVIDIA;
+		case 0x1002:
+			return CrVendor::AMD;
+		case 0x8086:
+			return CrVendor::Intel;
+		default:
+			return CrVendor::Unknown;
+	}
+}
+
 class ICrRenderDevice
 {
 public:
@@ -45,7 +74,7 @@ public:
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
-	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferCreateParams& params);
+	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferDescriptor& params);
 
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -55,7 +84,7 @@ public:
 
 	CrSwapchainSharedHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
-	CrTextureSharedHandle CreateTexture(const CrTextureCreateParams& params);
+	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
 	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor);
 
@@ -101,7 +130,7 @@ protected:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) = 0;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferCreateParams& params) = 0;
+	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferDescriptor& params) = 0;
 
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 
@@ -119,7 +148,7 @@ protected:
 
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
-	virtual ICrTexture* CreateTexturePS(const CrTextureCreateParams& params) = 0;
+	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
 	
 	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
 		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) = 0;

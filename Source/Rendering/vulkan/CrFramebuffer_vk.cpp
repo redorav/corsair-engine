@@ -12,7 +12,7 @@ CrFramebufferVulkan::~CrFramebufferVulkan()
 	vkDestroyFramebuffer(m_vkDevice, m_vkFramebuffer, nullptr);
 }
 
-CrFramebufferVulkan::CrFramebufferVulkan(ICrRenderDevice* renderDevice, const CrFramebufferCreateParams& params) : ICrFramebuffer(params)
+CrFramebufferVulkan::CrFramebufferVulkan(ICrRenderDevice* renderDevice, const CrFramebufferDescriptor& descriptor) : ICrFramebuffer(descriptor)
 {
 	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
@@ -29,13 +29,13 @@ CrFramebufferVulkan::CrFramebufferVulkan(ICrRenderDevice* renderDevice, const Cr
 	uint32_t attachmentCount = 0;
 	uint32_t colorReferenceCount = 0;
 
-	uint32_t width = params.m_colorTargets[0].texture->GetWidth();
-	uint32_t height = params.m_colorTargets[0].texture->GetHeight();
+	uint32_t width = descriptor.m_colorTargets[0].texture->GetWidth();
+	uint32_t height = descriptor.m_colorTargets[0].texture->GetHeight();
 
 	// TODO Do we allow to have holes?
 	for (uint32_t i = 0; i < attachmentDescriptions.size(); ++i)
 	{
-		const CrFramebufferCreateParams::CrAttachmentProperties& properties = params.m_colorTargets[i];
+		const CrFramebufferDescriptor::CrAttachmentProperties& properties = descriptor.m_colorTargets[i];
 		const CrTextureVulkan* texture = static_cast<const CrTextureVulkan*>(properties.texture);
 
 		if (texture)
@@ -53,11 +53,11 @@ CrFramebufferVulkan::CrFramebufferVulkan(ICrRenderDevice* renderDevice, const Cr
 		}
 	}
 
-	if (params.m_depthTarget.texture)
+	if (descriptor.m_depthTarget.texture)
 	{
-		const CrTextureVulkan* depthTexture = static_cast<const CrTextureVulkan*>(params.m_depthTarget.texture);
+		const CrTextureVulkan* depthTexture = static_cast<const CrTextureVulkan*>(descriptor.m_depthTarget.texture);
 		attachmentDescriptions[attachmentCount] = depthTexture->GetVkAttachmentDescription();
-		attachmentImageViews[attachmentCount] = depthTexture->GetVkImageViewSingleMipSlice(params.m_depthTarget.mipMap, params.m_depthTarget.slice);
+		attachmentImageViews[attachmentCount] = depthTexture->GetVkImageViewSingleMipSlice(descriptor.m_depthTarget.mipMap, descriptor.m_depthTarget.slice);
 		depthReference = { attachmentCount, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 		depthReferencePtr = &depthReference;
 		attachmentCount++;

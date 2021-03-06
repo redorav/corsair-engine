@@ -170,7 +170,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	}
 
 	// Determine the number of images
-	uint32_t desiredNumberOfSwapchainImages = surfaceCapabilities.minImageCount + 1;
+	uint32_t desiredNumberOfSwapchainImages = CrMax(surfaceCapabilities.minImageCount, swapchainDescriptor.requestedBufferCount);
 	if (surfaceCapabilities.maxImageCount > 0)
 	{
 		desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfaceCapabilities.maxImageCount);
@@ -207,7 +207,6 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
 	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
-
 	CrAssertMsg(result == VK_SUCCESS, "Swapchain creation failed");
 
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
@@ -224,7 +223,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
-	CrTextureCreateParams swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
+	CrTextureDescriptor swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{

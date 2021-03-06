@@ -13,16 +13,16 @@ class ICrRenderDevice;
 // Perhaps by storing void* as the view?
 struct AdditionalTextureViews
 {
-	CrArray<CrVector<VkImageView>, 14>	m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
+	CrArray<CrVector<VkImageView>, ICrTexture::MaxMipmaps>	m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
 
-	CrArray<VkImageView, 14>			m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
+	CrArray<VkImageView, ICrTexture::MaxMipmaps>			m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
 };
 
 class CrTextureVulkan final : public ICrTexture
 {
 public:
 
-	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params);
+	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureVulkan();
 
@@ -30,7 +30,7 @@ public:
 
 	VkSampleCountFlagBits GetVkSamples() const;
 
-	VkImage GetVkImage() const;;
+	VkImage GetVkImage() const;
 
 	VkImageView GetVkImageViewAllMipsSlices() const;
 

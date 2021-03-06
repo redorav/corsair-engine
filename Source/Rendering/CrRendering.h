@@ -373,8 +373,7 @@ namespace cr3d
 		Tex1D, 
 		Tex2D, 
 		Cubemap, 
-		Volume, 
-		TextureArray
+		Volume
 	};
 
 	namespace ShaderStage

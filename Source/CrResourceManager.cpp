@@ -17,7 +17,7 @@
 #include "Model/ICrModelDecoder.h"
 #include "Model/CrModelDecoderASSIMP.h"
 
-#include <cstdint>
+//#include <cstdint>
 
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePath)
 {

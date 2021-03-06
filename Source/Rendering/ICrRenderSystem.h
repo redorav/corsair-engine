@@ -19,7 +19,7 @@ class ICrRenderSystem
 {
 public:
 
-	ICrRenderSystem* Get();
+	static ICrRenderSystem* Get();
 
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 

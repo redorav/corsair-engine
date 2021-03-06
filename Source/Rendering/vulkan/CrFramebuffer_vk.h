@@ -11,7 +11,7 @@ public:
 
 	~CrFramebufferVulkan();
 
-	CrFramebufferVulkan(ICrRenderDevice* renderDevice, const CrFramebufferCreateParams& params);
+	CrFramebufferVulkan(ICrRenderDevice* renderDevice, const CrFramebufferDescriptor& descriptor);
 
 	VkFramebuffer GetVkFramebuffer() const;
 

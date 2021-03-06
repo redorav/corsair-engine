@@ -8,8 +8,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureCreateParams& params)
-	: ICrTexture(params)
+CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
+	: ICrTexture(renderDevice, descriptor)
 	, m_vkBaseFramebuffer(nullptr)
 	, m_vkBaseRenderPass(nullptr)
 	, m_vkImage(nullptr)
@@ -30,33 +30,35 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	VkImageUsageFlags usageFlags = 0;
 	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	if (IsRenderTarget())
+	if (IsSwapchain())
+	{
+		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	}
+	else
 	{
 		if (IsDepth())
 		{
 			usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
-		else
+
+		if (IsRenderTarget())
 		{
+			usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
-	}
-	else if (m_usage & cr3d::TextureUsage::SwapChain)
-	{
-		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	}
-	
-	if (IsUnorderedAccess())
-	{
-		usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+
+		if (IsUnorderedAccess())
+		{
+			usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+		}
 	}
 
 	// TODO Validate that the image format supports the usages and provide an alternative
 
 	usageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT; // All images can be sampled
 
-	m_sampleCount = params.sampleCount;
+	m_sampleCount = descriptor.sampleCount;
 	m_vkSamples = crvk::GetVkSampleCount(m_sampleCount);
 
 	//----------------------
@@ -66,7 +68,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	VkImageType vkImageType;
 	VkImageViewType vkImageViewType;
 	VkImageCreateFlags vkCreateFlags = 0;
-	uint32_t arrayLayers = params.arraySize;
+	uint32_t arrayLayers = descriptor.arraySize;
 
 	if (IsCubemap())
 	{
@@ -80,14 +82,13 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE;
 		}
 		vkCreateFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-		arrayLayers = 6;
 	}
 	else if (IsVolumeTexture())
 	{
 		vkImageType = VK_IMAGE_TYPE_3D;
 		vkImageViewType = VK_IMAGE_VIEW_TYPE_3D;
 	}
-	else if (m_type == cr3d::TextureType::Tex1D)
+	else if (Is1DTexture())
 	{
 		vkImageType = VK_IMAGE_TYPE_1D;
 
@@ -122,9 +123,9 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 	VkMemoryRequirements imageMemoryRequirements;
 
-	if (m_usage & cr3d::TextureUsage::SwapChain)
+	if (IsSwapchain())
 	{
-		m_vkImage = (VkImage)params.extraDataPtr;
+		m_vkImage = (VkImage)descriptor.extraDataPtr;
 		vkGetImageMemoryRequirements(m_vkDevice, m_vkImage, &imageMemoryRequirements);
 	}
 	else
@@ -146,7 +147,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 		VkMemoryPropertyFlags memoryFlags = 0;
 
-		if (params.usage & cr3d::TextureUsage::CPUReadable)
+		if (descriptor.usage & cr3d::TextureUsage::CPUReadable)
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED; // TODO Condition on initialData
@@ -188,7 +189,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// Create the image views
 	//-----------------------
 
-	if (NeedsAdditionalImageViews())
+	if (IsRenderTarget() || IsDepth() || IsUnorderedAccess() || IsSwapchain())
 	{
 		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
 	}
@@ -210,7 +211,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = m_vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
-		imageViewInfo.components = {}; // TODO Get from params
+		imageViewInfo.components = {};
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
 		imageViewInfo.subresourceRange.levelCount = m_numMipmaps;
 		imageViewInfo.subresourceRange.baseArrayLayer = 0;
@@ -232,7 +233,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = m_vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
-		imageViewInfo.components = {}; // TODO Get from params
+		imageViewInfo.components = {};
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
@@ -263,7 +264,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	// If we have initial data, copy it here via a staging buffer
 	// TODO An optimization to this is to use the Lock()/Unlock() pattern to get a pointer
 	// That way we can load the data directly into the buffer, avoiding one of the copies
-	if (params.initialData)
+	if (descriptor.initialData)
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
@@ -281,7 +282,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 
 			VkMemoryRequirements bufferMemoryRequirements;
 			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);
-			CrAssert(params.initialDataSize <= bufferMemoryRequirements.size);
+			CrAssert(descriptor.initialDataSize <= bufferMemoryRequirements.size);
 
 			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
@@ -296,7 +297,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			void* data;
 			result = vkMapMemory(m_vkDevice, stagingMemory, 0, bufferMemoryRequirements.size, 0, &data);
 			CrAssert(result == VK_SUCCESS);
-			memcpy(data, params.initialData, params.initialDataSize);
+			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
 			vkUnmapMemory(m_vkDevice, stagingMemory);
 
 			// Setup buffer copy regions for each mip level
@@ -377,12 +378,12 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 			void* data;
 			result = vkMapMemory(m_vkDevice, m_vkMemory, 0, imageMemoryRequirements.size, 0, &data);
 			CrAssert(result == VK_SUCCESS);
-			memcpy(data, params.initialData, imageMemoryRequirements.size);
+			memcpy(data, descriptor.initialData, imageMemoryRequirements.size);
 			vkUnmapMemory(m_vkDevice, m_vkMemory);
 		}
 	}
 
-	if (IsRenderTarget() || m_usage & cr3d::TextureUsage::SwapChain)
+	if (IsRenderTarget() || IsDepth() || IsSwapchain())
 	{
 		// We create a dummy attachment description here that will be useful for creating
 		// the framebuffer objects later. This isn't useful per se but can be used as a helper
@@ -392,7 +393,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureC
 	}
 
 	// TODO Review all this once we've implemented renderpasses and framebuffers
-	if (IsRenderTarget())
+	if (IsRenderTarget() || IsDepth())
 	{
 		VkAttachmentReference attachmentReference = { 0, imageLayout }; // Bind to slot 0 always if this is the only render target
 
@@ -497,7 +498,7 @@ CrTextureVulkan::~CrTextureVulkan()
 	CrAssert(m_vkImageView);
 	CrAssert(m_vkImage);
 
-	// We don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
+	// Don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
 	if (m_usage != cr3d::TextureUsage::SwapChain)
 	{
 		CrAssert(m_vkMemory);

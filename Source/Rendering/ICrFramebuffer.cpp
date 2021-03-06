@@ -5,7 +5,7 @@
 
 #include "Core/CrMacros.h"
 
-ICrFramebuffer::ICrFramebuffer(const CrFramebufferCreateParams&/* params*/)
+ICrFramebuffer::ICrFramebuffer(const CrFramebufferDescriptor&/* params*/)
 {
 }
 
@@ -19,23 +19,23 @@ ICrFramebuffer::~ICrFramebuffer()
 
 }
 
-CrFramebufferCreateParams::CrFramebufferCreateParams(const ICrTexture* colorTexture, const ICrTexture* depthTexture /*= nullptr*/)
+CrFramebufferDescriptor::CrFramebufferDescriptor(const ICrTexture* colorTexture, const ICrTexture* depthTexture /*= nullptr*/)
 {
 	m_colorTargets[0].texture = colorTexture;
 	m_depthTarget.texture = depthTexture;
 }
 
-CrFramebufferCreateParams::CrFramebufferCreateParams(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures)
+CrFramebufferDescriptor::CrFramebufferDescriptor(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures)
 {
 	m_colorTargets = colorTextures;
 }
 
-CrFramebufferCreateParams::CrFramebufferCreateParams(const CrAttachmentProperties& depthTexture)
+CrFramebufferDescriptor::CrFramebufferDescriptor(const CrAttachmentProperties& depthTexture)
 {
 	m_depthTarget = depthTexture;
 }
 
-CrFramebufferCreateParams::CrFramebufferCreateParams(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures, const CrAttachmentProperties& depthTexture)
+CrFramebufferDescriptor::CrFramebufferDescriptor(const CrArray<CrAttachmentProperties, cr3d::MaxRenderTargets>& colorTextures, const CrAttachmentProperties& depthTexture)
 {
 	m_colorTargets = colorTextures;
 	m_depthTarget = depthTexture;

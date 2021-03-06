@@ -17,5 +17,5 @@ public:
 
 private:
 
-
+	IDXGISwapChain1* m_d3d12Swapchain;
 };

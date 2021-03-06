@@ -110,7 +110,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		int fontWidth, fontHeight;
 		io.Fonts->GetTexDataAsRGBA32(&fontData, &fontWidth, &fontHeight);
 
-		CrTextureCreateParams fontParams;
+		CrTextureDescriptor fontParams;
 		fontParams.width = (uint32_t)fontWidth;
 		fontParams.height = (uint32_t)fontHeight;
 		fontParams.format = cr3d::DataFormat::RGBA8_Unorm;

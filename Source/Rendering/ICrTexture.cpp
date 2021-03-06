@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, cr3d::DataFormat::T format, 
+CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, cr3d::DataFormat::T format, 
 	cr3d::SampleCount sampleCount, cr3d::TextureType type, cr3d::TextureUsageFlags usage, const CrString& name, void* initialData, uint32_t extraData, void* extraDataPtr) 
 	: width(width)
 	, height(height)
@@ -26,47 +26,59 @@ CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, ui
 
 }
 
-CrTextureCreateParams::CrTextureCreateParams(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name)
-	: CrTextureCreateParams(width, height, 1, 1, 1, format, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, usage, name, nullptr, 0, nullptr)
+CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name)
+	: CrTextureDescriptor(width, height, 1, 1, 1, format, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, usage, name, nullptr, 0, nullptr)
 {
 
 }
 
-CrTextureCreateParams::CrTextureCreateParams()
-	: CrTextureCreateParams(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
+CrTextureDescriptor::CrTextureDescriptor()
+	: CrTextureDescriptor(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
 		cr3d::TextureUsage::Default, "", nullptr, 0, nullptr)
 {
 
 }
 
-ICrTexture::ICrTexture(const CrTextureCreateParams& params) : m_usedMemory(0)
+ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : m_usedMemory(0)
 {
-	m_width = params.width;
-	m_height = params.height;
-	m_depth = CrMax(params.depth, 1u);
-	m_numMipmaps = CrMax(params.numMipmaps, 1u);
-	m_type = params.type;
-	m_sampleCount = params.sampleCount;
+	m_renderDevice = renderDevice;
 
-	switch (params.type)
+	m_width = descriptor.width;
+	m_height = descriptor.height;
+	m_depth = CrMax(descriptor.depth, 1u);
+	m_numMipmaps = CrMax(descriptor.numMipmaps, 1u);
+	m_type = descriptor.type;
+	m_sampleCount = descriptor.sampleCount;
+	m_arraySize = descriptor.arraySize;
+
+	switch (descriptor.type)
 	{
 		case cr3d::TextureType::Volume:
-		CrAssertMsg(m_depth > 1, "Depth must be > 1");
-		break;
+		{
+			CrAssertMsg(m_depth > 1, "Depth must be > 1");
+			CrAssertMsg(m_arraySize == 1, "Cannot create arrays of volumes");
+			break;
+		}
 		case cr3d::TextureType::Cubemap:
-		CrAssertMsg(m_width == m_height, "Width and height must be the same");
-		CrAssertMsg(m_depth == 1, "Depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_width == m_height, "Width and height must be the same");
+			CrAssertMsg(m_depth == 1, "Depth must be 1");
+			break;
+		}
 		case cr3d::TextureType::Tex2D:
-		CrAssertMsg(m_depth == 1, "Depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_depth == 1, "Depth must be 1");
+			break;
+		}
 		case cr3d::TextureType::Tex1D:
-		CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
-		break;
+		{
+			CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
+			break;
+		}
 	}
 
-	m_format = params.format;
-	m_usage = params.usage;
+	m_format = descriptor.format;
+	m_usage = descriptor.usage;
 }
 
 uint32_t ICrTexture::GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
@@ -144,64 +156,4 @@ ICrTexture::~ICrTexture()
 	// TODO Add to a list that'll eventually delete it, to avoid destroying something currently in use
 	// Do this via the shared_ptr deleter
 	//DestroyPS();
-}
-
-bool ICrTexture::IsCubemap() const
-{
-	return m_type == cr3d::TextureType::Cubemap;
-}
-
-bool ICrTexture::IsRenderTarget() const
-{
-	return (m_usage & cr3d::TextureUsage::RenderTarget) != 0;
-}
-
-bool ICrTexture::IsUnorderedAccess() const
-{
-	return (m_usage & cr3d::TextureUsage::UnorderedAccess) != 0;
-}
-
-bool ICrTexture::IsSwapchain() const
-{
-	return (m_usage & cr3d::TextureUsage::SwapChain) != 0;
-}
-
-bool ICrTexture::IsVolumeTexture() const
-{
-	return m_type == cr3d::TextureType::Volume;
-}
-
-bool ICrTexture::IsDepth() const
-{
-	return (m_usage & cr3d::TextureUsage::Depth) != 0;
-}
-
-cr3d::DataFormat::T ICrTexture::GetFormat() const
-{
-	return m_format;
-}
-
-cr3d::SampleCount ICrTexture::GetSampleCount() const
-{
-	return m_sampleCount;
-}
-
-uint32_t ICrTexture::GetWidth() const
-{
-	return m_width;
-}
-
-uint32_t ICrTexture::GetHeight() const
-{
-	return m_height;
-}
-
-uint32_t ICrTexture::GetDepth() const
-{
-	return m_depth;
-}
-
-uint32_t ICrTexture::GetMipmapCount() const
-{
-	return m_numMipmaps;
 }

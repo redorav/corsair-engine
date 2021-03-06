@@ -2,6 +2,7 @@
 
 #include "ICrRenderDevice.h"
 #include "ICrCommandQueue.h"
+#include "ICrSwapchain.h"
 #include "ICrSampler.h"
 #include "ICrTexture.h"
 #include "ICrFramebuffer.h"
@@ -28,10 +29,10 @@ CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueTyp
 	return CrCommandQueueSharedHandle(CreateCommandQueuePS(type));
 }
 
-CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebufferCreateParams& params)
+CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebufferDescriptor& descriptor)
 {
 	// TODO Add validation rules here. All attachments must be the same size, etc.
-	return CrFramebufferSharedHandle(CreateFramebufferPS(params));
+	return CrFramebufferSharedHandle(CreateFramebufferPS(descriptor));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
@@ -86,8 +87,8 @@ CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& 
 
 CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CrAssertMsg(swapchainDescriptor.platformWindow, "Cannot be null");
-	CrAssertMsg(swapchainDescriptor.platformHandle, "Cannot be null");
+	CrAssertMsg(swapchainDescriptor.platformWindow, "Platform window cannot be null");
+	CrAssertMsg(swapchainDescriptor.platformHandle, "Platform handle cannot be null");
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
 	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));
@@ -100,9 +101,9 @@ CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescri
 	return swapchain;
 }
 
-CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureCreateParams& params)
+CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 {
-	return CrTextureSharedHandle(CreateTexturePS(params));
+	return CrTextureSharedHandle(CreateTexturePS(descriptor));
 }
 
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)

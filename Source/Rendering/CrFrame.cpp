@@ -8,6 +8,7 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
+#include "Rendering/ICrSwapchain.h"
 #include "Rendering/ICrShaderManager.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/ICrPipelineStateManager.h"
@@ -141,7 +142,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	descriptor.addressModeW = cr3d::AddressMode::Wrap;
 	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
-	CrTextureCreateParams rwTextureParams;
+	CrTextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
 	rwTextureParams.height = 64;
 	rwTextureParams.format = cr3d::DataFormat::RGBA16_Unorm;
@@ -436,8 +437,9 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
 
-	// We must destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
-	// that becomes available after (once the pointer assignment happens and the resource is destroyed)
+	// 1. Destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
+	// that becomes available after (once the pointer assignment happens and the resource is destroyed). Right after, create
+	// the new swapchain
 	m_swapchain = nullptr;
 
 	CrSwapchainDescriptor swapchainDescriptor = {};
@@ -446,15 +448,16 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
 	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
+	swapchainDescriptor.requestedBufferCount = 3;
 	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
 
 	// 2. Recreate depth stencil texture
 
-	CrTextureCreateParams depthTexParams;
+	CrTextureDescriptor depthTexParams;
 	depthTexParams.width = m_swapchain->GetWidth();
 	depthTexParams.height = m_swapchain->GetHeight();
 	depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;
-	depthTexParams.usage = cr3d::TextureUsage::Depth | cr3d::TextureUsage::RenderTarget;
+	depthTexParams.usage = cr3d::TextureUsage::Depth;
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
 
@@ -465,10 +468,10 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 
 	for (uint32_t i = 0; i < m_swapchainFrameBuffers.size(); i++)
 	{
-		CrFramebufferCreateParams frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
+		CrFramebufferDescriptor frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
 		m_swapchainFrameBuffers[i] = renderDevice->CreateFramebuffer(frameBufferParams);
 
-		CrFramebufferCreateParams frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
+		CrFramebufferDescriptor frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
 		m_swapchainFrameBuffersNoDepth[i] = renderDevice->CreateFramebuffer(frameBufferParamsNoDepth);
 	}
 

@@ -366,6 +366,7 @@ project(ProjectCrModel)
 	kind('StaticLib')
 	files { SourceModelDirectory..'/**' }
 
+	AddLibraryHeaders(TinyGLTFLibrary)
 	AddLibraryHeaders(AssimpLibrary)
 	LinkLibrary(AssimpLibrary)
 

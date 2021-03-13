@@ -48,6 +48,8 @@ public:
 
 	void BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip);
 
+	void BindStorageBuffer(cr3d::ShaderStage::T shaderStage, const StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer);
+
 	void BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer);
 
 	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwDataBufferIndex, const CrGPUBuffer* buffer);
@@ -124,11 +126,11 @@ protected:
 		uint32_t byteOffset = 0;
 	};
 
-	struct RWStorageBufferBinding
+	struct StorageBufferBinding
 	{
-		RWStorageBufferBinding() = default;
+		StorageBufferBinding() = default;
 
-		RWStorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t size, uint32_t byteOffset) : buffer(buffer), size(size), byteOffset(byteOffset) {}
+		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t size, uint32_t byteOffset) : buffer(buffer), size(size), byteOffset(byteOffset) {}
 
 		const ICrHardwareGPUBuffer* buffer = nullptr;
 		uint32_t byteOffset = 0;
@@ -179,7 +181,9 @@ protected:
 
 		RWTextureBinding				m_rwTextures[cr3d::ShaderStage::Count][RWTextures::Count];
 
-		RWStorageBufferBinding			m_rwStorageBuffers[cr3d::ShaderStage::Count][RWStorageBuffers::Count];
+		StorageBufferBinding			m_storageBuffers[cr3d::ShaderStage::Count][RWStorageBuffers::Count];
+
+		StorageBufferBinding			m_rwStorageBuffers[cr3d::ShaderStage::Count][RWStorageBuffers::Count];
 
 		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
 	};
@@ -304,9 +308,14 @@ inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, co
 	m_currentState.m_rwTextures[shaderStage][textureIndex] = RWTextureBinding(texture, mip);
 }
 
+inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, const StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer)
+{
+	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetSize(), buffer->GetByteOffset());
+}
+
 inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer)
 {
-	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = RWStorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetSize(), buffer->GetByteOffset());
+	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetSize(), buffer->GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)

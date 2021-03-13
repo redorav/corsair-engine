@@ -75,6 +75,23 @@ public:
 		return RWTextureMetaTable[id];
 	}
 
+	static const StorageBufferMetadata& GetStorageBuffer(const CrString& name)
+	{
+		auto storageBufferMetadata = StorageBufferTable.find(name);
+
+		if (storageBufferMetadata != StorageBufferTable.end())
+		{
+			return (*storageBufferMetadata).second;
+		}
+
+		return InvalidStorageBufferMetaInstance;
+	}
+
+	static const StorageBufferMetadata& GetStorageBuffer(StorageBuffers::T id)
+	{
+		return StorageBufferMetaTable[id];
+	}
+
 	static const RWStorageBufferMetadata& GetRWStorageBuffer(const CrString& name)
 	{
 		auto rwStorageBufferMetadata = RWStorageBufferTable.find(name);

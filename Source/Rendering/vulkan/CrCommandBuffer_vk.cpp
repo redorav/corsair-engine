@@ -186,9 +186,26 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
+	bindingTable.ForEachStorageBuffer([&](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
+	{
+		const StorageBufferBinding& binding = m_currentState.m_storageBuffers[stage][id];
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+
+		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = (VkDeviceSize)binding.size;
+
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
+		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
+
+		descriptorCount++;
+		bufferCount++;
+	});
+
 	bindingTable.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		const RWStorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[stage][id];
+		const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[stage][id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 	
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];

@@ -28,7 +28,7 @@ public:
 
 	GPUStackAllocation<void> Allocate(uint32_t bufferSize);
 
-	void Init();
+	void Initialize(uint32_t size);
 
 	void Begin();
 

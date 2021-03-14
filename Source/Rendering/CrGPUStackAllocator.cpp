@@ -32,10 +32,10 @@ GPUStackAllocation<void> CrGPUStackAllocator::Allocate(uint32_t bufferSize)
 	return GPUStackAllocation<void>(bufferPointer, offsetInPool);
 }
 
-void CrGPUStackAllocator::Init()
+void CrGPUStackAllocator::Initialize(uint32_t size)
 {
 	// TODO Configurable per platform
-	m_poolSize = 8 * 1024 * 1024; // 8 MB
+	m_poolSize = size;
 
 	CrHardwareGPUBufferDescriptor descriptor(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, m_poolSize);
 

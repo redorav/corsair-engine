@@ -9,7 +9,7 @@ CrCPUStackAllocator::~CrCPUStackAllocator()
 	delete[] m_memoryBasePointer;
 }
 
-void CrCPUStackAllocator::Initialize(uint32_t size)
+void CrCPUStackAllocator::Initialize(size_t size)
 {
 	m_poolSize = size;
 

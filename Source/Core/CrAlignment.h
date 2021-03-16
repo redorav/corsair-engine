@@ -1,14 +1,15 @@
 #include "Core/Logging/ICrDebug.h"
 
-// We could use std::align for this functionality, but std::align does not assert that the alignment is a power of 2
-
-inline int AlignPow2(int input, int pow2)
+template<typename T>
+inline T AlignUpPow2(T input, uintptr_t pow2)
 {
-	CrAssert(pow2 && ((pow2 & (pow2 - 1)) == 0));
-	return (input + pow2 - 1) & ~(pow2 - 1);
+	uintptr_t uInput = (uintptr_t)input;
+	CrAssertMsg(pow2 && ((pow2 & (pow2 - 1)) == 0), "Not a power of 2");
+	return (T)((uInput + pow2 - 1) & ~(pow2 - 1));
 }
 
-inline int Align256(int input)
+template<typename T>
+inline T AlignUp256(T input)
 {
-	return AlignPow2(input, 256);
+	return AlignUpPow2(input, 256);
 }

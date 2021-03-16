@@ -9,12 +9,14 @@ public:
 
 	~CrCPUStackAllocator();
 
-	void Initialize(uint32_t size);
+	void Initialize(size_t size);
 
 	template<typename T, typename... Args>
 	T* AllocateObject(Args... args);
 
-	void* Allocate(uint32_t bufferSize);
+	void* Allocate(size_t size);
+
+	void* AllocateAligned(size_t size, size_t alignment);
 
 	void Reset();
 
@@ -27,19 +29,22 @@ protected:
 	size_t m_poolSize = 0;
 };
 
-inline void* CrCPUStackAllocator::Allocate(uint32_t size)
+inline void* CrCPUStackAllocator::Allocate(size_t size)
 {
-	void* bufferPointer = m_currentPointer; // Take the current pointer
-	size_t alignedBufferSize = Align256(size); // Align memory as required
-	CrAssertMsg(m_currentPointer + alignedBufferSize < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream");
-	m_currentPointer += alignedBufferSize; // Reserve as many bytes as needed by the buffer
+	return AllocateAligned(size, 1);
+}
+
+inline void* CrCPUStackAllocator::AllocateAligned(size_t size, size_t alignment)
+{
+	uint8_t* bufferPointer = AlignUpPow2(m_currentPointer, alignment); // Take the current aligned pointer
+	CrAssertMsg(bufferPointer + size < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream");
+	m_currentPointer = bufferPointer + size; // Reserve as many bytes as needed by the buffer
 	return bufferPointer;
 }
 
 template<typename T, typename... Args>
 T* CrCPUStackAllocator::AllocateObject(Args... args)
 {
-	//uint32_t offset;
 	void* reservedMemory = Allocate(sizeof(T)); // Allocate memory off the stream
 	T* object = new(reservedMemory) T(args...); // Placement new on the memory owned by the stream
 	return object;

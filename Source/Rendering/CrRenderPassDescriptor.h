@@ -11,6 +11,8 @@ struct CrRenderTargetDescriptor
 		, mipMap(0)
 		, slice(0)
 		, clearColor(0.0f)
+		, depthClearValue(0.0f)
+		, stencilClearValue(0)
 		, loadOp(CrRenderTargetLoadOp::Load)
 		, storeOp(CrRenderTargetStoreOp::Store)
 		, stencilLoadOp(CrRenderTargetLoadOp::DontCare)

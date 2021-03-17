@@ -6,7 +6,6 @@
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 #include "Rendering/CrGPUBuffer.h"
-#include "Rendering/ICrRenderPass.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/ICrShaderManager.h"
 #include "Rendering/ICrPipelineStateManager.h"
@@ -15,6 +14,7 @@
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrSampler.h"
+#include "Rendering/CrRenderPassDescriptor.h"
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "imgui.h"
@@ -49,7 +49,7 @@ CrImGuiRenderer* CrImGuiRenderer::GetImGuiRenderer()
 	return k_instance;
 }
 
-void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
+void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 {
 	m_initParams = initParams;
 
@@ -59,18 +59,6 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
-
-	// Setup render pass used to blit the UI:
-	CrRenderPassDescriptor renderPassDescriptor;
-
-	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(
-		initParams.m_swapchainFormat, initParams.m_sampleCount,
-		CrAttachmentLoadOp::Load , CrAttachmentStoreOp::Store,
-		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
-		cr3d::ResourceState::Present, cr3d::ResourceState::Present
-	);
-
-	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
 
 	// Pipeline description:
 	{
@@ -84,6 +72,10 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
 		psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
 		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
+
+		psoDescriptor.renderTargets.colorFormats.push_back(initParams.m_swapchainFormat);
+		psoDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
+
 		psoDescriptor.Hash();
 
 		// TODO Rework shader paths
@@ -101,7 +93,7 @@ void CrImGuiRenderer::Init(const CrImGuiRendererInitParams& initParams)
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertex::GetVertexDescriptor(), renderPassDescriptor);
+		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertex::GetVertexDescriptor());
 	}
 
 	// Font atlas:
@@ -150,7 +142,7 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* output)
+void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrTexture* swapchainTexture)
 {
 	ImGui::Render();
 
@@ -161,18 +153,21 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* 
 		return;
 	}
 
-	const ImGuiIO& io = ImGui::GetIO();
-
 	UpdateBuffers(data);
 
-	// Begin rendering the draw lists:
-	CrRenderPassBeginParams passParams = {};
-	passParams.clear = false;
-	passParams.drawArea = { 0, 0, (uint32_t)io.DisplaySize.x, (uint32_t)io.DisplaySize.y };
+	CrRenderPassDescriptor graphicsRenderPass;
+
+	CrRenderTargetDescriptor swapchainAttachment;
+	swapchainAttachment.texture = swapchainTexture;
+	swapchainAttachment.loadOp = CrRenderTargetLoadOp::Load;
+	swapchainAttachment.initialState = cr3d::ResourceState::Present;
+	swapchainAttachment.finalState = cr3d::ResourceState::Present;
+
+	graphicsRenderPass.color.push_back(swapchainAttachment);
 
 	cmdBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
 	{
-		cmdBuffer->BeginRenderPass(m_renderPass.get(), output, passParams);
+		cmdBuffer->BeginRenderPass(graphicsRenderPass);
 		{
 			// Setup global config:
 			cmdBuffer->BindGraphicsPipelineState(m_uiGraphicsPipeline.get());

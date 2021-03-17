@@ -50,7 +50,7 @@ private:
 
 	virtual void FlushComputeRenderStatePS() override;
 
-	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
+	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) override;
 
 	virtual void EndRenderPassPS() override;
 };

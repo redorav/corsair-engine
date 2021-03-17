@@ -10,6 +10,8 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
+#include "Core/Containers/CrFixedVector.h"
+
 class ICrCommandBuffer
 {
 public:
@@ -75,7 +77,7 @@ public:
 
 	CrGPUBuffer AllocateConstantBuffer(uint32_t size);
 
-	void BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams);
+	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
 
 	void EndRenderPass();
 
@@ -105,7 +107,7 @@ protected:
 
 	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) = 0;
 
-	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) = 0;
+	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) = 0;
 
 	virtual void EndRenderPassPS() = 0;
 
@@ -323,9 +325,9 @@ inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage,
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
 }
 
-inline void ICrCommandBuffer::BeginRenderPass(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)
+inline void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	BeginRenderPassPS(renderPass, frameBuffer, renderPassParams);
+	BeginRenderPassPS(renderPassDescriptor);
 }
 
 inline void ICrCommandBuffer::EndRenderPass()

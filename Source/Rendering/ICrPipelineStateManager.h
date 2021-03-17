@@ -18,8 +18,7 @@ public:
 	(
 		const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 		const CrGraphicsShaderHandle& graphicsShader, 
-		const CrVertexDescriptor& vertexDescriptor,
-		const CrRenderPassDescriptor& renderPassDescriptor
+		const CrVertexDescriptor& vertexDescriptor
 	);
 
 	CrComputePipelineHandle GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader);

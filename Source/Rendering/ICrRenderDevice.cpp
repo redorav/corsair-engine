@@ -5,8 +5,6 @@
 #include "ICrSwapchain.h"
 #include "ICrSampler.h"
 #include "ICrTexture.h"
-#include "ICrFramebuffer.h"
-#include "ICrRenderPass.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
 #include "CrGPUBuffer.h"
@@ -29,12 +27,6 @@ CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueTyp
 	return CrCommandQueueSharedHandle(CreateCommandQueuePS(type));
 }
 
-CrFramebufferSharedHandle ICrRenderDevice::CreateFramebuffer(const CrFramebufferDescriptor& descriptor)
-{
-	// TODO Add validation rules here. All attachments must be the same size, etc.
-	return CrFramebufferSharedHandle(CreateFramebufferPS(descriptor));
-}
-
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
 {
 	return CrGPUFenceSharedHandle(CreateGPUFencePS());
@@ -55,9 +47,9 @@ CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShader
 	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
 }
 
-CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
-	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor, renderPassDescriptor));
+	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 }
 
 CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
@@ -73,11 +65,6 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareG
 CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
 	return CrIndexBufferSharedHandle(new CrIndexBuffer(this, dataFormat, numIndices));
-}
-
-CrRenderPassSharedHandle ICrRenderDevice::CreateRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
-{
-	return CrRenderPassSharedHandle(CreateRenderPassPS(renderPassDescriptor));
 }
 
 CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)

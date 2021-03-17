@@ -563,6 +563,34 @@ VkDescriptorType crvk::GetVkDescriptorType(cr3d::ShaderResourceType::T resourceT
 	//VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT = 10,
 }
 
+VkAttachmentLoadOp crvk::GetVkAttachmentLoadOp(CrRenderTargetLoadOp loadOp)
+{
+	switch (loadOp)
+	{
+		case CrRenderTargetLoadOp::Clear:
+			return VK_ATTACHMENT_LOAD_OP_CLEAR;
+		case CrRenderTargetLoadOp::DontCare:
+			return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		case CrRenderTargetLoadOp::Load:
+			return VK_ATTACHMENT_LOAD_OP_LOAD;
+		default:
+			return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
+	}
+}
+
+VkAttachmentStoreOp crvk::GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp)
+{
+	switch (storeOp)
+	{
+		case CrRenderTargetStoreOp::DontCare:
+			return VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		case CrRenderTargetStoreOp::Store:
+			return VK_ATTACHMENT_STORE_OP_STORE;
+		default:
+			return VK_ATTACHMENT_STORE_OP_MAX_ENUM;
+	}
+}
+
 VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
 (
 	VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage,

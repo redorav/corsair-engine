@@ -5,9 +5,8 @@
 #include "CrRenderDevice_vk.h"
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
-#include "CrRenderPass_vk.h"
-#include "CrFramebuffer_vk.h"
 #include "CrShader_vk.h"
+#include "Rendering/CrRenderPassDescriptor.h"
 
 #include "Rendering/CrShaderResourceMetadata.h"
 
@@ -70,6 +69,33 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 	result = vkAllocateCommandBuffers(m_vkDevice, &commandBufferAllocateInfo, &m_vkCommandBuffer);
 	CrAssert(result == VK_SUCCESS);
+
+	// Set up render pass allocation resources. Each command buffer manages their own render passes
+
+	m_renderPassAllocator.Initialize(2 * 1024 * 1024); // 2 MB
+	
+	m_usedRenderPasses.reserve(128);
+
+	static auto renderPassAllocationFn = [](void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
+	{
+		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
+		return commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment);
+	};
+
+	static auto renderPassFreeFn = [](void* /*pUserData*/, void* /*pMemory*/) {};
+
+	static auto renderPassReallocationFn = [](void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
+	{
+		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
+		void* memory = commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment);
+		memcpy(memory, pOriginal, size);
+		return memory;
+	};
+
+	m_renderPassAllocationCallbacks.pUserData = this;
+	m_renderPassAllocationCallbacks.pfnAllocation = renderPassAllocationFn;
+	m_renderPassAllocationCallbacks.pfnFree = renderPassFreeFn;
+	m_renderPassAllocationCallbacks.pfnReallocation = renderPassReallocationFn;
 }
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
@@ -310,38 +336,133 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
 }
 
-void CrCommandBufferVulkan::BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)
+static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDescriptor& attachmentDescriptor)
 {
+	VkAttachmentDescription attachmentDescription;
+
+	attachmentDescription.flags          = 0;
+	attachmentDescription.format         = crvk::GetVkFormat(attachmentDescriptor.texture->GetFormat());
+	attachmentDescription.samples        = crvk::GetVkSampleCount(attachmentDescriptor.texture->GetSampleCount());
+	attachmentDescription.loadOp         = crvk::GetVkAttachmentLoadOp(attachmentDescriptor.loadOp);
+	attachmentDescription.storeOp        = crvk::GetVkAttachmentStoreOp(attachmentDescriptor.storeOp);
+	attachmentDescription.stencilLoadOp  = crvk::GetVkAttachmentLoadOp(attachmentDescriptor.stencilLoadOp);
+	attachmentDescription.stencilStoreOp = crvk::GetVkAttachmentStoreOp(attachmentDescriptor.stencilStoreOp);
+
+	VkAccessFlags dummy;
+	CrCommandBufferVulkan::GetVkImageLayoutAndAccessFlags(false, attachmentDescriptor.initialState, attachmentDescription.initialLayout, dummy);
+	CrCommandBufferVulkan::GetVkImageLayoutAndAccessFlags(false, attachmentDescriptor.finalState, attachmentDescription.finalLayout, dummy);
+
+	return attachmentDescription;
+}
+
+void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& descriptor)
+{
+	// Attachment are up to number of render targets, plus depth
+	CrFixedVector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
+	CrFixedVector<VkImageView, cr3d::MaxRenderTargets + 1> attachmentImageViews;
+	CrFixedVector<VkClearValue, cr3d::MaxRenderTargets + 1> clearValues;
+
+	// Attachment references are set in subpasses
+	CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
+	VkAttachmentReference depthReference;
+
+	uint32_t numColorAttachments = (uint32_t)descriptor.color.size();
+	uint32_t numDepthAttachments = 0;
+
+	for (uint32_t i = 0; i < numColorAttachments; ++i)
+	{
+		const CrRenderTargetDescriptor& colorAttachment = descriptor.color[i];
+		colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+		attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(colorAttachment.texture)->GetVkImageViewSingleMipSlice(colorAttachment.mipMap, colorAttachment.slice));
+		attachments.push_back(GetVkAttachmentDescription(colorAttachment));
+		hlslpp::store(colorAttachment.clearColor, clearValues.push_back().color.float32);
+	}
+
+	if (descriptor.depth.texture != nullptr)
+	{
+		const CrRenderTargetDescriptor& depthAttachment = descriptor.depth;
+		depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+		attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(depthAttachment.texture)->GetVkImageViewSingleMipSlice(depthAttachment.mipMap, depthAttachment.slice));
+		attachments.push_back(GetVkAttachmentDescription(depthAttachment));
+		VkClearValue& depthClearValue = clearValues.push_back();
+		depthClearValue.depthStencil.depth = depthAttachment.depthClearValue;
+		depthClearValue.depthStencil.stencil = depthAttachment.stencilClearValue;
+		numDepthAttachments = 1;
+	}
+
+	// All render passes need at least one subpass to work. By defining a subpass dependency as external on both sides, we get the simplest render pass.
+	VkSubpassDescription subpassDescription;
+	subpassDescription.flags                   = 0;
+	subpassDescription.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpassDescription.inputAttachmentCount    = 0;
+	subpassDescription.pInputAttachments       = nullptr;
+	subpassDescription.colorAttachmentCount    = (uint32_t)colorReferences.size();
+	subpassDescription.pColorAttachments       = colorReferences.data();
+	subpassDescription.pResolveAttachments     = nullptr;
+	subpassDescription.pDepthStencilAttachment = numDepthAttachments > 0 ? &depthReference : nullptr;
+	subpassDescription.preserveAttachmentCount = 0;
+	subpassDescription.pPreserveAttachments    = nullptr;
+
+	CrArray<VkSubpassDependency, 2> dependencies;
+
+	dependencies[0].srcSubpass      = VK_SUBPASS_EXTERNAL;
+	dependencies[0].dstSubpass      = 0;
+	dependencies[0].srcStageMask    = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	dependencies[0].dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependencies[0].srcAccessMask   = VK_ACCESS_MEMORY_READ_BIT;
+	dependencies[0].dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+	dependencies[1].srcSubpass      = 0;
+	dependencies[1].dstSubpass      = VK_SUBPASS_EXTERNAL;
+	dependencies[1].srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependencies[1].dstStageMask    = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	dependencies[1].srcAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	dependencies[1].dstAccessMask   = VK_ACCESS_MEMORY_READ_BIT;
+	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+	// Create the renderpass
+	VkRenderPassCreateInfo renderPassInfo;
+	renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.pNext           = nullptr;
+	renderPassInfo.flags           = 0;
+	renderPassInfo.attachmentCount = (uint32_t)attachments.size();
+	renderPassInfo.pAttachments    = attachments.data();
+	renderPassInfo.subpassCount    = 1;
+	renderPassInfo.pSubpasses      = &subpassDescription;
+	renderPassInfo.dependencyCount = (uint32_t)dependencies.size();
+	renderPassInfo.pDependencies   = dependencies.data();
+
+	VkRenderPass& vkRenderPass = m_usedRenderPasses.push_back();
+	VkResult vkResult = vkCreateRenderPass(m_vkDevice, &renderPassInfo, &m_renderPassAllocationCallbacks, &vkRenderPass);
+	CrAssert(vkResult == VK_SUCCESS);
+
+	uint32_t width = !descriptor.color.empty() ? descriptor.color[0].texture->GetWidth() : descriptor.depth.texture->GetWidth();
+	uint32_t height = !descriptor.color.empty() ? descriptor.color[0].texture->GetHeight() : descriptor.depth.texture->GetHeight();
+
+	VkFramebufferCreateInfo frameBufferCreateInfo =
+	{
+		VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		nullptr, 0, vkRenderPass, (uint32_t)attachmentImageViews.size(),
+		attachmentImageViews.data(), width, height, 1
+	};
+
+	VkFramebuffer vkFramebuffer;
+	vkResult = vkCreateFramebuffer(m_vkDevice, &frameBufferCreateInfo, &m_renderPassAllocationCallbacks, &vkFramebuffer);
+	CrAssert(vkResult == VK_SUCCESS);
+
+	// Create render pass begin parameters
 	VkRenderPassBeginInfo renderPassBeginInfo;
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = static_cast<const CrRenderPassVulkan*>(renderPass)->GetVkRenderPass();
+	renderPassBeginInfo.renderPass = vkRenderPass;
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
-	renderPassBeginInfo.renderArea.extent.width = renderPassParams.drawArea.width;
-	renderPassBeginInfo.renderArea.extent.height = renderPassParams.drawArea.height;
-
-	VkClearValue clearValues[2];
-
-	if (renderPassParams.clear)
-	{
-		renderPassBeginInfo.clearValueCount = 2;
-
-		hlslpp::store(renderPassParams.colorClearValue, clearValues[0].color.float32);
-
-		clearValues[1].depthStencil.depth = renderPassParams.depthClearValue;
-		clearValues[1].depthStencil.stencil = renderPassParams.stencilClearValue;
-
-		renderPassBeginInfo.pClearValues = clearValues;
-	}
-	else
-	{
-		renderPassBeginInfo.clearValueCount = 0;
-		renderPassBeginInfo.pClearValues = nullptr;
-	}
-
-	renderPassBeginInfo.framebuffer = static_cast<const CrFramebufferVulkan*>(frameBuffer)->GetVkFramebuffer();
-
+	renderPassBeginInfo.renderArea.extent.width = width;
+	renderPassBeginInfo.renderArea.extent.height = height;
+	renderPassBeginInfo.framebuffer = vkFramebuffer;
+	renderPassBeginInfo.clearValueCount = (uint32_t)clearValues.size();
+	renderPassBeginInfo.pClearValues = clearValues.data();
 	vkCmdBeginRenderPass(m_vkCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
@@ -584,6 +705,23 @@ void CrCommandBufferVulkan::BeginPS()
 	commandBufferInfo.pNext = nullptr;
 	commandBufferInfo.flags = 0;
 	commandBufferInfo.pInheritanceInfo = nullptr;
+
+	// Is this really needed or can I ignore if no validation layers?
+	{
+		for (VkRenderPass pass : m_usedRenderPasses)
+		{
+			vkDestroyRenderPass(m_vkDevice, pass, &m_renderPassAllocationCallbacks);
+		}
+
+		for (VkFramebuffer framebuffer : m_usedFramebuffers)
+		{
+			vkDestroyFramebuffer(m_vkDevice, framebuffer, &m_renderPassAllocationCallbacks);
+		}
+	}
+
+	m_usedRenderPasses.clear();
+	m_usedFramebuffers.clear();
+	m_renderPassAllocator.Reset();
 
 	VkResult result = vkBeginCommandBuffer(m_vkCommandBuffer, &commandBufferInfo);
 	CrAssert(result == VK_SUCCESS);

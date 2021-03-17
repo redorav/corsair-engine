@@ -20,11 +20,11 @@ public:
 
 	static CrImGuiRenderer* GetImGuiRenderer();
 
-	void Init(const CrImGuiRendererInitParams& initParams);
+	void Initialize(const CrImGuiRendererInitParams& initParams);
 
 	void NewFrame(uint32_t width, uint32_t height);
 
-	void Render(ICrCommandBuffer* cmdBuffer, const ICrFramebuffer* output);
+	void Render(ICrCommandBuffer* cmdBuffer, const ICrTexture* swapchainTexture);
 
 private:
 
@@ -39,8 +39,6 @@ private:
 	void UpdateBuffers(ImDrawData* data);
 
 	static CrImGuiRenderer* k_instance;
-
-	CrRenderPassSharedHandle m_renderPass;
 
 	CrGraphicsPipelineHandle m_uiGraphicsPipeline;
 

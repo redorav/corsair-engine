@@ -8,9 +8,11 @@ using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
 
-struct aiScene;
-struct aiMesh;
-struct aiMaterial;
+namespace tinygltf
+{
+	class Model;
+	struct Mesh;
+}
 
 class CrModelDecoderGLTF final : public ICrModelDecoder
 {
@@ -18,6 +20,5 @@ public:
 	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) override;
 
 private:
-	void LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh* mesh);
-	bool LoadMaterial(CrMaterialSharedHandle&, const aiMaterial* material, const CrPath& relativePath);
+	CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData);
 };

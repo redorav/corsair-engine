@@ -97,8 +97,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		bool success = false;
 		if (binaryGLTF)
 		{
-			// TO-DO
-			//loader.LoadBinaryFromMemory()
+			success = loader.LoadBinaryFromMemory(&model, &error, &warning, (unsigned char*)fileData, (unsigned int)fileSize, parentPath);
 		}
 		else
 		{
@@ -118,7 +117,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		}
 	}
 	
-	// Create the render mode:
+	// Create the render model:
 	CrRenderModelSharedHandle renderModel = CrMakeShared<CrRenderModel>();
 	renderModel->m_renderMeshes.reserve(model.meshes.size());
 	for (const auto mesh : model.meshes)
@@ -126,10 +125,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		renderModel->m_renderMeshes.push_back(LoadMesh(&model, &mesh));
 	}
 
-
-	if (file)
-		return nullptr;
-	return nullptr;
+	return renderModel;
 }
 
 struct SimpleVertex
@@ -145,33 +141,99 @@ struct SimpleVertex
 	}
 };
 
+cr3d::DataFormat::T ToDataFormat(int format, int type = -1)
+{
+	switch (format)
+	{
+		case TINYGLTF_COMPONENT_TYPE_BYTE:				return cr3d::DataFormat::R8_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:		return cr3d::DataFormat::R8_Uint;
+		case TINYGLTF_COMPONENT_TYPE_SHORT:				return cr3d::DataFormat::R16_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:	return cr3d::DataFormat::R16_Uint;
+		case TINYGLTF_COMPONENT_TYPE_INT:				return cr3d::DataFormat::R32_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:		return cr3d::DataFormat::R32_Uint;
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:				return cr3d::DataFormat::R32_Float;
+		//   TINYGLTF_COMPONENT_TYPE_DOUBLE	
+	}
+	CrAssertMsg(false, "Failed to convert data format: %i", format);
+	return cr3d::DataFormat::R32_Float;
+}
+
+/*
+Types:
+	#define TINYGLTF_TYPE_VEC2 (2)
+	#define TINYGLTF_TYPE_VEC3 (3)
+	#define TINYGLTF_TYPE_VEC4 (4)
+	#define TINYGLTF_TYPE_MAT2 (32 + 2)
+	#define TINYGLTF_TYPE_MAT3 (32 + 3)
+	#define TINYGLTF_TYPE_MAT4 (32 + 4)
+	#define TINYGLTF_TYPE_SCALAR (64 + 1)
+	#define TINYGLTF_TYPE_VECTOR (64 + 4)
+	#define TINYGLTF_TYPE_MATRIX (64 + 16)
+*/
+
 CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData)
 {
 	CrMeshSharedHandle mesh = CrMakeShared<CrMesh>();
 
 	for (const auto primitive : meshData->primitives)
 	{		
-		if (primitive.indices != -1) // Index data.
+		// Index data
+		if (primitive.indices != -1) 
 		{
 			const auto indexAccessor = modelData->accessors[primitive.indices];
+			CrAssertMsg(indexAccessor.byteOffset == 0, "Handle this case!");
+			
+			// Create the buffer:
+			auto format = ToDataFormat(indexAccessor.componentType);
+			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
+			
+			// Use the buffer view to copy the data:
 			const auto bufferView = modelData->bufferViews[indexAccessor.bufferView];
-
-			//mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, bufferView.);
-			//uint16_t* indexData = (uint16_t*)mesh->m_indexBuffer->Lock();
-			//mesh->m_indexBuffer->Unlock();
-
+			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
+			data = data + bufferView.byteOffset;
+			if (bufferView.byteStride)
+			{
+				CrAssertMsg(false, "Byte stride not implemented");
+			}
+			else
+			{
+				void* indexData = mesh->m_indexBuffer->Lock();
+				memcpy(indexData, data, bufferView.byteLength); // check byteLength
+				mesh->m_indexBuffer->Unlock();
+			}
 		}
-		else if (!primitive.attributes.empty()) // Vertex data.
+
+		// Vertex data
+		if (!primitive.attributes.empty()) 
 		{
 			for (const auto attribute : primitive.attributes)
 			{
 				const std::string& attribName = attribute.first;
 				const int attribAccessorIndex = attribute.second;
+				const auto attribAccessor = modelData->accessors[attribAccessorIndex];
 
-				const auto attribAcessor = modelData->accessors[attribAccessorIndex];
+				if (attribName == "POSITION")
+				{
+					// Sanity check.
+					if (attribAccessor.type != TINYGLTF_TYPE_VEC3 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
+					{
+						CrAssert(false);
+					}
+					const auto bufferView = modelData->bufferViews[attribAccessor.bufferView];
 
-				// puke.
-				if (attribute.first == "POSITION")
+					/*
+						All this will get us to the position data. We need to account for the data size to figure out the
+						correct byte stride? (utility ByteStride())
+						bufferView.byteOffset;
+						bufferView.byteLength;;
+						bufferView.byteStride;
+					*/
+				}
+				else if (attribName == "NORMAL")
+				{
+
+				}
+				else if (attribName == "TEXCOORD_0")
 				{
 
 				}

@@ -21,7 +21,7 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 
 	m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice));
 
-	m_constantBufferGPUStack->Init();
+	m_constantBufferGPUStack->Initialize(8 * 1024 * 1024); // 8 MB
 }
 
 ICrCommandBuffer::~ICrCommandBuffer()

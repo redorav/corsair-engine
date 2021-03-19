@@ -21,13 +21,11 @@ public:
 
 	void UpdateCamera();
 
-	void RecreateSwapchainAndFramebuffers();
+	void RecreateSwapchainAndDepth();
 
 private:
 
 	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
-	CrVector<CrFramebufferSharedHandle> m_swapchainFrameBuffers;
-	CrVector<CrFramebufferSharedHandle> m_swapchainFrameBuffersNoDepth;
 
 	// TODO Pass as param
 	uint32_t m_width = 0;
@@ -43,8 +41,6 @@ private:
 	CrGraphicsPipelineHandle m_pipelineLineState;
 	CrComputePipelineHandle m_computePipelineState;
 
-	CrRenderPassSharedHandle m_renderPass;
-	
 	CrVertexBufferSharedHandle m_triangleVertexBuffer;
 	CrIndexBufferSharedHandle m_triangleIndexBuffer;
 	

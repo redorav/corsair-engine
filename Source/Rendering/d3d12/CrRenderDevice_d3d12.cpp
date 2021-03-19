@@ -4,8 +4,6 @@
 #include "CrRenderSystem_d3d12.h"
 
 #include "CrCommandQueue_d3d12.h"
-#include "CrFramebuffer_d3d12.h"
-#include "CrRenderPass_d3d12.h"
 #include "CrSampler_d3d12.h"
 #include "CrSwapchain_d3d12.h"
 #include "CrTexture_d3d12.h"
@@ -107,11 +105,6 @@ ICrCommandQueue* CrRenderDeviceD3D12::CreateCommandQueuePS(CrCommandQueueType::T
 	return new CrCommandQueueD3D12(this, type);
 }
 
-ICrFramebuffer* CrRenderDeviceD3D12::CreateFramebufferPS(const CrFramebufferDescriptor& descriptor)
-{
-	return new CrFramebufferD3D12(this, descriptor);
-}
-
 ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()
 {
 	return new CrGPUFenceD3D12(this);
@@ -139,11 +132,6 @@ ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHar
 	return new CrHardwareGPUBufferD3D12(this, descriptor);
 }
 
-ICrRenderPass* CrRenderDeviceD3D12::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
-{
-	return new CrRenderPassD3D12(this, renderPassDescriptor);
-}
-
 ICrSampler* CrRenderDeviceD3D12::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
 {
 	return new CrSamplerD3D12(this, descriptor);
@@ -159,12 +147,11 @@ ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureDescriptor& para
 	return new CrTextureD3D12(this, params);
 }
 
-ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor)
+ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	unused_parameter(pipelineDescriptor);
 	unused_parameter(graphicsShader);
 	unused_parameter(vertexDescriptor);
-	unused_parameter(renderPassDescriptor);
 	return nullptr;
 }
 

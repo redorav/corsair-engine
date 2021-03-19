@@ -6,6 +6,8 @@
 
 #include "Core/CrHash.h"
 
+#include "Core/Containers/CrFixedVector.h"
+
 struct CrRasterizerStateDescriptor
 {
 	cr3d::PolygonFillMode fillMode : 2;
@@ -74,6 +76,13 @@ struct CrMultisampleStateDescriptor
 	cr3d::SampleCount sampleCount : 4;
 };
 
+struct CrRenderTargetFormatDescriptor
+{
+	CrFixedVector<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats;
+	cr3d::DataFormat::T depthFormat = cr3d::DataFormat::Invalid;
+	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
+};
+
 struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDescriptor>
 {
 	CrGraphicsPipelineDescriptor()
@@ -94,11 +103,12 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 		depthStencilState.depthCompareOp = cr3d::CompareOp::Greater;
 	}
 
-	cr3d::PrimitiveTopology primitiveTopology = {};
-	CrRasterizerStateDescriptor rasterizerState = {};
-	CrBlendStateDescriptor blendState = {};
-	CrDepthStencilStateDescriptor depthStencilState = {};
-	CrMultisampleStateDescriptor multisampleState = {};
+	cr3d::PrimitiveTopology        primitiveTopology = {};
+	CrRasterizerStateDescriptor    rasterizerState = {};
+	CrBlendStateDescriptor         blendState = {};
+	CrDepthStencilStateDescriptor  depthStencilState = {};
+	CrMultisampleStateDescriptor   multisampleState = {};
+	CrRenderTargetFormatDescriptor       renderTargets = {};
 };
 
 class ICrGraphicsPipeline

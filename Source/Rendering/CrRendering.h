@@ -879,3 +879,21 @@ struct CrViewport
 	float minDepth;
 	float maxDepth;
 };
+
+// TODO Unify with scissor
+struct CrRect2D
+{
+	int32_t x, y;
+	uint32_t width, height;
+};
+
+// todo put in cr3d
+enum class CrRenderTargetLoadOp
+{
+	Load, Clear, DontCare
+};
+
+enum class CrRenderTargetStoreOp
+{
+	Store, DontCare
+};

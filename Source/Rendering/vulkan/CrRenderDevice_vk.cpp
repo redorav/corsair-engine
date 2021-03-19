@@ -9,8 +9,6 @@
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
 #include "CrSwapchain_vk.h"
-#include "CrFramebuffer_vk.h"
-#include "CrRenderPass_vk.h"
 #include "CrGPUSynchronization_vk.h"
 #include "CrShader_vk.h"
 
@@ -192,11 +190,6 @@ ICrCommandQueue* CrRenderDeviceVulkan::CreateCommandQueuePS(CrCommandQueueType::
 	return new CrCommandQueueVulkan(this, type);
 }
 
-ICrFramebuffer* CrRenderDeviceVulkan::CreateFramebufferPS(const CrFramebufferDescriptor& descriptor)
-{
-	return new CrFramebufferVulkan(this, descriptor);
-}
-
 ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()
 {
 	return new CrGPUFenceVulkan(this);
@@ -222,11 +215,6 @@ ICrHardwareGPUBuffer* CrRenderDeviceVulkan::CreateHardwareGPUBufferPS(const CrHa
 	return new CrHardwareGPUBufferVulkan(this, descriptor);
 }
 
-ICrRenderPass* CrRenderDeviceVulkan::CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
-{
-	return new CrRenderPassVulkan(this, renderPassDescriptor);
-}
-
 ICrSampler* CrRenderDeviceVulkan::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
 {
 	return new CrSamplerVulkan(this, descriptor);
@@ -246,8 +234,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 (
 	const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const ICrGraphicsShader* graphicsShader,
-	const CrVertexDescriptor& vertexDescriptor,
-	const CrRenderPassDescriptor& renderPassDescriptor
+	const CrVertexDescriptor& vertexDescriptor
 )
 {
 	CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = new CrGraphicsPipelineVulkan();
@@ -455,20 +442,80 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 
 	// We don't need the real renderpass here to create pipeline state objects, a compatible one is enough
 	// to make it work. I suspect the only thing it really needs is the description of how we're going to
-	// be using the render pass. In D3D12 this is actually part of the psoDescriptor (RTVFormats, DSVFormat)
+	// be using the render pass. In D3D12 this is actually part of the pipeline descriptor (RTVFormats, DSVFormat)
 	// TODO This should probably be optimized either by having another function that passes an actual render pass
 	// or by having a cache of render pass descriptors. The reason for using a dummy render pass is so that
 	// pipelines can be precreated without needing access to the actual draw commands.
-	CrRenderPassVulkan dummyRenderPass = CrRenderPassVulkan(this, renderPassDescriptor);
+	VkRenderPass vkCompatibleRenderPass;
+	{
+		CrFixedVector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
+		CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
+		VkAttachmentReference depthReference;
+
+		uint32_t numColorAttachments = (uint32_t)pipelineDescriptor.renderTargets.colorFormats.size();
+		uint32_t numDepthAttachments = 0;
+
+		for (uint32_t i = 0; i < pipelineDescriptor.renderTargets.colorFormats.size(); ++i)
+		{
+			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+			VkAttachmentDescription attachmentDescription = {};
+			attachmentDescription.flags = 0;
+			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
+			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
+			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachments.push_back(attachmentDescription);
+		}
+
+		if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
+		{
+			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+			VkAttachmentDescription attachmentDescription = {};
+			attachmentDescription.flags = 0;
+			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
+			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
+			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachments.push_back(attachmentDescription);
+			numDepthAttachments = 1;
+		}
+
+		// All render passes need at least one subpass to work.
+		// By defining a subpass dependency as external on both sides, we get the simplest render pass
+		VkSubpassDescription subpassDescription;
+		subpassDescription.flags = 0;
+		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassDescription.inputAttachmentCount = 0;
+		subpassDescription.pInputAttachments = nullptr;
+		subpassDescription.colorAttachmentCount = numColorAttachments;
+		subpassDescription.pColorAttachments = colorReferences.data();
+		subpassDescription.pResolveAttachments = nullptr;
+		subpassDescription.pDepthStencilAttachment = numDepthAttachments > 0 ? &depthReference : nullptr;
+		subpassDescription.preserveAttachmentCount = 0;
+		subpassDescription.pPreserveAttachments = nullptr;
+
+		// Create the renderpass
+		VkRenderPassCreateInfo renderPassInfo;
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.pNext = nullptr;
+		renderPassInfo.flags = 0;
+		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
+		renderPassInfo.pAttachments = attachments.data();
+		renderPassInfo.subpassCount = 1;
+		renderPassInfo.pSubpasses = &subpassDescription;
+		renderPassInfo.dependencyCount = 0;
+		renderPassInfo.pDependencies = nullptr;
+
+		vkResult = vkCreateRenderPass(m_vkDevice, &renderPassInfo, nullptr, &vkCompatibleRenderPass);
+		CrAssert(vkResult == VK_SUCCESS);
+	}
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = (uint32_t)graphicsShader->GetStages().size();
 	pipelineInfo.pStages = shaderStages;
 
-	pipelineInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout; // TODO Hack
-	pipelineInfo.pVertexInputState = &vertexInputState;				// TODO Create this pipeline layout first from the shader/vertex descriptor
-	pipelineInfo.renderPass = dummyRenderPass.GetVkRenderPass();
+	pipelineInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout;
+	pipelineInfo.pVertexInputState = &vertexInputState; // TODO Create this pipeline layout first from the shader/vertex descriptor
+	pipelineInfo.renderPass = vkCompatibleRenderPass;
 
 	pipelineInfo.pInputAssemblyState = &inputAssemblyState;
 	pipelineInfo.pRasterizationState = &rasterizerState;
@@ -480,6 +527,8 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 
 	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
+
+	vkDestroyRenderPass(m_vkDevice, vkCompatibleRenderPass, nullptr);
 
 	return vulkanGraphicsPipeline;
 }
@@ -622,10 +671,10 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		deviceCreateInfo.ppEnabledExtensionNames = enabledDeviceExtensions.data();
 	}
 
-	VkResult result = vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
-	CrAssertMsg(result == VK_SUCCESS, "Could not create vkDevice");
+	VkResult vkResult = vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not create vkDevice");
 
-	return result;
+	return vkResult;
 }
 
 bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)

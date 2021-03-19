@@ -16,6 +16,7 @@ namespace ConstantBuffers { enum T : uint8_t; }
 namespace Samplers { enum T : uint8_t; }
 namespace Textures { enum T : uint8_t; }
 namespace RWTextures { enum T : uint8_t; }
+namespace StorageBuffers { enum T : uint8_t; }
 namespace RWStorageBuffers { enum T : uint8_t; }
 namespace RWDataBuffers { enum T : uint8_t; }
 
@@ -38,6 +39,9 @@ struct CrShaderBinding
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTextures::T rwTextureID)
 		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
 
+	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, StorageBuffers::T storageBufferID)
+		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::StorageBuffer), storageBufferID(storageBufferID) {}
+
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWStorageBuffers::T rwStorageBufferID)
 		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
 
@@ -53,6 +57,7 @@ struct CrShaderBinding
 		Samplers::T samplerID;
 		Textures::T textureID;
 		RWTextures::T rwTextureID;
+		StorageBuffers::T storageBufferID;
 		RWStorageBuffers::T rwStorageBufferID;
 		RWDataBuffers::T rwDataBufferID;
 	};
@@ -122,6 +127,15 @@ public:
 	}
 
 	template<typename Fn>
+	void ForEachStorageBuffer(const Fn& fn) const
+	{
+		for (uint8_t i = m_storageBufferOffset; i < m_storageBufferOffset + m_storageBufferCount; ++i)
+		{
+			fn(m_bindings[i].stage, m_bindings[i].storageBufferID, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename Fn>
 	void ForEachRWStorageBuffer(const Fn& fn) const
 	{
 		for (uint8_t i = m_rwStorageBufferOffset; i < m_rwStorageBufferOffset + m_rwStorageBufferCount; ++i)
@@ -152,6 +166,9 @@ private:
 
 	uint8_t				m_rwTextureOffset = 0;
 	uint8_t				m_rwTextureCount = 0;
+
+	uint8_t				m_storageBufferOffset = 0;
+	uint8_t				m_storageBufferCount = 0;
 
 	uint8_t				m_rwStorageBufferOffset = 0;
 	uint8_t				m_rwStorageBufferCount = 0;

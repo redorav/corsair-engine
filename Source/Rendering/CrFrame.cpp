@@ -4,7 +4,6 @@
 
 #include "Core/CrPlatform.h"
 
-#include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
@@ -15,8 +14,8 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrCommandQueue.h"
-#include "Rendering/ICrFramebuffer.h"
-#include "Rendering/ICrRenderPass.h"
+#include "Rendering/CrGPUBuffer.h"
+#include "Rendering/CrRenderPassDescriptor.h"
 
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
@@ -153,21 +152,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	RecreateSwapchainAndFramebuffers();
-
-	// Create main renderpass
-	CrRenderPassDescriptor renderPassDescriptor;
-	renderPassDescriptor.m_colorAttachments[0] = CrAttachmentDescriptor(m_swapchain->GetFormat(), cr3d::SampleCount::S1,
-		CrAttachmentLoadOp::Clear, CrAttachmentStoreOp::Store,
-		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
-		cr3d::ResourceState::Undefined, cr3d::ResourceState::Present);
-
-	renderPassDescriptor.m_depthAttachment = CrAttachmentDescriptor(m_depthStencilTexture->GetFormat(), m_depthStencilTexture->GetSampleCount(),
-		CrAttachmentLoadOp::Clear, CrAttachmentStoreOp::Store,
-		CrAttachmentLoadOp::DontCare, CrAttachmentStoreOp::DontCare,
-		cr3d::ResourceState::Undefined, cr3d::ResourceState::PixelShaderInput);
-
-	m_renderPass = renderDevice->CreateRenderPass(renderPassDescriptor);
+	RecreateSwapchainAndDepth();
 	
 	CrBytecodeLoadDescriptor bytecodeLoadInfo;
 	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
@@ -206,6 +191,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor graphicsPipelineDescriptor;
+	graphicsPipelineDescriptor.renderTargets.colorFormats.push_back(m_swapchain->GetFormat());
+	graphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+	graphicsPipelineDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
+
 	graphicsPipelineDescriptor.Hash();
 
 	// TODO Reminder for next time:
@@ -214,11 +203,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor); // Test caching
+	// Test caching
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
@@ -226,8 +214,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	graphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	graphicsPipelineDescriptor.Hash();
-	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
-		graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor, renderPassDescriptor);
+	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
 	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();
@@ -238,11 +225,11 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
 
-	// ImGui renderer init:
+	// Initialize ImGui renderer
 	CrImGuiRendererInitParams imguiInitParams = {};
 	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
 	imguiInitParams.m_sampleCount = cr3d::SampleCount::S1;
-	CrImGuiRenderer::GetImGuiRenderer()->Init(imguiInitParams);
+	CrImGuiRenderer::GetImGuiRenderer()->Initialize(imguiInitParams);
 }
 
 void CrFrame::Process()
@@ -255,7 +242,7 @@ void CrFrame::Process()
 
 	if (swapchainResult == CrSwapchainResult::Invalid)
 	{
-		RecreateSwapchainAndFramebuffers();
+		RecreateSwapchainAndDepth();
 		swapchainResult = swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
 	}
 
@@ -275,19 +262,27 @@ void CrFrame::Process()
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)swapchain->GetWidth(), (float)swapchain->GetHeight()));
 		drawCommandBuffer->SetScissor(CrScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 	
-		CrRenderPassBeginParams renderPassParams;
-		renderPassParams.clear = true;
-		renderPassParams.colorClearValue = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
-		renderPassParams.depthClearValue = 0.0f;
-		renderPassParams.stencilClearValue = 0;
-		renderPassParams.drawArea.x = 0;
-		renderPassParams.drawArea.y = 0;
-		renderPassParams.drawArea.width = swapchain->GetWidth();
-		renderPassParams.drawArea.height = swapchain->GetHeight();
-	
+		CrRenderPassDescriptor renderPassDescriptor;
+
+		CrRenderTargetDescriptor swapchainAttachment;
+		swapchainAttachment.texture = swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get();
+		swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
+		swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
+		swapchainAttachment.initialState = cr3d::ResourceState::Undefined;
+		swapchainAttachment.finalState = cr3d::ResourceState::Present;
+
+		CrRenderTargetDescriptor depthAttachment;
+		depthAttachment.texture = m_depthStencilTexture.get();
+		depthAttachment.loadOp = CrRenderTargetLoadOp::Clear;
+		depthAttachment.initialState = cr3d::ResourceState::Undefined;
+		depthAttachment.finalState = cr3d::ResourceState::PixelShaderInput;
+
+		renderPassDescriptor.color.push_back(swapchainAttachment);
+		renderPassDescriptor.depth = depthAttachment;
+
 		drawCommandBuffer->BeginDebugEvent("RenderPass 1", float4(1.0f, 0.0, 1.0f, 1.0f));
 		{
-			drawCommandBuffer->BeginRenderPass(m_renderPass.get(), m_swapchainFrameBuffers[swapchain->GetCurrentFrameIndex()].get(), renderPassParams);
+			drawCommandBuffer->BeginRenderPass(renderPassDescriptor);
 			{
 				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
 	
@@ -358,7 +353,7 @@ void CrFrame::Process()
 		drawCommandBuffer->EndDebugEvent();
 
 		// Render ImGui
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchainFrameBuffersNoDepth[swapchain->GetCurrentFrameIndex()].get());
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get());
 
 		drawCommandBuffer->End();
 	}
@@ -430,7 +425,7 @@ void CrFrame::UpdateCamera()
 	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
 }
 
-void CrFrame::RecreateSwapchainAndFramebuffers()
+void CrFrame::RecreateSwapchainAndDepth()
 {
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
@@ -457,24 +452,10 @@ void CrFrame::RecreateSwapchainAndFramebuffers()
 	CrTextureDescriptor depthTexParams;
 	depthTexParams.width = m_swapchain->GetWidth();
 	depthTexParams.height = m_swapchain->GetHeight();
-	depthTexParams.format = cr3d::DataFormat::D24_Unorm_S8_Uint;
+	depthTexParams.format = cr3d::DataFormat::D32_Float_S8_Uint;
 	depthTexParams.usage = cr3d::TextureUsage::Depth;
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
-
-	// 3. Recreate framebuffers
-
-	m_swapchainFrameBuffers.resize(m_swapchain->GetImageCount());
-	m_swapchainFrameBuffersNoDepth.resize(m_swapchain->GetImageCount());
-
-	for (uint32_t i = 0; i < m_swapchainFrameBuffers.size(); i++)
-	{
-		CrFramebufferDescriptor frameBufferParams(m_swapchain->GetTexture(i).get(), m_depthStencilTexture.get());
-		m_swapchainFrameBuffers[i] = renderDevice->CreateFramebuffer(frameBufferParams);
-
-		CrFramebufferDescriptor frameBufferParamsNoDepth(m_swapchain->GetTexture(i).get(), nullptr);
-		m_swapchainFrameBuffersNoDepth[i] = renderDevice->CreateFramebuffer(frameBufferParamsNoDepth);
-	}
 
 	// 4. Recreate command buffers
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());

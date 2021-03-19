@@ -21,10 +21,6 @@ class ICrRenderSystem;
 class ICrRenderDevice;
 using CrRenderDeviceSharedHandle = CrSharedPtr<ICrRenderDevice>;
 
-class ICrFramebuffer;
-using CrFramebufferSharedHandle = CrSharedPtr<ICrFramebuffer>;
-struct CrFramebufferDescriptor;
-
 class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
 struct CrTextureDescriptor;
@@ -32,11 +28,6 @@ struct CrTextureDescriptor;
 class ICrSampler;
 using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
 struct CrSamplerDescriptor;
-
-class ICrRenderPass;
-using CrRenderPassSharedHandle = CrSharedPtr<ICrRenderPass>;
-struct CrRenderPassDescriptor;
-struct CrRenderPassBeginParams;
 
 class ICrCommandQueue;
 using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
@@ -68,6 +59,8 @@ using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 
 class ICrCommandBuffer;
 using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
+
+struct CrRenderPassDescriptor;
 
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;

@@ -74,11 +74,7 @@ public:
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
-	CrFramebufferSharedHandle CreateFramebuffer(const CrFramebufferDescriptor& params);
-
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices);
-
-	CrRenderPassSharedHandle CreateRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
 
 	CrSamplerSharedHandle CreateSampler(const CrSamplerDescriptor& descriptor);
 
@@ -97,8 +93,7 @@ public:
 
 	CrComputeShaderHandle CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor) const;
 
-	CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader,
-		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor);
+	CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 	
 	CrComputePipelineHandle CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader);
 
@@ -130,8 +125,6 @@ protected:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) = 0;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferDescriptor& params) = 0;
-
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
@@ -142,16 +135,13 @@ protected:
 
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
 
-	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
-
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
 
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
 	
-	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader,
-		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) = 0;
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
 
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader) = 0;
 	

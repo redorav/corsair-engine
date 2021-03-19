@@ -37,8 +37,6 @@ private:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) override;
 
-	virtual ICrFramebuffer* CreateFramebufferPS(const CrFramebufferDescriptor& descriptor) override;
-	
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
@@ -49,16 +47,13 @@ private:
 
 	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
 
-	virtual ICrRenderPass* CreateRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
-
 	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
 
 	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
 	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) override;
 
-	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader,
-		const CrVertexDescriptor& vertexDescriptor, const CrRenderPassDescriptor& renderPassDescriptor) override;
+	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader) override;
 

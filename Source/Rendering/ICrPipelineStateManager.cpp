@@ -19,8 +19,7 @@ CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 (
 	const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 	const CrGraphicsShaderHandle& graphicsShader, 
-	const CrVertexDescriptor& vertexDescriptor,
-	const CrRenderPassDescriptor& renderPassDescriptor
+	const CrVertexDescriptor& vertexDescriptor
 )
 {
 	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
@@ -40,11 +39,11 @@ CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 	}
 	else
 	{
-		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader.get(), vertexDescriptor, renderPassDescriptor);
+		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader.get(), vertexDescriptor);
 		graphicsPipeline->m_shader = graphicsShader;
 
 		// Insert in the hashmap
-		m_graphicsPipelines.insert({combinedHash.m_hash, graphicsPipeline});
+		m_graphicsPipelines.insert({ combinedHash.m_hash, graphicsPipeline });
 	}
 
 	return graphicsPipeline;

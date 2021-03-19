@@ -5,8 +5,6 @@
 #include "CrRenderDevice_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
-#include "CrRenderPass_d3d12.h"
-#include "CrFramebuffer_d3d12.h"
 
 #include "Core/Containers/CrArray.h"
 
@@ -18,11 +16,9 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrCommandQueue* commandQueue)
 	
 }
 
-void CrCommandBufferD3D12::BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams)
+void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& descriptor)
 {
-	unused_parameter(renderPass);
-	unused_parameter(frameBuffer);
-	unused_parameter(renderPassParams);
+	unused_parameter(descriptor);
 }
 
 void CrCommandBufferD3D12::EndRenderPassPS()

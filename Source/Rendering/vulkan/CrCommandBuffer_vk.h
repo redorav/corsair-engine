@@ -3,12 +3,16 @@
 #include "Rendering/ICrCommandBuffer.h"
 
 #include "CrGPUBuffer_vk.h"
+
 #include "CrPipeline_vk.h"
+
 #include "CrVulkan.h"
 
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+
+#include "Rendering/CrCPUStackAllocator.h"
 
 class CrTextureVulkan;
 class CrShaderBindingTableVulkan;
@@ -61,11 +65,19 @@ private:
 
 	virtual void FlushComputeRenderStatePS() override;
 
-	virtual void BeginRenderPassPS(const ICrRenderPass* renderPass, const ICrFramebuffer* frameBuffer, const CrRenderPassBeginParams& renderPassParams) override;
+	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) override;
 
 	virtual void EndRenderPassPS() override;
 
 	void UpdateResourceTableVulkan(const CrShaderBindingTableVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout);
+
+	CrCPUStackAllocator m_renderPassAllocator;
+
+	VkAllocationCallbacks m_renderPassAllocationCallbacks = {};
+
+	CrVector<VkRenderPass> m_usedRenderPasses;
+
+	CrVector<VkFramebuffer> m_usedFramebuffers;
 
 	VkDevice m_vkDevice;
 

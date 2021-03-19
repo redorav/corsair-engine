@@ -128,7 +128,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	}
 	m_triangleIndexBuffer->Unlock();
 
-	m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
+	m_renderModel = CrResourceManager::LoadModel("gltf/Duck.gltf");
+	//m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
 	//"jaina/storm_hero_jaina.fbx"
 
 	CrString SHADER_PATH = IN_SRC_PATH;
@@ -320,7 +321,7 @@ void CrFrame::Process()
 	
 				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
 				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
-	
+				
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{
 					const CrRenderMeshSharedHandle& renderMesh = m_renderModel->m_renderMeshes[m];

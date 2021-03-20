@@ -91,7 +91,7 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 
 		rasterizerState.fillMode = cr3d::PolygonFillMode::Fill;
 		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
-		rasterizerState.cullMode = cr3d::PolygonCullMode::None;
+		rasterizerState.cullMode = cr3d::PolygonCullMode::Back;
 
 		multisampleState.sampleCount = cr3d::SampleCount::S1;
 

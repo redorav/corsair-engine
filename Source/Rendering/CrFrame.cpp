@@ -371,36 +371,36 @@ void CrFrame::UpdateCamera()
 
 	float3 currentLookAt = camera.m_lookAt;
 	float3 currentRight = camera.m_right;
-
+	float camSpeed = 50.0f;
 	// TODO Hack to get a bit of movement on the camera
-	if (CrInput.GetKey(KeyCode::A) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) < 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::A) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) < 0.0f)
 	{
-		camera.Translate(currentRight * -5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentRight * -camSpeed * CrFrameTime::GetFrameDelta());
 	}
 
-	if (CrInput.GetKey(KeyCode::D) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) > 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::D) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) > 0.0f)
 	{
-		camera.Translate(currentRight * 5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentRight * camSpeed * CrFrameTime::GetFrameDelta());
 	}
 
-	if (CrInput.GetKey(KeyCode::W) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) > 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::W) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) > 0.0f)
 	{
-		camera.Translate(currentLookAt * 5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentLookAt * camSpeed * CrFrameTime::GetFrameDelta());
 	}
 
-	if (CrInput.GetKey(KeyCode::S) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) < 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::S) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) < 0.0f)
 	{
-		camera.Translate(currentLookAt * -5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentLookAt * -camSpeed * CrFrameTime::GetFrameDelta());
 	}
 
-	if (CrInput.GetKey(KeyCode::Q) || CrInput.GetAxis(AxisCode::JoystickL2) > 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::Q) || CrInput.GetAxis(AxisCode::JoystickL2) > 0.0f)
 	{
-		camera.Translate(float3(0.0f, -5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, -camSpeed, 0.0f) * CrFrameTime::GetFrameDelta());
 	}
 
-	if (CrInput.GetKey(KeyCode::E) || CrInput.GetAxis(AxisCode::JoystickR2) > 0.0f)
+	if (CrInput.GetHeldKey(KeyCode::E) || CrInput.GetAxis(AxisCode::JoystickR2) > 0.0f)
 	{
-		camera.Translate(float3(0.0f, 5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, camSpeed, 0.0f) * CrFrameTime::GetFrameDelta());
 	}
 
 	if (CrInput.GetAxis(AxisCode::JoystickRightAxisX) > 0.0f)

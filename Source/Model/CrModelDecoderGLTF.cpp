@@ -17,6 +17,8 @@
 
 #include "Image/CrImageDecoderSTB.h"
 
+#include "GeneratedShaders/ShaderMetadata.h"
+
 #define TINYGLTF_IMPLEMENTATION
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
@@ -32,20 +34,20 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 
 	// Custom image loading implementation, gltf will either load the 
 	//	raw data from the inline buffer or from the specified uri. Textures will be loaded and added to 
-	//  the texture table in preparation to build the material.
-	std::vector<CrTextureSharedHandle> textureTable;
+	//  the texture table in preparation to build the material
+	std::map<int, CrTextureSharedHandle> textureTable;
 	loader.SetImageLoader(
 		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* warning,
 			int requestedWidth, int requestedHeight, const unsigned char* data, int dataSize, void* userData)
 		{
-			auto textureTable = (std::vector<CrTextureSharedHandle>*)userData;
+			auto textureTable = (std::map<int, CrTextureSharedHandle>*)userData;
 			if (!textureTable)
 			{
 				(*error) += "Invalid textureTable!";
 				return false;
 			}
 
-			// Create a decoder to parse the binary blob:
+			// Create a decoder to parse the binary blob
 			CrSharedPtr<ICrImageDecoder> imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
 			CrImageHandle loadedImage = imageDecoder->Decode((void*)data, dataSize);
 			if (!loadedImage)
@@ -58,7 +60,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			image->width = loadedImage->GetWidth();
 			image->height= loadedImage->GetHeight();
 
-			// Create the texture resource:
+			// Create the texture resource
 			CrTextureDescriptor textureParams;
 			textureParams.width = loadedImage->GetWidth();
 			textureParams.height = loadedImage->GetHeight();
@@ -75,7 +77,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 				return false;
 			}
 
-			textureTable->push_back(texture);
+			(*textureTable)[imageIndex] = texture;
 
 			return true;
 		}
@@ -86,9 +88,9 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	CrPath filePath(file->GetFilePath());
 	std::string parentPath = filePath.parent_path().string();
 	
-	// Load it:
+	// Load it
 	{
-		// Read contents of the file:
+		// Read contents of the file
 		uint64_t fileSize = file->GetSize();
 		void* fileData = malloc(fileSize);
 		file->Read(fileData, fileSize);
@@ -103,9 +105,9 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		{
 			success = loader.LoadASCIIFromString(&model, &error, &warning, (const char*)fileData, (unsigned int)fileSize, parentPath);
 		}
-		free(fileData); // Free this now.
+		free(fileData); // Free this now
 
-		// Check for errors:
+		// Check for errors
 		if (!success)
 		{
 			CrLog("Failed to load:%s (%s)", file->GetFilePath(), error.c_str());
@@ -117,12 +119,17 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		}
 	}
 	
-	// Create the render model:
+	// Create the render model and setup the material. Note that by now, images have been loaded
+	// and textures created within the loader callback
 	CrRenderModelSharedHandle renderModel = CrMakeShared<CrRenderModel>();
 	renderModel->m_renderMeshes.reserve(model.meshes.size());
 	for (const auto mesh : model.meshes)
 	{
-		renderModel->m_renderMeshes.push_back(LoadMesh(&model, &mesh));
+		CrMaterialSharedHandle material = CrMakeShared <CrMaterial>();
+		CrRenderMeshSharedHandle renderMesh = LoadMesh(&model, &mesh, material, textureTable);
+		renderModel->m_renderMeshes.push_back(renderMesh);
+		renderModel->m_materials.push_back(material);
+		renderModel->m_materialMap.insert(CrPair<CrMesh*, uint32_t>(renderMesh.get(), (uint32_t)(renderModel->m_materials.size() - 1)));
 	}
 
 	return renderModel;
@@ -152,42 +159,50 @@ cr3d::DataFormat::T ToDataFormat(int format, int type = -1)
 		case TINYGLTF_COMPONENT_TYPE_INT:				return cr3d::DataFormat::R32_Sint;
 		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:		return cr3d::DataFormat::R32_Uint;
 		case TINYGLTF_COMPONENT_TYPE_FLOAT:				return cr3d::DataFormat::R32_Float;
-		//   TINYGLTF_COMPONENT_TYPE_DOUBLE	
 	}
 	CrAssertMsg(false, "Failed to convert data format: %i", format);
 	return cr3d::DataFormat::R32_Float;
 }
 
-/*
-Types:
-	#define TINYGLTF_TYPE_VEC2 (2)
-	#define TINYGLTF_TYPE_VEC3 (3)
-	#define TINYGLTF_TYPE_VEC4 (4)
-	#define TINYGLTF_TYPE_MAT2 (32 + 2)
-	#define TINYGLTF_TYPE_MAT3 (32 + 3)
-	#define TINYGLTF_TYPE_MAT4 (32 + 4)
-	#define TINYGLTF_TYPE_SCALAR (64 + 1)
-	#define TINYGLTF_TYPE_VECTOR (64 + 4)
-	#define TINYGLTF_TYPE_MATRIX (64 + 16)
-*/
-
-CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData)
+CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData, CrMaterialSharedHandle material, std::map<int, CrTextureSharedHandle>& textureTable)
 {
 	CrMeshSharedHandle mesh = CrMakeShared<CrMesh>();
 
+	// TO-DO: primitives refers to sub-meshes (?)
+	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");
 	for (const auto primitive : meshData->primitives)
 	{		
+		// Material data
+		if (primitive.material != -1)
+		{
+			auto materialInfo = modelData->materials[primitive.material];
+			
+			// Diffuse
+			if (materialInfo.pbrMetallicRoughness.baseColorTexture.index != -1)
+			{
+				auto diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
+				material->AddTexture(textureTable[diffuseTexture.source], Textures::DiffuseTexture0);
+			}
+
+			// Normals
+			if (materialInfo.normalTexture.index != -1)
+			{
+				auto normalsTexture = modelData->textures[materialInfo.normalTexture.index];
+				material->AddTexture(textureTable[normalsTexture.source], Textures::NormalTexture0);
+			}
+		}
+
 		// Index data
 		if (primitive.indices != -1) 
 		{
 			const auto indexAccessor = modelData->accessors[primitive.indices];
 			CrAssertMsg(indexAccessor.byteOffset == 0, "Handle this case!");
 			
-			// Create the buffer:
+			// Create the buffer
 			auto format = ToDataFormat(indexAccessor.componentType);
 			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
-			
-			// Use the buffer view to copy the data:
+		
+			// Use the buffer view to copy the data
 			const auto bufferView = modelData->bufferViews[indexAccessor.bufferView];
 			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
 			data = data + bufferView.byteOffset;
@@ -206,40 +221,76 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 		// Vertex data
 		if (!primitive.attributes.empty()) 
 		{
+			std::vector<hlslpp::float3> positions;
+			std::vector<hlslpp::float3> normals;
+			std::vector<hlslpp::float2> texCoords;
+
+			// TO-DO: If we are using gltf, we should properly leverage it by having it provide 
+			//        us with data that we can just copy into our GPU buffers without spending time
+			//        doing further processing \O_O/
+			// Load each attribute
 			for (const auto attribute : primitive.attributes)
 			{
 				const std::string& attribName = attribute.first;
-				const int attribAccessorIndex = attribute.second;
-				const auto attribAccessor = modelData->accessors[attribAccessorIndex];
-
+				const auto attribAccessor = modelData->accessors[attribute.second];
+				const auto bufferView = modelData->bufferViews[attribAccessor.bufferView];
+				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data(); // .data() contiguous  chunk?
+				data = data + bufferView.byteOffset;
+				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
 				if (attribName == "POSITION")
 				{
-					// Sanity check.
+					// Sanity check
 					if (attribAccessor.type != TINYGLTF_TYPE_VEC3 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
 					{
 						CrAssert(false);
 					}
-					const auto bufferView = modelData->bufferViews[attribAccessor.bufferView];
-
-					/*
-						All this will get us to the position data. We need to account for the data size to figure out the
-						correct byte stride? (utility ByteStride())
-						bufferView.byteOffset;
-						bufferView.byteLength;;
-						bufferView.byteStride;
-					*/
+					positions.resize(attribAccessor.count);
+					LoadAttribute<hlslpp::float3>(positions, data, attribAccessor.count, componentSize, bufferView.byteStride);				
 				}
 				else if (attribName == "NORMAL")
 				{
-
+					// Sanity check
+					if (attribAccessor.type != TINYGLTF_TYPE_VEC3 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
+					{
+						CrAssert(false);
+					}
+					normals.resize(attribAccessor.count);
+					LoadAttribute<hlslpp::float3>(normals, data, attribAccessor.count, componentSize, bufferView.byteStride);
 				}
 				else if (attribName == "TEXCOORD_0")
 				{
-
+					// Sanity check
+					if (attribAccessor.type != TINYGLTF_TYPE_VEC2 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
+					{
+						CrAssert(false);
+					}
+					texCoords.resize(attribAccessor.count);
+					LoadAttribute<hlslpp::float2>(texCoords, data, attribAccessor.count, componentSize, bufferView.byteStride);
 				}
 			}
+
+			// Create the vertex buffer
+			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)positions.size());
+			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
+			{
+				for (size_t vtxIndex = 0; vtxIndex < positions.size(); ++vtxIndex)
+				{
+					const auto curPosition = positions[vtxIndex];
+					const auto curNormal = normals[vtxIndex];
+					const auto curTexcoord = texCoords[vtxIndex];
+					SimpleVertex& curVertex = vertexBufferData[vtxIndex];
+					curVertex.position = { (half)curPosition.x, (half)curPosition.y, (half)curPosition.z };
+					curVertex.normal = {
+						(uint8_t)((curNormal.x * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((curNormal.y * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((curNormal.z * 0.5f + 0.5f) * 255.0f),
+					};
+					curVertex.tangent = { 0, 0, 0 };
+					curVertex.uv = { (half)curTexcoord.x, (half)curTexcoord.y };
+				}
+			}
+			mesh->m_vertexBuffer->Unlock();
 		}
 	}
-
 	return mesh;
 }

@@ -145,8 +145,8 @@ float4 main_ps(VS_OUT IN) : SV_Target0
 	
 	// Texture reads
 	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
-	float4 normal0 = float4(0.0, 1.0, 0.0, 0.0);// NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
-	float4 spec0 = float4(0.02, 0.02, 0.02, 0.5);// SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	
 	surface.roughness = 1.0 - spec0.a;
 	surface.F0 = spec0.rgb;

@@ -26,9 +26,6 @@
 
 #include <string.h>
 
-#pragma warning(push)
-#pragma warning(disable : 4100) // unreferenced formal parameter
-
 CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
 {
 	tinygltf::TinyGLTF loader;
@@ -39,8 +36,8 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	//  the texture table in preparation to build the material
 	std::map<int, CrTextureSharedHandle> textureTable;
 	loader.SetImageLoader(
-		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* warning,
-			int requestedWidth, int requestedHeight, const unsigned char* data, int dataSize, void* userData)
+		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* /*warning*/,
+			int /*requestedWidth*/, int /*requestedHeight*/, const unsigned char* data, int dataSize, void* userData)
 		{
 			auto textureTable = (std::map<int, CrTextureSharedHandle>*)userData;
 			if (!textureTable)
@@ -136,7 +133,6 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 
 	return renderModel;
 }
-#pragma warning(pop)
 
 struct SimpleVertex
 {
@@ -173,24 +169,24 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 
 	// TO-DO: primitives refers to sub-meshes (?)
 	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");
-	for (const auto primitive : meshData->primitives)
+	for (const auto& primitive : meshData->primitives)
 	{		
 		// Material data
 		if (primitive.material != -1)
 		{
-			auto materialInfo = modelData->materials[primitive.material];
+			const auto& materialInfo = modelData->materials[primitive.material];
 			
 			// Diffuse
 			if (materialInfo.pbrMetallicRoughness.baseColorTexture.index != -1)
 			{
-				auto diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
+				const auto& diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
 				material->AddTexture(textureTable[diffuseTexture.source], Textures::DiffuseTexture0);
 			}
 
 			// Normals
 			if (materialInfo.normalTexture.index != -1)
 			{
-				auto normalsTexture = modelData->textures[materialInfo.normalTexture.index];
+				const auto& normalsTexture = modelData->textures[materialInfo.normalTexture.index];
 				material->AddTexture(textureTable[normalsTexture.source], Textures::NormalTexture0);
 			}
 		}
@@ -198,27 +194,22 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 		// Index data
 		if (primitive.indices != -1) 
 		{
-			const auto indexAccessor = modelData->accessors[primitive.indices];
+			const auto& indexAccessor = modelData->accessors[primitive.indices];
 			CrAssertMsg(indexAccessor.byteOffset == 0, "Handle this case!");
 			
 			// Create the buffer
-			auto format = ToDataFormat(indexAccessor.componentType);
+			const auto& format = ToDataFormat(indexAccessor.componentType);
 			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
 		
 			// Use the buffer view to copy the data
-			const auto bufferView = modelData->bufferViews[indexAccessor.bufferView];
+			const auto& bufferView = modelData->bufferViews[indexAccessor.bufferView];
 			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
 			data = data + bufferView.byteOffset;
-			if (bufferView.byteStride)
-			{
-				CrAssertMsg(false, "Byte stride not implemented");
-			}
-			else
-			{
-				void* indexData = mesh->m_indexBuffer->Lock();
-				memcpy(indexData, data, bufferView.byteLength); // check byteLength
-				mesh->m_indexBuffer->Unlock();
-			}
+			
+			CrAssertMsg(bufferView.byteStride == 0, "Invalid stride");
+			void* indexData = mesh->m_indexBuffer->Lock();
+			memcpy(indexData, data, bufferView.byteLength); // check byteLength
+			mesh->m_indexBuffer->Unlock();
 		}
 
 		// Vertex data
@@ -228,16 +219,13 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 			std::vector<hlslpp::float3> normals;
 			std::vector<hlslpp::float2> texCoords;
 
-			// TO-DO: If we are using gltf, we should properly leverage it by having it provide 
-			//        us with data that we can just copy into our GPU buffers without spending time
-			//        doing further processing \O_O/
 			// Load each attribute
-			for (const auto attribute : primitive.attributes)
+			for (const auto& attribute : primitive.attributes)
 			{
 				const std::string& attribName = attribute.first;
-				const auto attribAccessor = modelData->accessors[attribute.second];
-				const auto bufferView = modelData->bufferViews[attribAccessor.bufferView];
-				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data(); // TO-DO: .data() contiguous  chunk?
+				const auto& attribAccessor = modelData->accessors[attribute.second];
+				const auto& bufferView = modelData->bufferViews[attribAccessor.bufferView];
+				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
 				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data stars we need to account for the acessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
 				if (attribName == "POSITION")
@@ -278,9 +266,9 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 			{
 				for (size_t vtxIndex = 0; vtxIndex < positions.size(); ++vtxIndex)
 				{
-					const auto curPosition = positions[vtxIndex];
-					const auto curNormal = normals[vtxIndex];
-					const auto curTexcoord = texCoords[vtxIndex];
+					const auto& curPosition = positions[vtxIndex];
+					const auto& curNormal = normals[vtxIndex];
+					const auto& curTexcoord = texCoords[vtxIndex];
 					SimpleVertex& curVertex = vertexBufferData[vtxIndex];
 					curVertex.position = { (half)curPosition.x, (half)curPosition.y, (half)curPosition.z };
 					curVertex.normal = {

@@ -234,8 +234,8 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 				const std::string& attribName = attribute.first;
 				const auto attribAccessor = modelData->accessors[attribute.second];
 				const auto bufferView = modelData->bufferViews[attribAccessor.bufferView];
-				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data(); // .data() contiguous  chunk?
-				data = data + bufferView.byteOffset;
+				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data(); // TO-DO: .data() contiguous  chunk?
+				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data stars we need to account for the acessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
 				if (attribName == "POSITION")
 				{
@@ -284,8 +284,9 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 						(uint8_t)((curNormal.x * 0.5f + 0.5f) * 255.0f),
 						(uint8_t)((curNormal.y * 0.5f + 0.5f) * 255.0f),
 						(uint8_t)((curNormal.z * 0.5f + 0.5f) * 255.0f),
+						0
 					};
-					curVertex.tangent = { 0, 0, 0 };
+					curVertex.tangent = { 0, 0, 0 , 0};
 					curVertex.uv = { (half)curTexcoord.x, (half)curTexcoord.y };
 				}
 			}

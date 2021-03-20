@@ -25,7 +25,9 @@
 #include "tiny_gltf.h"
 
 #include <string.h>
-#pragma warning(disable : 4100 4189)
+
+#pragma warning(push)
+#pragma warning(disable : 4100) // unreferenced formal parameter
 
 CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
 {
@@ -134,6 +136,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 
 	return renderModel;
 }
+#pragma warning(pop)
 
 struct SimpleVertex
 {
@@ -148,7 +151,7 @@ struct SimpleVertex
 	}
 };
 
-cr3d::DataFormat::T ToDataFormat(int format, int type = -1)
+cr3d::DataFormat::T ToDataFormat(int format)
 {
 	switch (format)
 	{

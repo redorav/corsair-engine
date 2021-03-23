@@ -127,10 +127,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	}
 	m_triangleIndexBuffer->Unlock();
 
-	camera.m_position = float3(0.0f, 0.0f, -5.0f);
-
 	//m_renderModel = CrResourceManager::LoadModel("gltf/Duck/Duck.gltf");
-	m_renderModel = CrResourceManager::LoadModel("gltf/DamagedHelmet/DamagedHelmet.glb");
+	m_renderModel = CrResourceManager::LoadModel("gltf/SciFiHelmet/SciFiHelmet.gltf");
+	//m_renderModel = CrResourceManager::LoadModel("gltf/DamagedHelmet/DamagedHelmet.glb");
 	//m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
 	//"jaina/storm_hero_jaina.fbx"
 

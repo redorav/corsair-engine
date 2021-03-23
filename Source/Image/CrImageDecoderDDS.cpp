@@ -28,13 +28,32 @@ static cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 
 CrImageHandle CrImageDecoderDDS::Decode(const CrFileSharedHandle& file)
 {
-	std::vector<unsigned char*> fileData;
-	uint64_t fileSize = file->GetSize();
-	fileData.resize(fileSize);
+	// Read in the header
+	unsigned char ddsHeaderData[ddspp::MAX_HEADER_SIZE];
+	file->Read(ddsHeaderData, ddspp::MAX_HEADER_SIZE);
 
-	file->Read(fileData.data(), fileSize);
-	
-	return Decode(fileData.data(), fileSize);
+	// Decode the header
+	ddspp::Descriptor desc;
+	ddspp::Result result = ddspp::decode_header(ddsHeaderData, desc);
+
+	if (result == ddspp::Success)
+	{
+		CrImageHandle image = CrImageHandle(new CrImage());
+
+		// Read in actual data (without the header)
+		uint64_t textureDataSize = file->GetSize() - desc.headerSize;
+		image->m_data.resize(textureDataSize);
+		file->Seek(SeekOrigin::Begin, desc.headerSize);
+		file->Read(image->m_data.data(), textureDataSize);
+
+		SetImageProperties(image, &desc);
+
+		return image;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 CrImageHandle CrImageDecoderDDS::Decode(void* data, uint64_t dataSize)
@@ -57,11 +76,8 @@ CrImageHandle CrImageDecoderDDS::Decode(void* data, uint64_t dataSize)
 
 		image->m_data.resize(textureDataSize);
 		memcpy(image->m_data.data(), data, textureDataSize);
-		image->m_format = DXGItoDataFormat(desc.format);
-		image->m_width = desc.width;
-		image->m_height = desc.height;
-		image->m_depth = desc.depth;
-		image->m_numMipmaps = desc.numMips;
+
+		SetImageProperties(image, &desc);
 
 		return image;
 	}
@@ -69,4 +85,13 @@ CrImageHandle CrImageDecoderDDS::Decode(void* data, uint64_t dataSize)
 	{
 		return nullptr;
 	}
+}
+
+void CrImageDecoderDDS::SetImageProperties(CrImageHandle& image, const ddspp::Descriptor* desc)
+{
+	image->m_width = desc->width;
+	image->m_height = desc->height;
+	image->m_depth = desc->depth;
+	image->m_numMipmaps = desc->numMips;
+	image->m_format = DXGItoDataFormat(desc->format);
 }

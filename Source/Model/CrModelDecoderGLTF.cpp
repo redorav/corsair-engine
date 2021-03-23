@@ -216,7 +216,7 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 			
 			CrAssertMsg(bufferView.byteStride == 0, "Invalid stride");
 			void* indexData = mesh->m_indexBuffer->Lock();
-			memcpy(indexData, data, bufferView.byteLength); // check byteLength
+			memcpy(indexData, data, bufferView.byteLength);
 			mesh->m_indexBuffer->Unlock();
 		}
 
@@ -234,7 +234,7 @@ CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData
 				const Accessor& attribAccessor = modelData->accessors[attribute.second];
 				const BufferView& bufferView = modelData->bufferViews[attribAccessor.bufferView];
 				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
-				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data stars we need to account for the acessor and view offsets
+				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the acessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
 				if (attribName == "POSITION")
 				{

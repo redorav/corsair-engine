@@ -26,6 +26,18 @@ static cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 	}
 }
 
+static cr3d::TextureType ToTextureType(ddspp::TextureType type)
+{
+	switch (type)
+	{
+	case ddspp::Texture1D:	return cr3d::TextureType::Tex1D;
+	case ddspp::Texture2D:	return cr3d::TextureType::Tex2D;
+	case ddspp::Texture3D:	return cr3d::TextureType::Volume;
+	case ddspp::Cubemap:	return cr3d::TextureType::Cubemap;
+	default:				return cr3d::TextureType::Tex2D;
+	}
+}
+
 CrImageHandle CrImageDecoderDDS::Decode(const CrFileSharedHandle& file)
 {
 	// Read in the header
@@ -93,5 +105,6 @@ void CrImageDecoderDDS::SetImageProperties(CrImageHandle& image, const ddspp::De
 	image->m_height = desc->height;
 	image->m_depth = desc->depth;
 	image->m_numMipmaps = desc->numMips;
+	image->m_type = ToTextureType(desc->type);
 	image->m_format = DXGItoDataFormat(desc->format);
 }

@@ -30,10 +30,11 @@ private:
 	template<typename T>
 	void LoadAttribute(std::vector<T>& targetBuffer, const unsigned char* sourceBuffer, size_t numComponents, int32_t componentSize, size_t componentStride)
 	{
+		const size_t componentOffset = componentStride != 0 ? componentStride : componentSize; // If stride is 0, buffer is tightly packed.
 		for (size_t componentIndex = 0; componentIndex < numComponents; ++componentIndex)
 		{
 			memcpy(&targetBuffer[componentIndex], sourceBuffer, componentSize);
-			sourceBuffer += componentStride;
+			sourceBuffer += componentOffset;
 		}
 	}
 };

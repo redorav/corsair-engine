@@ -10,7 +10,6 @@ LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}'
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibEASTL        = DependenciesDirectory..'/eastl'
 LibGlslang      = DependenciesDirectory..'/glslang'
-LibGainput      = DependenciesDirectory..'/gainput'
 LibSPIRVCross   = DependenciesDirectory..'/spirv-cross'
 LibHlslpp       = DependenciesDirectory..'/hlslpp'
 LibStb          = DependenciesDirectory..'/stb'
@@ -52,13 +51,6 @@ GlslangLibrary =
 	includeDirs = LibGlslang..'/Source/',
 	libDirs     = LibGlslang..BinaryDirectory,
 	libNames    = 'Glslang'..LibConfig
-}
-
-GainputLibrary = 
-{
-	includeDirs = LibGainput..'/Source/lib/include',
-	libDirs     = LibGainput..BinaryDirectory,
-	libNames    = 'Gainput'..LibConfig
 }
 
 EASTLLibrary =

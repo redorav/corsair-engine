@@ -154,7 +154,7 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 
 	// Generic io:
 	io.DisplaySize = ImVec2((float)width, (float)height);
-	io.DeltaTime = CrFrameTime::GetFrameDelta();
+	io.DeltaTime = (float)CrFrameTime::GetFrameDelta().AsSeconds();
 		
 	// Update input:
 	const MouseState& mouseState = CrInput.GetMouseState();

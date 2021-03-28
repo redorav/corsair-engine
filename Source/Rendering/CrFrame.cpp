@@ -375,41 +375,43 @@ void CrFrame::UpdateCamera()
 	const KeyboardState& keyboard = CrInput.GetKeyboardState();
 	const GamepadState& gamepadState = CrInput.GetGamepadState(0);
 
+	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
+
 	// TODO Hack to get a bit of movement on the camera
 	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera.Translate(currentRight * -5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentRight * -5.0f * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
-		camera.Translate(currentRight * 5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentRight * 5.0f * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
-		camera.Translate(currentLookAt * 5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentLookAt * 5.0f * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
-		camera.Translate(currentLookAt * -5.0f * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentLookAt * -5.0f * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, -5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, -5.0f, 0.0f) * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, 5.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Translate(float3(0.0f, 5.0f, 0.0f) * frameDelta);
 	}
 
 	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
 	{
 		//CrLogWarning("Moving right");
-		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
@@ -417,14 +419,14 @@ void CrFrame::UpdateCamera()
 	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
 	{
 		//CrLogWarning("Moving left");
-		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
 
 	if (mouseState.buttonPressed[MouseButton::Right])
 	{
-		camera.Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
 	}
 
 	camera.Update();

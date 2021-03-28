@@ -14,11 +14,13 @@ public:
 
 	int64_t AsTicks() const;
 
-	float AsSeconds() const;
+	double AsSeconds() const;
 
-	float AsMilliseconds() const;
+	double AsMilliseconds() const;
 
-	float AsFPS() const;
+	double AsMicroseconds() const;
+
+	double AsFPS() const;
 
 	CrTime operator + (const CrTime& other) const;
 
@@ -57,19 +59,24 @@ inline int64_t CrTime::AsTicks() const
 	return m_ticks;
 }
 
-inline float CrTime::AsSeconds() const
+inline double CrTime::AsSeconds() const
 {
-	return m_ticks / (float)TicksPerSecond;
+	return m_ticks / (double)TicksPerSecond;
 }
 
-inline float CrTime::AsMilliseconds() const
+inline double CrTime::AsMilliseconds() const
 {
-	return m_ticks * 1000.0f / (float)TicksPerSecond;
+	return m_ticks * 1000.0 / (double)TicksPerSecond;
 }
 
-inline float CrTime::AsFPS() const
+inline double CrTime::AsMicroseconds() const
 {
-	return (float)TicksPerSecond / m_ticks;
+	return m_ticks * 1000000.0 / (double)TicksPerSecond;
+}
+
+inline double CrTime::AsFPS() const
+{
+	return (double)TicksPerSecond / m_ticks;
 }
 
 inline CrTime CrTime::operator + (const CrTime& other) const

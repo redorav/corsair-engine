@@ -13,6 +13,7 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Process/CrProcess.h"
 #include "Core/CrPlatform.h"
+#include "Core/Time/CrTimer.h"
 
 #include "GlobalVariables.h"
 
@@ -130,8 +131,17 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi);
 	processDescriptor.commandLine += " ";
 
+	CrTimer compilationTime;
+
 	// Launch compilation process and wait
 	CrProcess::RunExecutable(processDescriptor);
+
+	CrLog("Compiled %s[%s] for %s %s (%f ms)", 
+		bytecodeDescriptor.entryPoint.c_str(), 
+		bytecodeDescriptor.path.string().c_str(), 
+		CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
+		CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi),
+		compilationTime.GetCurrent().AsMilliseconds());
 
 	CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);
 

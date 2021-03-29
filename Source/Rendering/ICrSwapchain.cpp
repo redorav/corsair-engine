@@ -22,13 +22,13 @@ ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescr
 
 }
 
-void ICrSwapchain::CreateWaitFences(uint32_t imageCount)
+void ICrSwapchain::CreatePresentSemaphores(uint32_t imageCount)
 {
-	m_waitFences.resize(imageCount);
+	m_presentCompleteSemaphores.resize(imageCount);
 
-	for (auto& waitFence : m_waitFences)
+	for (CrGPUSemaphoreSharedHandle& waitSemaphore : m_presentCompleteSemaphores)
 	{
-		waitFence = m_renderDevice->CreateGPUFence();
+		waitSemaphore = m_renderDevice->CreateGPUSemaphore();
 	}
 }
 
@@ -57,14 +57,16 @@ uint32_t ICrSwapchain::GetCurrentFrameIndex() const
 	return m_currentBufferIndex;
 }
 
-const CrGPUFenceSharedHandle& ICrSwapchain::GetCurrentWaitFence() const
+const CrGPUSemaphoreSharedHandle& ICrSwapchain::GetCurrentPresentCompleteSemaphore() const
 {
-	return m_waitFences[m_currentBufferIndex];
+	return m_presentCompleteSemaphores[m_currentSemaphoreIndex];
 }
 
-CrSwapchainResult ICrSwapchain::AcquireNextImage(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
+CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 {
-	return AcquireNextImagePS(signalSemaphore, timeoutNanoseconds);
+	m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
+	CrSwapchainResult swapchainResult = AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
+	return swapchainResult;
 }
 
 void ICrSwapchain::Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)

@@ -40,12 +40,6 @@ void CrCommandQueueVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* command
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 
-	if (signalSemaphore)
-	{
-		submitInfo.pSignalSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
-		submitInfo.signalSemaphoreCount = 1;
-	}
-
 	VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT; // TODO Need more control over this, probably best to put inside the semaphore object
 
 	if (waitSemaphore)
@@ -53,6 +47,12 @@ void CrCommandQueueVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* command
 		submitInfo.pWaitSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitDstStageMask = &waitStageMask;
+	}
+
+	if (signalSemaphore)
+	{
+		submitInfo.pSignalSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
+		submitInfo.signalSemaphoreCount = 1;
 	}
 
 	submitInfo.pCommandBuffers = &static_cast<const CrCommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer();

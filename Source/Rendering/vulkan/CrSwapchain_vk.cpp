@@ -152,21 +152,26 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR) { hasImmediate = true; }
 	}
 
-	if (hasMailbox) // Try to use mailbox mode. Low latency and non-tearing
+	if (hasMailbox)
 	{
+		// Try to use mailbox mode. Low latency and non-tearing. It will push frames before the
+		// vsync and will only use the last one (effectively discarding an entire, unpresented, frame)
 		swapchainPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
 	}
 	else if (hasRelaxedFifo)
 	{
+		// Try to vsync, but if frame comes in late, present (and potentially tear)
 		swapchainPresentMode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
 	}
 	else if (hasImmediate)
 	{
+		// Present as fast as possible. May cause tearing
 		swapchainPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 	}
 	else
 	{
-		swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR; // FIFO is required so is always present as fallback
+		// FIFO is required so is always present as fallback
+		swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
 	}
 
 	// Determine the number of images
@@ -231,7 +236,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		m_textures[i] = renderDevice->CreateTexture(swapchainTexParams);
 	}
 
-	CreateWaitFences(m_imageCount);
+	CreatePresentSemaphores(m_imageCount);
 }
 
 CrSwapchainVulkan::~CrSwapchainVulkan()

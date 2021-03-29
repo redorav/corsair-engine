@@ -22,6 +22,12 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 	m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice));
 
 	m_constantBufferGPUStack->Initialize(8 * 1024 * 1024); // 8 MB
+
+	m_completionSemaphore = m_renderDevice->CreateGPUSemaphore();
+
+	m_completionFence = m_renderDevice->CreateGPUFence();
+
+	m_submitted = false;
 }
 
 ICrCommandBuffer::~ICrCommandBuffer()
@@ -35,6 +41,16 @@ void ICrCommandBuffer::Begin()
 	// any bound state is also reset, and our tracking must match
 	m_currentState = CurrentState();
 	m_constantBufferGPUStack->Begin();
+
+	// If we previously submitted this command buffer, we need to wait
+	// for the fence to become signaled before we can start recording
+	if (m_submitted)
+	{
+		m_renderDevice->WaitForFence(m_completionFence.get(), UINT64_MAX);
+		m_renderDevice->ResetFence(m_completionFence.get());
+		m_submitted = false;
+	}
+
 	BeginPS();
 }
 
@@ -44,9 +60,13 @@ void ICrCommandBuffer::End()
 	EndPS();
 }
 
-void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 {
-	m_ownerCommandQueue->SubmitCommandBuffer(this, waitSemaphore, signalSemaphore, signalFence);
+	// We need this flag to be able to reset fences properly during the begin
+	m_submitted = true;
+
+	// Submission will signal the internal semaphore of this command buffer
+	m_ownerCommandQueue->SubmitCommandBuffer(this, waitSemaphore, m_completionSemaphore.get(), m_completionFence.get());
 }
 
 CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_t size)
@@ -74,7 +94,6 @@ void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int
 {
 	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
 	CrAssertMsg(globalIndex != -1, "Global index not set");
-	// TODO subclass CrGPUBuffer* to have constant buffers to
 
 	const CrGraphicsShaderHandle& currentShader = m_currentState.m_graphicsPipeline->m_shader;
 	

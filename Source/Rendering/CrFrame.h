@@ -27,15 +27,10 @@ private:
 
 	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
 
-	// TODO Pass as param
 	uint32_t m_width = 0;
+
 	uint32_t m_height = 0;
 
-	// Semaphores
-	// Used to coordinate operations within the graphics queue and ensure correct command ordering
-	CrGPUSemaphoreSharedHandle m_renderCompleteSemaphore;
-	CrGPUSemaphoreSharedHandle m_presentCompleteSemaphore;
-	
 	// TODO Temporary
 	CrGraphicsPipelineHandle m_pipelineTriangleState;
 	CrGraphicsPipelineHandle m_pipelineLineState;

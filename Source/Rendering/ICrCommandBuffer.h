@@ -24,7 +24,7 @@ public:
 
 	void End();
 
-	void Submit(const ICrGPUSemaphore* waitSemaphore = nullptr, const ICrGPUSemaphore* signalSemaphore = nullptr, const ICrGPUFence* signalFence = nullptr);
+	void Submit(const ICrGPUSemaphore* waitSemaphore = nullptr);
 
 	void SetViewport(const CrViewport& viewport);
 
@@ -82,6 +82,10 @@ public:
 	void EndRenderPass();
 
 	const ICrCommandQueue* GetCommandQueue() const;
+
+	const CrGPUSemaphoreSharedHandle& GetCompletionSemaphore() const;
+
+	const CrGPUFenceSharedHandle& GetCompletionFence() const;
 
 protected:
 
@@ -197,6 +201,14 @@ protected:
 	ICrCommandQueue*				m_ownerCommandQueue = nullptr;
 
 	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
+
+	// Signal semaphore when execution completes
+	CrGPUSemaphoreSharedHandle		m_completionSemaphore;
+
+	// Signal fence when execution completes
+	CrGPUFenceSharedHandle			m_completionFence;
+
+	bool							m_submitted;
 };
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
@@ -338,6 +350,16 @@ inline void ICrCommandBuffer::EndRenderPass()
 inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
 {
 	return m_ownerCommandQueue;
+}
+
+inline const CrGPUSemaphoreSharedHandle& ICrCommandBuffer::GetCompletionSemaphore() const
+{
+	return m_completionSemaphore;
+}
+
+inline const CrGPUFenceSharedHandle& ICrCommandBuffer::GetCompletionFence() const
+{
+	return m_completionFence;
 }
 
 template<typename MetaType>

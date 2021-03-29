@@ -215,11 +215,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	graphicsPipelineDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
-	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
-	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
-	// Semaphore used to ensures that image presentation is complete before starting to submit again
-	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
@@ -237,22 +233,16 @@ void CrFrame::Process()
 	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
-	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
+	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
 	if (swapchainResult == CrSwapchainResult::Invalid)
 	{
 		RecreateSwapchainAndDepth();
-		swapchainResult = swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
+		swapchainResult = swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
-	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
-
-	renderDevice->WaitForFence(swapchainFence, UINT64_MAX);
-
-	renderDevice->ResetFence(swapchainFence);
-
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()].get();
-	
+
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(swapchain->GetWidth(), swapchain->GetHeight());
 	ImGui::ShowDemoWindow();
 
@@ -357,9 +347,9 @@ void CrFrame::Process()
 		drawCommandBuffer->End();
 	}
 
-	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
+	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 
-	swapchain->Present(mainCommandQueue.get(), m_renderCompleteSemaphore.get());
+	swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	CrFrameTime::IncrementFrameCount();
 }

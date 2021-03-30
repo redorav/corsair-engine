@@ -65,8 +65,7 @@ const CrGPUSemaphoreSharedHandle& ICrSwapchain::GetCurrentPresentCompleteSemapho
 CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 {
 	m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
-	CrSwapchainResult swapchainResult = AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
-	return swapchainResult;
+	return AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
 }
 
 void ICrSwapchain::Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)

@@ -229,8 +229,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
+
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
-	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
@@ -238,23 +238,23 @@ void CrFrame::Process()
 	if (swapchainResult == CrSwapchainResult::Invalid)
 	{
 		RecreateSwapchainAndDepth();
-		swapchainResult = swapchain->AcquireNextImage(UINT64_MAX);
+		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()].get();
+	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
-	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(swapchain->GetWidth(), swapchain->GetHeight());
+	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 	ImGui::ShowDemoWindow();
 
 	{
 		drawCommandBuffer->Begin();
-		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)swapchain->GetWidth(), (float)swapchain->GetHeight()));
-		drawCommandBuffer->SetScissor(CrScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
+		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
+		drawCommandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 	
 		CrRenderPassDescriptor renderPassDescriptor;
 
 		CrRenderTargetDescriptor swapchainAttachment;
-		swapchainAttachment.texture = swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get();
+		swapchainAttachment.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
 		swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
 		swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
 		swapchainAttachment.initialState = cr3d::ResourceState::Undefined;
@@ -342,14 +342,14 @@ void CrFrame::Process()
 		drawCommandBuffer->EndDebugEvent();
 
 		// Render ImGui
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get());
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
 
 		drawCommandBuffer->End();
 	}
 
 	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 
-	swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
+	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	CrFrameTime::IncrementFrameCount();
 }

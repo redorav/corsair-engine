@@ -95,7 +95,7 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& 
 
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
 {
-	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor));
+	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor), DeleteGPUResource);
 }
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
@@ -103,9 +103,14 @@ CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::BufferAccess::T
 	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements));
 }
 
-cr3d::GPUWaitResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
 {
 	return WaitForFencePS(fence, timeoutNanoseconds);
+}
+
+cr3d::GPUFenceResult ICrRenderDevice::GetFenceStatus(ICrGPUFence* fence) const
+{
+	return GetFenceStatusPS(fence);
 }
 
 void ICrRenderDevice::ResetFence(ICrGPUFence* fence)

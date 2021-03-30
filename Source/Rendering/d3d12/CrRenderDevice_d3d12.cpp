@@ -162,11 +162,17 @@ ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrCompute
 	return nullptr;
 }
 
-cr3d::GPUWaitResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
 {
 	unused_parameter(fence);
 	unused_parameter(timeoutNanoseconds);
-	return cr3d::GPUWaitResult::Success;
+	return cr3d::GPUFenceResult::Success;
+}
+
+cr3d::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fence) const
+{
+	unused_parameter(fence);
+	return cr3d::GPUFenceResult::Success;
 }
 
 void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)

@@ -821,11 +821,11 @@ namespace cr3d
 		};
 	}
 
-	enum class GPUWaitResult : uint32_t
+	enum class GPUFenceResult : uint32_t
 	{
-		Success, // If this wait completed before the timeout
-		Timeout, // If this wait did not complete before the timeout
-		Error // If some error occurred
+		Success,         // Fence is signaled (ready)
+		TimeoutNotReady, // Fence is unsignaled right now or timed out (not ready)
+		Error            // Some error occurred
 	};
 }
 

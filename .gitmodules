@@ -28,3 +28,6 @@
 [submodule "Dependencies/imgui/Source"]
 	path = Dependencies/imgui/Source
 	url = https://github.com/ocornut/imgui.git
+[submodule "Dependencies/tinygltf/Source"]
+	path = Dependencies/tinygltf/Source
+	url = https://github.com/syoyo/tinygltf.git

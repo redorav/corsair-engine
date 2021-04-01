@@ -19,9 +19,15 @@ CrImageHandle CrImageDecoderSTB::Decode(const CrFileSharedHandle& file)
 	fileData.resize(file->GetSize());
 	file->Read(fileData.data(), fileData.size());
 
+	CrImageHandle image = Decode(&fileData[0], file->GetSize());
+	return image;
+}
+
+CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize)
+{
 	// Use stb to load image
 	int comp, w, h;
-	unsigned char* dataPointer = stbi_load_from_memory(fileData.data(), (int)fileData.size(), &w, &h, &comp, STBI_rgb_alpha);
+	unsigned char* dataPointer = stbi_load_from_memory((unsigned char*)data, (int)dataSize, &w, &h, &comp, STBI_rgb_alpha);
 
 	if (dataPointer)
 	{

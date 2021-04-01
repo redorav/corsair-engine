@@ -21,6 +21,12 @@ LibDdspp        = DependenciesDirectory..'/ddspp'
 LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibImGui        = DependenciesDirectory..'/imgui'
+LibTinyGLTF     = DependenciesDirectory..'/tinygltf'
+
+TinyGLTFLibrary = 
+{
+	includeDirs = LibTinyGLTF..'/Source'
+}
 
 AssimpLibrary =
 {

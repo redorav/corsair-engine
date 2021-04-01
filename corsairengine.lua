@@ -23,6 +23,7 @@ ProjectCrCore           = 'CrCore'
 ProjectCrInput          = 'CrInput'
 ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
+ProjectCrModel          = 'CrModel'
 
 -- Generated Code Directories
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
@@ -196,7 +197,7 @@ project (ProjectCorsairEngine)
 		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
-	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrInput }
+	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrInput, ProjectCrModel }
 	
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
@@ -350,7 +351,7 @@ SourceImageDirectory = SourceDirectory..'/Image'
 
 project(ProjectCrImage)
 	kind('StaticLib')
-	files { SourceImageDirectory..'/**' }
+	files{ 	SourceImageDirectory..'/**' }
 
 	AddLibraryHeaders(StbLibrary)
 	
@@ -367,6 +368,18 @@ project(ProjectCrInput)
 
 	filter {}
 	
+group('Model')
+
+SourceModelDirectory = SourceDirectory..'/Model'
+
+project(ProjectCrModel)
+	kind('StaticLib')
+	files { SourceModelDirectory..'/**' }
+
+	AddLibraryHeaders(TinyGLTFLibrary)
+	AddLibraryHeaders(AssimpLibrary)
+	LinkLibrary(AssimpLibrary)
+
 group('Core')
 
 SourceCoreDirectory = SourceDirectory..'/Core'

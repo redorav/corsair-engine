@@ -26,6 +26,11 @@ void CrCommandQueueD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandB
 	unused_parameter(signalFence);
 }
 
+void CrCommandQueueD3D12::SignalFencePS(const ICrGPUFence* signalFence)
+{
+	unused_parameter(signalFence);
+}
+
 void CrCommandQueueD3D12::WaitIdlePS()
 {
 	

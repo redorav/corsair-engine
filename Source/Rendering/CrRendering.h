@@ -824,7 +824,7 @@ namespace cr3d
 	enum class GPUFenceResult : uint32_t
 	{
 		Success,         // Fence is signaled (ready)
-		TimeoutNotReady, // Fence is unsignaled right now or timed out (not ready)
+		TimeoutOrNotReady, // Fence is unsignaled right now or timed out (not ready)
 		Error            // Some error occurred
 	};
 }

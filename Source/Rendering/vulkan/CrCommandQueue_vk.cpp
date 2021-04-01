@@ -61,6 +61,14 @@ void CrCommandQueueVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* command
 	CrAssert(result == VK_SUCCESS);
 }
 
+void CrCommandQueueVulkan::SignalFencePS(const ICrGPUFence* signalFence)
+{
+	CrAssert(signalFence != nullptr);
+
+	VkResult result = vkQueueSubmit(m_vkQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(signalFence)->GetVkFence());
+	CrAssert(result == VK_SUCCESS);
+}
+
 void CrCommandQueueVulkan::WaitIdlePS()
 {
 	vkQueueWaitIdle(m_vkQueue);

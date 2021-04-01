@@ -71,7 +71,7 @@ cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fen
 	switch (result)
 	{
 		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
-		case VK_TIMEOUT: return cr3d::GPUFenceResult::TimeoutNotReady;
+		case VK_TIMEOUT: return cr3d::GPUFenceResult::TimeoutOrNotReady;
 		default: return cr3d::GPUFenceResult::Error;
 	}
 }
@@ -83,7 +83,7 @@ cr3d::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* f
 	switch (result)
 	{
 		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
-		case VK_NOT_READY: return cr3d::GPUFenceResult::TimeoutNotReady;
+		case VK_NOT_READY: return cr3d::GPUFenceResult::TimeoutOrNotReady;
 		default: return cr3d::GPUFenceResult::Error;
 	}
 }

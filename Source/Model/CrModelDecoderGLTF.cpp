@@ -4,6 +4,7 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
+#include "Core/Containers/CrHashMap.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -28,6 +29,184 @@
 
 using namespace tinygltf;
 
+class CrMesh;
+using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
+
+class CrMaterial;
+using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
+
+struct SimpleVertex
+{
+	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
+	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
+	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
+	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
+
+	static CrVertexDescriptor GetVertexDescriptor()
+	{
+		return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
+	}
+};
+
+cr3d::DataFormat::T ToDataFormat(int format)
+{
+	switch (format)
+	{
+		case TINYGLTF_COMPONENT_TYPE_BYTE:				return cr3d::DataFormat::R8_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:		return cr3d::DataFormat::R8_Uint;
+		case TINYGLTF_COMPONENT_TYPE_SHORT:				return cr3d::DataFormat::R16_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:	return cr3d::DataFormat::R16_Uint;
+		case TINYGLTF_COMPONENT_TYPE_INT:				return cr3d::DataFormat::R32_Sint;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:		return cr3d::DataFormat::R32_Uint;
+		case TINYGLTF_COMPONENT_TYPE_FLOAT:				return cr3d::DataFormat::R32_Float;
+	}
+	CrAssertMsg(false, "Failed to convert data format: %i", format);
+	return cr3d::DataFormat::R32_Float;
+}
+
+template<typename T>
+void LoadAttribute(CrVector<T>& targetBuffer, const unsigned char* sourceBuffer, size_t numComponents, int32_t componentSize, size_t componentStride)
+{
+	if (componentStride == 0)
+	{
+		memcpy(targetBuffer.data(), sourceBuffer, componentSize * numComponents);
+	}
+	else
+	{
+		for (size_t componentIndex = 0; componentIndex < numComponents; ++componentIndex)
+		{
+			memcpy(&targetBuffer[componentIndex], sourceBuffer, componentSize);
+			sourceBuffer += componentStride;
+		}
+	}
+}
+
+CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData, const CrMaterialSharedHandle& material, CrHashMap<int, CrTextureSharedHandle>& textureTable)
+{
+	CrMeshSharedHandle mesh = CrMakeShared<CrMesh>();
+
+	// TO-DO: primitives refers to sub-meshes (?)
+	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");
+	const Primitive& primitive = meshData->primitives[0];
+	{
+		// Material data
+		if (primitive.material != -1)
+		{
+			const Material& materialInfo = modelData->materials[primitive.material];
+
+			// Diffuse
+			if (materialInfo.pbrMetallicRoughness.baseColorTexture.index != -1)
+			{
+				const Texture& diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
+				material->AddTexture(textureTable[diffuseTexture.source], Textures::DiffuseTexture0);
+			}
+
+			// Normals
+			if (materialInfo.normalTexture.index != -1)
+			{
+				const Texture& normalsTexture = modelData->textures[materialInfo.normalTexture.index];
+				material->AddTexture(textureTable[normalsTexture.source], Textures::NormalTexture0);
+			}
+
+			// Info
+			if (materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index != -1)
+			{
+				const Texture& metallicRoughTexture = modelData->textures[materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index];
+				material->AddTexture(textureTable[metallicRoughTexture.source], Textures::SpecularTexture0);
+			}
+		}
+
+		// Index data
+		if (primitive.indices != -1)
+		{
+			const Accessor& indexAccessor = modelData->accessors[primitive.indices];
+
+			// Create the buffer
+			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
+			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
+
+			// Use the buffer view to copy the data
+			const BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
+			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
+			data = data + (indexAccessor.byteOffset + bufferView.byteOffset);
+
+			CrAssertMsg(bufferView.byteStride == 0, "Invalid stride");
+			void* indexData = mesh->m_indexBuffer->Lock();
+			memcpy(indexData, data, bufferView.byteLength);
+			mesh->m_indexBuffer->Unlock();
+		}
+
+		// Vertex data
+		if (!primitive.attributes.empty())
+		{
+			struct GLTFFloat3
+			{
+				float x, y, z;
+			};
+			struct GLTFFloat2
+			{
+				float x, y;
+			};
+			CrVector<GLTFFloat3> positions;
+			CrVector<GLTFFloat3> normals;
+			CrVector<GLTFFloat2> texCoords;
+
+			// Load each attribute
+			for (const auto& attribute : primitive.attributes)
+			{
+				const std::string& attribName = attribute.first;
+				const Accessor& attribAccessor = modelData->accessors[attribute.second];
+				const BufferView& bufferView = modelData->bufferViews[attribAccessor.bufferView];
+				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
+				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the acessor and view offsets
+				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
+				if (attribName == "POSITION")
+				{
+					CrAssert(attribAccessor.type == TINYGLTF_TYPE_VEC3 && (ToDataFormat(attribAccessor.componentType) == cr3d::DataFormat::R32_Float));
+					positions.resize(attribAccessor.count);
+					LoadAttribute<GLTFFloat3>(positions, data, attribAccessor.count, componentSize, bufferView.byteStride);
+				}
+				else if (attribName == "NORMAL")
+				{
+					CrAssert(attribAccessor.type == TINYGLTF_TYPE_VEC3 && (ToDataFormat(attribAccessor.componentType) == cr3d::DataFormat::R32_Float));
+					normals.resize(attribAccessor.count);
+					LoadAttribute<GLTFFloat3>(normals, data, attribAccessor.count, componentSize, bufferView.byteStride);
+				}
+				else if (attribName == "TEXCOORD_0")
+				{
+					CrAssert(attribAccessor.type == TINYGLTF_TYPE_VEC2 && (ToDataFormat(attribAccessor.componentType) == cr3d::DataFormat::R32_Float));
+					texCoords.resize(attribAccessor.count);
+					LoadAttribute<GLTFFloat2>(texCoords, data, attribAccessor.count, componentSize, bufferView.byteStride);
+				}
+			}
+
+			// Create the vertex buffer
+			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)positions.size());
+			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
+			{
+				for (size_t vtxIndex = 0; vtxIndex < positions.size(); ++vtxIndex)
+				{
+					const GLTFFloat3& curPosition = positions[vtxIndex];
+					const GLTFFloat3& curNormal = normals[vtxIndex];
+					const GLTFFloat2& curTexcoord = texCoords[vtxIndex];
+					SimpleVertex& curVertex = vertexBufferData[vtxIndex];
+					curVertex.position = { (half)curPosition.x, (half)curPosition.y, (half)curPosition.z };
+					curVertex.normal = {
+						(uint8_t)((curNormal.x * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((curNormal.y * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((curNormal.z * 0.5f + 0.5f) * 255.0f),
+						0
+					};
+					curVertex.tangent = { 0, 0, 0 , 0 };
+					curVertex.uv = { (half)curTexcoord.x, (half)curTexcoord.y };
+				}
+			}
+			mesh->m_vertexBuffer->Unlock();
+		}
+	}
+	return mesh;
+}
+
 CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
 {
 	TinyGLTF loader;
@@ -36,12 +215,12 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	// Custom image loading implementation, gltf will either load the 
 	//	raw data from the inline buffer or from the specified uri. Textures will be loaded and added to 
 	//  the texture table in preparation to build the material
-	std::map<int, CrTextureSharedHandle> textureTable;
+	CrHashMap<int, CrTextureSharedHandle> textureTable;
 	loader.SetImageLoader(
 		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* /*warning*/,
 			int /*requestedWidth*/, int /*requestedHeight*/, const unsigned char* data, int dataSize, void* userData)
 		{
-			auto textureTable = (std::map<int, CrTextureSharedHandle>*)userData;
+			auto textureTable = (CrHashMap<int, CrTextureSharedHandle>*)userData;
 			if (!textureTable)
 			{
 				(*error) += "Invalid textureTable!";
@@ -134,163 +313,4 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	}
 
 	return renderModel;
-}
-
-struct SimpleVertex
-{
-	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
-	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
-
-	static CrVertexDescriptor GetVertexDescriptor()
-	{
-		return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
-	}
-};
-
-cr3d::DataFormat::T ToDataFormat(int format)
-{
-	switch (format)
-	{
-		case TINYGLTF_COMPONENT_TYPE_BYTE:				return cr3d::DataFormat::R8_Sint;
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:		return cr3d::DataFormat::R8_Uint;
-		case TINYGLTF_COMPONENT_TYPE_SHORT:				return cr3d::DataFormat::R16_Sint;
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:	return cr3d::DataFormat::R16_Uint;
-		case TINYGLTF_COMPONENT_TYPE_INT:				return cr3d::DataFormat::R32_Sint;
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:		return cr3d::DataFormat::R32_Uint;
-		case TINYGLTF_COMPONENT_TYPE_FLOAT:				return cr3d::DataFormat::R32_Float;
-	}
-	CrAssertMsg(false, "Failed to convert data format: %i", format);
-	return cr3d::DataFormat::R32_Float;
-}
-
-CrMeshSharedHandle CrModelDecoderGLTF::LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData, CrMaterialSharedHandle material, std::map<int, CrTextureSharedHandle>& textureTable)
-{
-	CrMeshSharedHandle mesh = CrMakeShared<CrMesh>();
-
-	// TO-DO: primitives refers to sub-meshes (?)
-	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");
-	for (const Primitive& primitive : meshData->primitives)
-	{		
-		// Material data
-		if (primitive.material != -1)
-		{
-			const Material& materialInfo = modelData->materials[primitive.material];
-			
-			// Diffuse
-			if (materialInfo.pbrMetallicRoughness.baseColorTexture.index != -1)
-			{
-				const Texture& diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
-				material->AddTexture(textureTable[diffuseTexture.source], Textures::DiffuseTexture0);
-			}
-
-			// Normals
-			if (materialInfo.normalTexture.index != -1)
-			{
-				const Texture& normalsTexture = modelData->textures[materialInfo.normalTexture.index];
-				material->AddTexture(textureTable[normalsTexture.source], Textures::NormalTexture0);
-			}
-
-			// Info
-			if (materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index != -1)
-			{
-				const Texture& metallicRoughTexture = modelData->textures[materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index];
-				material->AddTexture(textureTable[metallicRoughTexture.source], Textures::SpecularTexture0);
-			}
-		}
-
-		// Index data
-		if (primitive.indices != -1) 
-		{
-			const Accessor& indexAccessor = modelData->accessors[primitive.indices];
-			
-			// Create the buffer
-			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
-			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
-		
-			// Use the buffer view to copy the data
-			const BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
-			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
-			data = data + (indexAccessor.byteOffset + bufferView.byteOffset);
-			
-			CrAssertMsg(bufferView.byteStride == 0, "Invalid stride");
-			void* indexData = mesh->m_indexBuffer->Lock();
-			memcpy(indexData, data, bufferView.byteLength);
-			mesh->m_indexBuffer->Unlock();
-		}
-
-		// Vertex data
-		if (!primitive.attributes.empty()) 
-		{
-			std::vector<hlslpp::float3> positions;
-			std::vector<hlslpp::float3> normals;
-			std::vector<hlslpp::float2> texCoords;
-
-			// Load each attribute
-			for (const auto& attribute : primitive.attributes)
-			{
-				const std::string& attribName = attribute.first;
-				const Accessor& attribAccessor = modelData->accessors[attribute.second];
-				const BufferView& bufferView = modelData->bufferViews[attribAccessor.bufferView];
-				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
-				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the acessor and view offsets
-				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
-				if (attribName == "POSITION")
-				{
-					// Sanity check
-					if (attribAccessor.type != TINYGLTF_TYPE_VEC3 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
-					{
-						CrAssert(false);
-					}
-					positions.resize(attribAccessor.count);
-					LoadAttribute<hlslpp::float3>(positions, data, attribAccessor.count, componentSize, bufferView.byteStride);				
-				}
-				else if (attribName == "NORMAL")
-				{
-					// Sanity check
-					if (attribAccessor.type != TINYGLTF_TYPE_VEC3 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
-					{
-						CrAssert(false);
-					}
-					normals.resize(attribAccessor.count);
-					LoadAttribute<hlslpp::float3>(normals, data, attribAccessor.count, componentSize, bufferView.byteStride);
-				}
-				else if (attribName == "TEXCOORD_0")
-				{
-					// Sanity check
-					if (attribAccessor.type != TINYGLTF_TYPE_VEC2 || (ToDataFormat(attribAccessor.componentType) != cr3d::DataFormat::R32_Float))
-					{
-						CrAssert(false);
-					}
-					texCoords.resize(attribAccessor.count);
-					LoadAttribute<hlslpp::float2>(texCoords, data, attribAccessor.count, componentSize, bufferView.byteStride);
-				}
-			}
-
-			// Create the vertex buffer
-			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)positions.size());
-			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
-			{
-				for (size_t vtxIndex = 0; vtxIndex < positions.size(); ++vtxIndex)
-				{
-					const float3& curPosition = positions[vtxIndex];
-					const float3& curNormal = normals[vtxIndex];
-					const float2& curTexcoord = texCoords[vtxIndex];
-					SimpleVertex& curVertex = vertexBufferData[vtxIndex];
-					curVertex.position = { (half)curPosition.x, (half)curPosition.y, (half)curPosition.z };
-					curVertex.normal = {
-						(uint8_t)((curNormal.x * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((curNormal.y * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((curNormal.z * 0.5f + 0.5f) * 255.0f),
-						0
-					};
-					curVertex.tangent = { 0, 0, 0 , 0};
-					curVertex.uv = { (half)curTexcoord.x, (half)curTexcoord.y };
-				}
-			}
-			mesh->m_vertexBuffer->Unlock();
-		}
-	}
-	return mesh;
 }

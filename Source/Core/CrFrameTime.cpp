@@ -1,37 +1,28 @@
 #include "CrFrameTime.h"
+
 #include "Core/String/CrString.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include <chrono>
-#include <string>
+#include <string> // TODO remove
 
-using namespace std::chrono;
+uint64_t CrFrameTime::m_frameCount = 0;
+CrTime CrFrameTime::m_frameDelta;
+CrTime CrFrameTime::m_framePreviousEndTime;
 
-uint32_t CrFrameTime::m_frameCount = 0;
-double CrFrameTime::m_frameDelta;
-double CrFrameTime::m_framePreviousEndTime;
-
-uint32_t CrFrameTime::m_lastUpdatedFrameCount;
-double CrFrameTime::m_lastUpdatedTime;
-
-double CrFrameTime::GetTime()
-{
-	auto time = high_resolution_clock::now();
-	return double(time_point_cast<nanoseconds>(time).time_since_epoch().count()) / double(secondNanos);
-}
+uint64_t CrFrameTime::m_lastUpdatedFrameCount;
+CrTime CrFrameTime::m_lastUpdatedTime;
 
 void CrFrameTime::IncrementFrameCount()
 {
-	double currentTime = GetTime();
+	CrTime currentTime = CrTime::Current();
 
-	if (currentTime - m_lastUpdatedTime > 1.0f)
+	if ((currentTime - m_lastUpdatedTime).AsSeconds() > 1.0f)
 	{
-		uint32_t frames = m_frameCount - m_lastUpdatedFrameCount;
+		uint64_t frames = m_frameCount - m_lastUpdatedFrameCount;
 
-		CrString str = std::to_string(frames).c_str();
+		CrString str = std::to_string(frames).c_str(); // TODO change to eastl
 
-		CrLog("FPS %d", frames);
-		CrLog("Delta %f", m_frameDelta);
+		CrLog("[FPS] %d [DELTA] %f ms", frames, m_frameDelta.AsMilliseconds());
 		CrPrintProcessMemory("Frame Memory");
 
 		m_lastUpdatedTime = currentTime;
@@ -40,16 +31,15 @@ void CrFrameTime::IncrementFrameCount()
 
 	m_frameDelta = currentTime - m_framePreviousEndTime;
 	m_framePreviousEndTime = currentTime;
-
-	m_frameCount = (m_frameCount + 1) % UINT32_MAX;
+	m_frameCount = (m_frameCount + 1) % UINT64_MAX;
 }
 
-float CrFrameTime::GetFrameDelta()
+CrTime CrFrameTime::GetFrameDelta()
 {
-	return (float)m_frameDelta;
+	return m_frameDelta;
 }
 
-uint32_t CrFrameTime::GetFrameCount()
+uint64_t CrFrameTime::GetFrameCount()
 {
 	return m_frameCount;
 }

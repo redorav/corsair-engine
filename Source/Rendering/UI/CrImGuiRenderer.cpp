@@ -2,7 +2,7 @@
 
 #include "CrImGuiRenderer.h"
 
-#include "CrInputManager.h"
+#include "Input/CrInputManager.h"
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 #include "Rendering/CrGPUBuffer.h"
@@ -114,6 +114,31 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		CrAssertMsg(m_fontAtlas.get(), "Failed to create the ImGui font atlas");
 		io.Fonts->TexID = (ImTextureID)m_fontAtlas.get();
 	}
+
+	{
+		io.KeyMap[ImGuiKey_Tab]         = KeyboardKey::Tab;
+		io.KeyMap[ImGuiKey_LeftArrow]   = KeyboardKey::LeftArrow;
+		io.KeyMap[ImGuiKey_RightArrow]  = KeyboardKey::RightArrow;
+		io.KeyMap[ImGuiKey_UpArrow]     = KeyboardKey::UpArrow;
+		io.KeyMap[ImGuiKey_DownArrow]   = KeyboardKey::DownArrow;
+		io.KeyMap[ImGuiKey_PageUp]      = KeyboardKey::PageUp;
+		io.KeyMap[ImGuiKey_PageDown]    = KeyboardKey::PageDown;
+		io.KeyMap[ImGuiKey_Home]        = KeyboardKey::Home;
+		io.KeyMap[ImGuiKey_End]         = KeyboardKey::End;
+		io.KeyMap[ImGuiKey_Insert]      = KeyboardKey::Insert;
+		io.KeyMap[ImGuiKey_Delete]      = KeyboardKey::Delete;
+		io.KeyMap[ImGuiKey_Backspace]   = KeyboardKey::Backspace;
+		io.KeyMap[ImGuiKey_Space]       = KeyboardKey::Space;
+		io.KeyMap[ImGuiKey_Enter]       = KeyboardKey::Intro;
+		io.KeyMap[ImGuiKey_Escape]      = KeyboardKey::Escape;
+		io.KeyMap[ImGuiKey_KeyPadEnter] = KeyboardKey::KeypadEnter;
+		io.KeyMap[ImGuiKey_A]           = KeyboardKey::A;
+		io.KeyMap[ImGuiKey_C]           = KeyboardKey::C;
+		io.KeyMap[ImGuiKey_V]           = KeyboardKey::V;
+		io.KeyMap[ImGuiKey_X]           = KeyboardKey::X;
+		io.KeyMap[ImGuiKey_Y]           = KeyboardKey::Y;
+		io.KeyMap[ImGuiKey_Z]           = KeyboardKey::Z;
+	}
 	
 	// Default linear clamp sampler state:
 	CrSamplerDescriptor descriptor;
@@ -129,15 +154,22 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 
 	// Generic io:
 	io.DisplaySize = ImVec2((float)width, (float)height);
-	io.DeltaTime = CrFrameTime::GetFrameDelta();
+	io.DeltaTime = (float)CrFrameTime::GetFrameDelta().AsSeconds();
 		
 	// Update input:
-	io.MouseDown[0] = CrInput.GetKey(KeyCode::MouseLeft);
-	io.MouseDown[1] = CrInput.GetKey(KeyCode::MouseRight);
-	io.MouseDown[2] = CrInput.GetKey(KeyCode::MouseMiddle);
-	float mx = CrInput.GetAxis(AxisCode::MouseX);
-	float my = CrInput.GetAxis(AxisCode::MouseY);
-	io.MousePos = ImVec2(mx * io.DisplaySize.x, my * io.DisplaySize.y);
+	const MouseState& mouseState = CrInput.GetMouseState();
+	io.MouseDown[0] = mouseState.buttonPressed[MouseButton::Left];
+	io.MouseDown[1] = mouseState.buttonPressed[MouseButton::Right];
+	io.MouseDown[2] = mouseState.buttonPressed[MouseButton::Middle];
+	io.MousePos = ImVec2((float)mouseState.position.x, (float)mouseState.position.y);
+	io.MouseWheel = (float)mouseState.mouseWheel.y;
+
+	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
+
+	for (uint32_t k = 0; k < KeyboardKey::Count; ++k)
+	{
+		io.KeysDown[k] = keyboardState.keyPressed[k];
+	}
 
 	ImGui::NewFrame();
 }

@@ -41,7 +41,7 @@ private:
 
 	VkDeviceMemory m_vkMemory;
 
-	VkIndexType m_vkIndexType : 1; // Only used for index buffers
+	VkIndexType m_vkIndexType; // Only used for index buffers
 };
 
 inline VkIndexType CrHardwareGPUBufferVulkan::GetVkIndexType() const

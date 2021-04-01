@@ -40,6 +40,8 @@ public:
 
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
+	void SignalFence(const ICrGPUFence* signalFence);
+
 	const ICrCommandBuffer* GetLastSubmittedCommandBuffer();
 
 	void WaitIdle();
@@ -51,6 +53,8 @@ protected:
 	virtual ICrCommandBuffer* CreateCommandBufferPS() = 0;
 
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
+
+	virtual void SignalFencePS(const ICrGPUFence* signalFence) = 0;
 
 	virtual void WaitIdlePS() = 0;
 

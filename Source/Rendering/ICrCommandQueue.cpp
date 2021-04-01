@@ -26,6 +26,11 @@ void ICrCommandQueue::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer,
 	SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 }
 
+void ICrCommandQueue::SignalFence(const ICrGPUFence* signalFence)
+{
+	SignalFencePS(signalFence);
+}
+
 void ICrCommandQueue::WaitIdle()
 {
 	WaitIdlePS();

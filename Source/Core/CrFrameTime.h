@@ -2,27 +2,27 @@
 
 #include <cstdint>
 
+#include "Core/Time/CrTime.h"
+
 class CrFrameTime
 {
 public:
 	
-	static double GetTime();
-
 	static void IncrementFrameCount();
 
-	static float GetFrameDelta();
+	static CrTime GetFrameDelta();
 
-	static uint32_t GetFrameCount();
+	static uint64_t GetFrameCount();
 
 private:
 
-	static uint32_t			m_frameCount;
-	static double			m_frameDelta;
-	static double			m_framePreviousEndTime;
+	static uint64_t			m_frameCount;
 
-	static double			m_lastUpdatedTime;
-	static uint32_t			m_lastUpdatedFrameCount;
+	static CrTime			m_frameDelta;
 
-	static const uint64_t	secondNanos = 1000000000;
-	static const uint64_t	secondMicros = 1000000;
+	static CrTime			m_framePreviousEndTime;
+
+	static CrTime			m_lastUpdatedTime;
+
+	static uint64_t			m_lastUpdatedFrameCount;
 };

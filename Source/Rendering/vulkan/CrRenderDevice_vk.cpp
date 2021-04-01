@@ -64,15 +64,27 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 	
 }
 
-cr3d::GPUWaitResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
 {
 	VkResult result = vkWaitForFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence(), true, timeoutNanoseconds);
 
 	switch (result)
 	{
-		case VK_SUCCESS: return cr3d::GPUWaitResult::Success;
-		case VK_TIMEOUT: return cr3d::GPUWaitResult::Timeout;
-		default: return cr3d::GPUWaitResult::Error;
+		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
+		case VK_TIMEOUT: return cr3d::GPUFenceResult::TimeoutOrNotReady;
+		default: return cr3d::GPUFenceResult::Error;
+	}
+}
+
+cr3d::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* fence) const
+{
+	VkResult result = vkGetFenceStatus(m_vkDevice, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+
+	switch (result)
+	{
+		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
+		case VK_NOT_READY: return cr3d::GPUFenceResult::TimeoutOrNotReady;
+		default: return cr3d::GPUFenceResult::Error;
 	}
 }
 

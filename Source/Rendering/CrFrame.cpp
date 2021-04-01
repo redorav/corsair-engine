@@ -22,7 +22,7 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrMesh.h"
 
-#include "CrInputManager.h"
+#include "Input/CrInputManager.h"
 
 #include "Core/CrFrameTime.h"
 
@@ -127,10 +127,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	}
 	m_triangleIndexBuffer->Unlock();
 
-	//m_renderModel = CrResourceManager::LoadModel("gltf/Duck/Duck.gltf");
-	m_renderModel = CrResourceManager::LoadModel("gltf/SciFiHelmet/SciFiHelmet.gltf");
-	//m_renderModel = CrResourceManager::LoadModel("gltf/DamagedHelmet/DamagedHelmet.glb");
-	//m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
+	CrResourceManager::LoadModel(m_renderModel, "nyra/nyra_pose_mod.fbx");
 	//"jaina/storm_hero_jaina.fbx"
 
 	CrString SHADER_PATH = IN_SRC_PATH;
@@ -218,11 +215,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	graphicsPipelineDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
-	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
-	m_renderCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
-	// Semaphore used to ensures that image presentation is complete before starting to submit again
-	m_presentCompleteSemaphore = renderDevice->CreateGPUSemaphore();
 
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
@@ -236,38 +229,32 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
+
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
-	const CrSwapchainSharedHandle& swapchain = m_swapchain;
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
-	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
+	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
 	if (swapchainResult == CrSwapchainResult::Invalid)
 	{
 		RecreateSwapchainAndDepth();
-		swapchainResult = swapchain->AcquireNextImage(m_presentCompleteSemaphore.get(), UINT64_MAX);
+		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
-	ICrGPUFence* swapchainFence = swapchain->GetCurrentWaitFence().get();
+	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
-	renderDevice->WaitForFence(swapchainFence, UINT64_MAX);
-
-	renderDevice->ResetFence(swapchainFence);
-
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[swapchain->GetCurrentFrameIndex()].get();
-	
-	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(swapchain->GetWidth(), swapchain->GetHeight());
+	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 	ImGui::ShowDemoWindow();
 
 	{
 		drawCommandBuffer->Begin();
-		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)swapchain->GetWidth(), (float)swapchain->GetHeight()));
-		drawCommandBuffer->SetScissor(CrScissor(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
+		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
+		drawCommandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 	
 		CrRenderPassDescriptor renderPassDescriptor;
 
 		CrRenderTargetDescriptor swapchainAttachment;
-		swapchainAttachment.texture = swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get();
+		swapchainAttachment.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
 		swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
 		swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
 		swapchainAttachment.initialState = cr3d::ResourceState::Undefined;
@@ -318,7 +305,7 @@ void CrFrame::Process()
 	
 				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
 				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
-				
+	
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{
 					const CrRenderMeshSharedHandle& renderMesh = m_renderModel->m_renderMeshes[m];
@@ -355,14 +342,14 @@ void CrFrame::Process()
 		drawCommandBuffer->EndDebugEvent();
 
 		// Render ImGui
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, swapchain->GetTexture(swapchain->GetCurrentFrameIndex()).get());
+		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
 
 		drawCommandBuffer->End();
 	}
 
-	drawCommandBuffer->Submit(m_presentCompleteSemaphore.get(), m_renderCompleteSemaphore.get(), swapchain->GetCurrentWaitFence().get());
+	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 
-	swapchain->Present(mainCommandQueue.get(), m_renderCompleteSemaphore.get());
+	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	CrFrameTime::IncrementFrameCount();
 }
@@ -373,52 +360,63 @@ void CrFrame::UpdateCamera()
 
 	float3 currentLookAt = camera.m_lookAt;
 	float3 currentRight = camera.m_right;
-	float camSpeed = 50.0f;
+
+	const MouseState& mouseState = CrInput.GetMouseState();
+	const KeyboardState& keyboard = CrInput.GetKeyboardState();
+	const GamepadState& gamepadState = CrInput.GetGamepadState(0);
+
+	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
+
 	// TODO Hack to get a bit of movement on the camera
-	if (CrInput.GetHeldKey(KeyCode::A) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) < 0.0f)
+	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera.Translate(currentRight * -camSpeed * CrFrameTime::GetFrameDelta());
+		camera.Translate(currentRight * -5.0f * frameDelta);
+	}
+	
+	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
+	{
+		camera.Translate(currentRight * 5.0f * frameDelta);
+	}
+	
+	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
+	{
+		camera.Translate(currentLookAt * 5.0f * frameDelta);
+	}
+	
+	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
+	{
+		camera.Translate(currentLookAt * -5.0f * frameDelta);
+	}
+	
+	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
+	{
+		camera.Translate(float3(0.0f, -5.0f, 0.0f) * frameDelta);
+	}
+	
+	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
+	{
+		camera.Translate(float3(0.0f, 5.0f, 0.0f) * frameDelta);
 	}
 
-	if (CrInput.GetHeldKey(KeyCode::D) || CrInput.GetAxis(AxisCode::JoystickLeftAxisX) > 0.0f)
-	{
-		camera.Translate(currentRight * camSpeed * CrFrameTime::GetFrameDelta());
-	}
-
-	if (CrInput.GetHeldKey(KeyCode::W) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) > 0.0f)
-	{
-		camera.Translate(currentLookAt * camSpeed * CrFrameTime::GetFrameDelta());
-	}
-
-	if (CrInput.GetHeldKey(KeyCode::S) || CrInput.GetAxis(AxisCode::JoystickLeftAxisY) < 0.0f)
-	{
-		camera.Translate(currentLookAt * -camSpeed * CrFrameTime::GetFrameDelta());
-	}
-
-	if (CrInput.GetHeldKey(KeyCode::Q) || CrInput.GetAxis(AxisCode::JoystickL2) > 0.0f)
-	{
-		camera.Translate(float3(0.0f, -camSpeed, 0.0f) * CrFrameTime::GetFrameDelta());
-	}
-
-	if (CrInput.GetHeldKey(KeyCode::E) || CrInput.GetAxis(AxisCode::JoystickR2) > 0.0f)
-	{
-		camera.Translate(float3(0.0f, camSpeed, 0.0f) * CrFrameTime::GetFrameDelta());
-	}
-
-	if (CrInput.GetAxis(AxisCode::JoystickRightAxisX) > 0.0f)
+	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
 	{
 		//CrLogWarning("Moving right");
-		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
 
-	if (CrInput.GetAxis(AxisCode::JoystickRightAxisX) < 0.0f)
+	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
 	{
 		//CrLogWarning("Moving left");
-		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * CrFrameTime::GetFrameDelta());
+		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
+	}
+
+	if (mouseState.buttonPressed[MouseButton::Right])
+	{
+		camera.Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
 	}
 
 	camera.Update();

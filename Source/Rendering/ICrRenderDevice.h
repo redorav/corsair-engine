@@ -108,7 +108,9 @@ public:
 
 	// GPU Synchronization functions
 
-	cr3d::GPUWaitResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
+	cr3d::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds) const;
+
+	cr3d::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
 
 	void ResetFence(ICrGPUFence* fence);
 
@@ -145,7 +147,9 @@ protected:
 
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader) = 0;
 	
-	virtual cr3d::GPUWaitResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
+	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const = 0;
+
+	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
 
 	virtual void WaitIdlePS() = 0;
 

@@ -17,6 +17,8 @@ public:
 
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
+	virtual void SignalFencePS(const ICrGPUFence* signalFence) override;
+
 	virtual void WaitIdlePS() override;
 
 private:

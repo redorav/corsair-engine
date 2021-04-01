@@ -7,12 +7,17 @@
 // clear which is which. If unclear refer to the descriptions here for clarity
 
 // Synchronization between host and device
+// Direction is device -> host
+// e.g. GPU signals and CPU waits
 class ICrGPUFence
 {
 public:
 };
 
 // Synchronization between queues
+// Direction is device -> device
+// e.g. Graphics queue signals, compute queue receives
+// e.g. Graphics queue signals, graphics queue receives
 class ICrGPUSemaphore
 {
 public:

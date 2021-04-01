@@ -10,12 +10,12 @@ ICrOSWindow::ICrOSWindow(uint32_t width, uint32_t height)
 
 	int windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
+	// TODO Read title from global
 	m_window = SDL_CreateWindow("Corsair Engine 0.01", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
 }
 
 ICrOSWindow::~ICrOSWindow()
 {
-	//Destroy window
 	SDL_DestroyWindow(m_window);
 }
 

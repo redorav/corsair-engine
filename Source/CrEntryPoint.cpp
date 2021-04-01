@@ -1,4 +1,4 @@
-#include "CrInputManager.h"
+#include "Input/CrInputManager.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -12,21 +12,20 @@
 
 #include "ICrOSWindow.h"
 
+// TODO SDL-specific
+#include "Input/CrInputHandlerSDL.h"
 #include <SDL.h>
 #include <SDL_syswm.h>
-
-bool g_appWasClosed = false; // TODO This global needs to go
 
 uint32_t screenWidth = 1280;
 uint32_t screenHeight = 720;
 
 int main(int argc, char* argv[])
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
 	{
 		return 1;
 	}
-	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
 	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 
@@ -40,12 +39,13 @@ int main(int argc, char* argv[])
 		CrAssertMsg(false, "No root on the command line");
 	}
 
-	ICrOSWindow* mainWindow = new ICrOSWindow(1280, 720);
+	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
 
 	void* hWnd = mainWindow->GetNativeWindowHandle();
 
-	//HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
-	// Valid for the current executable (not valid for a dll) http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
+	// HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
+	// Valid for the current executable (not valid for a dll)
+	// http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
 	CrPrintProcessMemory("Before Render Device");
@@ -70,9 +70,13 @@ int main(int argc, char* argv[])
 	CrPrintProcessMemory("After Render Device");
 
 	CrFrame frame;
-	frame.Init(hInstance, hWnd, screenWidth, screenHeight);
+	frame.Init(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
 
-	while(!g_appWasClosed)
+	CrInputHandlerSDL inputHandler;
+
+	bool applicationRunning = true;
+
+	while(applicationRunning)
 	{
 		CrInput.Update();
 
@@ -84,21 +88,26 @@ int main(int argc, char* argv[])
 			{
 				case SDL_QUIT:
 				{
-					exit(0);
+					applicationRunning = false;
 					break;
 				}
-				case SDL_SYSWMEVENT:
+				case SDL_CONTROLLERDEVICEADDED:
+				case SDL_CONTROLLERDEVICEREMOVED:
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+				case SDL_MOUSEBUTTONDOWN:
+				case SDL_MOUSEBUTTONUP:
+				case SDL_MOUSEMOTION:
+				case SDL_MOUSEWHEEL:
+				case SDL_CONTROLLERAXISMOTION:
+				case SDL_CONTROLLERBUTTONDOWN:
+				case SDL_CONTROLLERBUTTONUP:
 				{
-					SDL_SysWMmsg wMsg = *event.syswm.msg;
-					MSG msg = {};
-					msg.hwnd = wMsg.msg.win.hwnd;
-					msg.message = wMsg.msg.win.msg;
-					msg.wParam = wMsg.msg.win.wParam;
-					msg.lParam = wMsg.msg.win.lParam;
-					CrInput.HandleMessage((void*)&msg);
+					inputHandler.HandleEvent(event);
 					break;
 				}
 				default:
+					CrLog("Unhandled SDL message %i", event.type);
 					break;
 			}
 		}

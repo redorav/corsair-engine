@@ -18,6 +18,10 @@ public:
 
 	void* GetNativeWindowHandle() const;
 
+	uint32_t GetWidth() const;
+
+	uint32_t GetHeight() const;
+
 private:
 
 	uint32_t m_width = 0;
@@ -26,3 +30,13 @@ private:
 
 	SDL_Window* m_window = nullptr;
 };
+
+inline uint32_t ICrOSWindow::GetWidth() const
+{
+	return m_width;
+}
+
+inline uint32_t ICrOSWindow::GetHeight() const
+{
+	return m_height;
+}

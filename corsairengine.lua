@@ -20,6 +20,7 @@ ProjectCrRendering      = 'CrRendering'
 ProjectShaderCompiler   = 'CrShaderCompiler'
 ProjectShaders          = 'CrShaders'
 ProjectCrCore           = 'CrCore'
+ProjectCrInput          = 'CrInput'
 ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
 ProjectCrModel          = 'CrModel'
@@ -196,13 +197,13 @@ project (ProjectCorsairEngine)
 		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
-	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrModel }
+	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrInput, ProjectCrModel }
 	
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
-	-- Project libraries have slimmed by about ~140MB	
-	AddLibraryHeaders(GainputLibrary)
-	LinkLibrary(GainputLibrary)
+	-- Project libraries have slimmed by about ~140MB
+	AddLibraryHeaders(AssimpLibrary)
+	LinkLibrary(AssimpLibrary)
 
 	AddLibraryHeaders(SDL2Library)
 	LinkLibrary(SDL2Library)
@@ -221,9 +222,6 @@ project (ProjectCorsairEngine)
 		CopyFileCommand(path.getabsolute(LibSDL2)..'/Binaries/SDL2.dll', '%{cfg.buildtarget.directory}')
 	}
 	
-	filter('system:windows')
-		LinkLibrary(XInputLibrary) -- Needed for gainput on Windows
-
 	filter{}
 
 group('Rendering')
@@ -254,7 +252,6 @@ project(ProjectCrRendering)
 	
 	AddLibraryHeaders(AssimpLibrary)
 	AddLibraryHeaders(SPIRVReflectLibrary)
-	AddLibraryHeaders(GainputLibrary) -- TODO Remove
 	AddLibraryHeaders(ImguiLibrary)
 	
 	filter { 'platforms:'..DesktopWin64 }
@@ -357,6 +354,19 @@ project(ProjectCrImage)
 	files{ 	SourceImageDirectory..'/**' }
 
 	AddLibraryHeaders(StbLibrary)
+	
+group('Input')
+
+SourceInputDirectory = SourceDirectory..'/Input'
+
+project(ProjectCrInput)
+	kind('StaticLib')
+
+	files { SourceInputDirectory..'/**' }
+	
+	AddLibraryHeaders(SDL2Library)
+
+	filter {}
 	
 group('Model')
 

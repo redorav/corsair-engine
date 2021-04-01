@@ -27,6 +27,8 @@ class ICrSampler
 {
 public:
 
+	virtual ~ICrSampler() {}
+
 protected:
 
 	ICrSampler(ICrRenderDevice* renderDevice);

@@ -10,8 +10,6 @@
 
 CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
-	unused_parameter(renderSystemDescriptor);
-
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Corsair Engine";		// TODO Come from application settings

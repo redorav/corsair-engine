@@ -143,10 +143,12 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			{
 				float x, y, z;
 			};
+
 			struct GLTFFloat2
 			{
 				float x, y;
 			};
+
 			CrVector<GLTFFloat3> positions;
 			CrVector<GLTFFloat3> normals;
 			CrVector<GLTFFloat2> texCoords;
@@ -158,8 +160,9 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 				const Accessor& attribAccessor = modelData->accessors[attribute.second];
 				const BufferView& bufferView = modelData->bufferViews[attribAccessor.bufferView];
 				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
-				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the acessor and view offsets
+				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the accessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
+				
 				if (attribName == "POSITION")
 				{
 					CrAssert(attribAccessor.type == TINYGLTF_TYPE_VEC3 && (ToDataFormat(attribAccessor.componentType) == cr3d::DataFormat::R32_Float));
@@ -212,18 +215,18 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	TinyGLTF loader;
 	Model model;
 
-	// Custom image loading implementation, gltf will either load the 
-	//	raw data from the inline buffer or from the specified uri. Textures will be loaded and added to 
-	//  the texture table in preparation to build the material
+	// Custom image loading implementation, gltf will either load the raw data from the inline buffer
+	// or from the specified uri. Textures will be loaded and added to the texture table in preparation
+	// to build the material
 	CrHashMap<int, CrTextureSharedHandle> textureTable;
 	loader.SetImageLoader(
 		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* /*warning*/,
 			int /*requestedWidth*/, int /*requestedHeight*/, const unsigned char* data, int dataSize, void* userData)
 		{
-			auto textureTable = (CrHashMap<int, CrTextureSharedHandle>*)userData;
+			CrHashMap<int, CrTextureSharedHandle>* textureTable = (CrHashMap<int, CrTextureSharedHandle>*)userData;
 			if (!textureTable)
 			{
-				(*error) += "Invalid textureTable!";
+				(*error) += "Invalid textureTable";
 				return false;
 			}
 
@@ -232,7 +235,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			CrImageHandle loadedImage = imageDecoder->Decode((void*)data, dataSize);
 			if (!loadedImage)
 			{
-				(*error) += "image[" + std::to_string(imageIndex) + "] failed to decode the image.";
+				(*error) += "image[" + std::to_string(imageIndex) + "] failed to decode the image";
 				return false;
 			}
 
@@ -253,7 +256,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
 			if (!texture)
 			{
-				(*error) += "image[" + std::to_string(imageIndex) + "] failed to create the texture.";
+				(*error) += "image[" + std::to_string(imageIndex) + "] failed to create the texture";
 				return false;
 			}
 
@@ -262,7 +265,6 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			return true;
 		}
 	, (void*)&textureTable);
-		
 
 	bool binaryGLTF = strstr(file->GetFilePath(), ".glb") != nullptr;
 	CrPath filePath(file->GetFilePath());
@@ -293,6 +295,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			CrLog("Failed to load:%s (%s)", file->GetFilePath(), error.c_str());
 			return nullptr;
 		}
+
 		if (!warning.empty())
 		{
 			CrLog("Warning when loading:%s (%s)", file->GetFilePath(), warning.c_str());
@@ -303,7 +306,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	// and textures created within the loader callback
 	CrRenderModelSharedHandle renderModel = CrMakeShared<CrRenderModel>();
 	renderModel->m_renderMeshes.reserve(model.meshes.size());
-	for (Mesh& mesh : model.meshes)
+	for (const Mesh& mesh : model.meshes)
 	{
 		CrMaterialSharedHandle material = CrMakeShared <CrMaterial>();
 		CrRenderMeshSharedHandle renderMesh = LoadMesh(&model, &mesh, material, textureTable);

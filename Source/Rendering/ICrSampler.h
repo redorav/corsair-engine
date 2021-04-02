@@ -3,6 +3,8 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "CrGPUDeletable.h"
+
 struct CrSamplerDescriptor
 {
 	cr3d::Filter minFilter         : 1;
@@ -23,7 +25,7 @@ struct CrSamplerDescriptor
 	CrSamplerDescriptor();
 };
 
-class ICrSampler
+class ICrSampler : public CrGPUDeletable
 {
 public:
 

@@ -225,6 +225,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
 	imguiInitParams.m_sampleCount = cr3d::SampleCount::S1;
 	CrImGuiRenderer::GetImGuiRenderer()->Initialize(imguiInitParams);
+	
+	renderDevice->InitializeDeletionQueues(m_swapchain->GetImageCount());
 }
 
 void CrFrame::Process()
@@ -350,6 +352,8 @@ void CrFrame::Process()
 	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 
 	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
+
+	renderDevice->ProcessDeletionQueue();
 
 	CrFrameTime::IncrementFrameCount();
 }

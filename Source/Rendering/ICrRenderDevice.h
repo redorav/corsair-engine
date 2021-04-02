@@ -3,10 +3,12 @@
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrGPUDeletionQueue.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/String/CrFixedString.h"
+#include "Core/Function/CrFixedFunction.h"
 
 namespace CrVendor
 {
@@ -69,6 +71,10 @@ public:
 	ICrRenderDevice(const ICrRenderSystem* renderSystem);
 
 	virtual ~ICrRenderDevice();
+
+	void InitializeDeletionQueues(uint32_t deletionQueueCount);
+
+	void ProcessDeletionQueue();
 
 	// Resource Creation Functions
 
@@ -154,6 +160,10 @@ protected:
 	virtual void WaitIdlePS() = 0;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
+
+	CrFixedFunction<4, void(CrGPUDeletable*)> m_gpuDeletionLambda = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue.AddToQueue(deletable); };
+
+	CrGPUDeletionQueue m_gpuDeletionQueue;
 
 	const ICrRenderSystem* m_renderSystem;
 

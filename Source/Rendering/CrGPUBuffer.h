@@ -2,6 +2,7 @@
 
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrGPUDeletable.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/CrHash.h"
@@ -90,7 +91,7 @@ struct CrGPUBufferDescriptor
 	cr3d::BufferAccess::T access;
 };
 
-class CrGPUBuffer
+class CrGPUBuffer : public CrGPUDeletable
 {
 public:
 

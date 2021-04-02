@@ -22,6 +22,16 @@ ICrRenderDevice::~ICrRenderDevice()
 
 }
 
+void ICrRenderDevice::InitializeDeletionQueues(uint32_t deletionQueueCount)
+{
+	m_gpuDeletionQueue.Initialize(this, deletionQueueCount);
+}
+
+void ICrRenderDevice::ProcessDeletionQueue()
+{
+	m_gpuDeletionQueue.Process();
+}
+
 CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueType::T type)
 {
 	return CrCommandQueueSharedHandle(CreateCommandQueuePS(type));
@@ -64,12 +74,12 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareG
 
 CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
-	return CrIndexBufferSharedHandle(new CrIndexBuffer(this, dataFormat, numIndices));
+	return CrIndexBufferSharedHandle(new CrIndexBuffer(this, dataFormat, numIndices), m_gpuDeletionLambda);
 }
 
 CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 {
-	return CrSamplerSharedHandle(CreateSamplerPS(descriptor));
+	return CrSamplerSharedHandle(CreateSamplerPS(descriptor), m_gpuDeletionLambda);
 }
 
 CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
@@ -95,7 +105,7 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& 
 
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
 {
-	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor));
+	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor), m_gpuDeletionLambda);
 }
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)

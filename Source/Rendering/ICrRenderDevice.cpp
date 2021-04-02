@@ -133,7 +133,7 @@ void ICrRenderDevice::WaitIdle()
 	WaitIdlePS();
 }
 
-const CrRenderDeviceProperties& ICrRenderDevice::GetProperties()
+const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
 {
 	return m_renderDeviceProperties;
 }

@@ -21,6 +21,9 @@ namespace eastl
 	// Strings
 	template <typename T, typename Allocator> class basic_string;
 	typedef basic_string<char, allocator> string;
+
+	template<int N, typename R>
+	class fixed_function;
 }
 
 template<typename T>
@@ -33,6 +36,9 @@ template<typename T>
 using CrVector = eastl::vector<T, eastl::allocator>;
 
 using CrString = eastl::string;
+
+template<int SIZE_IN_BYTES, typename R>
+using CrFixedFunction = eastl::fixed_function<SIZE_IN_BYTES, R>;
 
 // STD
 

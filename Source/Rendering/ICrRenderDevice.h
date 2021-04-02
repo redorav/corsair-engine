@@ -125,7 +125,7 @@ public:
 
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const = 0;
 
-	const CrRenderDeviceProperties& GetProperties();
+	const CrRenderDeviceProperties& GetProperties() const;
 
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 

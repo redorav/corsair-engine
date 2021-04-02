@@ -378,7 +378,6 @@ project(ProjectCrModel)
 
 	AddLibraryHeaders(TinyGLTFLibrary)
 	AddLibraryHeaders(AssimpLibrary)
-	LinkLibrary(AssimpLibrary)
 
 group('Core')
 

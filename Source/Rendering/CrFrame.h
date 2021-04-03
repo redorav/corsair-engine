@@ -19,6 +19,8 @@ public:
 
 	void Process();
 
+	void DrawDebugUI();
+
 	void UpdateCamera();
 
 	void RecreateSwapchainAndDepth();

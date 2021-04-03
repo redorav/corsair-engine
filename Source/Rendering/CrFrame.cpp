@@ -244,7 +244,7 @@ void CrFrame::Process()
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
-	ImGui::ShowDemoWindow();
+	DrawDebugUI();
 
 	{
 		drawCommandBuffer->Begin();
@@ -352,6 +352,29 @@ void CrFrame::Process()
 	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	CrFrameTime::IncrementFrameCount();
+}
+
+void CrFrame::DrawDebugUI()
+{
+	static bool s_DemoOpen = true;
+	static bool s_ShowStats = true;
+	if (s_DemoOpen)
+	{
+		ImGui::ShowDemoWindow(&s_DemoOpen);
+	}
+
+	if (s_ShowStats)
+	{
+		if (ImGui::Begin("Stats", &s_ShowStats)) {
+
+			CrTime delta = CrFrameTime::GetFrameDelta();
+			ImGui::Text("FrameTime: %.2f", delta.AsMilliseconds());
+			ImGui::Text("FPS: %.2f", delta.AsFPS());
+
+			ImGui::End();
+		}
+
+	}
 }
 
 void CrFrame::UpdateCamera()

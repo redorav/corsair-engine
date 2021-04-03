@@ -372,7 +372,7 @@ void CrFrame::DrawDebugUI()
 		if (ImGui::Begin("Stats", &s_ShowStats)) {
 
 			CrTime delta = CrFrameTime::GetFrameDelta();
-			ImGui::Text("FrameTime: %.2f", delta.AsMilliseconds());
+			ImGui::Text("Frame: %.2f ms", delta.AsMilliseconds());
 			ImGui::Text("FPS: %.2f", delta.AsFPS());
 
 			ImGui::End();

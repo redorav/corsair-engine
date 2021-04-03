@@ -34,6 +34,22 @@ int main(int argc, char* argv[])
 	bool enableGraphicsValidation = crcore::CommandLine["-debugGraphics"];
 	bool enableRenderdoc          = crcore::CommandLine["-renderdoc"];
 
+	CrString resolution = crcore::CommandLine("-resolution").str().c_str();
+	if (!resolution.empty())
+	{
+		CrString::size_type pos = resolution.find('x');
+		if(pos != CrString::npos)
+		{
+			screenWidth = atoi(resolution.substr(0, pos).c_str());
+			screenHeight = atoi(resolution.substr(pos + 1).c_str());
+			CrLog("Resolution set to %dx%d", screenWidth, screenHeight);
+		} 
+		else
+		{
+			CrLog("Resolution argument specified with an incorrect format! Expected format is <screenWidth>x<screenHeight>! Got \"%s\"", resolution.c_str());
+		}
+	}
+
 	if (dataPath.empty())
 	{
 		CrAssertMsg(false, "No root on the command line");

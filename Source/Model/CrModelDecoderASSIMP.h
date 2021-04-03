@@ -18,6 +18,7 @@ public:
 	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) override;
 
 private:
-	void LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh* mesh);
-	bool LoadMaterial(CrMaterialSharedHandle&, const aiMaterial* material, const CrPath& relativePath);
+
+	CrMeshSharedHandle LoadMesh(const aiMesh* mesh);
+	CrMaterialSharedHandle LoadMaterial(const aiMaterial* material, const CrPath& relativePath);
 };

@@ -73,8 +73,7 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 
 	for (uint32_t m = 0; m < scene->mNumMeshes; ++m)
 	{
-		CrMeshSharedHandle renderMesh;
-		LoadMesh(renderMesh, scene->mMeshes[m]);
+		CrMeshSharedHandle renderMesh = LoadMesh(scene->mMeshes[m]);
 		renderModel->m_renderMeshes.push_back(renderMesh);
 		renderModel->m_materialMap.insert(CrPair<CrMesh*, uint32_t>(renderMesh.get(), scene->mMeshes[m]->mMaterialIndex));
 	}
@@ -83,17 +82,16 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	const CrPath filePath(file->GetFilePath());
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
-		CrMaterialSharedHandle material;
-		LoadMaterial(material, scene->mMaterials[m], filePath);
+		CrMaterialSharedHandle material = LoadMaterial(scene->mMaterials[m], filePath);
 		renderModel->m_materials.push_back(material);
 	}
 
 	return renderModel;
 }
 
-void CrModelDecoderASSIMP::LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh* mesh)
+CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 {
-	renderMesh = CrMakeShared<CrMesh>();
+	CrMeshSharedHandle renderMesh = CrMakeShared<CrMesh>();
 
 	struct SimpleVertex
 	{
@@ -152,11 +150,13 @@ void CrModelDecoderASSIMP::LoadMesh(CrMeshSharedHandle& renderMesh, const aiMesh
 		}
 	}
 	renderMesh->m_indexBuffer->Unlock();
+
+	return renderMesh;
 }
 
-bool CrModelDecoderASSIMP::LoadMaterial(CrMaterialSharedHandle& material, const aiMaterial* aiMaterial, const CrPath& relativePath)
+CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& relativePath)
 {
-	CrMaterial::Create(material);
+	CrMaterialSharedHandle material = CrMakeShared<CrMaterial>();
 
 	aiString name;
 	aiMaterial->Get(AI_MATKEY_NAME, name);
@@ -201,5 +201,5 @@ bool CrModelDecoderASSIMP::LoadMaterial(CrMaterialSharedHandle& material, const 
 		}
 	}
 
-	return true;
+	return material;
 }

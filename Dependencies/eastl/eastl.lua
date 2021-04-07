@@ -7,8 +7,7 @@ workspace(ProjectName)
 	location ("Build/".._ACTION)
 	architecture("x64")
 	cppdialect("c++17")
-	debugformat("c7") -- Do not create pdbs, instead store in lib
-	
+
 	if _ACTION == "vs2017" then
 		toolset("msc") -- Use default VS toolset TODO do this platform specific
 		--toolset("msc-llvm-vs2014") -- Use for Clang on VS
@@ -16,6 +15,7 @@ workspace(ProjectName)
 	
 	configuration "Debug"
 		defines { "DEBUG", "_DEBUG" }
+		debugformat("c7") -- Do not create pdbs, instead store in lib
 		symbols "on"
 
 	configuration "Release"

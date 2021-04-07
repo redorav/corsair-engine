@@ -7,7 +7,6 @@ workspace(ProjectName)
 	location ("Build/".._ACTION)
 	architecture("x64")
 	cppdialect("c++17")
-	debugformat("c7") -- Do not create pdbs, instead store in lib
 	
 	if _ACTION == "vs2017" then
 		toolset("msc") -- Use default VS toolset TODO do this platform specific
@@ -18,6 +17,7 @@ workspace(ProjectName)
 	
 	configuration "Debug"
 		defines { "DEBUG" }
+		debugformat("c7") -- Do not create pdbs, instead store in lib
 		symbols ("on")
 
 	configuration "Release"

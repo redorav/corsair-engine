@@ -178,7 +178,10 @@ workspace 'Corsair Engine'
 		--symbols('on')
 		symbols('fastlink')
 		--inlining('auto')
-		runtime('debug')
+
+		-- we force the release runtime to be able to link against
+		-- release external libraries to speed up this config
+		runtime('release')
 
 	configuration 'Release'
 		defines { 'NDEBUG' }

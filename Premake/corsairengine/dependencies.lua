@@ -3,9 +3,6 @@
 DependenciesDirectory   = 'Dependencies'
 BinaryDirectory = '/Binaries/'
 
--- Careful, the names are debug and release but this depends on this project's naming as well
-LibConfig = '.'.._ACTION..'.%{cfg.buildcfg:lower()}'
-
 -- Library Directories
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibEASTL        = DependenciesDirectory..'/eastl'
@@ -32,7 +29,7 @@ AssimpLibrary =
 {
 	includeDirs = LibAssimp..'/Source/include',
 	libDirs     = LibAssimp..BinaryDirectory,
-	libNames    = 'Assimp'..LibConfig
+	libNames    = 'Assimp.'.._ACTION..".release"
 }
 
 VulkanLibrary =
@@ -56,7 +53,7 @@ GlslangLibrary =
 {
 	includeDirs = LibGlslang..'/Source/',
 	libDirs     = LibGlslang..BinaryDirectory,
-	libNames    = 'Glslang'..LibConfig
+	libNames    = 'Glslang.'.._ACTION..".release"
 }
 
 EASTLLibrary =
@@ -67,7 +64,7 @@ EASTLLibrary =
 		LibEASTL..'/Source/test/packages/EAAssert/include', LibEASTL..'/Source/test/packages/EABase/include/Common'
 	},
 	libDirs     = LibEASTL..BinaryDirectory,
-	libNames    = 'EASTL'..LibConfig
+	libNames    = 'EASTL.'.._ACTION..".release"
 }
 
 SDL2Library =
@@ -82,14 +79,14 @@ ImguiLibrary =
 {
 	includeDirs = LibImGui..'/Source/',
 	libDirs     = LibImGui..BinaryDirectory,
-	libNames    = 'ImGui'..LibConfig
+	libNames    = 'ImGui.'.._ACTION..".release"
 }
 
 SPIRVReflectLibrary =
 {
 	includeDirs = LibSPIRVReflect..'/Source/',
 	libDirs     = LibSPIRVReflect..BinaryDirectory,
-	libNames    = 'SPIRV-Reflect'..LibConfig
+	libNames    = 'SPIRV-Reflect.'.._ACTION..".release"
 }
 
 HlslppLibrary =

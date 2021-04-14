@@ -126,17 +126,17 @@ workspace 'Corsair Engine'
 	
 	-- Global library includes. Very few things should go here, basically things
 	-- that are used in every possible project like math and containers
-	AddLibraryHeaders(EASTLLibrary)
-	AddLibraryHeaders(HlslppLibrary)
-	AddLibraryHeaders(xxHashLibrary)
+	
+	AddLibraryIncludes(ArghLibrary)
+	AddLibraryIncludes(DdsppLibrary)
+	AddLibraryIncludes(EASTLLibrary)
+	AddLibraryIncludes(HalfLibrary)
+	AddLibraryIncludes(HlslppLibrary)
+	AddLibraryIncludes(xxHashLibrary)
 
 	-- Setup include directories
-	-- TODO Move to dependencies
 	includedirs
 	{
-		LibArgh..'/Source/',
-		LibHalf..'/Source',
-		LibDdspp..'/Source',
 		WorkspaceDirectory,
 		GeneratedCodeDirectory
 	}
@@ -149,15 +149,7 @@ workspace 'Corsair Engine'
    -- All defines from different libraries that need exceptions disabled go here.
     defines
 	{ 
-		'_HAS_EXCEPTIONS=0',
-		
-		'HALF_ENABLE_CPP11_NOEXCEPT=1',
-		'HALF_ENABLE_CPP11_CONSTEXPR=1',
-		'HALF_ENABLE_CPP11_TYPE_TRAITS=1',
-		'HALF_ENABLE_CPP11_CSTDINT=1',
-		'HALF_ENABLE_CPP11_USER_LITERALS=1',
-		'HALF_ENABLE_CPP11_STATIC_ASSERT=1',
-		'HALF_ENABLE_CPP11_CMATH=1',
+		'_HAS_EXCEPTIONS=0', -- Disable STL exceptions
 	}
 	
 	-- Generate the global paths file
@@ -205,10 +197,10 @@ project (ProjectCorsairEngine)
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
 	-- Project libraries have slimmed by about ~140MB
-	AddLibraryHeaders(AssimpLibrary)
+	AddLibraryIncludes(AssimpLibrary)
 	LinkLibrary(AssimpLibrary)
 
-	AddLibraryHeaders(SDL2Library)
+	AddLibraryIncludes(SDL2Library)
 	LinkLibrary(SDL2Library)
 	
 	LinkLibrary(EASTLLibrary)
@@ -253,14 +245,14 @@ project(ProjectCrRendering)
 		ShaderMetadataCpp
 	}
 	
-	AddLibraryHeaders(AssimpLibrary)
-	AddLibraryHeaders(SPIRVReflectLibrary)
-	AddLibraryHeaders(ImguiLibrary)
+	AddLibraryIncludes(AssimpLibrary)
+	AddLibraryIncludes(SPIRVReflectLibrary)
+	AddLibraryIncludes(ImguiLibrary)
 	
 	filter { 'platforms:'..DesktopWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
 		files { SourceRenderingDirectory..'/d3d12/*' }
-		AddLibraryHeaders(VulkanLibrary)
+		AddLibraryIncludes(VulkanLibrary)
 		
 	filter { 'platforms:'..VulkanOSX }
 		files { SourceRenderingDirectory..'/vulkan/*' }
@@ -320,10 +312,10 @@ project(ProjectShaderCompiler)
 	
 	links { ProjectCrCore }
 
-	AddLibraryHeaders(SPIRVReflectLibrary)
+	AddLibraryIncludes(SPIRVReflectLibrary)
 	LinkLibrary(SPIRVReflectLibrary)
 
-	AddLibraryHeaders(GlslangLibrary)
+	AddLibraryIncludes(GlslangLibrary)
 	LinkLibrary(GlslangLibrary)
 
 	-- Copy the shader compiler into a known directory
@@ -356,7 +348,7 @@ project(ProjectCrImage)
 	kind('StaticLib')
 	files{ 	SourceImageDirectory..'/**' }
 
-	AddLibraryHeaders(StbLibrary)
+	AddLibraryIncludes(StbLibrary)
 	
 group('Input')
 
@@ -367,7 +359,7 @@ project(ProjectCrInput)
 
 	files { SourceInputDirectory..'/**' }
 	
-	AddLibraryHeaders(SDL2Library)
+	AddLibraryIncludes(SDL2Library)
 
 	filter {}
 	
@@ -379,8 +371,8 @@ project(ProjectCrModel)
 	kind('StaticLib')
 	files { SourceModelDirectory..'/**' }
 
-	AddLibraryHeaders(TinyGLTFLibrary)
-	AddLibraryHeaders(AssimpLibrary)
+	AddLibraryIncludes(TinyGLTFLibrary)
+	AddLibraryIncludes(AssimpLibrary)
 
 group('Core')
 

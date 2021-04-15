@@ -7,7 +7,7 @@
 [submodule "Dependencies/glslang/Source"]
 	path = Dependencies/glslang/Source
 	url = https://github.com/KhronosGroup/glslang
-[submodule "Dependencies/hlslpp/Source"]
+[submodule "Dependencies/hlslpp/Include"]
 	path = Dependencies/hlslpp/Include
 	url = https://github.com/redorav/hlslpp
 [submodule "Dependencies/stb/Source"]

@@ -10,9 +10,6 @@
 [submodule "Dependencies/ddspp/Include"]
 	path = Dependencies/ddspp/Include
 	url = https://github.com/redorav/ddspp/
-[submodule "Dependencies/spirv-reflect/Source"]
-	path = Dependencies/spirv-reflect/Source
-	url = https://github.com/KhronosGroup/SPIRV-Reflect.git
 [submodule "Dependencies/tinygltf/Source"]
 	path = Dependencies/tinygltf/Source
 	url = https://github.com/syoyo/tinygltf.git

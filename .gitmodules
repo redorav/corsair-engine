@@ -1,9 +1,6 @@
 [submodule "Dependencies/hlslpp/Include"]
 	path = Dependencies/hlslpp/Include
 	url = https://github.com/redorav/hlslpp
-[submodule "Dependencies/xxhash/Source"]
-	path = Dependencies/xxhash/Source
-	url = https://github.com/Cyan4973/xxHash
 [submodule "Dependencies/ddspp/Include"]
 	path = Dependencies/ddspp/Include
 	url = https://github.com/redorav/ddspp/

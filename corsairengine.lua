@@ -214,7 +214,8 @@ project (ProjectCorsairEngine)
 	-- Copy necessary files or DLLs
 	postbuildcommands
 	{
-		CopyFileCommand(path.getabsolute(LibSDL2)..'/Binaries/SDL2.dll', '%{cfg.buildtarget.directory}')
+		-- TODO Make sure this copy command 
+		CopyFileCommand(path.getabsolute(SDL2Library.dlls), '%{cfg.buildtarget.directory}')
 	}
 	
 	filter{}

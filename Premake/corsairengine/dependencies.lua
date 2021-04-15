@@ -1,8 +1,8 @@
 -- Dependencies for Corsair Engine
 
 DependenciesDirectory   = 'Dependencies'
-BinaryDirectory = '/Binaries/'
-IncludeDirectory = '/Source/'
+BinaryDirectory = '/Libraries/'
+IncludeDirectory = '/Include/'
 
 -- Library Directories
 LibArgh         = DependenciesDirectory..'/argh'
@@ -53,8 +53,10 @@ EASTLLibrary =
 {
 	includeDirs =
 	{ 
-		LibEASTL..IncludeDirectory..'include', LibEASTL..IncludeDirectory..'test/packages/EAStdC/include', 
-		LibEASTL..IncludeDirectory..'test/packages/EAAssert/include', LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
+		LibEASTL..IncludeDirectory..'include',
+		LibEASTL..IncludeDirectory..'test/packages/EAStdC/include', 
+		LibEASTL..IncludeDirectory..'test/packages/EAAssert/include',
+		LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
 	},
 	libDirs     = LibEASTL..BinaryDirectory,
 	libNames    = 'EASTL.'.._ACTION..".release"
@@ -100,7 +102,8 @@ SDL2Library =
 	includeDirs = LibSDL2..IncludeDirectory..'include',
 	libDirs     = LibSDL2..BinaryDirectory,
 	libNames    = 'SDL2',
-	defines     = 'SDL_MAIN_HANDLED'
+	defines     = 'SDL_MAIN_HANDLED',
+	dlls        = LibSDL2..BinaryDirectory..'SDL2.dll'
 }
 
 SPIRVReflectLibrary =

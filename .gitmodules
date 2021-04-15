@@ -7,6 +7,3 @@
 [submodule "Dependencies/ddspp/Include"]
 	path = Dependencies/ddspp/Include
 	url = https://github.com/redorav/ddspp/
-[submodule "Dependencies/tinygltf/Source"]
-	path = Dependencies/tinygltf/Source
-	url = https://github.com/syoyo/tinygltf.git

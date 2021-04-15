@@ -370,6 +370,7 @@ SourceModelDirectory = SourceDirectory..'/Model'
 
 project(ProjectCrModel)
 	kind('StaticLib')
+	dependson { ProjectShaders }
 	files { SourceModelDirectory..'/**' }
 
 	AddLibraryIncludes(TinyGLTFLibrary)

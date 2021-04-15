@@ -23,7 +23,7 @@
 
 #include <filesystem>
 
-#include "GeneratedShaders/ShaderMetadata.h" // TODO Hack - delete from the .lua
+#include "GeneratedShaders/ShaderMetadata.h"
 
 // TODO Explore a better way to do this. Assigning a semantic to an input from Assimp doesn't seem the best solution
 static Textures::T GetTextureSemantic(aiTextureType textureType)

@@ -16,8 +16,8 @@
 [submodule "Dependencies/xxhash/Source"]
 	path = Dependencies/xxhash/Source
 	url = https://github.com/Cyan4973/xxHash
-[submodule "Dependencies/ddspp/Source"]
-	path = Dependencies/ddspp/Source
+[submodule "Dependencies/ddspp/Include"]
+	path = Dependencies/ddspp/Include
 	url = https://github.com/redorav/ddspp/
 [submodule "Dependencies/spirv-reflect/Source"]
 	path = Dependencies/spirv-reflect/Source

@@ -1,0 +1,53 @@
+<packages>
+
+	<repository name="github" url="https://github.com/redorav/corsair-dependencies/raw/master/packages/"/>
+
+	<package name="argh">
+		<version id="2292b90" file="argh_2020_05_18_2292b90.zip" repository="github"/>
+	</package>
+	
+	<package name="assimp">
+		<version id="80799bd" file="assimp_2017_12_11_80799bd.zip" repository="github"/>
+	</package>
+	
+	<package name="eastl">
+		<version id="fad5471" file="eastl_2021_01_18_fad5471.zip" repository="github"/>
+	</package>
+	
+	<package name="glslang">
+		<version id="be06c6f" file="glslang_2020_06_28_be06c6f.zip" repository="github"/>
+	</package>
+	
+	<package name="half">
+		<version id="1.12.0" file="half_1.12.0.zip" repository="github"/>
+	</package>
+	
+	<package name="imgui">
+		<version id="58075c4" file="imgui_2021_01_21_58075c4.zip" repository="github"/>
+	</package>
+	
+	<package name="sdl2">
+		<version id="2.0.14" file="sdl2_2.0.14.zip" repository="github"/>
+	</package>
+	
+	<package name="spirv-reflect">
+		<version id="c955ab3" file="spirv_reflect_2021_01_25_c955ab3.zip" repository="github"/>
+	</package>
+	
+	<package name="stb">
+		<version id="f54acd4" file="stb_2020_02_05_f54acd4.zip" repository="github"/>
+	</package>
+	
+	<package name="tinygltf">
+		<version id="298c37a" file="tinygltf_2021_03_02_298c37a.zip" repository="github"/>
+	</package>
+	
+	<package name="vulkan">
+		<version id="1.2.170" file="vulkan_1.2.170.zip" repository="github"/>
+	</package>
+	
+	<package name="xxhash">
+		<version id="c77920d" file="xxhash_2020_05_28_c77920d.zip" repository="github"/>
+	</package>
+
+</packages>

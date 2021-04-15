@@ -1,0 +1,1 @@
+"./Build Tools\Independency\Independency.exe" -packages packages.xml -dependencies corsair-dependencies.xml -destination Dependencies

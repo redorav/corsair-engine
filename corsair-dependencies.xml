@@ -1,0 +1,16 @@
+<dependencies>
+
+	<dependency name="argh" version="2292b90"/>
+	<dependency name="assimp" version="80799bd"/>
+	<dependency name="eastl" version="fad5471"/>
+	<dependency name="glslang" version="be06c6f"/>
+	<dependency name="half" version="1.12.0"/>
+	<dependency name="imgui" version="58075c4"/>
+	<dependency name="sdl2" version="2.0.14"/>
+	<dependency name="spirv-reflect" version="c955ab3"/>
+	<dependency name="stb" version="f54acd4"/>
+	<dependency name="tinygltf" version="298c37a"/>
+	<dependency name="vulkan" version="1.2.170"/>
+	<dependency name="xxhash" version="c77920d"/>
+
+</dependencies>

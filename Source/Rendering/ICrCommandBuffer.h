@@ -6,13 +6,15 @@
 
 #include "Rendering/ICrTexture.h"
 
+#include "Rendering/CrGPUDeletable.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "CrRenderingForwardDeclarations.h"
 
 #include "Core/Containers/CrFixedVector.h"
 
-class ICrCommandBuffer
+class ICrCommandBuffer : public CrGPUDeletable
 {
 public:
 

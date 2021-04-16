@@ -12,14 +12,19 @@
 
 static const bool DebugDeletionQueues = false;
 
-void CrGPUDeletionQueue::Initialize(ICrRenderDevice* renderDevice, uint32_t fenceCount)
+CrGPUDeletionQueue::~CrGPUDeletionQueue()
+{
+	
+}
+
+void CrGPUDeletionQueue::Initialize(ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 
 	// We need as many as the system requests plus an extra one for when they're
 	// all in flight (and the system reserves "the next one"). We could lazily
 	// allocate in the AddToQueue function but this is simpler to reason about
-	m_deletionLists.resize(fenceCount + 1);
+	m_deletionLists.resize(MaximumDeletionLists);
 
 	for (uint32_t i = 0; i < m_deletionLists.size(); ++i)
 	{
@@ -111,4 +116,30 @@ void CrGPUDeletionQueue::Process()
 	}
 
 	CrAssertMsg(m_currentDeletionList, "Current deletion list cannot be null");
+}
+
+void CrGPUDeletionQueue::Finalize()
+{
+	// Push current list to the main queue and signal it. These are the last remaining resources in flight
+	m_activeDeletionLists.push_back(m_currentDeletionList);
+	m_renderDevice->GetMainCommandQueue()->SignalFence(m_currentDeletionList->fence.get());
+
+	// Clear the rest of the resources that have been added to the lists, and wait for them
+	// instead of just checking whether the fence has been signaled at this point. There is
+	// no real risk of locking up here because we have certainty that all fences were queued
+	for (CrDeletionList* deletionList : m_activeDeletionLists)
+	{
+		if (m_renderDevice->WaitForFence(deletionList->fence.get(), UINT64_MAX) == cr3d::GPUFenceResult::Success)
+		{
+			for (CrGPUDeletable* deletable : deletionList->deletables)
+			{
+				delete deletable;
+			}
+
+			deletionList->deletables.clear();
+		}
+	}
+
+	m_currentDeletionList = nullptr;
+	m_activeDeletionLists.clear();
 }

@@ -64,6 +64,8 @@ inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
 	}
 }
 
+typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
+
 class ICrRenderDevice
 {
 public:
@@ -72,9 +74,11 @@ public:
 
 	virtual ~ICrRenderDevice();
 
-	void InitializeDeletionQueues(uint32_t deletionQueueCount);
+	void InitializeDeletionQueue();
 
 	void ProcessDeletionQueue();
+
+	void FinalizeDeletionQueue();
 
 	// Resource Creation Functions
 
@@ -129,6 +133,11 @@ public:
 
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 
+	const CrGPUDeletionCallbackType& GetGPUDeletionCallback() const
+	{
+		return m_gpuDeletionCallback;
+	}
+
 protected:
 
 	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) = 0;
@@ -161,7 +170,7 @@ protected:
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
-	CrFixedFunction<4, void(CrGPUDeletable*)> m_gpuDeletionLambda = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue.AddToQueue(deletable); };
+	CrGPUDeletionCallbackType m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue.AddToQueue(deletable); };
 
 	CrGPUDeletionQueue m_gpuDeletionQueue;
 

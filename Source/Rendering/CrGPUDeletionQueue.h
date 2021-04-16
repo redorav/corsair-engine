@@ -22,22 +22,26 @@ class CrGPUDeletionQueue
 {
 public:
 
+	~CrGPUDeletionQueue();
+
 	static const uint32_t MaximumDeletionLists = 8;
 
-	void Initialize(ICrRenderDevice* renderDevice, uint32_t fenceCount);
+	void Initialize(ICrRenderDevice* renderDevice);
 
 	void AddToQueue(CrGPUDeletable* deletable);
 
 	void Process();
 
-private:
+	void Finalize();
 
+private:
+	
 	ICrRenderDevice* m_renderDevice = nullptr;
 
 	// The current deletion list points to all the resources being deleted
 	// before we execute the fence. Once we execute the fence, we add it
 	// to the active deletion lists to be waited on
-	CrDeletionList* m_currentDeletionList;
+	CrDeletionList* m_currentDeletionList = nullptr;
 
 	// Active deletion lists have had fence signal commands scheduled on
 	// the GPU, and are waiting to receive that on the CPU. We want to

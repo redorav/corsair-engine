@@ -1,5 +1,6 @@
 #include "CrRendering_pch.h"
 
+#include "ICrRenderDevice.h"
 #include "ICrCommandQueue.h"
 #include "ICrCommandBuffer.h"
 
@@ -18,7 +19,7 @@ ICrCommandQueue::~ICrCommandQueue()
 
 CrCommandBufferSharedHandle ICrCommandQueue::CreateCommandBuffer()
 {
-	return CrCommandBufferSharedHandle(CreateCommandBufferPS());
+	return CrCommandBufferSharedHandle(CreateCommandBufferPS(), m_renderDevice->GetGPUDeletionCallback());
 }
 
 void ICrCommandQueue::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)

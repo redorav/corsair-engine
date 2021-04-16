@@ -27,6 +27,8 @@ public:
 
 	static void CreateRenderDevice();
 
+	virtual ~ICrRenderSystem();
+
 protected:
 
 	CrRenderDeviceSharedHandle m_mainDevice;

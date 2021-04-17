@@ -29,7 +29,7 @@ AssimpLibrary =
 {
 	includeDirs = LibAssimp..IncludeDirectory..'include',
 	libDirs     = LibAssimp..BinaryDirectory,
-	libNames    = 'Assimp.'.._ACTION..".release"
+	libNames    = 'Assimp.'.._ACTION..'.release'
 }
 
 VulkanLibrary =
@@ -59,14 +59,14 @@ EASTLLibrary =
 		LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
 	},
 	libDirs     = LibEASTL..BinaryDirectory,
-	libNames    = 'EASTL.'.._ACTION..".release"
+	libNames    = 'EASTL.'.._ACTION..'.release'
 }
 
 GlslangLibrary =
 {
 	includeDirs = LibGlslang..IncludeDirectory,
 	libDirs     = LibGlslang..BinaryDirectory,
-	libNames    = 'Glslang.'.._ACTION..".release"
+	libNames    = 'Glslang.'.._ACTION..'.release'
 }
 
 HalfLibrary =
@@ -87,6 +87,7 @@ HalfLibrary =
 HlslppLibrary =
 {
 	includeDirs = LibHlslpp..IncludeDirectory..'include',
+	files = LibHlslpp..IncludeDirectory..'include/**.h',
 	defines = 'HLSLPP_FEATURE_TRANSFORM'
 }
 
@@ -94,7 +95,7 @@ ImguiLibrary =
 {
 	includeDirs = LibImGui..IncludeDirectory,
 	libDirs     = LibImGui..BinaryDirectory,
-	libNames    = 'ImGui.'.._ACTION..".release"
+	libNames    = 'ImGui.'.._ACTION..'.release'
 }
 
 SDL2Library =
@@ -110,7 +111,7 @@ SPIRVReflectLibrary =
 {
 	includeDirs = LibSPIRVReflect..IncludeDirectory,
 	libDirs     = LibSPIRVReflect..BinaryDirectory,
-	libNames    = 'SPIRV-Reflect.'.._ACTION..".release"
+	libNames    = 'SPIRV-Reflect.'.._ACTION..'.release'
 }
 
 StbLibrary =
@@ -130,7 +131,13 @@ xxHashLibrary =
 
 function AddLibraryIncludes(library)
 	includedirs(library.includeDirs)
-	if(library["defines"]) then defines(library.defines) end
+	if(library['defines']) then defines(library.defines) end
+end
+
+-- Add files to the solution. This should generally not include cpp files
+-- and most of the time is to aid intellisense and parsing of includes
+function AddLibraryFiles(library)
+	files(library.files)
 end
 
 function LinkLibrary(library)

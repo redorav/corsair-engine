@@ -330,16 +330,10 @@ group('Math')
 	
 project(ProjectCrMath)
 	kind('StaticLib')
-	files
-	{
-		MathDirectory..'/**',
-		LibHlslpp..'/Source/include/**'
-	}
-
-	includedirs
-	{
-		MathDirectory
-	}
+	files { MathDirectory..'/**' }
+	includedirs { MathDirectory }
+	
+	AddLibraryFiles(HlslppLibrary)
 
 group('Image')
 

@@ -18,7 +18,7 @@ CrSamplerDescriptor::CrSamplerDescriptor()
 	, enableCompare(false)
 	, compareOp(cr3d::CompareOp::Always)
 	, minLod(0.0f)
-	, maxLod(1.0f)
+	, maxLod(1024.0f) // Some arbitrarily big number to mean no clamp
 	, borderColor(cr3d::BorderColor::OpaqueBlack)
 {
 

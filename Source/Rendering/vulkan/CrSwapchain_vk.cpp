@@ -228,12 +228,17 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
-	CrTextureDescriptor swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
+	CrTextureDescriptor swapchainTextureParams;
+	swapchainTextureParams.width = m_width;
+	swapchainTextureParams.height = m_height;
+	swapchainTextureParams.format = m_format;
+	swapchainTextureParams.name = "Swapchain Texture";
+	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		swapchainTexParams.extraDataPtr = images[i]; // Swapchain texture
-		m_textures[i] = renderDevice->CreateTexture(swapchainTexParams);
+		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
+		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
 	}
 
 	CreatePresentSemaphores(m_imageCount);

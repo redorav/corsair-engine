@@ -7,34 +7,19 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, cr3d::DataFormat::T format, 
-	cr3d::SampleCount sampleCount, cr3d::TextureType type, cr3d::TextureUsageFlags usage, const CrString& name, void* initialData, uint32_t extraData, void* extraDataPtr) 
-	: width(width)
-	, height(height)
-	, depth(depth)
-	, numMipmaps(numMipmaps)
-	, arraySize(arraySize)
-	, format(format)
-	, sampleCount(sampleCount)
-	, type(type)
-	, usage(usage)
-	, name(name)
-	, initialData(initialData)
-	, extraData(extraData)
-	, extraDataPtr(extraDataPtr)
-{
-
-}
-
-CrTextureDescriptor::CrTextureDescriptor(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name)
-	: CrTextureDescriptor(width, height, 1, 1, 1, format, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, usage, name, nullptr, 0, nullptr)
-{
-
-}
-
 CrTextureDescriptor::CrTextureDescriptor()
-	: CrTextureDescriptor(1, 1, 1, 1, 1, cr3d::DataFormat::RGBA8_Unorm, cr3d::SampleCount::S1, cr3d::TextureType::Tex2D, 
-		cr3d::TextureUsage::Default, "", nullptr, 0, nullptr)
+	: width(1)
+	, height(1)
+	, depth(1)
+	, numMipmaps(1)
+	, arraySize(1)
+	, format(cr3d::DataFormat::RGBA8_Unorm)
+	, sampleCount(cr3d::SampleCount::S1)
+	, type(cr3d::TextureType::Tex2D)
+	, usage(cr3d::TextureUsage::Default)
+	, initialData(nullptr)
+	, extraData(0)
+	, extraDataPtr(nullptr)
 {
 
 }

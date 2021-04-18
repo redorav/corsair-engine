@@ -50,14 +50,19 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	m_imageCount = swapchainDescriptor.requestedBufferCount; // In the case of D3D12, requesting too many fails
 	m_format = swapchainDescriptor.format;
 
-	CrTextureDescriptor swapchainTexParams(m_width, m_height, m_format, cr3d::TextureUsage::SwapChain, "Swapchain Texture");
+	CrTextureDescriptor swapchainTextureParams;
+	swapchainTextureParams.width = m_width;
+	swapchainTextureParams.height = m_height;
+	swapchainTextureParams.format = m_format;
+	swapchainTextureParams.name = "Swapchain Texture";
+	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
 		ID3D12Resource* surfaceResource;
 		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));
-		swapchainTexParams.extraDataPtr = surfaceResource; // Swapchain resource
-		m_textures[i] = renderDevice->CreateTexture(swapchainTexParams);
+		swapchainTextureParams.extraDataPtr = surfaceResource; // Swapchain resource
+		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
 	}
 }
 

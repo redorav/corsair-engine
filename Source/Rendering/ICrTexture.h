@@ -10,15 +10,8 @@
 
 struct CrTextureDescriptor
 {
-	CrTextureDescriptor(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, uint32_t arraySize, 
-						  cr3d::DataFormat::T format, cr3d::SampleCount sampleCount, cr3d::TextureType type, 
-						  cr3d::TextureUsageFlags usage, const CrString& name, 
-						  void* initialData, uint32_t extraData, void* extraDataPtr);
-
 	CrTextureDescriptor();
 	
-	CrTextureDescriptor(uint32_t width, uint32_t height, cr3d::DataFormat::T format, cr3d::TextureUsageFlags usage, const CrString& name);
-
 	uint32_t width;
 	uint32_t height;
 	uint32_t depth; // Valid for volume textures

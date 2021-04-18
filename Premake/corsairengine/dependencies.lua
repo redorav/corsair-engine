@@ -58,6 +58,7 @@ EASTLLibrary =
 		LibEASTL..IncludeDirectory..'test/packages/EAAssert/include',
 		LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
 	},
+	natvis = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,
 	libNames    = 'EASTL.'.._ACTION..'.release'
 }
@@ -88,6 +89,7 @@ HlslppLibrary =
 {
 	includeDirs = LibHlslpp..IncludeDirectory..'include',
 	files = LibHlslpp..IncludeDirectory..'include/**.h',
+	natvis = LibHlslpp..IncludeDirectory..'include/**.natvis',
 	defines = 'HLSLPP_FEATURE_TRANSFORM'
 }
 
@@ -138,6 +140,10 @@ end
 -- and most of the time is to aid intellisense and parsing of includes
 function AddLibraryFiles(library)
 	files(library.files)
+end
+
+function AddLibraryNatvis(library)
+	files(library.natvis)
 end
 
 function LinkLibrary(library)

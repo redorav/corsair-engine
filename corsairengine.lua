@@ -334,6 +334,7 @@ project(ProjectCrMath)
 	includedirs { MathDirectory }
 	
 	AddLibraryFiles(HlslppLibrary)
+	AddLibraryNatvis(HlslppLibrary)
 
 group('Image')
 
@@ -405,7 +406,7 @@ project(ProjectCrDebug)
 -- Create a dummy project for all the natvis files to be in, instead of the individual project folders
 project('Natvis')
 	kind('StaticLib')
-	files{ LibEASTL..'/Source/doc/**.natvis' }
+	AddLibraryNatvis(EASTLLibrary)
 
 --[[group('.Solution Generation')
 

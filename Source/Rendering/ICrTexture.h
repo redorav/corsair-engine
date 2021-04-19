@@ -44,7 +44,7 @@ public:
 
 	bool IsSwapchain() const { return (m_usage & cr3d::TextureUsage::SwapChain) != 0; }
 
-	bool IsDepth() const { return (m_usage & cr3d::TextureUsage::Depth) != 0; }
+	bool IsDepthStencil() const { return (m_usage & cr3d::TextureUsage::DepthStencil) != 0; }
 
 	bool Is1DTexture() const { return m_type == cr3d::TextureType::Tex1D; }
 

@@ -25,7 +25,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	resourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
 	resourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
-	if (IsDepth())
+	if (IsDepthStencil())
 	{
 		resourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 	}
@@ -127,7 +127,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 	}
 
-	if (IsDepth())
+	if (IsDepthStencil())
 	{
 		// Map texture formats to depth stencil formats
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDescriptor = {};

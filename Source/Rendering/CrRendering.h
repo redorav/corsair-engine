@@ -356,7 +356,7 @@ namespace cr3d
 
 			CPUReadable     = 1 << 1, // Can use map/unmap on it
 
-			Depth           = 1 << 2, // Use for depth texture
+			DepthStencil    = 1 << 2, // Use for depth stencil texture
 
 			RenderTarget    = 1 << 3, // Use as render target
 

@@ -36,7 +36,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	}
 	else
 	{
-		if (IsDepth())
+		if (IsDepthStencil())
 		{
 			usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -189,12 +189,12 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// Create the image views
 	//-----------------------
 
-	if (IsRenderTarget() || IsDepth() || IsUnorderedAccess() || IsSwapchain())
+	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
 		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
 	}
 
-	if (IsDepth()) // TODO sparse textures
+	if (IsDepthStencil()) // TODO sparse textures
 	{
 		m_vkAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 	}
@@ -383,7 +383,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		}
 	}
 
-	if (IsRenderTarget() || IsDepth() || IsSwapchain())
+	if (IsRenderTarget() || IsDepthStencil() || IsSwapchain())
 	{
 		// We create a dummy attachment description here that will be useful for creating
 		// the framebuffer objects later. This isn't useful per se but can be used as a helper
@@ -393,7 +393,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	}
 
 	// TODO Review all this once we've implemented renderpasses and framebuffers
-	if (IsRenderTarget() || IsDepth())
+	if (IsRenderTarget() || IsDepthStencil())
 	{
 		VkAttachmentReference attachmentReference = { 0, imageLayout }; // Bind to slot 0 always if this is the only render target
 
@@ -402,7 +402,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		VkSubpassDescription subpassDescription = {};
 		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
-		if (IsDepth())
+		if (IsDepthStencil())
 		{
 			subpassDescription.colorAttachmentCount = 0;
 			subpassDescription.pDepthStencilAttachment = &attachmentReference;
@@ -435,7 +435,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT; // Signal at the beginning of the renderpass
 		dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 		
-		if(IsDepth())
+		if(IsDepthStencil())
 		{
 			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT; // Signal at early depth stencil TODO correct?
 			dependencies[0].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
@@ -452,7 +452,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		dependencies[1].srcSubpass = 0; // The only subpass we have
 		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL; // Consumer are all commands outside of the renderpass
 		
-		if (IsDepth())
+		if (IsDepthStencil())
 		{
 			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT; // Signal at early depth stencil TODO correct?
 			dependencies[1].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;

@@ -30,7 +30,7 @@ public: // TODO remove
 	uint32_t m_width;
 	uint32_t m_height;
 	uint32_t m_depth;
-	uint32_t m_numMipmaps;
+	uint32_t m_mipmapCount;
 
 	CrVector<unsigned char> m_data;
 	cr3d::DataFormat::T m_format;

@@ -187,7 +187,7 @@ CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMa
 			textureParams.format = image->GetFormat();
 			textureParams.initialData = image->GetData();
 			textureParams.initialDataSize = image->GetDataSize();
-			textureParams.mipmapCount = image->m_numMipmaps;
+			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
 			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);

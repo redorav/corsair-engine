@@ -104,7 +104,7 @@ void CrImageDecoderDDS::SetImageProperties(CrImageHandle& image, const ddspp::De
 	image->m_width = desc->width;
 	image->m_height = desc->height;
 	image->m_depth = desc->depth;
-	image->m_numMipmaps = desc->numMips;
+	image->m_mipmapCount = desc->numMips;
 	image->m_type = ToTextureType(desc->type);
 	image->m_format = DXGItoDataFormat(desc->format);
 }

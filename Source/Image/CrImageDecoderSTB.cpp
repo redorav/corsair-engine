@@ -41,7 +41,7 @@ CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize)
 
 		image->m_width = w;
 		image->m_height = h;
-		image->m_numMipmaps = 1;
+		image->m_mipmapCount = 1;
 
 		// This format does not work for textures with 3 channels, so we tell stb to create an alpha channel
 		// because stb can return data with different number of channels depending on the image

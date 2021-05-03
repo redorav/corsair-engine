@@ -250,7 +250,7 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			textureParams.format = loadedImage->GetFormat();
 			textureParams.initialData = loadedImage->GetData();
 			textureParams.initialDataSize = loadedImage->GetDataSize();
-			textureParams.mipmapCount = loadedImage->m_numMipmaps;
+			textureParams.mipmapCount = loadedImage->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
 			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);

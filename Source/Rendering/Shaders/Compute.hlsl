@@ -28,7 +28,7 @@ struct CS_IN
 void MainCS(CS_IN input)
 {
 	//ExampleDataBufferCompute[0] = float4(0.0, 0.0, 1.0, 0.0);
-	ExampleRWTextureCompute[input.groupThreadId] = float4(input.groupThreadId.xy / 7.0, 0.0, 0.0);
+	ExampleRWTextureCompute[input.groupThreadId.xy] = float4(input.groupThreadId.xy / 7.0, 0.0, 0.0);
 
 	ComputeStruct s;
 	s.a = 3.0;

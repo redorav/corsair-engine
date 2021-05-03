@@ -5,7 +5,7 @@
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-#include "CrSPIRVCompiler.h"
+#include "CrGLSLANGCompiler.h"
 
 #include "GlobalVariables.h"
 
@@ -43,11 +43,10 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 		case cr3d::GraphicsApi::Vulkan:
 		{
 			std::vector<uint32_t> spirvBytecode;
-			CrSPIRVCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
+			CrGLSLANGCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
 
 			const char* outputPath = compilationDescriptor.outputPath.c_str();
 
-			// TODO Write to file
 			auto file = ICrFile::CreateUnique(outputPath, FileOpenFlags::Write | FileOpenFlags::ForceCreate);
 			file->Write(spirvBytecode.data(), spirvBytecode.size() * sizeof(uint32_t));
 			break;
@@ -202,7 +201,8 @@ int main(int argc, char* argv[])
 	std::string platformString    = commandline("-platform").str();
 	std::string graphicsApiString = commandline("-graphicsapi").str();
 
-	std::string inputPath = inputFilePath.string().c_str();inputPath;
+	std::string inputPath = inputFilePath.string();
+	std::string outputPath = inputFilePath.string();
 
 	CrShaderCompiler compiler;
 	compiler.Initialize();
@@ -211,10 +211,11 @@ int main(int argc, char* argv[])
 	if (buildMetadata)
 	{
 		CompilationDescriptor compilationDescriptor;
-		compilationDescriptor.inputPath = inputFilePath.string();
-		compilationDescriptor.outputPath = outputFilePath.string();
+		compilationDescriptor.inputPath = inputPath;
+		compilationDescriptor.outputPath = outputPath;
 		compilationDescriptor.entryPoint = entryPoint;
 		compilationDescriptor.shaderStage = cr3d::ShaderStage::Pixel;
+
 		CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor);
 	}
 	else

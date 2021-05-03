@@ -266,7 +266,7 @@ project(ProjectShaders)
 	dependson { ProjectShaderCompiler }
 
 	local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
-	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/metadata.hlsl'
+	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/Metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/'..ShaderMetadataFilename
 	local shaderGenCommandLine = 
 	'"'..ShaderCompilerAbsolutePath..'" '..

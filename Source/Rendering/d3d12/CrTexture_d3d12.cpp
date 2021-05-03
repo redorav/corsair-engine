@@ -20,7 +20,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	resourceDescriptor.Width = m_width;
 	resourceDescriptor.Height = m_height;
-	resourceDescriptor.MipLevels = (UINT16)m_numMipmaps;
+	resourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
 	resourceDescriptor.Format = dxgiFormat;
 	resourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
 	resourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -111,7 +111,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 
 		// Create one render target view for each mip/slice combination
-		for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
+		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
 			m_renderTargetViews[mip].resize(m_arraySize);
 			rtvDescriptor.Texture2D.MipSlice = mip;
@@ -158,7 +158,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 
 		// Create one render target view for each mip/slice combination
-		for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
+		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
 			m_renderTargetViews[mip].resize(m_arraySize);
 			dsvDescriptor.Texture2D.MipSlice = mip;

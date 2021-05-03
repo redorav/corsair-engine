@@ -31,7 +31,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	m_width = descriptor.width;
 	m_height = descriptor.height;
 	m_depth = CrMax(descriptor.depth, 1u);
-	m_numMipmaps = CrMax(descriptor.numMipmaps, 1u);
+	m_mipmapCount = CrMax(descriptor.numMipmaps, 1u);
 	m_type = descriptor.type;
 	m_sampleCount = descriptor.sampleCount;
 	m_arraySize = descriptor.arraySize;
@@ -133,7 +133,7 @@ uint32_t ICrTexture::GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t widt
 
 uint32_t ICrTexture::GetMipSliceOffset(uint32_t mip, uint32_t slice) const
 {
-	return GetMipSliceOffset(m_format, m_width, m_height, m_numMipmaps, IsVolumeTexture(), mip, slice);
+	return GetMipSliceOffset(m_format, m_width, m_height, m_mipmapCount, IsVolumeTexture(), mip, slice);
 }
 
 ICrTexture::~ICrTexture()

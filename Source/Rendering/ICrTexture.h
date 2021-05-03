@@ -64,7 +64,7 @@ public:
 
 	uint32_t GetDepth() const { return m_depth; }
 
-	uint32_t GetMipmapCount() const { return m_numMipmaps; }
+	uint32_t GetMipmapCount() const { return m_mipmapCount; }
 
 	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
@@ -96,7 +96,7 @@ protected:
 
 	uint32_t m_arraySize;
 
-	uint32_t m_numMipmaps;
+	uint32_t m_mipmapCount;
 
 	uint32_t m_usedMemory;
 

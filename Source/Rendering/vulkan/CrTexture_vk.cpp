@@ -135,7 +135,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageCreateInfo.pNext = nullptr;
 		imageCreateInfo.format = m_vkFormat;
 		imageCreateInfo.extent = { m_width, m_height, m_depth };
-		imageCreateInfo.mipLevels = m_numMipmaps;
+		imageCreateInfo.mipLevels = m_mipmapCount;
 		imageCreateInfo.arrayLayers = arrayLayers;
 		imageCreateInfo.samples = m_vkSamples;
 		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT; // TODO revise this usage
@@ -213,7 +213,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.flags = vkCreateFlags;
 		imageViewInfo.components = {};
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
-		imageViewInfo.subresourceRange.levelCount = m_numMipmaps;
+		imageViewInfo.subresourceRange.levelCount = m_mipmapCount;
 		imageViewInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewInfo.subresourceRange.layerCount = arrayLayers;
 		imageViewInfo.viewType = vkImageViewType;
@@ -238,7 +238,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
 
-		for (uint32_t mip = 0; mip < m_numMipmaps; ++mip)
+		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
 			imageViewInfo.subresourceRange.baseMipLevel = mip;
 			imageViewInfo.subresourceRange.levelCount = 1;
@@ -303,7 +303,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			// Setup buffer copy regions for each mip level
 			CrVector<VkBufferImageCopy> bufferCopyRegions;
 
-			for (uint32_t mip = 0; mip < m_numMipmaps; mip++)
+			for (uint32_t mip = 0; mip < m_mipmapCount; mip++)
 			{
 				VkBufferImageCopy bufferCopyRegion;
 				bufferCopyRegion.imageSubresource.aspectMask = m_vkAspectMask;
@@ -323,7 +323,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			VkImageSubresourceRange subresourceRange;
 			subresourceRange.aspectMask = m_vkAspectMask;
 			subresourceRange.baseMipLevel = 0;
-			subresourceRange.levelCount = m_numMipmaps;
+			subresourceRange.levelCount = m_mipmapCount;
 			subresourceRange.baseArrayLayer = 0;
 			subresourceRange.layerCount = 1; // TODO
 

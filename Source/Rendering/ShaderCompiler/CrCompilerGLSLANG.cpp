@@ -2,7 +2,7 @@
 #include <sstream>
 
 #include "CrShaderCompiler.h"
-#include "CrGLSLANGCompiler.h"
+#include "CrCompilerGLSLANG.h"
 
 #include "Rendering/CrRendering.h"
 
@@ -177,7 +177,7 @@ public:
 	}
 };
 
-bool CrGLSLANGCompiler::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
+bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
 {
 	// TODO Move this higher up. We don't want file loading logic here
 	std::ifstream fileStream;

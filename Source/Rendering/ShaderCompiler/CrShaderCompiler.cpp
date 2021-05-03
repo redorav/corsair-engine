@@ -5,7 +5,7 @@
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-#include "CrGLSLANGCompiler.h"
+#include "CrCompilerGLSLANG.h"
 
 #include "GlobalVariables.h"
 
@@ -43,7 +43,7 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 		case cr3d::GraphicsApi::Vulkan:
 		{
 			std::vector<uint32_t> spirvBytecode;
-			CrGLSLANGCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
+			CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
 
 			const char* outputPath = compilationDescriptor.outputPath.c_str();
 

@@ -1,7 +1,7 @@
 #include "CrShaderMetadataBuilder.h"
 
 #include "CrShaderCompiler.h"
-#include "CrGLSLANGCompiler.h"
+#include "CrCompilerGLSLANG.h"
 
 #include "Core/FileSystem/CrFileSystem.h"
 
@@ -64,7 +64,7 @@ static const std::string RWDataBufferSection =
 bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor)
 {
 	std::vector<uint32_t> spirvBytecode;
-	bool compiled = CrGLSLANGCompiler::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
+	bool compiled = CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
 
 	if (!compiled)
 	{

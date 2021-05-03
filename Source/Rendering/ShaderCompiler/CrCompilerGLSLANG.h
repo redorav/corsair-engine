@@ -7,7 +7,7 @@
 
 struct CompilationDescriptor;
 
-class CrGLSLANGCompiler
+class CrCompilerGLSLANG
 {
 public:
 

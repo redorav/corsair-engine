@@ -202,10 +202,25 @@ int main(int argc, char* argv[])
 	std::string graphicsApiString = commandline("-graphicsapi").str();
 
 	std::string inputPath = inputFilePath.string();
-	std::string outputPath = inputFilePath.string();
+	std::string outputPath = outputFilePath.string();
 
 	CrShaderCompiler compiler;
 	compiler.Initialize();
+
+	if (entryPoint.empty())
+	{
+		QuitWithError("Error: no entry point specified");
+	}
+
+	if (inputPath.empty())
+	{
+		QuitWithError("Error: no input file specified");
+	}
+
+	if (outputPath.empty())
+	{
+		QuitWithError("Error: no output file specified");
+	}
 
 	// If we've been asked to create metadata
 	if (buildMetadata)

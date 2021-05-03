@@ -14,6 +14,35 @@
 
 #include "Core/Containers/CrFixedVector.h"
 
+struct CrTextureBarrier
+{
+	struct PipelineStage
+	{
+		enum T
+		{
+			Host          = 1 << 1,
+			VertexShader  = 2 << 1,
+			PixelShader   = 3 << 1,
+			OutputMerger  = 4 << 1,
+			ComputeShader = 5 << 1
+		};
+	};
+
+	struct Usage
+	{
+		cr3d::TextureState::T state;
+		PipelineStage::T pipelineStages;
+	};
+
+	Usage initialUsage;
+
+	Usage finalUsage;
+
+	int32_t startMip = -1;
+
+	int32_t mipmapCount = -1;
+};
+
 class ICrCommandBuffer : public CrGPUDeletable
 {
 public:
@@ -72,7 +101,7 @@ public:
 
 	void EndDebugEvent();
 
-	void TransitionTexture(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState);
+	void TextureBarrier(const ICrTexture* texture, const CrTextureBarrier& resourceTransition);
 
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
@@ -111,7 +140,7 @@ protected:
 
 	virtual void EndDebugEventPS() = 0;
 
-	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) = 0;
+	virtual void TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition) = 0;
 
 	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) = 0;
 
@@ -272,21 +301,21 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
+	FlushGraphicsRenderStatePS();
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	FlushGraphicsRenderStatePS(); // TODO Put in platform-independent code
+	FlushGraphicsRenderStatePS();
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	FlushComputeRenderStatePS(); // TODO Put in platform-independent code
+	FlushComputeRenderStatePS();
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
@@ -301,9 +330,9 @@ inline void ICrCommandBuffer::EndDebugEvent()
 	EndDebugEventPS();
 }
 
-inline void ICrCommandBuffer::TransitionTexture(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState)
+inline void ICrCommandBuffer::TextureBarrier(const ICrTexture* texture, const CrTextureBarrier& resourceTransition)
 {
-	TransitionTexturePS(texture, initialState, destinationState);
+	TextureBarrierPS(texture, resourceTransition);
 }
 
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)

@@ -229,7 +229,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
-
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
@@ -250,24 +249,25 @@ void CrFrame::Process()
 		drawCommandBuffer->Begin();
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 		drawCommandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
-	
+
 		CrRenderPassDescriptor renderPassDescriptor;
+		{
+			CrRenderTargetDescriptor swapchainAttachment;
+			swapchainAttachment.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
+			swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
+			swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
+			swapchainAttachment.initialState = cr3d::TextureState::Undefined;
+			swapchainAttachment.finalState = cr3d::TextureState::Present;
 
-		CrRenderTargetDescriptor swapchainAttachment;
-		swapchainAttachment.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
-		swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
-		swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
-		swapchainAttachment.initialState = cr3d::ResourceState::Undefined;
-		swapchainAttachment.finalState = cr3d::ResourceState::Present;
+			CrRenderTargetDescriptor depthAttachment;
+			depthAttachment.texture = m_depthStencilTexture.get();
+			depthAttachment.loadOp = CrRenderTargetLoadOp::Clear;
+			depthAttachment.initialState = cr3d::TextureState::Undefined;
+			depthAttachment.finalState = cr3d::TextureState::DepthStencilWrite;
 
-		CrRenderTargetDescriptor depthAttachment;
-		depthAttachment.texture = m_depthStencilTexture.get();
-		depthAttachment.loadOp = CrRenderTargetLoadOp::Clear;
-		depthAttachment.initialState = cr3d::ResourceState::Undefined;
-		depthAttachment.finalState = cr3d::ResourceState::PixelShaderInput;
-
-		renderPassDescriptor.color.push_back(swapchainAttachment);
-		renderPassDescriptor.depth = depthAttachment;
+			renderPassDescriptor.color.push_back(swapchainAttachment);
+			renderPassDescriptor.depth = depthAttachment;
+		}
 
 		drawCommandBuffer->BeginDebugEvent("RenderPass 1", float4(1.0f, 0.0, 1.0f, 1.0f));
 		{

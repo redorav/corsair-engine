@@ -25,8 +25,6 @@ public:
 
 	virtual ~CrCommandBufferVulkan() override;
 
-	static void GetVkImageLayoutAndAccessFlags(bool isDepth, cr3d::ResourceState::T resourceState, VkImageLayout& imageLayout, VkAccessFlags& accessFlags);
-
 	const VkCommandBuffer& GetVkCommandBuffer() const;
 
 	VkCommandBuffer& GetVkCommandBuffer();
@@ -59,7 +57,7 @@ private:
 
 	virtual void EndDebugEventPS() override;
 
-	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
+	virtual void TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& textureBarrier) override;
 
 	virtual void FlushGraphicsRenderStatePS() override;
 

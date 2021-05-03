@@ -44,7 +44,7 @@ private:
 
 	virtual void EndDebugEventPS() override;
 
-	virtual void TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState) override;
+	virtual void TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition) override;
 
 	virtual void FlushGraphicsRenderStatePS() override;
 

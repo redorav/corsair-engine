@@ -26,11 +26,10 @@ void CrCommandBufferD3D12::EndRenderPassPS()
 	
 }
 
-void CrCommandBufferD3D12::TransitionTexturePS(const ICrTexture* texture, cr3d::ResourceState::T initialState, cr3d::ResourceState::T destinationState)
+void CrCommandBufferD3D12::TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition)
 {
 	unused_parameter(texture);
-	unused_parameter(initialState);
-	unused_parameter(destinationState);
+	unused_parameter(resourceTransition);
 }
 
 void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()

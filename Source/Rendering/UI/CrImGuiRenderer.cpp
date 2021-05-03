@@ -192,8 +192,8 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrTexture* swap
 	CrRenderTargetDescriptor swapchainAttachment;
 	swapchainAttachment.texture = swapchainTexture;
 	swapchainAttachment.loadOp = CrRenderTargetLoadOp::Load;
-	swapchainAttachment.initialState = cr3d::ResourceState::Present;
-	swapchainAttachment.finalState = cr3d::ResourceState::Present;
+	swapchainAttachment.initialState = cr3d::TextureState::Present;
+	swapchainAttachment.finalState = cr3d::TextureState::Present;
 
 	graphicsRenderPass.color.push_back(swapchainAttachment);
 

@@ -397,21 +397,24 @@ namespace cr3d
 		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
 	};
 
-	namespace ResourceState
+	// These resource states encapsulate resource states as a common denominator between APIs. Some platforms don't even
+	// have resource states but instead flush caches, etc. These are ways to clue in each platform of what needs doing.
+	// It might mean doing the same thing for some of the states.
+	namespace TextureState
 	{
 		enum T : uint8_t
 		{
-			Undefined        = 0, // Never use this as the destination state in a resource transition operation
-			ShaderInput      = 1, // Use as input to a shader other than the pixel shader
-			PixelShaderInput = 2, // Use as input to a pixel shader
-			RenderTarget     = 3, // Use as a Render Target
-			UnorderedAccess  = 4, // Use as Unordered Access
-			Present          = 5, // Use as swapchain image
-			DepthRead        = 6, // Use as depth read
-			DepthWrite       = 7, // Use to write depth to it
-			CopyDestination  = 8, // Use as destination of copy operation
-			CopySource       = 9, // Use as source of copy operation
-			PreInitialized   = 10,
+			Undefined         = 0, // Never use this as the destination state in a resource transition operation
+			ShaderInput       = 1, // Use as input to a shader (except depth)
+			RenderTarget      = 2, // Use as a render target
+			RWTexture         = 3, // Use as RW texture
+			Present           = 4, // Use as swapchain
+			DepthStencilRead  = 5, // Read depth in shader
+			DepthStencilWrite = 6, // Write to depth
+			CopySource        = 7, // Use as source of copy operation
+			CopyDestination   = 8, // Use as destination of copy operation
+			PreInitialized    = 9, // Linear content. Never a destination
+			Count
 		};
 	};
 

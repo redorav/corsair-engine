@@ -17,8 +17,8 @@ struct CrRenderTargetDescriptor
 		, storeOp(CrRenderTargetStoreOp::Store)
 		, stencilLoadOp(CrRenderTargetLoadOp::DontCare)
 		, stencilStoreOp(CrRenderTargetStoreOp::DontCare)
-		, initialState(cr3d::ResourceState::Undefined)
-		, finalState(cr3d::ResourceState::RenderTarget)
+		, initialState(cr3d::TextureState::Undefined)
+		, finalState(cr3d::TextureState::RenderTarget)
 	{}
 
 	const ICrTexture* texture;
@@ -33,8 +33,8 @@ struct CrRenderTargetDescriptor
 	CrRenderTargetStoreOp storeOp;
 	CrRenderTargetLoadOp stencilLoadOp;
 	CrRenderTargetStoreOp stencilStoreOp;
-	cr3d::ResourceState::T initialState;
-	cr3d::ResourceState::T finalState;
+	cr3d::TextureState::T initialState;
+	cr3d::TextureState::T finalState;
 };
 
 struct CrRenderPassDescriptor

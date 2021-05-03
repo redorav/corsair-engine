@@ -6,7 +6,11 @@ CrCamera::CrCamera() : CrEntity()
 , m_view2WorldMatrix(float4x4::identity())
 , m_world2ViewMatrix(float4x4::identity())
 , m_view2ProjectionMatrix(float4x4::identity())
-{}
+{
+	m_lookAtWorldSpace = float3(0, 0, 1);
+	m_upWorldSpace     = float3(0, 1, 0);
+	m_rightWorldSpace  = float3(1, 0, 0);
+}
 
 CrCamera::CrCamera(float width, float height, float nearPlane, float farPlane) : CrEntity()
 {
@@ -33,16 +37,16 @@ void CrCamera::LookAt(const float3& target, const float3& up)
 	float3 vx = normalize(cross(vz, up));
 	float3 vy = cross(vx, vz);
 
-	m_lookAt = vz;
-	m_right = vx;
-	m_up = vy;
+	m_lookAtWorldSpace = vz;
+	m_rightWorldSpace = vx;
+	m_upWorldSpace = vy;
 }
 
 void CrCamera::RotateAround(const float3& pivot, const float3& axis, float angle)
 {
-	quaternion rotation = axisangle(axis, angle * CrMath::Deg2Rad);
+	quaternion rotation = quaternion::rotation_axis(axis, angle * CrMath::Deg2Rad);
 	float3 currentDirection = m_position - pivot; // Get current direction
-	float3 direction = rotation * currentDirection; // Rotate with quaternion
+	float3 direction = mul(currentDirection, rotation); // Rotate with quaternion
 	m_position = pivot + direction; // Get position
 }
 
@@ -53,8 +57,19 @@ void CrCamera::Translate(const float3& t)
 
 void CrCamera::Rotate(const float3& r)
 {
-	quaternion rot = euler(r);
-	m_qrotation *= rot;
+	// Rotate around the Y axis
+	quaternion rotationY = quaternion::rotation_y(r.y);
+
+	// Rotate around the camera's previous right axis
+	// TODO It may be better to keep hold of the current full rotation
+	quaternion rotationX = quaternion::rotation_axis(m_rightWorldSpace, r.x);
+
+	// Combine rotations
+	quaternion rotationXY = mul(rotationX, rotationY);
+
+	m_lookAtWorldSpace = mul(m_lookAtWorldSpace, rotationXY);
+	m_upWorldSpace     = mul(m_upWorldSpace,     rotationXY);
+	m_rightWorldSpace  = mul(m_rightWorldSpace,  rotationXY);
 }
 
 void CrCamera::SetFilmWidth(float filmWidth)
@@ -74,17 +89,28 @@ void CrCamera::SetVerticalFieldOfView(float fovY)
 
 void CrCamera::Update()
 {
-	m_view2WorldMatrix = float4x4(m_qrotation);
-	
-	m_view2WorldMatrix._m03 = m_position.x;
-	m_view2WorldMatrix._m13 = m_position.y;
-	m_view2WorldMatrix._m23 = m_position.z;
+	m_view2WorldMatrix = float4x4::identity();
+	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
+	m_view2WorldMatrix._m10_m11_m12 = m_upWorldSpace;
+	m_view2WorldMatrix._m20_m21_m22 = m_lookAtWorldSpace;
+	m_view2WorldMatrix._m30_m31_m32 = m_position;
 
 	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
+}
 
-	m_lookAt	= mul(m_qrotation, float3(0, 0, 1));
-	m_up		= mul(m_qrotation, float3(0, 1, 0));
-	m_right		= mul(m_qrotation, float3(1, 0, 0));
+const hlslpp::float3& CrCamera::GetLookatVector() const
+{
+	return m_lookAtWorldSpace;
+}
+
+const hlslpp::float3& CrCamera::GetRightVector() const
+{
+	return m_rightWorldSpace;
+}
+
+const hlslpp::float3& CrCamera::GetUpVector() const
+{
+	return m_upWorldSpace;
 }
 
 const hlslpp::float4x4& CrCamera::GetWorld2ViewMatrix() const

@@ -383,8 +383,8 @@ void CrFrame::UpdateCamera()
 {
 	camera.SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
 
-	float3 currentLookAt = camera.m_lookAt;
-	float3 currentRight = camera.m_right;
+	float3 currentLookAt = camera.GetLookatVector();
+	float3 currentRight = camera.GetRightVector();
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboard = CrInput.GetKeyboardState();
@@ -392,35 +392,42 @@ void CrFrame::UpdateCamera()
 
 	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
 
+	float translationSpeed = 5.0f;
+
+	if (keyboard.keyPressed[KeyboardKey::LeftShift])
+	{
+		translationSpeed *= 3.0f;
+	}
+
 	// TODO Hack to get a bit of movement on the camera
 	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera.Translate(currentRight * -5.0f * frameDelta);
+		camera.Translate(currentRight * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
-		camera.Translate(currentRight * 5.0f * frameDelta);
+		camera.Translate(currentRight * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
-		camera.Translate(currentLookAt * 5.0f * frameDelta);
+		camera.Translate(currentLookAt * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
-		camera.Translate(currentLookAt * -5.0f * frameDelta);
+		camera.Translate(currentLookAt * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, -5.0f, 0.0f) * frameDelta);
+		camera.Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, 5.0f, 0.0f) * frameDelta);
+		camera.Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
 	}
 
 	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
@@ -446,7 +453,7 @@ void CrFrame::UpdateCamera()
 
 	camera.Update();
 
-	cameraConstantData.world2View = transpose(camera.GetWorld2ViewMatrix());
+	cameraConstantData.world2View = camera.GetWorld2ViewMatrix();
 	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
 }
 

@@ -23,8 +23,8 @@ struct VS_OUT
 
 struct Camera
 {
-	float4x4 view2Projection;
-	float4x4 world2View;
+	row_major float4x4 view2Projection;
+	row_major float4x4 world2View;
 };
 
 cbuffer Camera : register(b1)
@@ -112,9 +112,9 @@ VS_OUT main_vs(VS_IN IN)
 	float4 localPosition = float4(IN.pos.xyz, 1);
 
 	// TODO world matrix
-	float4 viewPosition = mul(cb_Camera.world2View, localPosition);
+	float4 viewPosition = mul(localPosition, cb_Camera.world2View);
 
-	output.hwPosition = mul(cb_Camera.view2Projection, viewPosition);
+	output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
 	//output.hwPosition = mul(cb_CameraVS.world2View, float4(IN.pos.xyz, 1));
 	#endif
 

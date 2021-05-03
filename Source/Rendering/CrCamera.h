@@ -7,10 +7,6 @@ class CrCamera : public CrEntity
 {
 public:
 
-	float3 m_up;
-	float3 m_right;
-	float3 m_lookAt;
-
 	struct ProjectionParams
 	{
 		cr3d::CameraProjection projection;
@@ -44,6 +40,12 @@ public:
 
 	void RotateAround(const float3& point, const float3& axis, float angle);
 
+	const float3& GetLookatVector() const;
+
+	const float3& GetRightVector() const;
+
+	const float3& GetUpVector() const;
+
 	const float4x4& GetWorld2ViewMatrix() const;
 
 	const float4x4& GetView2ProjectionMatrix() const;
@@ -56,6 +58,11 @@ private:
 	float m_fovY;
 	//float m_nearPlane;
 	//float m_farPlane;
+
+	// Camera vectors in world space
+	float3 m_lookAtWorldSpace;
+	float3 m_upWorldSpace;
+	float3 m_rightWorldSpace;
 
 	float4x4 m_view2WorldMatrix;
 	float4x4 m_world2ViewMatrix;

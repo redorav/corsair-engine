@@ -4,7 +4,7 @@ require("premake/corsairengine/dependencies")
 SourceDirectory         = 'Source'
 ToolsDirectory          = 'Tools'
 ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
-MathDirectory = SourceDirectory..'/Math'
+MathDirectory           = SourceDirectory..'/Math'
 
 -- Platforms
 DesktopWin64 = 'Desktop Win64'
@@ -29,7 +29,8 @@ ProjectCrModel          = 'CrModel'
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
 GeneratedCodeDirectory = WorkspaceDirectory..'/GeneratedCode'
 
-ShaderCompilerAbsolutePath = path.getabsolute(ShaderCompilerDirectory)..'/'..ProjectShaderCompiler..'.exe'
+ShaderCompilerAbsoluteDirectory = path.getabsolute(ShaderCompilerDirectory)
+ShaderCompilerAbsolutePath = ShaderCompilerAbsoluteDirectory..'/'..ProjectShaderCompiler..'.exe'
 
 function ExcludePlatformSpecificCode(rootPath)
 	excludes { rootPath..'**/platform/**' }
@@ -154,7 +155,10 @@ workspace 'Corsair Engine'
 	
 	-- Generate the global paths file
 	globalVariableHeader = io.open(path.getabsolute(GeneratedCodeDirectory)..'/GlobalVariables.h', 'wb');
-	globalVariableHeader:write('static const char* ShaderCompilerPath = "'..ShaderCompilerAbsolutePath..'";');
+	globalVariableHeader:write('namespace GlobalPaths\n{\n');
+	globalVariableHeader:write('\tstatic const char* ShaderCompilerDirectory = "'..ShaderCompilerAbsoluteDirectory..'";\n');
+	globalVariableHeader:write('\tstatic const char* ShaderCompilerPath = "'..ShaderCompilerAbsolutePath..'";\n');
+	globalVariableHeader:write('};\n');
 	globalVariableHeader:close();
 
 	filter('system:windows')

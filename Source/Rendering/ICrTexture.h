@@ -15,7 +15,7 @@ struct CrTextureDescriptor
 	uint32_t width;
 	uint32_t height;
 	uint32_t depth; // Valid for volume textures
-	uint32_t numMipmaps;
+	uint32_t mipmapCount;
 	uint32_t arraySize; // Valid for texture or cubemap arrays
 	cr3d::DataFormat::T format;
 	cr3d::SampleCount sampleCount;

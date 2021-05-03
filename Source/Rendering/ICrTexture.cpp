@@ -11,7 +11,7 @@ CrTextureDescriptor::CrTextureDescriptor()
 	: width(1)
 	, height(1)
 	, depth(1)
-	, numMipmaps(1)
+	, mipmapCount(1)
 	, arraySize(1)
 	, format(cr3d::DataFormat::RGBA8_Unorm)
 	, sampleCount(cr3d::SampleCount::S1)
@@ -31,7 +31,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	m_width = descriptor.width;
 	m_height = descriptor.height;
 	m_depth = CrMax(descriptor.depth, 1u);
-	m_mipmapCount = CrMax(descriptor.numMipmaps, 1u);
+	m_mipmapCount = CrMax(descriptor.mipmapCount, 1u);
 	m_type = descriptor.type;
 	m_sampleCount = descriptor.sampleCount;
 	m_arraySize = descriptor.arraySize;

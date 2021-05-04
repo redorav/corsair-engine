@@ -94,15 +94,14 @@ void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)
 CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
 {
 	CrProcessDescriptor processDescriptor;
+	processDescriptor.waitForCompletion = true;
 
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
 	// want the shader compiler in a known directory, or several directories that we search
 	// The platform-specific compilers also need to be in directories relative to the main one
-	processDescriptor.executablePath = GlobalPaths::ShaderCompilerPath;
-	processDescriptor.waitForCompletion = true;
+	processDescriptor.commandLine += GlobalPaths::ShaderCompilerPath;
 
-	// Build command line for shader compiler
-	processDescriptor.commandLine += "-input ";
+	processDescriptor.commandLine += " -input ";
 	processDescriptor.commandLine += bytecodeDescriptor.path.string().c_str();
 	processDescriptor.commandLine += " ";
 		
@@ -119,6 +118,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	outputPath += "_";
 	outputPath += bytecodeDescriptor.entryPoint.c_str();
 	outputPath.replace_extension(".spv");
+
 	processDescriptor.commandLine += "-output ";
 	processDescriptor.commandLine += outputPath.string().c_str();
 	processDescriptor.commandLine += " ";

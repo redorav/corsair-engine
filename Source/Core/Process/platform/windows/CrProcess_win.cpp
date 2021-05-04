@@ -11,16 +11,14 @@ CrProcessResult CrProcess::RunExecutable(const CrProcessDescriptor& processDescr
 	startupInfo.cb = sizeof(startupInfo);
 
 	// Convert to wchar_t
-	CrFixedWString512 convertedExecutable;
-	convertedExecutable.append_convert(processDescriptor.executablePath.string());
-	
+	// CreateProcessW can modify the incoming string so we need a temporary buffer
 	CrFixedWString512 convertedCommandLine;
 	convertedCommandLine.append_convert(processDescriptor.commandLine);
 
 	bool result = CreateProcess
 	(
-		(LPWSTR)convertedExecutable.c_str(),
-		&convertedCommandLine[0], // Apparently CreateProcess can modify the incoming string
+		nullptr,
+		&convertedCommandLine[0],
 		NULL,             // Process handle not inheritable
 		NULL,             // Thread handle not inheritable
 		FALSE,            // Set handle inheritance to FALSE

@@ -8,12 +8,6 @@
 
 struct CrProcessDescriptor
 {
-	CrProcessDescriptor() {}
-
-	CrProcessDescriptor(const CrPath& executablePath, const CrFixedString512& commandLine, bool waitForCompletion = true, uint32_t waitTimeout = 0xffffffff)
-		: executablePath(executablePath), commandLine(commandLine), waitForCompletion(waitForCompletion), waitTimeout(waitTimeout) {}
-
-	CrPath executablePath;
 	CrFixedString512 commandLine;
 	bool waitForCompletion = true;
 	uint32_t waitTimeout = 0xffffffff;

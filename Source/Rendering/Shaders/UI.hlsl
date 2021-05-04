@@ -3,16 +3,16 @@
 
 struct VS_IN_UI
 {
-	float2 position;
-	float2 uv;
-	float4 color;
+	float2 position : POSITION;
+	float2 uv       : UV;
+	float4 color    : COLOR;
 };
 
 struct VS_OUT_UI
 {
 	float4 hwPosition : SV_Position;
-	float4 color : COLOR;
-	float2 uv : UV;
+	float4 color      : COLOR;
+	float2 uv         : UV;
 };
 
 struct UIData

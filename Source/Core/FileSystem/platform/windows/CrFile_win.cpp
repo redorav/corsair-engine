@@ -144,3 +144,18 @@ uint64_t CrFileWindows::GetSize() const
 {
 	return m_fileSize;
 }
+
+bool ICrFile::FileExists(const char* filePath)
+{
+	WIN32_FILE_ATTRIBUTE_DATA attributeData;
+	
+	if (GetFileAttributesExA(filePath, GetFileExInfoStandard, &attributeData))
+	{
+		return attributeData.dwFileAttributes != INVALID_FILE_ATTRIBUTES &&
+			!(attributeData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+	}
+	else
+	{
+		return false;
+	}	
+}

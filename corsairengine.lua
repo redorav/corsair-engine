@@ -181,7 +181,7 @@ workspace 'Corsair Engine'
 
 	configuration 'Release'
 		defines { 'NDEBUG' }
-		optimize('full')
+		optimize('speed')
 		symbols('on')
 		inlining('auto')
 		flags { 'linktimeoptimization' }

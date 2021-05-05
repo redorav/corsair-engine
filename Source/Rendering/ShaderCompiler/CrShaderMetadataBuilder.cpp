@@ -172,7 +172,9 @@ struct HLSLResources
 	//std::vector<SpvReflectDescriptorBinding> pushConstantBuffers;
 };
 
-bool CrShaderMetadataBuilder::BuildSPIRVMetadata(const std::vector<uint32_t>& spirvBytecode, std::string& metadataHeader, std::string& metadataCpp)
+bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
+	const std::vector<uint32_t>& spirvBytecode, 
+	std::string& metadataHeader, std::string& metadataCpp)
 {
 	// This needs to be kept alive
 	spv_reflect::ShaderModule spvReflectModule(spirvBytecode.size() * 4, spirvBytecode.data());

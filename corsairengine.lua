@@ -322,6 +322,8 @@ project(ProjectShaderCompiler)
 
 	AddLibraryIncludes(GlslangLibrary)
 	LinkLibrary(GlslangLibrary)
+	
+	LinkLibrary(EASTLLibrary)
 
 	-- Copy the shader compiler into a known directory
 	postbuildcommands

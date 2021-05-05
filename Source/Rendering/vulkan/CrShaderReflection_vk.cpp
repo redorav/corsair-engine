@@ -34,7 +34,7 @@ void CrShaderReflectionVulkan::ForEachResource(ShaderReflectionFn fn) const
 				switch (binding.descriptor_type)
 				{
 					case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-						resource.name = binding.type_description->type_name;
+						resource.name = binding.name;
 						resource.type = cr3d::ShaderResourceType::ConstantBuffer;
 						break;
 					case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE:

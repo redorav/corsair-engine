@@ -23,6 +23,13 @@
 
 #include "Core/FileSystem/CrFileSystem.h"
 
+std::string CrShaderCompiler::ExecutablePath;
+
+const std::string& CrShaderCompiler::GetExecutablePath()
+{
+	return ExecutablePath;
+}
+
 void CrShaderCompiler::Initialize()
 {
 	glslang::InitializeProcess();
@@ -42,17 +49,12 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	{
 		case cr3d::GraphicsApi::Vulkan:
 		{
-			std::vector<uint32_t> spirvBytecode;
-			CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
-
-			const char* outputPath = compilationDescriptor.outputPath.c_str();
-
-			auto file = ICrFile::CreateUnique(outputPath, FileOpenFlags::Write | FileOpenFlags::ForceCreate);
-			file->Write(spirvBytecode.data(), spirvBytecode.size() * sizeof(uint32_t));
+			CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor);
 			break;
 		}
 		case cr3d::GraphicsApi::D3D12:
 		{
+			//CrCompilerDXC::HLSLtoDXIL(compilationDescriptor);
 			break;
 		}
 	}
@@ -190,6 +192,11 @@ private:
 int main(int argc, char* argv[])
 {
 	CommandLineArguments commandLineArguments(argc, argv);
+	
+	CrPath executablePath = argv[0];
+	executablePath.remove_filename();
+
+	CrShaderCompiler::ExecutablePath = executablePath.string();
 
 	argh::parser commandline(commandLineArguments.argc, commandLineArguments.argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 

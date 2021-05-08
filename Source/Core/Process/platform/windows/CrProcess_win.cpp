@@ -115,18 +115,21 @@ void CrProcess::Wait(uint64_t timeoutMilliseconds)
 
 void CrProcess::ReadStdOut(char* buffer, size_t bufferSize)
 {
-	while (true)
+	if (bufferSize > 0)
 	{
-		DWORD bytesRead = 0;
-		bool success = ReadFile(hStdInput, buffer, (DWORD)bufferSize, &bytesRead, NULL);
+		while (true)
+		{
+			DWORD bytesRead = 0;
+			bool success = ReadFile(hStdInput, buffer, (DWORD)(bufferSize - 1), &bytesRead, NULL);
 
-		if (success && bytesRead > 0)
-		{
-			buffer[bytesRead] = 0; // Null terminate the buffers
-		}
-		else
-		{
-			break;
+			if (success && bytesRead > 0)
+			{
+				buffer[bytesRead] = 0; // Null terminate the buffers
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 }

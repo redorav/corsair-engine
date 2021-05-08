@@ -1,7 +1,7 @@
-#include "triangle.hlsl"
-#include "brdf.hlsl"
-#include "compute.hlsl"
-#include "ui.hlsl"
+#include "Triangle.hlsl"
+#include "Brdf.hlsl"
+#include "Compute.hlsl"
+#include "UI.hlsl"
 
 float4 metadata() : SV_Target0
 {	

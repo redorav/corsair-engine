@@ -1,8 +1,8 @@
 #ifndef TRIANGLE_HLSL
 #define TRIANGLE_HLSL
 
-#include "brdf.hlsl"
-#include "surface.hlsl"
+#include "Brdf.hlsl"
+#include "Surface.hlsl"
 
 struct VS_IN
 {

@@ -225,8 +225,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	whiteTextureParams.initialDataSize = sizeof(whiteTextureInitialData);
 	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureParams);
 
+	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
 
-	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
+	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::BufferAccess::CPUWrite, 32);
 
 	// Initialize ImGui renderer
 	CrImGuiRendererInitParams imguiInitParams = {};
@@ -345,6 +346,10 @@ void CrFrame::Process()
 
 			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_structuredBuffer.get());
 
+			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
+		
+			drawCommandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
+		
 			drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
 		
 			drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);

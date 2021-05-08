@@ -54,7 +54,10 @@ private:
 
 	CrTextureSharedHandle m_colorsRWTexture;
 
-	CrStructuredBufferSharedHandle<ExampleRWStructuredBufferCompute> m_structuredBuffer;
+	CrStructuredBufferSharedHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
+
+	CrStructuredBufferSharedHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
+
 	CrDataBufferSharedHandle m_colorsRWDataBuffer;
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;

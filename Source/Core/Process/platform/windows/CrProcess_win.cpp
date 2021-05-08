@@ -27,7 +27,7 @@ static void CloseHandleSafe(void*& handle)
 }
 
 // https://stackoverflow.com/questions/15435994/how-do-i-open-an-exe-from-another-c-exe
-CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor)
+CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 {
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};

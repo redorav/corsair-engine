@@ -187,15 +187,15 @@ void QuitWithMessage(const std::string& errorMessage)
 }
 
 // Usage:
-// -input sourceFile.hlsl	: Source file to be compiled
-// -output outputFile.bin	: Destination the compiled shader is written to
-// -entryPoint main_px		: Entry point for the compiled shader
-// -stage pixel				: Shader stage this entry point runs in
-// -metadata metadataPath	: Where metadata is stored
-// -platform vulkan_pc		: Platform to compile this shader for
-// -D DEFINE1				: Add defines for the compilation
+// -input sourceFile.hlsl : Source file to be compiled
+// -output outputFile.bin : Destination the compiled shader is written to
+// -entryPoint main_px    : Entry point for the compiled shader
+// -stage pixel           : Shader stage this entry point runs in
+// -platform pc           : Platform to compile this shader for
+// -graphicsapi vulkan    : Graphics API for this platform
+// -D DEFINE1             : Add defines for the compilation
 // 
-// Example: crshadercompiler.exe -input sourceFile.hlsl -output outputFile.bin -entryPoint main_px -metadata metadataPath -platform vulkan_pc -D DEFINE1
+// -metadata metadataPath : Where metadata is stored
 
 int main(int argc, char* argv[])
 {

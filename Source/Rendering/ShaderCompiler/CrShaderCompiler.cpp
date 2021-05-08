@@ -191,7 +191,7 @@ void QuitWithMessage(const std::string& errorMessage)
 // -output outputFile.bin : Destination the compiled shader is written to
 // -entryPoint main_px    : Entry point for the compiled shader
 // -stage pixel           : Shader stage this entry point runs in
-// -platform pc           : Platform to compile this shader for
+// -platform windows      : Platform to compile this shader for
 // -graphicsapi vulkan    : Graphics API for this platform
 // -D DEFINE1             : Add defines for the compilation
 // 

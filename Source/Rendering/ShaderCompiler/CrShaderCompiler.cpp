@@ -6,6 +6,7 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 
 #include "CrCompilerGLSLANG.h"
+#include "CrCompilerDXC.h"
 
 #include "GlobalVariables.h"
 

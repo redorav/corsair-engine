@@ -1,3 +1,4 @@
+#include "Common.hlsl"
 #include "Triangle.hlsl"
 #include "Brdf.hlsl"
 #include "Compute.hlsl"

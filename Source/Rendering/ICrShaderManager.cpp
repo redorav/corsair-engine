@@ -94,7 +94,6 @@ void ICrShaderManager::Init(const ICrRenderDevice* renderDevice)
 CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
 {
 	CrProcessDescriptor processDescriptor;
-	processDescriptor.waitForCompletion = true;
 
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
 	// want the shader compiler in a known directory, or several directories that we search
@@ -132,30 +131,42 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 	CrTimer compilationTime;
 
-	// Launch compilation process and wait
-	CrProcess::RunExecutable(processDescriptor);
+	CrProcess process(processDescriptor);
+	process.Wait();
 
-	CrLog("Compiled %s[%s] for %s %s (%f ms)", 
-		bytecodeDescriptor.entryPoint.c_str(), 
-		bytecodeDescriptor.path.string().c_str(), 
-		CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
-		CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi),
-		compilationTime.GetCurrent().AsMilliseconds());
+	if (process.GetReturnValue() >= 0)
+	{
+		CrLog("Compiled %s[%s] for %s %s (%f ms)",
+			bytecodeDescriptor.entryPoint.c_str(),
+			bytecodeDescriptor.path.string().c_str(),
+			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
+			CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi),
+			compilationTime.GetCurrent().AsMilliseconds());
 
-	CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);
+		CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);
 
-	// Generate the SPIR-V bytecode
-	CrVector<unsigned char> spirvBytecodeBytes;
-	spirvBytecodeBytes.resize(compilationOutput->GetSize());
+		// Generate the SPIR-V bytecode
+		CrVector<unsigned char> spirvBytecodeBytes;
+		spirvBytecodeBytes.resize(compilationOutput->GetSize());
 
-	compilationOutput->Read(spirvBytecodeBytes.data(), spirvBytecodeBytes.size());
+		compilationOutput->Read(spirvBytecodeBytes.data(), spirvBytecodeBytes.size());
 
-	CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode
-	(
-		std::move(spirvBytecodeBytes),
-		bytecodeDescriptor.entryPoint,
-		bytecodeDescriptor.stage
-	));
+		CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode
+		(
+			std::move(spirvBytecodeBytes),
+			bytecodeDescriptor.entryPoint,
+			bytecodeDescriptor.stage
+		));
 
-	return bytecode;
+		return bytecode;
+	}
+	else
+	{
+		CrString processOutput;
+		processOutput.resize(2048);
+		process.ReadStdOut(processOutput.data(), processOutput.length());
+		CrLog(processOutput.c_str());
+
+		return nullptr;
+	}
 }

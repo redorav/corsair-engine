@@ -9,12 +9,11 @@
 struct CrProcessDescriptor
 {
 	CrFixedString512 commandLine;
-	bool waitForCompletion = true;
-	uint32_t waitTimeout = 0xffffffff;
 };
 
 enum class CrProcessResult
 {
+	Undefined,
 	Success,
 	Error
 };
@@ -25,7 +24,52 @@ public:
 	
 	static CrProcessResult RunExecutable(const CrProcessDescriptor& processDescriptor);
 
+	CrProcess(const CrProcessDescriptor& processDescriptor);
+
+	~CrProcess();
+
+	void Wait(uint64_t timeoutMilliseconds);
+
+	void Wait();
+
+	void ReadStdOut(char* buffer, size_t bufferSize);
+
+	// Terminate a hung process
+	void Terminate();
+
+	CrProcessResult GetResult() const
+	{
+		return result;
+	}
+
+	int GetReturnValue() const;
+
 private:
 
-	CrProcess() {}
+	CrProcess() 
+		: result(CrProcessResult::Undefined)
+		, returnValue(-2147483647 - 1)
+		, hProcess(nullptr)
+		, hStdOutput(nullptr)
+	{}
+
+	CrProcessResult result;
+
+	int returnValue;
+
+	void* hProcess;
+
+	void* hStdOutput; // Output of the subprocess
+
+	void* hStdInput; // Input handle that we create a file from
 };
+
+inline void CrProcess::Wait()
+{
+	Wait(0xffffffffffffffff);
+}
+
+inline int CrProcess::GetReturnValue() const
+{
+	return returnValue;
+}

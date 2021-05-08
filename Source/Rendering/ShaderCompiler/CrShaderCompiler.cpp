@@ -179,6 +179,13 @@ private:
 	bool m_managedMemory = false;
 };
 
+void QuitWithMessage(const std::string& errorMessage)
+{
+	printf(errorMessage.c_str());
+	fflush(stdout);
+	exit(-1);
+}
+
 // Usage:
 // -input sourceFile.hlsl	: Source file to be compiled
 // -output outputFile.bin	: Destination the compiled shader is written to
@@ -217,17 +224,17 @@ int main(int argc, char* argv[])
 
 	if (entryPoint.empty())
 	{
-		QuitWithError("Error: no entry point specified");
+		QuitWithMessage("Error: no entry point specified");
 	}
 
 	if (inputPath.empty())
 	{
-		QuitWithError("Error: no input file specified");
+		QuitWithMessage("Error: no input file specified");
 	}
 
 	if (outputPath.empty())
 	{
-		QuitWithError("Error: no output file specified");
+		QuitWithMessage("Error: no output file specified");
 	}
 
 	// If we've been asked to create metadata
@@ -247,28 +254,21 @@ int main(int argc, char* argv[])
 
 		if (platform == cr::Platform::Count)
 		{
-			printf("No platform defined");
-			// No platform defined!
-			// TODO print an error message
-			return 1;
+			QuitWithMessage("No platform specified");
 		}
 
 		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
 
 		if (graphicsApi == cr3d::GraphicsApi::Count)
 		{
-			// No graphics api defined!
-			// TODO print an error message
-			return 1;
+			QuitWithMessage("No graphics API specified");
 		}
 
 		cr3d::ShaderStage::T shaderStage = ParseShaderStage(shaderStageString);
 
 		if (shaderStage == cr3d::ShaderStage::Count)
 		{
-			// No stage defined!
-			// TODO print an error message
-			return 1;
+			QuitWithMessage("No shader stage specified");
 		}
 
 		CompilationDescriptor compilationDescriptor;

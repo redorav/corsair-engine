@@ -69,7 +69,8 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	processDescriptor.commandLine += compilationDescriptor.inputPath.c_str();
 	processDescriptor.commandLine += "\" ";
 
-	CrProcess::RunExecutable(processDescriptor);
+	CrProcess compilerProcess(processDescriptor);
+	compilerProcess.Wait();
 
-	return true;
+	return compilerProcess.GetReturnValue() == 0;
 }

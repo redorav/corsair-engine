@@ -41,7 +41,7 @@ void CrShaderCompiler::Finalize()
 	glslang::FinalizeProcess();
 }
 
-void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor)
+bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
 {
 	// The graphics API will tell us which compilation pipeline we want to use. The compilationDescriptor
 	// also includes which platform we want to be targeting so that we can make more informed decisions
@@ -50,7 +50,7 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	{
 		case cr3d::GraphicsApi::Vulkan:
 		{
-			CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor);
+			return CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, compilationStatus);
 			break;
 		}
 		case cr3d::GraphicsApi::D3D12:
@@ -59,6 +59,8 @@ void CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 			break;
 		}
 	}
+
+	return false;
 }
 
 static cr3d::ShaderStage::T ParseShaderStage(const std::string& stageString)
@@ -279,7 +281,13 @@ int main(int argc, char* argv[])
 		compilationDescriptor.platform    = platform;
 		compilationDescriptor.graphicsApi = graphicsApi;
 
-		compiler.Compile(compilationDescriptor);
+		std::string compilationStatus;
+		bool success = compiler.Compile(compilationDescriptor, compilationStatus);
+
+		if (!success)
+		{
+			QuitWithMessage(compilationStatus.c_str());
+		}
 	}
 
 	compiler.Finalize();

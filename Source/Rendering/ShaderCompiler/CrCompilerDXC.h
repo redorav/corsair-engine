@@ -8,5 +8,5 @@ class CrCompilerDXC
 {
 public:
 
-	static bool HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor);
+	static bool HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus);
 };

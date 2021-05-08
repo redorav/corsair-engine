@@ -45,7 +45,7 @@ static std::string FindDXCPath()
 	return "";
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor)
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
 {
 	std::string dxcPath = FindDXCPath();
 
@@ -71,6 +71,13 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 	CrProcess compilerProcess(processDescriptor);
 	compilerProcess.Wait();
+
+	if (compilerProcess.GetReturnValue() != 0)
+	{
+		CrArray<char, 2048> processOutput;
+		compilerProcess.ReadStdOut(processOutput.data(), processOutput.size());
+		compilationStatus += processOutput.data();
+	}
 
 	return compilerProcess.GetReturnValue() == 0;
 }

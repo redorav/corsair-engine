@@ -27,5 +27,5 @@ public:
 
 	void Finalize();
 
-	void Compile(const CompilationDescriptor& compilationDescriptor);
+	bool Compile(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus);
 };

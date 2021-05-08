@@ -14,6 +14,7 @@
 #include "Core/Process/CrProcess.h"
 #include "Core/CrPlatform.h"
 #include "Core/Time/CrTimer.h"
+#include "Core/Containers/CrArray.h"
 
 #include "GlobalVariables.h"
 
@@ -162,10 +163,9 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	}
 	else
 	{
-		CrString processOutput;
-		processOutput.resize(2048);
-		process.ReadStdOut(processOutput.data(), processOutput.length());
-		CrLog(processOutput.c_str());
+		CrArray<char, 2048> processOutput;
+		process.ReadStdOut(processOutput.data(), processOutput.size());
+		CrLog(processOutput.data());
 
 		return nullptr;
 	}

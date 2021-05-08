@@ -344,8 +344,6 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
 
-			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_structuredBuffer.get());
-
 			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
 		
 			drawCommandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());

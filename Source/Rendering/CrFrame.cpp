@@ -215,7 +215,15 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	graphicsPipelineDescriptor.Hash();
 	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
 
+	uint8_t whiteTextureInitialData[4 * 4 * 4];
+	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
 
+	CrTextureDescriptor whiteTextureParams;
+	whiteTextureParams.width = 4;
+	whiteTextureParams.height = 4;
+	whiteTextureParams.initialData = whiteTextureInitialData;
+	whiteTextureParams.initialDataSize = sizeof(whiteTextureInitialData);
+	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureParams);
 
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
@@ -276,7 +284,11 @@ void CrFrame::Process()
 				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
 	
 				UpdateCamera();
-	
+
+				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
+				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
+				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+
 				CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
 				Color* theColorData2 = colorBuffer.Lock();
 				{

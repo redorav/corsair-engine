@@ -43,6 +43,8 @@ private:
 	
 	CrRenderModelSharedHandle m_renderModel;
 
+	CrTextureSharedHandle m_defaultWhiteTexture;
+
 	CrSwapchainSharedHandle m_swapchain;
 
 	CrTextureSharedHandle m_depthStencilTexture;

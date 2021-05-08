@@ -46,11 +46,11 @@ public:
 
 private:
 
-	CrProcess() 
+	CrProcess()
 		: result(CrProcessResult::Undefined)
 		, returnValue(-2147483647 - 1)
 		, hProcess(nullptr)
-		, hStdOutput(nullptr)
+		, hStdInput(nullptr)
 	{}
 
 	CrProcessResult result;
@@ -59,9 +59,7 @@ private:
 
 	void* hProcess;
 
-	void* hStdOutput; // Output of the subprocess
-
-	void* hStdInput; // Input handle that we create a file from
+	void* hStdInput; // Input handle that we read from
 };
 
 inline void CrProcess::Wait()

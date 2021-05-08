@@ -52,6 +52,8 @@ CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 	{
 		if (SetHandleInformation(stdOutRead, HANDLE_FLAG_INHERIT, 0))
 		{
+			// Redirect both std out and std error to the same location
+			startupInfo.hStdError  = stdOutWrite;
 			startupInfo.hStdOutput = stdOutWrite;
 			startupInfo.dwFlags |= STARTF_USESTDHANDLES;
 		}
@@ -73,10 +75,10 @@ CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 
 	if (processResult)
 	{
+		CloseHandle(startupInfo.hStdOutput);
 		CloseHandle(processInfo.hThread);
 		result     = processResult ? CrProcessResult::Success : CrProcessResult::Error;
 		hProcess   = processInfo.hProcess;
-		hStdOutput = startupInfo.hStdOutput;
 		hStdInput  = stdOutRead;
 	}
 	else
@@ -88,7 +90,6 @@ CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 CrProcess::~CrProcess()
 {
 	CloseHandleSafe(hProcess);
-	CloseHandleSafe(hStdOutput);
 	CloseHandleSafe(hStdInput);
 }
 
@@ -114,9 +115,6 @@ void CrProcess::Wait(uint64_t timeoutMilliseconds)
 
 void CrProcess::ReadStdOut(char* buffer, size_t bufferSize)
 {
-	// Close redirected handle to flush
-	CloseHandleSafe(hStdOutput);
-
 	while (true)
 	{
 		DWORD bytesRead = 0;

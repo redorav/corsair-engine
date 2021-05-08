@@ -86,7 +86,7 @@ CrProcessResult CrProcess::RunExecutable(const CrProcessDescriptor& processDescr
 
 		while(true)
 		{
-			static const BufferSize = 2048;
+			static const int BufferSize = 2048;
 			DWORD bytesRead = 0;
 			CHAR messageBuffer[BufferSize + 1]; // +1 for null terminator
 

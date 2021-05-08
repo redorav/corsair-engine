@@ -101,7 +101,7 @@ cbuffer DynamicLight
 
 #define NO_TRANSFORM2
 
-VS_OUT main_vs(VS_IN IN)
+VS_OUT BasicVS(VS_IN IN)
 {
 	VS_OUT output;
 	
@@ -128,7 +128,7 @@ VS_OUT main_vs(VS_IN IN)
 
 const float3 lightDirection = float3(0.0, -1.0, 0.0);
 
-float4 main_ps(VS_OUT IN) : SV_Target0
+float4 BasicPS(VS_OUT IN) : SV_Target0
 {
 	Surface surface;
 	

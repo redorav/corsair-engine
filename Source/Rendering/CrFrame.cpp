@@ -161,10 +161,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 #if defined(USE_HLSL)
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
-		"main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.hlsl").c_str()), 
-		"main_ps", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "compute.hlsl").c_str()),
 		"MainCS", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
@@ -172,10 +172,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 #else
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.vert.spv").c_str()),
-		"main_vs", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((SHADER_PATH + "triangle.frag.spv").c_str()),
-		"main_ps", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		"BasicPS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #endif
 

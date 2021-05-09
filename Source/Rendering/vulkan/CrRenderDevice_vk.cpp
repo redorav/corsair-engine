@@ -475,6 +475,8 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
 			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
 			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachments.push_back(attachmentDescription);
 		}
 
@@ -486,6 +488,8 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
 			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
 			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachments.push_back(attachmentDescription);
 			numDepthAttachments = 1;
 		}

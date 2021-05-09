@@ -108,7 +108,7 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 	CrBlendStateDescriptor         blendState = {};
 	CrDepthStencilStateDescriptor  depthStencilState = {};
 	CrMultisampleStateDescriptor   multisampleState = {};
-	CrRenderTargetFormatDescriptor       renderTargets = {};
+	CrRenderTargetFormatDescriptor renderTargets = {};
 };
 
 class ICrGraphicsPipeline

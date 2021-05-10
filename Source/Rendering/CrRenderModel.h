@@ -16,8 +16,11 @@ class CrRenderModel
 {
 public:
 
+
+
 	CrHashMap<CrMesh*, uint32_t> m_materialMap;
 
 	CrVector<CrRenderMeshSharedHandle> m_renderMeshes;
+
 	CrVector<CrMaterialSharedHandle> m_materials;
 };

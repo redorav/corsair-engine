@@ -127,10 +127,7 @@ inline void CrCommandBufferVulkan::BeginDebugEventPS(const char* eventName, cons
 	{
 		VkDebugMarkerMarkerInfoEXT markerInfo = {};
 		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-		markerInfo.color[0] = color.r;
-		markerInfo.color[1] = color.g;
-		markerInfo.color[2] = color.b;
-		markerInfo.color[3] = color.a;
+		store(color, markerInfo.color);
 		markerInfo.pMarkerName = eventName;
 
 		vkCmdDebugMarkerBegin(m_vkCommandBuffer, &markerInfo);

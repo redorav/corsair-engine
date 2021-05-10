@@ -38,9 +38,6 @@ private:
 	CrGraphicsPipelineHandle m_pipelineLineState;
 	CrComputePipelineHandle m_computePipelineState;
 
-	CrVertexBufferSharedHandle m_triangleVertexBuffer;
-	CrIndexBufferSharedHandle m_triangleIndexBuffer;
-	
 	CrRenderModelSharedHandle m_renderModel;
 
 	CrTextureSharedHandle m_defaultWhiteTexture;

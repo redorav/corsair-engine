@@ -57,76 +57,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	// Load vertex data for the frame
-
-	// TODO Remove after final integration
-	m_triangleVertexBuffer = renderDevice->CreateVertexBuffer<SimpleVertex>((uint32_t)8);
-
-	SimpleVertex* vertexData = (SimpleVertex*)m_triangleVertexBuffer->Lock(); // Setup vertices
-	{
-		vertexData[0].position = { -0.5_h, -0.5_h, -0.5_h };
-		vertexData[0].normal = { 255, 0, 0, 255 };
-		vertexData[0].uv = { 1.0_h, 0.0_h };
-
-		vertexData[1].position = { -0.5_h, -0.5_h, 0.5_h };
-		vertexData[1].normal = { 0, 255, 0, 255 };
-		vertexData[1].uv = { 0.0_h, 0.0_h };
-
-		vertexData[2].position = { -0.5_h, 0.5_h, 0.5_h };
-		vertexData[2].normal = { 0, 0, 255, 255 };
-		vertexData[2].uv = { 0.0_h, 1.0_h };
-
-		vertexData[3].position = { -0.5_h, 0.5_h, -0.5_h };
-		vertexData[3].normal = { 255, 0, 255, 255 };
-		vertexData[3].uv = { 1.0_h, 1.0_h };
-
-		vertexData[4].position = { 0.5_h, -0.5_h, -0.5_h };
-		vertexData[4].normal = { 255, 255, 0, 255 };
-		vertexData[4].uv = { 0.0_h, 0.0_h };
-
-		vertexData[5].position = { 0.5_h, -0.5_h, 0.5_h };
-		vertexData[5].normal = { 0, 255, 255, 255 };
-		vertexData[5].uv = { 1.0_h, 0.0_h };
-
-		vertexData[6].position = { 0.5_h, 0.5_h, 0.5_h };
-		vertexData[6].normal = { 255, 255, 255, 255 };
-		vertexData[6].uv = { 1.0_h, 1.0_h };
-
-		vertexData[7].position = { 0.5_h, 0.5_h, -0.5_h };
-		vertexData[7].normal = { 0, 0, 0, 255 };
-		vertexData[7].uv = { 0.0_h, 1.0_h };
-	}
-	m_triangleVertexBuffer->Unlock();
-
-	m_triangleIndexBuffer = renderDevice->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, 36);
-	uint16_t* data = (uint16_t*)m_triangleIndexBuffer->Lock();
-	{
-		data[0] = 0; data[3] = 2;
-		data[1] = 1; data[4] = 3;
-		data[2] = 2; data[5] = 0;
-
-		data[6] = 4; data[9] = 3;
-		data[7] = 0; data[10] = 7;
-		data[8] = 3; data[11] = 4;
-
-		data[12] = 5; data[15] = 7;
-		data[13] = 4; data[16] = 6;
-		data[14] = 7; data[17] = 5;
-
-		data[18] = 1; data[21] = 6;
-		data[19] = 5; data[22] = 2;
-		data[20] = 6; data[23] = 1;
-
-		data[24] = 7; data[27] = 2;
-		data[25] = 3; data[28] = 6;
-		data[26] = 2; data[29] = 7;
-
-		data[30] = 5; data[33] = 0;
-		data[31] = 1; data[34] = 4;
-		data[32] = 0; data[35] = 5;
-	}
-	m_triangleIndexBuffer->Unlock();
-
 	m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
 	//m_renderModel = CrResourceManager::LoadModel("jaina/storm_hero_jaina.fbx");
 
@@ -202,10 +132,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	// Test caching
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
+	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
@@ -213,7 +143,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	graphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	graphicsPipelineDescriptor.Hash();
-	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, m_triangleVertexBuffer->m_vertexDescriptor);
+	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));

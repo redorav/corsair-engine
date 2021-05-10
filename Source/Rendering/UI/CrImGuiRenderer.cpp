@@ -73,7 +73,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
 		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
 
-		psoDescriptor.renderTargets.colorFormats.push_back(initParams.m_swapchainFormat);
+		psoDescriptor.renderTargets.colorFormats[0] = initParams.m_swapchainFormat;
 		psoDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
 
 		psoDescriptor.Hash();

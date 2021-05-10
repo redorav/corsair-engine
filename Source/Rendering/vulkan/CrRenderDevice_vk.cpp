@@ -280,9 +280,9 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	colorBlendState.logicOpEnable = false;
 	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
-	uint32_t numRenderTargets = pipelineDescriptor.blendState.numRenderTargets;
+	uint32_t numRenderTargets = (uint32_t)pipelineDescriptor.numRenderTargets;
 
-	CrVector<VkPipelineColorBlendAttachmentState> blendAttachments(numRenderTargets);
+	CrFixedVector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments(numRenderTargets);
 	for (uint32_t i = 0; i < numRenderTargets; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
@@ -312,7 +312,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampleState.pNext = nullptr;
 	multisampleState.flags = 0;
-	multisampleState.rasterizationSamples = crvk::GetVkSampleCount(pipelineDescriptor.multisampleState.sampleCount);
+	multisampleState.rasterizationSamples = crvk::GetVkSampleCount(pipelineDescriptor.sampleCount);
 	multisampleState.sampleShadingEnable = false;
 	multisampleState.minSampleShading = 0.0f;
 	multisampleState.pSampleMask = nullptr;
@@ -457,17 +457,18 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	// be using the render pass. In D3D12 this is actually part of the pipeline descriptor (RTVFormats, DSVFormat)
 	// TODO This should probably be optimized either by having another function that passes an actual render pass
 	// or by having a cache of render pass descriptors. The reason for using a dummy render pass is so that
-	// pipelines can be precreated without needing access to the actual draw commands.
+	// pipelines can be precreated without needing access to the actual draw commands. Another alternative is
+	// to create the render pass on the stack by using a custom allocator.
 	VkRenderPass vkCompatibleRenderPass;
 	{
 		CrFixedVector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
 		CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
 		VkAttachmentReference depthReference;
 
-		uint32_t numColorAttachments = (uint32_t)pipelineDescriptor.renderTargets.colorFormats.size();
+		uint32_t numColorAttachments = numRenderTargets;
 		uint32_t numDepthAttachments = 0;
 
-		for (uint32_t i = 0; i < pipelineDescriptor.renderTargets.colorFormats.size(); ++i)
+		for (uint32_t i = 0; i < numRenderTargets; ++i)
 		{
 			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 			VkAttachmentDescription attachmentDescription = {};

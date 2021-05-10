@@ -8,11 +8,13 @@
 
 #include "Core/Containers/CrFixedVector.h"
 
+#include "Core/Containers/CrArray.h"
+
 struct CrRasterizerStateDescriptor
 {
 	cr3d::PolygonFillMode fillMode : 2;
 	cr3d::PolygonCullMode cullMode : 2;
-	cr3d::FrontFace frontFace : 1; // Default is clockwise
+	cr3d::FrontFace frontFace : 1;
 	uint32_t depthClipEnable : 1;
 	uint32_t multisampleEnable : 1;
 	uint32_t antialiasedLineEnable : 1;
@@ -37,8 +39,7 @@ struct CrRenderTargetBlendDescriptor
 
 struct CrBlendStateDescriptor
 {
-	CrRenderTargetBlendDescriptor renderTargetBlends[cr3d::MaxRenderTargets];
-	uint8_t numRenderTargets : 8;
+	CrArray<CrRenderTargetBlendDescriptor, cr3d::MaxRenderTargets> renderTargetBlends;
 
 	// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
 	// in the blend state and not a per render target field.
@@ -71,43 +72,45 @@ struct CrDepthStencilStateDescriptor
 	float                 maxDepthBounds;
 };
 
-struct CrMultisampleStateDescriptor
-{
-	cr3d::SampleCount sampleCount : 4;
-};
-
 struct CrRenderTargetFormatDescriptor
 {
-	CrFixedVector<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats;
+	CrArray<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats;
 	cr3d::DataFormat::T depthFormat = cr3d::DataFormat::Invalid;
 	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
 };
 
+// TODO Optimize size of pipeline descriptor
 struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDescriptor>
 {
 	CrGraphicsPipelineDescriptor()
 	{
-		primitiveTopology = cr3d::PrimitiveTopology::TriangleList;
+		primitiveTopology         = cr3d::PrimitiveTopology::TriangleList;
+		sampleCount               = cr3d::SampleCount::S1;
 
-		rasterizerState.fillMode = cr3d::PolygonFillMode::Fill;
+		rasterizerState.fillMode  = cr3d::PolygonFillMode::Fill;
 		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
-		rasterizerState.cullMode = cr3d::PolygonCullMode::Back;
+		rasterizerState.cullMode  = cr3d::PolygonCullMode::Back;
 
-		multisampleState.sampleCount = cr3d::SampleCount::S1;
+		numRenderTargets          = 1;
 
-		blendState.numRenderTargets = 1;
-		blendState.renderTargetBlends[0].colorWriteMask = cr3d::ColorWriteComponent::All;
+		for (int i = 0; i < blendState.renderTargetBlends.size(); ++i)
+		{
+			blendState.renderTargetBlends[i].colorWriteMask = cr3d::ColorWriteComponent::All;
+		}
 
-		depthStencilState.depthTestEnable = true;
+		depthStencilState.depthTestEnable  = true;
 		depthStencilState.depthWriteEnable = true;
-		depthStencilState.depthCompareOp = cr3d::CompareOp::Greater;
+		depthStencilState.depthCompareOp   = cr3d::CompareOp::Greater; // Reverse depth by default
 	}
 
-	cr3d::PrimitiveTopology        primitiveTopology = {};
+	cr3d::PrimitiveTopology        primitiveTopology : 4;
+
+	// Multisample state
+	cr3d::SampleCount              sampleCount       : 4;
+	uint32_t                       numRenderTargets  : 4;
 	CrRasterizerStateDescriptor    rasterizerState = {};
 	CrBlendStateDescriptor         blendState = {};
 	CrDepthStencilStateDescriptor  depthStencilState = {};
-	CrMultisampleStateDescriptor   multisampleState = {};
 	CrRenderTargetFormatDescriptor renderTargets = {};
 };
 

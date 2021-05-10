@@ -190,7 +190,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor graphicsPipelineDescriptor;
-	graphicsPipelineDescriptor.renderTargets.colorFormats.push_back(m_swapchain->GetFormat());
+	graphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	graphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
 	graphicsPipelineDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
 

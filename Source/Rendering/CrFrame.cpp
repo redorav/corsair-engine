@@ -399,7 +399,7 @@ void CrFrame::UpdateCamera()
 	camera.Update();
 
 	cameraConstantData.world2View = camera.GetWorld2ViewMatrix();
-	cameraConstantData.view2Projection = transpose(camera.GetView2ProjectionMatrix());
+	cameraConstantData.view2Projection = camera.GetView2ProjectionMatrix();
 }
 
 void CrFrame::RecreateSwapchainAndDepth()

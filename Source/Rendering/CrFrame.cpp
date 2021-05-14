@@ -31,6 +31,8 @@
 #include "Rendering/UI/CrImGuiRenderer.h"
 #include "imgui.h"
 
+#include "GlobalVariables.h"
+
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;

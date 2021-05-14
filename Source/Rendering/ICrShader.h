@@ -84,6 +84,8 @@ public:
 
 	ICrShaderBindingTable(const CrShaderBindingTableResources& resources);
 
+	virtual ~ICrShaderBindingTable() {}
+
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 
 	static const uint32_t MaxStageTextures = 64; // Maximum textures per stage
@@ -229,6 +231,8 @@ class ICrShader
 {
 public:
 
+	virtual ~ICrShader() {}
+
 	// TODO We need a way to build the hash for a shader. The hash doesn't necessarily
 	// want to be the bytecode (perhaps a stripped version of the bytecode?) We need to
 	// give this some thought.
@@ -267,7 +271,7 @@ public:
 		}
 	}
 
-	~ICrGraphicsShader() {}
+	virtual ~ICrGraphicsShader() {}
 
 	const CrVector<CrShaderStageInfo>& GetStages() const
 	{
@@ -294,7 +298,7 @@ public:
 		m_stageInfo.stage = cr3d::ShaderStage::Compute;
 	}
 
-	~ICrComputeShader() {}
+	virtual ~ICrComputeShader() {}
 
 	CrShaderStageInfo m_stageInfo;
 };

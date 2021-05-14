@@ -138,7 +138,5 @@ uint32_t ICrTexture::GetMipSliceOffset(uint32_t mip, uint32_t slice) const
 
 ICrTexture::~ICrTexture()
 {
-	// TODO Add to a list that'll eventually delete it, to avoid destroying something currently in use
-	// Do this via the shared_ptr deleter
-	//DestroyPS();
+	
 }

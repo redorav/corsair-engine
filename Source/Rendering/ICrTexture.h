@@ -36,7 +36,7 @@ public:
 
 	static const uint32_t MaxMipmaps = 14;
 
-	~ICrTexture();
+	virtual ~ICrTexture();
 
 	bool IsRenderTarget() const { return (m_usage & cr3d::TextureUsage::RenderTarget) != 0; }
 

@@ -12,6 +12,8 @@
 class ICrGPUFence
 {
 public:
+
+	virtual ~ICrGPUFence() {}
 };
 
 // Synchronization between queues
@@ -21,4 +23,6 @@ public:
 class ICrGPUSemaphore
 {
 public:
+
+	virtual ~ICrGPUSemaphore() {}
 };

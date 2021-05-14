@@ -2,7 +2,7 @@
 
 #include "Rendering/ICrPipeline.h"
 
-class CrGraphicsPipelineVulkan : public ICrGraphicsPipeline
+class CrGraphicsPipelineVulkan final : public ICrGraphicsPipeline
 {
 public:
 
@@ -13,7 +13,7 @@ public:
 	VkPipeline m_vkPipeline;
 };
 
-class CrComputePipelineVulkan : public ICrComputePipeline
+class CrComputePipelineVulkan final : public ICrComputePipeline
 {
 public:
 

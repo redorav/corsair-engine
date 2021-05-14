@@ -14,12 +14,21 @@ struct GPUStackAllocation
 	uint32_t offset = 0;
 };
 
+struct CrGPUStackDescriptor
+{
+	cr3d::BufferUsage::T bufferUsage;
+
+	cr3d::BufferAccess::T bufferAccess;
+
+	uint32_t initialSize;
+};
+
 // Manages transient memory allocated per frame for GPU resources
 class CrGPUStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(ICrRenderDevice* renderDevice);
+	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrGPUStackDescriptor& descriptor);
 
 	virtual ~CrGPUStackAllocator();
 
@@ -27,8 +36,6 @@ public:
 	GPUStackAllocation<T> Allocate(Args... args);
 
 	GPUStackAllocation<void> Allocate(uint32_t bufferSize);
-
-	void Initialize(uint32_t size);
 
 	void Begin();
 

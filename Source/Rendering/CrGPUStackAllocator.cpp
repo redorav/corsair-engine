@@ -10,9 +10,14 @@
 
 #include "Core/CrAlignment.h"
 
-CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice)
+CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrGPUStackDescriptor& descriptor) : m_renderDevice(renderDevice)
 {
+	// TODO Configurable per platform
+	m_poolSize = descriptor.initialSize;
 
+	CrHardwareGPUBufferDescriptor gpuBufferDescriptor(descriptor.bufferUsage, descriptor.bufferAccess, m_poolSize);
+
+	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(gpuBufferDescriptor));
 }
 
 CrGPUStackAllocator::~CrGPUStackAllocator()
@@ -30,16 +35,6 @@ GPUStackAllocation<void> CrGPUStackAllocator::Allocate(uint32_t bufferSize)
 	uint32_t offsetInPool = static_cast<uint32_t>(m_currentPointer - m_memoryBasePointer);	// Figure out the current offset for this buffer
 	m_currentPointer += alignedBufferSize;											// Reserve as many bytes as needed by the buffer
 	return GPUStackAllocation<void>(bufferPointer, offsetInPool);
-}
-
-void CrGPUStackAllocator::Initialize(uint32_t size)
-{
-	// TODO Configurable per platform
-	m_poolSize = size;
-
-	CrHardwareGPUBufferDescriptor descriptor(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, m_poolSize);
-
-	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(descriptor));
 }
 
 void CrGPUStackAllocator::Begin()

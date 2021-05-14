@@ -809,9 +809,9 @@ namespace cr3d
 		enum T : uint8_t
 		{
 			Immutable = 1 << 0,
-			GPUWrite = 1 << 1,
-			CPUWrite = 1 << 2,
-			CPURead = 1 << 3,
+			GPUWrite  = 1 << 1,
+			CPUWrite  = 1 << 2,
+			CPURead   = 1 << 3,
 		};
 	};
 
@@ -826,9 +826,9 @@ namespace cr3d
 
 	enum class GPUFenceResult : uint32_t
 	{
-		Success,         // Fence is signaled (ready)
+		Success,           // Fence is signaled (ready)
 		TimeoutOrNotReady, // Fence is unsignaled right now or timed out (not ready)
-		Error            // Some error occurred
+		Error              // Some error occurred
 	};
 }
 

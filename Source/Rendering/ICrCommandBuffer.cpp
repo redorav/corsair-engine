@@ -19,9 +19,17 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 
 	m_renderDevice = commandQueue->GetRenderDevice();
 
-	m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice));
-
-	m_constantBufferGPUStack->Initialize(8 * 1024 * 1024); // 8 MB
+	// Initialize GPU buffer stack allocators - for streaming
+	// TODO it is possible to create these lazily on allocation instead
+	// to avoid having every command buffer allocate these if they
+	// aren't going to be used
+	{
+		CrGPUStackDescriptor constantBufferStack;
+		constantBufferStack.bufferUsage = cr3d::BufferUsage::Constant;
+		constantBufferStack.bufferAccess = cr3d::BufferAccess::CPUWrite;
+		constantBufferStack.initialSize = 8 * 1024 * 1024; // 8 MB
+		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+	}
 
 	m_completionSemaphore = m_renderDevice->CreateGPUSemaphore();
 

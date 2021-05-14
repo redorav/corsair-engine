@@ -28,7 +28,7 @@ cbuffer UIData : register(b0)
 Texture2D UITexture;
 SamplerState UISampleState;
 
-VS_OUT_UI main_vs(VS_IN_UI IN)
+VS_OUT_UI ImguiVS(VS_IN_UI IN)
 {
 	VS_OUT_UI output = (VS_OUT_UI)0;
 	output.uv = IN.uv;
@@ -37,7 +37,7 @@ VS_OUT_UI main_vs(VS_IN_UI IN)
 	return output;
 }
 
-float4 main_ps(VS_OUT_UI IN) : SV_Target0
+float4 ImguiPS(VS_OUT_UI IN) : SV_Target0
 {
 	return UITexture.Sample(UISampleState, IN.uv) * IN.color;
 }

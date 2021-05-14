@@ -112,27 +112,39 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 
 	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)mesh->mNumVertices);
 
+	float3 minVertex = float3( FLT_MAX);
+	float3 maxVertex = float3(-FLT_MAX);
+
 	SimpleVertex* vertex = (SimpleVertex*)renderMesh->m_vertexBuffer->Lock();
 	{
 		for (size_t j = 0; j < mesh->mNumVertices; ++j)
 		{
-			const aiVector3D& v = mesh->mVertices[j];
-			vertex[j].position = { (half)v.x, (half)v.y, (half)v.z };
+			const aiVector3D& position = mesh->mVertices[j];
+			position[j].position = { (half)position.x, (half)position.y, (half)position.z };
+
+			minVertex = min(minVertex, float3(position.x, position.y, position.z));
+			maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
 
 			// Normals
-			const aiVector3D& n = mesh->mNormals[j];
-			vertex[j].normal = { (uint8_t)((n.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((n.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((n.z * 0.5f + 0.5f) * 255.0f), 0 };
+			const aiVector3D& normal = mesh->mNormals[j];
+			position[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
 			//vertex[j].normal = { n.x, n.y, n.z, 0.0f };
 
-			const aiVector3D& t = mesh->mTangents[j];
-			vertex[j].tangent = { (uint8_t)((t.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((t.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((t.z * 0.5f + 0.5f) * 255.0f), 0 };
+			const aiVector3D& tangent = mesh->mTangents[j];
+			position[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
 
 			// UV coordinates
-			const aiVector3D& uv = mesh->mTextureCoords[0][j];
-			vertex[j].uv = { (half)uv.x, (half)uv.y };
+			const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
+			position[j].uv = { (half)texCoord.x, (half)texCoord.y };
 		}
 	}
 	renderMesh->m_vertexBuffer->Unlock();
+
+	CrBoundingBox boundingBox;
+	boundingBox.center  = (maxVertex + minVertex) * 0.5f;
+	boundingBox.extents = (maxVertex - minVertex) * 0.5f;
+
+	renderMesh->m_boundingBox = boundingBox;
 
 	renderMesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 

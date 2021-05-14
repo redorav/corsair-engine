@@ -156,10 +156,10 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			// Load each attribute
 			for (const auto& attribute : primitive.attributes)
 			{
-				const std::string& attribName = attribute.first;
+				const std::string& attribName  = attribute.first;
 				const Accessor& attribAccessor = modelData->accessors[attribute.second];
-				const BufferView& bufferView = modelData->bufferViews[attribAccessor.bufferView];
-				const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
+				const BufferView& bufferView   = modelData->bufferViews[attribAccessor.bufferView];
+				const unsigned char* data      = modelData->buffers[bufferView.buffer].data.data();
 				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the accessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
 				
@@ -183,28 +183,40 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 				}
 			}
 
+			float3 minVertex = float3(FLT_MAX);
+			float3 maxVertex = float3(-FLT_MAX);
+
 			// Create the vertex buffer
 			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)positions.size());
 			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
 			{
-				for (size_t vtxIndex = 0; vtxIndex < positions.size(); ++vtxIndex)
+				for (size_t vertexIndex = 0; vertexIndex < positions.size(); ++vertexIndex)
 				{
-					const GLTFFloat3& curPosition = positions[vtxIndex];
-					const GLTFFloat3& curNormal = normals[vtxIndex];
-					const GLTFFloat2& curTexcoord = texCoords[vtxIndex];
-					SimpleVertex& curVertex = vertexBufferData[vtxIndex];
-					curVertex.position = { (half)curPosition.x, (half)curPosition.y, (half)curPosition.z };
-					curVertex.normal = {
-						(uint8_t)((curNormal.x * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((curNormal.y * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((curNormal.z * 0.5f + 0.5f) * 255.0f),
+					const GLTFFloat3& position = positions[vertexIndex];
+					const GLTFFloat3& normal   = normals[vertexIndex];
+					const GLTFFloat2& texCoord = texCoords[vertexIndex];
+					SimpleVertex& vertex       = vertexBufferData[vertexIndex];
+					vertex.position = { (half)position.x, (half)position.y, (half)position.z };
+
+					minVertex = min(minVertex, float3(position.x, position.y, position.z));
+					maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
+
+					vertex.normal =
+					{
+						(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f),
+						(uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f),
 						0
 					};
-					curVertex.tangent = { 0, 0, 0 , 0 };
-					curVertex.uv = { (half)curTexcoord.x, (half)curTexcoord.y };
+
+					vertex.tangent = { 0, 0, 0 , 0 };
+					vertex.uv = { (half)texCoord.x, (half)texCoord.y };
 				}
 			}
 			mesh->m_vertexBuffer->Unlock();
+
+			renderMesh->m_boundingBox.center = (maxVertex + minVertex) * 0.5f;
+			renderMesh->m_boundingBox.extents = (maxVertex - minVertex) * 0.5f;
 		}
 	}
 	return mesh;
@@ -231,6 +243,8 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 			}
 
 			// Create a decoder to parse the binary blob
+			// TODO We cannot create a decoder here, we need to use the proper image loading API that decides
+			// based on extension, etc
 			CrSharedPtr<ICrImageDecoder> imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
 			CrImageHandle loadedImage = imageDecoder->Decode((void*)data, dataSize);
 			if (!loadedImage)

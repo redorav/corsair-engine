@@ -86,6 +86,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrBytecodeLoadDescriptor bytecodeLoadInfo;
 	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
 
+	CrString ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
+
 #define USE_HLSL
 
 #if defined(USE_HLSL)

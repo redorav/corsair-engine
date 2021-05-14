@@ -115,27 +115,27 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
 
-	SimpleVertex* vertex = (SimpleVertex*)renderMesh->m_vertexBuffer->Lock();
+	SimpleVertex* vertexBufferData = (SimpleVertex*)renderMesh->m_vertexBuffer->Lock();
 	{
 		for (size_t j = 0; j < mesh->mNumVertices; ++j)
 		{
-			const aiVector3D& position = mesh->mVertices[j];
-			position[j].position = { (half)position.x, (half)position.y, (half)position.z };
+			const aiVector3D& vertex = mesh->mVertices[j];
+			vertexBufferData[j].position = { (half)vertex.x, (half)vertex.y, (half)vertex.z };
 
-			minVertex = min(minVertex, float3(position.x, position.y, position.z));
-			maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
+			minVertex = min(minVertex, float3(vertex.x, vertex.y, vertex.z));
+			maxVertex = max(maxVertex, float3(vertex.x, vertex.y, vertex.z));
 
 			// Normals
 			const aiVector3D& normal = mesh->mNormals[j];
-			position[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
+			vertexBufferData[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
 			//vertex[j].normal = { n.x, n.y, n.z, 0.0f };
 
 			const aiVector3D& tangent = mesh->mTangents[j];
-			position[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
+			vertexBufferData[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
 
 			// UV coordinates
 			const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
-			position[j].uv = { (half)texCoord.x, (half)texCoord.y };
+			vertexBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
 		}
 	}
 	renderMesh->m_vertexBuffer->Unlock();

@@ -215,10 +215,11 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			}
 			mesh->m_vertexBuffer->Unlock();
 
-			renderMesh->m_boundingBox.center = (maxVertex + minVertex) * 0.5f;
-			renderMesh->m_boundingBox.extents = (maxVertex - minVertex) * 0.5f;
+			mesh->m_boundingBox.center = (maxVertex + minVertex) * 0.5f;
+			mesh->m_boundingBox.extents = (maxVertex - minVertex) * 0.5f;
 		}
 	}
+
 	return mesh;
 }
 

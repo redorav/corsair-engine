@@ -144,13 +144,7 @@ workspace 'Corsair Engine'
 		GeneratedCodeDirectory
 	}
 	
-	-- Set up defines
-	
-	-- TODO Make this command line based or something better basically
-	defines ('IN_SRC_PATH="'.. path.getabsolute(SourceDirectory)..'/"')
-
-   -- All defines from different libraries that need exceptions disabled go here.
-    defines
+	defines
 	{ 
 		'_HAS_EXCEPTIONS=0', -- Disable STL exceptions
 	}

@@ -5,6 +5,7 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrRenderSystem.h"
+#include "Rendering/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/CrFileSystem.h"
@@ -17,7 +18,6 @@
 #include "Model/ICrModelDecoder.h"
 #include "Model/CrModelDecoderASSIMP.h"
 #include "Model/CrModelDecoderGLTF.h"
-
 
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePath)
 {
@@ -35,7 +35,11 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePat
 		modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
 	}
 
-	return modelDecoder->Decode(file);
+	CrRenderModelSharedHandle model = modelDecoder->Decode(file);
+
+	model->ComputeBoundingBoxFromMeshes();
+
+	return model;
 }
 
 CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)

@@ -19,9 +19,9 @@ class CrShaderCompiler
 {
 public:
 
-	static const std::string& GetExecutablePath();
+	static const std::string& GetExecutableDirectory();
 
-	static std::string ExecutablePath;
+	static std::string ExecutableDirectory;
 
 	void Initialize();
 

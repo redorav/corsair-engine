@@ -1,10 +1,12 @@
 require("premake/corsairengine/dependencies")
 
 -- Directories
-SourceDirectory         = 'Source'
-ToolsDirectory          = 'Tools'
-ShaderCompilerDirectory = ToolsDirectory..'/Shader Compiler'
-MathDirectory           = SourceDirectory..'/Math'
+SourceDirectory          = 'Source'
+ToolsDirectory           = 'Tools'
+ShaderCompilerDirectory  = ToolsDirectory..'/Shader Compiler'
+MathDirectory            = SourceDirectory..'/Math'
+SourceRenderingDirectory = SourceDirectory..'/Rendering'
+SourceShadersDirectory   = SourceRenderingDirectory..'/Shaders'
 
 -- Platforms
 DesktopWin64 = 'Desktop Win64'
@@ -156,8 +158,9 @@ workspace 'Corsair Engine'
 	-- Generate the global paths file
 	globalVariableHeader = io.open(path.getabsolute(GeneratedCodeDirectory)..'/GlobalVariables.h', 'wb');
 	globalVariableHeader:write('namespace GlobalPaths\n{\n');
-	globalVariableHeader:write('\tstatic const char* ShaderCompilerDirectory = "'..ShaderCompilerAbsoluteDirectory..'";\n');
+	globalVariableHeader:write('\tstatic const char* ShaderCompilerDirectory = "'..ShaderCompilerAbsoluteDirectory..'/";\n');
 	globalVariableHeader:write('\tstatic const char* ShaderCompilerPath = "'..ShaderCompilerAbsolutePath..'";\n');
+	globalVariableHeader:write('\tstatic const char* ShaderSourceDirectory = "'..path.getabsolute(SourceShadersDirectory)..'/";\n');
 	globalVariableHeader:write('};\n');
 	globalVariableHeader:close();
 
@@ -226,8 +229,6 @@ project (ProjectCorsairEngine)
 
 group('Rendering')
 
-SourceRenderingDirectory = SourceDirectory..'/Rendering'
-SourceShadersDirectory = SourceRenderingDirectory..'/Shaders'
 SourceShaderCompilerDirectory = SourceRenderingDirectory..'/ShaderCompiler'
 ShaderMetadataFilename = "ShaderMetadata"
 

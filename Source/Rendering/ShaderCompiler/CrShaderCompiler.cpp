@@ -24,11 +24,11 @@
 
 #include "Core/FileSystem/CrFileSystem.h"
 
-std::string CrShaderCompiler::ExecutablePath;
+std::string CrShaderCompiler::ExecutableDirectory;
 
-const std::string& CrShaderCompiler::GetExecutablePath()
+const std::string& CrShaderCompiler::GetExecutableDirectory()
 {
-	return ExecutablePath;
+	return ExecutableDirectory;
 }
 
 void CrShaderCompiler::Initialize()
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
 	CrPath executablePath = argv[0];
 	executablePath.remove_filename();
 
-	CrShaderCompiler::ExecutablePath = executablePath.string();
+	CrShaderCompiler::ExecutableDirectory = executablePath.string() + "/";
 
 	argh::parser commandline(commandLineArguments.argc, commandLineArguments.argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 

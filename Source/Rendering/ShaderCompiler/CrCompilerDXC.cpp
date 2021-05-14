@@ -30,8 +30,8 @@ static std::string FindDXCPath()
 {
 	CrArray<std::string, 2> candidatePaths = 
 	{
-		CrShaderCompiler::GetExecutablePath() + "/DXC/DXC.exe",
-		std::string(GlobalPaths::ShaderCompilerDirectory) + "/DXC/DXC.exe"
+		CrShaderCompiler::GetExecutableDirectory() + "DXC/DXC.exe",
+		std::string(GlobalPaths::ShaderCompilerDirectory) + "DXC/DXC.exe"
 	};
 
 	for (const std::string& dxcPath : candidatePaths)

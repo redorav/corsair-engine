@@ -19,6 +19,8 @@
 
 #include "imgui.h"
 
+#include "GlobalVariables.h"
+
 // Based on ImDrawVert
 struct UIVertex
 {
@@ -78,18 +80,16 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.Hash();
 
-		// TODO Rework shader paths
-		CrString SHADER_PATH = IN_SRC_PATH;
-		SHADER_PATH = SHADER_PATH + "Rendering/Shaders/";
+		CrString ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
 
 		// Load shaders:
 		CrBytecodeLoadDescriptor bytecodeDesc;
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
-			CrPath((SHADER_PATH + "UI.hlsl").c_str()), "ImguiVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
-		));
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(
-			CrPath((SHADER_PATH + "UI.hlsl").c_str()), "ImguiPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows
-		));
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+			"ImguiVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:

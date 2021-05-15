@@ -34,6 +34,11 @@ struct CrHardwareGPUBufferDescriptor
 	uint32_t stride;
 };
 
+// A ICrHardwareGPUBuffer represents a real buffer on the GPU, with allocated memory and
+// properties. It can only be created from the render device. Because it is more efficient
+// to allocate a relatively big buffer and suballocate from there, it is not intended to
+// be created other than by lower level systems. From there one can reserve an offset and
+// a size, and APIs can bind appropriately
 class ICrHardwareGPUBuffer
 {
 public:
@@ -91,6 +96,9 @@ struct CrGPUBufferDescriptor
 	cr3d::BufferAccess::T access;
 };
 
+// A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that typically
+// will be smaller than the actual buffer it points to. It can also own a buffer and dispose of it suitably,
+// but this is a more infrequent case
 class CrGPUBuffer : public CrGPUDeletable
 {
 public:

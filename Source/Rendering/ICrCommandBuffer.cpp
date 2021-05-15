@@ -24,11 +24,16 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 	// to avoid having every command buffer allocate these if they
 	// aren't going to be used
 	{
-		CrGPUStackDescriptor constantBufferStack;
-		constantBufferStack.bufferUsage = cr3d::BufferUsage::Constant;
-		constantBufferStack.bufferAccess = cr3d::BufferAccess::CPUWrite;
-		constantBufferStack.initialSize = 8 * 1024 * 1024; // 8 MB
+		CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, 8 * 1024 * 1024); // 8 MB
 		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+
+		uint32_t maxIndices = 1024 * 1024; // 1 MB for indices
+
+		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite, maxIndices * 3);
+		m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
+
+		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::BufferAccess::CPUWrite, maxIndices, 2);
+		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 	}
 
 	m_completionSemaphore = m_renderDevice->CreateGPUSemaphore();
@@ -49,6 +54,8 @@ void ICrCommandBuffer::Begin()
 	// any bound state is also reset, and our tracking must match
 	m_currentState = CurrentState();
 	m_constantBufferGPUStack->Begin();
+	m_vertexBufferGPUStack->Begin();
+	m_indexBufferGPUStack->Begin();
 
 	// If we previously submitted this command buffer, we need to wait
 	// for the fence to become signaled before we can start recording
@@ -65,6 +72,8 @@ void ICrCommandBuffer::Begin()
 void ICrCommandBuffer::End()
 {
 	m_constantBufferGPUStack->End();
+	m_vertexBufferGPUStack->End();
+	m_indexBufferGPUStack->End();
 	EndPS();
 }
 
@@ -77,12 +86,12 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 	m_ownerCommandQueue->SubmitCommandBuffer(this, waitSemaphore, m_completionSemaphore.get(), m_completionFence.get());
 }
 
-CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_t size)
+CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size)
 {
-	GPUStackAllocation<void> allocation = m_constantBufferGPUStack->Allocate(size);
+	GPUStackAllocation<void> allocation = stackAllocator->Allocate(size);
 
-	CrGPUBufferDescriptor params(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite);
-	params.existingHardwareGPUBuffer = m_constantBufferGPUStack->GetHardwareGPUBuffer();
+	CrGPUBufferDescriptor params(stackAllocator->GetUsage(), stackAllocator->GetAccess());
+	params.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();
 	params.memory = allocation.memory;
 	params.offset = allocation.offset;
 	return params;
@@ -90,7 +99,17 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateConstantBufferParameters(uint32_
 
 CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateConstantBufferParameters(size), size);
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), size), size);
+}
+
+CrGPUBuffer ICrCommandBuffer::AllocateVertexBuffer(uint32_t size)
+{
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_vertexBufferGPUStack.get(), size), size);
+}
+
+CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t size)
+{
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), size), size, 2);
 }
 
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)

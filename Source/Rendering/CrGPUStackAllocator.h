@@ -4,6 +4,7 @@
 
 class ICrRenderDevice;
 class ICrHardwareGPUBuffer;
+struct CrHardwareGPUBufferDescriptor;
 
 template<typename T>
 struct GPUStackAllocation
@@ -14,23 +15,14 @@ struct GPUStackAllocation
 	uint32_t offset = 0;
 };
 
-struct CrGPUStackDescriptor
-{
-	cr3d::BufferUsage::T bufferUsage;
-
-	cr3d::BufferAccess::T bufferAccess;
-
-	uint32_t initialSize;
-};
-
 // Manages transient memory allocated per frame for GPU resources
 class CrGPUStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrGPUStackDescriptor& descriptor);
+	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
-	virtual ~CrGPUStackAllocator();
+	virtual ~CrGPUStackAllocator() {}
 
 	template<typename T, typename... Args>
 	GPUStackAllocation<T> Allocate(Args... args);
@@ -43,11 +35,19 @@ public:
 
 	ICrHardwareGPUBuffer* GetHardwareGPUBuffer() const;
 
+	cr3d::BufferUsage::T GetUsage() const;
+
+	cr3d::BufferAccess::T GetAccess() const;
+
 protected:
 
 	ICrRenderDevice* m_renderDevice = nullptr;
 
 	CrUniquePtr<ICrHardwareGPUBuffer> m_hardwareBuffer;
+
+	cr3d::BufferUsage::T m_bufferUsage;
+
+	cr3d::BufferAccess::T m_bufferAccess;
 
 	uint8_t* m_memoryBasePointer = nullptr;
 
@@ -59,6 +59,16 @@ protected:
 inline ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
 {
 	return m_hardwareBuffer.get();
+}
+
+inline cr3d::BufferUsage::T CrGPUStackAllocator::GetUsage() const
+{
+	return m_bufferUsage;
+}
+
+inline cr3d::BufferAccess::T CrGPUStackAllocator::GetAccess() const
+{
+	return m_bufferAccess;
 }
 
 template<typename T, typename... Args>

@@ -63,9 +63,9 @@ public:
 
 	// Binding functions
 
-	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer);
+	void BindIndexBuffer(const CrGPUBuffer* indexBuffer);
 	
-	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t bindPoint);
+	void BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t bindPoint);
 
 	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
 
@@ -107,6 +107,10 @@ public:
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
 	CrGPUBuffer AllocateConstantBuffer(uint32_t size);
+
+	CrGPUBuffer AllocateVertexBuffer(uint32_t size);
+
+	CrGPUBuffer AllocateIndexBuffer(uint32_t size);
 
 	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
 
@@ -150,7 +154,7 @@ protected:
 
 	virtual void FlushComputeRenderStatePS() = 0;
 
-	CrGPUBufferDescriptor AllocateConstantBufferParameters(uint32_t size);
+	CrGPUBufferDescriptor AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size);
 
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
@@ -194,10 +198,10 @@ protected:
 			return m_constantBuffers[stage][id];
 		}
 
-		const CrIndexBufferCommon*      m_indexBuffer;
+		const CrGPUBuffer*              m_indexBuffer;
 		bool                            m_indexBufferDirty = true;
 
-		const CrVertexBufferCommon*     m_vertexBuffer;
+		const CrGPUBuffer*              m_vertexBuffer;
 		bool                            m_vertexBufferDirty = true;
 
 		CrScissor                       m_scissor;
@@ -233,6 +237,10 @@ protected:
 
 	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
 
+	CrUniquePtr<CrGPUStackAllocator> m_vertexBufferGPUStack;
+
+	CrUniquePtr<CrGPUStackAllocator> m_indexBufferGPUStack;
+
 	// Signal semaphore when execution completes
 	CrGPUSemaphoreSharedHandle		m_completionSemaphore;
 
@@ -260,7 +268,7 @@ inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
 	}
 }
 
-inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBuffer)
+inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 {
 	if (m_currentState.m_indexBuffer != indexBuffer)
 	{
@@ -269,7 +277,7 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBu
 	}
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t /*bindPoint*/)
+inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t /*bindPoint*/)
 {
 	if (m_currentState.m_vertexBuffer != vertexBuffer)
 	{
@@ -396,5 +404,5 @@ inline const CrGPUFenceSharedHandle& ICrCommandBuffer::GetCompletionFence() cons
 template<typename MetaType>
 inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
-	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateConstantBufferParameters(sizeof(MetaType)), 1);
+	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), sizeof(MetaType)), 1);
 }

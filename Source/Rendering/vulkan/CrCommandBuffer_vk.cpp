@@ -318,7 +318,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_vertexBuffer->GetHardwareBuffer());
 
-		VkDeviceSize offsets[1] = { 0 };
+		VkDeviceSize offsets[1] = { m_currentState.m_vertexBuffer->GetByteOffset() };
 		uint32_t bindPoint = 0;
 		// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
 		// TODO Number of vertex shaders to be able to have several vertex streams ??

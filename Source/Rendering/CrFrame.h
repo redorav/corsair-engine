@@ -34,8 +34,8 @@ private:
 	uint32_t m_height = 0;
 
 	// TODO Temporary
-	CrGraphicsPipelineHandle m_pipelineTriangleState;
-	CrGraphicsPipelineHandle m_pipelineLineState;
+	CrGraphicsPipelineHandle m_basicPipelineState;
+	CrGraphicsPipelineHandle m_linePipelineState;
 	CrComputePipelineHandle m_computePipelineState;
 
 	CrRenderModelSharedHandle m_renderModel;

@@ -2,8 +2,6 @@
 
 #include "CrFrame.h"
 
-#include "Core/CrPlatform.h"
-
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
@@ -16,6 +14,7 @@
 #include "Rendering/ICrCommandQueue.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/CrRenderPassDescriptor.h"
+#include "Rendering/UI/CrImGuiRenderer.h"
 
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
@@ -24,11 +23,11 @@
 
 #include "Input/CrInputManager.h"
 
+#include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 
 #include "CrResourceManager.h"
 
-#include "Rendering/UI/CrImGuiRenderer.h"
 #include "imgui.h"
 
 #include "GlobalVariables.h"
@@ -84,7 +83,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	RecreateSwapchainAndDepth();
 	
-	CrBytecodeLoadDescriptor bytecodeLoadInfo;
+	CrBytecodeLoadDescriptor basicBytecodeLoadInfo;
 	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
 
 	CrString ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
@@ -93,10 +92,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 #if defined(USE_HLSL)
 
-	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
 		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
 		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
@@ -104,10 +103,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 #else
 
-	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
 		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	bytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
 		"BasicPS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #endif
@@ -118,16 +117,16 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 		ICrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
 
-	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeLoadInfo);
+	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(basicBytecodeLoadInfo);
 
 	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
 
-	CrGraphicsPipelineDescriptor graphicsPipelineDescriptor;
-	graphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
-	graphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
-	graphicsPipelineDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
+	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
+	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
+	basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+	basicGraphicsPipelineDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
 
-	graphicsPipelineDescriptor.Hash();
+	basicGraphicsPipelineDescriptor.Hash();
 
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
@@ -135,18 +134,18 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	// Test caching
-	m_pipelineTriangleState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
 	m_computePipelineState = ICrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
 
-	graphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	graphicsPipelineDescriptor.Hash();
-	m_pipelineLineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(graphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
+	basicGraphicsPipelineDescriptor.Hash();
+	m_linePipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
@@ -187,10 +186,45 @@ void CrFrame::Process()
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 	DrawDebugUI();
 
+	UpdateCamera();
+
 	{
 		drawCommandBuffer->Begin();
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 		drawCommandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+
+		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
+		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
+		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+
+		CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
+		Color* theColorData2 = colorBuffer.Lock();
+		{
+			theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		colorBuffer.Unlock();
+		drawCommandBuffer->BindConstantBuffer(&colorBuffer);
+
+		CrGPUBufferType<DynamicLight> dynamicLightBuffer = drawCommandBuffer->AllocateConstantBuffer<DynamicLight>();
+		DynamicLight* dynamicLightBufferData = dynamicLightBuffer.Lock();
+		{
+			dynamicLightBufferData->positionRadius = float4(1.0f, 1.0f, 1.0f, 0.0f);
+			dynamicLightBufferData->color = float4(1.0f, 0.25f, 0.25f, 0.0f);
+		}
+		dynamicLightBuffer.Unlock();
+		drawCommandBuffer->BindConstantBuffer(&dynamicLightBuffer);
+
+		CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
+		Camera* cameraData2 = cameraDataBuffer.Lock();
+		{
+			*cameraData2 = cameraConstantData;
+		}
+		cameraDataBuffer.Unlock();
+		drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
+
+		drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
+		drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
 
 		CrRenderPassDescriptor renderPassDescriptor;
 		{
@@ -215,42 +249,7 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BeginRenderPass(renderPassDescriptor);
 			{
-				drawCommandBuffer->BindGraphicsPipelineState(m_pipelineTriangleState.get());
-	
-				UpdateCamera();
-
-				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
-				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
-				drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
-
-				CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
-				Color* theColorData2 = colorBuffer.Lock();
-				{
-					theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-					theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
-				}
-				colorBuffer.Unlock();
-				drawCommandBuffer->BindConstantBuffer(&colorBuffer);
-	
-				CrGPUBufferType<DynamicLight> dynamicLightBuffer = drawCommandBuffer->AllocateConstantBuffer<DynamicLight>();
-				DynamicLight* dynamicLightBufferData = dynamicLightBuffer.Lock();
-				{
-					dynamicLightBufferData->positionRadius = float4(1.0f, 1.0f, 1.0f, 0.0f);
-					dynamicLightBufferData->color = float4(1.0f, 0.25f, 0.25f, 0.0f);
-				}
-				dynamicLightBuffer.Unlock();
-				drawCommandBuffer->BindConstantBuffer(&dynamicLightBuffer);
-	
-				CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
-				Camera* cameraData2 = cameraDataBuffer.Lock();
-				{
-					*cameraData2 = cameraConstantData;
-				}
-				cameraDataBuffer.Unlock();
-				drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
-	
-				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
-				drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
+				drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
 	
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{

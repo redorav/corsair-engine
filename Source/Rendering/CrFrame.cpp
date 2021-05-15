@@ -46,7 +46,7 @@ struct SimpleVertex
 	}
 };
 
-static CrCamera camera;
+static CrSharedPtr<CrCamera> camera;
 static Camera cameraConstantData;
 
 void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
@@ -62,6 +62,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
 	//m_renderModel = CrResourceManager::LoadModel("jaina/storm_hero_jaina.fbx");
 
+	camera = CrSharedPtr<CrCamera>(new CrCamera());
 
 	CrSamplerDescriptor descriptor;
 	m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
@@ -328,10 +329,10 @@ void CrFrame::DrawDebugUI()
 
 void CrFrame::UpdateCamera()
 {
-	camera.SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
+	camera->SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
 
-	float3 currentLookAt = camera.GetLookatVector();
-	float3 currentRight = camera.GetRightVector();
+	float3 currentLookAt = camera->GetLookatVector();
+	float3 currentRight = camera->GetRightVector();
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboard = CrInput.GetKeyboardState();
@@ -349,38 +350,38 @@ void CrFrame::UpdateCamera()
 	// TODO Hack to get a bit of movement on the camera
 	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera.Translate(currentRight * -translationSpeed * frameDelta);
+		camera->Translate(currentRight * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
-		camera.Translate(currentRight * translationSpeed * frameDelta);
+		camera->Translate(currentRight * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
-		camera.Translate(currentLookAt * translationSpeed * frameDelta);
+		camera->Translate(currentLookAt * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
-		camera.Translate(currentLookAt * -translationSpeed * frameDelta);
+		camera->Translate(currentLookAt * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
+		camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
 	{
-		camera.Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
+		camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
 	}
 
 	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
 	{
 		//CrLogWarning("Moving right");
-		camera.Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
+		camera->Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
@@ -388,20 +389,20 @@ void CrFrame::UpdateCamera()
 	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
 	{
 		//CrLogWarning("Moving left");
-		camera.Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
+		camera->Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
 
 	if (mouseState.buttonPressed[MouseButton::Right])
 	{
-		camera.Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
+		camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
 	}
 
-	camera.Update();
+	camera->Update();
 
-	cameraConstantData.world2View = camera.GetWorld2ViewMatrix();
-	cameraConstantData.view2Projection = camera.GetView2ProjectionMatrix();
+	cameraConstantData.world2View = camera->GetWorld2ViewMatrix();
+	cameraConstantData.view2Projection = camera->GetView2ProjectionMatrix();
 }
 
 void CrFrame::RecreateSwapchainAndDepth()

@@ -181,6 +181,8 @@ protected:
 	CrCommandQueueSharedHandle m_mainCommandQueue;
 
 	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
+
+	CrString m_pipelineCachePath;
 };
 
 template<typename Struct>

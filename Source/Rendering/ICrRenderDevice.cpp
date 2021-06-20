@@ -1,5 +1,6 @@
 #include "CrRendering_pch.h"
 
+#include "ICrRenderSystem.h"
 #include "ICrRenderDevice.h"
 #include "ICrCommandQueue.h"
 #include "ICrSwapchain.h"
@@ -12,9 +13,13 @@
 
 #include "Core/CrMacros.h"
 
+#include "GlobalVariables.h"
+
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
 {
-	
+	m_pipelineCachePath = CrString(GlobalPaths::ShaderSourceDirectory);
+	m_pipelineCachePath += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
+	m_pipelineCachePath += "/PipelineCache.bin";
 }
 
 ICrRenderDevice::~ICrRenderDevice()

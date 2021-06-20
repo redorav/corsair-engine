@@ -8,7 +8,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor)
+CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
 	UINT createFactoryFlags = 0;
 	HRESULT hResult = S_OK;

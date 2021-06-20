@@ -17,6 +17,16 @@
 
 static CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 
+ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
+{
+	m_graphicsApi = renderSystemDescriptor.graphicsApi;
+}
+
+ICrRenderSystem::~ICrRenderSystem()
+{
+
+}
+
 ICrRenderSystem* ICrRenderSystem::Get()
 {
 	return RenderSystem.get();
@@ -62,7 +72,7 @@ void ICrRenderSystem::CreateRenderDevice()
 	RenderSystem->m_mainDevice->InitializeDeletionQueue();
 }
 
-ICrRenderSystem::~ICrRenderSystem()
+cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
 {
-
+	return m_graphicsApi;
 }

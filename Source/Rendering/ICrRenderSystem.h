@@ -19,6 +19,10 @@ class ICrRenderSystem
 {
 public:
 
+	ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor);
+
+	virtual ~ICrRenderSystem();
+
 	static ICrRenderSystem* Get();
 
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
@@ -27,11 +31,13 @@ public:
 
 	static void CreateRenderDevice();
 
-	virtual ~ICrRenderSystem();
+	cr3d::GraphicsApi::T GetGraphicsApi() const;
 
 protected:
 
 	CrRenderDeviceSharedHandle m_mainDevice;
+
+	cr3d::GraphicsApi::T m_graphicsApi = cr3d::GraphicsApi::Count;
 
 	virtual ICrRenderDevice* CreateRenderDevicePS() const = 0;
 };

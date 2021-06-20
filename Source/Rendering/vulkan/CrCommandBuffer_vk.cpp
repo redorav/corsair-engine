@@ -7,11 +7,9 @@
 #include "CrSampler_vk.h"
 #include "CrShader_vk.h"
 #include "Rendering/CrRenderPassDescriptor.h"
-
 #include "Rendering/CrShaderResourceMetadata.h"
 
 #include "Core/Containers/CrArray.h"
-
 #include "Core/Logging/ICrDebug.h"
 
 // Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
@@ -166,16 +164,16 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	// 2. Get current resources and update the descriptor set
 	CrArray<VkDescriptorBufferInfo, 64> bufferInfos;
-	CrArray<VkDescriptorImageInfo, 64> imageInfos;
-	CrArray<VkBufferView, 64> bufferViews;
-	CrArray<VkWriteDescriptorSet, 64> writeDescriptorSets;
-	CrArray<uint32_t, 64> dynamicOffsets;
+	CrArray<VkDescriptorImageInfo, 64>  imageInfos;
+	CrArray<VkBufferView, 64>           bufferViews;
+	CrArray<VkWriteDescriptorSet, 64>   writeDescriptorSets;
+	CrArray<uint32_t, 64>               dynamicOffsets;
 
-	uint32_t descriptorCount = 0;
-	uint32_t bufferCount = 0;
-	uint32_t dynamicOffsetCount = 0;
-	uint32_t imageCount = 0;
-	uint32_t texelBufferCount = 0;
+	uint32_t descriptorCount = 0;    // Total number of descriptors
+	uint32_t bufferCount = 0;        // Total number of buffers (constant + storage)
+	uint32_t dynamicOffsetCount = 0; // Total number of dynamic offsets
+	uint32_t imageCount = 0;         // Total number of images
+	uint32_t texelBufferCount = 0;   // Total number of texel buffers
 
 	bindingTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
@@ -192,13 +190,13 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferInfo.range = (VkDeviceSize)constantBufferMeta.size; // TODO take this from bound buffer
 
 		dynamicOffsets[dynamicOffsetCount] = binding.byteOffset;
+		dynamicOffsetCount++;
 
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
 		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
 		descriptorCount++;
 		bufferCount++;
-		dynamicOffsetCount++;
 	});
 
 	bindingTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)

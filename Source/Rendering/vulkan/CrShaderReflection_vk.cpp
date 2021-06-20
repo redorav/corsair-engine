@@ -13,8 +13,17 @@ CrShaderReflectionVulkan::~CrShaderReflectionVulkan()
 
 void CrShaderReflectionVulkan::AddBytecode(const CrShaderBytecodeSharedHandle& bytecode)
 {
+	cr3d::ShaderStage::T shaderStage = bytecode->GetShaderStage();
+
 	// Perform reflection on the shader
-	spvReflectCreateShaderModule(bytecode->GetBytecode().size(), bytecode->GetBytecode().data(), &m_reflection[bytecode->GetShaderStage()]);
+	spvReflectCreateShaderModule(bytecode->GetBytecode().size(), bytecode->GetBytecode().data(), &m_reflection[shaderStage]);
+
+	for (uint32_t i = 0; i < m_reflection[shaderStage].descriptor_binding_count; ++i)
+	{
+		spvReflectChangeDescriptorBindingNumbers(&m_reflection[shaderStage], &m_reflection[shaderStage].descriptor_bindings[i],
+			m_currentBindSlot, (uint32_t)SPV_REFLECT_SET_NUMBER_DONT_CHANGE);
+		m_currentBindSlot++;
+	}
 }
 
 void CrShaderReflectionVulkan::ForEachResource(ShaderReflectionFn fn) const

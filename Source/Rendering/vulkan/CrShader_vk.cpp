@@ -93,25 +93,36 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
+	// SPIRV-Reflect currently has two issues:
+	// 1) Does small heap allocations for creation
+	// 2) Does a big heap allocations to copy the SPIR-V shader code. It would be better if we could supply the original code
+	// and it was reflected and modified in-place, or we could provide the memory for it to copy it
+
 	CrShaderReflectionVulkan vulkanReflection;
 
 	// Create the shader modules and parse reflection information
 	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
-		VkShaderModuleCreateInfo moduleCreateInfo;
-		moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		moduleCreateInfo.pNext = nullptr;
-		moduleCreateInfo.codeSize = shaderBytecode->GetBytecode().size();
-		moduleCreateInfo.pCode = (uint32_t*)shaderBytecode->GetBytecode().data();
-		moduleCreateInfo.flags = 0;
-
-		VkShaderModule vkShaderModule;
-		VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
-		CrAssert(vkResult == VK_SUCCESS);
-
-		m_vkShaderModules.push_back(vkShaderModule);
-
 		vulkanReflection.AddBytecode(shaderBytecode);
+
+		const SpvReflectShaderModule& shaderModule = vulkanReflection.m_reflection[shaderBytecode->GetShaderStage()];
+
+		// Create shader modules from the modified bytecode
+		if (shaderModule._internal)
+		{
+			VkShaderModuleCreateInfo moduleCreateInfo;
+			moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			moduleCreateInfo.pNext = nullptr;
+			moduleCreateInfo.codeSize = shaderModule._internal->spirv_size;
+			moduleCreateInfo.pCode = (uint32_t*)shaderModule._internal->spirv_code;
+			moduleCreateInfo.flags = 0;
+
+			VkShaderModule vkShaderModule;
+			VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
+			CrAssert(vkResult == VK_SUCCESS);
+
+			m_vkShaderModules.push_back(vkShaderModule);
+		}
 	}
 
 	// Create the optimized shader resource table

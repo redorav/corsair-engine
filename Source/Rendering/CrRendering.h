@@ -333,6 +333,17 @@ namespace cr3d
 			Metal,
 			Count
 		};
+
+		inline const char* ToString(cr3d::GraphicsApi::T graphicsApi)
+		{
+			switch (graphicsApi)
+			{
+				case cr3d::GraphicsApi::Vulkan: return "vulkan";
+				case cr3d::GraphicsApi::D3D12: return "d3d12";
+				case cr3d::GraphicsApi::Metal: return "metal";
+				default: return "invalid";
+			}
+		}
 	}
 
 	namespace TextureContent

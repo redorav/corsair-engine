@@ -8,16 +8,6 @@ class CrShaderCompilerCommandLine
 {
 public:
 
-	static const char* GetGraphicsApi(cr3d::GraphicsApi::T graphicsApi)
-	{
-		switch (graphicsApi)
-		{
-			case cr3d::GraphicsApi::Vulkan: return "vulkan";
-			case cr3d::GraphicsApi::D3D12: return "d3d12";
-			default: return "invalid";
-		}
-	}
-
 	static const char* GetPlatform(cr::Platform::T platform)
 	{
 		switch (platform)

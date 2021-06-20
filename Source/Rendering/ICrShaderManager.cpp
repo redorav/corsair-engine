@@ -128,7 +128,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-graphicsapi ";
-	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi);
+	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi);
 
 	CrTimer compilationTime;
 
@@ -141,7 +141,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 			bytecodeDescriptor.entryPoint.c_str(),
 			bytecodeDescriptor.path.string().c_str(),
 			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
-			CrShaderCompilerCommandLine::GetGraphicsApi(bytecodeDescriptor.graphicsApi),
+			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
 			compilationTime.GetCurrent().AsMilliseconds());
 
 		CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);

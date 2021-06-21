@@ -44,24 +44,37 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	// 5. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
+	// TODO This is per-device but it's currently global
 	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
-		vkDebugMarkerSetObjectTag = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
+		vkDebugMarkerSetObjectTag  = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
 		vkDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
-		vkCmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerBeginEXT");
-		vkCmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
-		vkCmdDebugMarkerInsert = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
+		vkCmdDebugMarkerBegin      = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerBeginEXT");
+		vkCmdDebugMarkerEnd        = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
+		vkCmdDebugMarkerInsert     = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
 	}
+
+	CrVector<char> pipelineCacheData;
+	LoadPipelineCache(pipelineCacheData);
 
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	pipelineCacheCreateInfo.pInitialData = pipelineCacheData.data();
+	pipelineCacheCreateInfo.initialDataSize = pipelineCacheData.size();
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
 	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
 }
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 {
-	
+	// Store pipeline cache to disk
+	size_t pipelineCacheSize = 0;
+	vkGetPipelineCacheData(m_vkDevice, m_vkPipelineCache, &pipelineCacheSize, nullptr);
+
+	CrVector<char> pipelineCacheData(pipelineCacheSize);
+	vkGetPipelineCacheData(m_vkDevice, m_vkPipelineCache, &pipelineCacheSize, pipelineCacheData.data());
+
+	StorePipelineCache(pipelineCacheData.data(), pipelineCacheSize);
 }
 
 cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const

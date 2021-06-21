@@ -12,14 +12,18 @@
 #include "CrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
+#include "Core/FileSystem/ICrFile.h"
+#include "Core/Time/CrTimer.h"
+#include "Core/Logging/ICrDebug.h"
 
 #include "GlobalVariables.h"
 
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
 {
-	m_pipelineCachePath = CrString(GlobalPaths::ShaderSourceDirectory);
-	m_pipelineCachePath += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
-	m_pipelineCachePath += "/PipelineCache.bin";
+	m_pipelineCacheDirectory = CrString(GlobalPaths::ShaderSourceDirectory);
+	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
+	m_pipelineCacheDirectory += "/";
+	m_pipelineCacheFilename = "PipelineCache.bin";
 }
 
 ICrRenderDevice::~ICrRenderDevice()
@@ -69,7 +73,13 @@ CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShader
 
 CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
-	return CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+	CrTimer pipelineCreationTime;
+
+	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+
+	CrLog("Pipeline created (%f ms)", pipelineCreationTime.GetCurrent().AsMilliseconds());
+
+	return pipeline;
 }
 
 CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
@@ -146,4 +156,27 @@ void ICrRenderDevice::WaitIdle()
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
 {
 	return m_renderDeviceProperties;
+}
+
+void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize)
+{
+	CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+
+	if (ICrFile::CreateFolder(m_pipelineCacheDirectory.c_str()))
+	{
+		CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
+		file->Write(pipelineCacheData, pipelineCacheSize);
+	}
+}
+
+void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
+{
+	CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+	CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
+
+	if (file)
+	{
+		pipelineCacheData.resize(file->GetSize());
+		file->Read(pipelineCacheData.data(), pipelineCacheData.size());
+	}
 }

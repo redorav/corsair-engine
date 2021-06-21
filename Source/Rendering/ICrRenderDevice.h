@@ -170,6 +170,10 @@ protected:
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
+	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
+
+	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
+
 	CrGPUDeletionCallbackType m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue.AddToQueue(deletable); };
 
 	CrGPUDeletionQueue m_gpuDeletionQueue;
@@ -182,7 +186,9 @@ protected:
 
 	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
 
-	CrString m_pipelineCachePath;
+	CrString m_pipelineCacheDirectory;
+
+	CrString m_pipelineCacheFilename;
 };
 
 template<typename Struct>

@@ -137,13 +137,6 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 	if (process.GetReturnValue() >= 0)
 	{
-		CrLog("Compiled %s[%s] for %s %s (%f ms)",
-			bytecodeDescriptor.entryPoint.c_str(),
-			bytecodeDescriptor.path.string().c_str(),
-			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
-			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
-			compilationTime.GetCurrent().AsMilliseconds());
-
 		CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);
 
 		// Generate the SPIR-V bytecode
@@ -158,6 +151,13 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 			bytecodeDescriptor.entryPoint,
 			bytecodeDescriptor.stage
 		));
+
+		CrLog("Compiled %s[%s] for %s %s (%f ms)",
+			bytecodeDescriptor.entryPoint.c_str(),
+			bytecodeDescriptor.path.string().c_str(),
+			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
+			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
+			compilationTime.GetCurrent().AsMilliseconds());
 
 		return bytecode;
 	}

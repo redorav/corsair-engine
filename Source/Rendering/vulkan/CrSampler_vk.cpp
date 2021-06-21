@@ -6,7 +6,9 @@
 // See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
 CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {
-	m_vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+
+	m_vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	VkSamplerCreateInfo createInfo = {};
 
@@ -40,6 +42,8 @@ CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerD
 	createInfo.unnormalizedCoordinates = false; // Not all APIs support it and it has many restrictions in Vulkan (e.g. no anisotropy)
 
 	vkCreateSampler(m_vkDevice, &createInfo, nullptr, &m_sampler);
+
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, descriptor.name.c_str());
 }
 
 CrSamplerVulkan::~CrSamplerVulkan()

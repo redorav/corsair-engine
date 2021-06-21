@@ -142,6 +142,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 	
 	// Default linear clamp sampler state:
 	CrSamplerDescriptor descriptor;
+	descriptor.name = "Imgui Sampler State";
 	m_uiSamplerState = renderDevice->CreateSampler(descriptor);
 
 	// Default resolution for the first frame, we need to query the real viewport during NewFrame()

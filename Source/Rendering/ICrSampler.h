@@ -1,12 +1,16 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
+#include "Core/String/CrFixedString.h"
+
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "CrGPUDeletable.h"
 
 struct CrSamplerDescriptor
 {
+	CrSamplerDescriptor();
+
 	cr3d::Filter minFilter         : 1;
 	cr3d::Filter magFilter         : 1;
 	cr3d::Filter mipmapFilter      : 1;
@@ -22,7 +26,7 @@ struct CrSamplerDescriptor
 	float minLod;
 	float maxLod;
 
-	CrSamplerDescriptor();
+	CrFixedString64 name;
 };
 
 class ICrSampler : public CrGPUDeletable

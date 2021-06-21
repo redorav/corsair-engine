@@ -64,11 +64,13 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	camera = CrSharedPtr<CrCamera>(new CrCamera());
 
 	CrSamplerDescriptor descriptor;
+	descriptor.name = "Linear Clamp Sampler";
 	m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
 
 	descriptor.addressModeU = cr3d::AddressMode::Wrap;
 	descriptor.addressModeV = cr3d::AddressMode::Wrap;
 	descriptor.addressModeW = cr3d::AddressMode::Wrap;
+	descriptor.name = "Linear Wrap Sampler";
 	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
 
 	CrTextureDescriptor rwTextureParams;
@@ -433,6 +435,7 @@ void CrFrame::RecreateSwapchainAndDepth()
 	depthTexParams.height = m_swapchain->GetHeight();
 	depthTexParams.format = cr3d::DataFormat::D32_Float_S8_Uint;
 	depthTexParams.usage = cr3d::TextureUsage::DepthStencil;
+	depthTexParams.name = "Depth Texture D32S8";
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
 

@@ -758,6 +758,19 @@ uint32_t CrRenderDeviceVulkan::GetVkQueueFamilyIndex() const
 	return m_commandQueueFamilyIndex;
 }
 
+void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const CrFixedString128& name) const
+{
+	if (vkDebugMarkerSetObjectName && !name.empty())
+	{
+		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+		nameInfo.objectType = objectType;
+		nameInfo.object = vkObject;
+		nameInfo.pObjectName = name.c_str();
+		vkDebugMarkerSetObjectName(m_vkDevice, &nameInfo);
+	}
+}
+
 bool CrRenderDeviceVulkan::GetIsFeatureSupported(CrRenderingFeature::T feature) const
 {
 	switch (feature)

@@ -16,9 +16,9 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	, m_vkImageView(nullptr)
 	, m_vkMemory(nullptr)
 {
-	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
-	m_vkDevice = vulkanDevice->GetVkDevice();
+	m_vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	VkResult result;
 	m_vkFormat = crvk::GetVkFormat(m_format);
@@ -174,7 +174,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		memAlloc.memoryTypeIndex = 0;
 		memAlloc.allocationSize = imageMemoryRequirements.size;
 
-		memAlloc.memoryTypeIndex = vulkanDevice->GetVkMemoryType(imageMemoryRequirements.memoryTypeBits, memoryFlags);
+		memAlloc.memoryTypeIndex = vulkanRenderDevice->GetVkMemoryType(imageMemoryRequirements.memoryTypeBits, memoryFlags);
 
 		result = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
 		CrAssert(result == VK_SUCCESS);
@@ -182,6 +182,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		result = vkBindImageMemory(m_vkDevice, m_vkImage, m_vkMemory, 0);
 		CrAssert(result == VK_SUCCESS);
 	}
+
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, descriptor.name.c_str());
 
 	m_usedMemory = (uint32_t)imageMemoryRequirements.size; // Take note of GPU memory usage
 
@@ -284,7 +286,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);
 			CrAssert(descriptor.initialDataSize <= bufferMemoryRequirements.size);
 
-			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanRenderDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 			VkDeviceMemory stagingMemory;
 			result = vkAllocateMemory(m_vkDevice, &memAllocInfo, nullptr, &stagingMemory);

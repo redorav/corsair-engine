@@ -5,6 +5,7 @@
 #include "Core/Containers/CrSet.h"
 #include "Core/Containers/CrVector.h"
 #include "Core/String/CrString.h"
+#include "Core/CrCoreForwardDeclarations.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
@@ -32,6 +33,8 @@ public:
 	uint32_t GetVkQueueMaxCount() const;
 
 	uint32_t GetVkQueueFamilyIndex() const;
+
+	void SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const CrFixedString128& name) const;
 
 private:
 

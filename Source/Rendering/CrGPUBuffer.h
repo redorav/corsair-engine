@@ -8,6 +8,7 @@
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/String/CrFixedString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Core/Logging/ICrDebug.h"
@@ -32,6 +33,8 @@ struct CrHardwareGPUBufferDescriptor
 	uint32_t numElements;
 
 	uint32_t stride;
+
+	CrFixedString128 name;
 };
 
 // A ICrHardwareGPUBuffer represents a real buffer on the GPU, with allocated memory and

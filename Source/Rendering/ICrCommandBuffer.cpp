@@ -25,14 +25,17 @@ ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
 	// aren't going to be used
 	{
 		CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::BufferAccess::CPUWrite, 8 * 1024 * 1024); // 8 MB
+		constantBufferStack.name = "Constant Buffer Stack";
 		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
 
 		uint32_t maxIndices = 1024 * 1024; // 1 MB for indices
 
 		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite, maxIndices * 3);
+		vertexBufferStack.name = "Vertex Buffer Stack";
 		m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
 		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::BufferAccess::CPUWrite, maxIndices, 2);
+		indexBufferStack.name = "Index Buffer Stack";
 		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 	}
 

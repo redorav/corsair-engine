@@ -142,18 +142,20 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
+	CrShaderReflectionVulkan vulkanReflection;
+	vulkanReflection.AddBytecode(computeShaderDescriptor.m_bytecode);
+
+	const SpvReflectShaderModule& shaderModule = vulkanReflection.m_reflection[computeShaderDescriptor.m_bytecode->GetShaderStage()];
+
 	VkShaderModuleCreateInfo moduleCreateInfo;
 	moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.codeSize = computeShaderDescriptor.m_bytecode->GetBytecode().size();
-	moduleCreateInfo.pCode = (uint32_t*)computeShaderDescriptor.m_bytecode->GetBytecode().data();
+	moduleCreateInfo.codeSize = shaderModule._internal->spirv_size;
+	moduleCreateInfo.pCode = (uint32_t*)shaderModule._internal->spirv_code;
 	moduleCreateInfo.flags = 0;
 
 	VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &m_vkShaderModule);
 	CrAssert(vkResult == VK_SUCCESS);
-
-	CrShaderReflectionVulkan vulkanReflection;
-	vulkanReflection.AddBytecode(computeShaderDescriptor.m_bytecode);
 
 	// Create the optimized shader resource table
 	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(CreateBindingTable(renderDevice, vulkanReflection));

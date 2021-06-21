@@ -59,7 +59,7 @@ public:
 
 	const char* GetFilePath() const;
 
-	static CrFileUniqueHandle CreateUnique(const char* filePath, FileOpenFlags::T openFlags);
+	static CrFileUniqueHandle OpenUnique(const char* filePath, FileOpenFlags::T openFlags);
 
 	static CrFileSharedHandle OpenFile(const CrPath& filePath, FileOpenFlags::T openFlags);
 

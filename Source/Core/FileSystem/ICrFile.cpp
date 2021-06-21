@@ -10,7 +10,7 @@ ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags)
 	m_openFlags = openFlags;
 }
 
-CrFileUniqueHandle ICrFile::CreateUnique(const char* filePath, FileOpenFlags::T openFlags)
+CrFileUniqueHandle ICrFile::OpenUnique(const char* filePath, FileOpenFlags::T openFlags)
 {
 	return CrFileUniqueHandle(OpenRaw(filePath, openFlags));
 }

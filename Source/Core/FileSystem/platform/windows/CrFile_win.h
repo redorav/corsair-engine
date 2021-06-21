@@ -10,7 +10,7 @@ class CrFileWindows final : public ICrFile
 {
 public:
 
-	CrFileWindows(const char* filePath, FileOpenFlags::T openFlags);
+	CrFileWindows(const char* filePath, FileOpenFlags::T openFlags, HANDLE fileHandle, uint64_t fileSize);
 
 	~CrFileWindows();
 

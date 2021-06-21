@@ -61,18 +61,23 @@ public:
 
 	static CrFileUniqueHandle CreateUnique(const char* filePath, FileOpenFlags::T openFlags);
 
-	static CrFileSharedHandle Create(const CrPath& filePath, FileOpenFlags::T openFlags);
+	static CrFileSharedHandle OpenFile(const CrPath& filePath, FileOpenFlags::T openFlags);
 
 	// TODO Move this elsewhere when we have a FileDevice
 	// We need to be able to create different files for different platforms, functionality, etc
 	// Functions like FileExists also would want to be part of the file device
-	static CrFileSharedHandle Create(const char* filePath, FileOpenFlags::T openFlags);
+	// Rename to Open and also return a null file handle if the file could not be opened
+	// It is currently a pretty bad bug
+	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
 	static bool FileExists(const char* filePath);
 
+	// If folder was created successfully or folder already exists, return true
+	static bool CreateFolder(const char* directoryPath);
+
 private:
 
-	static ICrFile* CreateRaw(const char* filePath, FileOpenFlags::T openFlags);
+	static ICrFile* OpenRaw(const char* filePath, FileOpenFlags::T openFlags);
 
 	CrFixedString<MaxFileLength> m_filePath;
 

@@ -28,7 +28,7 @@ ICrShaderManager* ICrShaderManager::Get()
 
 CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
 {
-	CrFileSharedHandle file = ICrFile::Create(path, FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(path, FileOpenFlags::Read);
 	return LoadShaderBytecode(file, bytecodeDescriptor);
 }
 
@@ -137,7 +137,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 	if (process.GetReturnValue() >= 0)
 	{
-		CrFileSharedHandle compilationOutput = ICrFile::Create(outputPath, FileOpenFlags::Read);
+		CrFileSharedHandle compilationOutput = ICrFile::OpenFile(outputPath, FileOpenFlags::Read);
 
 		// Generate the SPIR-V bytecode
 		CrVector<unsigned char> spirvBytecodeBytes;

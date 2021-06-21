@@ -4,13 +4,8 @@
 
 #include <windows.h>
 
-ICrFile* ICrFile::CreateRaw(const char* filePath, FileOpenFlags::T openFlags)
-{
-	return new CrFileWindows(filePath, openFlags);
-}
-
 // https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
-CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) : ICrFile(filePath, openFlags)
+ICrFile* ICrFile::OpenRaw(const char* filePath, FileOpenFlags::T openFlags)
 {
 	DWORD dwDesiredAccess = 0;
 	DWORD dwShareMode = 0;
@@ -28,7 +23,7 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 	{
 		dwDesiredAccess |= GENERIC_WRITE;
 	}
-	
+
 	// https://stackoverflow.com/questions/14469607/difference-between-open-always-and-create-always-in-createfile-of-windows-api
 	if (openFlags & FileOpenFlags::Create)
 	{
@@ -46,10 +41,9 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 	// Allow other processes to access this file, but only for reading
 	dwShareMode = FILE_SHARE_READ;
 
-
 	dwFlagsAndAttributes = FILE_ATTRIBUTE_NORMAL;
 
-	m_fileHandle = ::CreateFileA
+	HANDLE fileHandle = ::CreateFileA
 	(
 		filePath,
 		dwDesiredAccess,
@@ -60,9 +54,10 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 		hTemplateFile
 	);
 
-	if (m_fileHandle == INVALID_HANDLE_VALUE)
+	if (fileHandle == INVALID_HANDLE_VALUE)
 	{
 		CrLog("Invalid handle for file %s", filePath);
+		return nullptr;
 	}
 
 	// Note that if the return value is INVALID_FILE_SIZE (0xffffffff), an application must call GetLastError 
@@ -70,15 +65,27 @@ CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags) :
 	// when it has not is that lpFileSizeHigh could be non-NULL or the file size could be 0xffffffff. In this 
 	// case, GetLastError will return NO_ERROR (0) upon success. Because of this behavior, it is recommended 
 	// that you use GetFileSizeEx instead.
-	LARGE_INTEGER fileSize;
-	GetFileSizeEx(m_fileHandle, &fileSize);
+	LARGE_INTEGER liFileSize;
+	GetFileSizeEx(fileHandle, &liFileSize);
 
-	m_fileSize = fileSize.QuadPart;
+	uint64_t fileSize = liFileSize.QuadPart;
 
-	if(!(openFlags & FileOpenFlags::Append))
+	ICrFile* file = new CrFileWindows(filePath, openFlags, fileHandle, fileSize);
+
+	if (!(openFlags & FileOpenFlags::Append))
 	{
-		Rewind();
+		file->Rewind();
 	}
+
+	return file;
+}
+
+CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags, HANDLE fileHandle, uint64_t fileSize) 
+	: ICrFile(filePath, openFlags)
+	, m_fileHandle(fileHandle)
+	, m_fileSize (fileSize)
+{
+
 }
 
 CrFileWindows::~CrFileWindows()
@@ -158,4 +165,24 @@ bool ICrFile::FileExists(const char* filePath)
 	{
 		return false;
 	}	
+}
+
+bool ICrFile::CreateFolder(const char* directoryPath)
+{
+	bool result = CreateDirectoryA(directoryPath, nullptr);
+
+	if (result)
+	{
+		return true;
+	}
+	else
+	{
+		DWORD errorCode = GetLastError();
+		if (errorCode == ERROR_ALREADY_EXISTS)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -12,15 +12,15 @@ ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags)
 
 CrFileUniqueHandle ICrFile::CreateUnique(const char* filePath, FileOpenFlags::T openFlags)
 {
-	return CrFileUniqueHandle(CreateRaw(filePath, openFlags));
+	return CrFileUniqueHandle(OpenRaw(filePath, openFlags));
 }
 
-CrFileSharedHandle ICrFile::Create(const char* filePath, FileOpenFlags::T openFlags)
+CrFileSharedHandle ICrFile::OpenFile(const char* filePath, FileOpenFlags::T openFlags)
 {
-	return CrFileSharedHandle(CreateRaw(filePath, openFlags));
+	return CrFileSharedHandle(OpenRaw(filePath, openFlags));
 }
 
-CrFileSharedHandle ICrFile::Create(const CrPath& filePath, FileOpenFlags::T openFlags)
+CrFileSharedHandle ICrFile::OpenFile(const CrPath& filePath, FileOpenFlags::T openFlags)
 {
-	return Create(filePath.string().c_str(), openFlags);
+	return OpenFile(filePath.string().c_str(), openFlags);
 }

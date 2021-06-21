@@ -22,7 +22,7 @@
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePath)
 {
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
-	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.string().c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrModelDecoder> modelDecoder;
 	const std::string extension = fullPath.extension().string();
@@ -53,7 +53,7 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
 	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
 	CrPath extension = fullPath.extension();
 
-	CrFileSharedHandle file = ICrFile::Create(fullPath.string().c_str(), FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.string().c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 

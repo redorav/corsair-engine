@@ -172,7 +172,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 void CrFrame::Process()
 {
-	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);

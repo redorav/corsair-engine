@@ -55,7 +55,7 @@ void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDes
 	RenderSystem = CrUniquePtr<ICrRenderSystem>(renderSystem);
 }
 
-CrRenderDeviceSharedHandle ICrRenderSystem::GetRenderDevice()
+const CrRenderDeviceSharedHandle& ICrRenderSystem::GetRenderDevice()
 {
 	return RenderSystem->m_mainDevice;
 }

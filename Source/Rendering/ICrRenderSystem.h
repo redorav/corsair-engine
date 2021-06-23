@@ -27,7 +27,7 @@ public:
 
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
-	static CrRenderDeviceSharedHandle GetRenderDevice();
+	static const CrRenderDeviceSharedHandle& GetRenderDevice();
 
 	static void CreateRenderDevice();
 

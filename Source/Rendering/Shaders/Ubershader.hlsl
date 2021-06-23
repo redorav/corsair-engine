@@ -1,13 +1,17 @@
-#ifndef TRIANGLE_HLSL
-#define TRIANGLE_HLSL
+#ifndef UBERSHADER_HLSL
+#define UBERSHADER_HLSL
 
 #include "Common.hlsl"
-#include "Brdf.hlsl"
 #include "Surface.hlsl"
 
-#define NO_TRANSFORM2
+struct UbershaderPixelOutput
+{
+	float4 albedoTarget : SV_Target0;
 
-VS_OUT BasicVS(VS_IN IN)
+	float4 normalsTarget : SV_Target1;
+};
+
+VS_OUT UbershaderVS(VS_IN IN)
 {
 	VS_OUT output;
 	
@@ -17,16 +21,17 @@ VS_OUT BasicVS(VS_IN IN)
 
 	float4 localPosition = float4(IN.pos.xyz, 1);
 
-	float4 worldPosition = mul(localPosition, cb_Instance.local2World[IN.instanceID]);
+	float4 worldPosition = mul(localPosition, cb_Instance.local2World[0]);
 
 	float4 viewPosition = mul(worldPosition, cb_Camera.world2View);
 
 	output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
+	//output.hwPosition = mul(cb_CameraVS.world2View, float4(IN.pos.xyz, 1));
 	#endif
 
-	output.color = IN.normal.xyz; // TODO change
-    output.uv = IN.uv;
-	output.normal = IN.normal.xyz * 2.0 - 1.0;
+	output.color   = IN.normal.xyz; // TODO change
+    output.uv      = IN.uv;
+	output.normal  = IN.normal.xyz * 2.0 - 1.0;
 	output.tangent = IN.tangent.xyz * 2.0 - 1.0;
 	
 	return output;
@@ -34,8 +39,10 @@ VS_OUT BasicVS(VS_IN IN)
 
 const float3 lightDirection = float3(0.0, -1.0, 0.0);
 
-float4 BasicPS(VS_OUT IN) : SV_Target0
+UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 {
+	UbershaderPixelOutput pixelOutput = (UbershaderPixelOutput)0;
+
 	Surface surface;
 	
 	// Interpolants
@@ -62,15 +69,14 @@ float4 BasicPS(VS_OUT IN) : SV_Target0
 	// Space transformation
 	surface.pixelNormalWorld = mul(surface.pixelNormalTangent, tbn);
 	
-	// Lighting
-	surface.albedoSRGB = diffuse0.rgb; // TODO Make sure format is specified as sRGB so decoding is automatic
+	surface.albedoSRGB   = diffuse0.rgb;
 	surface.albedoLinear = surface.albedoSRGB * surface.albedoSRGB;
-	float NdotL = dot(normalize(surface.pixelNormalWorld.xyz), -lightDirection);
-	//float NdotV
-	
-	float3 litSurface = surface.albedoLinear.xyz;// * NdotL; // +surface.F0 * pow(;
-	
-	return float4(sqrt(litSurface), 1.0 * cb_Color.tint2.a);
+
+	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
+
+	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, 1.0);
+
+	return pixelOutput;
 }
 
 #endif

@@ -251,10 +251,25 @@ void CrFrame::Process()
 		{
 			drawCommandBuffer->BeginRenderPass(renderPassDescriptor);
 			{
-				drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
-	
+				float t0 = CrFrameTime::GetFrameCount() * 0.01f;
+				float x = sinf(t0);
+				float z = cosf(t0);
+
+				float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
+
+				CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
+				Instance* transformData = transformBuffer.Lock();
+				{
+					//store(transformMatrix, &transformData->local2World.m00);
+					transformData->local2World[0] = transformMatrix;
+				}
+				transformBuffer.Unlock();
+				drawCommandBuffer->BindConstantBuffer(&transformBuffer);
+
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{
+					drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
+
 					const CrRenderMeshSharedHandle& renderMesh = m_renderModel->m_renderMeshes[m];
 					uint32_t materialIndex = (*m_renderModel->m_materialMap.find(renderMesh.get())).second;
 					const CrMaterialSharedHandle& material = m_renderModel->m_materials[materialIndex];

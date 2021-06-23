@@ -3,10 +3,12 @@
 
 struct VS_IN
 {
-	float3 pos : POSITION;
-	float4 normal : NORMAL;
+	float3 pos     : POSITION;
+	float4 normal  : NORMAL;
 	float4 tangent : TANGENT;
-	float2 uv : TEXCOORD;
+	float2 uv      : TEXCOORD;
+
+	uint instanceID : SV_InstanceID;
 };
 
 struct VS_OUT
@@ -24,7 +26,7 @@ struct Camera
 	row_major float4x4 world2View;
 };
 
-cbuffer Camera : register(b1)
+cbuffer Camera
 {
 	Camera cb_Camera;
 };
@@ -35,7 +37,7 @@ struct Color
 	float4 tint2;
 };
 
-cbuffer Color : register(b2)
+cbuffer Color
 {
 	Color cb_Color;
 };
@@ -46,9 +48,19 @@ struct Engine
 	float4 tint2;
 };
 
-cbuffer Engine : register(b0)
+cbuffer Engine
 {
 	Engine cb_Engine;
+};
+
+struct Instance
+{
+	row_major float4x4 local2World[64];
+};
+
+cbuffer Instance
+{
+	Instance cb_Instance;
 };
 
 SamplerState AllPointClampSampler;

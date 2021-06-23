@@ -198,10 +198,12 @@ protected:
 			return m_constantBuffers[stage][id];
 		}
 
-		const CrGPUBuffer*              m_indexBuffer;
+		const ICrHardwareGPUBuffer*     m_indexBuffer;
+		uint32_t                        m_indexBufferOffset;
 		bool                            m_indexBufferDirty = true;
 
-		const CrGPUBuffer*              m_vertexBuffer;
+		const ICrHardwareGPUBuffer*     m_vertexBuffer;
+		uint32_t                        m_vertexBufferOffset;
 		bool                            m_vertexBufferDirty = true;
 
 		CrScissor                       m_scissor;
@@ -270,18 +272,22 @@ inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 {
-	if (m_currentState.m_indexBuffer != indexBuffer)
+	if (m_currentState.m_indexBuffer != indexBuffer->GetHardwareBuffer() ||
+		m_currentState.m_indexBufferOffset != indexBuffer->GetByteOffset())
 	{
-		m_currentState.m_indexBuffer = indexBuffer;
+		m_currentState.m_indexBuffer = indexBuffer->GetHardwareBuffer();
+		m_currentState.m_indexBufferOffset = indexBuffer->GetByteOffset();
 		m_currentState.m_indexBufferDirty = true;
 	}
 }
 
 inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t /*bindPoint*/)
 {
-	if (m_currentState.m_vertexBuffer != vertexBuffer)
+	if (m_currentState.m_vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
+		m_currentState.m_vertexBufferOffset != vertexBuffer->GetByteOffset())
 	{
-		m_currentState.m_vertexBuffer = vertexBuffer;
+		m_currentState.m_vertexBuffer = vertexBuffer->GetHardwareBuffer();
+		m_currentState.m_vertexBufferOffset = vertexBuffer->GetByteOffset();
 		m_currentState.m_vertexBufferDirty = true;
 	}
 }

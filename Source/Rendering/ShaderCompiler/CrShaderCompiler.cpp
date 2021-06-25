@@ -4,13 +4,14 @@
 #include "Core/CrPlatform.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/Containers/CrPair.h"
+#include "Core/Containers/CrHashMap.h"
+#include "Core/CrCommandLine.h"
 
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
 
 #include "GlobalVariables.h"
-
-#include <argh.h> // TODO Move to core
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -195,28 +196,34 @@ void QuitWithMessage(const std::string& errorMessage)
 // -stage pixel           : Shader stage this entry point runs in
 // -platform windows      : Platform to compile this shader for
 // -graphicsapi vulkan    : Graphics API for this platform
-// -D DEFINE1             : Add defines for the compilation
+// -D DEFINE1 -D DEFINE2  : Add defines for the compilation
 // 
 // -metadata metadataPath : Where metadata is stored
 
 int main(int argc, char* argv[])
 {
 	CommandLineArguments commandLineArguments(argc, argv);
+
+	CrCommandLineParser commandLine(argc, argv);
 	
 	CrPath executablePath = argv[0];
 	executablePath.remove_filename();
 
 	CrShaderCompiler::ExecutableDirectory = executablePath.string() + "/";
 
-	argh::parser commandline(commandLineArguments.argc, commandLineArguments.argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+	CrPath inputFilePath                 = commandLine("-input").c_str();
+	CrPath outputFilePath                = commandLine("-output").c_str();
+	bool buildMetadata                   = commandLine["-metadata"];
+	const std::string& entryPoint        = commandLine("-entrypoint").c_str();
+	const std::string& shaderStageString = commandLine("-stage").c_str();
+	const std::string& platformString    = commandLine("-platform").c_str();
+	const std::string& graphicsApiString = commandLine("-graphicsapi").c_str();
 
-	CrPath inputFilePath          = commandline("-input").str();
-	CrPath outputFilePath         = commandline("-output").str();
-	bool buildMetadata            = commandline["-metadata"];
-	std::string entryPoint        = commandline("-entrypoint").str();
-	std::string shaderStageString = commandline("-stage").str();
-	std::string platformString    = commandline("-platform").str();
-	std::string graphicsApiString = commandline("-graphicsapi").str();
+	std::vector<CrString> defines;
+	commandLine.for_each("-D",[&defines](const CrString& value)
+	{
+		defines.push_back(value);
+	});
 
 	std::string inputPath = inputFilePath.string();
 	std::string outputPath = outputFilePath.string();

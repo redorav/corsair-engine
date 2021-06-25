@@ -27,14 +27,14 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	crcore::CommandLine.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+	crcore::CommandLine = CrCommandLineParser(argc, argv);
 
-	CrString dataPath             = crcore::CommandLine("-root").str().c_str();
-	CrString graphicsApiString    = crcore::CommandLine("-graphicsapi").str().c_str();
-	bool enableGraphicsValidation = crcore::CommandLine["-debugGraphics"];
-	bool enableRenderdoc          = crcore::CommandLine["-renderdoc"];
+	const CrString& dataPath          = crcore::CommandLine("-root");
+	const CrString& graphicsApiString = crcore::CommandLine("-graphicsapi");
+	bool enableGraphicsValidation     = crcore::CommandLine["-debugGraphics"];
+	bool enableRenderdoc              = crcore::CommandLine["-renderdoc"];
 
-	CrString resolution = crcore::CommandLine("-resolution").str().c_str();
+	CrString resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())
 	{
 		CrString::size_type pos = resolution.find('x');

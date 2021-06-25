@@ -44,7 +44,7 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePat
 
 CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
 {
-	CrString dataPath = crcore::CommandLine("-root").str().c_str();
+	CrString dataPath = crcore::CommandLine("-root").c_str();
 	return CrPath(dataPath.c_str()) / relativePath;
 }
 

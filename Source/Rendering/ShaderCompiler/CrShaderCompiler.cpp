@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
 	const std::string& platformString    = commandLine("-platform").c_str();
 	const std::string& graphicsApiString = commandLine("-graphicsapi").c_str();
 
-	std::vector<CrString> defines;
+	CrVector<CrString> defines;
 	commandLine.for_each("-D",[&defines](const CrString& value)
 	{
 		defines.push_back(value);
@@ -287,6 +287,7 @@ int main(int argc, char* argv[])
 		compilationDescriptor.shaderStage = shaderStage;
 		compilationDescriptor.platform    = platform;
 		compilationDescriptor.graphicsApi = graphicsApi;
+		compilationDescriptor.defines     = defines;
 
 		std::string compilationStatus;
 		bool success = compiler.Compile(compilationDescriptor, compilationStatus);

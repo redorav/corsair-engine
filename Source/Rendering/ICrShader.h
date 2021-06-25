@@ -312,12 +312,13 @@ struct CrShaderBytecodeDescriptor
 	)
 		: path(path), entryPoint(entryPoint), stage(stage), format(format), graphicsApi(graphicsApi), platform(platform) {}
 
-	const CrPath                 path;
-	const CrFixedString128       entryPoint;
-	const cr3d::ShaderCodeFormat format;
-	const cr3d::ShaderStage::T   stage;
-	const cr3d::GraphicsApi::T   graphicsApi;
-	const cr::Platform::T        platform;
+	CrPath                    path;
+	CrFixedString128          entryPoint;
+	CrVector<CrFixedString64> defines;
+	cr3d::ShaderCodeFormat    format;
+	cr3d::ShaderStage::T      stage;
+	cr3d::GraphicsApi::T      graphicsApi;
+	cr::Platform::T           platform;
 };
 
 struct CrBytecodeLoadDescriptor

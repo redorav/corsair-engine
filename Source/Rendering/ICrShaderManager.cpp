@@ -130,6 +130,12 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	processDescriptor.commandLine += "-graphicsapi ";
 	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi);
 
+	for (uint32_t i = 0; i < bytecodeDescriptor.defines.size(); ++i)
+	{
+		processDescriptor.commandLine += " -D ";
+		processDescriptor.commandLine += bytecodeDescriptor.defines[i].c_str();
+	}
+
 	CrTimer compilationTime;
 
 	CrProcess process(processDescriptor);

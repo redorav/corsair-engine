@@ -1,6 +1,5 @@
 <dependencies>
 
-	<dependency name="argh" version="2292b90"/>
 	<dependency name="assimp" version="80799bd"/>
 	<dependency name="eastl" version="fad5471"/>
 	<dependency name="glslang" version="be06c6f"/>

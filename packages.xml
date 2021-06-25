@@ -2,10 +2,6 @@
 
 	<repository name="github" url="https://github.com/redorav/corsair-dependencies/raw/master/packages/"/>
 
-	<package name="argh">
-		<version id="2292b90" file="argh_2020_05_18_2292b90.zip" repository="github"/>
-	</package>
-	
 	<package name="assimp">
 		<version id="80799bd" file="assimp_2017_12_11_80799bd.zip" repository="github"/>
 	</package>

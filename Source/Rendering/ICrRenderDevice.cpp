@@ -15,12 +15,11 @@
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Time/CrTimer.h"
 #include "Core/Logging/ICrDebug.h"
-
-#include "GlobalVariables.h"
+#include "Core/CrGlobalPaths.h"
 
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
 {
-	m_pipelineCacheDirectory = CrString(GlobalPaths::ShaderSourceDirectory);
+	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "PipelineCache/";
 	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";
@@ -162,10 +161,15 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 {
 	CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 
-	if (ICrFile::CreateFolder(m_pipelineCacheDirectory.c_str()))
+	// We assume the directory has been created by now
+	if (ICrFile::CreateDirectories(m_pipelineCacheDirectory.c_str()))
 	{
 		CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
 		file->Write(pipelineCacheData, pipelineCacheSize);
+	}
+	else
+	{
+		CrLog("Could not create folder %s for shader cache", m_pipelineCacheDirectory.c_str());
 	}
 }
 

@@ -25,12 +25,11 @@
 
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
+#include "Core/CrGlobalPaths.h"
 
 #include "CrResourceManager.h"
 
 #include "imgui.h"
-
-#include "GlobalVariables.h"
 
 struct SimpleVertex
 {
@@ -88,7 +87,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrBytecodeLoadDescriptor basicBytecodeLoadInfo;
 	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
 
-	CrString ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
+	CrString ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 #define USE_HLSL
 

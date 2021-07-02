@@ -180,7 +180,7 @@ bool ICrFile::DirectoryExists(const char* filePath)
 	}
 }
 
-bool ICrFile::CreateFolder(const char* directoryPath)
+bool ICrFile::CreateDirectorySingle(const char* directoryPath)
 {
 	bool result = CreateDirectoryA(directoryPath, nullptr);
 

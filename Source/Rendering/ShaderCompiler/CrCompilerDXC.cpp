@@ -9,8 +9,7 @@
 #include "Core/Process/CrProcess.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrArray.h"
-
-#include "GlobalVariables.h"
+#include "Core/CrGlobalPaths.h"
 
 const char* GetDXCShaderProfile(cr3d::ShaderStage::T shaderStage)
 {
@@ -31,7 +30,7 @@ static std::string FindDXCPath()
 	CrArray<std::string, 2> candidatePaths = 
 	{
 		CrShaderCompiler::GetExecutableDirectory() + "DXC/DXC.exe",
-		std::string(GlobalPaths::ShaderCompilerDirectory) + "DXC/DXC.exe"
+		std::string(CrGlobalPaths::GetShaderCompilerDirectory().c_str()) + "DXC/DXC.exe"
 	};
 
 	for (const std::string& dxcPath : candidatePaths)

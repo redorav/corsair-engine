@@ -11,8 +11,6 @@
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
 
-#include "GlobalVariables.h"
-
 #if defined(_WIN32)
 #include <windows.h>
 #include <shellapi.h>

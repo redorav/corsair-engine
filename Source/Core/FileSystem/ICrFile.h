@@ -66,8 +66,6 @@ public:
 	// TODO Move this elsewhere when we have a FileDevice
 	// We need to be able to create different files for different platforms, functionality, etc
 	// Functions like FileExists also would want to be part of the file device
-	// Rename to Open and also return a null file handle if the file could not be opened
-	// It is currently a pretty bad bug
 	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
 	// Query if file exists
@@ -77,7 +75,9 @@ public:
 	static bool DirectoryExists(const char* filePath);
 
 	// If folder was created successfully or folder already exists, return true
-	static bool CreateFolder(const char* directoryPath);
+	static bool CreateDirectories(const char* directoryPath);
+
+	static bool CreateDirectorySingle(const char* directoryPath);
 
 private:
 

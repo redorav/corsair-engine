@@ -19,7 +19,7 @@
 
 #include "imgui.h"
 
-#include "GlobalVariables.h"
+#include "Core/CrGlobalPaths.h"
 
 // Based on ImDrawVert
 struct UIVertex
@@ -80,7 +80,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.Hash();
 
-		CrString ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
+		const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 		// Load shaders:
 		CrBytecodeLoadDescriptor bytecodeDesc;

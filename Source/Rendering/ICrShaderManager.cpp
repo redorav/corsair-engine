@@ -15,8 +15,7 @@
 #include "Core/CrPlatform.h"
 #include "Core/Time/CrTimer.h"
 #include "Core/Containers/CrArray.h"
-
-#include "GlobalVariables.h"
+#include "Core/CrGlobalPaths.h"
 
 // TODO Delete
 static ICrShaderManager g_shaderManager;
@@ -99,7 +98,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
 	// want the shader compiler in a known directory, or several directories that we search
 	// The platform-specific compilers also need to be in directories relative to the main one
-	processDescriptor.commandLine += GlobalPaths::ShaderCompilerPath;
+	processDescriptor.commandLine += CrGlobalPaths::GetShaderCompilerPath().c_str();
 
 	processDescriptor.commandLine += " -input ";
 	processDescriptor.commandLine += bytecodeDescriptor.path.string().c_str();
@@ -113,15 +112,28 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetShaderStage(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
-	CrPath outputPath = bytecodeDescriptor.path;
-	outputPath.replace_extension("");
-	outputPath += "_";
-	outputPath += bytecodeDescriptor.entryPoint.c_str();
-	outputPath.replace_extension(".spv");
+	const CrString& ShaderCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
 
-	processDescriptor.commandLine += "-output ";
-	processDescriptor.commandLine += outputPath.string().c_str();
-	processDescriptor.commandLine += " ";
+	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
+
+	CrFixedString512 outputPath = ShaderCacheDirectory.c_str();
+
+	CrFixedString128 filename = bytecodeDescriptor.path.filename().string().c_str();
+	size_t extensionDotPosition = filename.find_last_of(".");
+	if (extensionDotPosition != filename.npos)
+	{
+		filename.resize(extensionDotPosition);
+	}
+
+	filename += "_";
+	filename += bytecodeDescriptor.entryPoint.c_str();
+	filename += ".spv";
+
+	outputPath += filename.c_str();
+
+	processDescriptor.commandLine += "-output \"";
+	processDescriptor.commandLine += outputPath.c_str();
+	processDescriptor.commandLine += "\" ";
 
 	processDescriptor.commandLine += "-platform ";
 	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform);
@@ -143,7 +155,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 	if (process.GetReturnValue() >= 0)
 	{
-		CrFileSharedHandle compilationOutput = ICrFile::OpenFile(outputPath, FileOpenFlags::Read);
+		CrFileSharedHandle compilationOutput = ICrFile::OpenFile(outputPath.c_str(), FileOpenFlags::Read);
 
 		// Generate the SPIR-V bytecode
 		CrVector<unsigned char> spirvBytecodeBytes;

@@ -8,6 +8,8 @@
 #include "Core/CrFrameTime.h"
 #include "Core/Logging/ICrDebug.h"
 
+#include "Core/CrGlobalPaths.h"
+
 #include <windows.h> // TODO Remove
 
 #include "ICrOSWindow.h"
@@ -54,6 +56,8 @@ int main(int argc, char* argv[])
 	{
 		CrAssertMsg(false, "No root on the command line");
 	}
+
+	CrGlobalPaths::SetupGlobalPaths(argv[0], dataPath.c_str());
 
 	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
 

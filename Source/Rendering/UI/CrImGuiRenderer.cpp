@@ -146,7 +146,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 	m_uiSamplerState = renderDevice->CreateSampler(descriptor);
 
 	// Default resolution for the first frame, we need to query the real viewport during NewFrame()
-	io.DisplaySize = ImVec2(1920.0f, 1080.0f); 
+	io.DisplaySize = ImVec2(1920.0f, 1080.0f);
 }
 
 void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
@@ -227,17 +227,18 @@ void CrImGuiRenderer::Render(ICrCommandBuffer* cmdBuffer, const ICrTexture* swap
 				for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
 				{
 					const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
-					CrScissor scissorRect = CrScissor(
-						(uint32_t)(drawCmd->ClipRect.x - clipOffset.x), (uint32_t)(drawCmd->ClipRect.y - clipOffset.y),
-						(uint32_t)(drawCmd->ClipRect.z - clipOffset.x), (uint32_t)(drawCmd->ClipRect.w - clipOffset.y)
-					);
+
+					uint32_t x = (uint32_t)(drawCmd->ClipRect.x - clipOffset.x);
+					uint32_t y = (uint32_t)(drawCmd->ClipRect.y - clipOffset.y);
+					uint32_t width = (uint32_t)(drawCmd->ClipRect.z - x);
+					uint32_t height = (uint32_t)(drawCmd->ClipRect.w - y);
 
 					if (!drawCmd->UserCallback)
 					{
 						// Generic rendering.
 						ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
 						cmdBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
-						cmdBuffer->SetScissor(scissorRect);
+						cmdBuffer->SetScissor(CrScissor(x, y, width, height));
 						cmdBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
 					}
 					else

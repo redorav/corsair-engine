@@ -158,13 +158,26 @@ bool ICrFile::FileExists(const char* filePath)
 	
 	if (GetFileAttributesExA(filePath, GetFileExInfoStandard, &attributeData))
 	{
-		return attributeData.dwFileAttributes != INVALID_FILE_ATTRIBUTES &&
-			!(attributeData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+		return attributeData.dwFileAttributes != INVALID_FILE_ATTRIBUTES && !(attributeData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 	}
 	else
 	{
 		return false;
-	}	
+	}
+}
+
+bool ICrFile::DirectoryExists(const char* filePath)
+{
+	WIN32_FILE_ATTRIBUTE_DATA attributeData;
+
+	if (GetFileAttributesExA(filePath, GetFileExInfoStandard, &attributeData))
+	{
+		return attributeData.dwFileAttributes != INVALID_FILE_ATTRIBUTES && (attributeData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool ICrFile::CreateFolder(const char* directoryPath)

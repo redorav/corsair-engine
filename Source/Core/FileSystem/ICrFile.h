@@ -70,7 +70,11 @@ public:
 	// It is currently a pretty bad bug
 	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
+	// Query if file exists
 	static bool FileExists(const char* filePath);
+
+	// Query if directory exists
+	static bool DirectoryExists(const char* filePath);
 
 	// If folder was created successfully or folder already exists, return true
 	static bool CreateFolder(const char* directoryPath);

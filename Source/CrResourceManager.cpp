@@ -24,8 +24,8 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrModelDecoder> modelDecoder;
-	const std::string extension = fullPath.extension().c_str();
-	if (extension == ".gltf" || extension == ".glb")
+	CrPath extension = fullPath.extension();
+	if (CrFixedString8(".gltf").comparei(extension.c_str()) == 0 || CrFixedString8(".glb").comparei(extension.c_str()) == 0)
 	{
 		modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
 	}
@@ -55,7 +55,7 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
-	if(CrString(".dds").comparei(extension.c_str()) == 0)
+	if(CrFixedString8(".dds").comparei(extension.c_str()) == 0)
 	{
 		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
 	}

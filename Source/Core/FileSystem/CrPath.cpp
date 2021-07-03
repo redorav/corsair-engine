@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
-void CrPathString::Normalize()
+void CrPath::Normalize()
 {
 	size_t separatorPosition = m_pathString.find_first_of('\\');
 

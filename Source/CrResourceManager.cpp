@@ -8,10 +8,9 @@
 #include "Rendering/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"
-#include "Core/FileSystem/CrFileSystem.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include "Image/CrImageDecoderDDS.h"
 #include "Image/CrImageDecoderSTB.h"
@@ -20,7 +19,7 @@
 #include "Model/CrModelDecoderASSIMP.h"
 #include "Model/CrModelDecoderGLTF.h"
 
-CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPathString& fullPath)
+CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
@@ -42,15 +41,15 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPathString& fullP
 	return model;
 }
 
-CrPathString CrResourceManager::GetFullResourcePath(const CrPathString& relativePath)
+CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
 {
 	CrString dataPath = crcore::CommandLine("-root").c_str();
-	return CrPathString(dataPath.c_str()) / relativePath;
+	return CrPath(dataPath.c_str()) / relativePath;
 }
 
-CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPathString& fullPath)
+CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 {
-	CrPathString extension = fullPath.extension();
+	CrPath extension = fullPath.extension();
 
 	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 

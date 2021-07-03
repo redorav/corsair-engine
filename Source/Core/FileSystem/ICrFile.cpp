@@ -1,7 +1,5 @@
 #include "ICrFile.h"
 
-#include "Core/FileSystem/CrFileSystem.h"
-
 #include "Core/SmartPointers/CrSharedPtr.h"
 
 ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags)

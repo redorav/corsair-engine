@@ -25,7 +25,7 @@ ICrShaderManager* ICrShaderManager::Get()
 	return &g_shaderManager;
 }
 
-CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrPathString& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
+CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(path.c_str(), FileOpenFlags::Read);
 	return LoadShaderBytecode(file, bytecodeDescriptor);

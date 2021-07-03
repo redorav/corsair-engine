@@ -3,43 +3,43 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/String/CrFixedString.h"
 
-class CrPathString
+class CrPath
 {
 public:
 
-	CrPathString() {}
+	CrPath() {}
 
-	CrPathString(const char* path) { m_pathString = path; Normalize(); }
+	CrPath(const char* path) { m_pathString = path; Normalize(); }
 
-	CrPathString(const char* path, size_t count) { m_pathString = CrFixedString512(path, count); Normalize(); }
+	CrPath(const char* path, size_t count) { m_pathString = CrFixedString512(path, count); Normalize(); }
 
-	CrPathString(const char* path, size_t offset, size_t count) { m_pathString = CrFixedString512(path + offset, path + offset + count); Normalize(); }
+	CrPath(const char* path, size_t offset, size_t count) { m_pathString = CrFixedString512(path + offset, path + offset + count); Normalize(); }
 
-	CrPathString(const CrString& path) : CrPathString(path.c_str()) {}
+	CrPath(const CrString& path) : CrPath(path.c_str()) {}
 
-	CrPathString(const CrPathString& path, size_t count) : CrPathString(path.c_str(), count) {}
+	CrPath(const CrPath& path, size_t count) : CrPath(path.c_str(), count) {}
 
-	CrPathString(const CrPathString& path, size_t offset, size_t count) : CrPathString(path.c_str(), offset, count) {}
+	CrPath(const CrPath& path, size_t offset, size_t count) : CrPath(path.c_str(), offset, count) {}
 
 	const char* c_str() const { return m_pathString.c_str(); }
 
-	CrPathString extension() const
+	CrPath extension() const
 	{
 		size_t lastDot = m_pathString.find_last_of(".");
 		if (lastDot != m_pathString.npos)
 		{
-			return CrPathString(*this, lastDot, m_pathString.length() - lastDot);
+			return CrPath(*this, lastDot, m_pathString.length() - lastDot);
 		}
 		else
 		{
-			return CrPathString();
+			return CrPath();
 		}
 	}
 
-	CrPathString filename() const
+	CrPath filename() const
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
-		return CrPathString(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
+		return CrPath(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
 	}
 
 	bool has_extension() const
@@ -47,12 +47,12 @@ public:
 		return m_pathString.find_last_of(".") != m_pathString.npos;
 	}
 
-	CrPathString parent_path() const
+	CrPath parent_path() const
 	{
-		return CrPathString(*this, m_pathString.find_last_of("/"));
+		return CrPath(*this, m_pathString.find_last_of("/"));
 	}
 
-	CrPathString& remove_filename()
+	CrPath& remove_filename()
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
 		if (lastSeparator != m_pathString.length() - 1)
@@ -63,7 +63,7 @@ public:
 		return *this;
 	}
 
-	CrPathString& replace_extension(const char* extension)
+	CrPath& replace_extension(const char* extension)
 	{
 		bool nonEmptyString = extension && extension[0] != '\0';
 
@@ -77,20 +77,20 @@ public:
 		return *this;
 	}
 
-	CrPathString operator / (const char* str)
+	CrPath operator / (const char* str)
 	{
-		CrPathString newPath = *this;
+		CrPath newPath = *this;
 		newPath.AddTrailingSeparator();
 		newPath.m_pathString += str;
 		return newPath;
 	}
 
-	CrPathString operator / (const CrPathString& path)
+	CrPath operator / (const CrPath& path)
 	{
 		return *this / path.c_str();
 	}
 
-	CrPathString& operator /= (const char* str)
+	CrPath& operator /= (const char* str)
 	{
 		AddTrailingSeparator();
 		m_pathString += str;

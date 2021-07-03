@@ -31,7 +31,7 @@
 
 #include "imgui.h"
 
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
 struct SimpleVertex
 {
@@ -97,24 +97,26 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 #if defined(USE_HLSL)
 
-	CrShaderBytecodeDescriptor basicVSDescriptor = CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+	CrShaderBytecodeDescriptor basicVSDescriptor = CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
 		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicVSDescriptor);
 
-	CrShaderBytecodeDescriptor basicPSDescriptor = CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+	CrShaderBytecodeDescriptor basicPSDescriptor = CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
 		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+
+	basicPSDescriptor.defines.push_back("EXTRA_COLOR");
 
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
 
-	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Compute.hlsl").c_str()),
+	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
 		"MainCS", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #else
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
 		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
 		"BasicPS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #endif

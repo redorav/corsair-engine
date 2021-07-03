@@ -46,4 +46,4 @@ class ICrFile;
 using CrFileSharedHandle = CrSharedPtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
-class CrPathString;
+class CrPath;

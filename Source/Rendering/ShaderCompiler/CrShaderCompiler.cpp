@@ -7,7 +7,7 @@
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/ICrFile.h"
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
@@ -203,13 +203,13 @@ int main(int argc, char* argv[])
 
 	CrCommandLineParser commandLine(argc, argv);
 	
-	CrPathString executablePath = argv[0];
+	CrPath executablePath = argv[0];
 	executablePath.remove_filename();
 
 	CrShaderCompiler::ExecutableDirectory = executablePath.c_str();
 
-	CrPathString inputFilePath           = commandLine("-input").c_str();
-	CrPathString outputFilePath          = commandLine("-output").c_str();
+	CrPath inputFilePath           = commandLine("-input").c_str();
+	CrPath outputFilePath          = commandLine("-output").c_str();
 	bool buildMetadata                   = commandLine["-metadata"];
 	const std::string& entryPoint        = commandLine("-entrypoint").c_str();
 	const std::string& shaderStageString = commandLine("-stage").c_str();

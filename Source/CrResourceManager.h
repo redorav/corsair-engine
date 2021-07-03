@@ -17,10 +17,10 @@ class CrResourceManager
 {
 public:
 
-	static CrRenderModelSharedHandle LoadModel(const CrPathString& filePath);
+	static CrRenderModelSharedHandle LoadModel(const CrPath& filePath);
 
-	static CrPathString GetFullResourcePath(const CrPathString& relativePath);
+	static CrPath GetFullResourcePath(const CrPath& relativePath);
 
 	// TODO Also allow image loading to take a data pointer, so we can do the upload directly via the map
-	static CrImageHandle LoadImageFromDisk(const CrPathString& filePath);
+	static CrImageHandle LoadImageFromDisk(const CrPath& filePath);
 };

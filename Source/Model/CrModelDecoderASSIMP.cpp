@@ -3,7 +3,7 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -77,7 +77,7 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	}
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
-	const CrPathString filePath = file->GetFilePath();
+	const CrPath filePath = file->GetFilePath();
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
 		CrMaterialSharedHandle material = LoadMaterial(scene->mMaterials[m], filePath);
@@ -164,7 +164,7 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 	return renderMesh;
 }
 
-CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPathString& materialPath)
+CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& materialPath)
 {
 	CrMaterialSharedHandle material = CrMakeShared<CrMaterial>();
 
@@ -188,7 +188,7 @@ CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMa
 		{
 			aiMaterial->GetTexture(textureType, 0, &aiTexturePath);
 
-			CrPathString imagePath = materialPath.parent_path() / aiTexturePath.C_Str();
+			CrPath imagePath = materialPath.parent_path() / aiTexturePath.C_Str();
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(imagePath);
 
 			CrTextureDescriptor textureParams;

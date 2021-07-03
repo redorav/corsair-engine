@@ -2,7 +2,7 @@
 
 #include "GlobalVariables.h" // TODO Rename to GeneratedPaths.h
 
-#include "Core/FileSystem/CrPathString.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include <filesystem>
 
@@ -92,7 +92,7 @@ void CrGlobalPaths::SetupGlobalPaths
 	const char* dataRootDirectory
 )
 {
-	CurrentExecutableDirectory = CrPathString(currentExecutablePath).parent_path().c_str();
+	CurrentExecutableDirectory = CrPath(currentExecutablePath).parent_path().c_str();
 	CurrentExecutableDirectory += "/";
 	DataRootDirectory = dataRootDirectory;
 	DataRootDirectory += "/";

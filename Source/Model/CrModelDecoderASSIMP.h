@@ -22,5 +22,5 @@ private:
 
 	CrMeshSharedHandle LoadMesh(const aiMesh* mesh);
 
-	CrMaterialSharedHandle LoadMaterial(const aiMaterial* material, const CrPathString& relativePath);
+	CrMaterialSharedHandle LoadMaterial(const aiMaterial* material, const CrPath& relativePath);
 };

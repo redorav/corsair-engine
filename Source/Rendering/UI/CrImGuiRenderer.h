@@ -42,10 +42,6 @@ private:
 
 	CrGraphicsPipelineHandle m_uiGraphicsPipeline;
 
-	CrIndexBufferSharedHandle m_indexBuffer;
-
-	CrVertexBufferSharedHandle m_vertexBuffer;
-
 	CrTextureSharedHandle m_fontAtlas;
 
 	CrSamplerSharedHandle m_uiSamplerState;

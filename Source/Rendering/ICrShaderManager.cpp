@@ -25,9 +25,9 @@ ICrShaderManager* ICrShaderManager::Get()
 	return &g_shaderManager;
 }
 
-CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
+CrShaderBytecodeSharedHandle ICrShaderManager::LoadShaderBytecode(const CrPathString& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
 {
-	CrFileSharedHandle file = ICrFile::OpenFile(path, FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(path.c_str(), FileOpenFlags::Read);
 	return LoadShaderBytecode(file, bytecodeDescriptor);
 }
 
@@ -101,7 +101,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 	processDescriptor.commandLine += CrGlobalPaths::GetShaderCompilerPath().c_str();
 
 	processDescriptor.commandLine += " -input ";
-	processDescriptor.commandLine += bytecodeDescriptor.path.string().c_str();
+	processDescriptor.commandLine += bytecodeDescriptor.path.c_str();
 	processDescriptor.commandLine += " ";
 		
 	processDescriptor.commandLine += "-entrypoint ";
@@ -118,7 +118,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 	CrFixedString512 outputPath = ShaderCacheDirectory.c_str();
 
-	CrFixedString128 filename = bytecodeDescriptor.path.filename().string().c_str();
+	CrFixedString128 filename = bytecodeDescriptor.path.filename().c_str();
 	size_t extensionDotPosition = filename.find_last_of(".");
 	if (extensionDotPosition != filename.npos)
 	{
@@ -172,7 +172,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 
 		CrLog("Compiled %s[%s] for %s %s (%f ms)",
 			bytecodeDescriptor.entryPoint.c_str(),
-			bytecodeDescriptor.path.string().c_str(),
+			bytecodeDescriptor.path.c_str(),
 			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
 			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
 			compilationTime.GetCurrent().AsMilliseconds());

@@ -11,6 +11,7 @@
 #include "Core/FileSystem/CrFileSystem.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
+#include "Core/FileSystem/CrPathString.h"
 
 #include "Image/CrImageDecoderDDS.h"
 #include "Image/CrImageDecoderSTB.h"
@@ -19,13 +20,12 @@
 #include "Model/CrModelDecoderASSIMP.h"
 #include "Model/CrModelDecoderGLTF.h"
 
-CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePath)
+CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPathString& fullPath)
 {
-	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
-	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.string().c_str(), FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrModelDecoder> modelDecoder;
-	const std::string extension = fullPath.extension().string();
+	const std::string extension = fullPath.extension().c_str();
 	if (extension == ".gltf" || extension == ".glb")
 	{
 		modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
@@ -42,22 +42,21 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& relativePat
 	return model;
 }
 
-CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
+CrPathString CrResourceManager::GetFullResourcePath(const CrPathString& relativePath)
 {
 	CrString dataPath = crcore::CommandLine("-root").c_str();
-	return CrPath(dataPath.c_str()) / relativePath;
+	return CrPathString(dataPath.c_str()) / relativePath;
 }
 
-CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& relativePath)
+CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPathString& fullPath)
 {
-	CrPath fullPath = CrResourceManager::GetFullResourcePath(relativePath);
-	CrPath extension = fullPath.extension();
+	CrPathString extension = fullPath.extension();
 
-	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.string().c_str(), FileOpenFlags::Read);
+	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
-	if(CrString(".dds").comparei(extension.string().c_str()) == 0)
+	if(CrString(".dds").comparei(extension.c_str()) == 0)
 	{
 		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
 	}

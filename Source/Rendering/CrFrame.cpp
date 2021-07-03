@@ -31,6 +31,8 @@
 
 #include "imgui.h"
 
+#include "Core/FileSystem/CrPathString.h"
+
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
@@ -57,8 +59,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	m_renderModel = CrResourceManager::LoadModel("nyra/nyra_pose_mod.fbx");
-	//m_renderModel = CrResourceManager::LoadModel("jaina/storm_hero_jaina.fbx");
+	m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
+	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tall Building 01/TallBuilding01.fbx"));
+	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tavern/Barrel/Barrel.fbx"));
+	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
 
 	camera = CrSharedPtr<CrCamera>(new CrCamera());
 
@@ -93,21 +97,24 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 #if defined(USE_HLSL)
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
-		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+	CrShaderBytecodeDescriptor basicVSDescriptor = CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicVSDescriptor);
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()), 
-		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+	CrShaderBytecodeDescriptor basicPSDescriptor = CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 
-	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
+
+	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "Compute.hlsl").c_str()),
 		"MainCS", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #else
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
 		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
+	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
 		"BasicPS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 #endif

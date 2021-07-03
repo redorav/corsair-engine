@@ -26,7 +26,7 @@ public:
 
 	void Init(const ICrRenderDevice* renderDevice);
 
-	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
+	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrPathString& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
 
 	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
 

@@ -84,10 +84,10 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		// Load shaders:
 		CrBytecodeLoadDescriptor bytecodeDesc;
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "UI.hlsl").c_str()), 
 			"ImguiVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPathString((ShaderSourceDirectory + "UI.hlsl").c_str()), 
 			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);

@@ -20,11 +20,6 @@ CrFileSharedHandle ICrFile::OpenFile(const char* filePath, FileOpenFlags::T open
 	return CrFileSharedHandle(OpenRaw(filePath, openFlags));
 }
 
-CrFileSharedHandle ICrFile::OpenFile(const CrPath& filePath, FileOpenFlags::T openFlags)
-{
-	return OpenFile(filePath.string().c_str(), openFlags);
-}
-
 bool ICrFile::CreateDirectories(const char* directoryPath)
 {
 	if (!directoryPath)

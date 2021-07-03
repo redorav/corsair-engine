@@ -2,11 +2,12 @@
 
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/String/CrFixedString.h"
-#include "Core/FileSystem/CrFileSystem.h"
+#include "Core/FileSystem/CrPathString.h"
+
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
-#include "Core/CrCoreForwardDeclarations.h"
 
+#include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 using bindpoint_t = uint8_t;
@@ -307,12 +308,12 @@ struct CrShaderBytecodeDescriptor
 {
 	CrShaderBytecodeDescriptor
 	(
-		const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, 
+		const CrPathString& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, 
 		cr3d::ShaderCodeFormat format, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform
 	)
 		: path(path), entryPoint(entryPoint), stage(stage), format(format), graphicsApi(graphicsApi), platform(platform) {}
 
-	CrPath                    path;
+	CrPathString              path;
 	CrFixedString128          entryPoint;
 	CrVector<CrFixedString64> defines;
 	cr3d::ShaderCodeFormat    format;

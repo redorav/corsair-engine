@@ -12,7 +12,7 @@
 #include <SPIRV/GlslangToSpv.h>
 #pragma warning (pop)
 
-#include "Core/FileSystem/CrFileSystem.h"
+#include "Core/FileSystem/CrPathString.h"
 
 static const TBuiltInResource s_resourceLimits =
 {
@@ -139,11 +139,11 @@ public:
 	virtual IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t /*inclusionDepth*/) override
 	{
 		// We assume the file is in the same directory as us. If not, the include should have the required folder
-		CrPath includerPath = includerName;
-		CrPath includerDirectory = includerPath.parent_path();
-		CrPath headerPath = includerDirectory /= headerName;
+		CrPathString includerPath = includerName;
+		CrPathString includerDirectory = includerPath.parent_path();
+		CrPathString headerPath = includerDirectory / headerName;
 
-		std::ifstream fileStream(headerPath.string(), std::ios::binary);
+		std::ifstream fileStream(headerPath.c_str(), std::ios::binary);
 
 		if (fileStream.is_open())
 		{
@@ -155,7 +155,7 @@ public:
 			fileStream.read(&headerData[0], headerSize);
 			fileStream.close();
 
-			IncludeResult* includeResult = new IncludeResult(headerPath.string(), headerData, headerSize, nullptr);
+			IncludeResult* includeResult = new IncludeResult(headerPath.c_str(), headerData, headerSize, nullptr);
 			return includeResult;
 		}
 		else

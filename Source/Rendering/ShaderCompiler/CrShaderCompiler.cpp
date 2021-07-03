@@ -2,11 +2,12 @@
 #include "CrShaderMetadataBuilder.h"
 
 #include "Core/CrPlatform.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrCommandLine.h"
+#include "Core/FileSystem/ICrFile.h"
+#include "Core/FileSystem/CrPathString.h"
 
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
@@ -20,8 +21,6 @@
 // Glslang
 #include <glslang/Public/ShaderLang.h>
 #pragma warning (pop)
-
-#include "Core/FileSystem/CrFileSystem.h"
 
 std::string CrShaderCompiler::ExecutableDirectory;
 
@@ -204,13 +203,13 @@ int main(int argc, char* argv[])
 
 	CrCommandLineParser commandLine(argc, argv);
 	
-	CrPath executablePath = argv[0];
+	CrPathString executablePath = argv[0];
 	executablePath.remove_filename();
 
-	CrShaderCompiler::ExecutableDirectory = executablePath.string() + "/";
+	CrShaderCompiler::ExecutableDirectory = executablePath.c_str();
 
-	CrPath inputFilePath                 = commandLine("-input").c_str();
-	CrPath outputFilePath                = commandLine("-output").c_str();
+	CrPathString inputFilePath           = commandLine("-input").c_str();
+	CrPathString outputFilePath          = commandLine("-output").c_str();
 	bool buildMetadata                   = commandLine["-metadata"];
 	const std::string& entryPoint        = commandLine("-entrypoint").c_str();
 	const std::string& shaderStageString = commandLine("-stage").c_str();
@@ -223,8 +222,8 @@ int main(int argc, char* argv[])
 		defines.push_back(value);
 	});
 
-	std::string inputPath = inputFilePath.string();
-	std::string outputPath = outputFilePath.string();
+	std::string inputPath = inputFilePath.c_str();
+	std::string outputPath = outputFilePath.c_str();
 
 	CrShaderCompiler compiler;
 	compiler.Initialize();
@@ -280,8 +279,8 @@ int main(int argc, char* argv[])
 
 		CompilationDescriptor compilationDescriptor;
 		compilationDescriptor.entryPoint  = entryPoint;
-		compilationDescriptor.inputPath   = inputFilePath.string();
-		compilationDescriptor.outputPath  = outputFilePath.string();
+		compilationDescriptor.inputPath   = inputFilePath.c_str();
+		compilationDescriptor.outputPath  = outputFilePath.c_str();
 		compilationDescriptor.shaderStage = shaderStage;
 		compilationDescriptor.platform    = platform;
 		compilationDescriptor.graphicsApi = graphicsApi;

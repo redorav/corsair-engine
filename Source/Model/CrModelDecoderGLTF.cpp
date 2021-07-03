@@ -1,6 +1,6 @@
 #include "CrModelDecoderGLTF.h"
 
-#include "Core/FileSystem/CrFileSystem.h"
+#include "Core/FileSystem/CrPathString.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
@@ -282,8 +282,8 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 	, (void*)&textureTable);
 
 	bool binaryGLTF = strstr(file->GetFilePath(), ".glb") != nullptr;
-	CrPath filePath(file->GetFilePath());
-	std::string parentPath = filePath.parent_path().string();
+	CrPathString filePath = file->GetFilePath();
+	std::string parentPath = filePath.parent_path().c_str();
 	
 	// Load it
 	{

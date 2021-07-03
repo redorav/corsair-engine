@@ -61,8 +61,6 @@ public:
 
 	static CrFileUniqueHandle OpenUnique(const char* filePath, FileOpenFlags::T openFlags);
 
-	static CrFileSharedHandle OpenFile(const CrPath& filePath, FileOpenFlags::T openFlags);
-
 	// TODO Move this elsewhere when we have a FileDevice
 	// We need to be able to create different files for different platforms, functionality, etc
 	// Functions like FileExists also would want to be part of the file device

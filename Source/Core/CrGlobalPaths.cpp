@@ -2,6 +2,8 @@
 
 #include "GlobalVariables.h" // TODO Rename to GeneratedPaths.h
 
+#include "Core/FileSystem/CrPathString.h"
+
 #include <filesystem>
 
 #if defined(_WIN32)
@@ -10,7 +12,6 @@
 #endif
 
 // TODO Normalize paths properly
-// TODO Remove std::filesystem
 
 CrString CrGlobalPaths::AppDataDirectory;
 CrString CrGlobalPaths::CurrentExecutableDirectory;
@@ -91,7 +92,7 @@ void CrGlobalPaths::SetupGlobalPaths
 	const char* dataRootDirectory
 )
 {
-	CurrentExecutableDirectory = std::filesystem::path(currentExecutablePath).parent_path().string().c_str();
+	CurrentExecutableDirectory = CrPathString(currentExecutablePath).parent_path().c_str();
 	CurrentExecutableDirectory += "/";
 	DataRootDirectory = dataRootDirectory;
 	DataRootDirectory += "/";

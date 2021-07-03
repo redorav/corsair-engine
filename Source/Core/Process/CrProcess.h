@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/FileSystem/CrFileSystem.h"
 #include "Core/String/CrString.h"
 #include "Core/String/CrFixedString.h"
 

@@ -40,20 +40,10 @@ using CrString = eastl::string;
 template<int SIZE_IN_BYTES, typename R>
 using CrFixedFunction = eastl::fixed_function<SIZE_IN_BYTES, R>;
 
-// STD
-
-namespace std
-{
-	namespace filesystem
-	{
-		class path;
-	}
-}
-
-using CrPath = std::filesystem::path;
-
 class CrHash;
 
 class ICrFile;
 using CrFileSharedHandle = CrSharedPtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
+
+class CrPathString;

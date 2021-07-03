@@ -2,9 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <filesystem>
-
-using CrPath = std::filesystem::path;
 
 struct SpvReflectDescriptorBinding;
 struct SpvReflectTypeDescription;

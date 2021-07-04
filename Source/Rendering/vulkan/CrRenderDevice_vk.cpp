@@ -22,6 +22,19 @@ PFN_vkCmdDebugMarkerBeginEXT		vkCmdDebugMarkerBegin = nullptr;
 PFN_vkCmdDebugMarkerEndEXT			vkCmdDebugMarkerEnd = nullptr;
 PFN_vkCmdDebugMarkerInsertEXT		vkCmdDebugMarkerInsert = nullptr;
 
+// https://zeux.io/2019/07/17/serializing-pipeline-cache/
+// https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#pipelines-cache-header
+struct VkPipelineCacheHeader
+{
+	uint32_t dataSize; // Length in bytes of the entire pipeline cache header written as a stream of bytes, with the least significant byte first
+	uint32_t version;  // A VkPipelineCacheHeaderVersion value written as a stream of bytes, with the least significant byte first
+
+	uint32_t vendorID; // A vendor ID equal to VkPhysicalDeviceProperties::vendorID written as a stream of bytes, with the least significant byte first
+	uint32_t deviceID; // A device ID equal to VkPhysicalDeviceProperties::deviceID written as a stream of bytes, with the least significant byte first
+
+	uint8_t uuid[VK_UUID_SIZE]; // A pipeline cache ID equal to VkPhysicalDeviceProperties::pipelineCacheUUID
+};
+
 CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	: ICrRenderDevice(renderSystem)
 	, m_numCommandQueues(0)
@@ -54,13 +67,30 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 		vkCmdDebugMarkerInsert     = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
 	}
 
+	// Load serialized pipeline cache from disk. This pipeline cache is invalid if the uuid doesn't match
 	CrVector<char> pipelineCacheData;
 	LoadPipelineCache(pipelineCacheData);
 
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-	pipelineCacheCreateInfo.pInitialData = pipelineCacheData.data();
-	pipelineCacheCreateInfo.initialDataSize = pipelineCacheData.size();
+
+	if (!pipelineCacheData.empty())
+	{
+		const VkPipelineCacheHeader& pipelineCacheHeader = reinterpret_cast<VkPipelineCacheHeader&>(*pipelineCacheData.data());
+		bool matchesUUID = memcmp(pipelineCacheHeader.uuid, m_vkPhysicalDeviceProperties.pipelineCacheUUID, VK_UUID_SIZE) == 0;
+
+		if (matchesUUID)
+		{
+			CrLog("Serialized pipeline cache matches UUID");
+			pipelineCacheCreateInfo.pInitialData = pipelineCacheData.data();
+			pipelineCacheCreateInfo.initialDataSize = pipelineCacheData.size();
+		}
+		else
+		{
+			CrLog("Serialized pipeline cache does not match UUID. Creating empty pipeline cache");
+		}
+	}
+
 	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
 	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
 }

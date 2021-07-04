@@ -175,12 +175,13 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 
 void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
 {
-	CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+	CrPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 	CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
 
 	if (file)
 	{
 		pipelineCacheData.resize(file->GetSize());
 		file->Read(pipelineCacheData.data(), pipelineCacheData.size());
+		CrLog("Successfully loaded serialized pipeline cache from %s", pipelineCachePath.c_str());
 	}
 }

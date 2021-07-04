@@ -299,7 +299,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	for (uint32_t i = 0; i < numRenderTargets; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-		blendAttachments[i].colorWriteMask = renderTargetBlend.colorWriteMask; // TODO Careful with this, needs a platform-specific translation
+		blendAttachments[i].colorWriteMask = renderTargetBlend.colorWriteMask;
 		blendAttachments[i].blendEnable = renderTargetBlend.enable;
 		if (renderTargetBlend.enable)
 		{
@@ -348,33 +348,33 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	depthStencilState.stencilTestEnable = pipelineDescriptor.depthStencilState.stencilTestEnable;
 
 	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.depthFailOp);
-	depthStencilState.front.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilFailOp);
-	depthStencilState.front.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilPassOp);
-	depthStencilState.front.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.front.stencilCompareOp);
+	depthStencilState.front.failOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilFailOp);
+	depthStencilState.front.passOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilPassOp);
+	depthStencilState.front.compareOp   = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.front.stencilCompareOp);
 	depthStencilState.front.compareMask = pipelineDescriptor.depthStencilState.front.stencilReadMask;
-	depthStencilState.front.writeMask = pipelineDescriptor.depthStencilState.front.stencilWriteMask;
-	depthStencilState.front.reference = pipelineDescriptor.depthStencilState.front.reference;
+	depthStencilState.front.writeMask   = pipelineDescriptor.depthStencilState.front.stencilWriteMask;
+	depthStencilState.front.reference   = pipelineDescriptor.depthStencilState.front.reference;
 
-	depthStencilState.back.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.depthFailOp);
-	depthStencilState.back.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilFailOp);
-	depthStencilState.back.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilPassOp);
-	depthStencilState.back.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.back.stencilCompareOp);
-	depthStencilState.back.compareMask = pipelineDescriptor.depthStencilState.back.stencilReadMask;
-	depthStencilState.back.writeMask = pipelineDescriptor.depthStencilState.back.stencilWriteMask;
-	depthStencilState.back.reference = pipelineDescriptor.depthStencilState.back.reference;
+	depthStencilState.back.depthFailOp  = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.depthFailOp);
+	depthStencilState.back.failOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilFailOp);
+	depthStencilState.back.passOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilPassOp);
+	depthStencilState.back.compareOp    = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.back.stencilCompareOp);
+	depthStencilState.back.compareMask  = pipelineDescriptor.depthStencilState.back.stencilReadMask;
+	depthStencilState.back.writeMask    = pipelineDescriptor.depthStencilState.back.stencilWriteMask;
+	depthStencilState.back.reference    = pipelineDescriptor.depthStencilState.back.reference;
 
 	depthStencilState.minDepthBounds = 0.0f;
 	depthStencilState.maxDepthBounds = 1.0f;
 
 	// Viewport state
 	VkPipelineViewportStateCreateInfo viewportState;
-	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	viewportState.pNext = nullptr;
-	viewportState.flags = 0;
+	viewportState.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.pNext         = nullptr;
+	viewportState.flags         = 0;
 	viewportState.viewportCount = 1; // One viewport
-	viewportState.pViewports = nullptr;
-	viewportState.scissorCount = 1; // One scissor rectangle
-	viewportState.pScissors = nullptr;
+	viewportState.pViewports    = nullptr;
+	viewportState.scissorCount  = 1; // One scissor rectangle
+	viewportState.pScissors     = nullptr;
 
 	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines
 	// just for changing a viewport's dimensions or a scissor box

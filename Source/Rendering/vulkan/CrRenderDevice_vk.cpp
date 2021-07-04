@@ -675,6 +675,12 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		enabledDeviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
 	}
 
+	// To use instance id inside a shader
+	if (IsVkDeviceExtensionSupported(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME))
+	{
+		enabledDeviceExtensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
+	}
+
 	// We allocate queues up front, which are later retrieved via CreateCommandQueues. We don't really
 	// allocate command queues on demand, we have them cached within the device at creation time. This
 	// scheme is a bit inflexible, and it means that the CrCommandQueue needs to relay this information

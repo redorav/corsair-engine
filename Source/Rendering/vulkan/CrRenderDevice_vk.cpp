@@ -125,7 +125,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 
 	// Select from the list of available GPUs which one we want to use. A priority system will automatically select
 	// the best available from the list
-	uint32_t highestPriority = 0; highestPriority;
+	uint32_t highestPriority = 0;
 	uint32_t highestPriorityIndex = 0;
 	for (uint32_t i = 0; i < physicalDevices.size(); ++i)
 	{

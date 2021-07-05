@@ -109,9 +109,6 @@ public:
 
 	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-	template<typename Struct>
-	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices);
-
 	CrGPUFenceSharedHandle CreateGPUFence();
 
 	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();
@@ -190,12 +187,6 @@ protected:
 
 	CrString m_pipelineCacheFilename;
 };
-
-template<typename Struct>
-inline CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices)
-{
-	return CreateVertexBuffer(numVertices, Struct::GetVertexDescriptor());
-}
 
 template<typename Metadata>
 CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements)

@@ -284,26 +284,7 @@ public:
 
 	CrVertexBufferCommon(ICrRenderDevice* renderDevice, uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
 		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite), numVertices, vertexDescriptor.GetDataSize())
-	{
-		m_vertexDescriptor = vertexDescriptor;
-	}
-
-	CrVertexDescriptor m_vertexDescriptor;
-};
-
-template<typename Struct>
-class CrVertexBuffer : public CrVertexBufferCommon
-{
-public:
-
-	// Assumes that we have a structure for a vertex that has a GetVertexDescriptor static function that is kept in sync with the vertex data
-	CrVertexBuffer(ICrRenderDevice* renderDevice, uint32_t numVertices) 
-		: CrVertexBufferCommon(renderDevice, numVertices, Struct::GetVertexDescriptor()) {}
-
-	Struct* Lock()
-	{
-		return static_cast<Struct*>(CrVertexBufferCommon::Lock());
-	}
+	{}
 };
 
 //-------------

@@ -108,7 +108,7 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");
 	CrAssertMsg(mesh->HasTangentsAndBitangents(), "Error in mesh: no tangents available.");
 
-	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer<SimpleVertex>((uint32_t)mesh->mNumVertices);
+	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer((uint32_t)mesh->mNumVertices, SimpleVertex::GetVertexDescriptor());
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);

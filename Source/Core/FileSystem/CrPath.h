@@ -67,10 +67,16 @@ public:
 	{
 		bool nonEmptyString = extension && extension[0] != '\0';
 
+		size_t lastSeparator = m_pathString.find_last_of("/");
 		size_t lastDot = m_pathString.find_last_of(".");
 		if (lastDot != m_pathString.npos)
 		{
 			m_pathString.resize(lastDot + nonEmptyString); // Include the dot if valid extension
+			m_pathString += extension;
+		}
+		else if (lastSeparator != m_pathString.length() - 1)
+		{
+			m_pathString += ".";
 			m_pathString += extension;
 		}
 

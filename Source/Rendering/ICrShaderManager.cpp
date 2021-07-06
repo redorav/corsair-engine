@@ -170,7 +170,7 @@ CrShaderBytecodeSharedHandle ICrShaderManager::CompileShaderBytecode(const CrSha
 			bytecodeDescriptor.stage
 		));
 
-		CrLog("Compiled %s[%s] for %s %s (%f ms)",
+		CrLog("Compiled %s [%s] for %s %s (%f ms)",
 			bytecodeDescriptor.entryPoint.c_str(),
 			bytecodeDescriptor.path.c_str(),
 			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),

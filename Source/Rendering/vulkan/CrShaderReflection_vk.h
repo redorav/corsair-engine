@@ -16,11 +16,14 @@ public:
 
 	virtual void ForEachResource(ShaderReflectionFn fn) const override;
 
-// TODO make private
-
-	SpvReflectShaderModule m_reflection[cr3d::ShaderStage::Count] = {};
+	const SpvReflectShaderModule& GetReflection(cr3d::ShaderStage::T shaderStage) const
+	{
+		return m_reflection[shaderStage];
+	}
 
 private:
+
+	SpvReflectShaderModule m_reflection[cr3d::ShaderStage::Count] = {};
 
 	uint32_t m_currentBindSlot = 0;
 };

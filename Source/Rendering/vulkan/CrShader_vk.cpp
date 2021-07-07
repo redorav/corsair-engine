@@ -105,7 +105,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 	{
 		vulkanReflection.AddBytecode(shaderBytecode);
 
-		const SpvReflectShaderModule& shaderModule = vulkanReflection.m_reflection[shaderBytecode->GetShaderStage()];
+		const SpvReflectShaderModule& shaderModule = vulkanReflection.GetReflection(shaderBytecode->GetShaderStage());
 
 		// Create shader modules from the modified bytecode
 		if (shaderModule._internal)
@@ -145,7 +145,7 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice
 	CrShaderReflectionVulkan vulkanReflection;
 	vulkanReflection.AddBytecode(computeShaderDescriptor.m_bytecode);
 
-	const SpvReflectShaderModule& shaderModule = vulkanReflection.m_reflection[computeShaderDescriptor.m_bytecode->GetShaderStage()];
+	const SpvReflectShaderModule& shaderModule = vulkanReflection.GetReflection(computeShaderDescriptor.m_bytecode->GetShaderStage());
 
 	VkShaderModuleCreateInfo moduleCreateInfo;
 	moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

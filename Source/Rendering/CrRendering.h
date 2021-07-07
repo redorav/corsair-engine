@@ -8,7 +8,7 @@ namespace cr3d
 
 	namespace DataFormat
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			//-------------
 			// Uncompressed

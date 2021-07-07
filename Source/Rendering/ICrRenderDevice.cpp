@@ -122,9 +122,9 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& 
 	return CrTextureSharedHandle(CreateTexturePS(descriptor));
 }
 
-CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
+CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(uint32_t numVertices, uint32_t stride)
 {
-	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, vertexDescriptor), m_gpuDeletionCallback);
+	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, numVertices, stride), m_gpuDeletionCallback);
 }
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)

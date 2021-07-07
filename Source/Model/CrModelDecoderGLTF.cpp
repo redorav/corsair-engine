@@ -187,7 +187,7 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			float3 maxVertex = float3(-FLT_MAX);
 
 			// Create the vertex buffer
-			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer((uint32_t)positions.size(), SimpleVertex::GetVertexDescriptor());
+			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer((uint32_t)positions.size(), SimpleVertex::GetVertexDescriptor().GetDataSize());
 			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
 			{
 				for (size_t vertexIndex = 0; vertexIndex < positions.size(); ++vertexIndex)

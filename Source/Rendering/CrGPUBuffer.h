@@ -282,8 +282,8 @@ class CrVertexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrVertexBufferCommon(ICrRenderDevice* renderDevice, uint32_t numVertices, const CrVertexDescriptor& vertexDescriptor)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite), numVertices, vertexDescriptor.GetDataSize())
+	CrVertexBufferCommon(ICrRenderDevice* renderDevice, uint32_t numVertices, uint32_t stride)
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite), numVertices, stride)
 	{}
 };
 

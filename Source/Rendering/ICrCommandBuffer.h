@@ -65,7 +65,7 @@ public:
 
 	void BindIndexBuffer(const CrGPUBuffer* indexBuffer);
 	
-	void BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t bindPoint);
+	void BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId);
 
 	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
 
@@ -159,7 +159,7 @@ protected:
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
 	{
-		ConstantBufferBinding() = default;
+		ConstantBufferBinding() {}
 
 		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t byteOffset) : buffer(buffer), byteOffset(byteOffset) {}
 
@@ -169,7 +169,7 @@ protected:
 
 	struct StorageBufferBinding
 	{
-		StorageBufferBinding() = default;
+		StorageBufferBinding() {}
 
 		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t size, uint32_t byteOffset) : buffer(buffer), size(size), byteOffset(byteOffset) {}
 
@@ -180,12 +180,22 @@ protected:
 
 	struct RWTextureBinding
 	{
-		RWTextureBinding() = default;
+		RWTextureBinding() {}
 
 		RWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
 
 		const ICrTexture* texture = nullptr;
 		uint32_t mip = 0;
+	};
+
+	struct VertexBufferBinding
+	{
+		VertexBufferBinding() {}
+		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t offset)
+			: vertexBuffer(vertexBuffer), offset(offset) {}
+
+		const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
+		uint32_t offset = 0;
 	};
 
 	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
@@ -202,8 +212,7 @@ protected:
 		uint32_t                        m_indexBufferOffset;
 		bool                            m_indexBufferDirty = true;
 
-		const ICrHardwareGPUBuffer*     m_vertexBuffer;
-		uint32_t                        m_vertexBufferOffset;
+		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = true;
 
 		CrScissor                       m_scissor;
@@ -281,13 +290,13 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 	}
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t /*bindPoint*/)
+inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId)
 {
-	if (m_currentState.m_vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
-		m_currentState.m_vertexBufferOffset != vertexBuffer->GetByteOffset())
+	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
+		m_currentState.m_vertexBuffers[streamId].offset != vertexBuffer->GetByteOffset())
 	{
-		m_currentState.m_vertexBuffer = vertexBuffer->GetHardwareBuffer();
-		m_currentState.m_vertexBufferOffset = vertexBuffer->GetByteOffset();
+		m_currentState.m_vertexBuffers[streamId].vertexBuffer = vertexBuffer->GetHardwareBuffer();
+		m_currentState.m_vertexBuffers[streamId].offset = vertexBuffer->GetByteOffset();
 		m_currentState.m_vertexBufferDirty = true;
 	}
 }

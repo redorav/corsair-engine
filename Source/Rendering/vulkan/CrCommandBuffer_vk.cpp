@@ -305,6 +305,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 {
+	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
+	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
+	
 	if (m_currentState.m_indexBufferDirty)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer);
@@ -314,15 +317,17 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_vertexBufferDirty)
 	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_vertexBuffer);
-
-		VkDeviceSize offsets[1] = { m_currentState.m_vertexBufferOffset };
-		uint32_t bindPoint = 0;
-		// TODO Shader bind location! Retrieve this from the PSO which should have the current shader
-		// TODO Number of vertex shaders to be able to have several vertex streams ??
-		// TODO Make sure function accepts multiple vertex buffers
-		const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
-		vkCmdBindVertexBuffers(m_vkCommandBuffer, bindPoint, 1, vkBuffers, offsets);
+		for (uint32_t streamId = 0; streamId < cr3d::MaxVertexStreams; ++streamId)
+		{
+			const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
+			if (binding.vertexBuffer)
+			{
+				const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.vertexBuffer);
+				VkDeviceSize offsets[1] = { binding.offset };
+				const VkBuffer vkBuffers[1] = { vulkanGPUBuffer->GetVkBuffer() };
+				vkCmdBindVertexBuffers(m_vkCommandBuffer, streamId, 1, vkBuffers, offsets);
+			}
+		}
 
 		m_currentState.m_vertexBufferDirty = false;
 	}
@@ -355,8 +360,6 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 		m_currentState.m_viewportDirty = false;
 	}
 
-	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
 
 	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);

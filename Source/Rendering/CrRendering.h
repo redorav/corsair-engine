@@ -5,6 +5,8 @@
 namespace cr3d
 {
 	static constexpr uint32_t MaxRenderTargets = 8;
+	static constexpr uint32_t MaxVertexStreams = 8;
+	static constexpr uint32_t MaxVertexAttributes = 8;
 
 	namespace DataFormat
 	{

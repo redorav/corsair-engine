@@ -23,3 +23,6 @@
 #endif
 
 #define unused_parameter(x) (x)
+
+template<int N> struct static_sizeof_dummy;
+#define static_sizeof(T) static_sizeof_dummy<sizeof(T)>;

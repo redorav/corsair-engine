@@ -123,7 +123,7 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 
 			// Create the buffer
 			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
-			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(format, (uint32_t)indexAccessor.count);
+			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, format, (uint32_t)indexAccessor.count);
 
 			// Use the buffer view to copy the data
 			const BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
@@ -187,7 +187,7 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			float3 maxVertex = float3(-FLT_MAX);
 
 			// Create the vertex buffer
-			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer((uint32_t)positions.size(), SimpleVertex::GetVertexDescriptor().GetDataSize());
+			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, (uint32_t)positions.size(), SimpleVertex::GetVertexDescriptor().GetDataSize());
 			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
 			{
 				for (size_t vertexIndex = 0; vertexIndex < positions.size(); ++vertexIndex)

@@ -84,7 +84,7 @@ public:
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
-	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::DataFormat::T dataFormat, uint32_t numIndices);
+	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
 	CrSamplerSharedHandle CreateSampler(const CrSamplerDescriptor& descriptor);
 
@@ -92,7 +92,7 @@ public:
 
 	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
-	CrVertexBufferSharedHandle CreateVertexBuffer(uint32_t numVertices, uint32_t stride);
+	CrVertexBufferSharedHandle CreateVertexBuffer(cr3d::BufferAccess::T access, uint32_t numVertices, uint32_t stride);
 
 	template<typename Metadata>
 	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements);

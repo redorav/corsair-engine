@@ -108,7 +108,8 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");
 	CrAssertMsg(mesh->HasTangentsAndBitangents(), "Error in mesh: no tangents available.");
 
-	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer((uint32_t)mesh->mNumVertices, SimpleVertex::GetVertexDescriptor().GetDataSize());
+	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, (uint32_t)mesh->mNumVertices, SimpleVertex::GetVertexDescriptor().GetDataSize());
+	
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
@@ -144,7 +145,7 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 
 	renderMesh->m_boundingBox = boundingBox;
 
-	renderMesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	renderMesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
 	uint16_t* indexData = (uint16_t*)renderMesh->m_indexBuffer->Lock();

@@ -282,8 +282,8 @@ class CrVertexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrVertexBufferCommon(ICrRenderDevice* renderDevice, uint32_t numVertices, uint32_t stride)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, cr3d::BufferAccess::CPUWrite), numVertices, stride)
+	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, uint32_t numVertices, uint32_t stride)
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, access), numVertices, stride)
 	{}
 };
 
@@ -295,21 +295,11 @@ class CrIndexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, cr3d::BufferAccess::CPUWrite), numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4) {}
+	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, access), numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4) {}
 };
 
 using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
-
-class CrIndexBuffer : public CrIndexBufferCommon
-{
-public:
-
-	CrIndexBuffer(ICrRenderDevice* renderDevice, cr3d::DataFormat::T dataFormat, uint32_t numIndices) 
-		: CrIndexBufferCommon(renderDevice, dataFormat, numIndices) {}
-
-	void* Lock() { return CrIndexBufferCommon::Lock(); }
-};
 
 //----------------
 // Constant Buffer

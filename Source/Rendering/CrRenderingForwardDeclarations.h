@@ -7,10 +7,12 @@
 namespace cr3d
 {
 	namespace DataFormat { enum T : uint32_t; }
+	struct DataFormatInfo;
+
 	enum class TextureType : uint8_t;
 	using TextureUsageFlags = uint32_t;
-	enum class SampleCount :uint8_t;
-	struct DataFormatInfo;
+
+	enum class SampleCount : uint8_t;
 	namespace ShaderStage { enum T : uint8_t; }
 }
 
@@ -62,6 +64,7 @@ using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 
 struct CrRenderPassDescriptor;
 
+// Shaders & Pipeline Objects
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
 struct CrGraphicsShaderDescriptor;
@@ -78,12 +81,14 @@ class ICrComputePipeline;
 using CrComputePipelineHandle = CrSharedPtr<ICrComputePipeline>;
 struct CrComputePipelineDescriptor;
 
+// Shader Bytecode
 class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrBytecodeLoadDescriptor;
 struct CrShaderBytecodeDescriptor;
 struct CrShaderStageInfo;
 
+// GPU Buffers
 class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
 struct CrGPUBufferDescriptor;

@@ -6,9 +6,13 @@
 class CrHash
 {
 public:
+
+	static const uint64_t HashSeed = 100;
+
 	uint64_t m_hash;
 
 	CrHash() : m_hash(0) {}
+
 	CrHash(const CrHash& hash) : m_hash(hash.m_hash) {}
 
 	void Reset()
@@ -17,32 +21,36 @@ public:
 	}
 
 	template<typename T>
-	CrHash(void* data, const T& datatype)
+	CrHash(T* data)
 	{
-		m_hash = ComputeHash(data, datatype);
+		m_hash = ComputeHash<T>(data, sizeof(T));
 	}
 
-	// TODO This is broken
-	//CrHash(void* data, size_t dataSize)
-	//{
-	//	m_hash = ComputeHash(data, dataSize);
-	//}
+	template<typename T>
+	CrHash(T* data, uint64_t dataSize)
+	{
+		m_hash = ComputeHash<T>(data, dataSize);
+	}
 
 	CrHash& operator <<= (const CrHash& other)
 	{
 		uint64_t hashes[2] = { m_hash, other.m_hash };
-		m_hash = ComputeHash(hashes, hashes);
+		m_hash = ComputeHash(hashes, sizeof(hashes));
 		return *this;
 	}
 
-private:
+	// TODO Select hash function at compile time based on the size of datatype.
+	// http://aras-p.info/blog/2016/08/09/More-Hash-Function-Tests/
+	template<typename T>
+	static uint64_t ComputeHash(T* data)
+	{
+		return XXH64(data, sizeof(T), HashSeed);
+	}
 
 	template<typename T>
-	static uint64_t ComputeHash(void* data, const T&)
+	static uint64_t ComputeHash(T* data, uint64_t dataSize)
 	{
-		// TODO Select hash function at compile time based on the size of datatype.
-		// http://aras-p.info/blog/2016/08/09/More-Hash-Function-Tests/
-		return XXH64(data, sizeof(T), 100);
+		return XXH64(data, dataSize, HashSeed);
 	}
 };
 
@@ -56,6 +64,7 @@ template<typename T>
 class CrAutoHashable
 {
 public:
+
 	const CrHash& GetHash() const
 	{
 		return m_hash;
@@ -63,10 +72,10 @@ public:
 
 	void Hash()
 	{
-		static T dummy;
 		m_hash.Reset(); // The hash also takes part in the hashing because it's stored. Reset for consistent hashing
-		m_hash = CrHash(this, dummy);
+		m_hash = CrHash((T*)this);
 	}
+
 protected:
 
 	CrAutoHashable() {} // Don't allow instances of this type

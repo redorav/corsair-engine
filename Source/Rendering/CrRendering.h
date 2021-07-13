@@ -475,6 +475,12 @@ namespace cr3d
 		PatchList
 	};
 
+	enum class VertexInputRate
+	{
+		Vertex = 0,
+		Instance = 1
+	};
+
 	enum class PolygonFillMode : uint8_t { Fill, Line };
 	enum class PolygonCullMode : uint8_t { None, Front, Back };
 	enum class FrontFace : uint8_t { Clockwise, CounterClockwise };

@@ -36,6 +36,8 @@ namespace crvk
 	
 	VkPrimitiveTopology GetVkPrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology);
 
+	VkVertexInputRate GetVkVertexInputRate(cr3d::VertexInputRate vertexInputRate);
+
 	VkPolygonMode GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode);
 
 	VkCullModeFlags GetVkPolygonCullMode(cr3d::PolygonCullMode cullMode);

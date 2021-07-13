@@ -493,6 +493,17 @@ VkPrimitiveTopology crvk::GetVkPrimitiveTopology(cr3d::PrimitiveTopology primiti
 	return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 }
 
+VkVertexInputRate crvk::GetVkVertexInputRate(cr3d::VertexInputRate vertexInputRate)
+{
+	switch (vertexInputRate)
+	{
+		case cr3d::VertexInputRate::Vertex: return VK_VERTEX_INPUT_RATE_VERTEX;
+		case cr3d::VertexInputRate::Instance: return VK_VERTEX_INPUT_RATE_INSTANCE;
+	}
+
+	return VK_VERTEX_INPUT_RATE_MAX_ENUM;
+}
+
 VkPolygonMode crvk::GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode)
 {
 	switch (fillMode)

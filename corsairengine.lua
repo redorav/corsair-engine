@@ -166,7 +166,7 @@ workspace 'Corsair Engine'
 	filter{}
 	
 	configuration 'Debug'
-		defines { 'DEBUG' }
+		defines { 'DEBUG_CONFIG' }
 		optimize('off')
 		--symbols('on')
 		symbols('fastlink')
@@ -177,7 +177,11 @@ workspace 'Corsair Engine'
 		runtime('release')
 
 	configuration 'Release'
-		defines { 'NDEBUG' }
+		defines
+		{
+			'RELEASE_CONFIG',
+			'NDEBUG' -- Disables assert
+		}
 		optimize('speed')
 		symbols('on')
 		inlining('auto')

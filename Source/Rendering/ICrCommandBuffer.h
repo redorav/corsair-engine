@@ -95,7 +95,11 @@ public:
 
 	void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance);
 
+	void FlushGraphicsRenderState();
+
 	void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ);
+
+	void FlushComputeRenderState();
 
 	void BeginDebugEvent(const char* eventName, const float4& color);
 
@@ -324,23 +328,33 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	FlushGraphicsRenderStatePS();
+	FlushGraphicsRenderState();
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	FlushGraphicsRenderStatePS();
+	FlushGraphicsRenderState();
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+inline void ICrCommandBuffer::FlushGraphicsRenderState()
+{
+	FlushGraphicsRenderStatePS();
+}
+
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	FlushComputeRenderStatePS();
+	FlushComputeRenderState();
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+}
+
+inline void ICrCommandBuffer::FlushComputeRenderState()
+{
+	FlushComputeRenderStatePS();
 }
 
 inline void ICrCommandBuffer::BeginDebugEvent(const char* eventName, const float4& color)

@@ -5,7 +5,6 @@ BinaryDirectory = '/Libraries/'
 IncludeDirectory = '/Include/'
 
 -- Library Directories
-LibArgh         = DependenciesDirectory..'/argh'
 LibAssimp       = DependenciesDirectory..'/assimp'
 LibDdspp        = DependenciesDirectory..'/ddspp'
 LibEASTL        = DependenciesDirectory..'/eastl'
@@ -19,11 +18,6 @@ LibStb          = DependenciesDirectory..'/stb'
 LibTinyGLTF     = DependenciesDirectory..'/tinygltf'
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibxxHash       = DependenciesDirectory..'/xxHash'
-
-ArghLibrary =
-{
-	includeDirs = LibArgh..IncludeDirectory
-}
 
 AssimpLibrary =
 {

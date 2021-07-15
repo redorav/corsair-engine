@@ -130,7 +130,6 @@ workspace 'Corsair Engine'
 	-- Global library includes. Very few things should go here, basically things
 	-- that are used in every possible project like math and containers
 	
-	AddLibraryIncludes(ArghLibrary)
 	AddLibraryIncludes(DdsppLibrary)
 	AddLibraryIncludes(EASTLLibrary)
 	AddLibraryIncludes(HalfLibrary)

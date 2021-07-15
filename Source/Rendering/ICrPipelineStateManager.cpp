@@ -40,7 +40,7 @@ CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 	else
 	{
 		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader.get(), vertexDescriptor);
-		graphicsPipeline->m_shader = graphicsShader;
+		graphicsPipeline->m_shader = graphicsShader; // TODO Move inside CreateGraphicsPipeline
 
 		// Insert in the hashmap
 		m_graphicsPipelines.insert({ combinedHash.m_hash, graphicsPipeline });

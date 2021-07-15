@@ -76,6 +76,8 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 
 	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
+	pipeline->m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
+
 	CrLog("Pipeline created (%f ms)", pipelineCreationTime.GetCurrent().AsMilliseconds());
 
 	return pipeline;

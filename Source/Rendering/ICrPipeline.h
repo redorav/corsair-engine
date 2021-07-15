@@ -120,9 +120,13 @@ public:
 
 	virtual ~ICrGraphicsPipeline() {}
 
+	const CrGraphicsShaderHandle& GetShader() const { return m_shader; }
+
 	// TODO PRIVATE
-	
+
 	CrGraphicsShaderHandle m_shader;
+	
+	uint32_t m_usedVertexStreamCount = 0;
 };
 
 struct CrComputePipelineDescriptor : public CrAutoHashable<CrComputePipelineDescriptor>

@@ -461,26 +461,35 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
-	// Binding description
-	CrVector<VkVertexInputBindingDescription> bindingDescriptions;
-	bindingDescriptions.resize(1);
-	bindingDescriptions[0].binding = 0; // TODO Shader binding location
-	bindingDescriptions[0].stride = vertexDescriptor.GetDataSize();
-	bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+	uint32_t vertexStreamCount = vertexDescriptor.GetStreamCount();
+	CrArray<VkVertexInputBindingDescription, cr3d::MaxVertexStreams> bindingDescriptions;
 
-	uint32_t offset = 0;
-
-	// Create vertex input state
-	CrVector<VkVertexInputAttributeDescription> attributeDescriptions;
-
-	attributeDescriptions.resize(vertexDescriptor.GetNumAttributes());
-
-	for (uint32_t i = 0; i < vertexDescriptor.GetNumAttributes(); ++i)
+	for (uint32_t streamId = 0; streamId < vertexStreamCount; ++streamId)
 	{
-		const cr3d::DataFormatInfo& vertexFormatInfo = vertexDescriptor.GetVertexInfo(i);
-		attributeDescriptions[i].binding = 0; // TODO Shader binding location
-		attributeDescriptions[i].location = i;
-		attributeDescriptions[i].format = crvk::GetVkFormat(vertexFormatInfo.format);
+		bindingDescriptions[streamId].binding = streamId;
+		bindingDescriptions[streamId].stride = vertexDescriptor.GetStreamStride(streamId);
+		bindingDescriptions[streamId].inputRate = crvk::GetVkVertexInputRate(vertexDescriptor.GetInputRate(streamId));
+	}
+
+	uint32_t attributeCount = vertexDescriptor.GetAttributeCount();
+	CrArray<VkVertexInputAttributeDescription, cr3d::MaxVertexAttributes> attributeDescriptions;
+
+	uint32_t offset   = 0;
+	uint32_t streamId = 0;
+	for (uint32_t i = 0; i < attributeCount; ++i)
+	{
+		const CrVertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
+		const cr3d::DataFormatInfo& vertexFormatInfo = cr3d::DataFormats[vertexAttribute.format];
+		attributeDescriptions[i].binding = vertexAttribute.streamId;
+		attributeDescriptions[i].location = i; // We assume attributes come in the order the shader expects them
+		attributeDescriptions[i].format = crvk::GetVkFormat((cr3d::DataFormat::T)vertexAttribute.format);
+
+		if (streamId != vertexAttribute.streamId)
+		{
+			streamId = vertexAttribute.streamId;
+			offset = 0;
+		}
+
 		attributeDescriptions[i].offset = offset;
 		offset += vertexFormatInfo.dataOrBlockSize;
 	}
@@ -490,9 +499,9 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputState.pNext = nullptr;
 	vertexInputState.flags = 0;
-	vertexInputState.vertexBindingDescriptionCount = (uint32_t)bindingDescriptions.size();
+	vertexInputState.vertexBindingDescriptionCount = vertexStreamCount;
 	vertexInputState.pVertexBindingDescriptions = bindingDescriptions.data();
-	vertexInputState.vertexAttributeDescriptionCount = (uint32_t)attributeDescriptions.size();
+	vertexInputState.vertexAttributeDescriptionCount = attributeCount;
 	vertexInputState.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	// We don't need the real renderpass here to create pipeline state objects, a compatible one is enough
@@ -574,7 +583,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	pipelineInfo.pStages = shaderStages;
 
 	pipelineInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout;
-	pipelineInfo.pVertexInputState = &vertexInputState; // TODO Create this pipeline layout first from the shader/vertex descriptor
+	pipelineInfo.pVertexInputState = &vertexInputState;
 	pipelineInfo.renderPass = vkCompatibleRenderPass;
 
 	pipelineInfo.pInputAssemblyState = &inputAssemblyState;

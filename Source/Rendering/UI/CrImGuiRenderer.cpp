@@ -27,11 +27,13 @@ struct UIVertex
 	CrVertexElement<float, cr3d::DataFormat::RG32_Float> position;
 	CrVertexElement<float, cr3d::DataFormat::RG32_Float> uv;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
+};
 
-	static CrVertexDescriptor GetVertexDescriptor()
-	{
-		return { decltype(position)::GetFormat(), decltype(uv)::GetFormat(), decltype(color)::GetFormat() };
-	}
+CrVertexDescriptor UIVertexDescriptor =
+{
+	CrVertexAttribute(CrVertexSemantic::Position, cr3d::DataFormat::RG32_Float, 0),
+	CrVertexAttribute(CrVertexSemantic::TexCoord0, cr3d::DataFormat::RG32_Float, 0),
+	CrVertexAttribute(CrVertexSemantic::Color, cr3d::DataFormat::RGBA8_Unorm, 0),
 };
 
 CrImGuiRenderer* CrImGuiRenderer::k_instance = nullptr;
@@ -76,7 +78,6 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
 
 		psoDescriptor.renderTargets.colorFormats[0] = initParams.m_swapchainFormat;
-		psoDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
 
 		psoDescriptor.Hash();
 
@@ -93,7 +94,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertex::GetVertexDescriptor());
+		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
 	}
 
 	// Font atlas:

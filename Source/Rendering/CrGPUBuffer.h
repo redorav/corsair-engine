@@ -3,6 +3,7 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrGPUDeletable.h"
+#include "Rendering/CrVertexDescriptor.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/CrHash.h"
@@ -216,75 +217,20 @@ public:
 // Vertex Buffer
 //--------------
 
-class CrVertexDescriptor
-{
-public:
-
-	CrVertexDescriptor();
-
-	CrVertexDescriptor(std::initializer_list<cr3d::DataFormat::T> l);
-
-	void AddVertexAttribute(cr3d::DataFormat::T format);
-
-	uint32_t GetNumAttributes() const;
-
-	uint32_t GetDataSize() const;
-
-	const cr3d::DataFormatInfo& GetVertexInfo(uint32_t attributeIndex) const;
-
-	CrHash ComputeHash();
-
-private:
-
-	CrVector<cr3d::DataFormat::T> m_vertexAttributes;
-
-	uint32_t m_dataSize;
-};
-
-template<typename T, cr3d::DataFormat::T F>
-class CrVertexElement
-{
-public:
-
-	CrVertexElement()
-	{
-		StaticAsserts();
-	}
-
-	CrVertexElement(std::initializer_list<T> l) : data(l)
-	{
-		StaticAsserts();
-	}
-
-	static cr3d::DataFormat::T GetFormat()
-	{
-		return F;
-	}
-
-	uint32_t GetDataSize()
-	{
-		return sizeof(data);
-	}
-
-	VectorT<T, cr3d::DataFormats[F].numComponents> data;
-
-private:
-
-	void StaticAsserts()
-	{
-		static_assert(cr3d::CrTypeName<T>() == cr3d::DataFormats[F].name, "Type does not match");
-		static_assert(F == cr3d::DataFormats[F].format, "Vertex format is in an incorrect position with respect to the enum"); // Do not compile if the order in the array does not match the order in the enum
-		static_assert(sizeof(T) == cr3d::DataFormats[F].elementSizeR / 8, "Data type size does not match");
-	}
-};
-
 class CrVertexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, uint32_t numVertices, uint32_t stride)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, access), numVertices, stride)
+	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, access), numVertices, vertexDescriptor.GetDataSize())
+		, m_vertexDescriptor(vertexDescriptor)
 	{}
+
+	const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
+
+private:
+
+	CrVertexDescriptor m_vertexDescriptor;
 };
 
 //-------------

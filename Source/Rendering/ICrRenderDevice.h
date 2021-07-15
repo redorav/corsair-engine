@@ -92,7 +92,7 @@ public:
 
 	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
-	CrVertexBufferSharedHandle CreateVertexBuffer(cr3d::BufferAccess::T access, uint32_t numVertices, uint32_t stride);
+	CrVertexBufferSharedHandle CreateVertexBuffer(cr3d::BufferAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 	template<typename Metadata>
 	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements);

@@ -33,18 +33,8 @@
 
 #include "Core/FileSystem/CrPath.h"
 
-struct SimpleVertex
-{
-	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
-	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
-
-	static CrVertexDescriptor GetVertexDescriptor()
-	{
-		return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
-	}
-};
+#include "Rendering/CrVertexDescriptor.h"
+#include "Rendering/CrCommonVertexLayouts.h"
 
 static CrSharedPtr<CrCamera> camera;
 static Camera cameraConstantData;
@@ -134,7 +124,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
-	basicGraphicsPipelineDescriptor.renderTargets.sampleCount = cr3d::SampleCount::S1;
 
 	basicGraphicsPipelineDescriptor.Hash();
 
@@ -144,10 +133,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
 
 	// Test caching
-	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
@@ -155,7 +146,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	basicGraphicsPipelineDescriptor.Hash();
-	m_linePipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertex::GetVertexDescriptor());
+	m_linePipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+		basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertexDescriptor);
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
@@ -174,7 +166,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// Initialize ImGui renderer
 	CrImGuiRendererInitParams imguiInitParams = {};
 	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
-	imguiInitParams.m_sampleCount = cr3d::SampleCount::S1;
 	CrImGuiRenderer::GetImGuiRenderer()->Initialize(imguiInitParams);
 }
 
@@ -274,23 +265,27 @@ void CrFrame::Process()
 				transformBuffer.Unlock();
 				drawCommandBuffer->BindConstantBuffer(&transformBuffer);
 
+				drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
+
 				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
 				{
-					drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
-
 					const CrRenderMeshSharedHandle& renderMesh = m_renderModel->m_renderMeshes[m];
 					uint32_t materialIndex = (*m_renderModel->m_materialMap.find(renderMesh.get())).second;
 					const CrMaterialSharedHandle& material = m_renderModel->m_materials[materialIndex];
-	
+
 					for (uint32_t t = 0; t < material->m_textures.size(); ++t)
 					{
 						CrMaterial::TextureBinding binding = material->m_textures[t];
 						drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
 					}
-	
-					drawCommandBuffer->BindVertexBuffer(renderMesh->m_vertexBuffer.get(), 0);
-					drawCommandBuffer->BindIndexBuffer(renderMesh->m_indexBuffer.get());
-					drawCommandBuffer->DrawIndexed(renderMesh->m_indexBuffer->GetNumElements(), 1, 0, 0, 0);
+
+					for (uint32_t vbIndex = 0; vbIndex < renderMesh->GetVertexBufferCount(); ++vbIndex)
+					{
+						drawCommandBuffer->BindVertexBuffer(renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
+					}
+
+					drawCommandBuffer->BindIndexBuffer(renderMesh->GetIndexBuffer().get());
+					drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), 1, 0, 0, 0);
 				}
 			}
 			drawCommandBuffer->EndRenderPass();

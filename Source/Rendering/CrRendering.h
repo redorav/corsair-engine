@@ -83,6 +83,9 @@ namespace cr3d
 			RG11B10_Float,
 			RGB9E5_Float,
 
+			FirstUncompressed = R8_Unorm,
+			LastUncompressed = RGB9E5_Float,
+
 			//-----------
 			// Compressed
 			//-----------

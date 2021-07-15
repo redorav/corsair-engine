@@ -6,7 +6,7 @@ struct VS_IN
 	float3 pos     : POSITION;
 	float4 normal  : NORMAL;
 	float4 tangent : TANGENT;
-	float2 uv      : TEXCOORD;
+	float2 uv      : TEXCOORD0;
 
 	uint instanceID : SV_InstanceID;
 };

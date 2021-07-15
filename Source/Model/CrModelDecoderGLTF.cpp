@@ -15,6 +15,7 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrImage.h"
+#include "Rendering/CrCommonVertexLayouts.h"
 
 #include "Image/CrImageDecoderSTB.h"
 
@@ -34,19 +35,6 @@ using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
-
-struct SimpleVertex
-{
-	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
-	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
-
-	static CrVertexDescriptor GetVertexDescriptor()
-	{
-		return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
-	}
-};
 
 cr3d::DataFormat::T ToDataFormat(int format)
 {
@@ -123,7 +111,7 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 
 			// Create the buffer
 			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
-			mesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, format, (uint32_t)indexAccessor.count);
+			CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, format, (uint32_t)indexAccessor.count);
 
 			// Use the buffer view to copy the data
 			const BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
@@ -131,9 +119,11 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			data = data + (indexAccessor.byteOffset + bufferView.byteOffset);
 
 			CrAssertMsg(bufferView.byteStride == 0, "Invalid stride");
-			void* indexData = mesh->m_indexBuffer->Lock();
+			void* indexData = indexBuffer->Lock();
 			memcpy(indexData, data, bufferView.byteLength);
-			mesh->m_indexBuffer->Unlock();
+			indexBuffer->Unlock();
+
+			mesh->SetIndexBuffer(indexBuffer);
 		}
 
 		// Vertex data
@@ -187,21 +177,23 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			float3 maxVertex = float3(-FLT_MAX);
 
 			// Create the vertex buffer
-			mesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, (uint32_t)positions.size(), SimpleVertex::GetVertexDescriptor().GetDataSize());
-			SimpleVertex* vertexBufferData = (SimpleVertex*)mesh->m_vertexBuffer->Lock();
+			CrVertexBufferSharedHandle positionBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, PositionVertexDescriptor, (uint32_t)positions.size());
+			CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, AdditionalVertexDescriptor, (uint32_t)positions.size());
+			
+			ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
+			ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();
 			{
 				for (size_t vertexIndex = 0; vertexIndex < positions.size(); ++vertexIndex)
 				{
 					const GLTFFloat3& position = positions[vertexIndex];
 					const GLTFFloat3& normal   = normals[vertexIndex];
 					const GLTFFloat2& texCoord = texCoords[vertexIndex];
-					SimpleVertex& vertex       = vertexBufferData[vertexIndex];
-					vertex.position = { (half)position.x, (half)position.y, (half)position.z };
+					positionBufferData[vertexIndex].position = { (half)position.x, (half)position.y, (half)position.z };
 
 					minVertex = min(minVertex, float3(position.x, position.y, position.z));
 					maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
 
-					vertex.normal =
+					additionalBufferData[vertexIndex].normal =
 					{
 						(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f),
 						(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f),
@@ -209,14 +201,17 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 						0
 					};
 
-					vertex.tangent = { 0, 0, 0 , 0 };
-					vertex.uv = { (half)texCoord.x, (half)texCoord.y };
+					additionalBufferData[vertexIndex].tangent = { 0, 0, 0 , 0 };
+					additionalBufferData[vertexIndex].uv = { (half)texCoord.x, (half)texCoord.y };
 				}
 			}
-			mesh->m_vertexBuffer->Unlock();
+			positionBuffer->Unlock();
+			additionalBuffer->Unlock();
 
-			mesh->m_boundingBox.center = (maxVertex + minVertex) * 0.5f;
-			mesh->m_boundingBox.extents = (maxVertex - minVertex) * 0.5f;
+			mesh->AddVertexBuffer(positionBuffer);
+			mesh->AddVertexBuffer(additionalBuffer);
+
+			mesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 		}
 	}
 

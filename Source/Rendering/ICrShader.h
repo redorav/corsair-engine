@@ -7,6 +7,8 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
 
+#include "Rendering/CrVertexDescriptor.h"
+
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
@@ -182,9 +184,22 @@ private:
 	CrFixedVector<CrShaderBinding, 64> m_bindings;
 };
 
+struct CrVertexInput
+{
+	uint16_t semantic   : 5; // CrVertexSemantic::T
+	uint16_t components : 3;
+};
+
+static_assert(sizeof(CrVertexInput) == 2);
+
+struct CrInputSignature
+{
+	CrFixedVector<CrVertexInput, cr3d::MaxVertexStreams> inputs;
+};
+
 struct CrShaderStageInfo
 {
-	CrFixedString128 entryPoint;
+	CrFixedString128 entryPoint; // TODO Optimize
 	cr3d::ShaderStage::T stage;
 };
 
@@ -279,7 +294,14 @@ public:
 		return m_stageInfos;
 	}
 
-private:
+	const CrInputSignature& GetInputSignature() const
+	{
+		return m_inputSignature;
+	}
+
+protected:
+
+	CrInputSignature m_inputSignature;
 
 	CrVector<CrShaderStageInfo> m_stageInfos;
 };

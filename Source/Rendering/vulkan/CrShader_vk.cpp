@@ -125,6 +125,26 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 		}
 	}
 
+	const SpvReflectShaderModule& vertexShaderModule = vulkanReflection.GetReflection(cr3d::ShaderStage::Vertex);
+
+	if (vertexShaderModule._internal)
+	{
+		for (uint32_t i = 0; i < vertexShaderModule.input_variable_count; ++i)
+		{
+			SpvReflectInterfaceVariable* inputVariable = vertexShaderModule.input_variables[i];
+
+			// We don't want to register built-ins
+			if (inputVariable->name)
+			{
+				CrVertexInput& input = m_inputSignature.inputs.push_back();
+				const char* lastDot = strrchr(inputVariable->name, '.');
+				const char* semanticString = lastDot ? lastDot + 1 : inputVariable->name;
+				input.semantic = CrVertexSemantic::FromString(semanticString);
+				input.components = inputVariable->numeric.vector.component_count;
+			}
+		}
+	}
+
 	// Create the optimized shader resource table
 	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(CreateBindingTable(renderDevice, vulkanReflection));
 }

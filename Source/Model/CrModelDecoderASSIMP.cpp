@@ -14,6 +14,7 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrImage.h"
+#include "Rendering/CrCommonVertexLayouts.h"
 
 #pragma warning(push, 0)
 #include <assimp/Importer.hpp>
@@ -91,64 +92,51 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 {
 	CrMeshSharedHandle renderMesh = CrMakeShared<CrMesh>();
 
-	struct SimpleVertex
-	{
-		CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
-		CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
-		CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
-		CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
-
-		static CrVertexDescriptor GetVertexDescriptor()
-		{
-			return { decltype(position)::GetFormat(), decltype(normal)::GetFormat(), decltype(tangent)::GetFormat(), decltype(uv)::GetFormat() };
-		}
-	};
-
 	CrAssertMsg(mesh->HasTextureCoords(0), "Error in mesh: no texture coordinates available.");
 	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");
 	CrAssertMsg(mesh->HasTangentsAndBitangents(), "Error in mesh: no tangents available.");
 
-	renderMesh->m_vertexBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, (uint32_t)mesh->mNumVertices, SimpleVertex::GetVertexDescriptor().GetDataSize());
-	
+	CrVertexBufferSharedHandle positionBuffer   = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
 
-	SimpleVertex* vertexBufferData = (SimpleVertex*)renderMesh->m_vertexBuffer->Lock();
+	ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
+	ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();
 	{
 		for (size_t j = 0; j < mesh->mNumVertices; ++j)
 		{
 			const aiVector3D& vertex = mesh->mVertices[j];
-			vertexBufferData[j].position = { (half)vertex.x, (half)vertex.y, (half)vertex.z };
+			positionBufferData[j].position = { (half)vertex.x, (half)vertex.y, (half)vertex.z };
 
 			minVertex = min(minVertex, float3(vertex.x, vertex.y, vertex.z));
 			maxVertex = max(maxVertex, float3(vertex.x, vertex.y, vertex.z));
 
 			// Normals
 			const aiVector3D& normal = mesh->mNormals[j];
-			vertexBufferData[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
-			//vertex[j].normal = { n.x, n.y, n.z, 0.0f };
+			additionalBufferData[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
 
 			const aiVector3D& tangent = mesh->mTangents[j];
-			vertexBufferData[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
+			additionalBufferData[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
 
 			// UV coordinates
 			const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
-			vertexBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
+			additionalBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
 		}
 	}
-	renderMesh->m_vertexBuffer->Unlock();
+	positionBuffer->Unlock();
+	additionalBuffer->Unlock();
 
-	CrBoundingBox boundingBox;
-	boundingBox.center  = (maxVertex + minVertex) * 0.5f;
-	boundingBox.extents = (maxVertex - minVertex) * 0.5f;
+	renderMesh->AddVertexBuffer(positionBuffer);
+	renderMesh->AddVertexBuffer(additionalBuffer);
 
-	renderMesh->m_boundingBox = boundingBox;
+	renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-	renderMesh->m_indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
-	uint16_t* indexData = (uint16_t*)renderMesh->m_indexBuffer->Lock();
+	uint16_t* indexData = (uint16_t*)indexBuffer->Lock();
 	{
 		for (size_t j = 0; j < mesh->mNumFaces; ++j)
 		{
@@ -160,7 +148,9 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			}
 		}
 	}
-	renderMesh->m_indexBuffer->Unlock();
+	indexBuffer->Unlock();
+
+	renderMesh->SetIndexBuffer(indexBuffer);
 
 	return renderMesh;
 }

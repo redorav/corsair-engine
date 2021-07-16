@@ -38,11 +38,9 @@ CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 	}
 	else
 	{
-		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader.get(), vertexDescriptor);
-		graphicsPipeline->m_shader = graphicsShader; // TODO Move inside CreateGraphicsPipeline
+		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader, vertexDescriptor);
 
-		// Insert in the hashmap
-		m_graphicsPipelines.insert({ combinedHash.m_hash, graphicsPipeline });
+		m_graphicsPipelines.insert({ combinedHash.m_hash, graphicsPipeline }); // Insert in the hashmap
 	}
 
 	return graphicsPipeline;
@@ -64,11 +62,9 @@ CrComputePipelineHandle ICrPipelineStateManager::GetComputePipeline(const CrComp
 	}
 	else
 	{
-		computePipeline = m_renderDevice->CreateComputePipeline(pipelineDescriptor, computeShader.get());
-		computePipeline->m_shader = computeShader;
+		computePipeline = m_renderDevice->CreateComputePipeline(pipelineDescriptor, computeShader);
 
-		// Insert in the hashmap
-		m_computePipelines.insert({ combinedHash.m_hash, computePipeline });
+		m_computePipelines.insert({ combinedHash.m_hash, computePipeline }); // Insert in the hashmap
 	}
 
 	return computePipeline;

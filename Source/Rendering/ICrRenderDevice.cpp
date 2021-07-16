@@ -70,12 +70,13 @@ CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShader
 	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
 }
 
-CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	CrTimer pipelineCreationTime;
 
-	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader.get(), vertexDescriptor));
 
+	pipeline->m_shader = graphicsShader;
 	pipeline->m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
 
 	CrLog("Pipeline created (%f ms)", pipelineCreationTime.GetCurrent().AsMilliseconds());
@@ -83,9 +84,11 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	return pipeline;
 }
 
-CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader)
+CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
 {
-	return CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
+	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader.get()));
+	computePipeline->m_shader = computeShader;
+	return computePipeline;
 }
 
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)

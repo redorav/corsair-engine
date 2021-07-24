@@ -52,6 +52,10 @@ EASTLLibrary =
 		LibEASTL..IncludeDirectory..'test/packages/EAAssert/include',
 		LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
 	},
+	defines =
+	{
+		"EASTL_ASSERT_ENABLED=1",
+	},
 	natvis = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,
 	libNames    = 'EASTL.'.._ACTION..'.release'

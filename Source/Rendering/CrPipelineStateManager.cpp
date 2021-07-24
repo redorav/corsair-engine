@@ -1,6 +1,6 @@
 #include "CrRendering_pch.h"
 
-#include "ICrPipelineStateManager.h"
+#include "CrPipelineStateManager.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
 #include "ICrRenderDevice.h"
@@ -8,14 +8,14 @@
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"
 
-static ICrPipelineStateManager g_pipelineStateManager;
+static CrPipelineStateManager g_pipelineStateManager;
 
-ICrPipelineStateManager* ICrPipelineStateManager::Get()
+CrPipelineStateManager* CrPipelineStateManager::Get()
 {
 	return &g_pipelineStateManager;
 }
 
-CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
+CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 (
 	const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 	const CrGraphicsShaderHandle& graphicsShader, 
@@ -46,7 +46,7 @@ CrGraphicsPipelineHandle ICrPipelineStateManager::GetGraphicsPipeline
 	return graphicsPipeline;
 }
 
-CrComputePipelineHandle ICrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
+CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
 {
 	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
 	const CrHash& computeShaderHash = computeShader->GetHash();
@@ -70,7 +70,7 @@ CrComputePipelineHandle ICrPipelineStateManager::GetComputePipeline(const CrComp
 	return computePipeline;
 }
 
-void ICrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
+void CrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

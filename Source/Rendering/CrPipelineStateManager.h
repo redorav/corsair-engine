@@ -6,11 +6,11 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-class ICrPipelineStateManager
+class CrPipelineStateManager
 {
 public:
 
-	ICrPipelineStateManager() {}
+	CrPipelineStateManager() {}
 
 	void Init(ICrRenderDevice* renderDevice);
 
@@ -23,7 +23,7 @@ public:
 
 	CrComputePipelineHandle GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader);
 
-	static ICrPipelineStateManager* Get();
+	static CrPipelineStateManager* Get();
 
 protected:
 

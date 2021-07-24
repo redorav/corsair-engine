@@ -18,11 +18,11 @@ namespace ConstantBuffers { enum T : uint8_t; }
 namespace Textures { enum T : uint8_t; }
 namespace Samplers { enum T : uint8_t; }
 
-class ICrShaderManager
+class CrShaderManager
 {
 public:
 
-	static ICrShaderManager* Get();
+	static CrShaderManager* Get();
 
 	void Init(const ICrRenderDevice* renderDevice);
 

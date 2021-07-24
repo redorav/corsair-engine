@@ -6,9 +6,9 @@
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSampler.h"
 #include "Rendering/ICrSwapchain.h"
-#include "Rendering/ICrShaderManager.h"
+#include "Rendering/CrShaderManager.h"
 #include "Rendering/ICrShader.h"
-#include "Rendering/ICrPipelineStateManager.h"
+#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrCommandQueue.h"
@@ -113,13 +113,13 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-		ICrShaderManager::Get()->Init(renderDevice.get());
-		ICrPipelineStateManager::Get()->Init(renderDevice.get());
+		CrShaderManager::Get()->Init(renderDevice.get());
+		CrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
 
-	CrGraphicsShaderHandle graphicsShader = ICrShaderManager::Get()->LoadGraphicsShader(basicBytecodeLoadInfo);
+	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get()->LoadGraphicsShader(basicBytecodeLoadInfo);
 
-	CrComputeShaderHandle computeShader = ICrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
+	CrComputeShaderHandle computeShader = CrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
@@ -133,20 +133,20 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+	m_basicPipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
 		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
 
 	// Test caching
-	m_basicPipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+	m_basicPipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
 		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
-	m_computePipelineState = ICrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
+	m_computePipelineState = CrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
 
 	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	basicGraphicsPipelineDescriptor.Hash();
-	m_linePipelineState = ICrPipelineStateManager::Get()->GetGraphicsPipeline(
+	m_linePipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
 		basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertexDescriptor);
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];

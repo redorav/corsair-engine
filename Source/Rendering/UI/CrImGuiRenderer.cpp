@@ -7,8 +7,8 @@
 #include "Core/CrFrameTime.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrShader.h"
-#include "Rendering/ICrShaderManager.h"
-#include "Rendering/ICrPipelineStateManager.h"
+#include "Rendering/CrShaderManager.h"
+#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -91,10 +91,10 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
 			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-		CrGraphicsShaderHandle shaders = ICrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
+		CrGraphicsShaderHandle shaders = CrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_uiGraphicsPipeline = ICrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
+		m_uiGraphicsPipeline = CrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
 	}
 
 	// Font atlas:

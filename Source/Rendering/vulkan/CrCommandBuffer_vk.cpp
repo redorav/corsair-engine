@@ -364,6 +364,14 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 		m_currentState.m_viewportDirty = false;
 	}
 
+	if (m_currentState.m_graphicsPipelineDirty)
+	{
+		// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline)->m_vkPipeline);
+
+		m_currentState.m_graphicsPipelineDirty = false;
+	}
+
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
 
 	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);
@@ -374,6 +382,13 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 	const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
 	const CrComputeShaderHandle& currentComputeShader = vulkanComputePipeline->m_shader;
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentComputeShader->GetBindingTable());
+
+	if (m_currentState.m_computePipelineDirty)
+	{
+		// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
+		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline)->m_vkPipeline);
+		m_currentState.m_computePipelineDirty = false;
+	}
 
 	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
 }

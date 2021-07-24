@@ -132,10 +132,6 @@ protected:
 
 	virtual void EndPS() = 0;
 
-	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline) = 0;
-
-	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) = 0;
-
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) = 0;
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) = 0;
@@ -227,7 +223,10 @@ protected:
 
 		CrGraphicsPipelineDescriptor    m_graphicsPipelineDescriptor;
 		const ICrGraphicsPipeline*      m_graphicsPipeline;
+		bool                            m_graphicsPipelineDirty;
+
 		const ICrComputePipeline*       m_computePipeline;
+		bool                            m_computePipelineDirty;
 
 		ConstantBufferBinding			m_constantBuffers[cr3d::ShaderStage::Count][ConstantBuffers::Count];
 
@@ -244,7 +243,7 @@ protected:
 		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
 	};
 
-	CurrentState					m_currentState = {};
+	CurrentState					m_currentState;
 
 	ICrRenderDevice*				m_renderDevice = nullptr;
 
@@ -307,18 +306,20 @@ inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, 
 
 inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
 {
-	m_currentState.m_graphicsPipeline = graphicsPipeline;
-
-	// TODO Move to flush
-	BindGraphicsPipelineStatePS(graphicsPipeline);
+	if (m_currentState.m_graphicsPipeline != graphicsPipeline)
+	{
+		m_currentState.m_graphicsPipeline = graphicsPipeline;
+		m_currentState.m_graphicsPipelineDirty = true;
+	}
 }
 
 inline void ICrCommandBuffer::BindComputePipelineState(const ICrComputePipeline* computePipeline)
 {
-	m_currentState.m_computePipeline = computePipeline;
-
-	// TODO Move to flush
-	BindComputePipelineStatePS(computePipeline);
+	if (m_currentState.m_computePipeline = computePipeline)
+	{
+		m_currentState.m_computePipeline = computePipeline;
+		m_currentState.m_computePipelineDirty = true;
+	}	
 }
 
 inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)

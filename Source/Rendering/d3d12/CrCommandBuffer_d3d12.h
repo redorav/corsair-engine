@@ -22,10 +22,6 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline) override;
-
-	virtual void BindComputePipelineStatePS(const ICrComputePipeline* computePipeline) override;
-
 	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount) override;
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
@@ -54,16 +50,6 @@ private:
 
 	virtual void EndRenderPassPS() override;
 };
-
-inline void CrCommandBufferD3D12::BindGraphicsPipelineStatePS(const ICrGraphicsPipeline* graphicsPipeline)
-{
-	unused_parameter(graphicsPipeline);
-}
-
-inline void CrCommandBufferD3D12::BindComputePipelineStatePS(const ICrComputePipeline* computePipeline)
-{
-	unused_parameter(computePipeline);
-}
 
 inline void CrCommandBufferD3D12::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {

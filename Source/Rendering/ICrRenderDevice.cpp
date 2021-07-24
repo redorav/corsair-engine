@@ -79,15 +79,42 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	pipeline->m_shader = graphicsShader;
 	pipeline->m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
 
-	CrLog("Pipeline created (%f ms)", pipelineCreationTime.GetCurrent().AsMilliseconds());
+	// Print out a message that includes meaningful information
+	const CrVector<CrShaderStageInfo>& stages = graphicsShader->GetStages();
+	
+	// Add entry point names
+	CrFixedString128 entryPoints("(");
+	entryPoints.append(stages[0].entryPoint.c_str());
+
+	if (stages.size() > 1)
+	{
+		for (uint32_t i = 1; i < stages.size(); ++i)
+		{
+			entryPoints.append(", ");
+			entryPoints.append(stages[i].entryPoint.c_str());
+		}
+	}
+
+	entryPoints.append(")");
+
+	CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
 
 	return pipeline;
 }
 
 CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
 {
+	CrTimer pipelineCreationTime;
+
 	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader.get()));
 	computePipeline->m_shader = computeShader;
+
+	CrFixedString128 entryPoint("(");
+	entryPoint.append(computeShader->m_stageInfo.entryPoint.c_str());
+	entryPoint.append(")");
+
+	CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+
 	return computePipeline;
 }
 

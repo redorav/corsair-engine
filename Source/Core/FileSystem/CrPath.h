@@ -44,7 +44,13 @@ public:
 
 	bool has_extension() const
 	{
-		return m_pathString.find_last_of(".") != m_pathString.npos;
+		size_t lastDot = m_pathString.find_last_of(".");
+
+		return lastDot != m_pathString.npos && // If there is a dot
+		       lastDot != 0 && // And that last dot is not at the beginning of the path
+		       lastDot > 1 && // And the length is greater than 1
+		       m_pathString[lastDot - 1] != '/' &&
+		       m_pathString[lastDot - 1] != '.';
 	}
 
 	CrPath parent_path() const
@@ -63,23 +69,48 @@ public:
 		return *this;
 	}
 
+	// https://en.cppreference.com/w/cpp/filesystem/path/replace_extension
+	// Replaces the extension with replacement or removes it when the default value of replacement is used.
+	// Firstly, if this path has an extension(), it is removed from the generic-format view of the pathname.
+	// Then, a dot character is appended to the generic-format view of the pathname, if replacement is not empty and does not begin with a dot character.
+	// Then replacement is appended as if by operator+=(replacement).
 	CrPath& replace_extension(const char* extension)
 	{
-		bool nonEmptyString = extension && extension[0] != '\0';
-
-		size_t lastSeparator = m_pathString.find_last_of("/");
 		size_t lastDot = m_pathString.find_last_of(".");
-		if (lastDot != m_pathString.npos)
+
+		if (has_extension())
 		{
-			m_pathString.resize(lastDot + nonEmptyString); // Include the dot if valid extension
-			m_pathString += extension;
+			m_pathString.resize(lastDot);
 		}
-		else if (lastSeparator != m_pathString.length() - 1)
+
+		if (extension && extension[0] != '\0')
 		{
-			m_pathString += ".";
+			if (extension[0] != '.')
+			{
+				m_pathString += ".";
+			}
+
 			m_pathString += extension;
 		}
 
+		return *this;
+	}
+
+	CrPath operator + (const char* str)
+	{
+		CrPath newPath = *this;
+		newPath.m_pathString += str;
+		return newPath;
+	}
+
+	CrPath operator + (const CrPath& path)
+	{
+		return *this + path.c_str();
+	}
+
+	CrPath& operator += (const char* str)
+	{
+		m_pathString += str;
 		return *this;
 	}
 

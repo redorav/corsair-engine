@@ -6,7 +6,13 @@ namespace eastl
 {
 	class allocator;
 	class dummy_allocator;
-	
+
+	template <typename T> struct less;
+
+	template <typename T> struct hash;
+
+	template <typename T> struct equal_to;
+
 	template <bool bCondition, class ConditionIsTrueType, class ConditionIsFalseType> struct type_select;
 	
 	// Containers
@@ -14,9 +20,27 @@ namespace eastl
 
 	template <size_t N, typename WordType> class bitset;
 
-	template<typename T, typename Allocator> class vector;
+	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
+
+	template <typename Key, typename T, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_map;
+
+	template <typename Key, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_set;
 
 	template<typename T, size_t nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_vector;
+
+	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_map;
+
+	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
+
+	template <typename T1, typename T2> struct pair;
+
+	template <typename Key, typename Compare, typename Allocator> class set;
+
+	template<typename T, typename Allocator> class vector;
+
+	template <typename Key, typename T, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_map;
+
+	template <typename Key, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_set;
 
 	// Smart Pointers
 	template <typename T> class shared_ptr;
@@ -42,14 +66,48 @@ using CrUniquePtr = eastl::unique_ptr<T, D>;
 template<typename T, size_t N>
 using CrArray = eastl::array<T, N>;
 
-template<size_t N, typename WordType = EASTL_BITSET_WORD_TYPE_DEFAULT>
+template<size_t N, typename WordType = uint32_t>
 using CrBitset = eastl::bitset<N, WordType>;
+
+// Copied from EASTL
+#if !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x can't handle the declaration below.
+#define DEQUE_DEFAULT_SUBARRAY_SIZE(T) ((sizeof(T) <= 4) ? 64 : ((sizeof(T) <= 8) ? 32 : ((sizeof(T) <= 16) ? 16 : ((sizeof(T) <= 32) ? 8 : 4))))
+#else
+#define DEQUE_DEFAULT_SUBARRAY_SIZE(T) 16
+#endif
+
+template<typename T>
+using CrDeque = eastl::deque<T, eastl::allocator, DEQUE_DEFAULT_SUBARRAY_SIZE(T)>;
+
+template<typename Key, typename U, size_t N>
+using CrFixedMap = eastl::fixed_map<Key, U, N, false, eastl::less<Key>, eastl::dummy_allocator>;
+
+template<typename Key, size_t N>
+using CrFixedSet = eastl::fixed_set<Key, N, false, eastl::less<Key>, eastl::dummy_allocator>;
+
+template<typename T, size_t N>
+using CrFixedVector = eastl::fixed_vector<T, N, false, eastl::dummy_allocator>;
+
+template<typename Key, typename S>
+using CrHashMap = eastl::hash_map<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+
+template<typename Key, typename S>
+using CrHashMultiMap = eastl::hash_multimap<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+
+template<typename T, typename S>
+using CrPair = eastl::pair<T, S>;
+
+template<typename Key>
+using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
 template<typename T>
 using CrVector = eastl::vector<T, eastl::allocator>;
 
-template<typename T, size_t N>
-using CrFixedVector = eastl::fixed_vector<T, N, false, eastl::dummy_allocator>;
+template<typename Key, typename T>
+using CrVectorMap = eastl::vector_map<Key, T, eastl::less<Key>, eastl::allocator, eastl::vector<eastl::pair<Key, T>, eastl::allocator>>;
+
+template<typename Key>
+using CrVectorSet = eastl::vector_set<Key, eastl::less<Key>, eastl::allocator, eastl::vector<Key, eastl::allocator>>;
 
 using CrString = eastl::string;
 

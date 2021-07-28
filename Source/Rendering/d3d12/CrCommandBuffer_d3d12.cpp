@@ -6,8 +6,6 @@
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
 
-#include "Core/Containers/CrArray.h"
-
 #include "Core/Logging/ICrDebug.h"
 
 CrCommandBufferD3D12::CrCommandBufferD3D12(ICrCommandQueue* commandQueue)

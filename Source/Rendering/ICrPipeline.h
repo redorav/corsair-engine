@@ -6,8 +6,6 @@
 
 #include "Core/CrHash.h"
 
-#include "Core/Containers/CrFixedVector.h"
-
 #include "Core/Containers/CrArray.h"
 
 struct CrRasterizerStateDescriptor

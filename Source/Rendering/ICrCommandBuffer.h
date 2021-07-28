@@ -12,8 +12,6 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "Core/Containers/CrFixedVector.h"
-
 struct CrTextureBarrier
 {
 	struct PipelineStage

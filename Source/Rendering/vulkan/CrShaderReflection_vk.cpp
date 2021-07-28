@@ -3,6 +3,8 @@
 
 #include "Rendering/ICrShader.h"
 
+#include "Core/Function/CrFixedFunction.h"
+
 CrShaderReflectionVulkan::~CrShaderReflectionVulkan()
 {
 	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::Count; ++stage)
@@ -26,7 +28,7 @@ void CrShaderReflectionVulkan::AddBytecode(const CrShaderBytecodeSharedHandle& b
 	}
 }
 
-void CrShaderReflectionVulkan::ForEachResource(ShaderReflectionFn fn) const
+void CrShaderReflectionVulkan::ForEachResource(const ShaderReflectionFn& fn) const
 {
 	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::Count; ++stage)
 	{

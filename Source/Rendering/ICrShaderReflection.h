@@ -3,11 +3,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include "Core/String/CrFixedString.h"
-#include "Core/Function/CrFixedFunction.h"
-
 using bindpoint_t = uint8_t;
-using CrShaderResourceName = CrFixedString128;
 
 class CrShaderResource
 {
@@ -32,5 +28,5 @@ public:
 
 	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) = 0;
 
-	virtual void ForEachResource(ShaderReflectionFn fn) const = 0;
+	virtual void ForEachResource(const ShaderReflectionFn& fn) const = 0;
 };

@@ -53,16 +53,14 @@ namespace eastl
 	template <typename T, typename Allocator> class basic_string;
 	typedef basic_string<char, allocator> string;
 
+	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_string;
+
+	// Functional
 	template<int N, typename R>
 	class fixed_function;
 }
 
-template<typename T>
-using CrSharedPtr = eastl::shared_ptr<T>;
-
-template <typename T, typename D = eastl::default_delete<T>>
-using CrUniquePtr = eastl::unique_ptr<T, D>;
-
+// Containers
 template<typename T, size_t N>
 using CrArray = eastl::array<T, N>;
 
@@ -109,8 +107,45 @@ using CrVectorMap = eastl::vector_map<Key, T, eastl::less<Key>, eastl::allocator
 template<typename Key>
 using CrVectorSet = eastl::vector_set<Key, eastl::less<Key>, eastl::allocator, eastl::vector<Key, eastl::allocator>>;
 
+// Smart Pointers
+template<typename T>
+using CrSharedPtr = eastl::shared_ptr<T>;
+
+template <typename T, typename D = eastl::default_delete<T>>
+using CrUniquePtr = eastl::unique_ptr<T, D>;
+
+// Strings
 using CrString = eastl::string;
 
+
+// Take care to take the null terminator into account, i.e. a fixed string 
+// of 16 has 15 usable characters
+
+template<int N>
+using CrFixedString = eastl::fixed_string<char, N, false, eastl::allocator>;
+
+using CrFixedString8     = CrFixedString<8>;
+using CrFixedString16    = CrFixedString<16>;
+using CrFixedString32    = CrFixedString<32>;
+using CrFixedString64    = CrFixedString<64>;
+using CrFixedString128   = CrFixedString<128>;
+using CrFixedString256   = CrFixedString<256>;
+using CrFixedString512   = CrFixedString<512>;
+using CrFixedString1024  = CrFixedString<1024>;
+
+template<int N>
+using CrFixedWString     = eastl::fixed_string<wchar_t, N, false, eastl::allocator>;
+
+using CrFixedWString8    = CrFixedWString<8>;
+using CrFixedWString16   = CrFixedWString<16>;
+using CrFixedWString32   = CrFixedWString<32>;
+using CrFixedWString64   = CrFixedWString<64>;
+using CrFixedWString128  = CrFixedWString<128>;
+using CrFixedWString256  = CrFixedWString<256>;
+using CrFixedWString512  = CrFixedWString<512>;
+using CrFixedWString1024 = CrFixedWString<1024>;
+
+// Functional
 template<int SIZE_IN_BYTES, typename R>
 using CrFixedFunction = eastl::fixed_function<SIZE_IN_BYTES, R>;
 

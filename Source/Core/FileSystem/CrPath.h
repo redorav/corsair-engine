@@ -42,14 +42,18 @@ public:
 		return CrPath(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
 	}
 
+	// https://en.cppreference.com/w/cpp/filesystem/path/extension
+	// If the filename() component of the generic - format path contains a period(.), and is not one of the special filesystem elements dot 
+	// or dot - dot, then the extension is the substring beginning at the rightmost period(including the period) and until the end of the pathname.
+	// If the first character in the filename is a period, that period is ignored(a filename like ".profile" is not treated as an extension)
+	// If the pathname is either . or .., or if filename() does not contain the.character, then empty path is returned.
 	bool has_extension() const
 	{
 		size_t lastDot = m_pathString.find_last_of(".");
 
 		return lastDot != m_pathString.npos && // If there is a dot
-		       lastDot != 0 && // And that last dot is not at the beginning of the path
-		       lastDot > 1 && // And the length is greater than 1
-		       m_pathString[lastDot - 1] != '/' &&
+		       lastDot > 0 && // That last dot is not at the beginning of the path
+		       m_pathString[lastDot - 1] != '/' && // And the previous character is neither a / nor a . (special characters)
 		       m_pathString[lastDot - 1] != '.';
 	}
 

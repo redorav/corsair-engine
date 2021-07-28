@@ -208,8 +208,8 @@ int main(int argc, char* argv[])
 
 	CrShaderCompiler::ExecutableDirectory = executablePath.c_str();
 
-	CrPath inputFilePath           = commandLine("-input").c_str();
-	CrPath outputFilePath          = commandLine("-output").c_str();
+	CrPath inputFilePath                 = commandLine("-input").c_str();
+	CrPath outputFilePath                = commandLine("-output").c_str();
 	bool buildMetadata                   = commandLine["-metadata"];
 	const std::string& entryPoint        = commandLine("-entrypoint").c_str();
 	const std::string& shaderStageString = commandLine("-stage").c_str();
@@ -275,6 +275,16 @@ int main(int argc, char* argv[])
 		if (shaderStage == cr3d::ShaderStage::Count)
 		{
 			QuitWithMessage("No shader stage specified");
+		}
+
+		switch (shaderStage)
+		{
+			case cr3d::ShaderStage::Vertex:   defines.push_back("VERTEX_SHADER"); break;
+			case cr3d::ShaderStage::Pixel:    defines.push_back("PIXEL_SHADER"); break;
+			case cr3d::ShaderStage::Hull:     defines.push_back("HULL_SHADER"); break;
+			case cr3d::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
+			case cr3d::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
+			case cr3d::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
 		}
 
 		CompilationDescriptor compilationDescriptor;

@@ -411,6 +411,20 @@ namespace cr3d
 		inline T operator++(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; } // Post-increment
 		inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
 		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
+
+		constexpr const char* ToString(cr3d::ShaderStage::T stage)
+		{
+			switch (stage)
+			{
+				case cr3d::ShaderStage::Vertex: return "vertex";
+				case cr3d::ShaderStage::Pixel: return "pixel";
+				case cr3d::ShaderStage::Hull: return "hull";
+				case cr3d::ShaderStage::Domain: return "domain";
+				case cr3d::ShaderStage::Geometry: return "geometry";
+				case cr3d::ShaderStage::Compute: return "compute";
+				default: return "invalid";
+			}
+		}
 	};
 
 	// These resource states encapsulate resource states as a common denominator between APIs. Some platforms don't even

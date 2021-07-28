@@ -1,6 +1,5 @@
 ﻿#include "CrRendering_pch.h"
 
-#include "Rendering/ShaderCompiler/CrShaderCompilerCommandLine.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrShaderManager.h"
 #include "Rendering/ICrShaderReflection.h"
@@ -109,7 +108,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-stage ";
-	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetShaderStage(bytecodeDescriptor.stage);
+	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
 	const CrString& ShaderCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
@@ -127,7 +126,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 
 	filename += "_";
 	filename += bytecodeDescriptor.entryPoint.c_str();
-	filename += ".spv";
+	filename += ".spv"; // TODO Fix extension based on API/platform
 
 	outputPath += filename.c_str();
 
@@ -136,7 +135,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 	processDescriptor.commandLine += "\" ";
 
 	processDescriptor.commandLine += "-platform ";
-	processDescriptor.commandLine += CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform);
+	processDescriptor.commandLine += cr::Platform::ToString(bytecodeDescriptor.platform);
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-graphicsapi ";
@@ -173,7 +172,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 		CrLog("Compiled %s [%s] for %s %s (%f ms)",
 			bytecodeDescriptor.entryPoint.c_str(),
 			bytecodeDescriptor.path.c_str(),
-			CrShaderCompilerCommandLine::GetPlatform(bytecodeDescriptor.platform),
+			cr::Platform::ToString(bytecodeDescriptor.platform),
 			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
 			compilationTime.GetCurrent().AsMilliseconds());
 

@@ -10,5 +10,14 @@ namespace cr
 			Windows,
 			Count
 		};
+
+		constexpr const char* ToString(Platform::T platform)
+		{
+			switch (platform)
+			{
+				case Windows: return "windows";
+				default: return "invalid";
+			}
+		}
 	};
 }

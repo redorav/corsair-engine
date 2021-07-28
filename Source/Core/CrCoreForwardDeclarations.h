@@ -10,8 +10,15 @@ namespace eastl
 	template <bool bCondition, class ConditionIsTrueType, class ConditionIsFalseType> struct type_select;
 	
 	// Containers
+	template<typename T, size_t N> struct array;
+
+	template <size_t N, typename WordType> class bitset;
+
 	template<typename T, typename Allocator> class vector;
 
+	template<typename T, size_t nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_vector;
+
+	// Smart Pointers
 	template <typename T> class shared_ptr;
 
 	template <typename T> struct default_delete;
@@ -32,8 +39,17 @@ using CrSharedPtr = eastl::shared_ptr<T>;
 template <typename T, typename D = eastl::default_delete<T>>
 using CrUniquePtr = eastl::unique_ptr<T, D>;
 
+template<typename T, size_t N>
+using CrArray = eastl::array<T, N>;
+
+template<size_t N, typename WordType = EASTL_BITSET_WORD_TYPE_DEFAULT>
+using CrBitset = eastl::bitset<N, WordType>;
+
 template<typename T>
 using CrVector = eastl::vector<T, eastl::allocator>;
+
+template<typename T, size_t N>
+using CrFixedVector = eastl::fixed_vector<T, N, false, eastl::dummy_allocator>;
 
 using CrString = eastl::string;
 

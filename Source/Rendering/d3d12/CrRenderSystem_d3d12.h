@@ -4,8 +4,6 @@
 
 #include "Core/String/CrString.h"
 
-#include "Core/Containers/CrVector.h"
-
 #include "Core/Containers/CrSet.h"
 
 class CrRenderSystemD3D12 final : public ICrRenderSystem

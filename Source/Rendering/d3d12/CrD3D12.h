@@ -2,8 +2,6 @@
 
 #include <d3d12.h>
 
-#include "Core/Containers/CrVector.h"
-
 namespace crd3d
 {
 	DXGI_FORMAT GetD3DFormat(cr3d::DataFormat::T format);

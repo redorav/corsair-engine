@@ -5,7 +5,6 @@
 #include "Rendering/CrGPUDeletable.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-#include "Core/Containers/CrVector.h"
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/SmartPointers/CrSharedPtr.h"

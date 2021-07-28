@@ -3,7 +3,6 @@
 #include "Rendering/ICrRenderDevice.h"
 
 #include "Core/Containers/CrSet.h"
-#include "Core/Containers/CrVector.h"
 #include "Core/String/CrString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 

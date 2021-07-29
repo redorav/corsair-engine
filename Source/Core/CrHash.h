@@ -32,7 +32,7 @@ public:
 		m_hash = ComputeHash<T>(data, dataSize);
 	}
 
-	CrHash& operator <<= (const CrHash& other)
+	CrHash& operator <<= (CrHash other)
 	{
 		uint64_t hashes[2] = { m_hash, other.m_hash };
 		m_hash = ComputeHash(hashes, sizeof(hashes));
@@ -54,7 +54,7 @@ public:
 	}
 };
 
-inline CrHash operator << (const CrHash& first, const CrHash& second)
+inline CrHash operator << (CrHash first, CrHash second)
 {
 	uint64_t hashes[2] = { first.m_hash, second.m_hash };
 	return CrHash(hashes, sizeof(hashes));
@@ -65,7 +65,7 @@ class CrAutoHashable
 {
 public:
 
-	const CrHash& GetHash() const
+	CrHash GetHash() const
 	{
 		return m_hash;
 	}
@@ -95,7 +95,7 @@ public:
 		m_hash = static_cast<T*>(this)->ComputeHash();
 	}
 
-	const CrHash& GetHash()
+	CrHash GetHash()
 	{
 		return m_hash;
 	}

@@ -22,11 +22,11 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	const CrVertexDescriptor& vertexDescriptor
 )
 {
-	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
-	const CrHash& graphicsShaderHash = graphicsShader->GetHash();
-	const CrHash& vertexDescriptorHash = vertexDescriptor.ComputeHash();
+	const CrHash pipelineHash = pipelineDescriptor.GetHash();
+	const CrHash graphicsShaderHash = graphicsShader->GetHash();
+	const CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
 
-	const CrHash& combinedHash = pipelineHash << graphicsShaderHash << vertexDescriptorHash;
+	const CrHash combinedHash = pipelineHash << graphicsShaderHash << vertexDescriptorHash;
 
 	const auto& it = m_graphicsPipelines.find(combinedHash.m_hash);
 
@@ -48,10 +48,10 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 
 CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
 {
-	const CrHash& pipelineHash = pipelineDescriptor.GetHash();
-	const CrHash& computeShaderHash = computeShader->GetHash();
+	const CrHash pipelineHash = pipelineDescriptor.GetHash();
+	const CrHash computeShaderHash = computeShader->GetHash();
 
-	const CrHash& combinedHash = pipelineHash << computeShaderHash;
+	const CrHash combinedHash = pipelineHash << computeShaderHash;
 
 	const auto& it = m_computePipelines.find(combinedHash.m_hash);
 	CrComputePipelineHandle computePipeline;

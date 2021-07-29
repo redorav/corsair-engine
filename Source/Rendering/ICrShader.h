@@ -214,6 +214,11 @@ public:
 		m_bytecode = std::move(bytecode);
 		m_entryPoint = entryPoint;
 		m_shaderStage = shaderStage;
+
+		// The bytecode is the most unique representation for this object
+		// There might be bytecodes that are functionally equivalent with
+		// different e.g. textures but we cannot really distinguish
+		m_hash = CrHash(m_bytecode.data(), m_bytecode.size());
 	}
 
 	const CrVector<unsigned char>& GetBytecode() const
@@ -231,11 +236,17 @@ public:
 		return m_shaderStage;
 	}
 
+	CrHash GetHash()
+	{
+		return m_hash;
+	}
+
 private:
 
 	CrVector<unsigned char> m_bytecode;
 	CrFixedString128 m_entryPoint;
 	cr3d::ShaderStage::T m_shaderStage;
+	CrHash m_hash; // A hash of the entire bytecode
 };
 
 struct CrGraphicsShaderDescriptor
@@ -253,7 +264,7 @@ public:
 	// want to be the bytecode (perhaps a stripped version of the bytecode?) We need to
 	// give this some thought.
 
-	const CrHash& GetHash() const
+	CrHash GetHash() const
 	{
 		return m_hash;
 	}

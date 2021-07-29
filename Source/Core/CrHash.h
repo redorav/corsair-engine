@@ -95,7 +95,7 @@ public:
 		m_hash = static_cast<T*>(this)->ComputeHash();
 	}
 
-	CrHash GetHash()
+	CrHash GetHash() const
 	{
 		return m_hash;
 	}

@@ -236,7 +236,7 @@ public:
 		return m_shaderStage;
 	}
 
-	CrHash GetHash()
+	CrHash GetHash() const
 	{
 		return m_hash;
 	}
@@ -260,10 +260,6 @@ public:
 
 	virtual ~ICrShader() {}
 
-	// TODO We need a way to build the hash for a shader. The hash doesn't necessarily
-	// want to be the bytecode (perhaps a stripped version of the bytecode?) We need to
-	// give this some thought.
-
 	CrHash GetHash() const
 	{
 		return m_hash;
@@ -278,6 +274,7 @@ protected:
 
 	CrUniquePtr<ICrShaderBindingTable> m_bindingTable;
 
+	// Hash produced from the bytecodes belonging to this shader
 	CrHash m_hash;
 };
 
@@ -295,6 +292,7 @@ public:
 			info.entryPoint = bytecode->GetEntryPoint();
 			info.stage = bytecode->GetShaderStage();
 			m_stageInfos.push_back(info);
+			m_hash <<= bytecode->GetHash();
 		}
 	}
 
@@ -330,6 +328,7 @@ public:
 	{
 		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint();
 		m_stageInfo.stage = cr3d::ShaderStage::Compute;
+		m_hash = computeShaderDescriptor.m_bytecode->GetHash();
 	}
 
 	virtual ~ICrComputeShader() {}

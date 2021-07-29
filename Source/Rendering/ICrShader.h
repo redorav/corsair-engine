@@ -326,37 +326,33 @@ public:
 	CrShaderStageInfo m_stageInfo;
 };
 
-struct CrShaderBytecodeDescriptor
+struct CrShaderBytecodeCompilationDescriptor
 {
-	CrShaderBytecodeDescriptor
-	(
-		const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, 
-		cr3d::ShaderCodeFormat format, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform
-	)
-		: path(path), entryPoint(entryPoint), stage(stage), format(format), graphicsApi(graphicsApi), platform(platform) {}
+	CrShaderBytecodeCompilationDescriptor
+	(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
+		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
 	CrPath                    path;
 	CrFixedString128          entryPoint;
 	CrVector<CrFixedString64> defines;
-	cr3d::ShaderCodeFormat    format;
 	cr3d::ShaderStage::T      stage;
 	cr3d::GraphicsApi::T      graphicsApi;
 	cr::Platform::T           platform;
 };
 
-struct CrBytecodeLoadDescriptor
+struct CrShaderCompilationDescriptor
 {
-	void AddBytecodeDescriptor(const CrShaderBytecodeDescriptor& bytecodeDescriptor)
+	void AddBytecodeDescriptor(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor)
 	{
 		m_stageBytecodeDescriptors.push_back(bytecodeDescriptor);
 	}
 
-	const CrVector<CrShaderBytecodeDescriptor>& GetBytecodeDescriptors() const
+	const CrVector<CrShaderBytecodeCompilationDescriptor>& GetBytecodeDescriptors() const
 	{
 		return m_stageBytecodeDescriptors;
 	}
 
 private:
 
-	CrVector<CrShaderBytecodeDescriptor> m_stageBytecodeDescriptors;
+	CrVector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
 };

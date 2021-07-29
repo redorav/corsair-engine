@@ -24,46 +24,16 @@ CrShaderManager* CrShaderManager::Get()
 	return &g_shaderManager;
 }
 
-CrShaderBytecodeSharedHandle CrShaderManager::LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
-{
-	CrFileSharedHandle file = ICrFile::OpenFile(path.c_str(), FileOpenFlags::Read);
-	return LoadShaderBytecode(file, bytecodeDescriptor);
-}
-
-CrShaderBytecodeSharedHandle CrShaderManager::LoadShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
-{
-	switch (bytecodeDescriptor.format)
-	{
-		case cr3d::ShaderCodeFormat::Binary:
-		{
-			CrShaderBytecodeSharedHandle bytecode;
-			{
-				CrVector<unsigned char> bytecodeData;
-				bytecodeData.resize(file->GetSize());
-				file->Read(bytecodeData.data(), bytecodeData.size());
-				bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode(std::move(bytecodeData), bytecodeDescriptor.entryPoint, bytecodeDescriptor.stage));
-			}
-			return bytecode;
-		}
-		case cr3d::ShaderCodeFormat::SourceHLSL:
-		{
-			return CompileShaderBytecode(bytecodeDescriptor);
-		}
-	}
-
-	return nullptr;
-}
-
-CrGraphicsShaderHandle CrShaderManager::LoadGraphicsShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const
+CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const
 {
 	// Create the graphics shader descriptor
 	CrGraphicsShaderDescriptor graphicsShaderDescriptor;
 	graphicsShaderDescriptor.m_bytecodes.reserve(bytecodeLoadDescriptor.GetBytecodeDescriptors().size());
 
 	// Load all the relevant shader bytecodes
-	for (const CrShaderBytecodeDescriptor& bytecodeDescriptor : bytecodeLoadDescriptor.GetBytecodeDescriptors())
+	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : bytecodeLoadDescriptor.GetBytecodeDescriptors())
 	{
-		CrShaderBytecodeSharedHandle bytecode = LoadShaderBytecode(bytecodeDescriptor.path, bytecodeDescriptor);
+		CrShaderBytecodeSharedHandle bytecode = CompileShaderBytecode(bytecodeDescriptor);
 
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
@@ -73,12 +43,12 @@ CrGraphicsShaderHandle CrShaderManager::LoadGraphicsShader(const CrBytecodeLoadD
 	return graphicsShader;
 }
 
-CrComputeShaderHandle CrShaderManager::LoadComputeShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const
+CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const
 {
-	const CrShaderBytecodeDescriptor& bytecodeDescriptor = bytecodeLoadDescriptor.GetBytecodeDescriptors()[0];
+	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = bytecodeLoadDescriptor.GetBytecodeDescriptors()[0];
 
 	CrComputeShaderDescriptor computeShaderDescriptor;
-	computeShaderDescriptor.m_bytecode = LoadShaderBytecode(bytecodeDescriptor.path, bytecodeDescriptor);
+	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor);
 
 	CrComputeShaderHandle computeShader = m_renderDevice->CreateComputeShader(computeShaderDescriptor);
 
@@ -90,7 +60,7 @@ void CrShaderManager::Init(const ICrRenderDevice* renderDevice)
 	m_renderDevice = renderDevice;
 }
 
-CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const
+CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
 {
 	CrProcessDescriptor processDescriptor;
 

@@ -49,6 +49,11 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
+	// TODO Move block to rendering subsystem initialization function
+	{
+		CrShaderManager::Get()->Init(renderDevice.get());
+		CrPipelineStateManager::Get()->Init(renderDevice.get());
+	}
 	m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
 	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tall Building 01/TallBuilding01.fbx"));
 	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tavern/Barrel/Barrel.fbx"));
@@ -78,48 +83,27 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	RecreateSwapchainAndDepth();
 	
-	CrBytecodeLoadDescriptor basicBytecodeLoadInfo;
-	CrBytecodeLoadDescriptor computeBytecodeLoadInfo;
+	CrShaderCompilationDescriptor basicBytecodeLoadInfo;
+	CrShaderCompilationDescriptor computeBytecodeLoadInfo;
 
 	CrString ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
-#define USE_HLSL
-
-#if defined(USE_HLSL)
-
-	CrShaderBytecodeDescriptor basicVSDescriptor = CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
-		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+	CrShaderBytecodeCompilationDescriptor basicVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicVSDescriptor);
 
-	CrShaderBytecodeDescriptor basicPSDescriptor = CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
-		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+	CrShaderBytecodeCompilationDescriptor basicPSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
+		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 
-	basicPSDescriptor.defines.push_back("EXTRA_COLOR");
+	//basicBytecodeLoadInfo.defines.push_back("EXTRA_COLOR");
 
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
 
-	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
-		"MainCS", cr3d::ShaderStage::Compute, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
+		"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-#else
-
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.vert.spv").c_str()),
-		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "triangle.frag.spv").c_str()),
-		"BasicPS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::Binary, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-
-#endif
-
-	// TODO Move block to rendering subsystem initialization function
-	{
-		CrShaderManager::Get()->Init(renderDevice.get());
-		CrPipelineStateManager::Get()->Init(renderDevice.get());
-	}
-
-	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get()->LoadGraphicsShader(basicBytecodeLoadInfo);
-
-	CrComputeShaderHandle computeShader = CrShaderManager::Get()->LoadComputeShader(computeBytecodeLoadInfo);
+	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get()->CompileGraphicsShader(basicBytecodeLoadInfo);
+	CrComputeShaderHandle computeShader = CrShaderManager::Get()->CompileComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();

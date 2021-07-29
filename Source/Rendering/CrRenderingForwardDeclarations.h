@@ -84,8 +84,8 @@ struct CrComputePipelineDescriptor;
 // Shader Bytecode
 class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
-struct CrBytecodeLoadDescriptor;
-struct CrShaderBytecodeDescriptor;
+struct CrShaderCompilationDescriptor;
+struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderStageInfo;
 
 // GPU Buffers

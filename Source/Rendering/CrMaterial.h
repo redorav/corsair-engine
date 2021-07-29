@@ -4,9 +4,7 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
-class ICrGraphicsShader;
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;

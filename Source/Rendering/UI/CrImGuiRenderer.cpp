@@ -84,14 +84,14 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 		// Load shaders:
-		CrBytecodeLoadDescriptor bytecodeDesc;
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
-			"ImguiVS", cr3d::ShaderStage::Vertex, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		CrShaderCompilationDescriptor bytecodeDesc;
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+			"ImguiVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
-			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::ShaderCodeFormat::SourceHLSL, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
+			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-		CrGraphicsShaderHandle shaders = CrShaderManager::Get()->LoadGraphicsShader(bytecodeDesc);
+		CrGraphicsShaderHandle shaders = CrShaderManager::Get()->CompileGraphicsShader(bytecodeDesc);
 
 		// Create it:
 		m_uiGraphicsPipeline = CrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);

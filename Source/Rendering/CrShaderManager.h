@@ -10,8 +10,8 @@ struct ConstantBufferMetadata;
 struct TextureMetadata;
 struct SamplerMetadata;
 
-struct CrBytecodeLoadDescriptor;
-struct CrShaderBytecodeDescriptor;
+struct CrShaderCompilationDescriptor;
+struct CrShaderBytecodeCompilationDescriptor;
 class ICrShaderBindingTable;
 
 namespace ConstantBuffers { enum T : uint8_t; }
@@ -26,15 +26,11 @@ public:
 
 	void Init(const ICrRenderDevice* renderDevice);
 
-	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrPath& path, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
+	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 
-	CrShaderBytecodeSharedHandle LoadShaderBytecode(const CrFileSharedHandle& file, const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
+	CrGraphicsShaderHandle CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
-	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeDescriptor& bytecodeDescriptor) const;
-
-	CrGraphicsShaderHandle LoadGraphicsShader(const CrBytecodeLoadDescriptor& shaderCreateInfo) const;
-
-	CrComputeShaderHandle LoadComputeShader(const CrBytecodeLoadDescriptor& bytecodeLoadDescriptor) const;
+	CrComputeShaderHandle CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
 protected:
 

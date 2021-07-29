@@ -7,6 +7,7 @@
 
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrGPUDeletable.h"
 
 struct CrTextureDescriptor
 {
@@ -32,7 +33,7 @@ struct CrTextureDescriptor
 	CrFixedString128 name;
 };
 
-class ICrTexture
+class ICrTexture : public CrGPUDeletable
 {
 public:
 

@@ -468,12 +468,6 @@ namespace cr3d
 		};
 	};
 
-	enum class ShaderCodeFormat : uint8_t
-	{
-		SourceHLSL,
-		Binary,
-	};
-
 	enum class PrimitiveTopology : uint8_t
 	{
 		PointList,

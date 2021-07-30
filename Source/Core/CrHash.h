@@ -9,8 +9,6 @@ public:
 
 	static const uint64_t HashSeed = 100;
 
-	uint64_t m_hash;
-
 	CrHash() : m_hash(0) {}
 
 	CrHash(const CrHash& hash) : m_hash(hash.m_hash) {}
@@ -18,6 +16,11 @@ public:
 	void Reset()
 	{
 		m_hash = 0;
+	}
+
+	uint64_t GetHash() const
+	{
+		return m_hash;
 	}
 
 	template<typename T>
@@ -52,11 +55,15 @@ public:
 	{
 		return XXH64(data, dataSize, HashSeed);
 	}
+
+private:
+
+	uint64_t m_hash;
 };
 
 inline CrHash operator << (CrHash first, CrHash second)
 {
-	uint64_t hashes[2] = { first.m_hash, second.m_hash };
+	uint64_t hashes[2] = { first.GetHash(), second.GetHash() };
 	return CrHash(hashes, sizeof(hashes));
 }
 

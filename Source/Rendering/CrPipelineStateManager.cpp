@@ -28,7 +28,7 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 
 	const CrHash combinedHash = pipelineHash << graphicsShaderHash << vertexDescriptorHash;
 
-	const auto& it = m_graphicsPipelines.find(combinedHash.m_hash);
+	const auto& it = m_graphicsPipelines.find(combinedHash.GetHash());
 
 	CrGraphicsPipelineHandle graphicsPipeline;
 
@@ -40,7 +40,7 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	{
 		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader, vertexDescriptor);
 
-		m_graphicsPipelines.insert({ combinedHash.m_hash, graphicsPipeline }); // Insert in the hashmap
+		m_graphicsPipelines.insert({ combinedHash.GetHash(), graphicsPipeline }); // Insert in the hashmap
 	}
 
 	return graphicsPipeline;
@@ -53,7 +53,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 
 	const CrHash combinedHash = pipelineHash << computeShaderHash;
 
-	const auto& it = m_computePipelines.find(combinedHash.m_hash);
+	const auto& it = m_computePipelines.find(combinedHash.GetHash());
 	CrComputePipelineHandle computePipeline;
 
 	if (it != m_computePipelines.end())
@@ -64,7 +64,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	{
 		computePipeline = m_renderDevice->CreateComputePipeline(pipelineDescriptor, computeShader);
 
-		m_computePipelines.insert({ combinedHash.m_hash, computePipeline }); // Insert in the hashmap
+		m_computePipelines.insert({ combinedHash.GetHash(), computePipeline }); // Insert in the hashmap
 	}
 
 	return computePipeline;

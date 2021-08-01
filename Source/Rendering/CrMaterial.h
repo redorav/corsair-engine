@@ -9,7 +9,6 @@
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
 
-namespace Textures { enum T : uint8_t; }
 
 class CrMaterial
 {

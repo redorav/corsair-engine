@@ -14,10 +14,6 @@ struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 class ICrShaderBindingTable;
 
-namespace ConstantBuffers { enum T : uint8_t; }
-namespace Textures { enum T : uint8_t; }
-namespace Samplers { enum T : uint8_t; }
-
 class CrShaderManager
 {
 public:

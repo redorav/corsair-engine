@@ -13,8 +13,20 @@ namespace cr3d
 	using TextureUsageFlags = uint32_t;
 
 	enum class SampleCount : uint8_t;
+	
 	namespace ShaderStage { enum T : uint8_t; }
+
+	namespace GraphicsApi { enum T : uint8_t; }
 }
+
+// Forward declare shader resources
+namespace ConstantBuffers { enum T : uint8_t; }
+namespace Samplers { enum T : uint8_t; }
+namespace Textures { enum T : uint8_t; }
+namespace RWTextures { enum T : uint8_t; }
+namespace StorageBuffers { enum T : uint8_t; }
+namespace RWStorageBuffers { enum T : uint8_t; }
+namespace RWDataBuffers { enum T : uint8_t; }
 
 // Forward declare the necessary types for the rendering core
 

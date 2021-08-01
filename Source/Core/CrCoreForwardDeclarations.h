@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 // EASTL
 
 namespace eastl
@@ -156,3 +158,5 @@ using CrFileSharedHandle = CrSharedPtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 class CrPath;
+
+namespace cr { namespace Platform { enum T : uint8_t; } }

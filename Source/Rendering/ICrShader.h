@@ -14,18 +14,6 @@
 
 using bindpoint_t = uint8_t;
 
-// TODO Move to a forward declaration file ShaderResourcesForwardDeclarations.h
-namespace ConstantBuffers { enum T : uint8_t; }
-namespace Samplers { enum T : uint8_t; }
-namespace Textures { enum T : uint8_t; }
-namespace RWTextures { enum T : uint8_t; }
-namespace StorageBuffers { enum T : uint8_t; }
-namespace RWStorageBuffers { enum T : uint8_t; }
-namespace RWDataBuffers { enum T : uint8_t; }
-
-namespace cr { namespace Platform { enum T : uint8_t; } }
-namespace cr3d { namespace GraphicsApi { enum T : uint8_t; } }
-
 struct CrShaderBinding
 {
 	CrShaderBinding() {}

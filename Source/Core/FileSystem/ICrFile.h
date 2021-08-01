@@ -17,7 +17,7 @@ struct CrDirectoryEntry
 	bool isDirectory = false;
 };
 
-using FileIteratorFn = CrFixedFunction<4, void(const CrDirectoryEntry& entry)>;
+using FileIteratorFn = CrFixedFunction<4, bool(const CrDirectoryEntry& entry)>;
 
 namespace FileOpenFlags
 {

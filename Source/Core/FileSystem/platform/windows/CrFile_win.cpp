@@ -212,6 +212,7 @@ bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIterato
 	// Find first file. Bear in mind "file" is a misnomer as it actually finds any entry,
 	// whether directory, etc
 	HANDLE hFind = FindFirstFileW(wPath.c_str(), &findData);
+	bool continueIterating = true;
 
 	// If we found at least one file, start iterating
 	if (hFind != INVALID_HANDLE_VALUE)
@@ -227,11 +228,11 @@ bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIterato
 				CrDirectoryEntry entry;
 				entry.filename.append_convert(findData.cFileName);
 				entry.isDirectory = findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-				fn(entry);
+				continueIterating = fn(entry);
 			}
 
 			// Find next file
-		} while (FindNextFileW(hFind, &findData) != 0);
+		} while (continueIterating && FindNextFileW(hFind, &findData) != 0);
 	}
 
 	FindClose(hFind);

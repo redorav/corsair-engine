@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include "Core/String/CrFixedString.h"
 
@@ -49,8 +50,6 @@ class ICrFile
 {
 public:
 
-	static const uint32_t MaxFileLength = 512; // Maximum length of a file, avoids dynamic allocation
-
 	ICrFile(const char* filePath, FileOpenFlags::T openFlags);
 
 	virtual ~ICrFile() {}
@@ -95,7 +94,7 @@ private:
 
 	static ICrFile* OpenRaw(const char* filePath, FileOpenFlags::T openFlags);
 
-	CrFixedString<MaxFileLength> m_filePath;
+	CrPath m_filePath;
 
 	FileOpenFlags::T m_openFlags;
 };

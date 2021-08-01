@@ -16,12 +16,11 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/CrGlobalPaths.h"
 
-// TODO Delete
 static CrShaderManager g_shaderManager;
 
-CrShaderManager* CrShaderManager::Get()
+CrShaderManager& CrShaderManager::Get()
 {
-	return &g_shaderManager;
+	return g_shaderManager;
 }
 
 CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const
@@ -55,7 +54,7 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	return computeShader;
 }
 
-void CrShaderManager::Init(const ICrRenderDevice* renderDevice)
+void CrShaderManager::Initialize(const ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

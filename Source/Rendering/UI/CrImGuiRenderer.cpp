@@ -91,7 +91,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
 			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-		CrGraphicsShaderHandle shaders = CrShaderManager::Get()->CompileGraphicsShader(bytecodeDesc);
+		CrGraphicsShaderHandle shaders = CrShaderManager::Get().CompileGraphicsShader(bytecodeDesc);
 
 		// Create it:
 		m_uiGraphicsPipeline = CrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);

@@ -18,9 +18,9 @@ class CrShaderManager
 {
 public:
 
-	static CrShaderManager* Get();
+	static CrShaderManager& Get();
 
-	void Init(const ICrRenderDevice* renderDevice);
+	void Initialize(const ICrRenderDevice* renderDevice);
 
 	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 

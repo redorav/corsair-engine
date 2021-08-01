@@ -51,9 +51,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-		CrShaderManager::Get()->Init(renderDevice.get());
+		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
+
 	m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
 	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tall Building 01/TallBuilding01.fbx"));
 	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tavern/Barrel/Barrel.fbx"));
@@ -102,8 +103,8 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
 		"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get()->CompileGraphicsShader(basicBytecodeLoadInfo);
-	CrComputeShaderHandle computeShader = CrShaderManager::Get()->CompileComputeShader(computeBytecodeLoadInfo);
+	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get().CompileGraphicsShader(basicBytecodeLoadInfo);
+	CrComputeShaderHandle computeShader = CrShaderManager::Get().CompileComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();

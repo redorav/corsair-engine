@@ -10,6 +10,14 @@ class ICrFile;
 using CrFileSharedHandle = CrSharedPtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
+struct CrDirectoryEntry
+{
+	CrFixedString512 filename;
+	bool isDirectory = false;
+};
+
+using FileIteratorFn = CrFixedFunction<4, void(const CrDirectoryEntry& entry)>;
+
 namespace FileOpenFlags
 {
 	enum T : uint32_t
@@ -76,6 +84,8 @@ public:
 	static bool CreateDirectories(const char* directoryPath);
 
 	static bool CreateDirectorySingle(const char* directoryPath);
+
+	static bool ForEachDirectoryEntry(const char* directoryName, const FileIteratorFn& fn);
 
 private:
 

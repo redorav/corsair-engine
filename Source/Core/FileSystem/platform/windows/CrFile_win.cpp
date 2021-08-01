@@ -1,6 +1,7 @@
 #include "CrFile_win.h"
 
 #include "Core/Logging/ICrDebug.h"
+#include "Core/Function/CrFixedFunction.h"
 
 #include <windows.h>
 
@@ -198,4 +199,42 @@ bool ICrFile::CreateDirectorySingle(const char* directoryPath)
 	}
 
 	return false;
+}
+
+bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIteratorFn& fn)
+{
+	WIN32_FIND_DATAW findData;
+
+	CrFixedWString512 wPath;
+	wPath.append_convert(directoryName);
+	wPath.append(L"/*.*"); // Find everything inside this folder
+
+	// Find first file. Bear in mind "file" is a misnomer as it actually finds any entry,
+	// whether directory, etc
+	HANDLE hFind = FindFirstFileW(wPath.c_str(), &findData);
+
+	// If we found at least one file, start iterating
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			bool isDot = findData.cFileName[0] == L'.' && findData.cFileName[1] == L'\0';
+			bool isDoubleDot = findData.cFileName[0] == L'.' && findData.cFileName[1] == L'.' && findData.cFileName[2] == L'\0';
+
+			// Ignore special cases of '.' and '..' to be more in line with the C++ spec
+			if (!isDot && !isDoubleDot)
+			{
+				CrDirectoryEntry entry;
+				entry.filename.append_convert(findData.cFileName);
+				entry.isDirectory = findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+				fn(entry);
+			}
+
+			// Find next file
+		} while (FindNextFileW(hFind, &findData) != 0);
+	}
+
+	FindClose(hFind);
+
+	return true;
 }

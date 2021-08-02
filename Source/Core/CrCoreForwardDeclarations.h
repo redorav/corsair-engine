@@ -34,6 +34,8 @@ namespace eastl
 
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
 
+	template <typename Value, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_set;
+
 	template <typename T1, typename T2> struct pair;
 
 	template <typename Key, typename Compare, typename Allocator> class set;
@@ -94,6 +96,9 @@ using CrHashMap = eastl::hash_map<Key, S, eastl::hash<Key>, eastl::equal_to<Key>
 template<typename Key, typename S>
 using CrHashMultiMap = eastl::hash_multimap<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
 
+template<typename Value>
+using CrHashSet = eastl::hash_set<Value, eastl::hash<Value>, eastl::equal_to<Value>, eastl::allocator, false>;
+
 template<typename T, typename S>
 using CrPair = eastl::pair<T, S>;
 
@@ -118,7 +123,6 @@ using CrUniquePtr = eastl::unique_ptr<T, D>;
 
 // Strings
 using CrString = eastl::string;
-
 
 // Take care to take the null terminator into account, i.e. a fixed string 
 // of 16 has 15 usable characters

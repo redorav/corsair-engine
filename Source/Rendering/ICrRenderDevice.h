@@ -8,6 +8,7 @@
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/String/CrFixedString.h"
+#include "Core/String/CrString.h"
 #include "Core/Function/CrFixedFunction.h"
 
 namespace CrVendor

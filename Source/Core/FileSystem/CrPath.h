@@ -2,6 +2,7 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/String/CrFixedString.h"
+#include "Core/String/CrString.h"
 
 class CrPath
 {

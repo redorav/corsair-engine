@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/String/CrString.h"
 #include "Core/String/CrFixedString.h"
 
 #include <cstdint>

@@ -2,13 +2,17 @@
 #define UBERSHADER_HLSL
 
 #include "Common.hlsl"
+#include "Brdf.hlsl"
 #include "Surface.hlsl"
 
 struct UbershaderPixelOutput
 {
+#if defined(GBUFFER_VARIANT)
 	float4 albedoTarget : SV_Target0;
-
 	float4 normalsTarget : SV_Target1;
+#else
+    float4 finalTarget : SV_Target0;
+#endif
 };
 
 VS_OUT UbershaderVS(VS_IN IN)
@@ -72,9 +76,16 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	surface.albedoSRGB   = diffuse0.rgb;
 	surface.albedoLinear = surface.albedoSRGB * surface.albedoSRGB;
 
+    float NdotL = dot(normalize(surface.pixelNormalWorld.xyz), -lightDirection);
+	
+    float3 litSurface = surface.albedoSRGB.xyz; // * NdotL; // +surface.F0 * pow(;
+	
+#if defined(GBUFFER_VARIANT)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
-
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, 1.0);
+#else
+    pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint2.a);
+#endif
 
 	return pixelOutput;
 }

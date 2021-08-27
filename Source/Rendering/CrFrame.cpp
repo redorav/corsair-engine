@@ -89,14 +89,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrString ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
-	CrShaderBytecodeCompilationDescriptor basicVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
-		"BasicVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+	CrShaderBytecodeCompilationDescriptor basicVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Ubershader.hlsl").c_str()),
+		"UbershaderVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicVSDescriptor);
 
-	CrShaderBytecodeCompilationDescriptor basicPSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Triangle.hlsl").c_str()),
-		"BasicPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
-
-	//basicBytecodeLoadInfo.defines.push_back("EXTRA_COLOR");
+	CrShaderBytecodeCompilationDescriptor basicPSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Ubershader.hlsl").c_str()),
+		"UbershaderPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
 
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
 

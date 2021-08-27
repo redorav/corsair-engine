@@ -23,16 +23,16 @@ CrShaderManager& CrShaderManager::Get()
 	return g_shaderManager;
 }
 
-CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const
+CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	// Create the graphics shader descriptor
 	CrGraphicsShaderDescriptor graphicsShaderDescriptor;
-	graphicsShaderDescriptor.m_bytecodes.reserve(bytecodeLoadDescriptor.GetBytecodeDescriptors().size());
+	graphicsShaderDescriptor.m_bytecodes.reserve(shaderCompilationDescriptor.GetBytecodeDescriptors().size());
 
 	// Load all the relevant shader bytecodes
-	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : bytecodeLoadDescriptor.GetBytecodeDescriptors())
+	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : shaderCompilationDescriptor.GetBytecodeDescriptors())
 	{
-		CrShaderBytecodeSharedHandle bytecode = CompileShaderBytecode(bytecodeDescriptor);
+		CrShaderBytecodeSharedHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
@@ -42,12 +42,12 @@ CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderComp
 	return graphicsShader;
 }
 
-CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const
+CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
-	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = bytecodeLoadDescriptor.GetBytecodeDescriptors()[0];
+	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = shaderCompilationDescriptor.GetBytecodeDescriptors()[0];
 
 	CrComputeShaderDescriptor computeShaderDescriptor;
-	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor);
+	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
 	CrComputeShaderHandle computeShader = m_renderDevice->CreateComputeShader(computeShaderDescriptor);
 

@@ -353,13 +353,23 @@ struct CrShaderCompilationDescriptor
 		m_stageBytecodeDescriptors.push_back(bytecodeDescriptor);
 	}
 
+	void AddDefine(const CrString& define)
+	{
+		m_defines.defines.push_back(define);
+	}
+
 	const CrVector<CrShaderBytecodeCompilationDescriptor>& GetBytecodeDescriptors() const
 	{
 		return m_stageBytecodeDescriptors;
 	}
 
+	const CrShaderDefines& GetDefines() const
+	{
+		return m_defines;
+	}
+
 private:
 
 	CrVector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
-	CrShaderDefines defines;
+	CrShaderDefines m_defines;
 };

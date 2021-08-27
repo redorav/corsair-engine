@@ -99,6 +99,7 @@ using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderStageInfo;
+struct CrShaderDefines;
 
 // GPU Buffers
 class CrGPUStackAllocator;

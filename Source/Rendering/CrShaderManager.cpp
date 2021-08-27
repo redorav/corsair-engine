@@ -15,6 +15,7 @@
 #include "Core/Time/CrTimer.h"
 #include "Core/Containers/CrArray.h"
 #include "Core/CrGlobalPaths.h"
+#include "Core/CrPlatform.h"
 
 static CrShaderManager g_shaderManager;
 
@@ -54,6 +55,14 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	return computeShader;
 }
 
+CrPath CrShaderManager::GetShaderCachePath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
+{
+	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
+	CrString folderName = CrString(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
+	shaderCachePath /= folderName.c_str();
+	return shaderCachePath;
+}
+
 void CrShaderManager::Initialize(const ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
@@ -70,7 +79,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	const CrShaderDefines& defines
 ) const
 {
-	const CrString& ShaderCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
+	CrPath ShaderCacheDirectory = GetShaderCachePath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
 
 	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
 

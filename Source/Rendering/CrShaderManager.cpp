@@ -61,6 +61,21 @@ void CrShaderManager::Initialize(const ICrRenderDevice* renderDevice)
 
 CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
 {
+	return CompileShaderBytecode(bytecodeDescriptor, CrShaderDefines::Dummy);
+}
+
+CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
+(
+	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor,
+	const CrShaderDefines& defines
+) const
+{
+	const CrString& ShaderCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
+
+	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
+
+	CrFixedString512 outputPath = ShaderCacheDirectory.c_str();
+
 	CrProcessDescriptor processDescriptor;
 
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
@@ -80,12 +95,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
-	const CrString& ShaderCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
-
-	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
-
-	CrFixedString512 outputPath = ShaderCacheDirectory.c_str();
-
+	// TODO Replace with CrPath
 	CrFixedString128 filename = bytecodeDescriptor.path.filename().c_str();
 	size_t extensionDotPosition = filename.find_last_of(".");
 	if (extensionDotPosition != filename.npos)
@@ -110,10 +120,10 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShad
 	processDescriptor.commandLine += "-graphicsapi ";
 	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi);
 
-	for (uint32_t i = 0; i < bytecodeDescriptor.defines.size(); ++i)
+	for (uint32_t i = 0; i < defines.defines.size(); ++i)
 	{
 		processDescriptor.commandLine += " -D ";
-		processDescriptor.commandLine += bytecodeDescriptor.defines[i].c_str();
+		processDescriptor.commandLine += defines.defines[i].c_str();
 	}
 
 	CrTimer compilationTime;

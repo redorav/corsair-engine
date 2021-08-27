@@ -4,6 +4,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+CrShaderDefines CrShaderDefines::Dummy;
+
 ICrShaderBindingTable::ICrShaderBindingTable(const CrShaderBindingTableResources& resources)
 {
 	size_t totalResourceCount =

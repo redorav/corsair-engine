@@ -330,12 +330,20 @@ struct CrShaderBytecodeCompilationDescriptor
 	(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
 		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
-	CrPath                    path;
-	CrFixedString128          entryPoint;
-	CrVector<CrFixedString64> defines;
-	cr3d::ShaderStage::T      stage;
-	cr3d::GraphicsApi::T      graphicsApi;
-	cr::Platform::T           platform;
+	const CrPath                    path;
+	const CrFixedString128          entryPoint;
+	const cr3d::ShaderStage::T      stage;
+	const cr3d::GraphicsApi::T      graphicsApi;
+	const cr::Platform::T           platform;
+};
+
+// Add defines to a shader compilation
+// Cannot be in bytecode descriptor because
+// it's a shader-wide operation
+struct CrShaderDefines
+{
+	static CrShaderDefines Dummy;
+	CrVector<CrString> defines;
 };
 
 struct CrShaderCompilationDescriptor
@@ -353,4 +361,5 @@ struct CrShaderCompilationDescriptor
 private:
 
 	CrVector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
+	CrShaderDefines defines;
 };

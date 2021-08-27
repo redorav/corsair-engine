@@ -22,6 +22,8 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	const CrVertexDescriptor& vertexDescriptor
 )
 {
+	CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
+
 	const CrHash pipelineHash = pipelineDescriptor.GetHash();
 	const CrHash graphicsShaderHash = graphicsShader->GetHash();
 	const CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
@@ -48,6 +50,8 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 
 CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
 {
+	CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
+
 	const CrHash pipelineHash = pipelineDescriptor.GetHash();
 	const CrHash computeShaderHash = computeShader->GetHash();
 

@@ -30,7 +30,7 @@ VS_OUT UbershaderVS(VS_IN IN)
 	#endif
 
 	output.color   = IN.normal.xyz; // TODO change
-    output.uv      = IN.uv;
+	output.uv      = IN.uv;
 	output.normal  = IN.normal.xyz * 2.0 - 1.0;
 	output.tangent = IN.tangent.xyz * 2.0 - 1.0;
 	

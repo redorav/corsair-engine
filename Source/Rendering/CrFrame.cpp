@@ -277,21 +277,21 @@ void CrFrame::Process()
 		}
 		drawCommandBuffer->EndDebugEvent();
 
-		drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
-		{
-			drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
-
-			drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
-		
-			drawCommandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
-		
-			drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
-		
-			drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
-		
-			drawCommandBuffer->Dispatch(1, 1, 1);
-		}
-		drawCommandBuffer->EndDebugEvent();
+		//drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
+		//{
+		//	drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
+		//
+		//	drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
+		//
+		//	drawCommandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
+		//
+		//	drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
+		//
+		//	drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
+		//
+		//	drawCommandBuffer->Dispatch(1, 1, 1);
+		//}
+		//drawCommandBuffer->EndDebugEvent();
 
 		// Render ImGui
 		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());

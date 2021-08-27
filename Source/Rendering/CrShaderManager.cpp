@@ -83,9 +83,9 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	// The platform-specific compilers also need to be in directories relative to the main one
 	processDescriptor.commandLine += CrGlobalPaths::GetShaderCompilerPath().c_str();
 
-	processDescriptor.commandLine += " -input ";
+	processDescriptor.commandLine += " -input \"";
 	processDescriptor.commandLine += bytecodeDescriptor.path.c_str();
-	processDescriptor.commandLine += " ";
+	processDescriptor.commandLine += "\" ";
 		
 	processDescriptor.commandLine += "-entrypoint ";
 	processDescriptor.commandLine += bytecodeDescriptor.entryPoint.c_str();

@@ -42,6 +42,16 @@ public:
 		return *this;
 	}
 
+	bool operator == (CrHash other)
+	{
+		return m_hash == other.m_hash;
+	}
+
+	bool operator != (CrHash other)
+	{
+		return m_hash != other.m_hash;
+	}
+
 	// TODO Select hash function at compile time based on the size of datatype.
 	// http://aras-p.info/blog/2016/08/09/More-Hash-Function-Tests/
 	template<typename T>

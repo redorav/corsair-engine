@@ -22,6 +22,8 @@ public:
 
 	void Initialize(const ICrRenderDevice* renderDevice);
 
+	const ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
+
 	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 
 	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor, const CrShaderDefines& defines) const;

@@ -20,6 +20,8 @@ public:
 
 	static CrShaderManager& Get();
 
+	static const char* GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi);
+
 	void Initialize(const ICrRenderDevice* renderDevice);
 
 	const ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }

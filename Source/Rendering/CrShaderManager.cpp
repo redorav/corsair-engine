@@ -24,6 +24,16 @@ CrShaderManager& CrShaderManager::Get()
 	return g_shaderManager;
 }
 
+const char* CrShaderManager::GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi)
+{
+	switch (graphicsApi)
+	{
+		case cr3d::GraphicsApi::Vulkan: return ".spv";
+		case cr3d::GraphicsApi::D3D12: return ".bin";
+		default: return "";
+	}
+}
+
 CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	// Create the graphics shader descriptor
@@ -42,7 +52,6 @@ CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderComp
 
 	return graphicsShader;
 }
-
 CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = shaderCompilationDescriptor.GetBytecodeDescriptors()[0];
@@ -114,7 +123,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 
 	filename += "_";
 	filename += bytecodeDescriptor.entryPoint.c_str();
-	filename += ".spv"; // TODO Fix extension based on API/platform
+	filename += GetShaderBytecodeExtension(bytecodeDescriptor.platform);
 
 	outputPath += filename.c_str();
 

@@ -101,14 +101,14 @@ public:
 		return *this;
 	}
 
-	CrPath operator + (const char* str)
+	CrPath operator + (const char* str) const
 	{
 		CrPath newPath = *this;
 		newPath.m_pathString += str;
 		return newPath;
 	}
 
-	CrPath operator + (const CrPath& path)
+	CrPath operator + (const CrPath& path) const
 	{
 		return *this + path.c_str();
 	}
@@ -119,7 +119,7 @@ public:
 		return *this;
 	}
 
-	CrPath operator / (const char* str)
+	CrPath operator / (const char* str) const
 	{
 		CrPath newPath = *this;
 		newPath.AddTrailingSeparator();
@@ -127,7 +127,7 @@ public:
 		return newPath;
 	}
 
-	CrPath operator / (const CrPath& path)
+	CrPath operator / (const CrPath& path) const
 	{
 		return *this / path.c_str();
 	}

@@ -123,7 +123,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 
 	filename += "_";
 	filename += bytecodeDescriptor.entryPoint.c_str();
-	filename += GetShaderBytecodeExtension(bytecodeDescriptor.platform);
+	filename += GetShaderBytecodeExtension(bytecodeDescriptor.graphicsApi);
 
 	outputPath += filename.c_str();
 

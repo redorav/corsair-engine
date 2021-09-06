@@ -9,14 +9,14 @@ namespace cr3d
 	namespace DataFormat { enum T : uint32_t; }
 	struct DataFormatInfo;
 
-	enum class TextureType : uint8_t;
+	enum class TextureType : uint32_t;
 	using TextureUsageFlags = uint32_t;
 
-	enum class SampleCount : uint8_t;
+	enum class SampleCount : uint32_t;
 	
-	namespace ShaderStage { enum T : uint8_t; }
+	namespace ShaderStage { enum T : uint32_t; }
 
-	namespace GraphicsApi { enum T : uint8_t; }
+	namespace GraphicsApi { enum T : uint32_t; }
 }
 
 // Forward declare shader resources

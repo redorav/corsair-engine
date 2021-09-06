@@ -163,4 +163,4 @@ using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 class CrPath;
 
-namespace cr { namespace Platform { enum T : uint8_t; } }
+namespace cr { namespace Platform { enum T : uint32_t; } }

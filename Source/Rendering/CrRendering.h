@@ -331,7 +331,7 @@ namespace cr3d
 
 	namespace GraphicsApi
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Vulkan,
 			D3D12,
@@ -353,7 +353,7 @@ namespace cr3d
 
 	namespace TextureContent
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Diffuse,
 			Normals,
@@ -384,7 +384,7 @@ namespace cr3d
 
 	using TextureUsageFlags = uint32_t;
 
-	enum class TextureType : uint8_t
+	enum class TextureType : uint32_t
 	{
 		Tex1D, 
 		Tex2D, 
@@ -395,7 +395,7 @@ namespace cr3d
 	namespace ShaderStage
 	{
 		// Most shaders won't have Hull/Domain or Geometry, for performance we'll reorder them
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Vertex,
 			Pixel,
@@ -432,7 +432,7 @@ namespace cr3d
 	// It might mean doing the same thing for some of the states.
 	namespace TextureState
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Undefined         = 0, // Never use this as the destination state in a resource transition operation
 			ShaderInput       = 1, // Use as input to a shader (except depth)
@@ -454,7 +454,7 @@ namespace cr3d
 	// but this list doesn't cover ByteBuffers or Append as they fall under the umbrella of Storage Buffer
 	namespace ShaderResourceType
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			ConstantBuffer,
 			Sampler,
@@ -468,7 +468,7 @@ namespace cr3d
 		};
 	};
 
-	enum class PrimitiveTopology : uint8_t
+	enum class PrimitiveTopology : uint32_t
 	{
 		PointList,
 		LineList,
@@ -492,12 +492,12 @@ namespace cr3d
 		Instance = 1
 	};
 
-	enum class PolygonFillMode : uint8_t { Fill, Line };
-	enum class PolygonCullMode : uint8_t { None, Front, Back };
-	enum class FrontFace : uint8_t { Clockwise, CounterClockwise };
-	enum class BlendOp : uint8_t { Add, Subtract, ReverseSubtract, Min, Max, };
+	enum class PolygonFillMode : uint32_t { Fill, Line };
+	enum class PolygonCullMode : uint32_t { None, Front, Back };
+	enum class FrontFace : uint32_t { Clockwise, CounterClockwise };
+	enum class BlendOp : uint32_t { Add, Subtract, ReverseSubtract, Min, Max, };
 
-	enum class BlendFactor : uint8_t
+	enum class BlendFactor : uint32_t
 	{
 		Zero,
 		One,
@@ -520,7 +520,7 @@ namespace cr3d
 		OneMinusSrc1Alpha,
 	};
 
-	enum class LogicOp : uint8_t
+	enum class LogicOp : uint32_t
 	{
 		Clear,
 		And,
@@ -543,7 +543,7 @@ namespace cr3d
 	typedef uint32_t ColorWriteMask;
 	namespace ColorWriteComponent
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Red   = 1 << 0,
 			Green = 1 << 1,
@@ -556,7 +556,7 @@ namespace cr3d
 		static const ColorWriteMask AlphaOnly = ColorWriteComponent::Alpha;
 	};
 
-	enum class CompareOp : uint8_t
+	enum class CompareOp : uint32_t
 	{
 		Never,
 		Less,
@@ -568,7 +568,7 @@ namespace cr3d
 		Always,
 	};
 
-	enum class StencilOp : uint8_t
+	enum class StencilOp : uint32_t
 	{
 		Keep,
 		Zero,
@@ -580,18 +580,18 @@ namespace cr3d
 		DecrementAndWrap,
 	};
 
-	enum class SampleCount : uint8_t
+	enum class SampleCount : uint32_t
 	{
 		S1, S2, S4, S8, S16, S32, S64
 	};
 
-	enum class Filter : uint8_t
+	enum class Filter : uint32_t
 	{
 		Point = 0,
 		Linear = 1,
 	};
 
-	enum class AddressMode : uint8_t
+	enum class AddressMode : uint32_t
 	{
 		ClampToEdge,
 		ClampToBorder,
@@ -601,7 +601,7 @@ namespace cr3d
 	};
 
 	// DX12 has configurable border colors, but most platforms only support these predefined modes
-	enum class BorderColor : uint8_t
+	enum class BorderColor : uint32_t
 	{
 		TransparentBlack,
 		OpaqueBlack,
@@ -819,7 +819,7 @@ namespace cr3d
 {
 	namespace BufferUsage
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Constant   = 1 << 0,
 			Vertex     = 1 << 1,
@@ -836,7 +836,7 @@ namespace cr3d
 
 	namespace BufferAccess
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			Immutable = 1 << 0,
 			GPUWrite  = 1 << 1,
@@ -847,7 +847,7 @@ namespace cr3d
 
 	namespace BufferOwnership
 	{
-		enum T : uint8_t
+		enum T : uint32_t
 		{
 			NonOwning,
 			Owning

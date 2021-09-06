@@ -91,10 +91,16 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 
 		numRenderTargets          = 1;
 
-		for (int i = 0; i < blendState.renderTargetBlends.size(); ++i)
-		{
-			blendState.renderTargetBlends[i].colorWriteMask = cr3d::ColorWriteComponent::All;
-		}
+		// Don't put a loop here to initialize the color write masks. It helps the compiler
+		// hoist the code outside of loops
+		blendState.renderTargetBlends[0].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[1].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[2].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[3].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[4].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[5].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[6].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[7].colorWriteMask = cr3d::ColorWriteComponent::All;
 
 		depthStencilState.depthTestEnable  = true;
 		depthStencilState.depthWriteEnable = true;

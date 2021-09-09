@@ -377,21 +377,21 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	// Stencil
 	depthStencilState.stencilTestEnable = pipelineDescriptor.depthStencilState.stencilTestEnable;
 
-	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.depthFailOp);
-	depthStencilState.front.failOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilFailOp);
-	depthStencilState.front.passOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.front.stencilPassOp);
-	depthStencilState.front.compareOp   = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.front.stencilCompareOp);
-	depthStencilState.front.compareMask = pipelineDescriptor.depthStencilState.front.stencilReadMask;
-	depthStencilState.front.writeMask   = pipelineDescriptor.depthStencilState.front.stencilWriteMask;
-	depthStencilState.front.reference   = pipelineDescriptor.depthStencilState.front.reference;
+	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontDepthFailOp);
+	depthStencilState.front.failOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilFailOp);
+	depthStencilState.front.passOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilPassOp);
+	depthStencilState.front.compareOp   = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.frontStencilCompareOp);
+	depthStencilState.front.compareMask = pipelineDescriptor.depthStencilState.stencilReadMask;
+	depthStencilState.front.writeMask   = pipelineDescriptor.depthStencilState.stencilWriteMask;
+	depthStencilState.front.reference   = pipelineDescriptor.depthStencilState.reference;
 
-	depthStencilState.back.depthFailOp  = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.depthFailOp);
-	depthStencilState.back.failOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilFailOp);
-	depthStencilState.back.passOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.back.stencilPassOp);
-	depthStencilState.back.compareOp    = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.back.stencilCompareOp);
-	depthStencilState.back.compareMask  = pipelineDescriptor.depthStencilState.back.stencilReadMask;
-	depthStencilState.back.writeMask    = pipelineDescriptor.depthStencilState.back.stencilWriteMask;
-	depthStencilState.back.reference    = pipelineDescriptor.depthStencilState.back.reference;
+	depthStencilState.back.depthFailOp  = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backDepthFailOp);
+	depthStencilState.back.failOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilFailOp);
+	depthStencilState.back.passOp       = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilPassOp);
+	depthStencilState.back.compareOp    = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.backStencilCompareOp);
+	depthStencilState.back.compareMask  = pipelineDescriptor.depthStencilState.stencilReadMask;
+	depthStencilState.back.writeMask    = pipelineDescriptor.depthStencilState.stencilWriteMask;
+	depthStencilState.back.reference    = pipelineDescriptor.depthStencilState.reference;
 
 	depthStencilState.minDepthBounds = 0.0f;
 	depthStencilState.maxDepthBounds = 1.0f;

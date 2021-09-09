@@ -16,10 +16,15 @@ struct CrRasterizerStateDescriptor
 	uint32_t depthClipEnable : 1;
 	uint32_t multisampleEnable : 1;
 	uint32_t antialiasedLineEnable : 1;
+
+	uint32_t padding : 24;
+	
 	float depthBias;
 	float depthBiasClamp;
 	float slopeScaledDepthBias;
 };
+
+static_assert(sizeof(CrRasterizerStateDescriptor) == 16);
 
 struct CrRenderTargetBlendDescriptor
 {
@@ -32,8 +37,11 @@ struct CrRenderTargetBlendDescriptor
 	cr3d::BlendOp colorBlendOp : 3;
 	cr3d::BlendOp alphaBlendOp : 3;
 
-	uint8_t enable : 1;
+	uint32_t enable : 1;
+	uint32_t padding : 1;
 };
+
+static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4);
 
 struct CrBlendStateDescriptor
 {
@@ -41,34 +49,45 @@ struct CrBlendStateDescriptor
 
 	// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
 	// in the blend state and not a per render target field.
-	uint8_t logicOpEnable : 1;
+	uint32_t logicOpEnable : 1;
 	cr3d::LogicOp logicOp : 4;
+	uint32_t padding : 27;
 	float blendConstants[4];
 };
 
-struct CrStencilOpDescriptor
-{
-	cr3d::StencilOp stencilFailOp : 3;
-	cr3d::StencilOp depthFailOp : 3;
-	cr3d::StencilOp stencilPassOp : 3;
-	cr3d::CompareOp stencilCompareOp : 3;
-	uint8_t stencilReadMask : 8;
-	uint8_t stencilWriteMask : 8;
-	uint8_t reference : 8;
-};
+static_assert(sizeof(CrBlendStateDescriptor) == 52);
 
 struct CrDepthStencilStateDescriptor
 {
-	uint8_t               depthTestEnable : 1;
-	uint8_t               depthWriteEnable : 1;
 	cr3d::CompareOp       depthCompareOp : 3;
-	uint8_t               depthBoundsTestEnable : 1;
-	uint8_t               stencilTestEnable : 1;
-	CrStencilOpDescriptor front;
-	CrStencilOpDescriptor back;
+	uint32_t              depthTestEnable : 1;
+	uint32_t              depthWriteEnable : 1;
+	uint32_t              depthBoundsTestEnable : 1;
+	uint32_t              stencilTestEnable : 1;
+
+	uint32_t              stencilReadMask : 8;
+	uint32_t              stencilWriteMask : 8;
+	uint32_t              reference : 8;
+
+	uint32_t              padding : 1;
+
+	cr3d::StencilOp       frontStencilFailOp : 3;
+	cr3d::StencilOp       frontDepthFailOp : 3;
+	cr3d::StencilOp       frontStencilPassOp : 3;
+	cr3d::CompareOp       frontStencilCompareOp : 3;
+
+	cr3d::StencilOp       backStencilFailOp : 3;
+	cr3d::StencilOp       backDepthFailOp : 3;
+	cr3d::StencilOp       backStencilPassOp : 3;
+	cr3d::CompareOp       backStencilCompareOp : 3;
+
+	uint32_t              padding2 : 8;
+
 	float                 minDepthBounds;
 	float                 maxDepthBounds;
 };
+
+static_assert(sizeof(CrDepthStencilStateDescriptor) == 16);
 
 struct CrRenderTargetFormatDescriptor
 {
@@ -77,20 +96,24 @@ struct CrRenderTargetFormatDescriptor
 	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
 };
 
+static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40);
+
 // TODO Optimize size of pipeline descriptor
-struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDescriptor>
+struct CrGraphicsPipelineDescriptor
 {
 	CrGraphicsPipelineDescriptor()
 	{
 		primitiveTopology         = cr3d::PrimitiveTopology::TriangleList;
 		sampleCount               = cr3d::SampleCount::S1;
-
+		
 		rasterizerState.fillMode  = cr3d::PolygonFillMode::Fill;
 		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
 		rasterizerState.cullMode  = cr3d::PolygonCullMode::Back;
-
+		
 		numRenderTargets          = 1;
 
+		padding                   = 0;
+		
 		// Don't put a loop here to initialize the color write masks. It helps the compiler
 		// hoist the code outside of loops
 		blendState.renderTargetBlends[0].colorWriteMask = cr3d::ColorWriteComponent::All;
@@ -101,22 +124,29 @@ struct CrGraphicsPipelineDescriptor : public CrAutoHashable<CrGraphicsPipelineDe
 		blendState.renderTargetBlends[5].colorWriteMask = cr3d::ColorWriteComponent::All;
 		blendState.renderTargetBlends[6].colorWriteMask = cr3d::ColorWriteComponent::All;
 		blendState.renderTargetBlends[7].colorWriteMask = cr3d::ColorWriteComponent::All;
-
+		
 		depthStencilState.depthTestEnable  = true;
 		depthStencilState.depthWriteEnable = true;
 		depthStencilState.depthCompareOp   = cr3d::CompareOp::Greater; // Reverse depth by default
 	}
 
-	cr3d::PrimitiveTopology        primitiveTopology : 4;
+	CrHash ComputeHash() const
+	{
+		return CrHash(this, sizeof(*this));
+	}
 
-	// Multisample state
+	cr3d::PrimitiveTopology        primitiveTopology : 4;
 	cr3d::SampleCount              sampleCount       : 4;
 	uint32_t                       numRenderTargets  : 4;
+	uint32_t                       padding           : 20;
+
 	CrRasterizerStateDescriptor    rasterizerState = {};
 	CrBlendStateDescriptor         blendState = {};
 	CrDepthStencilStateDescriptor  depthStencilState = {};
 	CrRenderTargetFormatDescriptor renderTargets = {};
 };
+
+static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128);
 
 class ICrGraphicsPipeline
 {

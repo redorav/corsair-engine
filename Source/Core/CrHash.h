@@ -13,6 +13,8 @@ public:
 
 	CrHash(const CrHash& hash) : m_hash(hash.m_hash) {}
 
+	explicit CrHash(uint64_t hash) : m_hash(hash) {}
+
 	void Reset()
 	{
 		m_hash = 0;
@@ -77,10 +79,19 @@ inline CrHash operator << (CrHash first, CrHash second)
 	return CrHash(hashes, sizeof(hashes));
 }
 
+// Auto Hashable is a class that allows arbitrary structs to be hashed easily
+// It ensures padding is 0 so that copying or creating new instances doesn't 
+// alter the hash. However, it comes at a cost since the structure needs to
+// be memset
 template<typename T>
 class CrAutoHashable
 {
 public:
+
+	CrAutoHashable()
+	{
+		memset(this, 0, sizeof(T));
+	}
 
 	CrHash GetHash() const
 	{
@@ -90,36 +101,8 @@ public:
 	void Hash()
 	{
 		m_hash.Reset(); // The hash also takes part in the hashing because it's stored. Reset for consistent hashing
-		m_hash = CrHash((T*)this);
+		m_hash = CrHash((T*)this, sizeof(T));
 	}
-
-protected:
-
-	CrAutoHashable() {} // Don't allow instances of this type
-
-private:
-
-	CrHash m_hash;
-};
-
-template<typename T>
-class CrHashable
-{
-public:
-
-	void Hash()
-	{
-		m_hash = static_cast<T*>(this)->ComputeHash();
-	}
-
-	CrHash GetHash() const
-	{
-		return m_hash;
-	}
-
-protected:
-
-	CrHashable() {} // Don't allow instances of this type
 
 private:
 

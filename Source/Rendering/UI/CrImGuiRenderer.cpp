@@ -79,8 +79,6 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.renderTargets.colorFormats[0] = initParams.m_swapchainFormat;
 
-		psoDescriptor.Hash();
-
 		const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 		// Load shaders:

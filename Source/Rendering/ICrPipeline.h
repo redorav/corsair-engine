@@ -163,9 +163,12 @@ public:
 	uint32_t m_usedVertexStreamCount = 0;
 };
 
-struct CrComputePipelineDescriptor : public CrAutoHashable<CrComputePipelineDescriptor>
+struct CrComputePipelineDescriptor
 {
-
+	CrHash ComputeHash() const
+	{
+		return CrHash();
+	}
 };
 
 class ICrComputePipeline

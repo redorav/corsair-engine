@@ -52,7 +52,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 {
 	CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
 
-	const CrHash pipelineHash = pipelineDescriptor.GetHash();
+	const CrHash pipelineHash = pipelineDescriptor.ComputeHash();
 	const CrHash computeShaderHash = computeShader->GetHash();
 
 	const CrHash combinedHash = pipelineHash << computeShaderHash;

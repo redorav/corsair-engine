@@ -26,3 +26,14 @@
 
 template<int N> struct static_sizeof_dummy;
 #define static_sizeof(T) static_sizeof_dummy<sizeof(T)>;
+
+#if defined(_MSC_VER)
+
+#define pragma_pack_start __pragma( pack(push, 1) )
+#define pragma_pack_end __pragma( pack(pop) )
+
+#else
+
+#error Not implemented
+
+#endif

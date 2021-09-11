@@ -397,12 +397,12 @@ namespace cr3d
 		// Most shaders won't have Hull/Domain or Geometry, for performance we'll reorder them
 		enum T : uint32_t
 		{
-			Vertex,
-			Pixel,
-			Hull,
-			Domain,
-			Geometry,
-			Compute,
+			Vertex   = 0,
+			Pixel    = 1,
+			Hull     = 2,
+			Domain   = 3,
+			Geometry = 4,
+			Compute  = 5,
 			GraphicsStageCount = Geometry + 1,
 			Count = Compute + 1
 		};

@@ -51,6 +51,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	// TODO Move block to rendering subsystem initialization function
 	{
+		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrPipelineStateManager::Get()->Init(renderDevice.get());
 	}

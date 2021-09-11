@@ -108,8 +108,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
 
-	basicGraphicsPipelineDescriptor.Hash();
-
 	// TODO Reminder for next time:
 	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
 	// 2) Create hash for all three and combine
@@ -128,7 +126,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_computePipelineState = CrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
 
 	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	basicGraphicsPipelineDescriptor.Hash();
 	m_linePipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
 		basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertexDescriptor);
 

@@ -342,7 +342,20 @@ struct CrShaderBytecodeCompilationDescriptor
 // it's a shader-wide operation
 struct CrShaderDefines
 {
+	void AddDefine(const CrString& define)
+	{
+		defines.push_back(define);
+	}
+
+	const CrVector<CrString>& GetDefines() const
+	{
+		return defines;
+	}
+
 	static CrShaderDefines Dummy;
+
+private:
+
 	CrVector<CrString> defines;
 };
 
@@ -355,7 +368,7 @@ struct CrShaderCompilationDescriptor
 
 	void AddDefine(const CrString& define)
 	{
-		m_defines.defines.push_back(define);
+		m_defines.AddDefine(define);
 	}
 
 	const CrVector<CrShaderBytecodeCompilationDescriptor>& GetBytecodeDescriptors() const

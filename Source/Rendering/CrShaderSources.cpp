@@ -141,7 +141,7 @@ void CrShaderSources::Initialize()
 
 	if(createHashFile)
 	{
-		CrFileSharedHandle hashFile = ICrFile::OpenFile(m_ubershaderHashPath.c_str(), FileOpenFlags::Create | FileOpenFlags::Write);
+		CrFileSharedHandle hashFile = ICrFile::OpenFile(m_ubershaderHashPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 		hashFile->Write((void*)&m_ubershaderHash, sizeof(m_ubershaderHash));
 	}
 

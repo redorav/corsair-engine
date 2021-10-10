@@ -147,6 +147,7 @@ void CrShaderSources::Initialize()
 
 	// Resolve ubershader includes upfront. The only thing that really changes an ubershader
 	// is defines that we can either pass in from the compiler or inject at the top of the file
+	// TODO: Replace with a preprocessor
 	{
 		bool success = true;
 

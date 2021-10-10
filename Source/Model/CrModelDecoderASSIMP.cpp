@@ -7,12 +7,12 @@
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
+#include "Rendering/ICrTexture.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/CrMaterial.h"
+#include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrMesh.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/ICrTexture.h"
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
@@ -65,16 +65,13 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 		return nullptr;
 	}
 
-	CrRenderModelSharedHandle renderModel = CrMakeShared<CrRenderModel>();
-
-	// Load all meshes contained in the mesh
-	renderModel->m_renderMeshes.reserve(scene->mNumMeshes);
+	CrRenderModelDescriptor modelDescriptor;
 
 	for (uint32_t m = 0; m < scene->mNumMeshes; ++m)
 	{
 		CrMeshSharedHandle renderMesh = LoadMesh(scene->mMeshes[m]);
-		renderModel->m_renderMeshes.push_back(renderMesh);
-		renderModel->m_materialMap.insert(CrPair<CrMesh*, uint32_t>(renderMesh.get(), scene->mMeshes[m]->mMaterialIndex));
+		modelDescriptor.meshes.push_back(renderMesh);
+		modelDescriptor.materialIndices.push_back((uint8_t)scene->mMeshes[m]->mMaterialIndex);
 	}
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
@@ -82,10 +79,10 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
 		CrMaterialSharedHandle material = LoadMaterial(scene->mMaterials[m], filePath);
-		renderModel->m_materials.push_back(material);
+		modelDescriptor.materials.push_back(material);
 	}
 
-	return renderModel;
+	return CrMakeShared<CrRenderModel>(modelDescriptor);
 }
 
 CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
@@ -157,7 +154,8 @@ CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 
 CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& materialPath)
 {
-	CrMaterialSharedHandle material = CrMakeShared<CrMaterial>();
+	CrMaterialDescriptor materialDescriptor;
+	CrMaterialSharedHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
 
 	aiString name;
 	aiMaterial->Get(AI_MATKEY_NAME, name);

@@ -20,6 +20,9 @@
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrMesh.h"
+#include "Rendering/CrMaterialCompiler.h"
+#include "Rendering/CrMaterial.h"
+#include "Rendering/CrShaderSources.h"
 
 #include "Input/CrInputManager.h"
 
@@ -53,6 +56,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	{
 		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
+		CrMaterialCompiler::Get().Initialize();
 		CrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
 
@@ -246,13 +250,13 @@ void CrFrame::Process()
 				transformBuffer.Unlock();
 				drawCommandBuffer->BindConstantBuffer(&transformBuffer);
 
-				drawCommandBuffer->BindGraphicsPipelineState(m_basicPipelineState.get());
-
-				for (uint32_t m = 0; m < m_renderModel->m_renderMeshes.size(); ++m)
+				for (uint32_t meshIndex = 0; meshIndex < m_renderModel->GetRenderMeshCount(); ++meshIndex)
 				{
-					const CrRenderMeshSharedHandle& renderMesh = m_renderModel->m_renderMeshes[m];
-					uint32_t materialIndex = (*m_renderModel->m_materialMap.find(renderMesh.get())).second;
-					const CrMaterialSharedHandle& material = m_renderModel->m_materials[materialIndex];
+					CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> meshMaterial = m_renderModel->GetRenderMeshMaterial(meshIndex);
+					const CrRenderMeshSharedHandle& renderMesh = meshMaterial.first;
+					const CrMaterialSharedHandle& material = meshMaterial.second;
+
+					drawCommandBuffer->BindGraphicsPipelineState(m_renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get());
 
 					for (uint32_t t = 0; t < material->m_textures.size(); ++t)
 					{

@@ -9,6 +9,7 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrGPUBuffer.h"
+#include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrMesh.h"
@@ -27,8 +28,6 @@
 #include "tiny_gltf.h"
 
 #include <string.h>
-
-using namespace tinygltf;
 
 class CrMesh;
 using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
@@ -75,31 +74,31 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 
 	// TO-DO: primitives refers to sub-meshes (?)
 	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");
-	const Primitive& primitive = meshData->primitives[0];
+	const tinygltf::Primitive& primitive = meshData->primitives[0];
 	{
 		// Material data
 		if (primitive.material != -1)
 		{
-			const Material& materialInfo = modelData->materials[primitive.material];
+			const tinygltf::Material& materialInfo = modelData->materials[primitive.material];
 
 			// Diffuse
 			if (materialInfo.pbrMetallicRoughness.baseColorTexture.index != -1)
 			{
-				const Texture& diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
+				const tinygltf::Texture& diffuseTexture = modelData->textures[materialInfo.pbrMetallicRoughness.baseColorTexture.index];
 				material->AddTexture(textureTable[diffuseTexture.source], Textures::DiffuseTexture0);
 			}
 
 			// Normals
 			if (materialInfo.normalTexture.index != -1)
 			{
-				const Texture& normalsTexture = modelData->textures[materialInfo.normalTexture.index];
+				const tinygltf::Texture& normalsTexture = modelData->textures[materialInfo.normalTexture.index];
 				material->AddTexture(textureTable[normalsTexture.source], Textures::NormalTexture0);
 			}
 
 			// Info
 			if (materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index != -1)
 			{
-				const Texture& metallicRoughTexture = modelData->textures[materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index];
+				const tinygltf::Texture& metallicRoughTexture = modelData->textures[materialInfo.pbrMetallicRoughness.metallicRoughnessTexture.index];
 				material->AddTexture(textureTable[metallicRoughTexture.source], Textures::SpecularTexture0);
 			}
 		}
@@ -107,14 +106,14 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 		// Index data
 		if (primitive.indices != -1)
 		{
-			const Accessor& indexAccessor = modelData->accessors[primitive.indices];
+			const tinygltf::Accessor& indexAccessor = modelData->accessors[primitive.indices];
 
 			// Create the buffer
 			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
 			CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, format, (uint32_t)indexAccessor.count);
 
 			// Use the buffer view to copy the data
-			const BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
+			const tinygltf::BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
 			const unsigned char* data = modelData->buffers[bufferView.buffer].data.data();
 			data = data + (indexAccessor.byteOffset + bufferView.byteOffset);
 
@@ -147,8 +146,8 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 			for (const auto& attribute : primitive.attributes)
 			{
 				const std::string& attribName  = attribute.first;
-				const Accessor& attribAccessor = modelData->accessors[attribute.second];
-				const BufferView& bufferView   = modelData->bufferViews[attribAccessor.bufferView];
+				const tinygltf::Accessor& attribAccessor = modelData->accessors[attribute.second];
+				const tinygltf::BufferView& bufferView   = modelData->bufferViews[attribAccessor.bufferView];
 				const unsigned char* data      = modelData->buffers[bufferView.buffer].data.data();
 				data = data + (attribAccessor.byteOffset + bufferView.byteOffset); // To find where the data starts we need to account for the accessor and view offsets
 				int32_t componentSize = tinygltf::GetNumComponentsInType(attribAccessor.type) * tinygltf::GetComponentSizeInBytes(attribAccessor.componentType);
@@ -220,14 +219,14 @@ CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Me
 
 CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
 {
-	TinyGLTF loader;
-	Model model;
+	tinygltf::TinyGLTF gltfLoader;
+	tinygltf::Model gltfModel;
 
 	// Custom image loading implementation, gltf will either load the raw data from the inline buffer
 	// or from the specified uri. Textures will be loaded and added to the texture table in preparation
 	// to build the material
 	CrHashMap<int, CrTextureSharedHandle> textureTable;
-	loader.SetImageLoader(
+	gltfLoader.SetImageLoader(
 		[]( tinygltf::Image* image, const int imageIndex, std::string* error, std::string* /*warning*/,
 			int /*requestedWidth*/, int /*requestedHeight*/, const unsigned char* data, int dataSize, void* userData)
 		{
@@ -291,11 +290,11 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		bool success = false;
 		if (binaryGLTF)
 		{
-			success = loader.LoadBinaryFromMemory(&model, &error, &warning, (unsigned char*)fileData, (unsigned int)fileSize, parentPath);
+			success = gltfLoader.LoadBinaryFromMemory(&gltfModel, &error, &warning, (unsigned char*)fileData, (unsigned int)fileSize, parentPath);
 		}
 		else
 		{
-			success = loader.LoadASCIIFromString(&model, &error, &warning, (const char*)fileData, (unsigned int)fileSize, parentPath);
+			success = gltfLoader.LoadASCIIFromString(&gltfModel, &error, &warning, (const char*)fileData, (unsigned int)fileSize, parentPath);
 		}
 		free(fileData); // Free this now
 
@@ -312,18 +311,21 @@ CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& f
 		}
 	}
 	
+	CrRenderModelDescriptor modelDescriptor;
+
 	// Create the render model and setup the material. Note that by now, images have been loaded
 	// and textures created within the loader callback
-	CrRenderModelSharedHandle renderModel = CrMakeShared<CrRenderModel>();
-	renderModel->m_renderMeshes.reserve(model.meshes.size());
-	for (const Mesh& mesh : model.meshes)
+	for (uint32_t m = 0; m < gltfModel.meshes.size(); ++m)
 	{
-		CrMaterialSharedHandle material = CrMakeShared <CrMaterial>();
-		CrRenderMeshSharedHandle renderMesh = LoadMesh(&model, &mesh, material, textureTable);
-		renderModel->m_renderMeshes.push_back(renderMesh);
-		renderModel->m_materials.push_back(material);
-		renderModel->m_materialMap.insert(CrPair<CrMesh*, uint32_t>(renderMesh.get(), (uint32_t)(renderModel->m_materials.size() - 1)));
+		const tinygltf::Mesh& mesh = gltfModel.meshes[m];
+		CrMaterialDescriptor materialDescriptor;
+		CrMaterialSharedHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
+		CrRenderMeshSharedHandle renderMesh = LoadMesh(&gltfModel, &mesh, material, textureTable);
+
+		modelDescriptor.meshes.push_back(renderMesh);
+		modelDescriptor.materialIndices.push_back((uint8_t)m);
+		modelDescriptor.materials.push_back(material);
 	}
 
-	return renderModel;
+	return CrMakeShared<CrRenderModel>(modelDescriptor);
 }

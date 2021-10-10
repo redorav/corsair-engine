@@ -7,7 +7,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-class CrMesh
+class CrRenderMesh
 {
 public:
 
@@ -44,4 +44,4 @@ private:
 	CrBoundingBox m_boundingBox;
 };
 
-using CrRenderMeshSharedHandle = CrSharedPtr<CrMesh>;
+using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;

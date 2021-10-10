@@ -17,12 +17,12 @@ using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
 
-class CrMesh;
-using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
+class CrRenderMesh;
+using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
 
 struct CrRenderModelDescriptor
 {
-	CrFixedVector<CrMeshSharedHandle, 256> meshes;
+	CrFixedVector<CrRenderMeshSharedHandle, 256> meshes;
 
 	CrFixedVector<uint8_t, 256> materialIndices;
 
@@ -39,13 +39,13 @@ public:
 
 	const CrBoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
-	const CrPair<const CrMeshSharedHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
+	const CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
 	{
-		const CrMeshSharedHandle& renderMesh = m_renderMeshes[meshIndex];
+		const CrRenderMeshSharedHandle& renderMesh = m_renderMeshes[meshIndex];
 		uint32_t materialIndex = (*m_materialMap.find(renderMesh.get())).second;
 		const CrMaterialSharedHandle& material = m_materials[materialIndex];
 
-		return CrPair<const CrMeshSharedHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
+		return CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
 	}
 
 	const CrMaterialSharedHandle& GetMaterial(uint32_t meshIndex) const
@@ -73,16 +73,16 @@ public:
 
 private:
 
-	CrHashMap<CrMesh*, uint8_t> m_materialMap;
+	CrHashMap<CrRenderMesh*, uint8_t> m_materialMap;
 
-	CrHashMap<CrMesh*, uint8_t> m_pipelineMap;
+	CrHashMap<CrRenderMesh*, uint8_t> m_pipelineMap;
 
 	// A model has access to a collection of render meshes, each with a material attached.
 	// To start with we'll make all of these arrays of equal size, but they don't have to
 	// be. A merging of a material + a render mesh produces a pipeline state. The pipeline
 	// state knows everything about where it's going to be rendered (it needs to)
 
-	CrVector<CrMeshSharedHandle> m_renderMeshes;
+	CrVector<CrRenderMeshSharedHandle> m_renderMeshes;
 
 
 	CrVector<CrMaterialSharedHandle> m_materials;

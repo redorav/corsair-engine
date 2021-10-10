@@ -1,7 +1,7 @@
 #include "CrRendering_pch.h"
 
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/CrMesh.h"
+#include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrPipeline.h"
@@ -22,11 +22,11 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	// For every combination of mesh and material, create the necessary pipeline objects
 	for (uint32_t i = 0; i < descriptor.meshes.size(); ++i)
 	{
-		const CrMeshSharedHandle& mesh = descriptor.meshes[i];
+		const CrRenderMeshSharedHandle& mesh = descriptor.meshes[i];
 		const CrMaterialSharedHandle& material = descriptor.materials[descriptor.materialIndices[i]];
 
 		m_renderMeshes.push_back(mesh);
-		m_materialMap.insert(CrPair<CrMesh*, uint8_t>(mesh.get(), (uint8_t)descriptor.materialIndices[i]));
+		m_materialMap.insert(CrPair<CrRenderMesh*, uint8_t>(mesh.get(), (uint8_t)descriptor.materialIndices[i]));
 
 		for (CrMaterialPipelineVariant::T pipelineVariant = CrMaterialPipelineVariant::First; pipelineVariant < CrMaterialPipelineVariant::Count; ++pipelineVariant)
 		{

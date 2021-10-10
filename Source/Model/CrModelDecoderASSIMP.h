@@ -2,8 +2,8 @@
 
 #include "ICrModelDecoder.h"
 
-class CrMesh;
-using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
+class CrRenderMesh;
+using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
@@ -20,7 +20,7 @@ public:
 
 private:
 
-	CrMeshSharedHandle LoadMesh(const aiMesh* mesh);
+	CrRenderMeshSharedHandle LoadMesh(const aiMesh* mesh);
 
 	CrMaterialSharedHandle LoadMaterial(const aiMaterial* material, const CrPath& relativePath);
 };

@@ -19,7 +19,7 @@
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrMaterial.h"
-#include "Rendering/CrMesh.h"
+#include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrShaderSources.h"

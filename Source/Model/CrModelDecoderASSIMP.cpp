@@ -12,7 +12,7 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/CrMesh.h"
+#include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
@@ -69,7 +69,7 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 
 	for (uint32_t m = 0; m < scene->mNumMeshes; ++m)
 	{
-		CrMeshSharedHandle renderMesh = LoadMesh(scene->mMeshes[m]);
+		CrRenderMeshSharedHandle renderMesh = LoadMesh(scene->mMeshes[m]);
 		modelDescriptor.meshes.push_back(renderMesh);
 		modelDescriptor.materialIndices.push_back((uint8_t)scene->mMeshes[m]->mMaterialIndex);
 	}
@@ -85,9 +85,9 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	return CrMakeShared<CrRenderModel>(modelDescriptor);
 }
 
-CrMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
+CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 {
-	CrMeshSharedHandle renderMesh = CrMakeShared<CrMesh>();
+	CrRenderMeshSharedHandle renderMesh = CrMakeShared<CrRenderMesh>();
 
 	CrAssertMsg(mesh->HasTextureCoords(0), "Error in mesh: no texture coordinates available.");
 	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");

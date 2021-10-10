@@ -12,7 +12,7 @@
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/CrMesh.h"
+#include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrImage.h"
@@ -29,8 +29,8 @@
 
 #include <string.h>
 
-class CrMesh;
-using CrMeshSharedHandle = CrSharedPtr<CrMesh>;
+class CrRenderMesh;
+using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
@@ -68,9 +68,9 @@ void LoadAttribute(CrVector<T>& targetBuffer, const unsigned char* sourceBuffer,
 	}
 }
 
-CrMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData, const CrMaterialSharedHandle& material, CrHashMap<int, CrTextureSharedHandle>& textureTable)
+CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygltf::Mesh* meshData, const CrMaterialSharedHandle& material, CrHashMap<int, CrTextureSharedHandle>& textureTable)
 {
-	CrMeshSharedHandle mesh = CrMakeShared<CrMesh>();
+	CrRenderMeshSharedHandle mesh = CrMakeShared<CrRenderMesh>();
 
 	// TO-DO: primitives refers to sub-meshes (?)
 	CrAssertMsg(meshData->primitives.size() == 1, "Not implemented");

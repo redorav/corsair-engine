@@ -1,9 +1,9 @@
 #include "CrRendering_pch.h"
 
 #include "Rendering/CrGPUBuffer.h"
-#include "CrMesh.h"
+#include "CrRenderMesh.h"
 
-void CrMesh::AddVertexBuffer(const CrVertexBufferSharedHandle& vertexBuffer)
+void CrRenderMesh::AddVertexBuffer(const CrVertexBufferSharedHandle& vertexBuffer)
 {
 	m_vertexBuffers.push_back(vertexBuffer);
 
@@ -23,7 +23,7 @@ void CrMesh::AddVertexBuffer(const CrVertexBufferSharedHandle& vertexBuffer)
 //	//MergeVertexDescriptors();
 //}
 
-void CrMesh::MergeVertexDescriptors()
+void CrRenderMesh::MergeVertexDescriptors()
 {
 	m_vertexDescriptor = CrVertexDescriptor();
 

@@ -119,13 +119,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
 	// 4) After creation, put in table for next time
 
-	m_basicPipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
-		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
-
-	// Test caching
-	m_basicPipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
-		basicGraphicsPipelineDescriptor, graphicsShader, ComplexVertexDescriptor);
-
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
 	m_computePipelineState = CrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);

@@ -59,6 +59,8 @@ public:
 
 	void SetScissor(const CrScissor& scissor);
 
+	void SetStencilRef(uint32_t stencilRef);
+
 	// Binding functions
 
 	void BindIndexBuffer(const CrGPUBuffer* indexBuffer);
@@ -239,6 +241,9 @@ protected:
 		StorageBufferBinding			m_rwStorageBuffers[cr3d::ShaderStage::Count][RWStorageBuffers::Count];
 
 		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
+
+		uint32_t						m_stencilRef;
+		bool							m_stencilRefDirty;
 	};
 
 	CurrentState					m_currentState;
@@ -277,6 +282,15 @@ inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
 	{
 		m_currentState.m_scissor = scissor;
 		m_currentState.m_scissorDirty = true;
+	}
+}
+
+inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
+{
+	if (m_currentState.m_stencilRef != stencilRef)
+	{
+		m_currentState.m_stencilRef = stencilRef;
+		m_currentState.m_stencilRefDirty = true;
 	}
 }
 

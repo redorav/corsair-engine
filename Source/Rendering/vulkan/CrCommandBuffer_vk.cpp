@@ -372,6 +372,12 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 		m_currentState.m_graphicsPipelineDirty = false;
 	}
 
+	if (m_currentState.m_stencilRefDirty)
+	{
+		vkCmdSetStencilReference(m_vkCommandBuffer, VK_STENCIL_FACE_FRONT_AND_BACK, m_currentState.m_stencilRef);
+		m_currentState.m_stencilRefDirty = false;
+	}
+
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
 
 	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);

@@ -68,7 +68,7 @@ namespace eastl
 template<typename T, size_t N>
 using CrArray = eastl::array<T, N>;
 
-template<size_t N, typename WordType = uint32_t>
+template<size_t N, typename WordType = size_t>
 using CrBitset = eastl::bitset<N, WordType>;
 
 // Copied from EASTL

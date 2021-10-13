@@ -409,7 +409,12 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines
 	// just for changing a viewport's dimensions or a scissor box
 	// The dynamic state properties themselves are stored in the command buffer
-	CrArray<VkDynamicState, 2> dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+	CrArray<VkDynamicState, 3> dynamicStateEnables =
+	{
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_SCISSOR,
+		VK_DYNAMIC_STATE_STENCIL_REFERENCE
+	};
 
 	VkPipelineDynamicStateCreateInfo dynamicState;
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;

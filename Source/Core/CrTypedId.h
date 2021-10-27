@@ -1,9 +1,13 @@
 #pragma once
 
+#include "Core/CrNumericLimits.h"
+
 template<typename T, typename U>
 class CrTypedId
 {
 public:
+
+	static const U MaxId = CrNumericLimits<U>::max();
 
 	CrTypedId() : id(0) {}
 	explicit CrTypedId(U id) : id(id) {}

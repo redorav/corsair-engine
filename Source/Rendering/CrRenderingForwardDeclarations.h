@@ -109,3 +109,6 @@ struct CrHardwareGPUBufferDescriptor;
 
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;
+
+// Visibility
+struct CrBoundingBox;

@@ -23,6 +23,10 @@
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrShaderSources.h"
+#include "Rendering/CrVisibility.h"
+
+#include "Rendering/CrRenderWorld.h"
+#include "Rendering/CrRenderModelInstance.h"
 
 #include "Input/CrInputManager.h"
 
@@ -42,8 +46,17 @@
 static CrSharedPtr<CrCamera> camera;
 static Camera cameraConstantData;
 
+bool HashingAssert()
+{
+	CrGraphicsPipelineDescriptor defaultDescriptor;
+	CrAssertMsg(CrHash(&defaultDescriptor) == CrHash(12342096532583984399), "Failed to hash known pipeline descriptor!");
+	return true;
+}
+
 void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
 {
+	HashingAssert();
+
 	m_platformHandle = platformHandle;
 	m_platformWindow = platformWindow;
 
@@ -60,10 +73,28 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 		CrPipelineStateManager::Get()->Init(renderDevice.get());
 	}
 
-	m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
-	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tall Building 01/TallBuilding01.fbx"));
-	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("Tavern/Barrel/Barrel.fbx"));
-	//m_renderModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
+	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
+	CrRenderModelSharedHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
+	CrRenderModelSharedHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
+
+	// Create a render world
+	m_renderWorld = CrMakeShared<CrRenderWorld>();
+
+	m_modelInstance0 = m_renderWorld->CreateModelInstance();
+	m_modelInstance1 = m_renderWorld->CreateModelInstance();
+	m_modelInstance2 = m_renderWorld->CreateModelInstance();
+
+	float4x4 transform0 = mul(float4x4::scale(1.0f), float4x4::translation(0.0f, 0.0f, 0.0f));
+	float4x4 transform1 = mul(float4x4::scale(1.0f), float4x4::translation(10.0f, 0.0f, 0.0f));
+	float4x4 transform2 = mul(float4x4::scale(5.0f), float4x4::translation(20.0f, 0.0f, 0.0f));
+
+	m_renderWorld->SetTransform(m_modelInstance0.GetId(), transform0);
+	m_renderWorld->SetTransform(m_modelInstance1.GetId(), transform1);
+	m_renderWorld->SetTransform(m_modelInstance2.GetId(), transform2);
+
+	m_renderWorld->SetRenderModel(m_modelInstance0.GetId(), nyraModel);
+	m_renderWorld->SetRenderModel(m_modelInstance1.GetId(), jainaModel);
+	m_renderWorld->SetRenderModel(m_modelInstance2.GetId(), damagedHelmet);
 
 	camera = CrSharedPtr<CrCamera>(new CrCamera());
 
@@ -234,37 +265,51 @@ void CrFrame::Process()
 
 				float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
 
-				CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
-				Instance* transformData = transformBuffer.Lock();
+				m_renderWorld->SetTransform(m_modelInstance0.GetId(), transformMatrix);
+
+				m_renderWorld->ForEachModelInstance([drawCommandBuffer](const CrRenderWorld* const renderWorld, CrModelInstanceIndex instanceIndex)
 				{
-					//store(transformMatrix, &transformData->local2World.m00);
-					transformData->local2World[0] = transformMatrix;
-				}
-				transformBuffer.Unlock();
-				drawCommandBuffer->BindConstantBuffer(&transformBuffer);
+					const CrRenderModelSharedHandle& renderModel = renderWorld->GetRenderModel(instanceIndex);
+					float4x4 transform = renderWorld->GetTransform(instanceIndex);
 
-				for (uint32_t meshIndex = 0; meshIndex < m_renderModel->GetRenderMeshCount(); ++meshIndex)
-				{
-					CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> meshMaterial = m_renderModel->GetRenderMeshMaterial(meshIndex);
-					const CrRenderMeshSharedHandle& renderMesh = meshMaterial.first;
-					const CrMaterialSharedHandle& material = meshMaterial.second;
-
-					drawCommandBuffer->BindGraphicsPipelineState(m_renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get());
-
-					for (uint32_t t = 0; t < material->m_textures.size(); ++t)
+					CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
+					Instance* transformData = transformBuffer.Lock();
+					for (uint32_t i = 0; i < 10; ++i)
 					{
-						CrMaterial::TextureBinding binding = material->m_textures[t];
-						drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
+						transformData->local2World[i] = transform;
 					}
+					transformBuffer.Unlock();
+					drawCommandBuffer->BindConstantBuffer(&transformBuffer);
 
-					for (uint32_t vbIndex = 0; vbIndex < renderMesh->GetVertexBufferCount(); ++vbIndex)
+					for (uint32_t meshIndex = 0; meshIndex < renderModel->GetRenderMeshCount(); ++meshIndex)
 					{
-						drawCommandBuffer->BindVertexBuffer(renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
-					}
+						CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> meshMaterial = renderModel->GetRenderMeshMaterial(meshIndex);
+						const CrRenderMeshSharedHandle& renderMesh = meshMaterial.first;
+						const CrMaterialSharedHandle& material = meshMaterial.second;
 
-					drawCommandBuffer->BindIndexBuffer(renderMesh->GetIndexBuffer().get());
-					drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), 1, 0, 0, 0);
-				}
+						// Compute mesh visibility and don't render if outside frustum
+						if (!CrVisiblity::ObbProjection(renderMesh->GetBoundingBox(), transform, camera->GetWorld2ProjectionMatrix()))
+						{
+							continue;
+						}
+
+						drawCommandBuffer->BindGraphicsPipelineState(renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get());
+
+						for (uint32_t t = 0; t < material->m_textures.size(); ++t)
+						{
+							CrMaterial::TextureBinding binding = material->m_textures[t];
+							drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
+						}
+
+						for (uint32_t vbIndex = 0; vbIndex < renderMesh->GetVertexBufferCount(); ++vbIndex)
+						{
+							drawCommandBuffer->BindVertexBuffer(renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
+						}
+
+						drawCommandBuffer->BindIndexBuffer(renderMesh->GetIndexBuffer().get());
+						drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), 1, 0, 0, 0);
+					}
+				});
 			}
 			drawCommandBuffer->EndRenderPass();
 		}
@@ -444,4 +489,16 @@ void CrFrame::RecreateSwapchainAndDepth()
 
 	// Make sure all of this work is finished
 	renderDevice->WaitIdle();
+}
+
+CrFrame::CrFrame()
+{
+
+}
+
+CrFrame::~CrFrame()
+{
+	m_renderWorld->DestroyModelInstance(m_modelInstance0.GetId());
+	m_renderWorld->DestroyModelInstance(m_modelInstance1.GetId());
+	m_renderWorld->DestroyModelInstance(m_modelInstance2.GetId());
 }

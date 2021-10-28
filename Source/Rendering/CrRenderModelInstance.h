@@ -1,19 +1,28 @@
 #pragma once
 
-#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/CrTypedId.h"
 
-class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
+class CrRenderModelInstance;
+using CrModelInstanceId = CrTypedId<CrRenderModelInstance, uint32_t>;
 
 class CrRenderModelInstance
 {
 public:
 
-	void SetRenderModel(const CrRenderModelSharedHandle& renderModel);
+	CrRenderModelInstance() : m_instanceId(CrModelInstanceId::MaxId) {}
 
-	const CrRenderModelSharedHandle& GetRenderModel() const;
+	CrRenderModelInstance(CrModelInstanceId instanceId)
+		: m_instanceId(instanceId) {}
+
+	CrModelInstanceId GetId() const { return m_instanceId; }
+
+	void SetVisibilityId(uint32_t visibilityId) { m_visibilityId = visibilityId; }
+
+	void RemoveFromWorld();
 
 private:
 
-	CrRenderModelSharedHandle m_renderModel;
+	CrModelInstanceId m_instanceId;
+
+	uint32_t m_visibilityId;
 };

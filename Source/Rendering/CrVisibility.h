@@ -18,3 +18,10 @@ struct CrBoundingSphere
 {
 	float4 centerRadius;
 };
+
+class CrVisiblity
+{
+public:
+
+	static bool ObbProjection(const CrBoundingBox& obb, const float4x4& transform, const float4x4& projectionMatrix);
+};

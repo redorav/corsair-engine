@@ -40,15 +40,17 @@ public:
 
 	void RotateAround(const float3& point, const float3& axis, float angle);
 
-	const float3& GetLookatVector() const;
+	const float3& GetLookatVector() const { return m_lookAtWorldSpace; }
 
-	const float3& GetRightVector() const;
+	const float3& GetRightVector() const { return m_rightWorldSpace; }
 
-	const float3& GetUpVector() const;
+	const float3& GetUpVector() const { return m_upWorldSpace; }
 
-	const float4x4& GetWorld2ViewMatrix() const;
+	const float4x4& GetWorld2ViewMatrix() const { return m_world2ViewMatrix; }
 
-	const float4x4& GetView2ProjectionMatrix() const;
+	const float4x4& GetView2ProjectionMatrix() const { return m_view2ProjectionMatrix; }
+
+	const float4x4& GetWorld2ProjectionMatrix() const { return m_world2ProjectionMatrix; }
 
 private:
 
@@ -67,4 +69,5 @@ private:
 	float4x4 m_view2WorldMatrix;
 	float4x4 m_world2ViewMatrix;
 	float4x4 m_view2ProjectionMatrix;
+	float4x4 m_world2ProjectionMatrix;
 };

@@ -96,29 +96,6 @@ void CrCamera::Update()
 	m_view2WorldMatrix._m30_m31_m32 = m_position;
 
 	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
-}
 
-const hlslpp::float3& CrCamera::GetLookatVector() const
-{
-	return m_lookAtWorldSpace;
-}
-
-const hlslpp::float3& CrCamera::GetRightVector() const
-{
-	return m_rightWorldSpace;
-}
-
-const hlslpp::float3& CrCamera::GetUpVector() const
-{
-	return m_upWorldSpace;
-}
-
-const hlslpp::float4x4& CrCamera::GetWorld2ViewMatrix() const
-{
-	return m_world2ViewMatrix;
-}
-
-const hlslpp::float4x4& CrCamera::GetView2ProjectionMatrix() const
-{
-	return m_view2ProjectionMatrix;
+	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
 }

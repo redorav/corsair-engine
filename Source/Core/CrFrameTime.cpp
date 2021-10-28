@@ -3,8 +3,6 @@
 #include "Core/String/CrString.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include <string> // TODO remove
-
 uint64_t CrFrameTime::m_frameCount = 0;
 CrTime CrFrameTime::m_frameDelta;
 CrTime CrFrameTime::m_framePreviousEndTime;
@@ -20,7 +18,7 @@ void CrFrameTime::IncrementFrameCount()
 	{
 		uint64_t frames = m_frameCount - m_lastUpdatedFrameCount;
 
-		CrString str = std::to_string(frames).c_str(); // TODO change to eastl
+		CrString str = eastl::to_string(frames).c_str();
 
 		CrLog("[FPS] %d [DELTA] %f ms", frames, m_frameDelta.AsMilliseconds());
 		CrPrintProcessMemory("Frame Memory");

@@ -357,11 +357,13 @@ void CrFrame::DrawDebugUI()
 
 	if (s_ShowStats)
 	{
-		if (ImGui::Begin("Stats", &s_ShowStats)) {
-
+		if (ImGui::Begin("Stats", &s_ShowStats))
+		{
 			CrTime delta = CrFrameTime::GetFrameDelta();
-			ImGui::Text("Frame: %.2f ms", delta.AsMilliseconds());
-			ImGui::Text("FPS: %.2f", delta.AsFPS());
+			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage(); 
+			ImGui::Text("Statistics");
+			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds());
+			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 
 			ImGui::End();
 		}

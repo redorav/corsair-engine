@@ -26,9 +26,22 @@ public:
 
 	CrTime operator - (const CrTime& other) const;
 
-	void operator += (const CrTime& other);
+	CrTime& operator += (const CrTime& other);
 
-	void operator -= (const CrTime& other);
+	CrTime& operator -= (const CrTime& other);
+
+	// Multiply and divide operators don't take a CrTime because it doesn't
+	// make sense to multiply or divide times. Therefore we just accept the
+	// native word as a multiplier. We also don't accept float because we'd
+	// lose precision
+
+	CrTime operator * (const int64_t other) const;
+
+	CrTime operator / (const int64_t other) const;	
+
+	CrTime& operator *= (const int64_t other);
+
+	CrTime& operator /= (const int64_t other);
 
 	bool operator > (const CrTime& other) const;
 
@@ -89,14 +102,34 @@ inline CrTime CrTime::operator - (const CrTime& other) const
 	return CrTime(m_ticks - other.m_ticks);
 }
 
-inline void CrTime::operator += (const CrTime& other)
+inline CrTime& CrTime::operator += (const CrTime& other)
 {
-	m_ticks += other.m_ticks;
+	m_ticks += other.m_ticks; return *this;
 }
 
-inline void CrTime::operator -= (const CrTime& other)
+inline CrTime& CrTime::operator -= (const CrTime& other)
 {
 	m_ticks -= other.m_ticks;
+}
+
+inline CrTime CrTime::operator * (const int64_t other) const
+{
+	return CrTime(m_ticks * other);
+}
+
+inline CrTime& CrTime::operator *= (const int64_t other)
+{
+	m_ticks *= other;
+}
+
+inline CrTime CrTime::operator / (const int64_t other) const
+{
+	return CrTime(m_ticks / other);
+}
+
+inline CrTime& CrTime::operator /= (const int64_t other)
+{
+	m_ticks /= other; return *this;
 }
 
 inline bool	CrTime::operator > (const CrTime& other) const

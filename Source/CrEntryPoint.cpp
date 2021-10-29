@@ -5,7 +5,6 @@
 #include "Rendering/CrFrame.h"
 
 #include "Core/CrCommandLine.h"
-#include "Core/CrFrameTime.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/CrGlobalPaths.h"

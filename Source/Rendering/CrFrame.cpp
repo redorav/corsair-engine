@@ -191,10 +191,11 @@ void CrFrame::Process()
 		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
+	CrRenderingStatistics::Reset();
+
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
-	DrawDebugUI();
 
 	UpdateCamera();
 
@@ -331,6 +332,8 @@ void CrFrame::Process()
 		//}
 		//drawCommandBuffer->EndDebugEvent();
 
+		DrawDebugUI();
+
 		// Render ImGui
 		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
 
@@ -364,6 +367,7 @@ void CrFrame::DrawDebugUI()
 			ImGui::Text("Statistics");
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
+			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
 
 			ImGui::End();
 		}

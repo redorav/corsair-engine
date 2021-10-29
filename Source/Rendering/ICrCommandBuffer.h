@@ -8,6 +8,8 @@
 
 #include "Rendering/CrGPUDeletable.h"
 
+#include "Rendering/CrRenderingStatistics.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "CrRenderingForwardDeclarations.h"
@@ -344,6 +346,9 @@ inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount,
 	FlushGraphicsRenderState();
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
+
+	CrRenderingStatistics::AddDrawcall();
+	CrRenderingStatistics::AddVertices(vertexCount);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
@@ -351,6 +356,9 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 	FlushGraphicsRenderState();
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+
+	CrRenderingStatistics::AddDrawcall();
+	CrRenderingStatistics::AddVertices(indexCount);
 }
 
 inline void ICrCommandBuffer::FlushGraphicsRenderState()

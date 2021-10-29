@@ -317,12 +317,14 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_vertexBufferDirty)
 	{
-		if (vulkanGraphicsPipeline->m_usedVertexStreamCount > 0)
+		if (vulkanGraphicsPipeline->GetVertexStreamCount() > 0)
 		{
 			VkDeviceSize vkOffsets[cr3d::MaxVertexStreams];
 			VkBuffer vkBuffers[cr3d::MaxVertexStreams];
 
-			for (uint32_t streamId = 0; streamId < vulkanGraphicsPipeline->m_usedVertexStreamCount; ++streamId)
+			uint32_t usedVertexStreamCount = vulkanGraphicsPipeline->GetVertexStreamCount();
+
+			for (uint32_t streamId = 0; streamId < usedVertexStreamCount; ++streamId)
 			{
 				const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
 				vkOffsets[streamId] = binding.offset;
@@ -330,7 +332,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 			}
 
 			// Assume we always start at binding 0
-			vkCmdBindVertexBuffers(m_vkCommandBuffer, 0, vulkanGraphicsPipeline->m_usedVertexStreamCount, vkBuffers, vkOffsets);
+			vkCmdBindVertexBuffers(m_vkCommandBuffer, 0, usedVertexStreamCount, vkBuffers, vkOffsets);
 		}
 
 		m_currentState.m_vertexBufferDirty = false;

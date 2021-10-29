@@ -156,6 +156,8 @@ public:
 
 	const CrGraphicsShaderHandle& GetShader() const { return m_shader; }
 
+	const uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
+
 	// TODO PRIVATE
 
 	CrGraphicsShaderHandle m_shader;

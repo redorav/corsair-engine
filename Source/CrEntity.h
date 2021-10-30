@@ -22,6 +22,12 @@ public:
 	CrEntity();
 	CrEntity(const CrString& name);
 
+	const float3& GetPosition() const { return m_position; }
+
+	const float3& GetScale() const { return m_scale; }
+
+	const quaternion& GetRotation() const { return m_qrotation; }
+
 	void SetParent(CrEntity* const parent);
 
 	void SetLocalTransform(const CrTransform& localTransform);

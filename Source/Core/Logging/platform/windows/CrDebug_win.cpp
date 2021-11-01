@@ -22,7 +22,7 @@ void CrDebugWindows::Log(const char* file, unsigned long line, const char* func,
 	va_end(args);
 
 	char finalString[4096];
-	sprintf(finalString, "%s (%i): %s : %s\n", file, line, func, buffer);
+	sprintf(finalString, "%s (%ld): %s : %s\n", file, line, func, buffer);
 
 	OutputDebugStringA(finalString);
 }
@@ -73,7 +73,7 @@ void CrDebugWindows::PrintCurrentProcessMemory(const char* file, unsigned long l
 		}
 
 		char finalString[4096];
-		sprintf(finalString, "%s (%i): %s : [%s] Memory: %lld %s\n", file, line, func, buffer, memory, units);
+		sprintf(finalString, "%s (%ld): %s : [%s] Memory: %lld %s\n", file, line, func, buffer, memory, units);
 
 		OutputDebugStringA(finalString);
 	}

@@ -183,7 +183,7 @@ private:
 
 void QuitWithMessage(const std::string& errorMessage)
 {
-	printf(errorMessage.c_str());
+	printf("%s", errorMessage.c_str());
 	fflush(stdout);
 	exit(-1);
 }
@@ -287,6 +287,7 @@ int main(int argc, char* argv[])
 			case cr3d::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
 			case cr3d::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
 			case cr3d::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
+			default: break;
 		}
 
 		CompilationDescriptor compilationDescriptor;

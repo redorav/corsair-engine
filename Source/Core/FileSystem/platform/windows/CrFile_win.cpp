@@ -226,7 +226,7 @@ bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIterato
 			if (!isDot && !isDoubleDot)
 			{
 				CrDirectoryEntry entry;
-				entry.filename.append_convert(findData.cFileName);
+				entry.filename.append_convert<wchar_t>(findData.cFileName);
 				entry.isDirectory = findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 				continueIterating = fn(entry);
 			}

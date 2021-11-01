@@ -49,30 +49,27 @@ private:
 	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) override;
 
 	virtual void EndRenderPassPS() override;
+
+	ID3D12Device* m_d3d12Device;
+
+	ID3D12CommandAllocator* m_d3d12CommandAllocator;
+
+	ID3D12GraphicsCommandList* m_d3d12GraphicsCommandList;
 };
 
 inline void CrCommandBufferD3D12::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	unused_parameter(vertexCount);
-	unused_parameter(instanceCount);
-	unused_parameter(firstVertex);
-	unused_parameter(firstInstance);
+	m_d3d12GraphicsCommandList->DrawInstanced(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 inline void CrCommandBufferD3D12::DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	unused_parameter(indexCount);
-	unused_parameter(instanceCount);
-	unused_parameter(firstIndex);
-	unused_parameter(vertexOffset);
-	unused_parameter(firstInstance);
+	m_d3d12GraphicsCommandList->DrawIndexedInstanced(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 inline void CrCommandBufferD3D12::DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	unused_parameter(threadGroupCountX);
-	unused_parameter(threadGroupCountY);
-	unused_parameter(threadGroupCountZ);
+	m_d3d12GraphicsCommandList->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
 
 inline void CrCommandBufferD3D12::BeginDebugEventPS(const char* eventName, const float4& color)

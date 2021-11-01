@@ -11,7 +11,15 @@
 CrCommandBufferD3D12::CrCommandBufferD3D12(ICrCommandQueue* commandQueue)
 	: ICrCommandBuffer(commandQueue)
 {
-	
+	ICrRenderDevice* renderDevice = commandQueue->GetRenderDevice();
+
+	m_d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
+
+	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(commandQueue->GetType());
+
+	m_d3d12Device->CreateCommandAllocator(d3dc12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator));
+
+	m_d3d12Device->CreateCommandList(0, d3dc12CommandListType, m_d3d12CommandAllocator, nullptr, IID_PPV_ARGS(&m_d3d12GraphicsCommandList));
 }
 
 void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& descriptor)

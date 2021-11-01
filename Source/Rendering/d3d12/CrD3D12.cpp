@@ -1,6 +1,8 @@
 #include "CrRendering_pch.h"
 #include "CrD3D12.h"
 
+#include "Rendering/ICrCommandQueue.h"
+
 #include "Core/Logging/ICrDebug.h"
 
 DXGI_FORMAT crd3d::GetD3DFormat(cr3d::DataFormat::T format)
@@ -366,5 +368,20 @@ D3D12_CULL_MODE crd3d::GetD3D12PolygonCullMode(cr3d::PolygonCullMode cullMode)
 			return D3D12_CULL_MODE_NONE;
 		default:
 			return D3D12_CULL_MODE_NONE;
+	}
+}
+
+D3D12_COMMAND_LIST_TYPE crd3d::GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType)
+{
+	switch (commandQueueType)
+	{
+		case CrCommandQueueType::Graphics:
+			return D3D12_COMMAND_LIST_TYPE_DIRECT;
+		case CrCommandQueueType::Compute:
+			return D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		case CrCommandQueueType::Copy:
+			return D3D12_COMMAND_LIST_TYPE_COPY;
+		default:
+			return D3D12_COMMAND_LIST_TYPE_DIRECT;
 	}
 }

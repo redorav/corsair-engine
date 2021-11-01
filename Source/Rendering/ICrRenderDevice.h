@@ -33,7 +33,7 @@ struct CrRenderDeviceProperties
 	uint32_t maxTextureDimension3D = 0;
 };
 
-namespace CrCommandQueueType { enum T : uint8_t; }
+namespace CrCommandQueueType { enum T : uint32_t; }
 
 namespace CrRenderingFeature
 {

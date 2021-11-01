@@ -2,6 +2,8 @@
 
 #include <d3d12.h>
 
+namespace CrCommandQueueType { enum T : uint32_t; }
+
 namespace crd3d
 {
 	DXGI_FORMAT GetD3DFormat(cr3d::DataFormat::T format);
@@ -25,6 +27,8 @@ namespace crd3d
 	D3D12_FILL_MODE GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode);
 
 	D3D12_CULL_MODE GetD3D12PolygonCullMode(cr3d::PolygonCullMode cullMode);
+
+	D3D12_COMMAND_LIST_TYPE GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType);
 
 	// A shader-visible heap will have two handles, CPU and GPU. The CPU handle is what we use to update
 	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer

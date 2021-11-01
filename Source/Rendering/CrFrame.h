@@ -68,5 +68,8 @@ private:
 	CrRenderModelInstance m_modelInstance1;
 	CrRenderModelInstance m_modelInstance2;
 
+	CrSharedPtr<CrCamera> m_camera;
+	Camera m_cameraConstantData;
+
 	CrRenderWorldSharedHandle m_renderWorld;
 };

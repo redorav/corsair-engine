@@ -43,9 +43,6 @@
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-static CrSharedPtr<CrCamera> camera;
-static Camera cameraConstantData;
-
 bool HashingAssert()
 {
 	CrGraphicsPipelineDescriptor defaultDescriptor;
@@ -96,7 +93,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	m_renderWorld->SetRenderModel(m_modelInstance1.GetId(), jainaModel);
 	m_renderWorld->SetRenderModel(m_modelInstance2.GetId(), damagedHelmet);
 
-	camera = CrSharedPtr<CrCamera>(new CrCamera());
+	m_camera = CrSharedPtr<CrCamera>(new CrCamera());
 
 	CrSamplerDescriptor descriptor;
 	descriptor.name = "Linear Clamp Sampler";
@@ -229,7 +226,7 @@ void CrFrame::Process()
 		CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
 		Camera* cameraData2 = cameraDataBuffer.Lock();
 		{
-			*cameraData2 = cameraConstantData;
+			*cameraData2 = m_cameraConstantData;
 		}
 		cameraDataBuffer.Unlock();
 		drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
@@ -289,7 +286,7 @@ void CrFrame::Process()
 						const CrMaterialSharedHandle& material = meshMaterial.second;
 
 						// Compute mesh visibility and don't render if outside frustum
-						if (!CrVisiblity::ObbProjection(renderMesh->GetBoundingBox(), transform, camera->GetWorld2ProjectionMatrix()))
+						if (!CrVisiblity::ObbProjection(renderMesh->GetBoundingBox(), transform, m_camera->GetWorld2ProjectionMatrix()))
 						{
 							continue;
 						}
@@ -377,10 +374,10 @@ void CrFrame::DrawDebugUI()
 
 void CrFrame::UpdateCamera()
 {
-	camera->SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
+	m_camera->SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
 
-	float3 currentLookAt = camera->GetLookatVector();
-	float3 currentRight = camera->GetRightVector();
+	float3 currentLookAt = m_camera->GetLookatVector();
+	float3 currentRight = m_camera->GetRightVector();
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboard = CrInput.GetKeyboardState();
@@ -398,38 +395,38 @@ void CrFrame::UpdateCamera()
 	// TODO Hack to get a bit of movement on the camera
 	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera->Translate(currentRight * -translationSpeed * frameDelta);
+		m_camera->Translate(currentRight * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
-		camera->Translate(currentRight * translationSpeed * frameDelta);
+		m_camera->Translate(currentRight * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
-		camera->Translate(currentLookAt * translationSpeed * frameDelta);
+		m_camera->Translate(currentLookAt * translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
-		camera->Translate(currentLookAt * -translationSpeed * frameDelta);
+		m_camera->Translate(currentLookAt * -translationSpeed * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
 	{
-		camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
+		m_camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
 	}
 	
 	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
 	{
-		camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
+		m_camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
 	}
 
 	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
 	{
 		//CrLogWarning("Moving right");
-		camera->Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
+		m_camera->Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
@@ -437,20 +434,20 @@ void CrFrame::UpdateCamera()
 	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
 	{
 		//CrLogWarning("Moving left");
-		camera->Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
+		m_camera->Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
 		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
 
 	if (mouseState.buttonPressed[MouseButton::Right])
 	{
-		camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
+		m_camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
 	}
 
-	camera->Update();
+	m_camera->Update();
 
-	cameraConstantData.world2View = camera->GetWorld2ViewMatrix();
-	cameraConstantData.view2Projection = camera->GetView2ProjectionMatrix();
+	m_cameraConstantData.world2View = m_camera->GetWorld2ViewMatrix();
+	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
 }
 
 void CrFrame::RecreateSwapchainAndDepth()

@@ -49,7 +49,7 @@ static bool PopulateVkResourceTable()
 static bool dummyPopulateVkResourceTable = PopulateVkResourceTable();
 
 CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
-	: ICrCommandBuffer(commandQueue), m_vkCommandBuffer(nullptr)
+	: ICrCommandBuffer(commandQueue)
 {
 	// Command buffer device same as command queue device
 	CrCommandQueueVulkan* commandQueueVulkan = static_cast<CrCommandQueueVulkan*>(commandQueue);

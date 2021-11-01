@@ -46,7 +46,9 @@ public:
 
 	void WaitIdle();
 
-	ICrRenderDevice* GetRenderDevice() const;
+	ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
+
+	CrCommandQueueType::T GetType() const { return m_type; }
 
 protected:
 

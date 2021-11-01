@@ -36,8 +36,3 @@ void ICrCommandQueue::WaitIdle()
 {
 	WaitIdlePS();
 }
-
-ICrRenderDevice* ICrCommandQueue::GetRenderDevice() const
-{
-	return m_renderDevice;
-}

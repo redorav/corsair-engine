@@ -45,14 +45,14 @@ public:
 	}
 
 	// Get whether key is present
-	const bool operator[](const CrString& key)
+	bool operator[](const CrString& key)
 	{
 		return commandLineArgs.find(key) != commandLineArgs.end();
 	}
 
 	// Iterate through the different values of options
 	template<typename Fn>
-	const void for_each(const CrString& key, const Fn& fn)
+	void for_each(const CrString& key, const Fn& fn)
 	{
 		auto range = commandLineArgs.equal_range(key);
 		for (auto it = range.first; it != range.second; ++it)

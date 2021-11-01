@@ -56,6 +56,8 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 			//CrCompilerDXC::HLSLtoDXIL(compilationDescriptor);
 			break;
 		}
+		default:
+			break;
 	}
 
 	return false;

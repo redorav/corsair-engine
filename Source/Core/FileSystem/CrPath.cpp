@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Core/FileSystem/CrPath.h"
 
 void CrPath::Normalize()

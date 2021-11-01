@@ -109,7 +109,7 @@ inline CrTime& CrTime::operator += (const CrTime& other)
 
 inline CrTime& CrTime::operator -= (const CrTime& other)
 {
-	m_ticks -= other.m_ticks;
+	m_ticks -= other.m_ticks; return *this;
 }
 
 inline CrTime CrTime::operator * (const int64_t other) const
@@ -119,7 +119,7 @@ inline CrTime CrTime::operator * (const int64_t other) const
 
 inline CrTime& CrTime::operator *= (const int64_t other)
 {
-	m_ticks *= other;
+	m_ticks *= other; return *this;
 }
 
 inline CrTime CrTime::operator / (const int64_t other) const

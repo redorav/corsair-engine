@@ -37,7 +37,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 			const CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
 
-			CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get()->GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+			CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
 			m_pipelines[i][pipelineVariant] = pipeline;
 		}

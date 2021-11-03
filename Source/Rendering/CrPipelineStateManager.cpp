@@ -10,9 +10,9 @@
 
 static CrPipelineStateManager g_pipelineStateManager;
 
-CrPipelineStateManager* CrPipelineStateManager::Get()
+CrPipelineStateManager& CrPipelineStateManager::Get()
 {
-	return &g_pipelineStateManager;
+	return g_pipelineStateManager;
 }
 
 CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline

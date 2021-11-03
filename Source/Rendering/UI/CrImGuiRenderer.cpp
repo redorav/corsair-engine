@@ -92,7 +92,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		CrGraphicsShaderHandle shaders = CrShaderManager::Get().CompileGraphicsShader(bytecodeDesc);
 
 		// Create it:
-		m_uiGraphicsPipeline = CrPipelineStateManager::Get()->GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
+		m_uiGraphicsPipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
 	}
 
 	// Font atlas:

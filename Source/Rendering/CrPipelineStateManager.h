@@ -23,7 +23,7 @@ public:
 
 	CrComputePipelineHandle GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader);
 
-	static CrPipelineStateManager* Get();
+	static CrPipelineStateManager& Get();
 
 protected:
 

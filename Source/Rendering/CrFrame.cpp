@@ -67,7 +67,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrMaterialCompiler::Get().Initialize();
-		CrPipelineStateManager::Get()->Initialize(renderDevice.get());
+		CrPipelineStateManager::Get().Initialize(renderDevice.get());
 	}
 
 	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
@@ -149,10 +149,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
-	m_computePipelineState = CrPipelineStateManager::Get()->GetComputePipeline(computePipelineDescriptor, computeShader);
+	m_computePipelineState = CrPipelineStateManager::Get().GetComputePipeline(computePipelineDescriptor, computeShader);
 
 	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	m_linePipelineState = CrPipelineStateManager::Get()->GetGraphicsPipeline(
+	m_linePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(
 		basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertexDescriptor);
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];

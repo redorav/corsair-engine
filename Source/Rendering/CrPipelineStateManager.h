@@ -12,7 +12,7 @@ public:
 
 	CrPipelineStateManager() {}
 
-	void Init(ICrRenderDevice* renderDevice);
+	void Initialize(ICrRenderDevice* renderDevice);
 
 	CrGraphicsPipelineHandle GetGraphicsPipeline
 	(

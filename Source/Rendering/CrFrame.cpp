@@ -67,7 +67,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrMaterialCompiler::Get().Initialize();
-		CrPipelineStateManager::Get()->Init(renderDevice.get());
+		CrPipelineStateManager::Get()->Initialize(renderDevice.get());
 	}
 
 	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));

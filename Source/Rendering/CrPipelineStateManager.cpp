@@ -74,7 +74,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	return computePipeline;
 }
 
-void CrPipelineStateManager::Init(ICrRenderDevice* renderDevice)
+void CrPipelineStateManager::Initialize(ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

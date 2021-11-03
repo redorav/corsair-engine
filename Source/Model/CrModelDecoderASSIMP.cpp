@@ -89,9 +89,9 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 {
 	CrRenderMeshSharedHandle renderMesh = CrMakeShared<CrRenderMesh>();
 
-	CrAssertMsg(mesh->HasTextureCoords(0), "Error in mesh: no texture coordinates available.");
-	CrAssertMsg(mesh->HasNormals(), "Error in mesh: no normals available.");
-	CrAssertMsg(mesh->HasTangentsAndBitangents(), "Error in mesh: no tangents available.");
+	bool hasTextureCoords      = mesh->HasTextureCoords(0);
+	bool hasNormals            = mesh->HasNormals();
+	bool hasTangentsBitangents = mesh->HasTangentsAndBitangents();
 
 	CrVertexBufferSharedHandle positionBuffer   = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
 	CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
@@ -111,15 +111,48 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			maxVertex = max(maxVertex, float3(vertex.x, vertex.y, vertex.z));
 
 			// Normals
-			const aiVector3D& normal = mesh->mNormals[j];
-			additionalBufferData[j].normal = { (uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 0 };
+			if (hasNormals)
+			{
+				const aiVector3D& normal = mesh->mNormals[j];
+				additionalBufferData[j].normal = 
+				{
+					(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), 
+					(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), 
+					(uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 
+					0
+				};
+			}
+			else
+			{
+				additionalBufferData[j].normal = { 0, 255, 0, 0 };
+			}
 
-			const aiVector3D& tangent = mesh->mTangents[j];
-			additionalBufferData[j].tangent = { (uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), (uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f), 0 };
+			if (hasTangentsBitangents)
+			{
+				const aiVector3D& tangent = mesh->mTangents[j];
+				additionalBufferData[j].tangent = 
+				{ 
+					(uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), 
+					(uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), 
+					(uint8_t)((tangent.z * 0.5f + 0.5f) * 255.0f),
+					0
+				};
+			}
+			else
+			{
+				additionalBufferData[j].tangent = { 255, 0, 0, 0 };
+			}
 
 			// UV coordinates
-			const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
-			additionalBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
+			if (hasTextureCoords)
+			{
+				const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
+				additionalBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
+			}
+			else
+			{
+				additionalBufferData[j].uv = { 0.0_h, 0.0_h };
+			}
 		}
 	}
 	positionBuffer->Unlock();

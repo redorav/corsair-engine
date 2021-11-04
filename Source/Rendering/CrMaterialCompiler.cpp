@@ -38,7 +38,7 @@ void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 
 void CrMaterialCompiler::Initialize()
 {
-	m_bytecodeDiskCache = CrShaderDiskCache(CrShaderSources::Get().GetUbershaderTempDirectory() / "Bytecodes");
+	m_bytecodeDiskCache = CrShaderDiskCache(CrShaderSources::Get().GetUbershaderTempDirectory() / "BytecodeCache");
 }
 
 CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode

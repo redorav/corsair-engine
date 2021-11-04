@@ -34,7 +34,7 @@ public:
 
 	CrComputeShaderHandle CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
-	CrPath GetShaderCachePath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const;
+	CrPath GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const;
 
 protected:
 

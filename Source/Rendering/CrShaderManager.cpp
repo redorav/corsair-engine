@@ -64,9 +64,9 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	return computeShader;
 }
 
-CrPath CrShaderManager::GetShaderCachePath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
+CrPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
 {
-	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "ShaderCache/";
+	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "CompiledShaders/";
 	CrString folderName = CrString(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
 	shaderCachePath /= folderName.c_str();
 	return shaderCachePath;
@@ -88,7 +88,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	const CrShaderDefines& defines
 ) const
 {
-	CrPath ShaderCacheDirectory = GetShaderCachePath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
+	CrPath ShaderCacheDirectory = GetCompiledShadersPath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
 
 	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
 

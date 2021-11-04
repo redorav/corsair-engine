@@ -16,6 +16,62 @@ using CrRenderModelInstanceHandle = CrSharedPtr<CrRenderModelInstance>;
 class CrModelInstanceIndexDummy;
 using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
 
+class CrCPUStackAllocator;
+
+struct CrDepthSortKey
+{
+	uint64_t depth    : 16;
+	uint64_t pipeline : 16;
+	uint64_t mesh     : 16;
+	uint64_t material : 16; // Change to resource table
+};
+
+// Everything that is needed to render a packet
+struct CrRenderPacket
+{
+	bool operator < (const CrRenderPacket& other) const { return sortKey < other.sortKey; }
+
+	uint64_t sortKey;
+
+	// TODO Replace with resource table (textures, constants, etc)
+	float4x4* transforms;
+	const CrRenderMesh* renderMesh;
+	const CrMaterial* material;
+	const ICrGraphicsPipeline* pipeline;
+
+	// This decides how many instances are rendered of this mesh, and also
+	// how many transforms are in the transform array
+	uint32_t numInstances;
+};
+
+// A collection of render packets to be rendered
+struct CrRenderList
+{
+	void AddPacket(const CrRenderPacket& renderPacket)
+	{
+		m_renderPackets.push_back(renderPacket);
+	}
+
+	size_t Size() const { return m_renderPackets.size(); }
+
+	void Clear();
+
+	void Sort();
+
+	template<typename Fn>
+	void ForEachRenderPacket(const Fn& fn) const
+	{
+		for (const CrRenderPacket& renderPacket : m_renderPackets)
+		{
+			fn(renderPacket);
+		}
+	}
+
+private:
+
+	CrVector<CrRenderPacket> m_renderPackets;
+};
+
 // CrRenderWorld is where all rendering primitives live, e.g. model instances,
 // cameras, lights and other entities that contribute to the way the frame is rendered
 // such as post effects, etc. The render world is able to create and manage the members
@@ -57,6 +113,10 @@ public:
 	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceIndex instanceIndex) const { return m_renderModels[instanceIndex.id]; }
 	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
 
+	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
+
+	const CrRenderList& GetMainRenderList() const { return m_mainRenderList; }
+
 	// Traverse the model instances
 	template<typename Fn>
 	void ForEachModelInstance(const Fn& fn) const
@@ -66,6 +126,12 @@ public:
 			fn(this, instanceIndex);
 		}
 	}
+
+	void ComputeVisibilityAndRenderPackets();
+
+	void BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& renderingStream);
+
+	void EndRendering();
 
 private:
 
@@ -80,8 +146,6 @@ private:
 	CrVector<float4x4> m_modelInstanceTransforms;
 
 	CrVector<CrRenderModelSharedHandle> m_renderModels;
-
-	CrVector<CrGraphicsPipelineHandle> m_pipelines;
 
 	CrVector<CrBoundingBox> m_modelInstanceObbs;
 
@@ -102,7 +166,16 @@ private:
 
 	// TODO light ids
 
+	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;
+
 	// Camera data. We aren't doing data driven design for cameras as there won't be many
 	// and it's easier to manage this way
 	//CrVector<CrCamera> m_cameras;
+
+	// TODO Fix single camera
+	CrCameraHandle m_camera;
+
+	// Render lists containing visible rendering packets
+
+	CrRenderList m_mainRenderList;
 };

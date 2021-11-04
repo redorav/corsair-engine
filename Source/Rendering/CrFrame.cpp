@@ -27,6 +27,7 @@
 
 #include "Rendering/CrRenderWorld.h"
 #include "Rendering/CrRenderModelInstance.h"
+#include "Rendering/CrCPUStackAllocator.h"
 
 #include "Input/CrInputManager.h"
 
@@ -73,6 +74,10 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
 	CrRenderModelSharedHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
 	CrRenderModelSharedHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
+
+	// Create the rendering scratch. Start with 10MB
+	m_renderingStream = CrSharedPtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
+	m_renderingStream->Initialize(10 * 1024 * 1024);
 
 	// Create a render world
 	m_renderWorld = CrMakeShared<CrRenderWorld>();
@@ -196,6 +201,10 @@ void CrFrame::Process()
 
 	UpdateCamera();
 
+	m_renderWorld->BeginRendering(m_renderingStream);
+
+	m_renderWorld->SetCamera(m_camera);
+
 	{
 		drawCommandBuffer->Begin();
 		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
@@ -263,50 +272,60 @@ void CrFrame::Process()
 
 				float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
 
-				m_renderWorld->SetTransform(m_modelInstance0.GetId(), transformMatrix);
+				m_renderWorld->ComputeVisibilityAndRenderPackets();
 
-				m_renderWorld->ForEachModelInstance([drawCommandBuffer](const CrRenderWorld* const renderWorld, CrModelInstanceIndex instanceIndex)
+				const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
+				
+				float4x4* currentTransforms = nullptr;
+				const CrMaterial* currentMaterial = nullptr;
+				const CrRenderMesh* currentRenderMesh = nullptr;
+
+				mainRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 				{
-					const CrRenderModelSharedHandle& renderModel = renderWorld->GetRenderModel(instanceIndex);
-					float4x4 transform = renderWorld->GetTransform(instanceIndex);
+					float4x4* transforms                = renderPacket.transforms;
+					const CrRenderMesh* renderMesh      = renderPacket.renderMesh;
+					const CrMaterial* material          = renderPacket.material;
+					const ICrGraphicsPipeline* pipeline = renderPacket.pipeline;
+					uint32_t numInstances               = renderPacket.numInstances;
 
-					CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
-					Instance* transformData = transformBuffer.Lock();
-					for (uint32_t i = 0; i < 10; ++i)
+					if (currentTransforms != transforms)
 					{
-						transformData->local2World[i] = transform;
+						// Change to support instancing
+						CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
+						Instance* transformData = transformBuffer.Lock();
+						transformData->local2World = transforms[0];
+						transformBuffer.Unlock();
+						drawCommandBuffer->BindConstantBuffer(&transformBuffer);
+						currentTransforms = transforms;
 					}
-					transformBuffer.Unlock();
-					drawCommandBuffer->BindConstantBuffer(&transformBuffer);
 
-					for (uint32_t meshIndex = 0; meshIndex < renderModel->GetRenderMeshCount(); ++meshIndex)
+					// Internally tracked
+					drawCommandBuffer->BindGraphicsPipelineState(pipeline);
+
+					if (currentMaterial != material)
 					{
-						CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> meshMaterial = renderModel->GetRenderMeshMaterial(meshIndex);
-						const CrRenderMeshSharedHandle& renderMesh = meshMaterial.first;
-						const CrMaterialSharedHandle& material = meshMaterial.second;
-
-						// Compute mesh visibility and don't render if outside frustum
-						if (!CrVisiblity::ObbProjection(renderMesh->GetBoundingBox(), transform, m_camera->GetWorld2ProjectionMatrix()))
-						{
-							continue;
-						}
-
-						drawCommandBuffer->BindGraphicsPipelineState(renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get());
-
 						for (uint32_t t = 0; t < material->m_textures.size(); ++t)
 						{
 							CrMaterial::TextureBinding binding = material->m_textures[t];
 							drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
 						}
 
+						currentMaterial = material;
+					}
+
+					if (currentRenderMesh != renderMesh)
+					{
 						for (uint32_t vbIndex = 0; vbIndex < renderMesh->GetVertexBufferCount(); ++vbIndex)
 						{
 							drawCommandBuffer->BindVertexBuffer(renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
 						}
 
 						drawCommandBuffer->BindIndexBuffer(renderMesh->GetIndexBuffer().get());
-						drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), 1, 0, 0, 0);
+
+						currentRenderMesh = renderMesh;
 					}
+
+					drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), numInstances, 0, 0, 0);
 				});
 			}
 			drawCommandBuffer->EndRenderPass();
@@ -336,6 +355,10 @@ void CrFrame::Process()
 
 		drawCommandBuffer->End();
 	}
+
+	m_renderWorld->EndRendering();
+
+	m_renderingStream->Reset();
 
 	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 

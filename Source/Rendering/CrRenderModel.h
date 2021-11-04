@@ -65,13 +65,9 @@ public:
 
 	void ComputeBoundingBoxFromMeshes();
 
-public:
-
-	void Process();
+private:
 
 	CrBoundingBox m_boundingBox;
-
-private:
 
 	CrHashMap<CrRenderMesh*, uint8_t> m_materialMap;
 
@@ -83,7 +79,6 @@ private:
 	// state knows everything about where it's going to be rendered (it needs to)
 
 	CrVector<CrRenderMeshSharedHandle> m_renderMeshes;
-
 
 	CrVector<CrMaterialSharedHandle> m_materials;
 

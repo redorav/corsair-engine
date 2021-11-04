@@ -2,6 +2,12 @@
 
 #include "Rendering/CrRenderWorld.h"
 #include "Rendering/CrRenderModel.h"
+#include "Rendering/CrRenderMesh.h"
+#include "Rendering/CrCamera.h"
+
+#include "Rendering/CrCPUStackAllocator.h"
+
+#include "Core/CrSort.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Logging/ICrDebug.h"
@@ -10,7 +16,6 @@ CrRenderWorld::CrRenderWorld()
 {
 	m_modelInstanceTransforms.resize(1000);
 	m_renderModels.resize(1000);
-	m_pipelines.resize(1000);
 	m_modelInstanceObbs.resize(1000);
 
 	m_modelInstanceIdToIndex.resize(1000);
@@ -79,12 +84,10 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	// and copy the data belonging to the last model instance in the array
 	m_modelInstanceTransforms[destroyedInstanceIndex.id] = m_modelInstanceTransforms[lastInstanceIndex.id];
 	m_renderModels[destroyedInstanceIndex.id]            = m_renderModels[lastInstanceIndex.id];
-	m_pipelines[destroyedInstanceIndex.id]               = m_pipelines[lastInstanceIndex.id];
 	m_modelInstanceObbs[destroyedInstanceIndex.id]       = m_modelInstanceObbs[lastInstanceIndex.id];
 
 	// Free references (no need to zero out data that doesn't have a smart pointer)
 	m_renderModels[lastInstanceIndex.id]   = nullptr;
-	m_pipelines[lastInstanceIndex.id]      = nullptr;
 
 	//--------------------------
 	// Update indirection tables
@@ -108,4 +111,97 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	
 	// Decrement number of model instances
 	m_numModelInstances.id--;
+}
+
+void CrRenderWorld::ComputeVisibilityAndRenderPackets()
+{
+	for (CrModelInstanceIndex instanceIndex(0); instanceIndex < m_numModelInstances; ++instanceIndex)
+	{
+		const CrRenderModelSharedHandle& renderModel = GetRenderModel(instanceIndex);
+		const CrBoundingBox& modelBoundingBox = renderModel->GetBoundingBox();
+		float4x4 transform = GetTransform(instanceIndex);
+
+		uint32_t meshCount = renderModel->GetRenderMeshCount();
+
+		// Check for instance visibility. Only check if number of instances > 1, otherwise we duplicate work
+		if (meshCount > 1)
+		{
+			if (!CrVisiblity::ObbProjection(modelBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			{
+				continue;
+			}
+		}
+
+		// Allocate more transforms depending on what the model instance provides
+		float4x4* transforms = (float4x4*)m_renderingStream->Allocate(sizeof(float4x4));
+		transforms[0] = transform;
+
+		for (uint32_t meshIndex = 0; meshIndex < renderModel->GetRenderMeshCount(); ++meshIndex)
+		{
+			const auto& meshMaterial       = renderModel->GetRenderMeshMaterial(meshIndex);
+			const CrRenderMesh* renderMesh = meshMaterial.first.get();
+			const CrMaterial* material     = meshMaterial.second.get();
+
+			const CrBoundingBox& meshBoundingBox = renderMesh->GetBoundingBox();
+
+			// Compute mesh visibility and don't render if outside frustum
+			if (!CrVisiblity::ObbProjection(meshBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			{
+				continue;
+			}
+
+			float3 obbCenterWorld = mul(float4(meshBoundingBox.center, 1.0f), transform).xyz;
+
+			float3 cameraToMesh = obbCenterWorld - m_camera->GetPosition();
+
+			float squaredDistance = dot(cameraToMesh, cameraToMesh);
+
+			ICrGraphicsPipeline* pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
+
+			uint32_t depthUint = *reinterpret_cast<uint32_t*>(&squaredDistance);
+
+			// Set up sort key
+			// TODO How to do fading?
+			// TODO How to do LOD selection?
+			CrDepthSortKey depthSortKey;
+			depthSortKey.depth    = (uint16_t)(depthUint << 1); // Remove bit sign
+			depthSortKey.pipeline = ((uintptr_t)pipeline >> 3) & 0xff; // Remove last 3 bits which are likely to be equal
+			depthSortKey.mesh     = ((uintptr_t)renderMesh >> 3) & 0xff;
+			depthSortKey.material = ((uintptr_t)material >> 3) & 0xff;
+
+			CrRenderPacket mainPacket;
+			mainPacket.sortKey      = *reinterpret_cast<uint64_t*>(&depthSortKey);
+			mainPacket.transforms   = transforms;
+			mainPacket.pipeline     = pipeline;
+			mainPacket.renderMesh   = renderMesh;
+			mainPacket.material     = material;
+			mainPacket.numInstances = 1;
+
+			// Create render packets and add to the render lists
+			m_mainRenderList.AddPacket(mainPacket);
+		}
+	}
+
+	// Sort the render lists
+	m_mainRenderList.Sort();
+}
+
+void CrRenderWorld::BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& renderingStream)
+{
+	m_renderingStream = renderingStream;
+}
+
+void CrRenderWorld::EndRendering()
+{
+	m_mainRenderList.Clear();
+}
+
+void CrRenderList::Clear()
+{
+	m_renderPackets.clear();
+}
+
+void CrRenderList::Sort()
+{
+	CrQuicksort(m_renderPackets.begin(), m_renderPackets.end());
 }

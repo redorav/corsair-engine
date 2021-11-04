@@ -59,8 +59,3 @@ void CrRenderModel::ComputeBoundingBoxFromMeshes()
 	m_boundingBox.center  = (maxVertex + minVertex) * 0.5f;
 	m_boundingBox.extents = (maxVertex - minVertex) * 0.5f;
 }
-
-void CrRenderModel::Process()
-{
-
-}

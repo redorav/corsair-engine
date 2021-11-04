@@ -72,4 +72,7 @@ private:
 	Camera m_cameraConstantData;
 
 	CrRenderWorldSharedHandle m_renderWorld;
+
+	// This would need to be buffered to account for multiple threads
+	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;
 };

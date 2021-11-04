@@ -152,6 +152,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR) { hasImmediate = true; }
 	}
 
+	// FIFO modes are effectively vsync, whereas mailbox and immediate are essentially uncapped
+	// Mailbox is non-tearing whereas immediate can tear
 	if (hasMailbox)
 	{
 		// Try to use mailbox mode. Low latency and non-tearing. It will push frames before the

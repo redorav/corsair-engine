@@ -44,37 +44,63 @@ static std::string FindDXCPath()
 	return "";
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
+void CrCompilerDXC::CreateCommonCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine)
 {
 	std::string dxcPath = FindDXCPath();
 
 	CrProcessDescriptor processDescriptor;
-	processDescriptor.commandLine += dxcPath.c_str();
-	processDescriptor.commandLine += " -spirv -O3 ";
+	commandLine += dxcPath.c_str();
+	commandLine += " -O3 ";
 
-	processDescriptor.commandLine += "-E ";
-	processDescriptor.commandLine += compilationDescriptor.entryPoint.c_str();
-	processDescriptor.commandLine += " ";
+	commandLine += "-E ";
+	commandLine += compilationDescriptor.entryPoint.c_str();
+	commandLine += " ";
 
-	processDescriptor.commandLine += "-T ";
-	processDescriptor.commandLine += GetDXCShaderProfile(compilationDescriptor.shaderStage);
-	processDescriptor.commandLine += " ";
+	commandLine += "-T ";
+	commandLine += GetDXCShaderProfile(compilationDescriptor.shaderStage);
+	commandLine += " ";
 
-	processDescriptor.commandLine += "-Fo \"";
-	processDescriptor.commandLine += compilationDescriptor.outputPath.c_str();
-	processDescriptor.commandLine += "\" ";
+	commandLine += "-Fo \"";
+	commandLine += compilationDescriptor.outputPath.c_str();
+	commandLine += "\" ";
 
-	processDescriptor.commandLine += "\"";
-	processDescriptor.commandLine += compilationDescriptor.inputPath.c_str();
-	processDescriptor.commandLine += "\" ";
+	commandLine += "\"";
+	commandLine += compilationDescriptor.inputPath.c_str();
+	commandLine += "\" ";
 
 	for (uint32_t i = 0; i < compilationDescriptor.defines.size(); ++i)
 	{
 		const CrString& define = compilationDescriptor.defines[i];
-		processDescriptor.commandLine += "-D ";
-		processDescriptor.commandLine += define.c_str();
-		processDescriptor.commandLine += " ";
+		commandLine += "-D ";
+		commandLine += define.c_str();
+		commandLine += " ";
 	}
+}
+
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
+{
+	CrProcessDescriptor processDescriptor;
+	CreateCommonCommandLine(compilationDescriptor, processDescriptor.commandLine);
+
+	processDescriptor.commandLine += " -spirv ";
+
+	CrProcess compilerProcess(processDescriptor);
+	compilerProcess.Wait();
+
+	if (compilerProcess.GetReturnValue() != 0)
+	{
+		CrArray<char, 2048> processOutput;
+		compilerProcess.ReadStdOut(processOutput.data(), processOutput.size());
+		compilationStatus += processOutput.data();
+	}
+
+	return compilerProcess.GetReturnValue() == 0;
+}
+
+bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
+{
+	CrProcessDescriptor processDescriptor;
+	CreateCommonCommandLine(compilationDescriptor, processDescriptor.commandLine);
 
 	CrProcess compilerProcess(processDescriptor);
 	compilerProcess.Wait();

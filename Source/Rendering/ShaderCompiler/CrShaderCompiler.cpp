@@ -53,7 +53,7 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 		}
 		case cr3d::GraphicsApi::D3D12:
 		{
-			//CrCompilerDXC::HLSLtoDXIL(compilationDescriptor);
+			return CrCompilerDXC::HLSLtoDXIL(compilationDescriptor, compilationStatus);
 			break;
 		}
 		default:

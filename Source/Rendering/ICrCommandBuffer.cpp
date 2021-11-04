@@ -91,7 +91,7 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 
 CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size)
 {
-	GPUStackAllocation<void> allocation = stackAllocator->Allocate(size);
+	CrStackAllocation<void> allocation = stackAllocator->AllocateAligned(size, 256);
 
 	CrGPUBufferDescriptor params(stackAllocator->GetUsage(), stackAllocator->GetAccess());
 	params.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();

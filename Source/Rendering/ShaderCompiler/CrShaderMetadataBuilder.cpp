@@ -396,7 +396,7 @@ std::string CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDesc
 	// Add array dimensions
 	for(uint32_t i = 0; i < type.traits.array.dims_count; ++i)
 	{
-		result += "[" + std::to_string(type.traits.array.stride) + "]";
+		result += "[" + std::to_string(type.traits.array.dims[i]) + "]";
 	}
 
 	result += ";\n";

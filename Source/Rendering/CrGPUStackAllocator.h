@@ -11,8 +11,8 @@ struct GPUStackAllocation
 {
 	GPUStackAllocation(T* memory, uint32_t offset) : memory(memory), offset(offset) {}
 
-	T* memory = nullptr;
-	uint32_t offset = 0;
+	const T* memory = nullptr;
+	const uint32_t offset = 0;
 };
 
 // Manages transient memory allocated per frame for GPU resources

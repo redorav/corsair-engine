@@ -11,9 +11,8 @@ CrCPUStackAllocator::~CrCPUStackAllocator()
 
 void CrCPUStackAllocator::Initialize(size_t size)
 {
-	m_poolSize = size;
-
-	m_memoryBasePointer = new uint8_t[m_poolSize];
+	m_size = size;
+	m_memoryBasePointer = new uint8_t[size];
 	m_currentPointer = m_memoryBasePointer;
 }
 

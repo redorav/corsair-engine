@@ -55,7 +55,7 @@ cbuffer Engine
 
 struct Instance
 {
-	row_major float4x4 local2World[4];
+	row_major float4x4 local2World[1];
 };
 
 cbuffer Instance

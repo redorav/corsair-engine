@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/Logging/ICrDebug.h"
 
 template<typename T>

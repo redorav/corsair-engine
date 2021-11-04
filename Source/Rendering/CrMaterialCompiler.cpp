@@ -1,5 +1,6 @@
 #include "CrRendering_pch.h"
 
+#include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
@@ -70,7 +71,7 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 {
 	descriptor; // TODO
 
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Vulkan;
+	cr3d::GraphicsApi::T graphicsApi = ICrRenderSystem::Get()->GetGraphicsApi();
 	cr::Platform::T platform = cr::Platform::Windows;
 
 	CrPath shaderEntryPointPath = CrPath(CrGlobalPaths::GetShaderSourceDirectory()) / "Ubershader.hlsl";

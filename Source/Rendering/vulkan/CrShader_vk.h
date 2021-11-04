@@ -48,6 +48,8 @@ public:
 
 	const VkShaderModule GetVkShaderModule() const;
 
+private:
+
 	VkDevice m_vkDevice;
 
 	VkShaderModule m_vkShaderModule;

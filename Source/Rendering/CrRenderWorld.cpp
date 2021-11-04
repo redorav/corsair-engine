@@ -133,7 +133,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		}
 
 		// Allocate more transforms depending on what the model instance provides
-		float4x4* transforms = (float4x4*)m_renderingStream->Allocate(sizeof(float4x4)).memory;
+		float4x4* transforms = (float4x4*)m_renderingStream->Allocate(sizeof(float4x4));
 		transforms[0] = transform;
 
 		for (uint32_t meshIndex = 0; meshIndex < renderModel->GetRenderMeshCount(); ++meshIndex)

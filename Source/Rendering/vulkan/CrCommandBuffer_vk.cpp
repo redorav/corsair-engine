@@ -113,7 +113,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	static auto renderPassAllocationFn = [](void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
 	{
 		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
-		return commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
+		return commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment);
 	};
 
 	// We don't free because we reuse the memory every time the command buffer is reset
@@ -122,7 +122,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	static auto renderPassReallocationFn = [](void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
 	{
 		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
-		void* memory = commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
+		void* memory = commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment);
 		memcpy(memory, pOriginal, size);
 		return memory;
 	};

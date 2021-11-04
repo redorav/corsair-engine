@@ -95,7 +95,7 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator
 
 	CrGPUBufferDescriptor params(stackAllocator->GetUsage(), stackAllocator->GetAccess());
 	params.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();
-	params.memory = (void*)allocation.memory;
+	params.memory = allocation.memory;
 	params.offset = allocation.offset;
 	return params;
 }

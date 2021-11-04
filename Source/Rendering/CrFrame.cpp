@@ -293,7 +293,7 @@ void CrFrame::Process()
 						// Change to support instancing
 						CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
 						Instance* transformData = transformBuffer.Lock();
-						transformData->local2World = transforms[0];
+						transformData->local2World[0] = transforms[0];
 						transformBuffer.Unlock();
 						drawCommandBuffer->BindConstantBuffer(&transformBuffer);
 						currentTransforms = transforms;

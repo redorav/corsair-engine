@@ -1,14 +1,16 @@
 #include "CrRendering_pch.h"
 
-#include "CrRenderDevice_d3d12.h"
 #include "CrRenderSystem_d3d12.h"
+#include "CrRenderDevice_d3d12.h"
 
 #include "CrCommandQueue_d3d12.h"
+#include "CrCommandBuffer_d3d12.h"
+#include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
 #include "CrSwapchain_d3d12.h"
-#include "CrTexture_d3d12.h"
 #include "CrGPUBuffer_d3d12.h"
 #include "CrGPUSynchronization_d3d12.h"
+#include "CrShader_d3d12.h"
 
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
 {
@@ -117,14 +119,12 @@ ICrGPUSemaphore* CrRenderDeviceD3D12::CreateGPUSemaphorePS()
 
 ICrGraphicsShader* CrRenderDeviceD3D12::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
 {
-	unused_parameter(graphicsShaderDescriptor);
-	return nullptr;
+	return new CrGraphicsShaderD3D12(this, graphicsShaderDescriptor);
 }
 
 ICrComputeShader* CrRenderDeviceD3D12::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const
 {
-	unused_parameter(computeShaderDescriptor);
-	return nullptr;
+	return new CrComputeShaderD3D12(this, computeShaderDescriptor);
 }
 
 ICrHardwareGPUBuffer* CrRenderDeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)

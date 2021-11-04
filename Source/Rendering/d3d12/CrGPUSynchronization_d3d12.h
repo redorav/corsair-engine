@@ -15,6 +15,7 @@ public:
 
 private:
 
+	ID3D12Fence* m_d3d12Fence;
 };
 
 class CrGPUSemaphoreD3D12 final : public ICrGPUSemaphore

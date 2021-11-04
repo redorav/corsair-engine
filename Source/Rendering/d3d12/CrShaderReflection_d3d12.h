@@ -6,7 +6,7 @@
 
 class CrShaderReflectionD3D12 final : public ICrShaderReflection
 {
-private:
+public:
 
 	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) override;
 

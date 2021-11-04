@@ -23,11 +23,10 @@ CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice, const Cr
 // Then return the pointer. The calling code is responsible for filling in that memory.
 GPUStackAllocation<void> CrGPUStackAllocator::Allocate(uint32_t bufferSize)
 {
-	void* bufferPointer = m_currentPointer;                                                // Take the current pointer
-	size_t alignedBufferSize = AlignUp256(bufferSize);                                     // Align memory as required
-	CrAssertMsg(m_currentPointer + alignedBufferSize < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream");
-	uint32_t offsetInPool = static_cast<uint32_t>(m_currentPointer - m_memoryBasePointer); // Figure out the current offset for this buffer
-	m_currentPointer += alignedBufferSize;                                                 // Reserve as many bytes as needed by the buffer
+	uint8_t* bufferPointer = AlignUp256(m_currentPointer); // Copy the current pointer, with the correct alignment
+	m_currentPointer = bufferPointer + bufferSize;         // Update current pointer
+	CrAssertMsg(m_currentPointer < m_memoryBasePointer + m_poolSize, "Ran out of memory in stream"); // Make sure pointer didn't go over
+	uint32_t offsetInPool = static_cast<uint32_t>(bufferPointer - m_memoryBasePointer); // Work out the offset
 	return GPUStackAllocation<void>(bufferPointer, offsetInPool);
 }
 

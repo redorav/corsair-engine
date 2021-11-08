@@ -4,9 +4,14 @@
 #include "Core/String/CrFixedString.h"
 #include "Core/String/CrString.h"
 
+// This class is a fixe memory replacement for std::filesystem::path. The idea is that it doesn't allocate any memory
+// during all the operations at the cost of more memory at runtime. Extensions on top of this are possible, such as a
+// dynamic CrPath (for storing optimally), shorter CrPaths (for extensions), etc.
 class CrPath
 {
 public:
+
+	static const size_t npos = (size_t) - 1;
 
 	CrPath() {}
 
@@ -41,6 +46,16 @@ public:
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
 		return CrPath(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
+	}
+
+	size_t find_last_of(char c) const
+	{
+		return m_pathString.find_last_of(c);
+	}
+
+	size_t find_last_of(const char* s) const
+	{
+		return m_pathString.find_last_of(s);
 	}
 
 	// https://en.cppreference.com/w/cpp/filesystem/path/extension
@@ -99,6 +114,16 @@ public:
 		}
 
 		return *this;
+	}
+
+	void resize(size_t n)
+	{
+		m_pathString.resize(n);
+	}
+
+	void resize(size_t n, char c)
+	{
+		m_pathString.resize(n, c);
 	}
 
 	CrPath operator + (const char* str) const

@@ -113,8 +113,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
-	// TODO Replace with CrPath
-	CrFixedString128 filename = bytecodeDescriptor.path.filename().c_str();
+	CrPath filename = bytecodeDescriptor.path.filename();
 	size_t extensionDotPosition = filename.find_last_of(".");
 	if (extensionDotPosition != filename.npos)
 	{

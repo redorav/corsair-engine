@@ -24,7 +24,7 @@ struct CrRasterizerStateDescriptor
 	float slopeScaledDepthBias;
 };
 
-static_assert(sizeof(CrRasterizerStateDescriptor) == 16);
+static_assert(sizeof(CrRasterizerStateDescriptor) == 16, "CrRasterizerStateDescriptor size mismatch");
 
 struct CrRenderTargetBlendDescriptor
 {
@@ -41,7 +41,7 @@ struct CrRenderTargetBlendDescriptor
 	uint32_t padding : 1;
 };
 
-static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4);
+static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4, "CrRenderTargetBlendDescriptor size mismatch");
 
 struct CrBlendStateDescriptor
 {
@@ -55,7 +55,7 @@ struct CrBlendStateDescriptor
 	float blendConstants[4];
 };
 
-static_assert(sizeof(CrBlendStateDescriptor) == 52);
+static_assert(sizeof(CrBlendStateDescriptor) == 52, "CrBlendStateDescriptor size mismatch");
 
 struct CrDepthStencilStateDescriptor
 {
@@ -87,7 +87,7 @@ struct CrDepthStencilStateDescriptor
 	float                 maxDepthBounds;
 };
 
-static_assert(sizeof(CrDepthStencilStateDescriptor) == 16);
+static_assert(sizeof(CrDepthStencilStateDescriptor) == 16, "CrDepthStencilStateDescriptor size mismatch");
 
 struct CrRenderTargetFormatDescriptor
 {
@@ -96,7 +96,7 @@ struct CrRenderTargetFormatDescriptor
 	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
 };
 
-static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40);
+static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40, "CrRenderTargetFormatDescriptor size mismatch");
 
 // TODO Optimize size of pipeline descriptor
 struct CrGraphicsPipelineDescriptor
@@ -146,7 +146,7 @@ struct CrGraphicsPipelineDescriptor
 	CrRenderTargetFormatDescriptor renderTargets = {};
 };
 
-static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128);
+static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
 class ICrGraphicsPipeline
 {

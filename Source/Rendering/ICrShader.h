@@ -178,7 +178,7 @@ struct CrVertexInput
 	uint16_t components : 3;
 };
 
-static_assert(sizeof(CrVertexInput) == 2);
+static_assert(sizeof(CrVertexInput) == 2, "CrVertexInput size mismatch");
 
 struct CrInputSignature
 {

@@ -108,7 +108,7 @@ struct CrVertexAttribute
 	uint16_t streamId : 3;
 };
 
-static_assert(sizeof(CrVertexAttribute) == 2);
+static_assert(sizeof(CrVertexAttribute) == 2, "Vertex attribute size mismatch");
 static_assert(cr3d::DataFormat::LastUncompressed < 64, "Formats out of range");
 
 // A vertex format defines the layout for a vertex buffer or a mesh

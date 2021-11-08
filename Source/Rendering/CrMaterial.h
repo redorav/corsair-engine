@@ -130,7 +130,7 @@ struct CrMaterialShaderDescriptor
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
 };
 
-static_assert(sizeof(CrMaterialShaderDescriptor) == 28);
+static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescriptor size mismatch");
 
 class CrMaterial
 {

@@ -232,8 +232,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			writeFileStream << reflectionHeader;
 
 			// Write bytecode back out
-			CrStreamRawData rawData(bytecode.data(), bytecode.size());
-			writeFileStream << rawData;
+			writeFileStream << bytecode;
 		}
 
 		return true;

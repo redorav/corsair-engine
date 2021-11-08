@@ -9,6 +9,7 @@
 #include "CrD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
+#include "Core/CrMacros.h"
 
 CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : ICrSwapchain(renderDevice, swapchainDescriptor)
 {

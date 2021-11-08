@@ -3,6 +3,8 @@
 #include "CrGPUSynchronization_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
 
+#include "Core/CrMacros.h"
+
 CrGPUFenceD3D12::CrGPUFenceD3D12(ICrRenderDevice* renderDevice)
 {
 	ID3D12Device* d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();

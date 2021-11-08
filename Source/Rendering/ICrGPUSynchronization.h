@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/CrMacros.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 // For synchronization primitives we'll use Vulkan nomenclature, as the naming varies between APIs and it's not always

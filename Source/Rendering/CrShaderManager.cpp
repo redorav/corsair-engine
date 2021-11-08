@@ -4,6 +4,7 @@
 #include "Rendering/CrShaderManager.h"
 #include "Rendering/ICrShaderReflection.h"
 #include "Rendering/ICrShader.h"
+#include "Rendering/CrShaderReflectionHeader.h"
 #include "CrResourceManager.h"
 
 #include "Core/CrMacros.h"
@@ -16,6 +17,7 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/CrPlatform.h"
+#include "Core/Streams/CrFileStream.h"
 
 static CrShaderManager g_shaderManager;
 
@@ -113,6 +115,8 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
+	processDescriptor.commandLine += " -reflection ";
+
 	CrPath filename = bytecodeDescriptor.path.filename();
 	size_t extensionDotPosition = filename.find_last_of(".");
 	if (extensionDotPosition != filename.npos)
@@ -150,13 +154,19 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 
 	if (process.GetReturnValue() >= 0)
 	{
-		CrFileSharedHandle compilationOutput = ICrFile::OpenFile(outputPath.c_str(), FileOpenFlags::Read);
+		// Read in file as a stream.
+		CrReadFileStream compilationOutput(outputPath.c_str());
 
-		// Generate the SPIR-V bytecode
+		// Read the reflection data
+		CrShaderReflectionHeader reflectionHeader;
+		compilationOutput << reflectionHeader;
+
+		// Read in the SPIR-V bytecode
 		CrVector<unsigned char> spirvBytecodeBytes;
-		spirvBytecodeBytes.resize(compilationOutput->GetSize());
+		spirvBytecodeBytes.resize(compilationOutput.GetFileSize() - compilationOutput.Size());
 
-		compilationOutput->Read(spirvBytecodeBytes.data(), spirvBytecodeBytes.size());
+		CrStreamRawData bytecodeData(spirvBytecodeBytes.data(), spirvBytecodeBytes.size());
+		compilationOutput << bytecodeData;
 
 		CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode
 		(

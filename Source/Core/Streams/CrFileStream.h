@@ -4,7 +4,7 @@
 #include "Core/FileSystem/ICrFile.h"
 
 template<CrStreamType::T StreamTypeT>
-class CrFileStream : public ICrStream
+class CrFileStream final : public ICrStream
 {
 public:
 

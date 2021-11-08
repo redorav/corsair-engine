@@ -197,7 +197,12 @@ class CrShaderBytecode
 public:
 
 	// We take ownership of the bytecode to avoid all the coming and going of data
-	CrShaderBytecode(const CrVector<unsigned char>&& bytecode, const CrFixedString128& entryPoint, cr3d::ShaderStage::T shaderStage)
+	CrShaderBytecode
+	(
+		const CrVector<unsigned char>&& bytecode, 
+		const CrFixedString128& entryPoint, 
+		cr3d::ShaderStage::T shaderStage
+	)
 	{
 		m_bytecode = std::move(bytecode);
 		m_entryPoint = entryPoint;

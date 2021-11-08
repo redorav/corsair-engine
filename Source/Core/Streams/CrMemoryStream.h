@@ -1,7 +1,7 @@
 #pragma once
 
 template<CrStreamType::T StreamTypeT>
-class CrMemoryStream : public ICrStream
+class CrMemoryStream final : public ICrStream
 {
 public:
 

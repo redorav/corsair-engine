@@ -468,6 +468,26 @@ namespace cr3d
 		};
 	};
 
+	namespace ShaderInterfaceBuiltinType
+	{
+		enum T : uint32_t
+		{
+			Position, // SV_Position
+			BaseInstance,
+			InstanceId, // SV_InstanceID
+			VertexId, // SV_VertexID
+			Depth, // SV_Depth
+			IsFrontFace, // SV_IsFrontFace
+
+			GroupId, // SV_GroupID
+			GroupIndex, // SV_GroupIndex
+			GroupThreadId, // SV_GroupThreadID
+			DispatchThreadId, // SV_DispatchThreadID
+
+			None = 0xff, // Not a builtin
+		};
+	};
+
 	enum class PrimitiveTopology : uint32_t
 	{
 		PointList,

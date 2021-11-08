@@ -22,9 +22,9 @@
 #include <glslang/Public/ShaderLang.h>
 #pragma warning (pop)
 
-std::string CrShaderCompiler::ExecutableDirectory;
+CrString CrShaderCompiler::ExecutableDirectory;
 
-const std::string& CrShaderCompiler::GetExecutableDirectory()
+const CrString& CrShaderCompiler::GetExecutableDirectory()
 {
 	return ExecutableDirectory;
 }
@@ -39,7 +39,7 @@ void CrShaderCompiler::Finalize()
 	glslang::FinalizeProcess();
 }
 
-bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus)
+bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	// The graphics API will tell us which compilation pipeline we want to use. The compilationDescriptor
 	// also includes which platform we want to be targeting so that we can make more informed decisions
@@ -49,12 +49,10 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 		case cr3d::GraphicsApi::Vulkan:
 		{
 			return CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, compilationStatus);
-			break;
 		}
 		case cr3d::GraphicsApi::D3D12:
 		{
 			return CrCompilerDXC::HLSLtoDXIL(compilationDescriptor, compilationStatus);
-			break;
 		}
 		default:
 			break;
@@ -196,6 +194,8 @@ void QuitWithMessage(const std::string& errorMessage)
 // -platform windows      : Platform to compile this shader for
 // -graphicsapi vulkan    : Graphics API for this platform
 // -D DEFINE1 -D DEFINE2  : Add defines for the compilation
+// -reflection            : Append custom reflection to the shader. This makes it unreadable to compilers (e.g. fxc/dxc)
+//                          and is for use in the engine. It strips out the built-in reflection data
 // 
 // -metadata metadataPath : Where C++ metadata is stored
 
@@ -213,6 +213,7 @@ int main(int argc, char* argv[])
 	CrPath inputFilePath              = commandLine("-input").c_str();
 	CrPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
+	bool buildReflection              = commandLine["-reflection"];
 	const CrString& entryPoint        = commandLine("-entrypoint").c_str();
 	const CrString& shaderStageString = commandLine("-stage").c_str();
 	const CrString& platformString    = commandLine("-platform").c_str();
@@ -290,16 +291,21 @@ int main(int argc, char* argv[])
 			default: break;
 		}
 
+		CrPath tempPath = outputFilePath;
+		tempPath.replace_extension(".temp");
+
 		CompilationDescriptor compilationDescriptor;
 		compilationDescriptor.entryPoint      = entryPoint;
 		compilationDescriptor.inputPath       = inputFilePath.c_str();
 		compilationDescriptor.outputPath      = outputFilePath.c_str();
+		compilationDescriptor.tempPath        = tempPath.c_str();
 		compilationDescriptor.shaderStage     = shaderStage;
 		compilationDescriptor.platform        = platform;
 		compilationDescriptor.graphicsApi     = graphicsApi;
 		compilationDescriptor.defines         = defines;
+		compilationDescriptor.buildReflection = buildReflection;
 
-		std::string compilationStatus;
+		CrString compilationStatus;
 		bool success = compiler.Compile(compilationDescriptor, compilationStatus);
 
 		if (!success)

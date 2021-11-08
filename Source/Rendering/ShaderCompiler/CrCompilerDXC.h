@@ -8,9 +8,9 @@ class CrCompilerDXC
 {
 public:
 
-	static bool HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus);
+	static bool HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
 
-	static bool HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, std::string& compilationStatus);
+	static bool HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
 
 private:
 	

@@ -6,6 +6,7 @@
 #include "Rendering/CrShaderResourceMetadata.h"
 
 #include "Core/Logging/ICrDebug.h"
+#include "Core/CrMacros.h"
 
 static ICrShaderBindingTable* CreateBindingTable(const ICrRenderDevice* renderDevice, const CrShaderReflectionD3D12& vulkanReflection)
 {

@@ -5,6 +5,8 @@
 #include "CrGPUBuffer_d3d12.h"
 #include "CrD3D12.h"
 
+#include "Core/CrMacros.h"
+
 class CrVertexBufferCommon;
 class CrIndexBufferCommon;
 class ICrGraphicsPipeline;

@@ -9,9 +9,9 @@
 
 struct CompilationDescriptor
 {
-	std::string inputPath;
-	std::string outputPath;
-	std::string entryPoint;
+	CrString inputPath;
+	CrString outputPath;
+	CrString entryPoint;
 	CrVector<CrString> defines;
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;

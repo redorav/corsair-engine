@@ -63,7 +63,7 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	return false;
 }
 
-static cr3d::ShaderStage::T ParseShaderStage(const std::string& stageString)
+static cr3d::ShaderStage::T ParseShaderStage(const CrString& stageString)
 {
 	if (stageString == "vertex")
 	{
@@ -93,7 +93,7 @@ static cr3d::ShaderStage::T ParseShaderStage(const std::string& stageString)
 	return cr3d::ShaderStage::Count;
 }
 
-static cr::Platform::T ParsePlatform(const std::string& platformString)
+static cr::Platform::T ParsePlatform(const CrString& platformString)
 {
 	if (platformString == "windows")
 	{
@@ -105,7 +105,7 @@ static cr::Platform::T ParsePlatform(const std::string& platformString)
 	}
 }
 
-static cr3d::GraphicsApi::T ParseGraphicsApi(const std::string& graphicsApiString)
+static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 {
 	if (graphicsApiString == "vulkan")
 	{
@@ -197,7 +197,7 @@ void QuitWithMessage(const std::string& errorMessage)
 // -graphicsapi vulkan    : Graphics API for this platform
 // -D DEFINE1 -D DEFINE2  : Add defines for the compilation
 // 
-// -metadata metadataPath : Where metadata is stored
+// -metadata metadataPath : Where C++ metadata is stored
 
 int main(int argc, char* argv[])
 {
@@ -210,13 +210,13 @@ int main(int argc, char* argv[])
 
 	CrShaderCompiler::ExecutableDirectory = executablePath.c_str();
 
-	CrPath inputFilePath                 = commandLine("-input").c_str();
-	CrPath outputFilePath                = commandLine("-output").c_str();
-	bool buildMetadata                   = commandLine["-metadata"];
-	const std::string& entryPoint        = commandLine("-entrypoint").c_str();
-	const std::string& shaderStageString = commandLine("-stage").c_str();
-	const std::string& platformString    = commandLine("-platform").c_str();
-	const std::string& graphicsApiString = commandLine("-graphicsapi").c_str();
+	CrPath inputFilePath              = commandLine("-input").c_str();
+	CrPath outputFilePath             = commandLine("-output").c_str();
+	bool buildMetadata                = commandLine["-metadata"];
+	const CrString& entryPoint        = commandLine("-entrypoint").c_str();
+	const CrString& shaderStageString = commandLine("-stage").c_str();
+	const CrString& platformString    = commandLine("-platform").c_str();
+	const CrString& graphicsApiString = commandLine("-graphicsapi").c_str();
 
 	CrVector<CrString> defines;
 	commandLine.for_each("-D",[&defines](const CrString& value)
@@ -224,8 +224,8 @@ int main(int argc, char* argv[])
 		defines.push_back(value);
 	});
 
-	std::string inputPath = inputFilePath.c_str();
-	std::string outputPath = outputFilePath.c_str();
+	CrString inputPath = inputFilePath.c_str();
+	CrString outputPath = outputFilePath.c_str();
 
 	CrShaderCompiler compiler;
 	compiler.Initialize();
@@ -291,13 +291,13 @@ int main(int argc, char* argv[])
 		}
 
 		CompilationDescriptor compilationDescriptor;
-		compilationDescriptor.entryPoint  = entryPoint;
-		compilationDescriptor.inputPath   = inputFilePath.c_str();
-		compilationDescriptor.outputPath  = outputFilePath.c_str();
-		compilationDescriptor.shaderStage = shaderStage;
-		compilationDescriptor.platform    = platform;
-		compilationDescriptor.graphicsApi = graphicsApi;
-		compilationDescriptor.defines     = defines;
+		compilationDescriptor.entryPoint      = entryPoint;
+		compilationDescriptor.inputPath       = inputFilePath.c_str();
+		compilationDescriptor.outputPath      = outputFilePath.c_str();
+		compilationDescriptor.shaderStage     = shaderStage;
+		compilationDescriptor.platform        = platform;
+		compilationDescriptor.graphicsApi     = graphicsApi;
+		compilationDescriptor.defines         = defines;
 
 		std::string compilationStatus;
 		bool success = compiler.Compile(compilationDescriptor, compilationStatus);

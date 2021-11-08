@@ -181,7 +181,7 @@ bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDesc
 {
 	// TODO Move this higher up. We don't want file loading logic here
 	std::ifstream fileStream;
-	fileStream.open(compilationDescriptor.inputPath, std::ios::binary);
+	fileStream.open(compilationDescriptor.inputPath.c_str(), std::ios::binary);
 
 	if (!fileStream.is_open())
 	{

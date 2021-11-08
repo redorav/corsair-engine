@@ -16,6 +16,7 @@ struct CrShaderReflectionResource
 {
 	uint8_t bindPoint;
 	cr3d::ShaderResourceType::T type;
+	uint32_t bytecodeOffset; // Offset into the bytecode to mangle the bind point (needed for Vulkan)
 	CrString name;
 };
 
@@ -23,7 +24,8 @@ template<typename StreamT>
 StreamT& operator << (StreamT& stream, CrShaderReflectionResource& resource)
 {
 	stream << resource.bindPoint;
-	stream << (resource.type);
+	stream << resource.type;
+	stream << resource.bytecodeOffset;
 	stream << resource.name;
 	return stream;
 }
@@ -39,7 +41,7 @@ template<typename StreamT>
 StreamT& operator << (StreamT& stream, CrShaderInterfaceVariable& resource)
 {
 	stream << resource.bindPoint;
-	stream.operator << (resource.type);
+	stream << resource.type;
 	stream << resource.name;
 	return stream;
 }
@@ -64,6 +66,7 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionHeader& reflectionHeade
 {
 	stream << reflectionHeader.version;
 	stream << reflectionHeader.entryPoint;
+	stream << reflectionHeader.shaderStage;
 
 	stream << reflectionHeader.resources;
 	stream << reflectionHeader.stageInputs;

@@ -127,6 +127,7 @@ cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const SpvReflectInter
 {
 	switch (spvInterfaceVariable.built_in)
 	{
+		case SpvBuiltIn::SpvBuiltInPosition: return cr3d::ShaderInterfaceBuiltinType::Position;
 		case SpvBuiltIn::SpvBuiltInFragCoord: return cr3d::ShaderInterfaceBuiltinType::Position;
 		case SpvBuiltIn::SpvBuiltInBaseInstance: return cr3d::ShaderInterfaceBuiltinType::BaseInstance;
 		case SpvBuiltIn::SpvBuiltInInstanceIndex: return cr3d::ShaderInterfaceBuiltinType::InstanceId;
@@ -182,6 +183,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 			CrShaderReflectionHeader reflectionHeader;
 			reflectionHeader.entryPoint = shaderModule.entry_point_name;
+			reflectionHeader.shaderStage = compilationDescriptor.shaderStage;
 
 			for (uint32_t i = 0; i < shaderModule.descriptor_binding_count; ++i)
 			{
@@ -193,6 +195,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 					resource.name = binding.name;
 					resource.type = GetShaderResourceType(binding);
 					resource.bindPoint = (uint8_t)binding.binding;
+					resource.bytecodeOffset = binding.word_offset.binding;
 					reflectionHeader.resources.push_back(resource);
 				}
 			}

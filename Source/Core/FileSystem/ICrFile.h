@@ -73,6 +73,9 @@ public:
 	// Functions like FileExists also would want to be part of the file device
 	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
+	// Unconditionally delete a file. If successfully deleted or file didn't exist, return true
+	static bool FileDelete(const char* filePath);
+
 	// Query if file exists
 	static bool FileExists(const char* filePath);
 

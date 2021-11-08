@@ -153,6 +153,26 @@ uint64_t CrFileWindows::GetSize() const
 	return m_fileSize;
 }
 
+bool ICrFile::FileDelete(const char* filePath)
+{
+	bool success = DeleteFileA(filePath);
+	
+	if (!success)
+	{
+		return true;
+	}
+	else
+	{
+		DWORD errorCode = GetLastError();
+		if (errorCode == ERROR_FILE_NOT_FOUND)
+		{
+			return true;
+		}
+
+		return false;
+	}
+}
+
 bool ICrFile::FileExists(const char* filePath)
 {
 	WIN32_FILE_ATTRIBUTE_DATA attributeData;
@@ -183,9 +203,9 @@ bool ICrFile::DirectoryExists(const char* filePath)
 
 bool ICrFile::CreateDirectorySingle(const char* directoryPath)
 {
-	bool result = CreateDirectoryA(directoryPath, nullptr);
+	bool success = CreateDirectoryA(directoryPath, nullptr);
 
-	if (result)
+	if (success)
 	{
 		return true;
 	}

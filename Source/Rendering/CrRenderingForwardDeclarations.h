@@ -100,6 +100,7 @@ struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderStageInfo;
 struct CrShaderDefines;
+struct CrShaderReflectionHeader;
 
 // GPU Buffers
 class CrGPUStackAllocator;

@@ -15,9 +15,10 @@ namespace CrStreamType
 struct CrStreamRawData
 {
 	CrStreamRawData() {}
-	CrStreamRawData(void* data, size_t size) : data(data), size(size) {}
+	CrStreamRawData(void* data, size_t size) : data(data), size((uint32_t)size) {}
+	CrStreamRawData(void* data, uint32_t size) : data(data), size(size) {}
 	void* data;
-	size_t size;
+	uint32_t size;
 };
 
 // This pure virtual interface is used to enforce the functions in the

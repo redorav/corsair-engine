@@ -41,7 +41,21 @@ public:
 	virtual CrFileStream& operator << (float& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 	virtual CrFileStream& operator << (double& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 
-	virtual CrFileStream& operator << (CrStreamRawData& rawData) { IsReading() ? Read(rawData.data, rawData.size) : Write(rawData.data, rawData.size); return *this; }
+	virtual CrFileStream& operator << (CrStreamRawData& rawData)
+	{
+		if(IsReading())
+		{
+			Read(&rawData.size, sizeof(rawData.size));
+			Read(rawData.data, rawData.size);
+		}
+		else
+		{
+			Write(&rawData.size, sizeof(rawData.size));
+			Write(rawData.data, rawData.size);
+		}
+
+		return *this;
+	}
 
 	virtual uint64_t Size() const override { return m_sizeBytes; }
 
@@ -81,9 +95,17 @@ public:
 			value.resize(size);
 		}
 
-		for (T& v : value)
+		if (std::is_fundamental<T>::value)
 		{
-			*this << v; // Assumes v has a compatible streaming operator
+			CrStreamRawData data(value.data(), value.size());
+			*this << data;
+		}
+		else
+		{
+			for (T& v : value)
+			{
+				*this << v; // Assumes v has a compatible streaming operator
+			}
 		}
 
 		return *this;

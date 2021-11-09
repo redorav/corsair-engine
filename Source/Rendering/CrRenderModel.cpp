@@ -53,7 +53,7 @@ void CrRenderModel::ComputeBoundingBoxFromMeshes()
 	{
 		const CrBoundingBox& meshBox = renderMesh->GetBoundingBox();
 		minVertex = min(minVertex, meshBox.center - meshBox.extents);
-		maxVertex = max(minVertex, meshBox.center + meshBox.extents);
+		maxVertex = max(maxVertex, meshBox.center + meshBox.extents);
 	}
 
 	m_boundingBox.center  = (maxVertex + minVertex) * 0.5f;

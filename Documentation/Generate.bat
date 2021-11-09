@@ -1,2 +1,0 @@
-cd doxygen
-doxygen.exe

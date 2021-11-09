@@ -195,30 +195,35 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 					resource.name = binding.name;
 					resource.type = GetShaderResourceType(binding);
 					resource.bindPoint = (uint8_t)binding.binding;
-					resource.bytecodeOffset = binding.word_offset.binding;
+					resource.bytecodeOffset = binding.word_offset.binding * 4; // Turn into a byte offset
 					reflectionHeader.resources.push_back(resource);
 				}
 			}
 
-			for (uint32_t i = 0; i < shaderModule.input_variable_count; ++i)
+			const auto ProcessInterfaceVariables = []
+			(
+				uint32_t variableCount, 
+				SpvReflectInterfaceVariable** variables,
+				CrVector<CrShaderInterfaceVariable>& interfaceVariables)
 			{
-				const SpvReflectInterfaceVariable& spvInterfaceVariable = *shaderModule.input_variables[i];
-				CrShaderInterfaceVariable interfaceVariable;
-				interfaceVariable.name = spvInterfaceVariable.built_in == -1 ? spvInterfaceVariable.name : "";
-				interfaceVariable.type = GetShaderInterfaceType(spvInterfaceVariable);
-				interfaceVariable.bindPoint = (uint8_t)spvInterfaceVariable.location;
-				reflectionHeader.stageInputs.push_back(interfaceVariable);
-			}
+				for (uint32_t i = 0; i < variableCount; ++i)
+				{
+					const SpvReflectInterfaceVariable& spvInterfaceVariable = *variables[i];
+					CrShaderInterfaceVariable interfaceVariable;
+					if (spvInterfaceVariable.name)
+					{
+						const char* lastDot = strrchr(spvInterfaceVariable.name, '.');
+						interfaceVariable.name = lastDot ? lastDot + 1 : spvInterfaceVariable.name;
+					}
+					interfaceVariable.type = GetShaderInterfaceType(spvInterfaceVariable);
+					interfaceVariable.bindPoint = (uint8_t)spvInterfaceVariable.location;
+					interfaceVariables.push_back(interfaceVariable);
+				}
+			};
 
-			for (uint32_t i = 0; i < shaderModule.output_variable_count; ++i)
-			{
-				const SpvReflectInterfaceVariable& spvInterfaceVariable = *shaderModule.output_variables[i];
-				CrShaderInterfaceVariable interfaceVariable;
-				interfaceVariable.name = spvInterfaceVariable.built_in == -1 ? spvInterfaceVariable.name : "";
-				interfaceVariable.type = GetShaderInterfaceType(spvInterfaceVariable);
-				interfaceVariable.bindPoint = (uint8_t)spvInterfaceVariable.location;
-				reflectionHeader.stageOutputs.push_back(interfaceVariable);
-			}
+			ProcessInterfaceVariables(shaderModule.input_variable_count, shaderModule.input_variables, reflectionHeader.stageInputs);
+
+			ProcessInterfaceVariables(shaderModule.output_variable_count, shaderModule.output_variables, reflectionHeader.stageOutputs);
 
 			if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
 			{
@@ -230,8 +235,6 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			// Write reflection header out
 			CrWriteFileStream writeFileStream(compilationDescriptor.outputPath.c_str());
 			writeFileStream << reflectionHeader;
-
-			// Write bytecode back out
 			writeFileStream << bytecode;
 		}
 

@@ -7,7 +7,7 @@
 // Calculates the Obb in projection space and effectively does the same calculations as a vertex shader would do
 // to determine whether any part of the bounding box is inside the camera.
 // TODO This function can be optimized further
-bool CrVisiblity::ObbProjection(const CrBoundingBox& obb, const float4x4& transform, const float4x4& viewProjectionMatrix)
+bool CrVisibility::ObbProjection(const CrBoundingBox& obb, const float4x4& transform, const float4x4& viewProjectionMatrix)
 {
 	float4x4 worldProjectionMatrix = mul(transform, viewProjectionMatrix);
 

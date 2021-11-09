@@ -46,6 +46,4 @@ class ICrStream
 	virtual ICrStream& operator << (CrString& value) = 0;
 
 	virtual ICrStream& operator << (CrStreamRawData& rawData) = 0;
-
-	virtual uint64_t Size() const = 0; // Return size of data stream (so, written or read bytes)
 };

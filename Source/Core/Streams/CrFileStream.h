@@ -57,8 +57,6 @@ public:
 		return *this;
 	}
 
-	virtual uint64_t Size() const override { return m_sizeBytes; }
-
 	template<typename T, typename std::enable_if<std::is_enum<T>::value, bool>::type = true>
 	CrFileStream& operator<<(T& value)
 	{
@@ -111,26 +109,22 @@ public:
 		return *this;
 	}
 
-	uint64_t GetFileSize() const
+	const ICrFile* const GetFile() const
 	{
-		return m_file->GetSize();
+		return m_file.get();
 	}
 
 private:
 
 	void Read(void* dstBuffer, size_t sizeBytes)
 	{
-		uint64_t bytesRead = m_file->Read(dstBuffer, sizeBytes);
-		m_sizeBytes += bytesRead;
+		m_file->Read(dstBuffer, sizeBytes);
 	}
 
 	void Write(void* srcBuffer, size_t sizeBytes)
 	{
-		uint64_t bytesWritten = m_file->Write(srcBuffer, sizeBytes);
-		m_sizeBytes += bytesWritten;
+		m_file->Write(srcBuffer, sizeBytes);
 	}
-
-	uint64_t m_sizeBytes = 0; // Size of bytes read or written to (file knows its total size)
 
 	CrFileUniqueHandle m_file;
 };

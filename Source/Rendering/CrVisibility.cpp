@@ -27,9 +27,6 @@ bool CrVisibility::ObbProjection(const CrBoundingBox& obb, const float4x4& trans
 		float4(cornerMax.x, cornerMin.yzw)
 	};
 
-	float4 maxProjectedPosition = float4(-FLT_MAX);
-	float4 minProjectedPosition = float4(FLT_MAX);
-
 	float3 outsideLeft = float3(1.0f, 1.0f, 1.0f);
 	float3 outsideRight = float3(1.0f, 1.0f, 1.0f);
 

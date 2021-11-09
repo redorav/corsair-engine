@@ -30,24 +30,15 @@ bool CrVisiblity::ObbProjection(const CrBoundingBox& obb, const float4x4& transf
 	float4 maxProjectedPosition = float4(-FLT_MAX);
 	float4 minProjectedPosition = float4(FLT_MAX);
 
+	float3 outsideLeft = float3(1.0f, 1.0f, 1.0f);
+	float3 outsideRight = float3(1.0f, 1.0f, 1.0f);
+
 	for (uint32_t i = 0; i < boxVertices.size(); ++i)
 	{
 		float4 projectedPosition = mul(boxVertices[i], worldProjectionMatrix);
-		projectedPosition /= projectedPosition.wwww;
-
-		maxProjectedPosition = max(maxProjectedPosition, projectedPosition);
-		minProjectedPosition = min(minProjectedPosition, projectedPosition);
+		outsideLeft = outsideLeft * (projectedPosition.xyz < float3(-projectedPosition.ww, 0.0f));
+		outsideRight = outsideRight * (projectedPosition.xyz > float3(projectedPosition.www));
 	}
 
-	if (any(maxProjectedPosition.xy <= -1.0f) || 
-		any(minProjectedPosition.xy >= 1.0f) ||
-		maxProjectedPosition.z <= 0.0f ||
-		minProjectedPosition.z >= 1.0f)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return !(any(outsideLeft) || any(outsideRight));
 }

@@ -19,7 +19,7 @@ struct CrBoundingSphere
 	float4 centerRadius;
 };
 
-class CrVisiblity
+class CrVisibility
 {
 public:
 

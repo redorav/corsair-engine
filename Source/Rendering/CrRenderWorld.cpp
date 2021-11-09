@@ -126,7 +126,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		// Check for instance visibility. Only check if number of instances > 1, otherwise we duplicate work
 		if (meshCount > 1)
 		{
-			if (!CrVisiblity::ObbProjection(modelBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			if (!CrVisibility::ObbProjection(modelBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
 			{
 				continue;
 			}
@@ -145,7 +145,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			const CrBoundingBox& meshBoundingBox = renderMesh->GetBoundingBox();
 
 			// Compute mesh visibility and don't render if outside frustum
-			if (!CrVisiblity::ObbProjection(meshBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			if (!CrVisibility::ObbProjection(meshBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
 			{
 				continue;
 			}

@@ -29,8 +29,7 @@ VS_OUT UbershaderVS(VS_IN IN)
 
 	float4 viewPosition = mul(worldPosition, cb_Camera.world2View);
 
-	output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
-	//output.hwPosition = mul(cb_CameraVS.world2View, float4(IN.pos.xyz, 1));
+    output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
 	#endif
 
 	output.color   = IN.normal.xyz; // TODO change

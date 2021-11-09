@@ -6,8 +6,10 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
+#include "Core/Streams/CrFileStream.h"
 
 #include "Rendering/CrVertexDescriptor.h"
+#include "Rendering/CrShaderReflectionHeader.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
@@ -54,21 +56,26 @@ struct CrShaderBinding
 	};
 };
 
+// We use this table to bucket resources before passing
+// them on (sorted) to the shader binding table.
 struct CrShaderBindingTableResources
 {
 	CrFixedVector<CrShaderBinding, 64> constantBuffers;
-	CrFixedVector<CrShaderBinding, 64> samplers;
+	CrFixedVector<CrShaderBinding, 16> samplers;
 	CrFixedVector<CrShaderBinding, 64> textures;
-	CrFixedVector<CrShaderBinding, 64> rwTextures;
+	CrFixedVector<CrShaderBinding, 32> rwTextures;
 
-	CrFixedVector<CrShaderBinding, 64> storageBuffers;
-	CrFixedVector<CrShaderBinding, 64> rwStorageBuffers;
-	CrFixedVector<CrShaderBinding, 64> dataBuffers;
-	CrFixedVector<CrShaderBinding, 64> rwDataBuffers;
+	CrFixedVector<CrShaderBinding, 32> storageBuffers;
+	CrFixedVector<CrShaderBinding, 32> rwStorageBuffers;
+	CrFixedVector<CrShaderBinding, 32> dataBuffers;
+	CrFixedVector<CrShaderBinding, 32> rwDataBuffers;
 };
 
-// A class that represents both the input layout for the vertex shader
-// and the constant resources needed by every stage
+// A class that represents the resources needed by every stage. It is designed to be 
+// fast to loop through in order to rebuild tables quickly. Resources are sorted
+// according to type. This is not the resource table, just the binding points. 
+// It also doesn't contain any names, but points to the builtins that the engine knows
+// about
 class ICrShaderBindingTable
 {
 public:
@@ -196,37 +203,26 @@ class CrShaderBytecode
 {
 public:
 
-	// We take ownership of the bytecode to avoid all the coming and going of data
-	CrShaderBytecode
-	(
-		const CrVector<unsigned char>&& bytecode, 
-		const CrFixedString128& entryPoint, 
-		cr3d::ShaderStage::T shaderStage
-	)
-	{
-		m_bytecode = std::move(bytecode);
-		m_entryPoint = entryPoint;
-		m_shaderStage = shaderStage;
-
-		// The bytecode is the most unique representation for this object
-		// There might be bytecodes that are functionally equivalent with
-		// different e.g. textures but we cannot really distinguish
-		m_hash = CrHash(m_bytecode.data(), m_bytecode.size());
-	}
+	CrShaderBytecode() {}
 
 	const CrVector<unsigned char>& GetBytecode() const
 	{
 		return m_bytecode;
 	}
 
-	const CrFixedString128& GetEntryPoint() const
+	const CrString& GetEntryPoint() const
 	{
-		return m_entryPoint;
+		return m_reflection.entryPoint;
 	}
 
 	cr3d::ShaderStage::T GetShaderStage() const
 	{
-		return m_shaderStage;
+		return m_reflection.shaderStage;
+	}
+
+	const CrShaderReflectionHeader& GetReflection() const
+	{
+		return m_reflection;
 	}
 
 	CrHash GetHash() const
@@ -234,13 +230,32 @@ public:
 		return m_hash;
 	}
 
+	void ComputeHash()
+	{
+		m_hash = CrHash(m_bytecode.data(), m_bytecode.size());
+	}
+
+	template<typename StreamT>
+	friend StreamT& operator << (StreamT& stream, CrShaderBytecode& bytecode);
+
 private:
 
 	CrVector<unsigned char> m_bytecode;
-	CrFixedString128 m_entryPoint;
-	cr3d::ShaderStage::T m_shaderStage;
+	CrShaderReflectionHeader m_reflection;
 	CrHash m_hash; // A hash of the entire bytecode
 };
+
+template<typename StreamT>
+StreamT& operator << (StreamT& stream, CrShaderBytecode& bytecode)
+{
+	stream << bytecode.m_reflection;
+	stream << bytecode.m_bytecode;
+	if (stream.IsReading())
+	{
+		bytecode.ComputeHash();
+	}
+	return stream;
+}
 
 struct CrGraphicsShaderDescriptor
 {
@@ -282,7 +297,7 @@ public:
 		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 		{
 			CrShaderStageInfo info;
-			info.entryPoint = bytecode->GetEntryPoint();
+			info.entryPoint = bytecode->GetEntryPoint().c_str();
 			info.stage = bytecode->GetShaderStage();
 			m_stageInfos.push_back(info);
 			m_hash <<= bytecode->GetHash();
@@ -305,7 +320,7 @@ protected:
 
 	CrInputSignature m_inputSignature;
 
-	CrVector<CrShaderStageInfo> m_stageInfos;
+	CrVector<CrShaderStageInfo> m_stageInfos; // TODO Optimize
 };
 
 struct CrComputeShaderDescriptor
@@ -319,7 +334,7 @@ public:
 
 	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
-		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint();
+		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint().c_str();
 		m_stageInfo.stage = cr3d::ShaderStage::Compute;
 		m_hash = computeShaderDescriptor.m_bytecode->GetHash();
 	}

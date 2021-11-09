@@ -45,8 +45,7 @@ CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderByt
 (const CrPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
 {
 	// Try to load bytecode from cache
-	CrShaderBytecodeSharedHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache
-	(shaderHash, entryPoint.c_str(), materialShaderDescriptor.graphicsApi, materialShaderDescriptor.shaderStage);
+	CrShaderBytecodeSharedHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache(shaderHash, materialShaderDescriptor.graphicsApi);
 	
 	// If we couldn't find the bytecode in the cache, compile and cache here
 	if (!shaderBytecode)

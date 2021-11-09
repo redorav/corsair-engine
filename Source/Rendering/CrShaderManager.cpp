@@ -115,7 +115,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
 	processDescriptor.commandLine += " ";
 
-	processDescriptor.commandLine += " -reflection ";
+	processDescriptor.commandLine += "-reflection ";
 
 	CrPath filename = bytecodeDescriptor.path.filename();
 	size_t extensionDotPosition = filename.find_last_of(".");
@@ -154,26 +154,10 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 
 	if (process.GetReturnValue() >= 0)
 	{
-		// Read in file as a stream.
+		// Serialize in bytecode
 		CrReadFileStream compilationOutput(outputPath.c_str());
-
-		// Read the reflection data
-		CrShaderReflectionHeader reflectionHeader;
-		compilationOutput << reflectionHeader;
-
-		// Read in the SPIR-V bytecode
-		CrVector<unsigned char> spirvBytecodeBytes;
-		spirvBytecodeBytes.resize(compilationOutput.GetFileSize() - compilationOutput.Size());
-
-		CrStreamRawData bytecodeData(spirvBytecodeBytes.data(), spirvBytecodeBytes.size());
-		compilationOutput << bytecodeData;
-
-		CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode
-		(
-			std::move(spirvBytecodeBytes),
-			bytecodeDescriptor.entryPoint,
-			bytecodeDescriptor.stage
-		));
+		CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
+		compilationOutput << *bytecode.get();
 
 		CrLog("Compiled %s [%s] for %s %s (%f ms)",
 			bytecodeDescriptor.entryPoint.c_str(),

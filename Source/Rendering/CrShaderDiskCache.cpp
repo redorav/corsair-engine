@@ -7,6 +7,7 @@
 
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/CrHash.h"
+#include "Core/Streams/CrFileStream.h"
 
 CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath)
 	: m_cachePath(cachePath)
@@ -24,19 +25,17 @@ CrPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::Graphic
 	return cachedBytecodePath;
 }
 
-CrShaderBytecodeSharedHandle CrShaderDiskCache::LoadFromCache
-(const CrHash& hash, const char* entryPoint, cr3d::GraphicsApi::T graphicsApi, cr3d::ShaderStage::T shaderStage) const
+CrShaderBytecodeSharedHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
 {
 	CrPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
 	
-	CrFileSharedHandle cachedBytecodeFile = ICrFile::OpenFile(cachedBytecodePath.c_str(), FileOpenFlags::Read);
+	CrReadFileStream cachedBytecodeFile(cachedBytecodePath.c_str());
 	
-	if (cachedBytecodeFile)
+	if (cachedBytecodeFile.GetFile())
 	{
-		CrVector<unsigned char> bytecodeData;
-		bytecodeData.resize(cachedBytecodeFile->GetSize());
-		cachedBytecodeFile->Read(bytecodeData.data(), bytecodeData.size());
-		return CrShaderBytecodeSharedHandle(new CrShaderBytecode(std::move(bytecodeData), entryPoint, shaderStage));
+		CrShaderBytecodeSharedHandle shaderBytecode(new CrShaderBytecode());
+		cachedBytecodeFile << *shaderBytecode.get();
+		return shaderBytecode;
 	}
 	else
 	{
@@ -50,8 +49,7 @@ void CrShaderDiskCache::SaveToCache(const CrHash& hash, cr3d::GraphicsApi::T gra
 	{
 		CrPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
 
-		// Save bytecode to cache for next run
-		CrFileSharedHandle shaderBytecodeCached = ICrFile::OpenFile(cachedBytecodePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-		shaderBytecodeCached->Write((void*)bytecode->GetBytecode().data(), bytecode->GetBytecode().size());
+		CrWriteFileStream writeFileStream(cachedBytecodePath.c_str());
+		writeFileStream << *bytecode.get();
 	}
 }

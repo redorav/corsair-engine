@@ -183,6 +183,15 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	// Query physical device properties
 	vkGetPhysicalDeviceMemoryProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceMemoryProperties);
 
+	for (uint32_t i = 0; i < m_vkPhysicalDeviceMemoryProperties.memoryHeapCount; ++i)
+	{
+		VkMemoryHeap memoryHeap = m_vkPhysicalDeviceMemoryProperties.memoryHeaps[i];
+		if (memoryHeap.flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+		{
+			m_renderDeviceProperties.gpuMemoryBytes += memoryHeap.size;
+		}
+	}
+
 	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
 
 	// Populate the render device properties into the platform-independent structure

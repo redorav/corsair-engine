@@ -31,6 +31,8 @@ struct CrRenderDeviceProperties
 	uint32_t maxTextureDimension1D = 0;
 	uint32_t maxTextureDimension2D = 0;
 	uint32_t maxTextureDimension3D = 0;
+
+	uint64_t gpuMemoryBytes = 0;
 };
 
 namespace CrCommandQueueType { enum T : uint32_t; }

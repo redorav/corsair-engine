@@ -56,26 +56,19 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	m_vkDevice = commandQueueVulkan->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
-	CrArray<VkDescriptorPoolSize, 5> typeCounts;
+	CrArray<VkDescriptorPoolSize, 4> typeCounts;
 
 	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	typeCounts[0].descriptorCount = 64;
 
-	typeCounts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	typeCounts[1].descriptorCount = 32;
+	typeCounts[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	typeCounts[1].descriptorCount = 64;
 
-	typeCounts[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	typeCounts[2].descriptorCount = 32;
+	typeCounts[2].type = VK_DESCRIPTOR_TYPE_SAMPLER;
+	typeCounts[2].descriptorCount = 64;
 
-	typeCounts[3].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-	typeCounts[3].descriptorCount = 32;
-
-	typeCounts[4].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-	typeCounts[4].descriptorCount = 64;
-
-	// For additional types you need to add new entries in the type count list
-	// typeCounts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	// typeCounts[1].descriptorCount = 2;
+	typeCounts[3].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+	typeCounts[3].descriptorCount = 64;
 
 	// Create the global descriptor pool
 	// All descriptors used in this example are allocated from this pool
@@ -84,10 +77,12 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	descriptorPoolInfo.pNext = nullptr;
 	descriptorPoolInfo.poolSizeCount = (uint32_t)typeCounts.size();
 	descriptorPoolInfo.pPoolSizes = typeCounts.data();
-	//descriptorPoolInfo.maxSets Affects amount of CPU memory Vulkan Fast Paths, Timothy Lottes
+	// The command buffer pool should not have the VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT flag,
+	// because the pool gets reset in block with every command buffer Begin()
 
 	// Set the max. number of sets that can be requested
 	// Requesting descriptors beyond maxSets will result in an error
+	// Affects amount of CPU memory Vulkan Fast Paths, Timothy Lottes
 	descriptorPoolInfo.maxSets = 10000; // TODO as part of constructor with sensible defaults
 
 	VkResult result = VK_SUCCESS;

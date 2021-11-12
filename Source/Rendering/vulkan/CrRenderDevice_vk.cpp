@@ -202,6 +202,11 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;
 	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties.limits.maxImageDimension3D;
 
+	// A pipeline cache belonging to renderdoc is invalid (it never has the same hash), so we don't want to 
+	// store it or even delete a previous cache just because renderdoc can't use or create one.
+	uint8_t* cacheUUID = m_vkPhysicalDeviceProperties.pipelineCacheUUID;
+	m_isValidPipelineCache = !(cacheUUID[0] == 'r' && cacheUUID[1] == 'd' && cacheUUID[2] == 'o' && cacheUUID[3] == 'c');
+
 	// Loop through all available formats and add to supported lists. These will be useful later 
 	// when determining availability and features.
 

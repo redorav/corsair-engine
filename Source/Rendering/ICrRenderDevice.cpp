@@ -17,7 +17,9 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"
 
-ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem) : m_renderSystem(renderSystem)
+ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
+	: m_renderSystem(renderSystem)
+	, m_isValidPipelineCache(false)
 {
 	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "PipelineCache/";
 	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
@@ -191,29 +193,35 @@ const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
 
 void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize)
 {
-	CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+	if (m_isValidPipelineCache)
+	{
+		CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 
-	// We assume the directory has been created by now
-	if (ICrFile::CreateDirectories(m_pipelineCacheDirectory.c_str()))
-	{
-		CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
-		file->Write(pipelineCacheData, pipelineCacheSize);
-	}
-	else
-	{
-		CrLog("Could not create folder %s for shader cache", m_pipelineCacheDirectory.c_str());
+		// We assume the directory has been created by now
+		if (ICrFile::CreateDirectories(m_pipelineCacheDirectory.c_str()))
+		{
+			CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
+			file->Write(pipelineCacheData, pipelineCacheSize);
+		}
+		else
+		{
+			CrLog("Could not create folder %s for shader cache", m_pipelineCacheDirectory.c_str());
+		}
 	}
 }
 
 void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
 {
-	CrPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
-	CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
-
-	if (file)
+	if (m_isValidPipelineCache)
 	{
-		pipelineCacheData.resize(file->GetSize());
-		file->Read(pipelineCacheData.data(), pipelineCacheData.size());
-		CrLog("Successfully loaded serialized pipeline cache from %s", pipelineCachePath.c_str());
+		CrPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+		CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
+
+		if (file)
+		{
+			pipelineCacheData.resize(file->GetSize());
+			file->Read(pipelineCacheData.data(), pipelineCacheData.size());
+			CrLog("Successfully loaded serialized pipeline cache from %s", pipelineCachePath.c_str());
+		}
 	}
 }

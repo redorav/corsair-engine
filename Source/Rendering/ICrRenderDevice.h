@@ -186,6 +186,10 @@ protected:
 
 	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
 
+	// The platform-specific code is able to determine whether
+	// the pipeline is valid or not
+	bool m_isValidPipelineCache;
+
 	CrString m_pipelineCacheDirectory;
 
 	CrString m_pipelineCacheFilename;

@@ -371,11 +371,11 @@ std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 		result += "bool";
 	}
 
-	if (type.traits.numeric.matrix.row_count > 0)
+	if (type.type_flags & SPV_REFLECT_TYPE_FLAG_MATRIX)
 	{
 		result += std::to_string(type.traits.numeric.matrix.row_count) + "x" + std::to_string(type.traits.numeric.matrix.column_count);
 	}
-	else if (type.traits.numeric.vector.component_count > 0)
+	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_VECTOR)
 	{
 		result += std::to_string(type.traits.numeric.vector.component_count);
 	}

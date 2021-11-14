@@ -358,7 +358,7 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 
 	CrRenderingStatistics::AddDrawcall();
-	CrRenderingStatistics::AddVertices(indexCount);
+	CrRenderingStatistics::AddVertices(indexCount * instanceCount);
 }
 
 inline void ICrCommandBuffer::FlushGraphicsRenderState()

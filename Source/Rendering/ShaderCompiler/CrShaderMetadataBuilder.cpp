@@ -351,7 +351,9 @@ std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 {
 	std::string result;
 
-	bool isComplexType = type.traits.numeric.matrix.row_count > 0 || type.traits.numeric.vector.component_count > 0;
+	bool isComplexType = 
+		(type.type_flags & SPV_REFLECT_TYPE_FLAG_MATRIX) ||
+		(type.type_flags & SPV_REFLECT_TYPE_FLAG_VECTOR);
 
 	if (isComplexType)
 	{
@@ -364,7 +366,21 @@ std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 	}
 	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_INT)
 	{
-		result += "int";
+		if (type.traits.numeric.scalar.signedness != 0)
+		{
+			result += "int";
+		}
+		else
+		{
+			if (type.traits.numeric.vector.component_count > 1)
+			{
+				result += "uint";
+			}
+			else
+			{
+				result += "uint32_t";
+			}
+		}
 	}
 	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_BOOL)
 	{
@@ -373,7 +389,11 @@ std::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 
 	if (type.type_flags & SPV_REFLECT_TYPE_FLAG_MATRIX)
 	{
-		result += std::to_string(type.traits.numeric.matrix.row_count) + "x" + std::to_string(type.traits.numeric.matrix.column_count);
+		// In SPIR-V, columns and rows are swapped with respect to HLSL.
+		// There are good explanations here as to why this is the case
+		// https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst#vectors-and-matrices
+		// https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst#appendix-a-matrix-representation
+		result += std::to_string(type.traits.numeric.matrix.column_count) + "x" + std::to_string(type.traits.numeric.matrix.row_count);
 	}
 	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_VECTOR)
 	{

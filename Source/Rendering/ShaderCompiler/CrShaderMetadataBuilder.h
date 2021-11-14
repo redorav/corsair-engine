@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/CrCoreForwardDeclarations.h"
+
 #include <string>
 #include <vector>
 
@@ -20,94 +22,94 @@ public:
 private:
 
 	// Takes SPIRV as input and creates two text files, one for the header and one for the cpp
-	static bool BuildSPIRVMetadata(const std::vector<uint32_t>& spirvBytecode, std::string& metadataHeader, std::string& metadataCpp);
+	static bool BuildSPIRVMetadata(const std::vector<uint32_t>& spirvBytecode, CrString& metadataHeader, CrString& metadataCpp);
 
-	static std::string PrintResourceMetadataInstanceDeclaration(const std::string& resourceType, const ResourceVector& uniformBuffers);
+	static CrString PrintResourceMetadataInstanceDeclaration(const CrString& resourceType, const ResourceVector& uniformBuffers);
 
 	// Builds the enum with all the resources
-	static std::string PrintResourceEnum(const std::string& resourceTypeName, const ResourceVector& resources);
-	static std::string PrintResourceHashmap(const std::string& resourceTypeName, const ResourceVector& resources);
+	static CrString PrintResourceEnum(const CrString& resourceTypeName, const ResourceVector& resources);
+	static CrString PrintResourceHashmap(const CrString& resourceTypeName, const ResourceVector& resources);
 
 	// Prints out the struct or built-in as it comes from the reflection information
-	static std::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const std::string& memberName, const std::string& indentation);
-	static std::string PrintMemberStruct(const SpvReflectTypeDescription& type, const std::string& structTypeName, const std::string& structName, uint32_t indentationLevel);
+	static CrString PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const CrString& memberName, const CrString& indentation);
+	static CrString PrintMemberStruct(const SpvReflectTypeDescription& type, const CrString& structTypeName, const CrString& structName, uint32_t indentationLevel);
 
 	//-----------------
 	// Constant Buffers
 	//-----------------
 
-	static std::string BuildConstantBufferMetadataHeader(const HLSLResources& resources);
-	static std::string BuildConstantBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintConstantBufferMetadataStructDeclaration();	
-	static std::string PrintConstantBufferMetadataInstanceDefinition(const ResourceVector& uniformBuffers);
-	static std::string PrintConstantBufferStructMetadata(const std::string& name, int index);
+	static CrString BuildConstantBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildConstantBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintConstantBufferMetadataStructDeclaration();	
+	static CrString PrintConstantBufferMetadataInstanceDefinition(const ResourceVector& uniformBuffers);
+	static CrString PrintConstantBufferStructMetadata(const CrString& name, int index);
 
 	//---------
 	// Samplers
 	//---------
 
-	static std::string BuildSamplerMetadataHeader(const HLSLResources& resources);
-	static std::string BuildSamplerMetadataCpp(const HLSLResources& resources);
-	static std::string PrintSamplerMetadataInstanceDefinition(const ResourceVector& samplers);
-	static std::string PrintSamplerMetadataStructDeclaration();
+	static CrString BuildSamplerMetadataHeader(const HLSLResources& resources);
+	static CrString BuildSamplerMetadataCpp(const HLSLResources& resources);
+	static CrString PrintSamplerMetadataInstanceDefinition(const ResourceVector& samplers);
+	static CrString PrintSamplerMetadataStructDeclaration();
 
 	//---------
 	// Textures
 	//---------
 
-	static std::string BuildTextureMetadataHeader(const HLSLResources& resources);
-	static std::string BuildTextureMetadataCpp(const HLSLResources& resources);
-	static std::string PrintTextureMetadataInstanceDefinition(const ResourceVector& textures);
-	static std::string PrintTextureMetadataStructDeclaration();
+	static CrString BuildTextureMetadataHeader(const HLSLResources& resources);
+	static CrString BuildTextureMetadataCpp(const HLSLResources& resources);
+	static CrString PrintTextureMetadataInstanceDefinition(const ResourceVector& textures);
+	static CrString PrintTextureMetadataStructDeclaration();
 
 	//------------
 	// RW Textures
 	//------------
 
-	static std::string BuildRWTextureMetadataHeader(const HLSLResources& resources);
-	static std::string BuildRWTextureMetadataCpp(const HLSLResources& resources);
-	static std::string PrintRWTextureMetadataInstanceDefinition(const ResourceVector& rwTextures);
-	static std::string PrintRWTextureMetadataStructDeclaration();
+	static CrString BuildRWTextureMetadataHeader(const HLSLResources& resources);
+	static CrString BuildRWTextureMetadataCpp(const HLSLResources& resources);
+	static CrString PrintRWTextureMetadataInstanceDefinition(const ResourceVector& rwTextures);
+	static CrString PrintRWTextureMetadataStructDeclaration();
 
 	//--------
 	// Buffers
 	//--------
 
-	static std::string BuildStorageBufferMetadataStruct(const std::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool rw);
+	static CrString BuildStorageBufferMetadataStruct(const CrString bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool rw);
 
-	static std::string BuildStorageBufferMetadataHeader(const HLSLResources& resources);
-	static std::string BuildStorageBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintStorageBufferMetadataInstanceDefinition(const ResourceVector& buffers);
-	static std::string PrintStorageBufferMetadataStructDeclaration();
+	static CrString BuildStorageBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildStorageBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintStorageBufferMetadataInstanceDefinition(const ResourceVector& buffers);
+	static CrString PrintStorageBufferMetadataStructDeclaration();
 
 	//-----------
 	// RW Buffers
 	//-----------
 
-	static std::string BuildRWStorageBufferMetadataHeader(const HLSLResources& resources);
-	static std::string BuildRWStorageBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintRWStorageBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers);
-	static std::string PrintRWStorageBufferMetadataStructDeclaration();
+	static CrString BuildRWStorageBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildRWStorageBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintRWStorageBufferMetadataInstanceDefinition(const ResourceVector& rwBuffers);
+	static CrString PrintRWStorageBufferMetadataStructDeclaration();
 
 	//-------------
 	// Data Buffers
 	//-------------
 
-	static std::string BuildDataBufferMetadataHeader(const HLSLResources& resources);
-	static std::string BuildDataBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers);
-	static std::string PrintDataBufferMetadataStructDeclaration();
+	static CrString BuildDataBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildDataBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers);
+	static CrString PrintDataBufferMetadataStructDeclaration();
 
 	//----------------
 	// RW Data Buffers
 	//----------------
 
-	static std::string BuildRWDataBufferMetadataHeader(const HLSLResources& resources);
-	static std::string BuildRWDataBufferMetadataCpp(const HLSLResources& resources);
-	static std::string PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers);
-	static std::string PrintRWDataBufferMetadataStructDeclaration();
+	static CrString BuildRWDataBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildRWDataBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers);
+	static CrString PrintRWDataBufferMetadataStructDeclaration();
 
-	static void WriteToFile(const std::string& filename, const std::string& text);
+	static void WriteToFile(const CrString& filename, const CrString& text);
 
-	static void WriteToFileIfChanged(const std::string& filename, const std::string& text);
+	static void WriteToFileIfChanged(const CrString& filename, const CrString& text);
 };

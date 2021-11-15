@@ -27,6 +27,10 @@ struct CrStreamRawData
 // However if not possible, the stream
 class ICrStream
 {
+public:
+
+	virtual ~ICrStream() {}
+
 	virtual ICrStream& operator << (bool& value) = 0;
 	virtual ICrStream& operator << (char& value) = 0;
 

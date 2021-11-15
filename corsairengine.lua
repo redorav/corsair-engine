@@ -42,6 +42,26 @@ function CopyFileCommand(filePath, destinationPath)
 	return '{copyfile} "'..filePath..'" "'..destinationPath..'"'
 end
 
+-- Add warnings globally to fix serious issues that could cause incorrect
+-- runtime behavior or crashes.
+-- Remove warnings globally only if it makes sense to do so. For example,
+-- we are interested in using a specific extension or feature.
+function HandleGlobalWarnings()
+
+	filter('toolset:msc*')
+
+		fatalwarnings
+		{
+			'5204', -- class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+		}
+		
+		disablewarnings
+		{
+			'4201' -- nonstandard extension used: nameless struct/union
+		}
+
+end
+
 -- Note on precompiled header files
 -- On Visual Studio, the header file needs to be the exact string as it appears in your include,
 -- e.g. if your cpp says #include 'Foo_pch.h' then pchheader('Foo_pch.h')
@@ -54,6 +74,7 @@ workspace 'Corsair Engine'
 	preferredtoolarchitecture('x86_64') -- Prefer this toolset on MSVC as it can handle more memory for multiprocessor compiles
 	toolset('msc') -- Use default VS toolset TODO do this platform specific
 	--toolset('msc-llvm') -- Use for Clang on VS
+	--toolset('msc-clangcl') -- Use for Clang on VS
 	warnings('extra')
 	startproject(ProjectCorsairEngine)
 	language('C++')
@@ -66,7 +87,7 @@ workspace 'Corsair Engine'
 	flags { 'fatalcompilewarnings' }
 	vectorextensions('sse4.1')
 	
-	filter('toolset:msc')
+	filter('toolset:msc*')
 		flags
 		{
 			'multiprocessorcompile', -- /MP
@@ -77,9 +98,6 @@ workspace 'Corsair Engine'
 			'/experimental:module'
 		}
 		
-	filter('toolset:msc-llvm')
-		buildoptions { '-Wno-reorder -msse4.1' }
-		
 	filter('system:windows')
 		defines
 		{
@@ -89,6 +107,8 @@ workspace 'Corsair Engine'
 			'VC_EXTRALEAN'
 		}
 		
+	HandleGlobalWarnings()
+		
 	filter{}
 	
 	includedirs	{ SourceDirectory }
@@ -96,9 +116,12 @@ workspace 'Corsair Engine'
 	filter { 'platforms:'..DesktopWin64 }
 		system('windows')
 		architecture('x64')
-		defines { 'WINDOWS_TARGET' }
-		defines { 'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR' }
-		defines { 'D3D12_API' }
+		defines
+		{
+			'WINDOWS_TARGET',
+			'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR',
+			'D3D12_API'
+		}
 
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
@@ -171,7 +194,7 @@ workspace 'Corsair Engine'
 		symbols('fastlink')
 		--inlining('auto')
 
-		-- we force the release runtime to be able to link against
+		-- We force the release runtime to be able to link against
 		-- release external libraries to speed up this config
 		runtime('release')
 

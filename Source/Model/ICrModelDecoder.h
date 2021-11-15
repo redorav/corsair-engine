@@ -7,5 +7,7 @@ class ICrModelDecoder
 {
 public:
 
+	virtual ~ICrModelDecoder() {}
+
 	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) = 0;
 };

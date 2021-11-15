@@ -6,6 +6,8 @@ class ICrDebug
 {
 public:
 
+	virtual ~ICrDebug() {}
+
 	virtual void Log(const char* file, unsigned long line, const char* func, const char* format...) const = 0;
 
 	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const = 0;

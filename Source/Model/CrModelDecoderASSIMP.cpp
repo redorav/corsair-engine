@@ -4,6 +4,7 @@
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/FileSystem/CrPath.h"
+#include "Core/CrMacros.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -16,11 +17,11 @@
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-#pragma warning(push, 0)
+warnings_off
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#pragma warning(pop)
+warnings_on
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

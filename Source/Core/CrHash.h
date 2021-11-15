@@ -1,7 +1,11 @@
 #pragma once
 
+#include "Core/CrMacros.h"
+
+warnings_off
 #define XXH_INLINE_ALL
 #include <xxhash.h>
+warnings_on
 
 class CrHash
 {

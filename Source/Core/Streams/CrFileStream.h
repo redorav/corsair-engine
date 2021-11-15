@@ -8,8 +8,8 @@ class CrFileStream final : public ICrStream
 {
 public:
 
-	static const bool IsReading() { return StreamTypeT == CrStreamType::Read; }
-	static const bool IsWriting() { return StreamTypeT == CrStreamType::Write; }
+	static bool IsReading() { return StreamTypeT == CrStreamType::Read; }
+	static bool IsWriting() { return StreamTypeT == CrStreamType::Write; }
 
 	CrFileStream(const char* filePath)
 	{
@@ -41,7 +41,7 @@ public:
 	virtual CrFileStream& operator << (float& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 	virtual CrFileStream& operator << (double& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 
-	virtual CrFileStream& operator << (CrStreamRawData& rawData)
+	virtual CrFileStream& operator << (CrStreamRawData& rawData) override
 	{
 		if(IsReading())
 		{
@@ -109,7 +109,7 @@ public:
 		return *this;
 	}
 
-	const ICrFile* const GetFile() const
+	const ICrFile* GetFile() const
 	{
 		return m_file.get();
 	}

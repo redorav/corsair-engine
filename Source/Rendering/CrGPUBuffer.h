@@ -16,7 +16,7 @@
 struct CrHardwareGPUBufferDescriptor
 {
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat)
-		: usage(usage), access(access), numElements(1), dataFormat(dataFormat), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
+		: usage(usage), access(access), dataFormat(dataFormat), numElements(1), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
 
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
 		: usage(usage), access(access), numElements(1), stride(size) {}

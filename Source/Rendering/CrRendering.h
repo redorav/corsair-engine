@@ -213,7 +213,17 @@ namespace cr3d
 	template<typename type>
 	constexpr DataFormatInfo CreateDataFormatInfo(cr3d::DataFormat::T enumEntry, uint32_t numComponents, bool compressed)
 	{
-		return { enumEntry, sizeof(type) * numComponents, sizeof(type) * 8, sizeof(type) * 8, sizeof(type) * 8, sizeof(type) * 8, numComponents, compressed, CrTypeName<type>() };
+		return
+		{
+			enumEntry,
+			(uint32_t) sizeof(type) * numComponents,
+			(uint32_t) sizeof(type) * 8,
+			(uint32_t) sizeof(type) * 8,
+			(uint32_t) sizeof(type) * 8,
+			(uint32_t) sizeof(type) * 8,
+			numComponents,
+			compressed,
+			CrTypeName<type>() };
 	}
 
 	constexpr DataFormatInfo CreateDataFormatInfo

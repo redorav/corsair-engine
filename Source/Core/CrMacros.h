@@ -9,7 +9,7 @@
 _Pragma("clang diagnostic push") \
 _Pragma("clang diagnostic ignored \"-Weverything\"")
 
-#define warnings_on _Pragma("clang diagnostic pop") \
+#define warnings_on _Pragma("clang diagnostic pop")
 
 #elif defined(__GNUC__)
 

@@ -276,58 +276,106 @@ void CrFrame::Process()
 
 				const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
 				
-				float4x4* currentTransforms = nullptr;
-				const CrMaterial* currentMaterial = nullptr;
-				const CrRenderMesh* currentRenderMesh = nullptr;
+				// Batches render packets
+				struct CrRenderPacketBatcher
+				{
+					CrRenderPacketBatcher(ICrCommandBuffer* commandBuffer)
+					{
+						m_commandBuffer = commandBuffer;
+					}
+
+					void AddRenderPacket(const CrRenderPacket& renderPacket)
+					{
+						bool stateMismatch = 
+							renderPacket.pipeline != m_pipeline ||
+							renderPacket.material != m_material ||
+							renderPacket.renderMesh != m_renderMesh;
+
+						bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_matrices.size();
+
+						if (stateMismatch || noMoreSpace)
+						{
+							ExecuteBatch();
+							m_batchStarted = false;
+						}
+
+						if (!m_batchStarted)
+						{
+							// Begin batch
+							m_numInstances    = 0;
+							m_material        = renderPacket.material;
+							m_renderMesh      = renderPacket.renderMesh;
+							m_pipeline        = renderPacket.pipeline;
+							m_batchStarted    = true;
+						}
+
+						// Accumulate and copy matrix pointers over
+						for (uint32_t i = 0; i < renderPacket.numInstances; ++i)
+						{
+							m_matrices[m_numInstances + i] = &renderPacket.transforms[i];
+						}
+
+						m_numInstances += renderPacket.numInstances;
+					}
+
+					void ExecuteBatch()
+					{
+						if (m_numInstances > 0)
+						{
+							// Allocate constant buffer with all transforms and copy them across
+							CrGPUBufferType<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
+							cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.Lock();
+							{
+								for (uint32_t i = 0; i < m_numInstances; ++i)
+								{
+									transforms[i] = *m_matrices[i];
+								}
+							}
+							transformBuffer.Unlock();
+							m_commandBuffer->BindConstantBuffer(&transformBuffer);
+
+							m_commandBuffer->BindGraphicsPipelineState(m_pipeline);
+
+							for (uint32_t t = 0; t < m_material->m_textures.size(); ++t)
+							{
+								CrMaterial::TextureBinding binding = m_material->m_textures[t];
+								m_commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
+							}
+
+							for (uint32_t vbIndex = 0; vbIndex < m_renderMesh->GetVertexBufferCount(); ++vbIndex)
+							{
+								m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
+							}
+
+							m_commandBuffer->BindIndexBuffer(m_renderMesh->GetIndexBuffer().get());
+
+							m_commandBuffer->DrawIndexed(m_renderMesh->GetIndexBuffer()->GetNumElements(), m_numInstances, 0, 0, 0);
+						}
+					}
+
+					bool m_batchStarted = false;
+
+					uint32_t m_numInstances = 0;
+					const CrMaterial* m_material = nullptr;
+					const CrRenderMesh* m_renderMesh = nullptr;
+					const ICrGraphicsPipeline* m_pipeline = nullptr;
+
+					ICrCommandBuffer* m_commandBuffer = nullptr;
+
+					// Has to match the maximum number of matrices declared in the shader
+					CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
+				};
+
+				CrRenderPacketBatcher renderPacketBatcher(drawCommandBuffer);
 
 				mainRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 				{
-					float4x4* transforms                = renderPacket.transforms;
-					const CrRenderMesh* renderMesh      = renderPacket.renderMesh;
-					const CrMaterial* material          = renderPacket.material;
-					const ICrGraphicsPipeline* pipeline = renderPacket.pipeline;
-					uint32_t numInstances               = renderPacket.numInstances;
-
-					if (currentTransforms != transforms)
-					{
-						// Change to support instancing
-						CrGPUBufferType<Instance> transformBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
-						Instance* transformData = transformBuffer.Lock();
-						transformData->local2World[0] = transforms[0];
-						transformBuffer.Unlock();
-						drawCommandBuffer->BindConstantBuffer(&transformBuffer);
-						currentTransforms = transforms;
-					}
-
-					// Internally tracked
-					drawCommandBuffer->BindGraphicsPipelineState(pipeline);
-
-					if (currentMaterial != material)
-					{
-						for (uint32_t t = 0; t < material->m_textures.size(); ++t)
-						{
-							CrMaterial::TextureBinding binding = material->m_textures[t];
-							drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
-						}
-
-						currentMaterial = material;
-					}
-
-					if (currentRenderMesh != renderMesh)
-					{
-						for (uint32_t vbIndex = 0; vbIndex < renderMesh->GetVertexBufferCount(); ++vbIndex)
-						{
-							drawCommandBuffer->BindVertexBuffer(renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
-						}
-
-						drawCommandBuffer->BindIndexBuffer(renderMesh->GetIndexBuffer().get());
-
-						currentRenderMesh = renderMesh;
-					}
-
-					drawCommandBuffer->DrawIndexed(renderMesh->GetIndexBuffer()->GetNumElements(), numInstances, 0, 0, 0);
+					renderPacketBatcher.AddRenderPacket(renderPacket);
 				});
+
+				renderPacketBatcher.ExecuteBatch();
 			}
+
 			drawCommandBuffer->EndRenderPass();
 		}
 		drawCommandBuffer->EndDebugEvent();

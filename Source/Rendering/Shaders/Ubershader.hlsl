@@ -25,7 +25,7 @@ VS_OUT UbershaderVS(VS_IN IN)
 
 	float4 localPosition = float4(IN.pos.xyz, 1);
 
-	float4 worldPosition = mul(localPosition, cb_Instance.local2World[0]);
+	float4 worldPosition = mul(localPosition, cb_Instance.local2World[IN.instanceID]);
 
 	float4 viewPosition = mul(worldPosition, cb_Camera.world2View);
 

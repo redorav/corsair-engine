@@ -18,25 +18,32 @@ using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
 
 class CrCPUStackAllocator;
 
-struct CrDepthSortKey
+struct CrStandardSortKey
 {
-	uint64_t depth    : 16;
-	uint64_t pipeline : 16;
-	uint64_t mesh     : 16;
-	uint64_t material : 16; // Change to resource table
+	union
+	{
+		struct
+		{
+			uint64_t depth : 16;
+			uint64_t mesh : 16;
+			uint64_t material : 16; // TODO Change to resource table
+			uint64_t pipeline : 16;
+		};
+
+		uint64_t key = 0;
+	};
 };
 
 // Everything that is needed to render a packet
 struct CrRenderPacket
 {
-	bool operator < (const CrRenderPacket& other) const { return sortKey < other.sortKey; }
+	bool operator < (const CrRenderPacket& other) const { return sortKey.key < other.sortKey.key; }
 
-	uint64_t sortKey;
+	CrStandardSortKey sortKey;
 
-	// TODO Replace with resource table (textures, constants, etc)
 	float4x4* transforms;
 	const CrRenderMesh* renderMesh;
-	const CrMaterial* material;
+	const CrMaterial* material; // TODO Replace with resource table (textures, constants, etc)
 	const ICrGraphicsPipeline* pipeline;
 
 	// This decides how many instances are rendered of this mesh, and also

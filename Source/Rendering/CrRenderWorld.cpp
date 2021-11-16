@@ -160,17 +160,19 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 			uint32_t depthUint = *reinterpret_cast<uint32_t*>(&squaredDistance);
 
-			// Set up sort key
 			// TODO How to do fading?
 			// TODO How to do LOD selection?
-			CrDepthSortKey depthSortKey;
-			depthSortKey.depth    = (uint16_t)(depthUint << 1); // Remove bit sign
-			depthSortKey.pipeline = ((uintptr_t)pipeline >> 3) & 0xff; // Remove last 3 bits which are likely to be equal
-			depthSortKey.mesh     = ((uintptr_t)renderMesh >> 3) & 0xff;
-			depthSortKey.material = ((uintptr_t)material >> 3) & 0xff;
+			
+			// Set up sort key
+			// Sorting is implementing in ascending order, so a lower depth sorts first
+			CrStandardSortKey depthSortKey;
+			depthSortKey.depth    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
+			depthSortKey.pipeline = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
+			depthSortKey.mesh     = (uint16_t)((uintptr_t)renderMesh >> 3);
+			depthSortKey.material = (uint16_t)((uintptr_t)material >> 3);
 
 			CrRenderPacket mainPacket;
-			mainPacket.sortKey      = *reinterpret_cast<uint64_t*>(&depthSortKey);
+			mainPacket.sortKey      = depthSortKey;
 			mainPacket.transforms   = transforms;
 			mainPacket.pipeline     = pipeline;
 			mainPacket.renderMesh   = renderMesh;

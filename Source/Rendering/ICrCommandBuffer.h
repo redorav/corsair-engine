@@ -112,6 +112,12 @@ public:
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
+	// This function is to be used when you know exactly what the constant buffer contains, as it will
+	// treat the memory as the MetaType, even though there are fewer entries than declared in HLSL.
+	// However this is useful when you know the constant buffer is an array of entries in HLSL
+	template<typename MetaType>
+	CrGPUBufferType<MetaType> AllocateConstantBuffer(uint32_t size);
+
 	CrGPUBuffer AllocateConstantBuffer(uint32_t size);
 
 	CrGPUBuffer AllocateVertexBuffer(uint32_t size);
@@ -455,4 +461,10 @@ template<typename MetaType>
 inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
 	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), sizeof(MetaType)), 1);
+}
+
+template<typename MetaType>
+inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
+{
+	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), size), 1);
 }

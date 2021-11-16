@@ -40,3 +40,5 @@ _Pragma("clang diagnostic ignored \"-Weverything\"")
 
 template<int N> struct static_sizeof_dummy;
 #define static_sizeof(T) static_sizeof_dummy<sizeof(T)>;
+
+#define sizeof_array(x) sizeof(x) / sizeof(x[0])

@@ -5,7 +5,6 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 class ICrGraphicsPipeline;
-struct CrRenderPassDescriptor;
 struct ImDrawData;
 
 struct CrImGuiRendererInitParams

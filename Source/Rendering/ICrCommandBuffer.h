@@ -335,7 +335,7 @@ inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipelin
 
 inline void ICrCommandBuffer::BindComputePipelineState(const ICrComputePipeline* computePipeline)
 {
-	if (m_currentState.m_computePipeline = computePipeline)
+	if (m_currentState.m_computePipeline == computePipeline)
 	{
 		m_currentState.m_computePipeline = computePipeline;
 		m_currentState.m_computePipelineDirty = true;

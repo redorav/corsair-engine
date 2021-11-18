@@ -611,7 +611,9 @@ void CrCommandBufferVulkan::BeginPS()
 
 void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)
 {
-	VkClearColorValue clearColor = { color.r, color.g, color.b, color.a };
+	VkClearColorValue clearColor;
+	store(color, clearColor.float32);
+
 	VkImageSubresourceRange imageSubResourceRange = {};
 	imageSubResourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	imageSubResourceRange.baseMipLevel = level;

@@ -40,6 +40,7 @@
 	
 	<package name="vulkan">
 		<version id="1.2.170" file="vulkan_1.2.170.zip" repository="github"/>
+		<version id="1.2.189.2" file="vulkan_1.2.189.2.zip" repository="github"/>
 	</package>
 	
 	<package name="xxhash">

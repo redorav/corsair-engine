@@ -444,16 +444,29 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			Undefined         = 0, // Never use this as the destination state in a resource transition operation
-			ShaderInput       = 1, // Use as input to a shader (except depth)
-			RenderTarget      = 2, // Use as a render target
-			RWTexture         = 3, // Use as RW texture
-			Present           = 4, // Use as swapchain
-			DepthStencilRead  = 5, // Read depth in shader
-			DepthStencilWrite = 6, // Write to depth
-			CopySource        = 7, // Use as source of copy operation
-			CopyDestination   = 8, // Use as destination of copy operation
-			PreInitialized    = 9, // Linear content. Never a destination
+			Undefined,         // Never use this as the destination state in a resource transition operation
+			ShaderInput,       // Use as input to a shader (except depth)
+			RenderTarget,      // Use as a render target
+			RWTexture,         // Use as RW texture
+			Present,           // Use as swapchain
+			DepthStencilRead,  // Read depth in shader
+			DepthStencilWrite, // Write to depth
+			CopySource,        // Use as source of copy operation
+			CopyDestination,   // Use as destination of copy operation
+			PreInitialized,    // Linear content. Never a destination
+			Count
+		};
+	};
+
+	namespace BufferState
+	{
+		enum T
+		{
+			Undefined,
+			ShaderInput,
+			ReadWrite,
+			CopySource,
+			CopyDestination,
 			Count
 		};
 	};

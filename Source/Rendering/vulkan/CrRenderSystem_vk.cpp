@@ -84,9 +84,16 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 
-	if (renderSystemDescriptor.enableValidation && IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+	if (renderSystemDescriptor.enableValidation)
 	{
-		enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+		{
+			enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		}
+		else
+		{
+			CrLog("Graphics validation layer %s not found", VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		}
 	}
 
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();

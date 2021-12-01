@@ -250,7 +250,7 @@ void CrFrame::Process()
 			swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
 			swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
 			swapchainAttachment.initialState = cr3d::TextureState::Undefined;
-			swapchainAttachment.finalState = cr3d::TextureState::Present;
+			swapchainAttachment.finalState = cr3d::TextureState::RenderTarget;
 
 			CrRenderTargetDescriptor depthAttachment;
 			depthAttachment.texture = m_depthStencilTexture.get();

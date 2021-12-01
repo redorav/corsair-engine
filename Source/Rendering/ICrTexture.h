@@ -69,6 +69,8 @@ public:
 
 	uint32_t GetMipmapCount() const { return m_mipmapCount; }
 
+	uint32_t GetArraySize() const { return m_arraySize; }
+
 	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
 	uint32_t GetMipSliceOffset(uint32_t mip, uint32_t slice) const;

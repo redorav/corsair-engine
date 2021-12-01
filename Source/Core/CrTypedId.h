@@ -2,17 +2,17 @@
 
 #include "Core/CrNumericLimits.h"
 
-template<typename T, typename U>
+template<typename T, typename U, U DefaultValueT = CrNumericLimits<U>::max()>
 class CrTypedId
 {
 public:
 
+	enum : U { DefaultValue = DefaultValueT };
+
 	static const U MaxId = CrNumericLimits<U>::max();
 
-	CrTypedId() : id(0) {}
+	CrTypedId() : id(DefaultValue) {}
 	explicit CrTypedId(U id) : id(id) {}
-
-	CrTypedId& operator = (U otherId) { id = otherId; return *this; }
 
 	CrTypedId operator - (CrTypedId otherId) { return CrTypedId(id - otherId.id); }
 	CrTypedId operator - (U otherId) { return CrTypedId(id - otherId); }

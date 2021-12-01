@@ -96,8 +96,6 @@ class CrRenderWorld
 {
 public:
 
-	static const uint32_t InvalidModelInstanceId = 0xffffffff;
-
 	CrRenderWorld();
 
 	~CrRenderWorld();

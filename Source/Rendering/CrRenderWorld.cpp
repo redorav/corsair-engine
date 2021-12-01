@@ -18,16 +18,12 @@ CrRenderWorld::CrRenderWorld()
 	m_renderModels.resize(1000);
 	m_modelInstanceObbs.resize(1000);
 
+	// Defaults to invalid id
 	m_modelInstanceIdToIndex.resize(1000);
 	m_modelInstanceIndexToId.resize(1000);
 
-	for (uint32_t i = 0; i < m_modelInstanceIdToIndex.size(); ++i)
-	{
-		m_modelInstanceIdToIndex[i] = CrModelInstanceIndex(InvalidModelInstanceId);
-		m_modelInstanceIndexToId[i] = CrModelInstanceId(InvalidModelInstanceId);
-	}
-
-	m_lastAvailableId = CrModelInstanceId(InvalidModelInstanceId);
+	m_maxModelInstanceId = CrModelInstanceId(0);
+	m_numModelInstances = CrModelInstanceIndex(0);
 }
 
 CrRenderWorld::~CrRenderWorld()
@@ -37,10 +33,10 @@ CrRenderWorld::~CrRenderWorld()
 
 CrRenderModelInstance CrRenderWorld::CreateModelInstance()
 {
-	CrModelInstanceId availableId = CrModelInstanceId(InvalidModelInstanceId);
+	CrModelInstanceId availableId;
 
 	// If we have an available id (from a previously deleted instance) reuse that
-	if (m_lastAvailableId.id != InvalidModelInstanceId)
+	if (m_lastAvailableId != CrModelInstanceId())
 	{
 		availableId = m_lastAvailableId;
 		m_lastAvailableId.id = m_modelInstanceIdToIndex[m_lastAvailableId.id].id;
@@ -107,7 +103,7 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_modelInstanceIndexToId[destroyedInstanceIndex.id] = lastInstanceId;
 
 	// Point last model instance to an invalid id
-	m_modelInstanceIndexToId[lastInstanceIndex.id]      = CrModelInstanceId(0xffffffff);
+	m_modelInstanceIndexToId[lastInstanceIndex.id]      = CrModelInstanceId();
 	
 	// Decrement number of model instances
 	m_numModelInstances.id--;

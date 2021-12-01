@@ -59,6 +59,20 @@ namespace eastl
 
 	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_string;
 
+	// Keep here until EASTL natively provides this functionality. Copied from <EASTL/string>
+	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator>
+	struct hash<fixed_string<T, nodeCount, bEnableOverflow, OverflowAllocator>>
+	{
+		size_t operator()(const fixed_string<T, nodeCount, bEnableOverflow, OverflowAllocator>& x) const
+		{
+			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
+			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
+			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
+				result = (result * 16777619) ^ c;
+			return (size_t)result;
+		}
+	};
+
 	// Functional
 	template<int N, typename R>
 	class fixed_function;

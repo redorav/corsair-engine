@@ -29,6 +29,8 @@
 #include "Rendering/CrRenderModelInstance.h"
 #include "Rendering/CrCPUStackAllocator.h"
 
+#include "Rendering/CrRenderGraph.h"
+
 #include "Input/CrInputManager.h"
 
 #include "Core/CrPlatform.h"
@@ -44,12 +46,103 @@
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
+// TODO Put somewhere else
 bool HashingAssert()
 {
 	CrGraphicsPipelineDescriptor defaultDescriptor;
 	CrAssertMsg(CrHash(&defaultDescriptor) == CrHash(12342096532583984399), "Failed to hash known pipeline descriptor!");
 	return true;
 }
+
+// Batches render packets
+struct CrRenderPacketBatcher
+{
+	CrRenderPacketBatcher(ICrCommandBuffer* commandBuffer)
+	{
+		m_commandBuffer = commandBuffer;
+	}
+
+	void AddRenderPacket(const CrRenderPacket& renderPacket)
+	{
+		bool stateMismatch =
+			renderPacket.pipeline != m_pipeline ||
+			renderPacket.material != m_material ||
+			renderPacket.renderMesh != m_renderMesh;
+
+		bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_matrices.size();
+
+		if (stateMismatch || noMoreSpace)
+		{
+			ExecuteBatch();
+			m_batchStarted = false;
+		}
+
+		if (!m_batchStarted)
+		{
+			// Begin batch
+			m_numInstances = 0;
+			m_material = renderPacket.material;
+			m_renderMesh = renderPacket.renderMesh;
+			m_pipeline = renderPacket.pipeline;
+			m_batchStarted = true;
+		}
+
+		// Accumulate and copy matrix pointers over
+		for (uint32_t i = 0; i < renderPacket.numInstances; ++i)
+		{
+			m_matrices[m_numInstances + i] = &renderPacket.transforms[i];
+		}
+
+		m_numInstances += renderPacket.numInstances;
+	}
+
+	void ExecuteBatch()
+	{
+		if (m_numInstances > 0)
+		{
+			// Allocate constant buffer with all transforms and copy them across
+			CrGPUBufferType<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
+			cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.Lock();
+			{
+				for (uint32_t i = 0; i < m_numInstances; ++i)
+				{
+					transforms[i] = *m_matrices[i];
+				}
+			}
+			transformBuffer.Unlock();
+			m_commandBuffer->BindConstantBuffer(&transformBuffer);
+
+			m_commandBuffer->BindGraphicsPipelineState(m_pipeline);
+
+			for (uint32_t t = 0; t < m_material->m_textures.size(); ++t)
+			{
+				CrMaterial::TextureBinding binding = m_material->m_textures[t];
+				m_commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
+			}
+
+			for (uint32_t vbIndex = 0; vbIndex < m_renderMesh->GetVertexBufferCount(); ++vbIndex)
+			{
+				m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
+			}
+
+			m_commandBuffer->BindIndexBuffer(m_renderMesh->GetIndexBuffer().get());
+
+			m_commandBuffer->DrawIndexed(m_renderMesh->GetIndexBuffer()->GetNumElements(), m_numInstances, 0, 0, 0);
+		}
+	}
+
+	bool m_batchStarted = false;
+
+	uint32_t m_numInstances = 0;
+	const CrMaterial* m_material = nullptr;
+	const CrRenderMesh* m_renderMesh = nullptr;
+	const ICrGraphicsPipeline* m_pipeline = nullptr;
+
+	ICrCommandBuffer* m_commandBuffer = nullptr;
+
+	// Has to match the maximum number of matrices declared in the shader
+	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
+};
 
 void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
 {
@@ -82,21 +175,40 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	// Create a render world
 	m_renderWorld = CrMakeShared<CrRenderWorld>();
 
-	m_modelInstance0 = m_renderWorld->CreateModelInstance();
-	m_modelInstance1 = m_renderWorld->CreateModelInstance();
-	m_modelInstance2 = m_renderWorld->CreateModelInstance();
+	const uint32_t numModels = 100;
 
-	float4x4 transform0 = mul(float4x4::scale(1.0f), float4x4::translation(0.0f, 0.0f, 0.0f));
-	float4x4 transform1 = mul(float4x4::scale(1.0f), float4x4::translation(10.0f, 0.0f, 0.0f));
-	float4x4 transform2 = mul(float4x4::scale(5.0f), float4x4::translation(20.0f, 0.0f, 0.0f));
+	for (uint32_t i = 0; i < numModels; ++i)
+	{
+		CrRenderModelInstance modelInstance = m_renderWorld->CreateModelInstance();
 
-	m_renderWorld->SetTransform(m_modelInstance0.GetId(), transform0);
-	m_renderWorld->SetTransform(m_modelInstance1.GetId(), transform1);
-	m_renderWorld->SetTransform(m_modelInstance2.GetId(), transform2);
+		float angle = 1.61803f * i;
+		float radius = 300.0f * i / numModels;
 
-	m_renderWorld->SetRenderModel(m_modelInstance0.GetId(), nyraModel);
-	m_renderWorld->SetRenderModel(m_modelInstance1.GetId(), jainaModel);
-	m_renderWorld->SetRenderModel(m_modelInstance2.GetId(), damagedHelmet);
+		float x = radius * sinf(angle);
+		float z = radius * cosf(angle);
+
+		float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
+
+		m_renderWorld->SetTransform(modelInstance.GetId(), transformMatrix);
+
+		int r = rand();
+		CrRenderModelSharedHandle renderModel;
+
+		if (r < RAND_MAX / 3)
+		{
+			renderModel = nyraModel;
+		}
+		else if (r < 2 * RAND_MAX / 3)
+		{
+			renderModel = jainaModel;
+		}
+		else
+		{
+			renderModel = damagedHelmet;
+		}
+
+		m_renderWorld->SetRenderModel(modelInstance.GetId(), renderModel);
+	}
 
 	m_camera = CrSharedPtr<CrCamera>(new CrCamera());
 
@@ -139,18 +251,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
 		"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
 
-	CrGraphicsShaderHandle graphicsShader = CrShaderManager::Get().CompileGraphicsShader(basicBytecodeLoadInfo);
+	CrGraphicsShaderHandle lineGraphicsShader = CrShaderManager::Get().CompileGraphicsShader(basicBytecodeLoadInfo);
 	CrComputeShaderHandle computeShader = CrShaderManager::Get().CompileComputeShader(computeBytecodeLoadInfo);
 
 	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
 	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
-
-	// TODO Reminder for next time:
-	// 1) Pass in psoDescriptor, vertexInputState (need to encapsulate) and loaded/compiled graphics shader to GetGraphicsPipeline
-	// 2) Create hash for all three and combine
-	// 3) Do a lookup. If not in table, call CreateGraphicsPipeline with all three again
-	// 4) After creation, put in table for next time
 
 	CrComputePipelineDescriptor computePipelineDescriptor;
 
@@ -158,7 +264,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
 	m_linePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(
-		basicGraphicsPipelineDescriptor, graphicsShader, SimpleVertexDescriptor);
+		basicGraphicsPipelineDescriptor, lineGraphicsShader, SimpleVertexDescriptor);
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
@@ -199,222 +305,191 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
+	CrRenderGraph renderGraph;
+	renderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
+
 	UpdateCamera();
 
 	m_renderWorld->BeginRendering(m_renderingStream);
 
 	m_renderWorld->SetCamera(m_camera);
 
+	drawCommandBuffer->Begin();
+
+	CrRenderGraphTextureId depthTexture;
+	CrRenderGraphTextureId swapchainTexture;
+
 	{
-		drawCommandBuffer->Begin();
-		drawCommandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
-		drawCommandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+		CrRenderGraphTextureDescriptor depthDescriptor;
+		depthDescriptor.texture = m_depthStencilTexture.get();
+		depthTexture = renderGraph.CreateTexture("Depth", depthDescriptor);
 
-		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
-		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
-		drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+		CrRenderGraphTextureDescriptor swapchainDescriptor;
+		swapchainDescriptor.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
+		swapchainTexture = renderGraph.CreateTexture("Swapchain", swapchainDescriptor);
+	}
 
-		CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
+	renderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.AddRenderTarget(swapchainTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+	},
+	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
+		commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+
+		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
 		Color* theColorData2 = colorBuffer.Lock();
 		{
 			theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 			theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		colorBuffer.Unlock();
-		drawCommandBuffer->BindConstantBuffer(&colorBuffer);
+		commandBuffer->BindConstantBuffer(&colorBuffer);
 
-		CrGPUBufferType<DynamicLight> dynamicLightBuffer = drawCommandBuffer->AllocateConstantBuffer<DynamicLight>();
+		CrGPUBufferType<DynamicLight> dynamicLightBuffer = commandBuffer->AllocateConstantBuffer<DynamicLight>();
 		DynamicLight* dynamicLightBufferData = dynamicLightBuffer.Lock();
 		{
 			dynamicLightBufferData->positionRadius = float4(1.0f, 1.0f, 1.0f, 0.0f);
 			dynamicLightBufferData->color = float4(1.0f, 0.25f, 0.25f, 0.0f);
 		}
 		dynamicLightBuffer.Unlock();
-		drawCommandBuffer->BindConstantBuffer(&dynamicLightBuffer);
+		commandBuffer->BindConstantBuffer(&dynamicLightBuffer);
 
-		CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
+		CrGPUBufferType<Camera> cameraDataBuffer = commandBuffer->AllocateConstantBuffer<Camera>();
 		Camera* cameraData2 = cameraDataBuffer.Lock();
 		{
 			*cameraData2 = m_cameraConstantData;
 		}
 		cameraDataBuffer.Unlock();
-		drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
+		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
 
-		drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
-		drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
 
-		CrRenderPassDescriptor renderPassDescriptor;
+		float t0 = CrFrameTime::GetFrameCount() * 0.01f;
+		float x = sinf(t0);
+		float z = cosf(t0);
+
+		float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
+
+		m_renderWorld->ComputeVisibilityAndRenderPackets();
+
+		const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
+
+		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
+
+		mainRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 		{
-			CrRenderTargetDescriptor swapchainAttachment;
-			swapchainAttachment.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
-			swapchainAttachment.clearColor = float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f);
-			swapchainAttachment.loadOp = CrRenderTargetLoadOp::Clear;
-			swapchainAttachment.initialState = cr3d::TextureState::Undefined;
-			swapchainAttachment.finalState = cr3d::TextureState::RenderTarget;
+			renderPacketBatcher.AddRenderPacket(renderPacket);
+		});
 
-			CrRenderTargetDescriptor depthAttachment;
-			depthAttachment.texture = m_depthStencilTexture.get();
-			depthAttachment.loadOp = CrRenderTargetLoadOp::Clear;
-			depthAttachment.initialState = cr3d::TextureState::Undefined;
-			depthAttachment.finalState = cr3d::TextureState::DepthStencilWrite;
+		renderPacketBatcher.ExecuteBatch();
+	});
 
-			renderPassDescriptor.color.push_back(swapchainAttachment);
-			renderPassDescriptor.depth = depthAttachment;
-		}
+	CrRenderGraphBufferDescriptor structuredBufferDescriptor;
+	structuredBufferDescriptor.buffer = m_structuredBuffer.get();
+	CrRenderGraphBufferId structuredBuffer = renderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
 
-		drawCommandBuffer->BeginDebugEvent("RenderPass 1", float4(1.0f, 0.0, 1.0f, 1.0f));
-		{
-			drawCommandBuffer->BeginRenderPass(renderPassDescriptor);
-			{
-				float t0 = CrFrameTime::GetFrameCount() * 0.01f;
-				float x = sinf(t0);
-				float z = cosf(t0);
+	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor;
+	rwStructuredBufferDescriptor.buffer = m_rwStructuredBuffer.get();
+	CrRenderGraphBufferId rwStructuredBuffer = renderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
 
-				float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
+	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor;
+	colorsRWDataBufferDescriptor.buffer = m_colorsRWDataBuffer.get();
+	CrRenderGraphBufferId colorsRWDataBuffer = renderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
 
-				m_renderWorld->ComputeVisibilityAndRenderPackets();
+	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor;
+	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
+	CrRenderGraphTextureId colorsRWTexture = renderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
-				const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
-				
-				// Batches render packets
-				struct CrRenderPacketBatcher
-				{
-					CrRenderPacketBatcher(ICrCommandBuffer* commandBuffer)
-					{
-						m_commandBuffer = commandBuffer;
-					}
+	CrComputePipelineHandle computePipeline = m_computePipelineState;
 
-					void AddRenderPacket(const CrRenderPacket& renderPacket)
-					{
-						bool stateMismatch = 
-							renderPacket.pipeline != m_pipeline ||
-							renderPacket.material != m_material ||
-							renderPacket.renderMesh != m_renderMesh;
+	renderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	[&](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddBuffer(structuredBuffer);
+		renderGraph.AddRWBuffer(rwStructuredBuffer);
+		renderGraph.AddRWBuffer(colorsRWDataBuffer);
+		renderGraph.AddRWTexture(colorsRWTexture, 0, 1, 0, 1);
+	},
+	[this, computePipeline](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->BindComputePipelineState(computePipeline.get());
+		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
+		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
+		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
+		commandBuffer->Dispatch(1, 1, 1);
+	});
 
-						bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_matrices.size();
-
-						if (stateMismatch || noMoreSpace)
-						{
-							ExecuteBatch();
-							m_batchStarted = false;
-						}
-
-						if (!m_batchStarted)
-						{
-							// Begin batch
-							m_numInstances    = 0;
-							m_material        = renderPacket.material;
-							m_renderMesh      = renderPacket.renderMesh;
-							m_pipeline        = renderPacket.pipeline;
-							m_batchStarted    = true;
-						}
-
-						// Accumulate and copy matrix pointers over
-						for (uint32_t i = 0; i < renderPacket.numInstances; ++i)
-						{
-							m_matrices[m_numInstances + i] = &renderPacket.transforms[i];
-						}
-
-						m_numInstances += renderPacket.numInstances;
-					}
-
-					void ExecuteBatch()
-					{
-						if (m_numInstances > 0)
-						{
-							// Allocate constant buffer with all transforms and copy them across
-							CrGPUBufferType<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
-							cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.Lock();
-							{
-								for (uint32_t i = 0; i < m_numInstances; ++i)
-								{
-									transforms[i] = *m_matrices[i];
-								}
-							}
-							transformBuffer.Unlock();
-							m_commandBuffer->BindConstantBuffer(&transformBuffer);
-
-							m_commandBuffer->BindGraphicsPipelineState(m_pipeline);
-
-							for (uint32_t t = 0; t < m_material->m_textures.size(); ++t)
-							{
-								CrMaterial::TextureBinding binding = m_material->m_textures[t];
-								m_commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
-							}
-
-							for (uint32_t vbIndex = 0; vbIndex < m_renderMesh->GetVertexBufferCount(); ++vbIndex)
-							{
-								m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
-							}
-
-							m_commandBuffer->BindIndexBuffer(m_renderMesh->GetIndexBuffer().get());
-
-							m_commandBuffer->DrawIndexed(m_renderMesh->GetIndexBuffer()->GetNumElements(), m_numInstances, 0, 0, 0);
-						}
-					}
-
-					bool m_batchStarted = false;
-
-					uint32_t m_numInstances = 0;
-					const CrMaterial* m_material = nullptr;
-					const CrRenderMesh* m_renderMesh = nullptr;
-					const ICrGraphicsPipeline* m_pipeline = nullptr;
-
-					ICrCommandBuffer* m_commandBuffer = nullptr;
-
-					// Has to match the maximum number of matrices declared in the shader
-					CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
-				};
-
-				CrRenderPacketBatcher renderPacketBatcher(drawCommandBuffer);
-
-				mainRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
-				{
-					renderPacketBatcher.AddRenderPacket(renderPacket);
-				});
-
-				renderPacketBatcher.ExecuteBatch();
-			}
-
-			drawCommandBuffer->EndRenderPass();
-		}
-		drawCommandBuffer->EndDebugEvent();
-
-		//drawCommandBuffer->BeginDebugEvent("Compute Shader 1", float4(0.0f, 0.0, 1.0f, 1.0f));
-		//{
-		//	drawCommandBuffer->BindComputePipelineState(m_computePipelineState.get());
-		//
-		//	drawCommandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
-		//
-		//	drawCommandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
-		//
-		//	drawCommandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
-		//
-		//	drawCommandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
-		//
-		//	drawCommandBuffer->Dispatch(1, 1, 1);
-		//}
-		//drawCommandBuffer->EndDebugEvent();
-
+	renderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
+	[](CrRenderGraph&)
+	{},
+	[this](const CrRenderGraph&, ICrCommandBuffer*)
+	{
 		DrawDebugUI();
+	});
 
-		// Render ImGui
-		CrImGuiRenderer::GetImGuiRenderer()->Render(drawCommandBuffer, m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
+	// Render ImGui
+	CrImGuiRenderer::GetImGuiRenderer()->Render(renderGraph, swapchainTexture);
 
-		drawCommandBuffer->End();
-	}
+	// Present the frame
+	renderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddSwapchain(swapchainTexture);
+	},
+	[this, mainCommandQueue](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->End();
+
+		commandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
+
+		m_swapchain->Present(mainCommandQueue.get(), commandBuffer->GetCompletionSemaphore().get());
+	});
+
+	renderGraph.Execute();
 
 	m_renderWorld->EndRendering();
 
 	m_renderingStream->Reset();
 
-	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
-
-	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
-
 	renderDevice->ProcessDeletionQueue();
 
 	CrFrameTime::IncrementFrameCount();
+}
+
+struct CrSizeUnit
+{
+	uint64_t smallUnit;
+	const char* unit;
+};
+
+CrSizeUnit GetSizeUnit(uint64_t bytes)
+{
+	if (bytes > 1024 * 1024 * 1024)
+	{
+		return { bytes / (1024 * 1024 * 1024), "GB" };
+	}
+	else if (bytes > 1024 * 1024)
+	{
+		return { bytes / (1024 * 1024), "MB" };
+	}
+	else if (bytes > 1024)
+	{
+		return { bytes / 1024, "KB" };
+	}
+	else
+	{
+		return { bytes, "bytes" };
+	}
 }
 
 void CrFrame::DrawDebugUI()
@@ -428,18 +503,21 @@ void CrFrame::DrawDebugUI()
 
 	if (s_ShowStats)
 	{
-		if (ImGui::Begin("Stats", &s_ShowStats))
+		if (ImGui::Begin("Statistics", &s_ShowStats))
 		{
 			CrTime delta = CrFrameTime::GetFrameDelta();
 			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage(); 
-			ImGui::Text("Statistics");
+
+			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
+			CrSizeUnit sizeUnit = GetSizeUnit(properties.gpuMemoryBytes);
+
+			ImGui::Text("GPU: %s (%llu%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
 
 			ImGui::End();
 		}
-
 	}
 }
 
@@ -572,7 +650,4 @@ CrFrame::CrFrame()
 
 CrFrame::~CrFrame()
 {
-	m_renderWorld->DestroyModelInstance(m_modelInstance0.GetId());
-	m_renderWorld->DestroyModelInstance(m_modelInstance1.GetId());
-	m_renderWorld->DestroyModelInstance(m_modelInstance2.GetId());
 }

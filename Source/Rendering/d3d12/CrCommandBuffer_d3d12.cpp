@@ -22,20 +22,14 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrCommandQueue* commandQueue)
 	m_d3d12Device->CreateCommandList(0, d3dc12CommandListType, m_d3d12CommandAllocator, nullptr, IID_PPV_ARGS(&m_d3d12GraphicsCommandList));
 }
 
-void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& descriptor)
+void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	unused_parameter(descriptor);
+	unused_parameter(renderPassDescriptor);
 }
 
 void CrCommandBufferD3D12::EndRenderPassPS()
 {
 	
-}
-
-void CrCommandBufferD3D12::TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition)
-{
-	unused_parameter(texture);
-	unused_parameter(resourceTransition);
 }
 
 void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()

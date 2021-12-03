@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
+#include "Core/CrTypedId.h"
 
 #include <cstdint>
 
@@ -46,21 +47,6 @@ struct CrSamplerDescriptor;
 class ICrCommandQueue;
 using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
 
-class CrIndexBufferCommon;
-using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
-
-class CrVertexBufferCommon;
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
-
-template<typename Metadata>
-class CrStructuredBuffer;
-
-template<typename Metadata>
-using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
-
-class CrDataBuffer;
-using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
-
 class ICrSwapchain;
 using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
 struct CrSwapchainDescriptor;
@@ -75,6 +61,7 @@ class ICrCommandBuffer;
 using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 
 struct CrRenderPassDescriptor;
+struct CrComputePassDescriptor;
 
 // Shaders & Pipeline Objects
 class ICrGraphicsShader;
@@ -103,10 +90,26 @@ struct CrShaderDefines;
 struct CrShaderReflectionHeader;
 
 // GPU Buffers
-class CrGPUStackAllocator;
 class ICrHardwareGPUBuffer;
-struct CrGPUBufferDescriptor;
 struct CrHardwareGPUBufferDescriptor;
+class CrGPUBuffer;
+struct CrGPUBufferDescriptor;
+class CrGPUStackAllocator;
+
+class CrIndexBufferCommon;
+using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
+
+class CrVertexBufferCommon;
+using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
+
+template<typename Metadata>
+class CrStructuredBuffer;
+
+template<typename Metadata>
+using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
+
+class CrDataBuffer;
+using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
 
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;
@@ -117,3 +120,15 @@ struct CrBoundingBox;
 // Render World objects
 class CrCamera;
 using CrCameraHandle = CrSharedPtr<CrCamera>;
+
+// RenderGraph
+class CrRenderGraph;
+
+struct CrRenderGraphPass;
+using CrRenderPassId = CrTypedId<CrRenderGraphPass, uint32_t>;
+
+struct CrRenderGraphTextureResource;
+using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint32_t>;
+
+struct CrRenderGraphBufferResource;
+using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint32_t>;

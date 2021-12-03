@@ -463,11 +463,20 @@ namespace cr3d
 		enum T
 		{
 			Undefined,
-			ShaderInput,
-			ReadWrite,
+			ShaderInput, // StructuredBuffer, Buffer, ByteAddressBuffer
+			ReadWrite, // RWStructuredBuffer, RWBuffer, RWByteAddressBuffer
 			CopySource,
 			CopyDestination,
 			Count
+		};
+	};
+
+	namespace RenderPassType
+	{
+		enum T
+		{
+			Graphics,
+			Compute
 		};
 	};
 

@@ -10,38 +10,11 @@
 
 #include "Rendering/CrRenderingStatistics.h"
 
+#include "Rendering/CrRenderPassDescriptor.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "CrRenderingForwardDeclarations.h"
-
-struct CrTextureBarrier
-{
-	struct PipelineStage
-	{
-		enum T
-		{
-			Host          = 1 << 1,
-			VertexShader  = 2 << 1,
-			PixelShader   = 3 << 1,
-			OutputMerger  = 4 << 1,
-			ComputeShader = 5 << 1
-		};
-	};
-
-	struct Usage
-	{
-		cr3d::TextureState::T state;
-		PipelineStage::T pipelineStages;
-	};
-
-	Usage initialUsage;
-
-	Usage finalUsage;
-
-	int32_t startMip = -1;
-
-	int32_t mipmapCount = -1;
-};
 
 class ICrCommandBuffer : public CrGPUDeletable
 {
@@ -107,8 +80,6 @@ public:
 
 	void EndDebugEvent();
 
-	void TextureBarrier(const ICrTexture* texture, const CrTextureBarrier& resourceTransition);
-
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
@@ -152,9 +123,7 @@ protected:
 
 	virtual void EndDebugEventPS() = 0;
 
-	virtual void TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition) = 0;
-
-	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) = 0;
+	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 
 	virtual void EndRenderPassPS() = 0;
 
@@ -252,6 +221,10 @@ protected:
 
 		uint32_t						m_stencilRef;
 		bool							m_stencilRefDirty;
+
+		CrRenderPassDescriptor			m_currentRenderPass;
+
+		bool							m_renderPassActive;
 	};
 
 	CurrentState					m_currentState;
@@ -394,11 +367,6 @@ inline void ICrCommandBuffer::EndDebugEvent()
 	EndDebugEventPS();
 }
 
-inline void ICrCommandBuffer::TextureBarrier(const ICrTexture* texture, const CrTextureBarrier& resourceTransition)
-{
-	TextureBarrierPS(texture, resourceTransition);
-}
-
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
@@ -430,16 +398,6 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
 {
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
-}
-
-inline void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
-{
-	BeginRenderPassPS(renderPassDescriptor);
-}
-
-inline void ICrCommandBuffer::EndRenderPass()
-{
-	EndRenderPassPS();
 }
 
 inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const

@@ -42,13 +42,11 @@ private:
 
 	virtual void EndDebugEventPS() override;
 
-	virtual void TextureBarrierPS(const ICrTexture* texture, const CrTextureBarrier& resourceTransition) override;
-
 	virtual void FlushGraphicsRenderStatePS() override;
 
 	virtual void FlushComputeRenderStatePS() override;
 
-	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& descriptor) override;
+	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
 
 	virtual void EndRenderPassPS() override;
 

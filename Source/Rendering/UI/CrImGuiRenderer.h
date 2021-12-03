@@ -4,7 +4,7 @@
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
-class ICrGraphicsPipeline;
+
 struct ImDrawData;
 
 struct CrImGuiRendererInitParams
@@ -23,7 +23,7 @@ public:
 
 	void NewFrame(uint32_t width, uint32_t height);
 
-	void Render(ICrCommandBuffer* cmdBuffer, const ICrTexture* swapchainTexture);
+	void Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId swapchainTextureId);
 
 private:
 

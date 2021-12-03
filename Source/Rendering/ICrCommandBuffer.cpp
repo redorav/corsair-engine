@@ -131,3 +131,32 @@ void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int
 		m_currentState.m_constantBuffers[stage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetByteOffset());
 	}
 }
+
+void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
+{
+	CrAssertMsg(!m_currentState.m_renderPassActive, "Render pass already active. Have you forgotten to close a render pass?");
+	
+	m_currentState.m_currentRenderPass = renderPassDescriptor;
+	m_currentState.m_renderPassActive = true;
+
+	if (m_currentState.m_currentRenderPass.debugName.size() > 0)
+	{
+		BeginDebugEvent(m_currentState.m_currentRenderPass.debugName.c_str(), m_currentState.m_currentRenderPass.debugColor);
+	}
+
+	BeginRenderPassPS(renderPassDescriptor);
+}
+
+void ICrCommandBuffer::EndRenderPass()
+{
+	CrAssertMsg(m_currentState.m_renderPassActive, "Render pass not active. Have you forgotten to start a render pass?");
+	
+	EndRenderPassPS();
+
+	if (m_currentState.m_currentRenderPass.debugName.size() > 0)
+	{
+		EndDebugEvent();
+	}
+
+	m_currentState.m_renderPassActive = false;
+}

@@ -15,6 +15,7 @@
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrSampler.h"
 #include "Rendering/CrRenderPassDescriptor.h"
+#include "Rendering/CrRenderGraph.h"
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "imgui.h"
@@ -174,111 +175,101 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render(ICrCommandBuffer* commandBuffer, const ICrTexture* swapchainTexture)
+void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId swapchainTextureId)
 {
-	ImGui::Render();
-
-	// Query the draw data for this frame:
-	ImDrawData* data = ImGui::GetDrawData();
-	if (!data || !data->Valid || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
+	renderGraph.AddRenderPass("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
+	[&](CrRenderGraph& renderGraph)
 	{
-		return;
-	}
-
-	// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-	CrGPUBuffer indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount);
-	CrGPUBuffer vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount);
-
-	// Update contents:
-	ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.Lock();
-	ImDrawVert* pVtx = (ImDrawVert*)vertexBuffer.Lock();
-	for (int i = 0; i < data->CmdListsCount; ++i)
+		renderGraph.AddRenderTarget(swapchainTextureId);
+	},
+	[this](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
 	{
-		ImDrawList* drawList = data->CmdLists[i];
+		ImGui::Render();
 
-		memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
-		memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert));
-
-		pIdx += drawList->IdxBuffer.Size;
-		pVtx += drawList->VtxBuffer.Size;
-	}
-	indexBuffer.Unlock();
-	vertexBuffer.Unlock();
-
-	CrRenderPassDescriptor graphicsRenderPass;
-
-	CrRenderTargetDescriptor swapchainAttachment;
-	swapchainAttachment.texture = swapchainTexture;
-	swapchainAttachment.loadOp = CrRenderTargetLoadOp::Load;
-	swapchainAttachment.initialState = cr3d::TextureState::RenderTarget;
-	swapchainAttachment.finalState = cr3d::TextureState::Present;
-
-	graphicsRenderPass.color.push_back(swapchainAttachment);
-
-	commandBuffer->BeginDebugEvent("ImGui Render", float4(0.3f, 0.3f, 0.6f, 1.0f));
-	{
-		commandBuffer->BeginRenderPass(graphicsRenderPass);
+		// Query the draw data for this frame:
+		ImDrawData* data = ImGui::GetDrawData();
+		if (!data || !data->Valid || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
 		{
-			// Setup global config:
-			commandBuffer->BindGraphicsPipelineState(m_uiGraphicsPipeline.get());
-			commandBuffer->BindIndexBuffer(&indexBuffer);
-			commandBuffer->BindVertexBuffer(&vertexBuffer, 0);
-			commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
+			return;
+		}
 
-			// Projection matrix. TODO: this could be cached.
-			CrGPUBufferType<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
-			UIDataData* uiData = uiDataBuffer.Lock();
-			{
-				uiData->projection = ComputeProjectionMatrix(data);
-			}
-			uiDataBuffer.Unlock();
-			commandBuffer->BindConstantBuffer(&uiDataBuffer);
+		// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
+		CrGPUBuffer indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount);
+		CrGPUBuffer vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount);
 
-			// Iterate over each draw list -> draw command: 
-			ImVec2 clipOffset = data->DisplayPos;
-			uint32_t acumVtxOffset = 0;
-			uint32_t acumIdxOffset = 0;
-			for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+		// Update contents:
+		ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.Lock();
+		ImDrawVert* pVtx = (ImDrawVert*)vertexBuffer.Lock();
+		for (int i = 0; i < data->CmdListsCount; ++i)
+		{
+			ImDrawList* drawList = data->CmdLists[i];
+
+			memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
+			memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert));
+
+			pIdx += drawList->IdxBuffer.Size;
+			pVtx += drawList->VtxBuffer.Size;
+		}
+		indexBuffer.Unlock();
+		vertexBuffer.Unlock();
+
+		// Setup global config:
+		commandBuffer->BindGraphicsPipelineState(m_uiGraphicsPipeline.get());
+		commandBuffer->BindIndexBuffer(&indexBuffer);
+		commandBuffer->BindVertexBuffer(&vertexBuffer, 0);
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
+
+		// Projection matrix. TODO: this could be cached.
+		CrGPUBufferType<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
+		UIDataData* uiData = uiDataBuffer.Lock();
+		{
+			uiData->projection = ComputeProjectionMatrix(data);
+		}
+		uiDataBuffer.Unlock();
+		commandBuffer->BindConstantBuffer(&uiDataBuffer);
+
+		// Iterate over each draw list -> draw command: 
+		ImVec2 clipOffset = data->DisplayPos;
+		uint32_t acumVtxOffset = 0;
+		uint32_t acumIdxOffset = 0;
+		for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+		{
+			const ImDrawList* drawList = data->CmdLists[listIdx];
+			for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
 			{
-				const ImDrawList* drawList = data->CmdLists[listIdx];
-				for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
+				const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
+
+				uint32_t x = (uint32_t)(drawCmd->ClipRect.x - clipOffset.x);
+				uint32_t y = (uint32_t)(drawCmd->ClipRect.y - clipOffset.y);
+				uint32_t width = (uint32_t)(drawCmd->ClipRect.z - x);
+				uint32_t height = (uint32_t)(drawCmd->ClipRect.w - y);
+
+				if (!drawCmd->UserCallback)
 				{
-					const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
-
-					uint32_t x = (uint32_t)(drawCmd->ClipRect.x - clipOffset.x);
-					uint32_t y = (uint32_t)(drawCmd->ClipRect.y - clipOffset.y);
-					uint32_t width = (uint32_t)(drawCmd->ClipRect.z - x);
-					uint32_t height = (uint32_t)(drawCmd->ClipRect.w - y);
-
-					if (!drawCmd->UserCallback)
+					// Generic rendering.
+					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
+					commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
+					commandBuffer->SetScissor(CrScissor(x, y, width, height));
+					commandBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
+				}
+				else
+				{
+					// Handle user callback:
+					if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
 					{
-						// Generic rendering.
-						ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
-						commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
-						commandBuffer->SetScissor(CrScissor(x, y, width, height));
-						commandBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
+						// This is a special case to reset the render state.. What should we do here?
+						CrAssertMsg(false, "Not implemented");
 					}
 					else
 					{
-						// Handle user callback:
-						if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
-						{
-							// This is a special case to reset the render state.. What should we do here?
-							CrAssertMsg(false, "Not implemented");
-						}
-						else
-						{
-							drawCmd->UserCallback(drawList, drawCmd);
-						}
+						drawCmd->UserCallback(drawList, drawCmd);
 					}
 				}
-				acumIdxOffset += drawList->IdxBuffer.Size;
-				acumVtxOffset += drawList->VtxBuffer.Size;
 			}
+			acumIdxOffset += drawList->IdxBuffer.Size;
+			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
-		commandBuffer->EndRenderPass();
-	}
-	commandBuffer->EndDebugEvent();
+	});
 }
 
 float4x4 CrImGuiRenderer::ComputeProjectionMatrix(ImDrawData* data)

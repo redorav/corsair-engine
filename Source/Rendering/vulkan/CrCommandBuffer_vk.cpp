@@ -551,7 +551,7 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
 	bufferMemoryBarrier.srcAccessMask = CrVkBufferResourceStateTable[sourceState].accessMask;
-	bufferMemoryBarrier.srcAccessMask = CrVkBufferResourceStateTable[destinationState].accessMask;
+	bufferMemoryBarrier.dstAccessMask = CrVkBufferResourceStateTable[destinationState].accessMask;
 
 	bufferMemoryBarrier.buffer = gpuBufferVulkan->GetVkBuffer();
 	bufferMemoryBarrier.offset = buffer->GetByteOffset();

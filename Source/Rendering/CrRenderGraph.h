@@ -254,6 +254,11 @@ public:
 		return m_textureResources[textureId.id].descriptor.texture;
 	}
 
+	CrGPUBuffer* GetPhysicalBuffer(CrRenderGraphBufferId bufferId) const
+	{
+		return m_bufferResources[bufferId.id].descriptor.buffer;
+	}
+
 	void Execute();
 
 private:

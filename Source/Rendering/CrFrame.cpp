@@ -305,8 +305,8 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
-	CrRenderGraph renderGraph;
-	renderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
+	CrRenderGraph mainRenderGraph;
+	mainRenderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
 
 	UpdateCamera();
 
@@ -322,14 +322,14 @@ void CrFrame::Process()
 	{
 		CrRenderGraphTextureDescriptor depthDescriptor;
 		depthDescriptor.texture = m_depthStencilTexture.get();
-		depthTexture = renderGraph.CreateTexture("Depth", depthDescriptor);
+		depthTexture = mainRenderGraph.CreateTexture("Depth", depthDescriptor);
 
 		CrRenderGraphTextureDescriptor swapchainDescriptor;
 		swapchainDescriptor.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
-		swapchainTexture = renderGraph.CreateTexture("Swapchain", swapchainDescriptor);
+		swapchainTexture = mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
 	}
 
-	renderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	mainRenderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -395,23 +395,23 @@ void CrFrame::Process()
 
 	CrRenderGraphBufferDescriptor structuredBufferDescriptor;
 	structuredBufferDescriptor.buffer = m_structuredBuffer.get();
-	CrRenderGraphBufferId structuredBuffer = renderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
+	CrRenderGraphBufferId structuredBuffer = mainRenderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor;
 	rwStructuredBufferDescriptor.buffer = m_rwStructuredBuffer.get();
-	CrRenderGraphBufferId rwStructuredBuffer = renderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
+	CrRenderGraphBufferId rwStructuredBuffer = mainRenderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor;
 	colorsRWDataBufferDescriptor.buffer = m_colorsRWDataBuffer.get();
-	CrRenderGraphBufferId colorsRWDataBuffer = renderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
+	CrRenderGraphBufferId colorsRWDataBuffer = mainRenderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
 
 	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor;
 	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
-	CrRenderGraphTextureId colorsRWTexture = renderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
+	CrRenderGraphTextureId colorsRWTexture = mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
 	CrComputePipelineHandle computePipeline = m_computePipelineState;
 
-	renderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
@@ -431,7 +431,7 @@ void CrFrame::Process()
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 
-	renderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
+	mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)
 	{},
 	[this](const CrRenderGraph&, ICrCommandBuffer*)
@@ -440,15 +440,15 @@ void CrFrame::Process()
 	});
 
 	// Render ImGui
-	CrImGuiRenderer::GetImGuiRenderer()->Render(renderGraph, swapchainTexture);
+	CrImGuiRenderer::GetImGuiRenderer()->Render(mainRenderGraph, swapchainTexture);
 
 	// Present the frame
-	renderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
+	mainRenderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddSwapchain(swapchainTexture);
 	},
-	[this, mainCommandQueue](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
+	[this, mainCommandQueue](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->End();
 
@@ -457,7 +457,7 @@ void CrFrame::Process()
 		m_swapchain->Present(mainCommandQueue.get(), commandBuffer->GetCompletionSemaphore().get());
 	});
 
-	renderGraph.Execute();
+	mainRenderGraph.Execute();
 
 	m_renderWorld->EndRendering();
 

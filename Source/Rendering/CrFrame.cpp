@@ -419,13 +419,15 @@ void CrFrame::Process()
 		renderGraph.AddRWBuffer(colorsRWDataBuffer, cr3d::ShaderStageFlags::Compute);
 		renderGraph.AddRWTexture(colorsRWTexture, cr3d::ShaderStageFlags::Compute, 0, 1, 0, 1);
 	},
-	[this, computePipeline](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(computePipeline.get());
-		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, m_rwStructuredBuffer.get());
-		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer.get());
-		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, m_colorsRWDataBuffer.get());
-		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), 0);
+		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
+		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
+		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
+		commandBuffer->Dispatch(1, 1, 1);
+	});
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 

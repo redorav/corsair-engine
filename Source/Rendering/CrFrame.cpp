@@ -414,10 +414,10 @@ void CrFrame::Process()
 	renderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
-		renderGraph.AddBuffer(structuredBuffer);
-		renderGraph.AddRWBuffer(rwStructuredBuffer);
-		renderGraph.AddRWBuffer(colorsRWDataBuffer);
-		renderGraph.AddRWTexture(colorsRWTexture, 0, 1, 0, 1);
+		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWBuffer(rwStructuredBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWBuffer(colorsRWDataBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWTexture(colorsRWTexture, cr3d::ShaderStageFlags::Compute, 0, 1, 0, 1);
 	},
 	[this, computePipeline](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
 	{

@@ -64,7 +64,8 @@ struct CrRenderGraphTextureUsage
 	CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare;
 	CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare;
 
-	cr3d::TextureState::T usageState = cr3d::TextureState::Undefined;
+	cr3d::TextureState::T state = cr3d::TextureState::Undefined;
+	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
 };
 
 struct CrRenderGraphBufferUsage
@@ -72,6 +73,7 @@ struct CrRenderGraphBufferUsage
 	CrRenderGraphBufferId bufferId;
 
 	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined;
+	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
 };
 
 // Description of a texture in the render graph. The properties in the descriptor
@@ -101,9 +103,9 @@ struct CrRenderGraphTextureTransition
 	cr3d::TextureState::T usageState = cr3d::TextureState::Undefined; // State I want it to be used in
 	cr3d::TextureState::T finalState = cr3d::TextureState::Undefined; // State it needs to be left in
 
-	//PipelineStage::T initialPipelineStage;
-	//PipelineStage::T usagePipelineStage;
-	//PipelineStage::T finalPipelineStage;
+	cr3d::ShaderStageFlags::T initialShaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::ShaderStageFlags::T usageShaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
 };
 
 struct CrRenderGraphBufferTransition
@@ -117,6 +119,10 @@ struct CrRenderGraphBufferTransition
 	cr3d::BufferState::T initialState = cr3d::BufferState::Undefined; // State it comes in
 	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined; // State I want it to be used in
 	cr3d::BufferState::T finalState = cr3d::BufferState::Undefined; // State it needs to be left in
+
+	cr3d::ShaderStageFlags::T initialShaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::ShaderStageFlags::T usageShaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
 };
 
 struct CrRenderGraphBufferResource
@@ -212,9 +218,9 @@ public:
 
 	CrRenderGraphBufferId CreateBuffer(const CrRenderGraphString& name, const CrRenderGraphBufferDescriptor& descriptor);
 
-	void AddTexture(CrRenderGraphTextureId textureId);
+	void AddTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages);
 
-	void AddRWTexture(CrRenderGraphTextureId textureId, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount);
+	void AddRWTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmapStart = 0, uint32_t mipmapCount = 1, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
 
 	void AddRenderTarget
 	(
@@ -239,9 +245,9 @@ public:
 
 	void AddSwapchain(CrRenderGraphTextureId textureId);
 
-	void AddBuffer(CrRenderGraphBufferId bufferId);
+	void AddBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages);
 
-	void AddRWBuffer(CrRenderGraphBufferId bufferId);
+	void AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages);
 
 	ICrTexture* GetPhysicalTexture(CrRenderGraphTextureId textureId) const
 	{

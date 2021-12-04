@@ -50,20 +50,29 @@ struct CrRenderTargetDescriptor
 // but not at the end of a pass, if the states are the same)
 struct CrRenderPassBufferDescriptor
 {
-	CrRenderPassBufferDescriptor(const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
-		: buffer(buffer), sourceState(sourceState), destinationState(destinationState) {}
+	CrRenderPassBufferDescriptor
+	(
+		const CrGPUBuffer* buffer, 
+		cr3d::BufferState::T sourceState, cr3d::ShaderStageFlags::T sourceShaderStages, 
+		cr3d::BufferState::T destinationState, cr3d::ShaderStageFlags::T destinationShaderStages)
+		: buffer(buffer), sourceState(sourceState), sourceShaderStages(sourceShaderStages),
+		destinationState(destinationState), destinationShaderStages(destinationShaderStages) {}
 
 	const CrGPUBuffer* buffer;
 	cr3d::BufferState::T sourceState;
 	cr3d::BufferState::T destinationState;
+	cr3d::ShaderStageFlags::T sourceShaderStages;
+	cr3d::ShaderStageFlags::T destinationShaderStages;
 };
 
 struct CrRenderPassTextureDescriptor
 {
 	CrRenderPassTextureDescriptor(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
-		uint32_t sliceStart, uint32_t sliceCount, cr3d::TextureState::T sourceState, cr3d::TextureState::T destinationState)
+		uint32_t sliceStart, uint32_t sliceCount, 
+		cr3d::TextureState::T sourceState, cr3d::ShaderStageFlags::T sourceShaderStages, 
+		cr3d::TextureState::T destinationState, cr3d::ShaderStageFlags::T destinationShaderStages)
 		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount)
-		, sourceState(sourceState), destinationState(destinationState) {}
+		, sourceState(sourceState), sourceShaderStages(sourceShaderStages), destinationState(destinationState), destinationShaderStages(destinationShaderStages) {}
 
 	const ICrTexture* texture;
 
@@ -75,6 +84,8 @@ struct CrRenderPassTextureDescriptor
 
 	cr3d::TextureState::T sourceState;
 	cr3d::TextureState::T destinationState;
+	cr3d::ShaderStageFlags::T sourceShaderStages;
+	cr3d::ShaderStageFlags::T destinationShaderStages;
 };
 
 struct CrRenderPassDescriptor

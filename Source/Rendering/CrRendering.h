@@ -437,6 +437,26 @@ namespace cr3d
 		}
 	};
 
+	// This enum exists so we can OR stages together
+	namespace ShaderStageFlags
+	{
+		enum T : uint32_t
+		{
+			None     = 0,
+			Vertex   = 1 << ShaderStage::Vertex,
+			Pixel    = 1 << ShaderStage::Pixel,
+			Hull     = 1 << ShaderStage::Hull,
+			Domain   = 1 << ShaderStage::Domain,
+			Geometry = 1 << ShaderStage::Geometry,
+			Compute  = 1 << ShaderStage::Compute
+		};
+
+		inline ShaderStageFlags::T operator | (ShaderStageFlags::T flag1, ShaderStageFlags::T flag2)
+		{
+			return (ShaderStageFlags::T)((uint32_t)flag1 | (uint32_t)flag2);
+		}
+	};
+
 	// These resource states encapsulate resource states as a common denominator between APIs. Some platforms don't even
 	// have resource states but instead flush caches, etc. These are ways to clue in each platform of what needs doing.
 	// It might mean doing the same thing for some of the states.

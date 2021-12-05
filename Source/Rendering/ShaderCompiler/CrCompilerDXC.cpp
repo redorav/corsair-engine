@@ -1,6 +1,15 @@
 #include "CrCompilerDXC.h"
 
+// SPIR-V Reflection
 #include <spirv_reflect.h>
+
+// DXIL Reflection
+#pragma warning(push)
+#pragma warning(disable : 5204)
+#include <atlbase.h> // Common COM helpers.
+#include "dxc/dxcapi.h" // Use quotes to explicitly use version in dependencies. Be sure to link with dxcompiler.lib
+#include <d3d12shader.h>
+#pragma warning(pop)
 
 #include "CrShaderCompiler.h"
 
@@ -242,6 +251,97 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	}
 }
 
+cr3d::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_DESC& resourceBindingDescriptor)
+{
+	switch (resourceBindingDescriptor.Type)
+	{
+		case D3D_SIT_CBUFFER:
+			return cr3d::ShaderResourceType::ConstantBuffer;
+		case D3D_SIT_TEXTURE:
+			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
+			{
+				return cr3d::ShaderResourceType::DataBuffer;
+			}
+			else
+			{
+				return cr3d::ShaderResourceType::Texture;
+			}
+		case D3D_SIT_SAMPLER:
+			return cr3d::ShaderResourceType::Sampler;
+		case D3D_SIT_UAV_RWTYPED:
+			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
+			{
+				return cr3d::ShaderResourceType::RWDataBuffer;
+			}
+			else
+			{
+				return cr3d::ShaderResourceType::RWTexture;
+			}
+		case D3D_SIT_STRUCTURED:
+		case D3D_SIT_BYTEADDRESS:
+			return cr3d::ShaderResourceType::StorageBuffer;
+		case D3D_SIT_UAV_RWSTRUCTURED:
+		case D3D_SIT_UAV_RWBYTEADDRESS:
+		case D3D_SIT_UAV_APPEND_STRUCTURED:
+		case D3D_SIT_UAV_CONSUME_STRUCTURED:
+		case D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
+			return cr3d::ShaderResourceType::RWStorageBuffer;
+		default:
+			return cr3d::ShaderResourceType::Count;
+	}
+}
+
+// D3D_NAME_UNDEFINED = 0,
+// D3D_NAME_POSITION = 1,
+// D3D_NAME_CLIP_DISTANCE = 2,
+// D3D_NAME_CULL_DISTANCE = 3,
+// D3D_NAME_RENDER_TARGET_ARRAY_INDEX = 4,
+// D3D_NAME_VIEWPORT_ARRAY_INDEX = 5,
+// D3D_NAME_VERTEX_ID = 6,
+// D3D_NAME_PRIMITIVE_ID = 7,
+// D3D_NAME_INSTANCE_ID = 8,
+// D3D_NAME_IS_FRONT_FACE = 9,
+// D3D_NAME_SAMPLE_INDEX = 10,
+// D3D_NAME_FINAL_QUAD_EDGE_TESSFACTOR = 11,
+// D3D_NAME_FINAL_QUAD_INSIDE_TESSFACTOR = 12,
+// D3D_NAME_FINAL_TRI_EDGE_TESSFACTOR = 13,
+// D3D_NAME_FINAL_TRI_INSIDE_TESSFACTOR = 14,
+// D3D_NAME_FINAL_LINE_DETAIL_TESSFACTOR = 15,
+// D3D_NAME_FINAL_LINE_DENSITY_TESSFACTOR = 16,
+// D3D_NAME_BARYCENTRICS = 23,
+// D3D_NAME_SHADINGRATE = 24,
+// D3D_NAME_CULLPRIMITIVE = 25,
+// D3D_NAME_TARGET = 64,
+// D3D_NAME_DEPTH = 65,
+// D3D_NAME_COVERAGE = 66,
+// D3D_NAME_DEPTH_GREATER_EQUAL = 67,
+// D3D_NAME_DEPTH_LESS_EQUAL = 68,
+// D3D_NAME_STENCIL_REF = 69,
+// D3D_NAME_INNER_COVERAGE = 70,
+
+cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE_PARAMETER_DESC& d3dSignatureParameter)
+{
+	switch (d3dSignatureParameter.SystemValueType)
+	{
+		case D3D_NAME_UNDEFINED: return cr3d::ShaderInterfaceBuiltinType::None;
+		case D3D_NAME_POSITION: return cr3d::ShaderInterfaceBuiltinType::Position;
+		//case SpvBuiltIn::SpvBuiltInFragCoord: return cr3d::ShaderInterfaceBuiltinType::Position;
+		//case SpvBuiltIn::SpvBuiltInBaseInstance: return cr3d::ShaderInterfaceBuiltinType::BaseInstance;
+		case D3D_NAME_INSTANCE_ID: return cr3d::ShaderInterfaceBuiltinType::InstanceId;
+		case D3D_NAME_VERTEX_ID: return cr3d::ShaderInterfaceBuiltinType::VertexId;
+		case D3D_NAME_DEPTH: return cr3d::ShaderInterfaceBuiltinType::Depth;
+		case D3D_NAME_IS_FRONT_FACE: return cr3d::ShaderInterfaceBuiltinType::IsFrontFace;
+
+		//case SpvBuiltIn::SpvBuiltInWorkgroupId: return cr3d::ShaderInterfaceBuiltinType::GroupId;
+		//case SpvBuiltIn::SpvBuiltInLocalInvocationId: return cr3d::ShaderInterfaceBuiltinType::GroupThreadId;
+		//case SpvBuiltIn::SpvBuiltInLocalInvocationIndex: return cr3d::ShaderInterfaceBuiltinType::GroupIndex;
+		//case SpvBuiltIn::SpvBuiltInGlobalInvocationId: return cr3d::ShaderInterfaceBuiltinType::DispatchThreadId;
+
+		default:
+			return cr3d::ShaderInterfaceBuiltinType::None;
+	}
+}
+
 bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	CrProcessDescriptor processDescriptor;
@@ -259,6 +359,93 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 	}
 	else
 	{
+		if (compilationDescriptor.buildReflection)
+		{
+			CrVector<char> bytecode;
+
+			// Read data in
+			CrFileUniqueHandle tempFile = ICrFile::OpenUnique(compilationDescriptor.tempPath.c_str(), FileOpenFlags::Read);
+			bytecode.resize(tempFile->GetSize());
+			tempFile->Read(bytecode.data(), bytecode.size());
+			tempFile = nullptr; // Close the file
+
+			CComPtr<IDxcUtils> dxcUtils;
+			DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+
+			DxcBuffer buffer = { bytecode.data(), bytecode.size(), 0 };
+			
+			CComPtr<ID3D12ShaderReflection> pReflection;
+			HRESULT hResult = dxcUtils->CreateReflection(&buffer, IID_PPV_ARGS(&pReflection));
+
+			if(hResult != S_OK)
+			{
+				return false;
+			}
+
+			// Get reflection interface
+			D3D12_SHADER_DESC shaderDescriptor;
+			pReflection->GetDesc(&shaderDescriptor);
+
+			CrShaderReflectionHeader reflectionHeader;
+			reflectionHeader.entryPoint = compilationDescriptor.entryPoint;
+			reflectionHeader.shaderStage = compilationDescriptor.shaderStage;
+
+			for (uint32_t i = 0; i < shaderDescriptor.BoundResources; ++i)
+			{
+				D3D12_SHADER_INPUT_BIND_DESC resourceDescriptor;
+				pReflection->GetResourceBindingDesc(i, &resourceDescriptor);
+
+				CrShaderReflectionResource resource;
+				resource.name = resourceDescriptor.Name;
+				resource.type = GetShaderResourceType(resourceDescriptor);
+				resource.bindPoint = (uint8_t)resourceDescriptor.BindPoint;
+				resource.bytecodeOffset = 0;
+				reflectionHeader.resources.push_back(resource);
+			}
+
+			const auto ProcessInterfaceVariable = [](const D3D12_SIGNATURE_PARAMETER_DESC& parameterDescriptor, CrVector<CrShaderInterfaceVariable>& interfaceVariables)
+			{
+				if (parameterDescriptor.ReadWriteMask)
+				{
+					CrShaderInterfaceVariable interfaceVariable;
+					if (parameterDescriptor.SystemValueType == D3D_NAME_UNDEFINED)
+					{
+						interfaceVariable.name = parameterDescriptor.SemanticName;
+					}
+
+					interfaceVariable.type = GetShaderInterfaceType(parameterDescriptor);
+					interfaceVariable.bindPoint = (uint8_t)parameterDescriptor.Register;
+					interfaceVariables.push_back(interfaceVariable);
+				}
+			};
+
+			for (uint32_t i = 0; i < shaderDescriptor.InputParameters; ++i)
+			{
+				D3D12_SIGNATURE_PARAMETER_DESC inputParameterDescriptor;
+				pReflection->GetInputParameterDesc(i, &inputParameterDescriptor);
+				ProcessInterfaceVariable(inputParameterDescriptor, reflectionHeader.stageInputs);
+			}
+
+			for (uint32_t i = 0; i < shaderDescriptor.OutputParameters; ++i)
+			{
+				D3D12_SIGNATURE_PARAMETER_DESC outputParameterDescriptor;
+				pReflection->GetOutputParameterDesc(i, &outputParameterDescriptor);
+				ProcessInterfaceVariable(outputParameterDescriptor, reflectionHeader.stageOutputs);
+			}
+
+			int perry = pReflection->GetNumInterfaceSlots();perry;
+
+			if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+			{
+				pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);
+			}
+
+			// Write reflection header out
+			CrWriteFileStream writeFileStream(compilationDescriptor.outputPath.c_str());
+			writeFileStream << reflectionHeader;
+			writeFileStream << bytecode;
+		}
+
 		return true;
 	}
 }

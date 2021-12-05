@@ -43,6 +43,15 @@ DdsppLibrary =
 	includeDirs = LibDdspp..IncludeDirectory
 }
 
+-- Vulkan comes with the dxc parsing library, and it is regularly updated. To avoid extra complexity,
+-- we'll source it from there
+DxcLibrary =
+{
+	includeDirs = LibVulkan..IncludeDirectory..'include',
+	libDirs = LibVulkan..BinaryDirectory,
+	libNames = {'dxcompiler'}
+}
+
 EASTLLibrary =
 {
 	includeDirs =

@@ -343,6 +343,9 @@ project(ProjectShaderCompiler)
 
 	AddLibraryIncludes(SPIRVReflectLibrary)
 	LinkLibrary(SPIRVReflectLibrary)
+	
+	AddLibraryIncludes(DxcLibrary)
+	LinkLibrary(DxcLibrary)
 
 	AddLibraryIncludes(GlslangLibrary)
 	LinkLibrary(GlslangLibrary)

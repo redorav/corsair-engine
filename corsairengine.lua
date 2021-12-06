@@ -63,6 +63,8 @@ function HandleGlobalWarnings()
 		{
 			'4201' -- nonstandard extension used: nameless struct/union
 		}
+	
+	filter{}
 
 end
 

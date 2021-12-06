@@ -193,7 +193,7 @@ workspace 'Corsair Engine'
 		
 	filter{}
 	
-	configuration 'Debug'
+	filter { 'configurations:Debug' }
 		defines { 'DEBUG_CONFIG' }
 		optimize('off')
 		--symbols('on')
@@ -204,7 +204,7 @@ workspace 'Corsair Engine'
 		-- release external libraries to speed up this config
 		runtime('release')
 
-	configuration 'Release'
+	filter { 'configurations:Release' }
 		defines
 		{
 			'RELEASE_CONFIG',

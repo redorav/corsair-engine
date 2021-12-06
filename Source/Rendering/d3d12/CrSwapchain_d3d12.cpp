@@ -17,7 +17,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 
 	DXGI_SWAP_CHAIN_DESC1 d3d12SwapchainDescriptor = {};
 	d3d12SwapchainDescriptor.BufferCount = swapchainDescriptor.requestedBufferCount;
-	d3d12SwapchainDescriptor.Format = crd3d::GetD3DFormat(swapchainDescriptor.format);
+	d3d12SwapchainDescriptor.Format = crd3d::GetDXGIFormat(swapchainDescriptor.format);
 	d3d12SwapchainDescriptor.Width = swapchainDescriptor.requestedWidth;
 	d3d12SwapchainDescriptor.Height = swapchainDescriptor.requestedHeight;
 	d3d12SwapchainDescriptor.SampleDesc.Count = 1;

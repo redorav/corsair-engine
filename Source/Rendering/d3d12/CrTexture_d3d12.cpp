@@ -14,7 +14,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	CrRenderDeviceD3D12* renderDeviceD3D12 = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = renderDeviceD3D12->GetD3D12Device();
 
-	DXGI_FORMAT dxgiFormat = crd3d::GetD3DFormat(descriptor.format);
+	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 
 	D3D12_RESOURCE_DESC resourceDescriptor = {};
 	resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

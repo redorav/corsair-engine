@@ -6,7 +6,7 @@ namespace CrCommandQueueType { enum T : uint32_t; }
 
 namespace crd3d
 {
-	DXGI_FORMAT GetD3DFormat(cr3d::DataFormat::T format);
+	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
 
 	D3D12_TEXTURE_ADDRESS_MODE GetD3DAddressMode(cr3d::AddressMode addressMode);
 	
@@ -23,6 +23,8 @@ namespace crd3d
 	uint32_t GetD3D12SampleCount(cr3d::SampleCount sampleCount);
 
 	D3D_PRIMITIVE_TOPOLOGY GetD3D12PrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology);
+
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE GetD3D12PrimitiveTopologyType(cr3d::PrimitiveTopology primitiveTopology);
 
 	D3D12_FILL_MODE GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode);
 

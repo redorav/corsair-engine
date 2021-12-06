@@ -5,7 +5,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-DXGI_FORMAT crd3d::GetD3DFormat(cr3d::DataFormat::T format)
+DXGI_FORMAT crd3d::GetDXGIFormat(cr3d::DataFormat::T format)
 {
 	switch (format)
 	{
@@ -341,6 +341,23 @@ D3D_PRIMITIVE_TOPOLOGY crd3d::GetD3D12PrimitiveTopology(cr3d::PrimitiveTopology 
 	}
 
 	return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+}
+
+D3D12_PRIMITIVE_TOPOLOGY_TYPE crd3d::GetD3D12PrimitiveTopologyType(cr3d::PrimitiveTopology primitiveTopology)
+{
+	switch (primitiveTopology)
+	{
+		case cr3d::PrimitiveTopology::PointList:
+			return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+		case cr3d::PrimitiveTopology::LineList:
+		case cr3d::PrimitiveTopology::LineStrip:
+			return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+		case cr3d::PrimitiveTopology::TriangleList:
+		case cr3d::PrimitiveTopology::TriangleStrip:
+			return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		default:
+			return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
+	}
 }
 
 D3D12_FILL_MODE crd3d::GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode)

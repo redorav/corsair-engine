@@ -85,7 +85,6 @@ class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
-struct CrShaderStageInfo;
 struct CrShaderDefines;
 struct CrShaderReflectionHeader;
 

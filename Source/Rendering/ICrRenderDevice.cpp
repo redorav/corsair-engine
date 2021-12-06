@@ -82,18 +82,18 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	pipeline->m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
 
 	// Print out a message that includes meaningful information
-	const CrVector<CrShaderStageInfo>& stages = graphicsShader->GetStages();
+	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = graphicsShader->GetBytecodes();
 	
 	// Add entry point names
 	CrFixedString128 entryPoints("(");
-	entryPoints.append(stages[0].entryPoint.c_str());
+	entryPoints.append(bytecodes[0]->GetEntryPoint().c_str());
 
-	if (stages.size() > 1)
+	if (bytecodes.size() > 1)
 	{
-		for (uint32_t i = 1; i < stages.size(); ++i)
+		for (uint32_t i = 1; i < bytecodes.size(); ++i)
 		{
 			entryPoints.append(", ");
-			entryPoints.append(stages[i].entryPoint.c_str());
+			entryPoints.append(bytecodes[i]->GetEntryPoint().c_str());
 		}
 	}
 
@@ -112,7 +112,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 	computePipeline->m_shader = computeShader;
 
 	CrFixedString128 entryPoint("(");
-	entryPoint.append(computeShader->m_stageInfo.entryPoint.c_str());
+	entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
 	entryPoint.append(")");
 
 	CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());

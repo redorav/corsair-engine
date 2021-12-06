@@ -192,12 +192,6 @@ struct CrInputSignature
 	CrFixedVector<CrVertexInput, cr3d::MaxVertexStreams> inputs;
 };
 
-struct CrShaderStageInfo
-{
-	CrFixedString128 entryPoint; // TODO Optimize
-	cr3d::ShaderStage::T stage;
-};
-
 // Bytecode represents a shader code, e.g. vertex, pixel, etc
 class CrShaderBytecode
 {
@@ -296,19 +290,16 @@ public:
 	{
 		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 		{
-			CrShaderStageInfo info;
-			info.entryPoint = bytecode->GetEntryPoint().c_str();
-			info.stage = bytecode->GetShaderStage();
-			m_stageInfos.push_back(info);
+			m_bytecodes.push_back(bytecode);
 			m_hash <<= bytecode->GetHash();
 		}
 	}
 
 	virtual ~ICrGraphicsShader() {}
 
-	const CrVector<CrShaderStageInfo>& GetStages() const
+	const CrVector<CrShaderBytecodeSharedHandle>& GetBytecodes() const
 	{
-		return m_stageInfos;
+		return m_bytecodes;
 	}
 
 	const CrInputSignature& GetInputSignature() const
@@ -320,7 +311,7 @@ protected:
 
 	CrInputSignature m_inputSignature;
 
-	CrVector<CrShaderStageInfo> m_stageInfos; // TODO Optimize
+	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
 };
 
 struct CrComputeShaderDescriptor
@@ -334,14 +325,20 @@ public:
 
 	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
-		m_stageInfo.entryPoint = computeShaderDescriptor.m_bytecode->GetEntryPoint().c_str();
-		m_stageInfo.stage = cr3d::ShaderStage::Compute;
+		m_bytecode = computeShaderDescriptor.m_bytecode;
 		m_hash = computeShaderDescriptor.m_bytecode->GetHash();
+	}
+
+	const CrShaderBytecodeSharedHandle& GetBytecode() const
+	{
+		return m_bytecode;
 	}
 
 	virtual ~ICrComputeShader() {}
 
-	CrShaderStageInfo m_stageInfo;
+private:
+
+	CrShaderBytecodeSharedHandle m_bytecode;
 };
 
 struct CrShaderBytecodeCompilationDescriptor

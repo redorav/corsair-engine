@@ -28,17 +28,29 @@ static_assert(sizeof(CrRasterizerStateDescriptor) == 16, "CrRasterizerStateDescr
 
 struct CrRenderTargetBlendDescriptor
 {
-	cr3d::BlendFactor srcColorBlendFactor : 5;
-	cr3d::BlendFactor dstColorBlendFactor : 5;
+	union
+	{
+		struct
+		{
+			cr3d::BlendFactor srcColorBlendFactor : 5;
+			cr3d::BlendFactor dstColorBlendFactor : 5;
 
-	cr3d::BlendFactor srcAlphaBlendFactor : 5;
-	cr3d::BlendFactor dstAlphaBlendFactor : 5;
-	cr3d::ColorWriteMask colorWriteMask : 4;
-	cr3d::BlendOp colorBlendOp : 3;
-	cr3d::BlendOp alphaBlendOp : 3;
+			cr3d::BlendFactor srcAlphaBlendFactor : 5;
+			cr3d::BlendFactor dstAlphaBlendFactor : 5;
+			cr3d::ColorWriteMask colorWriteMask : 4;
+			cr3d::BlendOp colorBlendOp : 3;
+			cr3d::BlendOp alphaBlendOp : 3;
 
-	uint32_t enable : 1;
-	uint32_t padding : 1;
+			uint32_t enable : 1;
+			uint32_t padding : 1;
+		};
+
+		uint32_t bits;
+	};
+
+	bool operator == (const CrRenderTargetBlendDescriptor& other) { return bits == other.bits; }
+
+	bool operator != (const CrRenderTargetBlendDescriptor& other) { return bits != other.bits; }
 };
 
 static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4, "CrRenderTargetBlendDescriptor size mismatch");

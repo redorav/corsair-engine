@@ -441,26 +441,26 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 
 	// Shader information
 	VkPipelineShaderStageCreateInfo shaderStages[cr3d::ShaderStage::GraphicsStageCount] = {};
-	VkPipelineShaderStageCreateInfo shaderStageInfo = {};
-	shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
+	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
 	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader);
 
 	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
-	const CrVector<CrShaderStageInfo>& stageInfos = vulkanGraphicsShader->GetStages();
+	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
 
 	uint32_t usedShaderStages = 0;
 
-	for (uint32_t i = 0; i < stageInfos.size(); ++i)
+	for (uint32_t i = 0; i < bytecodes.size(); ++i)
 	{
-		const CrShaderStageInfo& stageInfo = stageInfos[i];
+		const CrShaderBytecodeSharedHandle& bytecode = bytecodes[i];
 		const VkShaderModule vkShaderModule = vkShaderModules[i];
 
-		shaderStageInfo.module = vkShaderModule;
-		shaderStageInfo.stage = crvk::GetVkShaderStage(stageInfo.stage);
-		shaderStageInfo.pName = stageInfo.entryPoint.c_str();
-		shaderStages[usedShaderStages++] = shaderStageInfo;
+		shaderStageCreateInfo.module = vkShaderModule;
+		shaderStageCreateInfo.stage = crvk::GetVkShaderStage(bytecode->GetShaderStage());
+		shaderStageCreateInfo.pName = bytecode->GetEntryPoint().c_str();
+		shaderStages[usedShaderStages++] = shaderStageCreateInfo;
 	}
 
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(graphicsShader->GetBindingTable());
@@ -596,24 +596,24 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 		CrAssert(vkResult == VK_SUCCESS);
 	}
 
-	VkGraphicsPipelineCreateInfo pipelineInfo = {};
-	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	pipelineInfo.stageCount = (uint32_t)graphicsShader->GetStages().size();
-	pipelineInfo.pStages = shaderStages;
+	VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
+	graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShader->GetBytecodes().size();
+	graphicsPipelineCreateInfo.pStages = shaderStages;
 
-	pipelineInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout;
-	pipelineInfo.pVertexInputState = &vertexInputState;
-	pipelineInfo.renderPass = vkCompatibleRenderPass;
+	graphicsPipelineCreateInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout;
+	graphicsPipelineCreateInfo.pVertexInputState = &vertexInputState;
+	graphicsPipelineCreateInfo.renderPass = vkCompatibleRenderPass;
 
-	pipelineInfo.pInputAssemblyState = &inputAssemblyState;
-	pipelineInfo.pRasterizationState = &rasterizerState;
-	pipelineInfo.pColorBlendState = &colorBlendState;
-	pipelineInfo.pMultisampleState = &multisampleState;
-	pipelineInfo.pViewportState = &viewportState;
-	pipelineInfo.pDepthStencilState = &depthStencilState;
-	pipelineInfo.pDynamicState = &dynamicState;
+	graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
+	graphicsPipelineCreateInfo.pRasterizationState = &rasterizerState;
+	graphicsPipelineCreateInfo.pColorBlendState = &colorBlendState;
+	graphicsPipelineCreateInfo.pMultisampleState = &multisampleState;
+	graphicsPipelineCreateInfo.pViewportState = &viewportState;
+	graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilState;
+	graphicsPipelineCreateInfo.pDynamicState = &dynamicState;
 
-	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipeline);
+	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
 	vkDestroyRenderPass(m_vkDevice, vkCompatibleRenderPass, nullptr);
@@ -633,7 +633,7 @@ ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
 	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
 	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader)->GetVkShaderModule();
-	shaderStage.pName = computeShader->m_stageInfo.entryPoint.c_str();
+	shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
 	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(computeShader->GetBindingTable());
 
@@ -653,12 +653,12 @@ ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
 	vkResult = vkCreatePipelineLayout(m_vkDevice, &pipelineLayoutCreateInfo, nullptr, &vulkanComputePipeline->m_vkPipelineLayout);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline layout");
 
-	VkComputePipelineCreateInfo pipelineInfo = {};
-	pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-	pipelineInfo.stage = shaderStage;
-	pipelineInfo.layout = vulkanComputePipeline->m_vkPipelineLayout;
+	VkComputePipelineCreateInfo computePipelineCreateInfo = {};
+	computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	computePipelineCreateInfo.stage = shaderStage;
+	computePipelineCreateInfo.layout = vulkanComputePipeline->m_vkPipelineLayout;
 
-	vkResult = vkCreateComputePipelines(m_vkDevice, m_vkPipelineCache, 1, &pipelineInfo, nullptr, &vulkanComputePipeline->m_vkPipeline);
+	vkResult = vkCreateComputePipelines(m_vkDevice, m_vkPipelineCache, 1, &computePipelineCreateInfo, nullptr, &vulkanComputePipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
 	return vulkanComputePipeline;

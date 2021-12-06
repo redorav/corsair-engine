@@ -150,7 +150,7 @@ struct CrVertexDescriptor
 		return m_attributeCount;
 	}
 
-	const cr3d::DataFormatInfo& GetAttributeInfo(uint32_t attributeIndex)
+	const cr3d::DataFormatInfo& GetDataFormatInfo(uint32_t attributeIndex)
 	{
 		return cr3d::DataFormats[GetAttribute(attributeIndex).format];
 	}

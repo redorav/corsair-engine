@@ -5,11 +5,11 @@
 
 class ICrRenderDevice;
 
-class CrShaderBindingTableD3D12 final : public ICrShaderBindingTable
+class CrShaderBindingTableD3D12 final : public ICrShaderBindingLayout
 {
 public:
 
-	CrShaderBindingTableD3D12(const CrShaderBindingTableResources& resources) : ICrShaderBindingTable(resources) {}
+	CrShaderBindingTableD3D12(const CrShaderBindingLayoutResources& resources) : ICrShaderBindingLayout(resources) {}
 };
 
 class CrGraphicsShaderD3D12 final : public ICrGraphicsShader

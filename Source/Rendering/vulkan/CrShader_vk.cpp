@@ -6,14 +6,14 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-static ICrShaderBindingTable* CreateBindingTable
+static ICrShaderBindingLayout* CreateBindingLayout
 (
 	const ICrRenderDevice* renderDevice, 
 	const CrFixedVector<CrShaderReflectionHeader, cr3d::ShaderStage::Count>& reflectionHeaders
 )
 {
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
-	CrShaderBindingTableResources resources;
+	CrShaderBindingLayoutResources resources;
 
 	for (uint32_t k = 0; k < reflectionHeaders.size(); ++k)
 	{
@@ -24,13 +24,6 @@ static ICrShaderBindingTable* CreateBindingTable
 			const CrShaderReflectionResource& resource = reflectionHeader.resources[i];
 
 			cr3d::ShaderStage::T stage = reflectionHeader.shaderStage;
-
-			VkDescriptorSetLayoutBinding layoutBinding;
-			layoutBinding.binding = resource.bindPoint;
-			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
-			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
-			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
-			layoutBinding.pImmutableSamplers = nullptr;
 
 			switch (resource.type)
 			{
@@ -78,11 +71,18 @@ static ICrShaderBindingTable* CreateBindingTable
 				}
 			}
 
+			VkDescriptorSetLayoutBinding layoutBinding;
+			layoutBinding.binding = resource.bindPoint;
+			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+			layoutBinding.pImmutableSamplers = nullptr;
+
 			layoutBindings.push_back(layoutBinding);
 		}
 	}
 
-	CrShaderBindingTableVulkan* vulkanBindingTable = new CrShaderBindingTableVulkan(resources);
+	CrShaderBindingLayoutVulkan* vulkanBindingTable = new CrShaderBindingLayoutVulkan(resources);
 
 	VkDescriptorSetLayoutCreateInfo descriptorLayout;
 	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -93,7 +93,7 @@ static ICrShaderBindingTable* CreateBindingTable
 
 	VkResult result = vkCreateDescriptorSetLayout(
 		static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), &descriptorLayout, nullptr,
-		&static_cast<CrShaderBindingTableVulkan*>(vulkanBindingTable)->m_vkDescriptorSetLayout);
+		&static_cast<CrShaderBindingLayoutVulkan*>(vulkanBindingTable)->m_vkDescriptorSetLayout);
 
 	CrAssert(result == VK_SUCCESS);
 
@@ -159,7 +159,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 	}
 
 	// Create the optimized shader resource table
-	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(CreateBindingTable(renderDevice, reflectionHeaders));
+	m_bindingTable = CrUniquePtr<ICrShaderBindingLayout>(CreateBindingLayout(renderDevice, reflectionHeaders));
 }
 
 CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
@@ -189,5 +189,5 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice
 	CrAssert(vkResult == VK_SUCCESS);
 
 	// Create the optimized shader resource table
-	m_bindingTable = CrUniquePtr<ICrShaderBindingTable>(CreateBindingTable(renderDevice, reflectionHeaders));
+	m_bindingTable = CrUniquePtr<ICrShaderBindingLayout>(CreateBindingLayout(renderDevice, reflectionHeaders));
 }

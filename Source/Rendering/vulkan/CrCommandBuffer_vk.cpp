@@ -160,7 +160,7 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 // properly because if these tables persist across frames, they should have the same
 // lifetime as the resources they contain
 void CrCommandBufferVulkan::UpdateResourceTableVulkan
-(const CrShaderBindingTableVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout)
+(const CrShaderBindingLayoutVulkan& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout)
 {
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
@@ -168,7 +168,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	descriptorSetAllocInfo.pNext = nullptr;
 	descriptorSetAllocInfo.descriptorPool = m_vkDescriptorPool;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	descriptorSetAllocInfo.pSetLayouts = &bindingTable.m_vkDescriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &bindingLayout.m_vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
 	VkResult result = vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocInfo, &descriptorSet);
@@ -187,7 +187,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	uint32_t imageCount = 0;         // Total number of images
 	uint32_t texelBufferCount = 0;   // Total number of texel buffers
 
-	bindingTable.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		const ConstantBufferMetadata& constantBufferMeta = CrShaderMetadata::GetConstantBuffer(id);
 		const ConstantBufferBinding& binding = m_currentState.GetConstantBufferBinding(stage, id);
@@ -211,7 +211,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingTable.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
 	{
 		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][id]);
 
@@ -226,7 +226,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingTable.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id]);
 
@@ -242,7 +242,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingTable.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
 	{
 		const RWTextureBinding& binding = m_currentState.m_rwTextures[stage][id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
@@ -259,7 +259,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingTable.ForEachStorageBuffer([&](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		const StorageBufferBinding& binding = m_currentState.m_storageBuffers[stage][id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -276,7 +276,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingTable.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[stage][id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -293,7 +293,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingTable.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id]->GetHardwareBuffer());
 
@@ -392,16 +392,16 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 		m_currentState.m_stencilRefDirty = false;
 	}
 
-	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentGraphicsShader->GetBindingTable());
+	const CrShaderBindingLayoutVulkan& bindingLayout = static_cast<const CrShaderBindingLayoutVulkan&>(currentGraphicsShader->GetBindingLayout());
 
-	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);
+	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);
 }
 
 void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 {
 	const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
 	const CrComputeShaderHandle& currentComputeShader = vulkanComputePipeline->m_shader;
-	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(currentComputeShader->GetBindingTable());
+	const CrShaderBindingLayoutVulkan& bindingLayout = static_cast<const CrShaderBindingLayoutVulkan&>(currentComputeShader->GetBindingLayout());
 
 	if (m_currentState.m_computePipelineDirty)
 	{
@@ -410,7 +410,7 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 		m_currentState.m_computePipelineDirty = false;
 	}
 
-	UpdateResourceTableVulkan(bindingTable, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
+	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
 }
 
 static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDescriptor& renderTargetDescriptor)

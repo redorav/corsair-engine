@@ -12,7 +12,7 @@ struct SamplerMetadata;
 
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
-class ICrShaderBindingTable;
+class ICrShaderBindingLayout;
 
 class CrShaderManager
 {

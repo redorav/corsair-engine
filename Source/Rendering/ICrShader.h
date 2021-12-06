@@ -57,8 +57,8 @@ struct CrShaderBinding
 };
 
 // We use this table to bucket resources before passing
-// them on (sorted) to the shader binding table.
-struct CrShaderBindingTableResources
+// them on (sorted) to the shader binding layout.
+struct CrShaderBindingLayoutResources
 {
 	CrFixedVector<CrShaderBinding, 64> constantBuffers;
 	CrFixedVector<CrShaderBinding, 16> samplers;
@@ -76,13 +76,13 @@ struct CrShaderBindingTableResources
 // according to type. This is not the resource table, just the binding points. 
 // It also doesn't contain any names, but points to the builtins that the engine knows
 // about
-class ICrShaderBindingTable
+class ICrShaderBindingLayout
 {
 public:
 
-	ICrShaderBindingTable(const CrShaderBindingTableResources& resources);
+	ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources);
 
-	virtual ~ICrShaderBindingTable() {}
+	virtual ~ICrShaderBindingLayout() {}
 
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 
@@ -267,14 +267,14 @@ public:
 		return m_hash;
 	}
 
-	const ICrShaderBindingTable& GetBindingTable() const
+	const ICrShaderBindingLayout& GetBindingLayout() const
 	{
 		return *m_bindingTable.get();
 	}	
 
 protected:
 
-	CrUniquePtr<ICrShaderBindingTable> m_bindingTable;
+	CrUniquePtr<ICrShaderBindingLayout> m_bindingTable;
 
 	// Hash produced from the bytecodes belonging to this shader
 	CrHash m_hash;

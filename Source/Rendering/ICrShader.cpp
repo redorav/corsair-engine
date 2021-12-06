@@ -6,7 +6,7 @@
 
 CrShaderDefines CrShaderDefines::Dummy;
 
-ICrShaderBindingTable::ICrShaderBindingTable(const CrShaderBindingTableResources& resources)
+ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources)
 {
 	size_t totalResourceCount =
 		resources.constantBuffers.size() + 

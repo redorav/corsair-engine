@@ -463,7 +463,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 		shaderStages[usedShaderStages++] = shaderStageCreateInfo;
 	}
 
-	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(graphicsShader->GetBindingTable());
+	const CrShaderBindingLayoutVulkan& bindingTable = static_cast<const CrShaderBindingLayoutVulkan&>(graphicsShader->GetBindingLayout());
 
 	// Pipeline Resource Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -635,7 +635,7 @@ ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
 	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader)->GetVkShaderModule();
 	shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
-	const CrShaderBindingTableVulkan& bindingTable = static_cast<const CrShaderBindingTableVulkan&>(computeShader->GetBindingTable());
+	const CrShaderBindingLayoutVulkan& bindingTable = static_cast<const CrShaderBindingLayoutVulkan&>(computeShader->GetBindingLayout());
 
 	VkResult vkResult;
 

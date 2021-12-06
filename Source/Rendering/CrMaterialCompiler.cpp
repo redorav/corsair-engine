@@ -68,7 +68,7 @@ CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderByt
 
 CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor& descriptor)
 {
-	descriptor; // TODO
+	unused_parameter(descriptor); // TODO
 
 	cr3d::GraphicsApi::T graphicsApi = ICrRenderSystem::Get()->GetGraphicsApi();
 	cr::Platform::T platform = cr::Platform::Windows;

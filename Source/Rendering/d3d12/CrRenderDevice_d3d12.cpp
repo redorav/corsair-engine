@@ -284,12 +284,13 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	// ID3D12RootSignature* pRootSignature;
 
 	ID3D12PipelineState* d3d12PipelineState;
-	HRESULT hResult = m_d3d12Device->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&d3d12GraphicsPipeline->m_d3d12PipelineState));
+	HRESULT hResult = m_d3d12Device->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&d3d12PipelineState));
 
 	if (hResult == S_OK)
 	{
 		CrGraphicsPipelineD3D12* d3d12GraphicsPipeline = new CrGraphicsPipelineD3D12();
 		d3d12GraphicsPipeline->m_d3d12PipelineState = d3d12PipelineState;
+		return d3d12GraphicsPipeline;
 	}
 	else
 	{

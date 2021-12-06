@@ -56,6 +56,7 @@ function HandleGlobalWarnings()
 			'4264', -- no override available for virtual member function from base 'class'; function is hidden
 			'4265', -- class has virtual functions, but destructor is not virtual
 			'5204', -- class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+			'4555', -- result of expression not used
 		}
 		
 		disablewarnings

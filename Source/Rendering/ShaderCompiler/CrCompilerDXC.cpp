@@ -433,8 +433,6 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				ProcessInterfaceVariable(outputParameterDescriptor, reflectionHeader.stageOutputs);
 			}
 
-			int perry = pReflection->GetNumInterfaceSlots();perry;
-
 			if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
 			{
 				pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);

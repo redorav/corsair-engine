@@ -171,18 +171,20 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	rasterizerDesc.ForcedSampleCount = 1;
 	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
+	uint32_t numRenderTargets = (uint32_t)pipelineDescriptor.numRenderTargets;
+
 	D3D12_BLEND_DESC& blendDesc = d3d12PipelineStateDescriptor.BlendState;
 	blendDesc.AlphaToCoverageEnable = false;
-	blendDesc.IndependentBlendEnable;
-
-	uint32_t numRenderTargets = (uint32_t)pipelineDescriptor.numRenderTargets;
-	
+	blendDesc.IndependentBlendEnable = false;	
 	d3d12PipelineStateDescriptor.NumRenderTargets = numRenderTargets;
+
+	const CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
 	for (uint32_t i = 0; i < numRenderTargets; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 		D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
+
 		renderTargetDesc.BlendEnable = renderTargetBlend.enable;
 		renderTargetDesc.LogicOpEnable = false;
 		renderTargetDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
@@ -198,6 +200,9 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 		renderTargetDesc.RenderTargetWriteMask = renderTargetBlend.colorWriteMask;
 
 		d3d12PipelineStateDescriptor.RTVFormats[i] = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
+
+		// If any blend state is different, turn on independent blend
+		blendDesc.IndependentBlendEnable = blendDesc.IndependentBlendEnable || (firstBlendState != renderTargetBlend);
 	}
 
 	d3d12PipelineStateDescriptor.DSVFormat = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.depthFormat);
@@ -262,14 +267,31 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	D3D12_INPUT_LAYOUT_DESC& inputLayoutDescriptor = d3d12PipelineStateDescriptor.InputLayout;
 
 	CrArray<D3D12_INPUT_ELEMENT_DESC, cr3d::MaxVertexAttributes> inputElementDescriptors;
+	CrArray<CrFixedString16, cr3d::MaxVertexAttributes> renamedAttributes;
 
 	for (uint32_t i = 0; i < vertexDescriptor.GetAttributeCount(); ++i)
 	{
 		D3D12_INPUT_ELEMENT_DESC& inputElementDescriptor = inputElementDescriptors[i];
 		const CrVertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
+		const CrVertexSemantic::Data& semanticData = CrVertexSemantic::GetData((CrVertexSemantic::T)vertexAttribute.semantic);
 
-		inputElementDescriptor.SemanticName = CrVertexSemantic::ToString((CrVertexSemantic::T)vertexAttribute.semantic);
-		inputElementDescriptor.SemanticIndex = 0;
+		// D3D12 doesn't like semantics with names at the end, instead it
+		// expects the index as an integer in SemanticIndex
+		// Deal with this case by copying the semantic name and removing the index
+		if (semanticData.indexOffset == 0xffffffff)
+		{
+			inputElementDescriptor.SemanticName = semanticData.semanticName.c_str();
+			inputElementDescriptor.SemanticIndex = 0;
+		}
+		else
+		{
+			CrFixedString16& semanticNameCopy = renamedAttributes[i];
+			semanticNameCopy = semanticData.semanticName.c_str();
+			semanticNameCopy[semanticData.indexOffset] = 0;
+			inputElementDescriptor.SemanticName = semanticNameCopy.c_str();
+			inputElementDescriptor.SemanticIndex = semanticData.index;
+		}
+
 		inputElementDescriptor.Format = crd3d::GetDXGIFormat((cr3d::DataFormat::T)vertexAttribute.format);
 		inputElementDescriptor.InputSlot = vertexAttribute.streamId;
 		inputElementDescriptor.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
@@ -282,6 +304,7 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 
 	// TODO Decide on an adequate strategy for the root signatures
 	// ID3D12RootSignature* pRootSignature;
+	d3d12PipelineStateDescriptor.pRootSignature = nullptr;
 
 	ID3D12PipelineState* d3d12PipelineState;
 	HRESULT hResult = m_d3d12Device->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&d3d12PipelineState));
@@ -294,7 +317,6 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	}
 	else
 	{
-		
 		return nullptr;
 	}
 }

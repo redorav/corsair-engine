@@ -4,6 +4,7 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Containers/CrBitSet.h"
 #include "Core/CrHash.h"
+#include "Core/String/CrString.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
@@ -22,24 +23,30 @@ namespace CrVertexSemantic
 		Count
 	};
 
-	struct CrVertexSemanticData
+	struct Data
 	{
-		CrVertexSemanticData() {}
+		Data() {}
+		Data(CrVertexSemantic::T semantic, const char* name);
 
-		CrVertexSemanticData(CrVertexSemantic::T semantic, const char* name)
-			: semantic(semantic), name(name) {}
-
-		CrVertexSemantic::T semantic = CrVertexSemantic::Count;
-		const char* name = nullptr;
+		CrVertexSemantic::T semantic;
+		CrString semanticName;
+		
+		uint32_t index; // Which index this semantic has
+		uint32_t indexOffset; // Where in the string the first digit is
 	};
 
-	extern CrArray<CrVertexSemanticData, CrVertexSemantic::Count> VertexSemanticData;
+	extern CrArray<Data, CrVertexSemantic::Count> VertexSemanticData;
 
 	bool CreateVertexSemanticData();
 
+	inline const Data& GetData(T semantic)
+	{
+		return VertexSemanticData[semantic];
+	}
+
 	inline const char* ToString(T semantic)
 	{
-		return VertexSemanticData[semantic].name;
+		return VertexSemanticData[semantic].semanticName.c_str();
 	}
 
 	inline CrVertexSemantic::T FromString(const char* semanticString)
@@ -48,7 +55,7 @@ namespace CrVertexSemantic
 		{
 			for (uint32_t s = 0; s < VertexSemanticData.size(); ++s)
 			{
-				if (strstr(semanticString, VertexSemanticData[s].name) == 0)
+				if (VertexSemanticData[s].semanticName == semanticString)
 				{
 					return (CrVertexSemantic::T)s;
 				}

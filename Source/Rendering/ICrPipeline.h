@@ -48,9 +48,9 @@ struct CrRenderTargetBlendDescriptor
 		uint32_t bits;
 	};
 
-	bool operator == (const CrRenderTargetBlendDescriptor& other) { return bits == other.bits; }
+	bool operator == (const CrRenderTargetBlendDescriptor& other) const { return bits == other.bits; }
 
-	bool operator != (const CrRenderTargetBlendDescriptor& other) { return bits != other.bits; }
+	bool operator != (const CrRenderTargetBlendDescriptor& other) const { return bits != other.bits; }
 };
 
 static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4, "CrRenderTargetBlendDescriptor size mismatch");

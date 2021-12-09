@@ -241,7 +241,6 @@ project (ProjectCorsairEngine)
 
 	-- todo platform filters
 	LinkLibrary(VulkanLibrary)
-	LinkLibrary(SPIRVReflectLibrary)
 	LinkLibrary(D3D12Library)
 
 	-- Copy necessary files or DLLs

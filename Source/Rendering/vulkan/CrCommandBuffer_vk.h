@@ -53,6 +53,8 @@ private:
 
 	virtual void EndDebugEventPS() override;
 
+	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
+
 	virtual void FlushGraphicsRenderStatePS() override;
 
 	virtual void FlushComputeRenderStatePS() override;
@@ -114,7 +116,6 @@ inline void CrCommandBufferVulkan::BeginDebugEventPS(const char* eventName, cons
 		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 		store(color, markerInfo.color);
 		markerInfo.pMarkerName = eventName;
-
 		vkCmdDebugMarkerBegin(m_vkCommandBuffer, &markerInfo);
 	}
 }
@@ -124,5 +125,17 @@ inline void CrCommandBufferVulkan::EndDebugEventPS()
 	if (vkCmdDebugMarkerEnd)
 	{
 		vkCmdDebugMarkerEnd(m_vkCommandBuffer);
+	}
+}
+
+inline void CrCommandBufferVulkan::InsertDebugMarkerPS(const char* markerName, const float4& color)
+{
+	if (vkCmdDebugMarkerInsert)
+	{
+		VkDebugMarkerMarkerInfoEXT markerInfo = {};
+		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+		store(color, markerInfo.color);
+		markerInfo.pMarkerName = markerName;
+		vkCmdDebugMarkerInsert(m_vkCommandBuffer, &markerInfo);
 	}
 }

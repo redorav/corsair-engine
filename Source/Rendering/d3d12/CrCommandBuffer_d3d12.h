@@ -42,6 +42,8 @@ private:
 
 	virtual void EndDebugEventPS() override;
 
+	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
+
 	virtual void FlushGraphicsRenderStatePS() override;
 
 	virtual void FlushComputeRenderStatePS() override;
@@ -81,4 +83,10 @@ inline void CrCommandBufferD3D12::BeginDebugEventPS(const char* eventName, const
 inline void CrCommandBufferD3D12::EndDebugEventPS()
 {
 	
+}
+
+inline void CrCommandBufferD3D12::InsertDebugMarkerPS(const char* markerName, const float4& color)
+{
+	unused_parameter(markerName);
+	unused_parameter(color);
 }

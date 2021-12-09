@@ -80,6 +80,8 @@ public:
 
 	void EndDebugEvent();
 
+	void InsertDebugMarker(const char* markerName, const float4& color);
+
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
@@ -122,6 +124,8 @@ protected:
 	virtual void BeginDebugEventPS(const char* eventName, const float4& color) = 0;
 
 	virtual void EndDebugEventPS() = 0;
+
+	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) = 0;
 
 	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 
@@ -365,6 +369,11 @@ inline void ICrCommandBuffer::BeginDebugEvent(const char* eventName, const float
 inline void ICrCommandBuffer::EndDebugEvent()
 {
 	EndDebugEventPS();
+}
+
+inline void ICrCommandBuffer::InsertDebugMarker(const char* markerName, const float4& color)
+{
+	InsertDebugMarkerPS(markerName, color);
 }
 
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)

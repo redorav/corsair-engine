@@ -14,5 +14,5 @@ public:
 
 private:
 	
-	static void CreateCommonCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine);
+	static void CreateCommonDXCCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine);
 };

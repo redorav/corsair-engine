@@ -56,7 +56,7 @@ static CrString FindDXCPath()
 	return "";
 }
 
-void CrCompilerDXC::CreateCommonCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine)
+void CrCompilerDXC::CreateCommonDXCCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine)
 {
 	CrString dxcPath = FindDXCPath();
 
@@ -157,7 +157,7 @@ cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const SpvReflectInter
 bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	CrProcessDescriptor processDescriptor;
-	CreateCommonCommandLine(compilationDescriptor, processDescriptor.commandLine);
+	CreateCommonDXCCommandLine(compilationDescriptor, processDescriptor.commandLine);
 
 	processDescriptor.commandLine += " -spirv ";
 
@@ -291,51 +291,16 @@ cr3d::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_
 	}
 }
 
-// D3D_NAME_UNDEFINED = 0,
-// D3D_NAME_POSITION = 1,
-// D3D_NAME_CLIP_DISTANCE = 2,
-// D3D_NAME_CULL_DISTANCE = 3,
-// D3D_NAME_RENDER_TARGET_ARRAY_INDEX = 4,
-// D3D_NAME_VIEWPORT_ARRAY_INDEX = 5,
-// D3D_NAME_VERTEX_ID = 6,
-// D3D_NAME_PRIMITIVE_ID = 7,
-// D3D_NAME_INSTANCE_ID = 8,
-// D3D_NAME_IS_FRONT_FACE = 9,
-// D3D_NAME_SAMPLE_INDEX = 10,
-// D3D_NAME_FINAL_QUAD_EDGE_TESSFACTOR = 11,
-// D3D_NAME_FINAL_QUAD_INSIDE_TESSFACTOR = 12,
-// D3D_NAME_FINAL_TRI_EDGE_TESSFACTOR = 13,
-// D3D_NAME_FINAL_TRI_INSIDE_TESSFACTOR = 14,
-// D3D_NAME_FINAL_LINE_DETAIL_TESSFACTOR = 15,
-// D3D_NAME_FINAL_LINE_DENSITY_TESSFACTOR = 16,
-// D3D_NAME_BARYCENTRICS = 23,
-// D3D_NAME_SHADINGRATE = 24,
-// D3D_NAME_CULLPRIMITIVE = 25,
-// D3D_NAME_TARGET = 64,
-// D3D_NAME_DEPTH = 65,
-// D3D_NAME_COVERAGE = 66,
-// D3D_NAME_DEPTH_GREATER_EQUAL = 67,
-// D3D_NAME_DEPTH_LESS_EQUAL = 68,
-// D3D_NAME_STENCIL_REF = 69,
-// D3D_NAME_INNER_COVERAGE = 70,
-
 cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE_PARAMETER_DESC& d3dSignatureParameter)
 {
 	switch (d3dSignatureParameter.SystemValueType)
 	{
 		case D3D_NAME_UNDEFINED: return cr3d::ShaderInterfaceBuiltinType::None;
 		case D3D_NAME_POSITION: return cr3d::ShaderInterfaceBuiltinType::Position;
-		//case SpvBuiltIn::SpvBuiltInFragCoord: return cr3d::ShaderInterfaceBuiltinType::Position;
-		//case SpvBuiltIn::SpvBuiltInBaseInstance: return cr3d::ShaderInterfaceBuiltinType::BaseInstance;
 		case D3D_NAME_INSTANCE_ID: return cr3d::ShaderInterfaceBuiltinType::InstanceId;
 		case D3D_NAME_VERTEX_ID: return cr3d::ShaderInterfaceBuiltinType::VertexId;
 		case D3D_NAME_DEPTH: return cr3d::ShaderInterfaceBuiltinType::Depth;
 		case D3D_NAME_IS_FRONT_FACE: return cr3d::ShaderInterfaceBuiltinType::IsFrontFace;
-
-		//case SpvBuiltIn::SpvBuiltInWorkgroupId: return cr3d::ShaderInterfaceBuiltinType::GroupId;
-		//case SpvBuiltIn::SpvBuiltInLocalInvocationId: return cr3d::ShaderInterfaceBuiltinType::GroupThreadId;
-		//case SpvBuiltIn::SpvBuiltInLocalInvocationIndex: return cr3d::ShaderInterfaceBuiltinType::GroupIndex;
-		//case SpvBuiltIn::SpvBuiltInGlobalInvocationId: return cr3d::ShaderInterfaceBuiltinType::DispatchThreadId;
 
 		default:
 			return cr3d::ShaderInterfaceBuiltinType::None;
@@ -345,7 +310,7 @@ cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE
 bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	CrProcessDescriptor processDescriptor;
-	CreateCommonCommandLine(compilationDescriptor, processDescriptor.commandLine);
+	CreateCommonDXCCommandLine(compilationDescriptor, processDescriptor.commandLine);
 
 	CrProcess compilerProcess(processDescriptor);
 	compilerProcess.Wait();

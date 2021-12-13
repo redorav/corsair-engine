@@ -513,6 +513,7 @@ void CrFrame::DrawDebugUI()
 			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetSizeUnit(properties.gpuMemoryBytes);
 
+			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
 			ImGui::Text("GPU: %s (%llu%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());

@@ -5,6 +5,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderWorld.h"
+#include "Rendering/CrRenderGraph.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
@@ -35,7 +36,7 @@ public:
 private:
 
 	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
-
+	
 	uint32_t m_width = 0;
 
 	uint32_t m_height = 0;
@@ -72,6 +73,8 @@ private:
 	Camera m_cameraConstantData;
 
 	CrRenderWorldSharedHandle m_renderWorld;
+
+	CrRenderGraph m_mainRenderGraph;
 
 	// This would need to be buffered to account for multiple threads
 	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;

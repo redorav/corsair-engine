@@ -202,15 +202,7 @@ class CrRenderGraph
 {
 public:
 
-	CrRenderGraph()
-	{
-		m_uniquePassId = CrRenderPassId(0);
-		m_uniqueTextureId = CrRenderGraphTextureId(0);
-		m_uniqueBufferId = CrRenderGraphBufferId(0);
-
-		m_logicalPasses.reserve(256);
-		m_textureResources.reserve(256);
-	}
+	CrRenderGraph();
 
 	void AddRenderPass(const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, const CrRenderGraphSetupFunction& setupFunction, const CrRenderGraphExecutionFunction& executionFunction);
 
@@ -260,6 +252,8 @@ public:
 	}
 
 	void Execute();
+
+	void Reset();
 
 private:
 

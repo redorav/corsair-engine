@@ -5,6 +5,11 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+CrRenderGraph::CrRenderGraph()
+{
+	Reset();
+}
+
 void CrRenderGraph::AddRenderPass
 (
 	const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, 
@@ -390,4 +395,26 @@ void CrRenderGraph::Execute()
 			renderGraphPass.executionFunction(*this, commandBuffer);
 		}
 	}
+}
+
+void CrRenderGraph::Reset()
+{
+	m_uniquePassId = CrRenderPassId(0);
+	m_uniqueTextureId = CrRenderGraphTextureId(0);
+	m_uniqueBufferId = CrRenderGraphBufferId(0);
+
+	m_logicalPasses.reserve(256);
+	m_textureResources.reserve(256);
+
+	m_logicalPasses.clear();
+	m_nameToLogicalPassId.clear();
+
+	m_textureResources.clear();
+	m_nameToTextureId.clear();
+
+	m_bufferResources.clear();
+	m_nameToBufferId.clear();
+
+	m_textureLastUsedPass.clear();
+	m_bufferLastUsedPass.clear();
 }

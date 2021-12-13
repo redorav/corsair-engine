@@ -305,8 +305,7 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
-	CrRenderGraph mainRenderGraph;
-	mainRenderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
+	m_mainRenderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
 
 	UpdateCamera();
 
@@ -329,7 +328,7 @@ void CrFrame::Process()
 		swapchainTexture = mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
 	}
 
-	mainRenderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -411,7 +410,7 @@ void CrFrame::Process()
 
 	CrComputePipelineHandle computePipeline = m_computePipelineState;
 
-	mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
@@ -431,7 +430,7 @@ void CrFrame::Process()
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 
-	mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
+	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)
 	{},
 	[this](const CrRenderGraph&, ICrCommandBuffer*)
@@ -440,28 +439,36 @@ void CrFrame::Process()
 	});
 
 	// Render ImGui
-	CrImGuiRenderer::GetImGuiRenderer()->Render(mainRenderGraph, swapchainTexture);
+	CrImGuiRenderer::GetImGuiRenderer()->Render(m_mainRenderGraph, swapchainTexture);
 
-	// Present the frame
-	mainRenderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
+	// Create a render pass that transitions the frame. We need to give the render graph
+	// visibility over what's going to happen with the texture, but not necessarily
+	// execute the behavior inside as we may want to do further work before we end the 
+	// command buffer
+	m_mainRenderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddSwapchain(swapchainTexture);
 	},
-	[this, mainCommandQueue](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this, mainCommandQueue](const CrRenderGraph&, ICrCommandBuffer* /*commandBuffer*/)
 	{
-		commandBuffer->End();
-
-		commandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
-
-		m_swapchain->Present(mainCommandQueue.get(), commandBuffer->GetCompletionSemaphore().get());
+		
 	});
 
-	mainRenderGraph.Execute();
+	m_mainRenderGraph.Execute();
+
+
+	drawCommandBuffer->End();
+
+	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
+
+	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	m_renderWorld->EndRendering();
 
 	m_renderingStream->Reset();
+
+	m_mainRenderGraph.Reset();
 
 	renderDevice->ProcessDeletionQueue();
 

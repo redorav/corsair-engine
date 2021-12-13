@@ -608,19 +608,7 @@ VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
 	VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices
 )
 {
-	VkBufferCreateInfo bufferCreateInfo =
-	{
-		VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-		nullptr,
-		flags,
-		size,
-		usage,
-		sharingMode,
-		queueFamilyIndexCount,
-		pQueueFamilyIndices
-	};
-
-	return bufferCreateInfo;
+	return { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, nullptr, flags, size, usage, sharingMode, queueFamilyIndexCount, pQueueFamilyIndices };
 }
 
 VkMemoryAllocateInfo crvk::CreateVkMemoryAllocateInfo(VkDeviceSize allocationSize, uint32_t memoryTypeIndex, void* extension /*= nullptr*/)

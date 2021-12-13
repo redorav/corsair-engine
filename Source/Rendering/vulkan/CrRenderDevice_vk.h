@@ -16,13 +16,15 @@ public:
 
 	~CrRenderDeviceVulkan();
 
-	const VkInstance GetVkInstance() const { return m_vkInstance; }
+	VkInstance GetVkInstance() const { return m_vkInstance; }
 
-	const VkDevice GetVkDevice() const { return m_vkDevice; }
+	VkDevice GetVkDevice() const { return m_vkDevice; }
 
-	const VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
+	VkPhysicalDevice GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
 
-	const VkPipelineCache GetVkPipelineCache() const { return m_vkPipelineCache; }
+	VkPipelineCache GetVkPipelineCache() const { return m_vkPipelineCache; }
+
+	VkPhysicalDeviceProperties GetVkPhysicalDeviceProperties() const { return m_vkPhysicalDeviceProperties; }
 
 	uint32_t GetVkMemoryType(uint32_t typeBits, VkFlags properties) const;
 

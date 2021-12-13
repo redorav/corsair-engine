@@ -9,11 +9,11 @@ class CrSamplerVulkan final : public ICrSampler
 {
 public:
 
+	CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+
 	~CrSamplerVulkan();
 
 	VkSampler GetVkSampler() const { return m_sampler; }
-
-	CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
 
 private:
 

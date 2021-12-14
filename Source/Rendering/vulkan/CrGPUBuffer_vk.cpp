@@ -147,23 +147,14 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 void* CrHardwareGPUBufferVulkan::LockPS()
 {
 	void* data = nullptr;
-	VkResult result = VK_SUCCESS;
 
-	if (access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite))
-	{
-		VkMemoryMapFlags mapFlags = 0;
-		result = vkMapMemory(m_vkDevice, m_vkMemory, 0, VK_WHOLE_SIZE, mapFlags, &data);
-	}
-
+	VkMemoryMapFlags mapFlags = 0;
+	VkResult result = vkMapMemory(m_vkDevice, m_vkMemory, 0, VK_WHOLE_SIZE, mapFlags, &data);
 	CrAssert(result == VK_SUCCESS);
-
 	return data;
 }
 
 void CrHardwareGPUBufferVulkan::UnlockPS()
 {
-	if (access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite))
-	{
-		vkUnmapMemory(m_vkDevice, m_vkMemory);
-	}
+	vkUnmapMemory(m_vkDevice, m_vkMemory);
 }

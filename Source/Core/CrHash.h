@@ -41,6 +41,11 @@ public:
 		m_hash = ComputeHash<T>(data, dataSize);
 	}
 
+	CrHash(const char* data)
+	{
+		m_hash = ComputeHash<const char>(data, strlen(data));
+	}
+
 	CrHash& operator <<= (CrHash other)
 	{
 		uint64_t hashes[2] = { m_hash, other.m_hash };
@@ -48,12 +53,12 @@ public:
 		return *this;
 	}
 
-	bool operator == (CrHash other)
+	bool operator == (const CrHash& other) const
 	{
 		return m_hash == other.m_hash;
 	}
 
-	bool operator != (CrHash other)
+	bool operator != (const CrHash& other) const
 	{
 		return m_hash != other.m_hash;
 	}
@@ -111,4 +116,16 @@ public:
 private:
 
 	CrHash m_hash;
+};
+
+namespace eastl
+{
+	template<>
+	struct hash<CrHash>
+	{
+		size_t operator()(const CrHash& h) const
+		{
+			return (size_t)h.GetHash();
+		}
+	};
 };

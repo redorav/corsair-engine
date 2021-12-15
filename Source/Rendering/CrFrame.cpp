@@ -394,19 +394,19 @@ void CrFrame::Process()
 
 	CrRenderGraphBufferDescriptor structuredBufferDescriptor;
 	structuredBufferDescriptor.buffer = m_structuredBuffer.get();
-	CrRenderGraphBufferId structuredBuffer = mainRenderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
+	CrRenderGraphBufferId structuredBuffer = m_mainRenderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor;
 	rwStructuredBufferDescriptor.buffer = m_rwStructuredBuffer.get();
-	CrRenderGraphBufferId rwStructuredBuffer = mainRenderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
+	CrRenderGraphBufferId rwStructuredBuffer = m_mainRenderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor;
 	colorsRWDataBufferDescriptor.buffer = m_colorsRWDataBuffer.get();
-	CrRenderGraphBufferId colorsRWDataBuffer = mainRenderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
+	CrRenderGraphBufferId colorsRWDataBuffer = m_mainRenderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
 
 	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor;
 	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
-	CrRenderGraphTextureId colorsRWTexture = mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
+	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
 	CrComputePipelineHandle computePipeline = m_computePipelineState;
 

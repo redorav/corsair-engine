@@ -1,8 +1,12 @@
 #ifndef COMPUTE_HLSL
 #define COMPUTE_HLSL
 
-RWBuffer<float4> ExampleDataBufferCompute;
+#include "Common.hlsl"
+
+Buffer<float4> ExampleDataBufferCompute;
+RWBuffer<float4> ExampleRWDataBufferCompute;
 RWTexture2D<float4> ExampleRWTextureCompute;
+Texture2D ExampleTextureCompute;
 
 struct ComputeStruct
 {

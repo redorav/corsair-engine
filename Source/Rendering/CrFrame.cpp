@@ -423,7 +423,7 @@ void CrFrame::Process()
 		commandBuffer->BindComputePipelineState(computePipeline.get());
 		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
 		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
-		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));
+		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));
 		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
 		commandBuffer->Dispatch(1, 1, 1);
 	});

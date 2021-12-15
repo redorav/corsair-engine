@@ -328,6 +328,12 @@ ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrCompute
 	return nullptr;
 }
 
+ICrGPUQueryPool* CrRenderDeviceD3D12::CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+{
+	unused_parameter(queryPoolDescriptor);
+	return nullptr;
+}
+
 cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
 {
 	unused_parameter(fence);

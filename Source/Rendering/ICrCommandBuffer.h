@@ -82,6 +82,14 @@ public:
 
 	void InsertDebugMarker(const char* markerName, const float4& color);
 
+	void BeginTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
+
+	void EndTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
+
+	void ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);
+
+	void ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);
+
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
@@ -126,6 +134,14 @@ protected:
 	virtual void EndDebugEventPS() = 0;
 
 	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) = 0;
+
+	virtual void BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+
+	virtual void EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+
+	virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
+
+	virtual void ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
 
 	virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
 

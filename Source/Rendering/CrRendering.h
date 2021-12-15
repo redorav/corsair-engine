@@ -680,6 +680,14 @@ namespace cr3d
 		OpaqueWhite,
 	};
 
+	enum class QueryType : uint32_t
+	{
+		Timing,       // Time parts of the frame
+		Occlusion,    // Measure occlusion
+		Predication,  // Use for predication queries
+		PipelineStats // Use to measure stats in the pipeline
+	};
+
 	constexpr bool IsFormatCompressed(DataFormat::T format)
 	{
 		return (format >= DataFormat::FirstCompressed && format <= DataFormat::LastCompressed);
@@ -893,13 +901,15 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			Constant   = 1 << 0,
-			Vertex     = 1 << 1,
-			Index      = 1 << 2,
-			Structured = 1 << 3,
-			Data       = 1 << 4,
-			Byte       = 1 << 5,
-			Indirect   = 1 << 6,
+			Constant    = 1 << 0, // Will be used as constant buffer
+			Vertex      = 1 << 1, // Will be used as vertex buffer
+			Index       = 1 << 2, // Will be used as index buffer
+			Structured  = 1 << 3, // Will be bound as a structured buffer
+			Data        = 1 << 4, // Will be bound as a data (compressed) buffer
+			Byte        = 1 << 5, // Will be bound as a byte (raw data) buffer
+			Indirect    = 1 << 6, // Will be used as an indirect buffer
+			TransferDst = 1 << 7, // Will be used to transfer data from the GPU to the CPU
+			TransferSrc = 1 << 8, // Will be used to transfer data from the CPU to the GPU
 
 			// Compound
 			Storage = Structured | Byte,

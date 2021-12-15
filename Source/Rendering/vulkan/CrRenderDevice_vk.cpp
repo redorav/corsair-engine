@@ -11,6 +11,7 @@
 #include "CrGPUBuffer_vk.h"
 #include "CrGPUSynchronization_vk.h"
 #include "CrShader_vk.h"
+#include "CrGPUQueryPool_vk.h"
 
 #include "Core/CrCommandLine.h"
 
@@ -662,6 +663,11 @@ ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
 	return vulkanComputePipeline;
+}
+
+ICrGPUQueryPool* CrRenderDeviceVulkan::CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+{
+	return new CrGPUQueryPoolVulkan(this, queryPoolDescriptor);
 }
 
 void CrRenderDeviceVulkan::RetrieveQueueFamilies()

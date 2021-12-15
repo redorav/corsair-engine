@@ -61,6 +61,8 @@ private:
 
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const ICrComputeShader* computeShader) override;
 
+	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) override;
+
 	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const override;
 
 	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;

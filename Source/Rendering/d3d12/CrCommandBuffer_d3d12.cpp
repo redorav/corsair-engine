@@ -32,6 +32,20 @@ void CrCommandBufferD3D12::EndRenderPassPS()
 	
 }
 
+void CrCommandBufferD3D12::ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	unused_parameter(queryPool);
+	unused_parameter(start);
+	unused_parameter(count);
+}
+
+void CrCommandBufferD3D12::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	unused_parameter(queryPool);
+	unused_parameter(start);
+	unused_parameter(count);
+}
+
 void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 {
 

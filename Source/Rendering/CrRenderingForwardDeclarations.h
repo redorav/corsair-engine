@@ -63,6 +63,13 @@ using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
 struct CrRenderPassDescriptor;
 struct CrComputePassDescriptor;
 
+class ICrGPUQueryPool;
+struct CrGPUQueryPoolDescriptor;
+using CrGPUQueryPoolHandle = CrSharedPtr<ICrGPUQueryPool>;
+
+class CrGPUQueryDummy;
+using CrGPUQueryId = CrTypedId<CrGPUQueryDummy, uint32_t>;
+
 // Shaders & Pipeline Objects
 class ICrGraphicsShader;
 using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;

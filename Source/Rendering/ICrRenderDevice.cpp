@@ -8,6 +8,7 @@
 #include "ICrTexture.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
+#include "ICrGPUQueryPool.h"
 #include "CrGPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 
@@ -118,6 +119,11 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 	CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
 
 	return computePipeline;
+}
+
+CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+{
+	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor));
 }
 
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)

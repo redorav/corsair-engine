@@ -100,6 +100,26 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator
 	return params;
 }
 
+void ICrCommandBuffer::BeginTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+{
+	BeginTimingQueryPS(queryPool, query);
+}
+
+void ICrCommandBuffer::EndTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+{
+	EndTimingQueryPS(queryPool, query);
+}
+
+void ICrCommandBuffer::ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	ResetGPUQueriesPS(queryPool, start, count);
+}
+
+void ICrCommandBuffer::ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	ResolveGPUQueriesPS(queryPool, start, count);
+}
+
 CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
 {
 	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), size), size);

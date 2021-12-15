@@ -141,6 +141,16 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 		usageFlags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
 	}
 
+	if (usage & cr3d::BufferUsage::TransferDst)
+	{
+		usageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	}
+
+	if (usage & cr3d::BufferUsage::TransferSrc)
+	{
+		usageFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	}
+
 	return usageFlags;
 }
 

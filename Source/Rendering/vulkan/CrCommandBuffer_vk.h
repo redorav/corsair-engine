@@ -6,6 +6,8 @@
 
 #include "CrPipeline_vk.h"
 
+#include "CrGPUQueryPool_vk.h"
+
 #include "CrVulkan.h"
 
 #include "Rendering/CrRendering.h"
@@ -54,6 +56,14 @@ private:
 	virtual void EndDebugEventPS() override;
 
 	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
+
+	virtual void BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+
+	virtual void EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+
+	virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
+
+	virtual void ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
 	virtual void FlushGraphicsRenderStatePS() override;
 
@@ -138,4 +148,49 @@ inline void CrCommandBufferVulkan::InsertDebugMarkerPS(const char* markerName, c
 		markerInfo.pMarkerName = markerName;
 		vkCmdDebugMarkerInsert(m_vkCommandBuffer, &markerInfo);
 	}
+}
+
+// Vulkan exposes timestamp queries, but a timestamp by itself isn't very useful unless compared
+// to some other timestamp. Therefore we create this fictional begin/end pair for timestamps.
+// It's useful to do it anyway because we need to specify the stage, and that is implicit in the
+// Begin and End. Note that we assume query ids are consecutive, as that's what a pool will do.
+inline void CrCommandBufferVulkan::BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+	vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), 2 * query.id);
+}
+
+inline void CrCommandBufferVulkan::EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+	vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), 2 * query.id + 1);
+}
+
+inline void CrCommandBufferVulkan::ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+
+	if (queryPool->GetType() == cr3d::QueryType::Timing)
+	{
+		start = 2 * start;
+		count = 2 * count;
+	}
+
+	vkCmdResetQueryPool(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count);
+}
+
+inline void CrCommandBufferVulkan::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vulkanQueryPool->GetResultsBuffer());
+
+	if (queryPool->GetType() == cr3d::QueryType::Timing)
+	{
+		start = 2 * start;
+		count = 2 * count;
+	}
+
+	// The wait flag here doesn't wait on the CPU, rather the GPU will ensure query results are all ready before resolving. In practice this means
+	// it won't try to reorder the copy on the GPU to a point before the query was actually finished
+	vkCmdCopyQueryPoolResults(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanQueryPool->GetQuerySize(), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
 }

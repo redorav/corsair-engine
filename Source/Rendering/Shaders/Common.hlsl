@@ -20,6 +20,17 @@ struct VS_OUT
 	float2 uv			: TEXCOORD3;
 };
 
+struct VS_IN_FULLSCREEN
+{
+    uint vertexId : SV_VertexID;
+};
+
+struct VS_OUT_FULLSCREEN
+{
+    float4 hwPosition : SV_Position;
+    float2 uv : TEXCOORD0;
+};
+
 struct Camera
 {
 	row_major float4x4 view2Projection;

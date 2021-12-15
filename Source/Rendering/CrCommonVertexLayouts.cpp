@@ -9,6 +9,8 @@ CrVertexDescriptor SimpleVertexDescriptor
 	CrVertexAttribute(CrVertexSemantic::TexCoord0, cr3d::DataFormat::RG16_Float, 0)
 });
 
+CrVertexDescriptor NullVertexDescriptor({});
+
 CrVertexDescriptor PositionVertexDescriptor
 ({
 	CrVertexAttribute(CrVertexSemantic::Position, cr3d::DataFormat::RGBA16_Float, 0),

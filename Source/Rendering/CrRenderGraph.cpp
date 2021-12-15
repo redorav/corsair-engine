@@ -296,7 +296,7 @@ void CrRenderGraph::Execute()
 			for (uint32_t i = 0; i < renderGraphPass.textureUsages.size(); ++i)
 			{
 				const CrRenderGraphTextureUsage& textureUsage = renderGraphPass.textureUsages[i];
-				CrRenderGraphTextureId textureId = textureUsage.textureId;
+				const CrRenderGraphTextureId textureId = textureUsage.textureId;
 				const CrRenderGraphTextureTransition& transitionInfo = renderGraphPass.textureTransitions.find(textureId.id)->second;
 
 				switch (textureUsage.state)

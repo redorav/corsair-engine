@@ -11,6 +11,7 @@ struct SimpleVertex
 };
 
 extern CrVertexDescriptor SimpleVertexDescriptor;
+extern CrVertexDescriptor NullVertexDescriptor;
 
 struct ComplexVertexPosition
 {

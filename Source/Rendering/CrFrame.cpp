@@ -235,7 +235,6 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	RecreateSwapchainAndDepth();
 	
 	CrShaderCompilationDescriptor basicBytecodeLoadInfo;
-	CrShaderCompilationDescriptor computeBytecodeLoadInfo;
 
 	CrString ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
@@ -248,23 +247,42 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
 
-	computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
-		"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-
 	CrGraphicsShaderHandle lineGraphicsShader = CrShaderManager::Get().CompileGraphicsShader(basicBytecodeLoadInfo);
-	CrComputeShaderHandle computeShader = CrShaderManager::Get().CompileComputeShader(computeBytecodeLoadInfo);
 
-	CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
-	basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
-	basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
+	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
+	lineGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+	lineGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
+	m_linePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(lineGraphicsPipelineDescriptor, lineGraphicsShader, SimpleVertexDescriptor);
 
-	CrComputePipelineDescriptor computePipelineDescriptor;
+	{
+		CrShaderCompilationDescriptor computeBytecodeLoadInfo;
+		computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
+			"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
+		CrComputeShaderHandle computeShader = CrShaderManager::Get().CompileComputeShader(computeBytecodeLoadInfo);
 
-	m_computePipelineState = CrPipelineStateManager::Get().GetComputePipeline(computePipelineDescriptor, computeShader);
+		CrComputePipelineDescriptor computePipelineDescriptor;
+		m_computePipelineState = CrPipelineStateManager::Get().GetComputePipeline(computePipelineDescriptor, computeShader);
+	}
 
-	basicGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	m_linePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(
-		basicGraphicsPipelineDescriptor, lineGraphicsShader, SimpleVertexDescriptor);
+	{
+		CrShaderCompilationDescriptor fullscreenTriangleBytecodeLoadInfo;
+
+		CrShaderBytecodeCompilationDescriptor fullscreenTriangleVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "CopyTexture.hlsl").c_str()),
+			"CopyTextureVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+		fullscreenTriangleBytecodeLoadInfo.AddBytecodeDescriptor(fullscreenTriangleVSDescriptor);
+
+		CrShaderBytecodeCompilationDescriptor fullscreenTrianglePSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "CopyTexture.hlsl").c_str()),
+			"CopyTexturePS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
+		fullscreenTriangleBytecodeLoadInfo.AddBytecodeDescriptor(fullscreenTrianglePSDescriptor);
+
+		CrGraphicsShaderHandle fullscreenTriangleGraphicsShader = CrShaderManager::Get().CompileGraphicsShader(fullscreenTriangleBytecodeLoadInfo);
+
+		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
+		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
+
+		m_fullscreenTrianglePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, fullscreenTriangleGraphicsShader, NullVertexDescriptor);
+	}
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
@@ -321,11 +339,11 @@ void CrFrame::Process()
 	{
 		CrRenderGraphTextureDescriptor depthDescriptor;
 		depthDescriptor.texture = m_depthStencilTexture.get();
-		depthTexture = mainRenderGraph.CreateTexture("Depth", depthDescriptor);
+		depthTexture = m_mainRenderGraph.CreateTexture("Depth", depthDescriptor);
 
 		CrRenderGraphTextureDescriptor swapchainDescriptor;
 		swapchainDescriptor.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
-		swapchainTexture = mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
+		swapchainTexture = m_mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
 	}
 
 	m_mainRenderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,

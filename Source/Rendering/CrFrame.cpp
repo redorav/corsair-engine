@@ -427,8 +427,6 @@ void CrFrame::Process()
 		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
 		commandBuffer->Dispatch(1, 1, 1);
 	});
-		commandBuffer->Dispatch(1, 1, 1);
-	});
 
 	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)

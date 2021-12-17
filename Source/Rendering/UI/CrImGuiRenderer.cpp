@@ -80,6 +80,8 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.renderTargets.colorFormats[0] = initParams.m_swapchainFormat;
 
+		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
+
 		const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 		// Load shaders:

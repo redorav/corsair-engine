@@ -682,7 +682,7 @@ namespace cr3d
 
 	enum class QueryType : uint32_t
 	{
-		Timing,       // Time parts of the frame
+		Timestamp,       // Time parts of the frame
 		Occlusion,    // Measure occlusion
 		Predication,  // Use for predication queries
 		PipelineStats // Use to measure stats in the pipeline

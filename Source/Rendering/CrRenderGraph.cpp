@@ -2,12 +2,14 @@
 
 #include "CrRenderGraph.h"
 #include "Rendering/ICrCommandBuffer.h"
+#include "Rendering/ICrGPUQueryPool.h"
+#include "Rendering/CrGPUTimingQueryTracker.h"
 
 #include "Core/Logging/ICrDebug.h"
 
 CrRenderGraph::CrRenderGraph()
 {
-	Reset();
+	End();
 }
 
 void CrRenderGraph::AddRenderPass
@@ -383,21 +385,33 @@ void CrRenderGraph::Execute()
 				}
 			}
 
-			commandBuffer->BeginRenderPass(renderPassDescriptor);
+			// TODO Compute hash statically
+			CrGPUTimingRequest passRequest = m_frameParams.timingQueryTracker->AllocateTimingRequest(CrHash(renderGraphPass.name.c_str()));
+
+			m_frameParams.commandBuffer->BeginTimestampQuery(m_frameParams.timingQueryTracker->GetCurrentQueryPool(), passRequest.startQuery);
+
+			m_frameParams.commandBuffer->BeginRenderPass(renderPassDescriptor);
 
 			// Execute the render graph lambda
-			renderGraphPass.executionFunction(*this, commandBuffer);
+			renderGraphPass.executionFunction(*this, m_frameParams.commandBuffer);
 
-			commandBuffer->EndRenderPass();
+			m_frameParams.commandBuffer->EndRenderPass();
+
+			m_frameParams.commandBuffer->BeginTimestampQuery(m_frameParams.timingQueryTracker->GetCurrentQueryPool(), passRequest.endQuery);
 		}
 		else
 		{
-			renderGraphPass.executionFunction(*this, commandBuffer);
+			renderGraphPass.executionFunction(*this, m_frameParams.commandBuffer);
 		}
 	}
 }
 
-void CrRenderGraph::Reset()
+void CrRenderGraph::Begin(const CrRenderGraphFrameParams& frameParams)
+{
+	m_frameParams = frameParams;
+}
+
+void CrRenderGraph::End()
 {
 	m_uniquePassId = CrRenderPassId(0);
 	m_uniqueTextureId = CrRenderGraphTextureId(0);

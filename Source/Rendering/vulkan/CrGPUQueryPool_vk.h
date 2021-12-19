@@ -19,11 +19,9 @@ public:
 
 protected:
 
-	virtual void GetTimingDataPS(CrGPUTiming* timingData, uint32_t timingCount) override;
+	virtual void GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount) override;
 
 	virtual void GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t count) override;
-
-	double m_timestampPeriod;
 
 	// Use the platform-independent code so we don't have to rewrite it
 	CrUniquePtr<ICrHardwareGPUBuffer> m_queryBuffer;

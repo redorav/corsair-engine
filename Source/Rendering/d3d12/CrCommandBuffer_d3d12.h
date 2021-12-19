@@ -44,9 +44,9 @@ private:
 
 	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
 
-	virtual void BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+	virtual void BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
-	virtual void EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+	virtual void EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
 	virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
@@ -99,13 +99,13 @@ inline void CrCommandBufferD3D12::InsertDebugMarkerPS(const char* markerName, co
 	unused_parameter(color);
 }
 
-inline void CrCommandBufferD3D12::BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+inline void CrCommandBufferD3D12::BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
 	unused_parameter(queryPool);
 	unused_parameter(query);
 }
 
-inline void CrCommandBufferD3D12::EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+inline void CrCommandBufferD3D12::EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
 	unused_parameter(queryPool);
 	unused_parameter(query);

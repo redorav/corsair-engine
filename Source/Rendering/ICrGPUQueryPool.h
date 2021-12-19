@@ -5,9 +5,12 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrTypedId.h"
 
-struct CrGPUTiming
+struct CrGPUTimestamp
 {
-	double nanoseconds; // Represents a time difference in nanoseconds
+	CrGPUTimestamp() { ticks = 0; }
+	CrGPUTimestamp(uint64_t ticks) : ticks(ticks) {}
+
+	uint64_t ticks;
 };
 
 struct CrGPUOcclusion
@@ -33,8 +36,9 @@ public:
 		: m_renderDevice(renderDevice)
 		, m_descriptor(descriptor)
 		, m_currentQuery(0)
-		, m_querySize(0) // Gets calculated by each platform
 		, m_resolved(false)
+		, m_querySize(0) // Gets calculated by each platform
+		, m_timestampPeriod(1.0) // Gets calculated per platform
 	{}
 
 	virtual ~ICrGPUQueryPool() {}
@@ -42,6 +46,11 @@ public:
 	uint32_t GetActiveQueryCount() const
 	{
 		return m_currentQuery;
+	}
+
+	uint32_t GetTotalQueryCount() const
+	{
+		return m_descriptor.count;
 	}
 
 	uint32_t GetQuerySize() const
@@ -69,13 +78,16 @@ public:
 	// to retrieve it on the CPU
 	void Resolve(ICrCommandBuffer* commandBuffer);
 
-	void GetTimingData(CrGPUTiming* timingData, uint32_t count);
+	void GetTimestampData(CrGPUTimestamp* timingData, uint32_t count);
 
 	void Reset(ICrCommandBuffer* commandBuffer);
 
+	// Computes the duration in nanoseconds between two timestamps
+	double GetDuration(CrGPUTimestamp startTime, CrGPUTimestamp endTime) const;
+
 protected:
 
-	virtual void GetTimingDataPS(CrGPUTiming* timingData, uint32_t count) = 0;
+	virtual void GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t count) = 0;
 
 	virtual void GetOcclusionDataPS(CrGPUOcclusion* data, uint32_t count) = 0;
 
@@ -83,9 +95,14 @@ protected:
 	
 	bool m_resolved;
 
+	// Size of each query in bytes
 	uint32_t m_querySize;
 
 	uint32_t m_currentQuery;
+
+	// Not all platforms work the same way, so this is just a multiplier that takes from
+	// raw ticks to nanoseconds. In many common cases it will just be 1.0
+	double m_timestampPeriod;
 
 	ICrRenderDevice* m_renderDevice;
 };

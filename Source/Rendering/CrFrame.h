@@ -76,6 +76,8 @@ private:
 
 	CrRenderGraph m_mainRenderGraph;
 
+	CrUniquePtr<CrGPUTimingQueryTracker> m_timingQueryTracker;
+
 	// This would need to be buffered to account for multiple threads
 	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;
 };

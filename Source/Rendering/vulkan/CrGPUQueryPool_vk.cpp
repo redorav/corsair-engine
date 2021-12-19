@@ -10,7 +10,7 @@ VkQueryType GetVkQueryType(cr3d::QueryType queryType)
 {
 	switch (queryType)
 	{
-		case cr3d::QueryType::Timing: return VK_QUERY_TYPE_TIMESTAMP;
+		case cr3d::QueryType::Timestamp: return VK_QUERY_TYPE_TIMESTAMP;
 		case cr3d::QueryType::Occlusion: return VK_QUERY_TYPE_OCCLUSION;
 		default: return VK_QUERY_TYPE_MAX_ENUM;
 	}
@@ -20,18 +20,8 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
-	uint32_t queryCount = 0;
-
-	if (descriptor.type == cr3d::QueryType::Timing)
-	{
-		queryCount = 2 * descriptor.count; // We need a query per timestamp
-		m_querySize = sizeof(uint64_t);
-	}
-	else
-	{
-		queryCount = descriptor.count;
-		m_querySize = sizeof(uint64_t);
-	}
+	uint32_t queryCount = descriptor.count;
+	m_querySize = sizeof(uint64_t);
 
 	VkQueryPoolCreateInfo poolCreateInfo = {};
 	poolCreateInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
@@ -63,30 +53,11 @@ CrGPUQueryPoolVulkan::~CrGPUQueryPoolVulkan()
 	vkDestroyQueryPool(vulkanRenderDevice->GetVkDevice(), m_vkQueryPool, nullptr);
 }
 
-void CrGPUQueryPoolVulkan::GetTimingDataPS(CrGPUTiming* timingData, uint32_t timingCount)
+void CrGPUQueryPoolVulkan::GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount)
 {
 	uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 	{
-		for (uint32_t i = 0; i < timingCount; i++)
-		{
-			uint64_t initialTimestamp = memory[2 * i]; // Resolve pairs of timings
-			uint64_t finalTimestamp = memory[2 * i + 1];
-			uint64_t tickDelta = 0;
-
-			// Check for overflow
-			if (finalTimestamp > initialTimestamp)
-			{
-				tickDelta = finalTimestamp - initialTimestamp;
-			}
-			else
-			{
-				tickDelta = (uint64_t)(-1) - initialTimestamp + finalTimestamp;
-			}
-
-			double nanosecondDelta = tickDelta * m_timestampPeriod;
-
-			timingData[i].nanoseconds = nanosecondDelta;
-		}
+		memcpy(timingData, memory, timingCount * sizeof(timingData));
 	}
 	m_queryBuffer->Unlock();
 }

@@ -15,6 +15,8 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/UI/CrImGuiRenderer.h"
+#include "Rendering/ICrGPUQueryPool.h"
+#include "Rendering/CrGPUTimingQueryTracker.h"
 
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
@@ -302,6 +304,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	CrImGuiRendererInitParams imguiInitParams = {};
 	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
 	CrImGuiRenderer::GetImGuiRenderer()->Initialize(imguiInitParams);
+
+	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
+	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 }
 
 void CrFrame::Process()
@@ -323,16 +328,23 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
-	m_mainRenderGraph.commandBuffer = drawCommandBuffer; // TODO Rework
+	// Set up render graph to start recording passes
+	CrRenderGraphFrameParams frameParams;
+	frameParams.commandBuffer = drawCommandBuffer;
+	frameParams.timingQueryTracker = m_timingQueryTracker.get();
+	m_mainRenderGraph.Begin(frameParams);
 
 	UpdateCamera();
 
+	m_renderingStream->Reset();
 	m_renderWorld->BeginRendering(m_renderingStream);
 
 	m_renderWorld->SetCamera(m_camera);
 
 	drawCommandBuffer->Begin();
 
+	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
+	
 	CrRenderGraphTextureId depthTexture;
 	CrRenderGraphTextureId swapchainTexture;
 
@@ -466,13 +478,14 @@ void CrFrame::Process()
 	{
 		renderGraph.AddSwapchain(swapchainTexture);
 	},
-	[this, mainCommandQueue](const CrRenderGraph&, ICrCommandBuffer* /*commandBuffer*/)
+	[](const CrRenderGraph&, ICrCommandBuffer*)
 	{
 		
 	});
 
 	m_mainRenderGraph.Execute();
 
+	m_timingQueryTracker->EndFrame(drawCommandBuffer);
 
 	drawCommandBuffer->End();
 
@@ -482,9 +495,7 @@ void CrFrame::Process()
 
 	m_renderWorld->EndRendering();
 
-	m_renderingStream->Reset();
-
-	m_mainRenderGraph.Reset();
+	m_mainRenderGraph.End();
 
 	renderDevice->ProcessDeletionQueue();
 

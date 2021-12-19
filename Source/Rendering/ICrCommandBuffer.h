@@ -82,9 +82,9 @@ public:
 
 	void InsertDebugMarker(const char* markerName, const float4& color);
 
-	void BeginTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
+	void BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
 
-	void EndTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
+	void EndTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
 
 	void ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);
 
@@ -135,9 +135,9 @@ protected:
 
 	virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) = 0;
 
-	virtual void BeginTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+	virtual void BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
 
-	virtual void EndTimingQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+	virtual void EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
 
 	virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
 

@@ -9,9 +9,9 @@ void ICrGPUQueryPool::Resolve(ICrCommandBuffer* commandBuffer)
 	m_resolved = true;
 }
 
-void ICrGPUQueryPool::GetTimingData(CrGPUTiming* timingData, uint32_t timingCount)
+void ICrGPUQueryPool::GetTimestampData(CrGPUTimestamp* timingData, uint32_t timingCount)
 {
-	CrAssertMsg(m_descriptor.type == cr3d::QueryType::Timing, "Wrong query type");
+	CrAssertMsg(m_descriptor.type == cr3d::QueryType::Timestamp, "Wrong query type");
 
 	if (m_resolved)
 	{
@@ -24,4 +24,21 @@ void ICrGPUQueryPool::Reset(ICrCommandBuffer* commandBuffer)
 {
 	commandBuffer->ResetGPUQueries(this, 0, m_descriptor.count);
 	m_currentQuery = 0;
+}
+
+double ICrGPUQueryPool::GetDuration(CrGPUTimestamp startTime, CrGPUTimestamp endTime) const
+{
+	uint64_t tickDelta = 0;
+
+	// Check for overflow
+	if (endTime.ticks >= startTime.ticks)
+	{
+		tickDelta = endTime.ticks - startTime.ticks;
+	}
+	else
+	{
+		tickDelta = (uint64_t)(-1) - startTime.ticks + endTime.ticks;
+	}
+
+	return tickDelta * m_timestampPeriod;
 }

@@ -198,6 +198,12 @@ struct CrRenderGraphPass
 // 4.1) All passes are executed sequentially once their order has been determined. One has to think of the render graph as an
 // independent execution timeline from the one where the lambda was created
 
+struct CrRenderGraphFrameParams
+{
+	ICrCommandBuffer* commandBuffer;
+	CrGPUTimingQueryTracker* timingQueryTracker;
+};
+
 class CrRenderGraph
 {
 public:
@@ -253,7 +259,18 @@ public:
 
 	void Execute();
 
-	void Reset();
+	void Begin(const CrRenderGraphFrameParams& setupParams);
+
+	void End();
+
+	template<typename Fn>
+	void ForEachPass(const Fn& fn)
+	{
+		for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
+		{
+			fn(m_logicalPasses[logicalPassId.id]);
+		}
+	}
 
 private:
 
@@ -287,7 +304,5 @@ private:
 
 	CrVector<CrRenderPassId> m_bufferLastUsedPass;
 
-public: // TODO Remove
-
-	ICrCommandBuffer* commandBuffer;
+	CrRenderGraphFrameParams m_frameParams;
 };

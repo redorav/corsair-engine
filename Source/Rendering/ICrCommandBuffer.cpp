@@ -100,14 +100,14 @@ CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator
 	return params;
 }
 
-void ICrCommandBuffer::BeginTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+void ICrCommandBuffer::BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
-	BeginTimingQueryPS(queryPool, query);
+	BeginTimestampQueryPS(queryPool, query);
 }
 
-void ICrCommandBuffer::EndTimingQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+void ICrCommandBuffer::EndTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
-	EndTimingQueryPS(queryPool, query);
+	EndTimestampQueryPS(queryPool, query);
 }
 
 void ICrCommandBuffer::ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)

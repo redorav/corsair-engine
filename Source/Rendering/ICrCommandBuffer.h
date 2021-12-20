@@ -84,6 +84,7 @@ public:
 
 	void BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
 
+	// This function is here to cater for Vulkan where we can specify the point in the pipeline the timestamp should be taken
 	void EndTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query);
 
 	void ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);

@@ -3,6 +3,7 @@
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/CrRendering.h"
 #include "CrGPUBuffer_d3d12.h"
+#include "CrGPUQueryPool_d3d12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrMacros.h"
@@ -101,12 +102,11 @@ inline void CrCommandBufferD3D12::InsertDebugMarkerPS(const char* markerName, co
 
 inline void CrCommandBufferD3D12::BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
-	unused_parameter(queryPool);
-	unused_parameter(query);
+	const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
+	m_d3d12GraphicsCommandList->EndQuery(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, query.id);
 }
 
 inline void CrCommandBufferD3D12::EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
-	unused_parameter(queryPool);
-	unused_parameter(query);
+	BeginTimestampQueryPS(queryPool, query);
 }

@@ -13,6 +13,8 @@ public:
 
 	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
+	ID3D12Resource* GetD3D12Buffer() const { return m_d3dBufferResource; }
+
 	virtual void* LockPS() override;
 
 	virtual void UnlockPS() override;

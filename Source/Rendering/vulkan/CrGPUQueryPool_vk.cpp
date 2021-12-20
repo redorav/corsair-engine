@@ -20,14 +20,13 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
-	uint32_t queryCount = descriptor.count;
 	m_querySize = sizeof(uint64_t);
 
 	VkQueryPoolCreateInfo poolCreateInfo = {};
 	poolCreateInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
 	poolCreateInfo.flags = 0;
 	poolCreateInfo.queryType = GetVkQueryType(descriptor.type);
-	poolCreateInfo.queryCount = queryCount;
+	poolCreateInfo.queryCount = descriptor.count;
 
 	VkResult vkResult = VK_SUCCESS;
 
@@ -38,7 +37,7 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 	(
 		cr3d::BufferUsage::TransferDst,
 		(cr3d::BufferAccess::T)(cr3d::BufferAccess::GPUWrite | cr3d::BufferAccess::CPURead),
-		queryCount,
+		descriptor.count,
 		m_querySize
 	);
 

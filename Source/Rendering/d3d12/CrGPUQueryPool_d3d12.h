@@ -12,7 +12,7 @@ public:
 
 	~CrGPUQueryPoolD3D12();
 
-	ID3D12QueryHeap* GetD3DQueryHeap() const { return m_d3d12QueryHeap; }
+	ID3D12QueryHeap* GetD3D12QueryHeap() const { return m_d3d12QueryHeap; }
 
 	const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
 

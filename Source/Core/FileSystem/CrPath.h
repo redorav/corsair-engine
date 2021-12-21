@@ -132,6 +132,16 @@ public:
 		m_pathString.resize(n, c);
 	}
 
+	bool operator == (const CrPath& path) const
+	{
+		return m_pathString == path.m_pathString;
+	}
+
+	bool operator != (const CrPath& path) const
+	{
+		return m_pathString != path.m_pathString;
+	}
+
 	CrPath operator + (const char* str) const
 	{
 		CrPath newPath = *this;

@@ -9,26 +9,7 @@ public:
 
 	CrCommandLineParser() {}
 
-	CrCommandLineParser(int argc, char* argv[])
-	{
-		for (int i = 0; i < argc; ++i)
-		{
-			// If it starts with an option character
-			if (argv[i][0] == '-')
-			{
-				// If it has a value and the value is not an option string
-				if ((i + 1) < argc && argv[i + 1][0] != '-')
-				{
-					commandLineArgs.insert({ CrString(argv[i]), CrString(argv[i + 1]) }); // Insert value option
-					++i; // Skip next argument
-				}
-				else
-				{
-					commandLineArgs.insert({ CrString(argv[i]), CrString() });
-				}
-			}
-		}
-	}
+	CrCommandLineParser(int argc, char* argv[]);
 
 	// Get first value using key
 	const CrString& operator()(const CrString& key)

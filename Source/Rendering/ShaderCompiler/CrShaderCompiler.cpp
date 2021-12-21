@@ -119,66 +119,6 @@ static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 	}
 }
 
-struct CommandLineArguments
-{
-	CommandLineArguments(int argcOriginal, char* argvOriginal[]) : argc(argcOriginal), argv(argvOriginal)
-	{
-		// Unix systems work in UTF-8 by default and have no problem inputting a properly encoded argv.
-		// On Windows, however, directories do not come in as UTF-8 so we need to translate the wchar
-		// version of the parameters to a Unicode (multibyte in Windows parlance) version. Because of
-		// that, we also need to manage the memory for that fixed command line
-		#if defined(_WIN32)
-
-			argv = new char* [argcOriginal + 1];
-			argv[argcOriginal] = nullptr;
-			m_managedMemory = true;
-
-			// Get the wide command line provided by Windows
-			int wargc;
-			wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
-
-			// Convert to UTF-8 and store locally
-			for (int i = 0; i < wargc; ++i)
-			{
-				// Returns size required for the UTF-8 string
-				int size = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, nullptr, 0, nullptr, nullptr);
-
-				// Allocate new string (taking care to add the null terminator)
-				argv[i] = new char[size];
-				argv[i][size - 1] = 0;
-
-				// Convert wide char to multibyte
-				WideCharToMultiByte(CP_UTF8, 0, wargv[i], (int)wcslen(wargv[i]), argv[i], size, nullptr, nullptr);
-			}
-
-			LocalFree(wargv);
-
-		#endif
-	}
-
-	~CommandLineArguments()
-	{
-		if (m_managedMemory)
-		{
-			// Delete each string first
-			for (int i = 0; argv[i] != nullptr; ++i)
-			{
-				delete argv[i];
-			}
-
-			// Delete the array
-			delete[] argv;
-		}
-	}
-
-	int argc = 0;
-	char** argv = nullptr;
-
-private:
-
-	bool m_managedMemory = false;
-};
-
 void QuitWithMessage(const std::string& errorMessage)
 {
 	printf("%s", errorMessage.c_str());
@@ -201,8 +141,6 @@ void QuitWithMessage(const std::string& errorMessage)
 
 int main(int argc, char* argv[])
 {
-	CommandLineArguments commandLineArguments(argc, argv);
-
 	CrCommandLineParser commandLine(argc, argv);
 	
 	CrPath executablePath = argv[0];
@@ -214,10 +152,10 @@ int main(int argc, char* argv[])
 	CrPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
 	bool buildReflection              = commandLine["-reflection"];
-	const CrString& entryPoint        = commandLine("-entrypoint").c_str();
-	const CrString& shaderStageString = commandLine("-stage").c_str();
-	const CrString& platformString    = commandLine("-platform").c_str();
-	const CrString& graphicsApiString = commandLine("-graphicsapi").c_str();
+	const CrString& entryPoint        = commandLine("-entrypoint");
+	const CrString& shaderStageString = commandLine("-stage");
+	const CrString& platformString    = commandLine("-platform");
+	const CrString& graphicsApiString = commandLine("-graphicsapi");
 
 	CrVector<CrString> defines;
 	commandLine.for_each("-D",[&defines](const CrString& value)

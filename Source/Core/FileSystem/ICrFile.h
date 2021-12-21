@@ -13,7 +13,7 @@ using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 struct CrDirectoryEntry
 {
-	CrFixedString512 filename;
+	CrPath filename;
 	bool isDirectory = false;
 };
 

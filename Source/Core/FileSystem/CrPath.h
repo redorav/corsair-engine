@@ -27,6 +27,12 @@ public:
 
 	CrPath(const CrPath& path, size_t offset, size_t count) : CrPath(path.c_str(), offset, count) {}
 
+	template <typename CharType>
+	CrPath& append_convert(const CharType* other)
+	{
+		m_pathString.append_convert(other); return *this;
+	}
+
 	const char* c_str() const { return m_pathString.c_str(); }
 
 	CrPath extension() const

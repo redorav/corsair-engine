@@ -132,9 +132,19 @@ public:
 		m_pathString.resize(n, c);
 	}
 
+	bool operator == (const char* path) const
+	{
+		return m_pathString == path;
+	}
+
 	bool operator == (const CrPath& path) const
 	{
 		return m_pathString == path.m_pathString;
+	}
+
+	bool operator != (const char* path) const
+	{
+		return m_pathString != path;
 	}
 
 	bool operator != (const CrPath& path) const

@@ -57,7 +57,6 @@ ICrFile* ICrFile::OpenRaw(const char* filePath, FileOpenFlags::T openFlags)
 
 	if (fileHandle == INVALID_HANDLE_VALUE)
 	{
-		CrLog("Invalid handle for file %s", filePath);
 		return nullptr;
 	}
 

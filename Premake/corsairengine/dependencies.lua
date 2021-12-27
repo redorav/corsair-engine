@@ -12,6 +12,7 @@ LibGlslang      = DependenciesDirectory..'/glslang'
 LibHalf         = DependenciesDirectory..'/half'
 LibHlslpp       = DependenciesDirectory..'/hlslpp'
 LibImGui        = DependenciesDirectory..'/imgui'
+LibRapidYAML    = DependenciesDirectory..'/rapidyaml'
 LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibStb          = DependenciesDirectory..'/stb'
@@ -105,6 +106,17 @@ ImguiLibrary =
 	includeDirs = LibImGui..IncludeDirectory,
 	libDirs     = LibImGui..BinaryDirectory,
 	libNames    = 'ImGui.'.._ACTION..'.release'
+}
+
+LibRapidYAML =
+{
+	includeDirs = 
+	{
+		LibRapidYAML..IncludeDirectory..'src',
+		LibRapidYAML..IncludeDirectory..'ext/c4core/src',
+	},
+	libDirs     = LibRapidYAML..BinaryDirectory,
+	libNames    = 'rapidyaml.'.._ACTION..'.release'
 }
 
 SDL2Library =

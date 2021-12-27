@@ -292,7 +292,7 @@ project(ProjectCrRendering)
 
 project(ProjectShaders)
 	kind('StaticLib')
-	files { SourceShadersDirectory..'/**' }
+	files { SourceShadersDirectory..'/**.hlsl', SourceShadersDirectory..'/**.shaders' }
 	dependson { ProjectShaderCompiler }
 
 	local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
@@ -307,9 +307,9 @@ project(ProjectShaders)
 
 	buildcommands
 	{
-		'{mkdir} '..'"'..GeneratedShadersDirectoryAbsolute..'"', 	-- Create the output folder
-		'{echo} '..shaderGenCommandLine,				-- Echo the command line
-		shaderGenCommandLine,							-- Run
+		'{mkdir} '..'"'..GeneratedShadersDirectoryAbsolute..'"', -- Create the output folder
+		'{echo} '..shaderGenCommandLine, -- Echo the command line
+		shaderGenCommandLine, -- Run
 	}
 	
 	buildoutputs

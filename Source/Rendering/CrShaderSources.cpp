@@ -40,11 +40,11 @@ void CrShaderSources::Initialize()
 	const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 	// Load all the files in this directory and put them in a hashmap based on filename
-	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), [this, &ShaderSourceDirectory](const CrDirectoryEntry& entry)
+	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), [this](const CrDirectoryEntry& entry)
 	{
 		if (!entry.isDirectory)
 		{
-			CrPath shaderPath = ShaderSourceDirectory.c_str();
+			CrPath shaderPath = entry.directory;
 			shaderPath /= entry.filename.c_str();
 
 			CrFileSharedHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);

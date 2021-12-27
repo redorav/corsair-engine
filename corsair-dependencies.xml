@@ -5,6 +5,7 @@
 	<dependency name="glslang" version="be06c6f"/>
 	<dependency name="half" version="1.12.0"/>
 	<dependency name="imgui" version="58075c4"/>
+	<dependency name="rapidyaml" version="4a8fb19"/>
 	<dependency name="sdl2" version="2.0.14"/>
 	<dependency name="spirv-reflect" version="c955ab3"/>
 	<dependency name="stb" version="f54acd4"/>

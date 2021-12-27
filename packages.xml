@@ -26,6 +26,10 @@
 		<version id="2.0.14" file="sdl2_2.0.14.zip" repository="github"/>
 	</package>
 	
+	<package name="rapidyaml">
+		<version id="4a8fb19" file="rapidyaml_2021_12_09_4a8fb19.zip" repository="github"/>
+	</package>
+	
 	<package name="spirv-reflect">
 		<version id="c955ab3" file="spirv_reflect_2021_01_25_c955ab3.zip" repository="github"/>
 	</package>

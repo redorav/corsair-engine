@@ -1,4 +1,5 @@
 #include "CrShaderMetadataBuilder.h"
+#include "CrShaderCompilerUtilities.h"
 
 #include "CrShaderCompiler.h"
 #include "CrCompilerGLSLANG.h"
@@ -80,14 +81,14 @@ bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compila
 
 	// Create header and cpp filenames
 	CrPath headerPath = compilationDescriptor.outputPath.c_str();
-	WriteToFileIfChanged(headerPath.replace_extension("h").c_str(), metadataHeader);
+	CrShaderCompilerUtilities::WriteToFileIfChanged(headerPath.replace_extension("h").c_str(), metadataHeader);
 
 	CrPath cppPath = compilationDescriptor.outputPath.c_str();
-	WriteToFileIfChanged(cppPath.replace_extension("cpp").c_str(), metadataCpp);
+	CrShaderCompilerUtilities::WriteToFileIfChanged(cppPath.replace_extension("cpp").c_str(), metadataCpp);
 
 	// Write dummy file that tells the build system dependency tracker that files are up to date
 	CrPath uptodatePath = compilationDescriptor.outputPath.c_str();
-	WriteToFile(uptodatePath.replace_extension("uptodate").c_str(), "");
+	CrShaderCompilerUtilities::WriteToFile(uptodatePath.replace_extension("uptodate").c_str(), "");
 
 	return true;
 }
@@ -942,28 +943,4 @@ CrString CrShaderMetadataBuilder::PrintRWDataBufferMetadataStructDeclaration()
 		"\tconst RWDataBuffers::T id;\n" \
 		"};\n\n";
 	return result;
-}
-
-void CrShaderMetadataBuilder::WriteToFile(const CrString& filename, const CrString& text)
-{
-	std::ofstream fileStream;
-	fileStream.open(filename.c_str(), std::ios::out);
-	fileStream.write(text.c_str(), text.size());
-	fileStream.close();
-	printf("Wrote contents of file to %s\n", filename.c_str());
-}
-
-void CrShaderMetadataBuilder::WriteToFileIfChanged(const CrString& filename, const CrString& text)
-{
-	std::ifstream originalFile(filename.c_str());
-	std::stringstream originalFileStream;
-	originalFileStream << originalFile.rdbuf();
-	originalFile.close();
-
-	const CrString& originalContents = originalFileStream.str().c_str();
-
-	if (originalContents != text)
-	{
-		WriteToFile(filename, text);
-	}
 }

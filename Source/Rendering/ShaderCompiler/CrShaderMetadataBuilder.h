@@ -2,7 +2,6 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include <string>
 #include <vector>
 
 struct SpvReflectDescriptorBinding;
@@ -108,8 +107,4 @@ private:
 	static CrString BuildRWDataBufferMetadataCpp(const HLSLResources& resources);
 	static CrString PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers);
 	static CrString PrintRWDataBufferMetadataStructDeclaration();
-
-	static void WriteToFile(const CrString& filename, const CrString& text);
-
-	static void WriteToFileIfChanged(const CrString& filename, const CrString& text);
 };

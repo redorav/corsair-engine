@@ -24,7 +24,6 @@ struct CrStreamRawData
 // This pure virtual interface is used to enforce the functions in the
 // streams, but in practice the best way to use the streams is to pass
 // it in to a templated function and avoid the virtual function calls.
-// However if not possible, the stream
 class ICrStream
 {
 public:
@@ -50,4 +49,53 @@ public:
 	virtual ICrStream& operator << (CrString& value) = 0;
 
 	virtual ICrStream& operator << (CrStreamRawData& rawData) = 0;
+
+private:
+
+	virtual void Read(void* dstBuffer, size_t sizeBytes) = 0;
+
+	virtual void Write(void* srcBuffer, size_t sizeBytes) = 0;
 };
+
+// Add operators that work with any type of stream. This allows us
+// to have common templated code for all types of streams. The only
+// downside is having to expose the Read/Write family of functions
+
+template<typename StreamT, typename T>
+StreamT& operator << (StreamT& stream, CrVector<T>& value)
+{
+	uint32_t size = (uint32_t)value.size();
+	stream << size;
+
+	if (stream.IsReading())
+	{
+		value.resize(size);
+	}
+
+	if (std::is_trivially_copyable<T>::value)
+	{
+		if (stream.IsReading())
+		{
+			stream.Read(value.data(), size);
+		}
+		else
+		{
+			stream.Write(value.data(), size);
+		}
+	}
+	else
+	{
+		for (T& v : value)
+		{
+			stream << v; // Assumes v has a compatible streaming operator
+		}
+	}
+
+	return stream;
+}
+
+template<typename StreamT, typename T, typename std::enable_if<std::is_enum<T>::value, bool>::type* = nullptr>
+StreamT& operator << (StreamT& stream, T& value)
+{
+	stream.IsReading() ? stream.Read(&value, sizeof(value)) : stream.Write(&value, sizeof(value)); return stream;
+}

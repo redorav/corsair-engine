@@ -30,6 +30,8 @@ public:
 
 	virtual CrMemoryStream& operator << (CrStreamRawData& rawData)
 	{
+		*this << rawData.size;
+
 		if (IsReading())
 		{
 			memcpy(rawData.data, m_currentPointer, rawData.size);
@@ -44,12 +46,6 @@ public:
 		return *this;
 	}
 
-	template<typename T, typename enable_if<std::is_enum<T>::value, bool>::type = true>
-	CrMemoryStream& operator << (T& value)
-	{
-		IsReading() ? Read(value) : Write(value); return *this;
-	}
-
 	virtual CrMemoryStream& operator << (CrString& value) override
 	{
 		uint32_t stringSize;
@@ -58,18 +54,28 @@ public:
 		{
 			*this << stringSize;
 			value.resize(stringSize);
-			memcpy(value.data(), m_currentPointer, stringSize);
+			Read(value.data(), stringSize);
 		}
 		else
 		{
 			stringSize = (uint32_t)value.size();
-			Write(stringSize);
-			memcpy(m_currentPointer, value.data(), stringSize);
+			*this << stringSize;
+			Write(value.data(), stringSize);
 		}
 
-		m_currentPointer += stringSize;
-
 		return *this;
+	}
+
+	virtual void Read(void* dstBuffer, size_t sizeBytes) override
+	{
+		memcpy(dstBuffer, m_currentPointer, sizeBytes);
+		m_currentPointer += sizeBytes;
+	}
+
+	virtual void Write(void* srcBuffer, size_t sizeBytes) override
+	{
+		memcpy(m_currentPointer, srcBuffer, sizeBytes);
+		m_currentPointer += sizeBytes;
 	}
 
 private:

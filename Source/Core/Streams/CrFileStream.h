@@ -57,12 +57,6 @@ public:
 		return *this;
 	}
 
-	template<typename T, typename std::enable_if<std::is_enum<T>::value, bool>::type = true>
-	CrFileStream& operator<<(T& value)
-	{
-		IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this;
-	}
-
 	virtual CrFileStream& operator << (CrString& value) override
 	{
 		if (IsReading())
@@ -82,49 +76,22 @@ public:
 		return *this;
 	}
 
-	template<typename T>
-	CrFileStream& operator << (CrVector<T>& value)
-	{
-		uint32_t size = (uint32_t)value.size();
-		*this << size;
-
-		if (IsReading())
-		{
-			value.resize(size);
-		}
-
-		if (std::is_fundamental<T>::value)
-		{
-			CrStreamRawData data(value.data(), value.size());
-			*this << data;
-		}
-		else
-		{
-			for (T& v : value)
-			{
-				*this << v; // Assumes v has a compatible streaming operator
-			}
-		}
-
-		return *this;
-	}
-
 	const ICrFile* GetFile() const
 	{
 		return m_file.get();
 	}
 
-private:
-
-	void Read(void* dstBuffer, size_t sizeBytes)
+	virtual void Read(void* dstBuffer, size_t sizeBytes) override
 	{
 		m_file->Read(dstBuffer, sizeBytes);
 	}
 
-	void Write(void* srcBuffer, size_t sizeBytes)
+	virtual void Write(void* srcBuffer, size_t sizeBytes) override
 	{
 		m_file->Write(srcBuffer, sizeBytes);
 	}
+
+private:
 
 	CrFileUniqueHandle m_file;
 };

@@ -105,17 +105,20 @@ workspace 'Corsair Engine'
 		}
 		
 	filter('system:windows')
+		--systemversion(os.winSdkVersion())
+		entrypoint 'mainCRTStartup'
 		defines
 		{
 			-- Define this system-wide so we have no more unexpected surprises
 			'NOMINMAX', 
 			'WIN32_LEAN_AND_MEAN', 
-			'VC_EXTRALEAN'
+			'VC_EXTRALEAN',
+			'_CRT_SECURE_NO_WARNINGS'
 		}
 		
 	HandleGlobalWarnings()
 		
-	filter{}
+	filter {}
 	
 	includedirs	{ SourceDirectory }
 
@@ -150,7 +153,7 @@ workspace 'Corsair Engine'
 		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_IOS_MVK', 'IOS_TARGET' }
 		
 	--filter { 'platforms:'..VulkanSwitch }
-		--system 'Linux'
+		--system 'linux'
 		--architecture 'x64'
 		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_VI_NN', 'SWITCH_TARGET' }
 		
@@ -165,7 +168,7 @@ workspace 'Corsair Engine'
 	AddLibraryIncludes(HlslppLibrary)
 	AddLibraryIncludes(xxHashLibrary)
 
-	-- Setup include directories
+	-- Setup global include directories
 	includedirs
 	{
 		WorkspaceDirectory,
@@ -185,11 +188,6 @@ workspace 'Corsair Engine'
 	globalVariableHeader:write('\tstatic const char* ShaderSourceDirectory = "'..path.getabsolute(SourceShadersDirectory)..'/";\n');
 	globalVariableHeader:write('};\n');
 	globalVariableHeader:close();
-
-	filter('system:windows')
-		--systemversion(os.winSdkVersion())
-		entrypoint 'mainCRTStartup'
-		defines { '_CRT_SECURE_NO_WARNINGS' }
 		
 	filter{}
 	

@@ -232,7 +232,7 @@ bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDesc
 	glslang::TShader* shader = new glslang::TShader(stage);
 
 	const char* shaderSources[] = { shaderSource.data() };
-	const char* shaderNames[] = { compilationDescriptor.inputPath.data() };
+	const char* shaderNames[] = { compilationDescriptor.inputPath.c_str() };
 
 	shader->setStringsWithLengthsAndNames(shaderSources, nullptr, shaderNames, 1);
 	shader->setEntryPoint(compilationDescriptor.entryPoint.c_str());

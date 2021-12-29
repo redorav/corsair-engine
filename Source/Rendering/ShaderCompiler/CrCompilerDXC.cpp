@@ -159,7 +159,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	CrProcessDescriptor processDescriptor;
 	CreateCommonDXCCommandLine(compilationDescriptor, processDescriptor.commandLine);
 
-	processDescriptor.commandLine += " -spirv ";
+	processDescriptor.commandLine += "-spirv ";
 
 	CrProcess compilerProcess(processDescriptor);
 	compilerProcess.Wait();
@@ -175,7 +175,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	{
 		if (compilationDescriptor.buildReflection)
 		{
-			CrVector<char> bytecode;
+			CrVector<uint8_t> bytecode;
 
 			// Read data in
 			CrFileUniqueHandle tempFile = ICrFile::OpenUnique(compilationDescriptor.tempPath.c_str(), FileOpenFlags::Read);
@@ -333,6 +333,9 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 			bytecode.resize(tempFile->GetSize());
 			tempFile->Read(bytecode.data(), bytecode.size());
 			tempFile = nullptr; // Close the file
+
+			// Delete the temporary file
+			ICrFile::FileDelete(compilationDescriptor.tempPath.c_str());
 
 			CComPtr<IDxcUtils> dxcUtils;
 			DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));

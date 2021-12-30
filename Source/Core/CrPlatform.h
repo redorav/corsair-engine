@@ -11,12 +11,12 @@ namespace cr
 			Count
 		};
 
-		constexpr const char* ToString(Platform::T platform)
+		constexpr const char* ToString(Platform::T platform, bool lowercase = false)
 		{
 			switch (platform)
 			{
-				case Windows: return "windows";
-				default: return "invalid";
+				case Windows: return lowercase ? "windows" : "Windows";
+				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
 	};

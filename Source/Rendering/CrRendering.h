@@ -349,14 +349,14 @@ namespace cr3d
 			Count
 		};
 
-		inline const char* ToString(cr3d::GraphicsApi::T graphicsApi)
+		inline const char* ToString(cr3d::GraphicsApi::T graphicsApi, bool lowercase = false)
 		{
 			switch (graphicsApi)
 			{
-				case cr3d::GraphicsApi::Vulkan: return "vulkan";
-				case cr3d::GraphicsApi::D3D12: return "d3d12";
-				case cr3d::GraphicsApi::Metal: return "metal";
-				default: return "invalid";
+				case cr3d::GraphicsApi::Vulkan: return lowercase ? "vulkan" : "Vulkan";
+				case cr3d::GraphicsApi::D3D12:  return lowercase ? "d3d12"  : "D3D12";
+				case cr3d::GraphicsApi::Metal:  return lowercase ? "metal"  : "Metal";
+				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
 	}
@@ -422,17 +422,17 @@ namespace cr3d
 		inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
 		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
 
-		constexpr const char* ToString(cr3d::ShaderStage::T stage)
+		constexpr const char* ToString(cr3d::ShaderStage::T stage, bool lowercase = false)
 		{
 			switch (stage)
 			{
-				case cr3d::ShaderStage::Vertex: return "vertex";
-				case cr3d::ShaderStage::Pixel: return "pixel";
-				case cr3d::ShaderStage::Hull: return "hull";
-				case cr3d::ShaderStage::Domain: return "domain";
-				case cr3d::ShaderStage::Geometry: return "geometry";
-				case cr3d::ShaderStage::Compute: return "compute";
-				default: return "invalid";
+				case cr3d::ShaderStage::Vertex:   return lowercase ? "vertex"   : "Vertex";
+				case cr3d::ShaderStage::Pixel:    return lowercase ? "pixel"    : "Pixel";
+				case cr3d::ShaderStage::Hull:     return lowercase ? "hull"     : "Hull";
+				case cr3d::ShaderStage::Domain:   return lowercase ? "domain"   : "Domain";
+				case cr3d::ShaderStage::Geometry: return lowercase ? "geometry" : "Geometry";
+				case cr3d::ShaderStage::Compute:  return lowercase ? "compute"  : "Compute";
+				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
 	};

@@ -112,7 +112,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-stage ";
-	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage);
+	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage, true);
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-reflection ";
@@ -135,11 +135,12 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	processDescriptor.commandLine += "\" ";
 
 	processDescriptor.commandLine += "-platform ";
-	processDescriptor.commandLine += cr::Platform::ToString(bytecodeDescriptor.platform);
+	processDescriptor.commandLine += cr::Platform::ToString(bytecodeDescriptor.platform, true);
 	processDescriptor.commandLine += " ";
 
 	processDescriptor.commandLine += "-graphicsapi ";
-	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi);
+	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi, true);
+	processDescriptor.commandLine += " ";
 
 	for (uint32_t i = 0; i < defines.GetDefines().size(); ++i)
 	{

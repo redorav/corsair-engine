@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ICrStream.h"
+
 template<CrStreamType::T StreamTypeT>
 class CrMemoryStream final : public ICrStream
 {

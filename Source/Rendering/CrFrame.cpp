@@ -214,15 +214,39 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_camera = CrSharedPtr<CrCamera>(new CrCamera());
 
-	CrSamplerDescriptor descriptor;
-	descriptor.name = "Linear Clamp Sampler";
-	m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
+	{
+		CrSamplerDescriptor descriptor;
+		descriptor.name = "Linear Clamp Sampler";
+		m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
+	}
 
-	descriptor.addressModeU = cr3d::AddressMode::Wrap;
-	descriptor.addressModeV = cr3d::AddressMode::Wrap;
-	descriptor.addressModeW = cr3d::AddressMode::Wrap;
-	descriptor.name = "Linear Wrap Sampler";
-	m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
+	{
+		CrSamplerDescriptor descriptor;
+		descriptor.addressModeU = cr3d::AddressMode::Wrap;
+		descriptor.addressModeV = cr3d::AddressMode::Wrap;
+		descriptor.addressModeW = cr3d::AddressMode::Wrap;
+		descriptor.name = "Linear Wrap Sampler";
+		m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
+	}
+
+	{
+		CrSamplerDescriptor descriptor;
+		descriptor.name = "Point Clamp Sampler";
+		descriptor.magFilter = cr3d::Filter::Point;
+		descriptor.minFilter = cr3d::Filter::Point;
+		m_pointClampSamplerHandle = renderDevice->CreateSampler(descriptor);
+	}
+
+	{
+		CrSamplerDescriptor descriptor;
+		descriptor.name = "Linear Wrap Sampler";
+		descriptor.magFilter = cr3d::Filter::Point;
+		descriptor.minFilter = cr3d::Filter::Point;
+		descriptor.addressModeU = cr3d::AddressMode::Wrap;
+		descriptor.addressModeV = cr3d::AddressMode::Wrap;
+		descriptor.addressModeW = cr3d::AddressMode::Wrap;
+		m_pointWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
+	}
 
 	CrTextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
@@ -401,6 +425,8 @@ void CrFrame::Process()
 
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
 
 		float t0 = CrFrameTime::GetFrameCount() * 0.01f;
 		float x = sinf(t0);

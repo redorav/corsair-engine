@@ -64,7 +64,7 @@ function HandleGlobalWarnings()
 			'4201' -- nonstandard extension used: nameless struct/union
 		}
 	
-	filter{}
+	filter {}
 
 end
 
@@ -87,6 +87,8 @@ workspace 'Corsair Engine'
 	cppdialect('C++17')
 	rtti('off')
 	exceptionhandling ('off') -- Don't enable this setting
+	objdir ("%{wks.location}/Object")
+	targetdir ("%{wks.location}/Binaries/%{cfg.platform}/%{cfg.buildcfg}")
 	
 	-- For best configuration, see https://blogs.msdn.microsoft.com/vcblog/2017/07/13/precompiled-header-pch-issues-and-recommendations/
 	
@@ -134,7 +136,7 @@ workspace 'Corsair Engine'
 
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
-		architecture 'x64'		
+		architecture 'x64'
 		defines { 'VULKAN_API', 'VK_USE_PLATFORM_MACOS_MVK', 'MAC_TARGET' }
 		
 	--filter { 'platforms:'..VulkanAndroid }
@@ -157,7 +159,7 @@ workspace 'Corsair Engine'
 		--architecture 'x64'
 		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_VI_NN', 'SWITCH_TARGET' }
 		
-	filter{}
+	filter {}
 	
 	-- Global library includes. Very few things should go here, basically things
 	-- that are used in every possible project like math and containers
@@ -244,11 +246,10 @@ project (ProjectCorsairEngine)
 	-- Copy necessary files or DLLs
 	postbuildcommands
 	{
-		-- TODO Make sure this copy command 
 		CopyFileCommand(path.getabsolute(SDL2Library.dlls), '%{cfg.buildtarget.directory}')
 	}
 	
-	filter{}
+	filter {}
 
 group('Rendering')
 
@@ -286,22 +287,23 @@ project(ProjectCrRendering)
 	filter { 'platforms:'..VulkanOSX }
 		files { SourceRenderingDirectory..'/vulkan/*' }
 	
-	filter{}
+	filter {}
 
 project(ProjectShaders)
 	kind('StaticLib')
 	files { SourceShadersDirectory..'/**.hlsl', SourceShadersDirectory..'/**.shaders' }
 	dependson { ProjectShaderCompiler }
 
+	------------------------------------
+	-- 1. Create metadata generation job
+	------------------------------------
 	local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/Metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/'..ShaderMetadataFilename
 	local shaderMetadataCommandLine = 
 	'"'..ShaderCompilerAbsolutePath..'" '..
-	'-metadata ' ..
-	'-input "'..metadataFile..'" ' ..
-	'-output "'..outputFile..'" ' ..
-	'-entrypoint metadata'
+	'-metadata -input "'..metadataFile..'" ' ..
+	'-output "'..outputFile..'" -entrypoint metadata'
 
 	buildcommands
 	{

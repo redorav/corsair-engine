@@ -3,19 +3,28 @@
 #include "Rendering/CrRendering.h"
 #include "Core/CrPlatform.h"
 #include "Core/String/CrString.h"
+#include "Core/FileSystem/CrPath.h"
 #include "Core/Containers/CrVector.h"
 
 struct CompilationDescriptor
 {
-	CrString inputPath;
-	CrString outputPath;
-	CrString tempPath; // Filename compiler can use to dump intermediate data
+	CompilationDescriptor() {}
+
+	void Process() const;
+
+	CrPath inputPath;
+	CrPath outputPath;
+	CrPath tempPath; // Filename compiler can use to dump intermediate data
 	CrString entryPoint;
-	CrVector<CrString> defines;
+	mutable CrVector<CrString> defines;
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;
-	bool buildReflection;
+	bool buildReflection = true;
+
+private:
+
+	mutable bool processed = true;
 };
 
 class CrShaderCompiler
@@ -26,9 +35,9 @@ public:
 
 	static CrString ExecutableDirectory;
 
-	void Initialize();
+	static void Initialize();
 
-	void Finalize();
+	static void Finalize();
 
-	bool Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
+	static bool Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
 };

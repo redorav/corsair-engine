@@ -12,6 +12,11 @@
 #include "d3d12/CrRenderSystem_d3d12.h"
 #endif
 
+#include "Core/Streams/CrMemoryStream.h"
+#include "Rendering/ICrShader.h"
+
+#include "GeneratedShaders/BuiltinShaders.h"
+
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 
@@ -20,6 +25,21 @@ static CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
 	m_graphicsApi = renderSystemDescriptor.graphicsApi;
+
+	// Load builtin shaders here. The render system is only instantiated once and knows
+	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
+	// rest of the engine interacts with them and not the raw data that was passed in, 
+	// as the metadata needs to be serialized, etc.
+	for (uint32_t i = 0; i < CrBuiltinShaders::Count; ++i)
+	{
+		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetBuiltinShaderMetadata((CrBuiltinShaders::T)i, m_graphicsApi);
+
+		CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
+
+		const CrShaderBytecodeSharedHandle& bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
+		shaderBytecodeStream << *bytecode.get();
+		m_builtinShaderBytecodes.push_back(bytecode);
+	}
 }
 
 ICrRenderSystem::~ICrRenderSystem()
@@ -72,7 +92,12 @@ void ICrRenderSystem::CreateRenderDevice()
 	RenderSystem->m_mainDevice->InitializeDeletionQueue();
 }
 
-cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
+cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()
 {
-	return m_graphicsApi;
+	return RenderSystem->m_graphicsApi;
+}
+
+const CrShaderBytecodeSharedHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
+{
+	return RenderSystem->m_builtinShaderBytecodes[builtinShader];
 }

@@ -1,5 +1,7 @@
 ﻿#include "CrShaderCompiler.h"
 #include "CrShaderMetadataBuilder.h"
+#include "CrBuiltinShaderBuilder.h"
+#include "CrShaderCompilerUtilities.h"
 
 #include "Core/CrPlatform.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
@@ -8,6 +10,10 @@
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/FileSystem/CrPath.h"
+#include "Core/Logging/ICrDebug.h"
+#include "Core/Function/CrFixedFunction.h"
+#include "Core/String/CrStringUtilities.h"
+#include "Core/CrMacros.h"
 
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
@@ -17,10 +23,42 @@
 #include <shellapi.h>
 #endif
 
-#pragma warning (push, 0)
+warnings_off
 // Glslang
 #include <glslang/Public/ShaderLang.h>
-#pragma warning (pop)
+warnings_on
+
+void CompilationDescriptor::Process() const
+{
+	if (!processed)
+	{
+		switch (shaderStage)
+		{
+			case cr3d::ShaderStage::Vertex:   defines.push_back("VERTEX_SHADER"); break;
+			case cr3d::ShaderStage::Pixel:    defines.push_back("PIXEL_SHADER"); break;
+			case cr3d::ShaderStage::Hull:     defines.push_back("HULL_SHADER"); break;
+			case cr3d::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
+			case cr3d::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
+			case cr3d::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
+			default: break;
+		}
+
+		switch (platform)
+		{
+			case cr::Platform::Windows: defines.push_back("WINDOWS_TARGET"); break;
+			default: break;
+		}
+
+		switch (graphicsApi)
+		{
+			case cr3d::GraphicsApi::Vulkan: defines.push_back("VULKAN_API"); break;
+			case cr3d::GraphicsApi::D3D12: defines.push_back("D3D12_API"); break;
+			default: break;
+		}
+
+		processed = true;
+	}
+}
 
 CrString CrShaderCompiler::ExecutableDirectory;
 
@@ -41,6 +79,10 @@ void CrShaderCompiler::Finalize()
 
 bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
+	// Patches the compilation descriptor with information derived from the current state (such as defines that identify
+	// the shader stage, the platform, etc)
+	compilationDescriptor.Process();
+
 	// The graphics API will tell us which compilation pipeline we want to use. The compilationDescriptor
 	// also includes which platform we want to be targeting so that we can make more informed decisions
 	// within (such as what level of support to expect e.g. in Vulkan, etc)
@@ -119,13 +161,6 @@ static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 	}
 }
 
-void QuitWithMessage(const std::string& errorMessage)
-{
-	printf("%s", errorMessage.c_str());
-	fflush(stdout);
-	exit(-1);
-}
-
 // Usage:
 // -input sourceFile.hlsl : Source file to be compiled
 // -output outputFile.bin : Destination the compiled shader is written to
@@ -138,6 +173,7 @@ void QuitWithMessage(const std::string& errorMessage)
 //                          and is for use in the engine. It strips out the built-in reflection data
 // 
 // -metadata metadataPath : Where C++ metadata is stored
+// -builtin               : Build builtin shaders
 
 int main(int argc, char* argv[])
 {
@@ -151,11 +187,17 @@ int main(int argc, char* argv[])
 	CrPath inputFilePath              = commandLine("-input").c_str();
 	CrPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
+	bool buildBuiltinShaders          = commandLine["-builtin"];
 	bool buildReflection              = commandLine["-reflection"];
 	const CrString& entryPoint        = commandLine("-entrypoint");
 	const CrString& shaderStageString = commandLine("-stage");
 	const CrString& platformString    = commandLine("-platform");
-	const CrString& graphicsApiString = commandLine("-graphicsapi");
+
+	CrVector<CrString> graphicsApiStrings;
+	commandLine.for_each("-graphicsapi", [&graphicsApiStrings](const CrString& value)
+	{
+		graphicsApiStrings.push_back(value);
+	});
 
 	CrVector<CrString> defines;
 	commandLine.for_each("-D",[&defines](const CrString& value)
@@ -166,27 +208,26 @@ int main(int argc, char* argv[])
 	CrString inputPath = inputFilePath.c_str();
 	CrString outputPath = outputFilePath.c_str();
 
-	CrShaderCompiler compiler;
-	compiler.Initialize();
-
-	if (entryPoint.empty())
-	{
-		QuitWithMessage("Error: no entry point specified");
-	}
+	CrShaderCompiler::Initialize();
 
 	if (inputPath.empty())
 	{
-		QuitWithMessage("Error: no input file specified");
+		CrShaderCompilerUtilities::QuitWithMessage("Error: no input specified");
 	}
 
 	if (outputPath.empty())
 	{
-		QuitWithMessage("Error: no output file specified");
+		CrShaderCompilerUtilities::QuitWithMessage("Error: no output specified");
 	}
 
 	// If we've been asked to create metadata
 	if (buildMetadata)
 	{
+		if (entryPoint.empty())
+		{
+			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified");
+		}
+
 		CompilationDescriptor compilationDescriptor;
 		compilationDescriptor.inputPath = inputPath;
 		compilationDescriptor.outputPath = outputPath;
@@ -195,64 +236,87 @@ int main(int argc, char* argv[])
 
 		CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor);
 	}
+	else if (buildBuiltinShaders)
+	{
+		cr::Platform::T platform = ParsePlatform(platformString);
+
+		if (platform == cr::Platform::Count)
+		{
+			CrShaderCompilerUtilities::QuitWithMessage("No platform specified");
+		}
+
+		CrBuiltinShadersDescriptor builtinShadersDescriptor;
+		builtinShadersDescriptor.inputPath = inputFilePath;
+		builtinShadersDescriptor.outputPath = outputFilePath;
+
+		for (const CrString& graphicsApiString : graphicsApiStrings)
+		{
+			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+
+			if (graphicsApi == cr3d::GraphicsApi::Count)
+			{
+				CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified");
+			}
+
+			builtinShadersDescriptor.graphicsApis.push_back(graphicsApi);
+		}
+
+		builtinShadersDescriptor.platform = platform;
+
+		CrBuiltinShaderBuilder::ProcessBuiltinShaders(builtinShadersDescriptor);
+	}
 	else
 	{
 		cr::Platform::T platform = ParsePlatform(platformString);
 
 		if (platform == cr::Platform::Count)
 		{
-			QuitWithMessage("No platform specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No platform specified");
 		}
 
-		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiStrings[0]);
 
 		if (graphicsApi == cr3d::GraphicsApi::Count)
 		{
-			QuitWithMessage("No graphics API specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified");
+		}
+
+		if (entryPoint.empty())
+		{
+			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified");
 		}
 
 		cr3d::ShaderStage::T shaderStage = ParseShaderStage(shaderStageString);
 
 		if (shaderStage == cr3d::ShaderStage::Count)
 		{
-			QuitWithMessage("No shader stage specified");
-		}
-
-		switch (shaderStage)
-		{
-			case cr3d::ShaderStage::Vertex:   defines.push_back("VERTEX_SHADER"); break;
-			case cr3d::ShaderStage::Pixel:    defines.push_back("PIXEL_SHADER"); break;
-			case cr3d::ShaderStage::Hull:     defines.push_back("HULL_SHADER"); break;
-			case cr3d::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
-			case cr3d::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
-			case cr3d::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
-			default: break;
+			CrShaderCompilerUtilities::QuitWithMessage("No shader stage specified");
 		}
 
 		CrPath tempPath = outputFilePath;
 		tempPath.replace_extension(".temp");
 
 		CompilationDescriptor compilationDescriptor;
+		compilationDescriptor.inputPath       = inputFilePath;
+		compilationDescriptor.outputPath      = outputFilePath;
+		compilationDescriptor.tempPath        = tempPath;
 		compilationDescriptor.entryPoint      = entryPoint;
-		compilationDescriptor.inputPath       = inputFilePath.c_str();
-		compilationDescriptor.outputPath      = outputFilePath.c_str();
-		compilationDescriptor.tempPath        = tempPath.c_str();
-		compilationDescriptor.shaderStage     = shaderStage;
+		compilationDescriptor.defines         = defines;
 		compilationDescriptor.platform        = platform;
 		compilationDescriptor.graphicsApi     = graphicsApi;
-		compilationDescriptor.defines         = defines;
+		compilationDescriptor.shaderStage     = shaderStage;
 		compilationDescriptor.buildReflection = buildReflection;
 
 		CrString compilationStatus;
-		bool success = compiler.Compile(compilationDescriptor, compilationStatus);
+		bool success = CrShaderCompiler::Compile(compilationDescriptor, compilationStatus);
 
 		if (!success)
 		{
-			QuitWithMessage(compilationStatus.c_str());
+			CrShaderCompilerUtilities::QuitWithMessage(compilationStatus.c_str());
 		}
 	}
 
-	compiler.Finalize();
+	CrShaderCompiler::Finalize();
 
 	return 0;
 }

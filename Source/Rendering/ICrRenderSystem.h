@@ -15,6 +15,8 @@ struct CrRenderSystemDescriptor
 	bool enableDebuggingTool = false; // e.g. renderdoc
 };
 
+namespace CrBuiltinShaders { enum T : uint32_t; };
+
 class ICrRenderSystem
 {
 public:
@@ -31,9 +33,13 @@ public:
 
 	static void CreateRenderDevice();
 
-	cr3d::GraphicsApi::T GetGraphicsApi() const;
+	static cr3d::GraphicsApi::T GetGraphicsApi();
+
+	static const CrShaderBytecodeSharedHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
 
 protected:
+
+	CrVector<CrShaderBytecodeSharedHandle> m_builtinShaderBytecodes;
 
 	CrRenderDeviceSharedHandle m_mainDevice;
 

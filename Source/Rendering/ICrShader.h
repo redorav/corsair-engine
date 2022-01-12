@@ -234,7 +234,7 @@ public:
 
 private:
 
-	CrVector<unsigned char> m_bytecode;
+	CrVector<uint8_t> m_bytecode;
 	CrShaderReflectionHeader m_reflection;
 	CrHash m_hash; // A hash of the entire bytecode
 };

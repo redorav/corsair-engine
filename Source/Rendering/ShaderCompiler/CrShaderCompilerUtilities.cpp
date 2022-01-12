@@ -28,3 +28,11 @@ void CrShaderCompilerUtilities::WriteToFileIfChanged(const CrString& filename, c
 		WriteToFile(filename, text);
 	}
 }
+
+void CrShaderCompilerUtilities::QuitWithMessage(const CrString& errorMessage)
+{
+	// We need a message pump that flushes every message for the shader compiler, otherwise a crash won't allow us to see them
+	printf("%s", errorMessage.c_str());
+	fflush(stdout);
+	exit(-1);
+}

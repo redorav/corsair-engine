@@ -6,6 +6,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderWorld.h"
 #include "Rendering/CrRenderGraph.h"
+#include "Rendering/CrBuiltinPipeline.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
@@ -45,6 +46,8 @@ private:
 	CrGraphicsPipelineHandle m_linePipelineState;
 	CrComputePipelineHandle m_computePipelineState;
 
+	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
+
 	CrTextureSharedHandle m_defaultWhiteTexture;
 
 	CrSwapchainSharedHandle m_swapchain;
@@ -66,10 +69,6 @@ private:
 
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;
-
-	CrRenderModelInstance m_modelInstance0;
-	CrRenderModelInstance m_modelInstance1;
-	CrRenderModelInstance m_modelInstance2;
 
 	CrSharedPtr<CrCamera> m_camera;
 	Camera m_cameraConstantData;

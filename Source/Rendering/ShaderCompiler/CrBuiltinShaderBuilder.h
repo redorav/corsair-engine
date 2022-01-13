@@ -19,7 +19,17 @@ struct CrBuiltinShadersDescriptor
 };
 
 struct CompilationDescriptor;
-struct CrShaderInfo;
+
+struct CrShaderInfo
+{
+	CrString name;
+};
+
+struct CrShaderCompilationJob
+{
+	CrString name;
+	CompilationDescriptor compilationDescriptor;
+};
 
 class CrBuiltinShaderBuilder
 {
@@ -33,6 +43,6 @@ private:
 	(
 		const CrBuiltinShadersDescriptor& builtinShadersDescriptor, 
 		const CrVector<CrShaderInfo>& shaderInfos,
-		const CrVector<CrHashMap<CrString, CompilationDescriptor>>& compilationJobs
+		const CrVector<CrVector<CrShaderCompilationJob>>& compilationJobs
 	);
 };

@@ -1,0 +1,22 @@
+FullscreenTriangle:
+  entrypoint: CopyTextureVS
+  stage: Vertex
+
+CopyTextureColor:
+  entrypoint: CopyTexturePS
+  stage: Pixel
+
+CopyTextureDepth:
+  entrypoint: CopyTexturePS
+  stage: Pixel
+  defines: "DEPTH"
+  
+CopyTextureCubemap:
+  entrypoint: CopyTexturePS
+  stage: Pixel
+  defines: "CUBEMAP"
+
+CopyTextureCubemapDepth:
+  entrypoint: CopyTexturePS
+  stage: Pixel
+  defines: ["DEPTH", "CUBEMAP"]

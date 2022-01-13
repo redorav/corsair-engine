@@ -30,7 +30,11 @@ VS_OUT_FULLSCREEN CopyTextureVS(VS_IN_FULLSCREEN input)
 
 float4 CopyTexturePS(VS_OUT_FULLSCREEN input) : SV_Target0
 {
+#if defined(DEPTH)
+    return CopyTexture.Sample(AllPointClampSampler, input.uv);
+#else
     return CopyTexture.Sample(AllLinearClampSampler, input.uv);
+#endif
 }
 
 #endif

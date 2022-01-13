@@ -48,6 +48,8 @@
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
+#include "GeneratedShaders/BuiltinShaders.h"
+
 // TODO Put somewhere else
 bool HashingAssert()
 {
@@ -292,22 +294,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	}
 
 	{
-		CrShaderCompilationDescriptor fullscreenTriangleBytecodeLoadInfo;
-
-		CrShaderBytecodeCompilationDescriptor fullscreenTriangleVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "CopyTexture.hlsl").c_str()),
-			"CopyTextureVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
-		fullscreenTriangleBytecodeLoadInfo.AddBytecodeDescriptor(fullscreenTriangleVSDescriptor);
-
-		CrShaderBytecodeCompilationDescriptor fullscreenTrianglePSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "CopyTexture.hlsl").c_str()),
-			"CopyTexturePS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
-		fullscreenTriangleBytecodeLoadInfo.AddBytecodeDescriptor(fullscreenTrianglePSDescriptor);
-
-		CrGraphicsShaderHandle fullscreenTriangleGraphicsShader = CrShaderManager::Get().CompileGraphicsShader(fullscreenTriangleBytecodeLoadInfo);
-
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
-
-		m_fullscreenTrianglePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, fullscreenTriangleGraphicsShader, NullVertexDescriptor);
+		m_copyTexturePipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
@@ -371,6 +360,7 @@ void CrFrame::Process()
 	
 	CrRenderGraphTextureId depthTexture;
 	CrRenderGraphTextureId swapchainTexture;
+	CrRenderGraphTextureId preSwapchainTexture;
 
 	{
 		CrRenderGraphTextureDescriptor depthDescriptor;
@@ -380,13 +370,17 @@ void CrFrame::Process()
 		CrRenderGraphTextureDescriptor swapchainDescriptor;
 		swapchainDescriptor.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
 		swapchainTexture = m_mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
+
+		CrRenderGraphTextureDescriptor preSwapchainDescriptor;
+		preSwapchainDescriptor.texture = m_preSwapchainTexture.get();
+		preSwapchainTexture = m_mainRenderGraph.CreateTexture("Pre Swapchain", preSwapchainDescriptor);
 	}
 
-	m_mainRenderGraph.AddRenderPass("Render Pass 1", float4(1.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass("Render Pass 1", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
-		renderGraph.AddRenderTarget(swapchainTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+		renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
 	},
 	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
@@ -446,6 +440,19 @@ void CrFrame::Process()
 		});
 
 		renderPacketBatcher.ExecuteBatch();
+	});
+
+	m_mainRenderGraph.AddRenderPass("Copy Pass", float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddTexture(preSwapchainTexture, cr3d::ShaderStageFlags::Pixel);
+		renderGraph.AddRenderTarget(swapchainTexture);
+	},
+	[this, preSwapchainTexture](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::CopyTexture, renderGraph.GetPhysicalTexture(preSwapchainTexture));
+		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline.get());
+		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
 	CrRenderGraphBufferDescriptor structuredBufferDescriptor;
@@ -694,6 +701,16 @@ void CrFrame::RecreateSwapchainAndDepth()
 	depthTexParams.name = "Depth Texture D32S8";
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
+
+	{
+		CrTextureDescriptor preSwapchainTexParams;
+		preSwapchainTexParams.width = m_swapchain->GetWidth();
+		preSwapchainTexParams.height = m_swapchain->GetHeight();
+		preSwapchainTexParams.format = m_swapchain->GetFormat();
+		preSwapchainTexParams.usage = cr3d::TextureUsage::RenderTarget;
+		preSwapchainTexParams.name = "Pre Swapchain";
+		m_preSwapchainTexture = renderDevice->CreateTexture(preSwapchainTexParams);
+	}
 
 	// 4. Recreate command buffers
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());

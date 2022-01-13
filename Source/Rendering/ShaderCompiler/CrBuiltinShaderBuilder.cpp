@@ -14,14 +14,9 @@
 #define RYML_USE_ASSERT 0
 #include <ryml.hpp>
 
-struct CrShaderInfo
-{
-	CrString name;
-};
-
 void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescriptor& builtinShadersDescriptor)
 {
-	CrVector<CrHashMap<CrString, CompilationDescriptor>> compilationJobs;
+	CrVector<CrVector<CrShaderCompilationJob>> compilationJobs;
 	compilationJobs.resize(builtinShadersDescriptor.graphicsApis.size());
 
 	CrVector<CrShaderInfo> shaderInfos;
@@ -67,7 +62,8 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 				CrString stageName;
 
-				CompilationDescriptor compilationDescriptor;
+				CrShaderCompilationJob compilationJob;
+				CompilationDescriptor& compilationDescriptor = compilationJob.compilationDescriptor;
 				compilationDescriptor.inputPath = hlslFilePath;
 				compilationDescriptor.graphicsApi = builtinShadersDescriptor.graphicsApis[0];
 				compilationDescriptor.platform = builtinShadersDescriptor.platform;
@@ -127,6 +123,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				CrShaderInfo shaderInfo;
 				shaderInfo.name = shaderName;
 				shaderInfos.push_back(shaderInfo);
+				compilationJob.name = shaderName;
 
 				for(uint32_t i = 0; i < builtinShadersDescriptor.graphicsApis.size(); ++i)
 				{
@@ -148,10 +145,8 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 					compilationDescriptor.outputPath = binaryFilePath;
 					compilationDescriptor.tempPath = tempPath;
-
 					compilationDescriptor.graphicsApi = graphicsApi;
-					compilationDescriptor.Process();
-					compilationJobs[i].insert({ shaderName, compilationDescriptor });
+					compilationJobs[i].push_back(compilationJob);
 				}
 			}
 		}
@@ -161,14 +156,12 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 	// Execute all compilation jobs.
 	// TODO This part can be multithreaded very easily
-	for (const CrHashMap<CrString, CompilationDescriptor>& graphicsApiCompilationJobs : compilationJobs)
+	for (const auto& graphicsApiCompilationJobs : compilationJobs)
 	{
-		for (const auto& compilationJob : graphicsApiCompilationJobs)
+		for (const CrShaderCompilationJob& compilationJob : graphicsApiCompilationJobs)
 		{
-			const CompilationDescriptor& compilationDescriptor = compilationJob.second;
-
 			CrString compilationStatus;
-			bool success = CrShaderCompiler::Compile(compilationDescriptor, compilationStatus);
+			bool success = CrShaderCompiler::Compile(compilationJob.compilationDescriptor, compilationStatus);
 
 			if (!success)
 			{
@@ -185,7 +178,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 (
 	const CrBuiltinShadersDescriptor& builtinShadersDescriptor, 
 	const CrVector<CrShaderInfo>& shaderInfos,
-	const CrVector<CrHashMap<CrString, CompilationDescriptor>>& compilationJobs
+	const CrVector<CrVector<CrShaderCompilationJob>>& compilationJobs
 )
 {
 	CrString builtinShadersGenericHeader;
@@ -231,7 +224,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	{
 		const char* graphicsApiString = cr3d::GraphicsApi::ToString(graphicsApi);
 
-		const CrHashMap<CrString, CompilationDescriptor>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
+		const CrVector<CrShaderCompilationJob>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
 
 		builtinShadersGenericHeaderGetFunction += "\tif(graphicsApi == cr3d::GraphicsApi::";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
@@ -248,8 +241,8 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		// We need to include all the necessary metadata to be able to recompile it on demand
 		for (const auto& shaderJob : graphicsApiCompilationJobs)
 		{
-			const CrString& shaderName = shaderJob.first;
-			const CompilationDescriptor& compilationDescriptor = shaderJob.second;
+			const CrString& shaderName = shaderJob.name;
+			const CompilationDescriptor& compilationDescriptor = shaderJob.compilationDescriptor;
 
 			// Load binary file
 			CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.outputPath.c_str(), FileOpenFlags::Read);

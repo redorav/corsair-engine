@@ -44,7 +44,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	}
 
 	m_renderDeviceProperties.vendor = GetVendorFromVendorID(selectedAdapterDescriptor.VendorId);
-	m_renderDeviceProperties.description.append_convert(selectedAdapterDescriptor.Description);
+	m_renderDeviceProperties.description.append_convert<wchar_t>(selectedAdapterDescriptor.Description);
 
 	HRESULT hResult = S_OK;
 

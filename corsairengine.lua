@@ -110,7 +110,8 @@ workspace 'Corsair Engine'
 		
 		buildoptions
 		{
-			'/experimental:module'
+			'/experimental:module',
+			'/permissive-'
 		}
 		
 	filter('system:windows')

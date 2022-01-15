@@ -1,21 +1,19 @@
-//#include <fstream>
-//#include <sstream>
-
 #include "CrShaderCompiler.h"
 #include "CrShaderCompilerUtilities.h"
 #include "CrCompilerGLSLANG.h"
 
 #include "Rendering/CrRendering.h"
 
-#pragma warning (push, 0)
-// Glslang
-#include <glslang/Public/ShaderLang.h>
-#include <SPIRV/GlslangToSpv.h>
-#pragma warning (pop)
-
 #include "Core/FileSystem/CrPath.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
+#include "Core/CrMacros.h"
+
+warnings_off
+// Glslang
+#include <glslang/Public/ShaderLang.h>
+#include <SPIRV/GlslangToSpv.h>
+warnings_on
 
 static const TBuiltInResource s_resourceLimits =
 {

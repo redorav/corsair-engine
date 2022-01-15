@@ -212,12 +212,12 @@ int main(int argc, char* argv[])
 
 	if (inputPath.empty())
 	{
-		CrShaderCompilerUtilities::QuitWithMessage("Error: no input specified");
+		CrShaderCompilerUtilities::QuitWithMessage("Error: no input specified\n");
 	}
 
 	if (outputPath.empty())
 	{
-		CrShaderCompilerUtilities::QuitWithMessage("Error: no output specified");
+		CrShaderCompilerUtilities::QuitWithMessage("Error: no output specified\n");
 	}
 
 	// If we've been asked to create metadata
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 	{
 		if (entryPoint.empty())
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified\n");
 		}
 
 		CompilationDescriptor compilationDescriptor;
@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 
 		if (platform == cr::Platform::Count)
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No platform specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No platform specified\n");
 		}
 
 		CrBuiltinShadersDescriptor builtinShadersDescriptor;
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
 
 			if (graphicsApi == cr3d::GraphicsApi::Count)
 			{
-				CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified");
+				CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified\n");
 			}
 
 			builtinShadersDescriptor.graphicsApis.push_back(graphicsApi);
@@ -271,26 +271,26 @@ int main(int argc, char* argv[])
 
 		if (platform == cr::Platform::Count)
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No platform specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No platform specified\n");
 		}
 
 		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiStrings[0]);
 
 		if (graphicsApi == cr3d::GraphicsApi::Count)
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified\n");
 		}
 
 		if (entryPoint.empty())
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified\n");
 		}
 
 		cr3d::ShaderStage::T shaderStage = ParseShaderStage(shaderStageString);
 
 		if (shaderStage == cr3d::ShaderStage::Count)
 		{
-			CrShaderCompilerUtilities::QuitWithMessage("No shader stage specified");
+			CrShaderCompilerUtilities::QuitWithMessage("No shader stage specified\n");
 		}
 
 		CrPath tempPath = outputFilePath;

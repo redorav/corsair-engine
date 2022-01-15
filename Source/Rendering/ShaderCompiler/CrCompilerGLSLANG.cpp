@@ -1,7 +1,8 @@
-#include <fstream>
-#include <sstream>
+//#include <fstream>
+//#include <sstream>
 
 #include "CrShaderCompiler.h"
+#include "CrShaderCompilerUtilities.h"
 #include "CrCompilerGLSLANG.h"
 
 #include "Rendering/CrRendering.h"
@@ -13,6 +14,8 @@
 #pragma warning (pop)
 
 #include "Core/FileSystem/CrPath.h"
+#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/FileSystem/ICrFile.h"
 
 static const TBuiltInResource s_resourceLimits =
 {
@@ -143,23 +146,22 @@ public:
 		CrPath includerDirectory = includerPath.parent_path();
 		CrPath headerPath = includerDirectory / headerName;
 
-		std::ifstream fileStream(headerPath.c_str(), std::ios::binary);
+		CrFileSharedHandle file = ICrFile::OpenFile(headerPath.c_str(), FileOpenFlags::Read);
 
-		if (fileStream.is_open())
+		if (file)
 		{
-			fileStream.seekg(0, std::ios::end);
-			size_t headerSize = fileStream.tellg();
+			size_t headerSize = file->GetSize();
 			char* headerData = new char[headerSize];
-			//headerData.resize(fileStream.tellg());
-			fileStream.seekg(0, std::ios::beg);
-			fileStream.read(&headerData[0], headerSize);
-			fileStream.close();
-
+			file->Read(headerData, headerSize);
+			file = nullptr;
 			IncludeResult* includeResult = new IncludeResult(headerPath.c_str(), headerData, headerSize, nullptr);
 			return includeResult;
 		}
 		else
 		{
+			CrString errorMessage;
+			errorMessage.append_sprintf("Include %s not found\n", headerPath.c_str());
+			CrShaderCompilerUtilities::QuitWithMessage(errorMessage);
 			return nullptr;
 		}
 	}
@@ -179,21 +181,16 @@ public:
 
 bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
 {
-	// TODO Move this higher up. We don't want file loading logic here
-	std::ifstream fileStream;
-	fileStream.open(compilationDescriptor.inputPath.c_str(), std::ios::binary);
+	CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
 
-	if (!fileStream.is_open())
+	if (!file)
 	{
 		return false;
 	}
 
 	std::vector<char> shaderSource;
-	fileStream.seekg(0, std::ios::end);
-	shaderSource.resize(fileStream.tellg());
-	fileStream.seekg(0, std::ios::beg);
-	fileStream.read(&shaderSource[0], shaderSource.size());
-	fileStream.close();
+	shaderSource.resize(file->GetSize());
+	file->Read(shaderSource.data(), shaderSource.size());
 	shaderSource.push_back(0);
 
 	int defaultVersion = 450;
@@ -308,9 +305,7 @@ bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDesc
 	static bool readableSpirv = false;
 	if (readableSpirv) // Optionally disassemble into human-readable format
 	{
-		std::ostringstream outstr;
-		//spv::Disassemble(outstr, spirvBytecode);
-		std::string spirvString = outstr.str();
+		
 	}
 
 	return true;

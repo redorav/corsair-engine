@@ -1,5 +1,5 @@
-#ifndef UI_HLSL
-#define UI_HLSL
+#ifndef IMGUI_HLSL
+#define IMGUI_HLSL
 
 struct VS_IN_UI
 {

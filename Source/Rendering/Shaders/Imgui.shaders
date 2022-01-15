@@ -1,0 +1,7 @@
+ImguiVS:
+  entrypoint: ImguiVS
+  stage: Vertex
+
+ImguiPS:
+  entrypoint: ImguiPS
+  stage: Pixel

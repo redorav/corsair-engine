@@ -21,6 +21,7 @@
 #include "imgui.h"
 
 #include "Core/CrGlobalPaths.h"
+#include "GeneratedShaders/BuiltinShaders.h"
 
 // Based on ImDrawVert
 struct UIVertex
@@ -82,20 +83,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
 
-		const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
-
-		// Load shaders:
-		CrShaderCompilationDescriptor bytecodeDesc;
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
-			"ImguiVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-
-		bytecodeDesc.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "UI.hlsl").c_str()), 
-			"ImguiPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-
-		CrGraphicsShaderHandle shaders = CrShaderManager::Get().CompileGraphicsShader(bytecodeDesc);
-
-		// Create it:
-		m_uiGraphicsPipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(psoDescriptor, shaders, UIVertexDescriptor);
+		m_imguiGraphicsPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
 	}
 
 	// Font atlas:
@@ -216,7 +204,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		vertexBuffer.Unlock();
 
 		// Setup global config:
-		commandBuffer->BindGraphicsPipelineState(m_uiGraphicsPipeline.get());
+		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
 		commandBuffer->BindIndexBuffer(&indexBuffer);
 		commandBuffer->BindVertexBuffer(&vertexBuffer, 0);
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());

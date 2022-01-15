@@ -4,6 +4,7 @@
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrBuiltinPipeline.h"
 
 struct ImDrawData;
 
@@ -39,7 +40,7 @@ private:
 
 	static CrImGuiRenderer* k_instance;
 
-	CrGraphicsPipelineHandle m_uiGraphicsPipeline;
+	CrBuiltinGraphicsPipeline m_imguiGraphicsPipeline;
 
 	CrTextureSharedHandle m_fontAtlas;
 

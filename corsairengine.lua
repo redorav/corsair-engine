@@ -26,6 +26,7 @@ ProjectCrMath           = 'CrMath'
 ProjectCrRendering      = 'CrRendering'
 ProjectShaderCompiler   = 'CrShaderCompiler'
 ProjectShaders          = 'CrShaders'
+ProjectBuiltinShaders   = 'CrBuiltinShaders'
 ProjectCrCore           = 'CrCore'
 ProjectCrInput          = 'CrInput'
 ProjectCrDebug          = 'CrDebug'
@@ -272,6 +273,7 @@ project(ProjectCrRendering)
 	pchheader('CrRendering_pch.h')
 	pchsource(SourceRenderingDirectory..'/CrRendering_pch.cpp')
 	dependson { ProjectShaders } -- This depends on the shaders. Shaders in turn depends on the shader compiler
+	dependson { ProjectBuiltinShaders }
 
 	local ShaderMetadataHeader = GeneratedShadersDirectory..'/'..ShaderMetadataFilename..'.h'
 	local ShaderMetadataCpp = GeneratedShadersDirectory..'/'..ShaderMetadataFilename..'.cpp'
@@ -305,15 +307,20 @@ project(ProjectCrRendering)
 	
 	filter {}
 
+local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
+
+local hlslFiles = os.matchfiles(SourceShadersDirectory..'/**.hlsl')
+local shadersFiles = os.matchfiles(SourceShadersDirectory..'/**.shaders')
+
 project(ProjectShaders)
 	kind('StaticLib')
 	files { SourceShadersDirectory..'/**.hlsl', SourceShadersDirectory..'/**.shaders' }
 	dependson { ProjectShaderCompiler }
 
-	------------------------------------
-	-- 1. Create metadata generation job
-	------------------------------------
-	local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
+	---------------------------------
+	-- Create metadata generation job
+	---------------------------------
+	
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/Metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/'..ShaderMetadataFilename
 	local shaderMetadataCommandLine = 
@@ -328,11 +335,26 @@ project(ProjectShaders)
 		shaderMetadataCommandLine, -- Run
 	}
 	
+	buildinputs { hlslFiles, shadersFiles, ShaderCompilerAbsolutePath }
+	
 	buildoutputs { outputFile..'.uptodate' }
+	
+	buildmessage('')
 
-	-------------------------------------------
-	-- 2. Create builtin shader generation jobs
-	-------------------------------------------
+	-- Let Visual Studio know we don't want to compile shaders through the built-in compiler
+	-- In the future built in shaders could be compiled this way
+	filter { 'files:**.hlsl' }
+		buildaction('none')
+		
+	filter {}
+
+project(ProjectBuiltinShaders)
+	kind('StaticLib')
+	dependson { ProjectShaderCompiler }
+
+	---------------------------------------
+	-- Create builtin shader generation job
+	---------------------------------------
 
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/BuiltinShaders'
 	local builtinShaderCommandLine =
@@ -353,26 +375,13 @@ project(ProjectShaders)
 		builtinShaderCommandLine,
 	}
 
+	buildinputs { hlslFiles, shadersFiles, ShaderCompilerAbsolutePath }
+
 	buildoutputs { outputFile..'.uptodate' }
 	
-	local hlslFiles = os.matchfiles(SourceShadersDirectory..'/**.hlsl')
-	local shadersFiles = os.matchfiles(SourceShadersDirectory..'/**.shaders')
-	
-	buildinputs
-	{
-		hlslFiles,
-		shadersFiles,
-		ShaderCompilerAbsolutePath
-	}
-	
 	buildmessage('')
-
-	-- Let Visual Studio know we don't want to compile shaders through the built-in compiler
-	-- In the future built in shaders could be compiled this way
-	filter { 'files:**.hlsl' }
-		buildaction('none')
 		
-	filter{}
+	filter {}
 
 project(ProjectShaderCompiler)
 	kind('ConsoleApp')

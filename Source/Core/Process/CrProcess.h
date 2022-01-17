@@ -32,9 +32,6 @@ public:
 
 	void ReadStdOut(char* buffer, size_t bufferSize);
 
-	// Terminate a hung process
-	void Terminate();
-
 	CrProcessResult GetResult() const
 	{
 		return result;

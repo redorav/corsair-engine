@@ -2,7 +2,7 @@
 #include "Ubershader.hlsl"
 #include "Brdf.hlsl"
 #include "Compute.hlsl"
-#include "UI.hlsl"
+#include "Imgui.hlsl"
 #include "CopyTexture.hlsl"
 
 float4 metadata() : SV_Target0

@@ -208,10 +208,10 @@ protected:
 
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
-		bool                            m_indexBufferDirty = true;
+		bool                            m_indexBufferDirty = false;
 
 		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
-		bool                            m_vertexBufferDirty = true;
+		bool                            m_vertexBufferDirty = false;
 
 		CrScissor                       m_scissor;
 		bool                            m_scissorDirty = true;

@@ -200,7 +200,7 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 						0
 					};
 
-					additionalBufferData[vertexIndex].tangent = { 0, 0, 0 , 0 };
+					additionalBufferData[vertexIndex].tangent = { 0, 0, 0, 0 };
 					additionalBufferData[vertexIndex].uv = { (half)texCoord.x, (half)texCoord.y };
 				}
 			}

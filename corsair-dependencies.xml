@@ -2,7 +2,7 @@
 
 	<dependency name="assimp" version="80799bd"/>
 	<dependency name="eastl" version="fad5471"/>
-	<dependency name="glslang" version="be06c6f"/>
+	<dependency name="glslang" version="6624e13"/>
 	<dependency name="half" version="1.12.0"/>
 	<dependency name="imgui" version="58075c4"/>
 	<dependency name="rapidyaml" version="4a8fb19"/>

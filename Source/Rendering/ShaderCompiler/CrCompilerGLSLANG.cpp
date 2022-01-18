@@ -177,7 +177,7 @@ public:
 	}
 };
 
-bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
+bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescriptor, const glslang::TIntermediate*& intermediate)
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
 
@@ -241,7 +241,7 @@ bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDesc
 
 	int clientInputSemanticsVersion = 100;
 	shader->setEnvInput(glslang::EShSourceHlsl, stage, glslang::EShClientVulkan, clientInputSemanticsVersion);
-	
+
 	shader->setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
 
 	// Specify SPIR-V version for the module
@@ -294,7 +294,15 @@ bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDesc
 		return false;
 	}
 
-	const glslang::TIntermediate* intermediate = program.getIntermediate(stage);
+	intermediate = program.getIntermediate(stage);
+
+	return true;
+}
+
+bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
+{
+	const glslang::TIntermediate* intermediate = nullptr;
+	HLSLtoAST(compilationDescriptor, intermediate);
 
 	// Generate the SPIR-V bytecode
 	spv::SpvBuildLogger logger;

@@ -481,15 +481,6 @@ project(ProjectCrCore)
 
 	filter {}
 
-SourceDebugDirectory = SourceDirectory..'/Debug'
-	
-project(ProjectCrDebug)
-	kind('StaticLib')
-	files
-	{
-		SourceDebugDirectory..'/**'
-	}
-
 -- Create a dummy project for all the natvis files to be in, instead of the individual project folders
 project('Natvis')
 	kind('StaticLib')

@@ -4,6 +4,7 @@
 struct VS_IN
 {
 	float3 pos     : POSITION;
+	float4 color   : COLOR;
 	float4 normal  : NORMAL;
 	float4 tangent : TANGENT;
 	float2 uv      : TEXCOORD0;
@@ -14,7 +15,7 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 hwPosition 	: SV_Position;
-	float3 color 		: TEXCOORD0;
+	float4 color 		: TEXCOORD0;
 	float3 normal		: TEXCOORD1;
 	float3 tangent		: TEXCOORD2;
 	float2 uv			: TEXCOORD3;

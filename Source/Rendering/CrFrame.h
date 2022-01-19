@@ -43,9 +43,8 @@ private:
 	uint32_t m_height = 0;
 
 	// TODO Temporary
-	CrGraphicsPipelineHandle m_linePipelineState;
-	CrComputePipelineHandle m_computePipelineState;
-
+	CrBuiltinGraphicsPipeline m_linePipeline;
+	CrBuiltinComputePipeline m_computePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 
 	CrTextureSharedHandle m_defaultWhiteTexture;

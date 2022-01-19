@@ -262,35 +262,15 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	RecreateSwapchainAndDepth();
 	
-	CrShaderCompilationDescriptor basicBytecodeLoadInfo;
-
-	CrString ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
-
-	CrShaderBytecodeCompilationDescriptor basicVSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Ubershader.hlsl").c_str()),
-		"UbershaderVS", cr3d::ShaderStage::Vertex, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicVSDescriptor);
-
-	CrShaderBytecodeCompilationDescriptor basicPSDescriptor = CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Ubershader.hlsl").c_str()),
-		"UbershaderPS", cr3d::ShaderStage::Pixel, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows);
-
-	basicBytecodeLoadInfo.AddBytecodeDescriptor(basicPSDescriptor);
-
-	CrGraphicsShaderHandle lineGraphicsShader = CrShaderManager::Get().CompileGraphicsShader(basicBytecodeLoadInfo);
-
 	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	lineGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
 	lineGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-	m_linePipelineState = CrPipelineStateManager::Get().GetGraphicsPipeline(lineGraphicsPipelineDescriptor, lineGraphicsShader, SimpleVertexDescriptor);
+	m_linePipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, SimpleVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
 
 	{
-		CrShaderCompilationDescriptor computeBytecodeLoadInfo;
-		computeBytecodeLoadInfo.AddBytecodeDescriptor(CrShaderBytecodeCompilationDescriptor(CrPath((ShaderSourceDirectory + "Compute.hlsl").c_str()),
-			"MainCS", cr3d::ShaderStage::Compute, cr3d::GraphicsApi::Vulkan, cr::Platform::Windows));
-		CrComputeShaderHandle computeShader = CrShaderManager::Get().CompileComputeShader(computeBytecodeLoadInfo);
-
 		CrComputePipelineDescriptor computePipelineDescriptor;
-		m_computePipelineState = CrPipelineStateManager::Get().GetComputePipeline(computePipelineDescriptor, computeShader);
+		m_computePipeline = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::ExampleCompute);
 	}
 
 	{
@@ -422,12 +402,6 @@ void CrFrame::Process()
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
 
-		float t0 = CrFrameTime::GetFrameCount() * 0.01f;
-		float x = sinf(t0);
-		float z = cosf(t0);
-
-		float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
-
 		m_renderWorld->ComputeVisibilityAndRenderPackets();
 
 		const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
@@ -439,6 +413,7 @@ void CrFrame::Process()
 			renderPacketBatcher.AddRenderPacket(renderPacket);
 		});
 
+		// Execute the last batch
 		renderPacketBatcher.ExecuteBatch();
 	});
 
@@ -471,7 +446,7 @@ void CrFrame::Process()
 	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
 	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
-	CrComputePipelineHandle computePipeline = m_computePipelineState;
+	const ICrComputePipeline* computePipeline = m_computePipeline.get();
 
 	m_mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
@@ -483,7 +458,7 @@ void CrFrame::Process()
 	},
 	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		commandBuffer->BindComputePipelineState(computePipeline.get());
+		commandBuffer->BindComputePipelineState(computePipeline);
 		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
 		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
 		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));

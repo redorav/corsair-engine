@@ -1,0 +1,7 @@
+BasicVS:
+  entrypoint: BasicVS
+  stage: Vertex
+
+BasicPS:
+  entrypoint: BasicPS
+  stage: Pixel

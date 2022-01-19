@@ -32,7 +32,7 @@ VS_OUT UbershaderVS(VS_IN IN)
     output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
 	#endif
 
-	output.color   = IN.normal.xyz; // TODO change
+	output.color   = IN.color;
 	output.uv      = IN.uv;
 	output.normal  = IN.normal.xyz * 2.0 - 1.0;
 	output.tangent = IN.tangent.xyz * 2.0 - 1.0;

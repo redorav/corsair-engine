@@ -5,6 +5,7 @@
 struct SimpleVertex
 {
 	CrVertexElement<half, cr3d::DataFormat::RGBA16_Float> position;
+	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
 	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
@@ -20,6 +21,7 @@ struct ComplexVertexPosition
 
 struct ComplexVertexAdditional
 {
+	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
 	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;

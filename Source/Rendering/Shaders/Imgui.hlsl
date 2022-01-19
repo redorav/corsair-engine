@@ -20,7 +20,7 @@ struct UIData
 	float4x4 projection;
 };
 
-cbuffer UIData : register(b0)
+cbuffer UIData
 {
 	UIData cbData;
 }

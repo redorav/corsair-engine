@@ -177,7 +177,7 @@ public:
 	}
 };
 
-bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescriptor, const glslang::TIntermediate*& intermediate)
+bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescriptor, const glslang::TIntermediate*& intermediate, CrString& compilationStatus)
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
 
@@ -273,24 +273,16 @@ bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescri
 	bool linked = program.link((EShMessages)msg);
 	if (!linked)
 	{
-		const char* infoLog = shader->getInfoLog();
-		const char* infoDebugLog = shader->getInfoDebugLog();
-		printf("%s", infoLog);
-		printf("%s", infoDebugLog);
-		//CrLogError(infoLog);
-		//CrLogError(infoDebugLog);
+		compilationStatus += shader->getInfoLog();
+		compilationStatus += shader->getInfoDebugLog();
 		return false;
 	}
 
 	bool ioMapped = program.mapIO();
 	if (!ioMapped)
 	{
-		const char* infoLog = shader->getInfoLog();
-		const char* infoDebugLog = shader->getInfoDebugLog();
-		printf("%s", infoLog);
-		printf("%s", infoDebugLog);
-		//CrLogError(shader->getInfoLog());
-		//CrLogError(shader->getInfoDebugLog());
+		compilationStatus += shader->getInfoLog();
+		compilationStatus += shader->getInfoDebugLog();
 		return false;
 	}
 
@@ -299,20 +291,27 @@ bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescri
 	return true;
 }
 
-bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode)
+bool CrCompilerGLSLANG::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, std::vector<uint32_t>& spirvBytecode, CrString& compilationStatus)
 {
 	const glslang::TIntermediate* intermediate = nullptr;
-	HLSLtoAST(compilationDescriptor, intermediate);
+	HLSLtoAST(compilationDescriptor, intermediate, compilationStatus);
 
-	// Generate the SPIR-V bytecode
-	spv::SpvBuildLogger logger;
-	glslang::GlslangToSpv(*intermediate, spirvBytecode, &logger);
-
-	static bool readableSpirv = false;
-	if (readableSpirv) // Optionally disassemble into human-readable format
+	if (intermediate)
 	{
-		
-	}
+		// Generate the SPIR-V bytecode
+		spv::SpvBuildLogger logger;
+		glslang::GlslangToSpv(*intermediate, spirvBytecode, &logger);
 
-	return true;
+		static bool readableSpirv = false;
+		if (readableSpirv) // Optionally disassemble into human-readable format
+		{
+
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

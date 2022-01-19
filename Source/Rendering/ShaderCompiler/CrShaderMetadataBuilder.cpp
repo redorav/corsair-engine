@@ -61,10 +61,10 @@ static const CrString RWDataBufferSection =
 "// RW Data Buffers\n"
 "//----------------\n\n";
 
-bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor)
+bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	std::vector<uint32_t> spirvBytecode;
-	bool compiled = CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode);
+	bool compiled = CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus);
 
 	if (!compiled)
 	{

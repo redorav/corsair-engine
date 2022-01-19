@@ -16,7 +16,7 @@ class CrShaderMetadataBuilder
 {
 public:
 
-	static bool BuildMetadata(const CompilationDescriptor& compilationDescriptor);
+	static bool BuildMetadata(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
 
 private:
 

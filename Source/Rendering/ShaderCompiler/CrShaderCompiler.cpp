@@ -234,7 +234,13 @@ int main(int argc, char* argv[])
 		compilationDescriptor.entryPoint = entryPoint;
 		compilationDescriptor.shaderStage = cr3d::ShaderStage::Pixel;
 
-		CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor);
+		CrString compilationStatus;
+		bool success = CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor, compilationStatus);
+
+		if (!success)
+		{
+			CrShaderCompilerUtilities::QuitWithMessage(compilationStatus.c_str());
+		}
 	}
 	else if (buildBuiltinShaders)
 	{

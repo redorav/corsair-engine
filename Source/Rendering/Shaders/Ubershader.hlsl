@@ -7,7 +7,7 @@
 
 struct UbershaderPixelOutput
 {
-#if defined(GBUFFER_VARIANT)
+#if (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
 	float4 albedoTarget : SV_Target0;
 	float4 normalsTarget : SV_Target1;
 #else
@@ -79,13 +79,13 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	
     float3 litSurface = surface.albedoSRGB.xyz; // * NdotL; // +surface.F0 * pow(;
 	
-#if defined(GBUFFER_VARIANT)
+#if (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, 1.0);
 #else
     pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint2.a);
 #endif
-
+	
 	return pixelOutput;
 }
 

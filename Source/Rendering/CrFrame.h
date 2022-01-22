@@ -52,6 +52,7 @@ private:
 	CrSwapchainSharedHandle m_swapchain;
 
 	CrTextureSharedHandle m_depthStencilTexture;
+	CrTextureSharedHandle m_preSwapchainTexture;
 
 	CrSamplerSharedHandle m_linearClampSamplerHandle;
 	CrSamplerSharedHandle m_linearWrapSamplerHandle;

@@ -355,9 +355,7 @@ struct CrShaderBytecodeCompilationDescriptor
 };
 
 // Add defines to a shader compilation
-// Cannot be in bytecode descriptor because
-// it's a shader-wide operation
-struct CrShaderDefines
+struct CrShaderCompilerDefines
 {
 	void AddDefine(const CrString& define)
 	{
@@ -369,7 +367,7 @@ struct CrShaderDefines
 		return defines;
 	}
 
-	static CrShaderDefines Dummy;
+	static CrShaderCompilerDefines Dummy;
 
 private:
 
@@ -393,7 +391,7 @@ struct CrShaderCompilationDescriptor
 		return m_stageBytecodeDescriptors;
 	}
 
-	const CrShaderDefines& GetDefines() const
+	const CrShaderCompilerDefines& GetDefines() const
 	{
 		return m_defines;
 	}
@@ -401,5 +399,5 @@ struct CrShaderCompilationDescriptor
 private:
 
 	CrVector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
-	CrShaderDefines m_defines;
+	CrShaderCompilerDefines m_defines;
 };

@@ -51,6 +51,9 @@ public:
 
 	void Initialize();
 
+	// Creates set of defines based on the material shader descriptor
+	void CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines);
+
 	// Compiles a material through its material descriptor
 	CrMaterialSharedHandle CompileMaterial(const CrMaterialDescriptor& descriptor);
 

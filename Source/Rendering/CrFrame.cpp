@@ -334,6 +334,8 @@ void CrFrame::Process()
 
 	m_renderWorld->SetCamera(m_camera);
 
+	m_renderWorld->ComputeVisibilityAndRenderPackets();
+
 	drawCommandBuffer->Begin();
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
@@ -356,7 +358,7 @@ void CrFrame::Process()
 		preSwapchainTexture = m_mainRenderGraph.CreateTexture("Pre Swapchain", preSwapchainDescriptor);
 	}
 
-	m_mainRenderGraph.AddRenderPass("Render Pass 1", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass("Main Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -370,6 +372,11 @@ void CrFrame::Process()
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
 
 		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
 		Color* theColorData2 = colorBuffer.Lock();
@@ -397,12 +404,6 @@ void CrFrame::Process()
 		cameraDataBuffer.Unlock();
 		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
 
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
-
-		m_renderWorld->ComputeVisibilityAndRenderPackets();
 
 		const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
 

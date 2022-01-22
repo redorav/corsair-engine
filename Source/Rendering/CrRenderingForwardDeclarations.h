@@ -97,7 +97,7 @@ class CrShaderBytecode;
 using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
-struct CrShaderDefines;
+struct CrShaderCompilerDefines;
 struct CrShaderReflectionHeader;
 
 // GPU Buffers

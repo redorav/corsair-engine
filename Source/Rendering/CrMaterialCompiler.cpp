@@ -16,6 +16,22 @@ CrString CrShaderHeaderGenerator::HashDefine = "#define ";
 
 static CrMaterialCompiler MaterialCompiler;
 
+template<typename Enum>
+const char* GetMaterialShaderEnum(Enum);
+
+template<>
+const char* GetMaterialShaderEnum(CrMaterialShaderVariant::T materialShaderVariant)
+{
+	switch (materialShaderVariant)
+	{
+		case CrMaterialShaderVariant::Depth:   return "EMaterialShaderVariant_Depth";
+		case CrMaterialShaderVariant::GBuffer: return "EMaterialShaderVariant_GBuffer";
+		case CrMaterialShaderVariant::Forward: return "EMaterialShaderVariant_Forward";
+		case CrMaterialShaderVariant::Debug:   return "EMaterialShaderVariant_Debug";
+		default: return "Invalid";
+	}
+}
+
 CrMaterialCompiler& CrMaterialCompiler::Get()
 {
 	return MaterialCompiler;
@@ -33,12 +49,18 @@ void CrShaderHeaderGenerator::DefineString(const char* define, const char* strin
 
 void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 {
-	m_header += HashDefine + define + eastl::to_string(value) + "\n";
+	m_header += HashDefine + define + " " + eastl::to_string(value) + "\n";
 }
 
 void CrMaterialCompiler::Initialize()
 {
 	m_bytecodeDiskCache = CrShaderDiskCache(CrShaderSources::Get().GetUbershaderTempDirectory() / "BytecodeCache");
+}
+
+void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines)
+{
+	CrString materialShaderVariantDefine = "EMaterialShaderVariant="; materialShaderVariantDefine += GetMaterialShaderEnum(materialShaderDescriptor.shaderVariant);
+	defines.AddDefine(materialShaderVariantDefine);
 }
 
 CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
@@ -50,12 +72,16 @@ CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderByt
 	// If we couldn't find the bytecode in the cache, compile and cache here
 	if (!shaderBytecode)
 	{
+		// Create defines
+		CrShaderCompilerDefines defines;
+		CreateMaterialShaderDefines(materialShaderDescriptor, defines);
+
 		CrShaderBytecodeCompilationDescriptor compilationDescriptor(shaderSourcePath, entryPoint.c_str(),
 		materialShaderDescriptor.shaderStage, materialShaderDescriptor.graphicsApi, materialShaderDescriptor.platform);
 
 		// Compile bytecode
-		shaderBytecode = CrShaderManager::Get().CompileShaderBytecode(compilationDescriptor);
-	
+		shaderBytecode = CrShaderManager::Get().CompileShaderBytecode(compilationDescriptor, defines);
+
 		// Save to cache if compilation was successful
 		if (shaderBytecode)
 		{
@@ -77,7 +103,11 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 
 	// Generate header with defines
 	CrShaderHeaderGenerator shaderHeaderGenerator;
-	shaderHeaderGenerator.Define("PERRY");
+
+	for (CrMaterialShaderVariant::T i = (CrMaterialShaderVariant::T)0; i < CrMaterialShaderVariant::Count; ++i)
+	{
+		shaderHeaderGenerator.DefineInt(GetMaterialShaderEnum(i), i);
+	}
 
 	CrString patchedShaderSource;
 	patchedShaderSource += shaderHeaderGenerator.GetString();
@@ -92,10 +122,9 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 	patchedShaderSourcePath /= "ShaderTemp.hlsl";
 
 	// Save patched code. We overwrite any existing file (hence ForceCreate)
-	{
-		CrFileSharedHandle patchedSourceFile = ICrFile::OpenFile(patchedShaderSourcePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-		patchedSourceFile->Write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
-	}
+	CrFileSharedHandle patchedSourceFile = ICrFile::OpenFile(patchedShaderSourcePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+	patchedSourceFile->Write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
+	patchedSourceFile = nullptr;
 
 	CrMaterialSharedHandle material = CrMakeShared<CrMaterial>();
 
@@ -118,14 +147,21 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 	{
 		CrGraphicsShaderDescriptor shaderDescriptor;
 
+		CrMaterialShaderDescriptor materialShaderDescriptor = baseShaderDescriptor;
+		materialShaderDescriptor.shaderVariant = variant;
+
 		for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage <= cr3d::ShaderStage::Pixel; ++stage)
 		{
-			// TODO Store per-variant patched shader on disk
-
-			CrMaterialShaderDescriptor materialShaderDescriptor = baseShaderDescriptor;
-			materialShaderDescriptor.shaderVariant = variant;
 			materialShaderDescriptor.shaderStage = stage;
-			CrShaderBytecodeSharedHandle bytecode = GetDiskCachedOrCompileShaderBytecode(patchedShaderSourcePath, entryPoints[stage], materialShaderDescriptor.ComputeHash(), materialShaderDescriptor);
+
+			CrShaderBytecodeSharedHandle bytecode = GetDiskCachedOrCompileShaderBytecode
+			(
+				patchedShaderSourcePath, 
+				entryPoints[stage], 
+				materialShaderDescriptor.ComputeHash(), 
+				materialShaderDescriptor
+			);
+
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 

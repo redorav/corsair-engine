@@ -81,13 +81,13 @@ void CrShaderManager::Initialize(const ICrRenderDevice* renderDevice)
 
 CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
 {
-	return CompileShaderBytecode(bytecodeDescriptor, CrShaderDefines::Dummy);
+	return CompileShaderBytecode(bytecodeDescriptor, CrShaderCompilerDefines::Dummy);
 }
 
 CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 (
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor,
-	const CrShaderDefines& defines
+	const CrShaderCompilerDefines& defines
 ) const
 {
 	CrPath ShaderCacheDirectory = GetCompiledShadersPath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);

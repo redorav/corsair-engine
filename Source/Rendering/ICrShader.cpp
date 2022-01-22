@@ -4,7 +4,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrShaderDefines CrShaderDefines::Dummy;
+CrShaderCompilerDefines CrShaderCompilerDefines::Dummy;
 
 ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources)
 {

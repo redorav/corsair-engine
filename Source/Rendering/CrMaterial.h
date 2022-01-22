@@ -60,10 +60,10 @@ namespace CrMaterialShaderVariant
 		First = Depth
 	};
 
-	inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; } // Pre-increment
-	inline T operator++(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; } // Post-increment
-	inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
-	inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
+	inline T& operator ++ (T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; }
+	inline T  operator ++ (T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; }
+	inline T& operator -- (T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; }
+	inline T  operator -- (T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; }
 };
 
 // Expresses the combination of shader variant + render state
@@ -81,10 +81,10 @@ namespace CrMaterialPipelineVariant
 		First = Depth
 	};
 
-	inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; } // Pre-increment
-	inline T operator++(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; } // Post-increment
-	inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
-	inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
+	inline T& operator ++ (T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; }
+	inline T  operator ++ (T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; }
+	inline T& operator -- (T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; }
+	inline T  operator -- (T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; }
 };
 
 struct CrMaterialPassProperties

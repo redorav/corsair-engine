@@ -40,8 +40,6 @@ public:
 
 	VkImageAspectFlags GetVkImageAspectFlags() const;
 
-	VkAttachmentDescription GetVkAttachmentDescription() const;
-
 private:
 
 	VkDevice							m_vkDevice;
@@ -62,13 +60,4 @@ private:
 	VkDeviceMemory						m_vkMemory;
 
 	VkImageAspectFlags					m_vkAspectMask; // Bits that specify color, depth, stencil or sparse texture
-
-	VkAttachmentDescription				m_vkAttachmentDescription;
-
-	// These are filled in when used as a render target. These can only be used if this attachment is the only one for this combination of framebuffer/renderpass. 
-	// E.g. If we use the depth buffer in a depth-prepass we can bind this one. If it's used as an attachment to the GBuffer or the Swapchain, we can't use this renderpass/framebuffer,
-	// we need to use the one created specifically for that usage. We can still reuse the attachment description for that renderpass though.
-	VkRenderPass						m_vkBaseRenderPass;
-
-	VkFramebuffer						m_vkBaseFramebuffer;
 };

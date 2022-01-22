@@ -10,8 +10,6 @@
 
 CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)
-	, m_vkBaseFramebuffer(nullptr)
-	, m_vkBaseRenderPass(nullptr)
 	, m_vkImage(nullptr)
 	, m_vkImageView(nullptr)
 	, m_vkMemory(nullptr)
@@ -176,6 +174,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 		memAlloc.memoryTypeIndex = vulkanRenderDevice->GetVkMemoryType(imageMemoryRequirements.memoryTypeBits, memoryFlags);
 
+		// TODO Allocate from a pool as there are limited allocations
 		result = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
 		CrAssert(result == VK_SUCCESS);
 
@@ -384,115 +383,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			vkUnmapMemory(m_vkDevice, m_vkMemory);
 		}
 	}
-
-	if (IsRenderTarget() || IsDepthStencil() || IsSwapchain())
-	{
-		// We create a dummy attachment description here that will be useful for creating
-		// the framebuffer objects later. This isn't useful per se but can be used as a helper
-		// for creating render passes and framebuffers. I think this needs to be deleted.
-		m_vkAttachmentDescription = { 0, m_vkFormat, m_vkSamples, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_DONT_CARE,
-			VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_DONT_CARE, VK_IMAGE_LAYOUT_UNDEFINED, imageLayout };
-	}
-
-	// TODO Review all this once we've implemented renderpasses and framebuffers
-	if (IsRenderTarget() || IsDepthStencil())
-	{
-		VkAttachmentReference attachmentReference = { 0, imageLayout }; // Bind to slot 0 always if this is the only render target
-
-		// Setup a single subpass reference. We do this to create a subpass dependency and an obvious resource transition instead
-		// of a vkCmdPipelineBarrier call somewhere later. If need be we could change this to be more explicit
-		VkSubpassDescription subpassDescription = {};
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-
-		if (IsDepthStencil())
-		{
-			subpassDescription.colorAttachmentCount = 0;
-			subpassDescription.pDepthStencilAttachment = &attachmentReference;
-		}
-		else
-		{
-			subpassDescription.colorAttachmentCount = 1;
-			subpassDescription.pColorAttachments = &attachmentReference;
-		}
-
-		subpassDescription.inputAttachmentCount = 0; // Input attachments can be used to sample from contents of a previous subpass
-		subpassDescription.pInputAttachments = nullptr;
-		subpassDescription.preserveAttachmentCount = 0; // Preserved attachments can be used to loop (and preserve) attachments through subpasses
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		if (m_sampleCount == cr3d::SampleCount::S1)
-		{
-			subpassDescription.pResolveAttachments = nullptr; // Resolve attachments are resolved at the end of a sub pass and can be used for e.g. multi sampling
-		}
-		else
-		{
-			// TODO Multisampling
-		}		
-
-		VkSubpassDependency dependencies[2];
-
-		// First dependency at the start of the renderpass. Does the transition from final to initial layout
-		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL; // Source is all commands outside of the renderpass
-		dependencies[0].dstSubpass = 0;
-		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT; // Signal at the beginning of the renderpass
-		dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		
-		if(IsDepthStencil())
-		{
-			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT; // Signal at early depth stencil TODO correct?
-			dependencies[0].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		}
-		else
-		{
-			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // Signal at the blending stage
-			dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		}
-		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-		// Second dependency at the end the renderpass
-		// Does the transition from the initial to the final layout
-		dependencies[1].srcSubpass = 0; // The only subpass we have
-		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL; // Consumer are all commands outside of the renderpass
-		
-		if (IsDepthStencil())
-		{
-			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT; // Signal at early depth stencil TODO correct?
-			dependencies[1].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		}
-		else
-		{
-			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // Signal at the blending stage
-			dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		}
-
-		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-		VkRenderPassCreateInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount = 1;
-		renderPassInfo.pAttachments = &m_vkAttachmentDescription;
-		renderPassInfo.subpassCount = 1;
-		renderPassInfo.pSubpasses = &subpassDescription;
-		renderPassInfo.dependencyCount = 2;
-		renderPassInfo.pDependencies = dependencies;
-
-		result = vkCreateRenderPass(m_vkDevice, &renderPassInfo, nullptr, &m_vkBaseRenderPass);
-		CrAssert(result == VK_SUCCESS);
-
-		VkFramebufferCreateInfo frameBufferCreateInfo = {};
-		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		frameBufferCreateInfo.pNext = nullptr;
-		frameBufferCreateInfo.renderPass = m_vkBaseRenderPass;
-		frameBufferCreateInfo.attachmentCount = 1;
-		frameBufferCreateInfo.pAttachments = &m_vkImageView;
-		frameBufferCreateInfo.width = m_width;
-		frameBufferCreateInfo.height = m_height;
-		frameBufferCreateInfo.layers = 1;
-
-		result = vkCreateFramebuffer(m_vkDevice, &frameBufferCreateInfo, nullptr, &m_vkBaseFramebuffer);
-	}
 }
 
 CrTextureVulkan::~CrTextureVulkan()
@@ -524,18 +414,6 @@ CrTextureVulkan::~CrTextureVulkan()
 				vkDestroyImageView(m_vkDevice, m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
 			}
 		}
-	}
-
-	if (m_vkBaseRenderPass)
-	{
-		vkDestroyRenderPass(m_vkDevice, m_vkBaseRenderPass, nullptr);
-		m_vkBaseRenderPass = nullptr;
-	}
-
-	if (m_vkBaseFramebuffer)
-	{
-		vkDestroyFramebuffer(m_vkDevice, m_vkBaseFramebuffer, nullptr);
-		m_vkBaseFramebuffer = nullptr;
 	}
 }
 
@@ -572,9 +450,4 @@ VkImageView CrTextureVulkan::GetVkImageViewSingleMipAllSlices(uint32_t mip) cons
 VkImageAspectFlags CrTextureVulkan::GetVkImageAspectFlags() const
 {
 	return m_vkAspectMask;
-}
-
-VkAttachmentDescription CrTextureVulkan::GetVkAttachmentDescription() const
-{
-	return m_vkAttachmentDescription;
 }

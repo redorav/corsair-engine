@@ -15,6 +15,8 @@
 
 #include "CrD3D12.h"
 
+#include "Core/CrMacros.h"
+
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
 {
 	const CrRenderSystemD3D12* d3d12RenderSystem = static_cast<const CrRenderSystemD3D12*>(renderSystem);
@@ -171,40 +173,52 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	rasterizerDesc.ForcedSampleCount = 1;
 	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-	uint32_t numRenderTargets = (uint32_t)pipelineDescriptor.numRenderTargets;
+	uint32_t numRenderTargets = 0;
 
 	D3D12_BLEND_DESC& blendDesc = d3d12PipelineStateDescriptor.BlendState;
 	blendDesc.AlphaToCoverageEnable = false;
-	blendDesc.IndependentBlendEnable = false;	
-	d3d12PipelineStateDescriptor.NumRenderTargets = numRenderTargets;
+	blendDesc.IndependentBlendEnable = false;
 
 	const CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
-	for (uint32_t i = 0; i < numRenderTargets; ++i)
+	static_assert(cr3d::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats));
+
+	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
 	{
-		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-		D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
+		const CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
 
-		renderTargetDesc.BlendEnable = renderTargetBlend.enable;
-		renderTargetDesc.LogicOpEnable = false;
-		renderTargetDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+		if (renderTargets.colorFormats[0] != cr3d::DataFormat::Invalid)
+		{
+			const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
+			D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
-		renderTargetDesc.BlendOp = crd3d::GetD3DBlendOp(renderTargetBlend.colorBlendOp);
-		renderTargetDesc.SrcBlend = crd3d::GetD3DBlendFactor(renderTargetBlend.srcColorBlendFactor);
-		renderTargetDesc.DestBlend = crd3d::GetD3DBlendFactor(renderTargetBlend.dstColorBlendFactor);
+			renderTargetDesc.BlendEnable = renderTargetBlend.enable;
+			renderTargetDesc.LogicOpEnable = false;
+			renderTargetDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
 
-		renderTargetDesc.BlendOpAlpha = crd3d::GetD3DBlendOp(renderTargetBlend.alphaBlendOp);
-		renderTargetDesc.SrcBlendAlpha = crd3d::GetD3DBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
-		renderTargetDesc.DestBlendAlpha = crd3d::GetD3DBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
+			renderTargetDesc.BlendOp = crd3d::GetD3DBlendOp(renderTargetBlend.colorBlendOp);
+			renderTargetDesc.SrcBlend = crd3d::GetD3DBlendFactor(renderTargetBlend.srcColorBlendFactor);
+			renderTargetDesc.DestBlend = crd3d::GetD3DBlendFactor(renderTargetBlend.dstColorBlendFactor);
 
-		renderTargetDesc.RenderTargetWriteMask = renderTargetBlend.colorWriteMask;
+			renderTargetDesc.BlendOpAlpha = crd3d::GetD3DBlendOp(renderTargetBlend.alphaBlendOp);
+			renderTargetDesc.SrcBlendAlpha = crd3d::GetD3DBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
+			renderTargetDesc.DestBlendAlpha = crd3d::GetD3DBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
 
-		d3d12PipelineStateDescriptor.RTVFormats[i] = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
+			renderTargetDesc.RenderTargetWriteMask = renderTargetBlend.colorWriteMask;
 
-		// If any blend state is different, turn on independent blend
-		blendDesc.IndependentBlendEnable = blendDesc.IndependentBlendEnable || (firstBlendState != renderTargetBlend);
+			d3d12PipelineStateDescriptor.RTVFormats[i] = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
+
+			// If any blend state is different, turn on independent blend
+			blendDesc.IndependentBlendEnable = blendDesc.IndependentBlendEnable || (firstBlendState != renderTargetBlend);
+			numRenderTargets++;
+		}
+		else
+		{
+			break;
+		}
 	}
 
+	d3d12PipelineStateDescriptor.NumRenderTargets = numRenderTargets;
 	d3d12PipelineStateDescriptor.DSVFormat = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.depthFormat);
 
 	DXGI_SAMPLE_DESC& sampleDesc = d3d12PipelineStateDescriptor.SampleDesc;

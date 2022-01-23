@@ -338,27 +338,36 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	colorBlendState.logicOpEnable = false;
 	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
-	uint32_t numRenderTargets = (uint32_t)pipelineDescriptor.numRenderTargets;
-
-	CrFixedVector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments(numRenderTargets);
-	for (uint32_t i = 0; i < numRenderTargets; ++i)
+	CrFixedVector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments;
+	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-		blendAttachments[i].colorWriteMask = renderTargetBlend.colorWriteMask;
-		blendAttachments[i].blendEnable = renderTargetBlend.enable;
-		if (renderTargetBlend.enable)
-		{
-			blendAttachments[i].colorBlendOp = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
-			blendAttachments[i].dstColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstColorBlendFactor);
-			blendAttachments[i].srcColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcColorBlendFactor);
+		const CrRenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
 
-			blendAttachments[i].alphaBlendOp = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
-			blendAttachments[i].dstAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
-			blendAttachments[i].srcAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
+		if (renderTarget.colorFormats[i] != cr3d::DataFormat::Invalid)
+		{
+			VkPipelineColorBlendAttachmentState& blendAttachment = blendAttachments.push_back();
+			blendAttachment.colorWriteMask = renderTargetBlend.colorWriteMask;
+			blendAttachment.blendEnable = renderTargetBlend.enable;
+
+			if (renderTargetBlend.enable)
+			{
+				blendAttachment.colorBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
+				blendAttachment.dstColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstColorBlendFactor);
+				blendAttachment.srcColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcColorBlendFactor);
+
+				blendAttachment.alphaBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
+				blendAttachment.dstAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
+				blendAttachment.srcAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
+			}
+		}
+		else
+		{
+			break;
 		}
 	}
 
-	colorBlendState.attachmentCount = numRenderTargets;
+	colorBlendState.attachmentCount = (uint32_t)blendAttachments.size();
 	colorBlendState.pAttachments = blendAttachments.data();
 	colorBlendState.blendConstants[0] = 1.0f;
 	colorBlendState.blendConstants[1] = 1.0f;
@@ -537,10 +546,10 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 		CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
 		VkAttachmentReference depthReference;
 
-		uint32_t numColorAttachments = numRenderTargets;
+		uint32_t numColorAttachments = colorBlendState.attachmentCount;
 		uint32_t numDepthAttachments = 0;
 
-		for (uint32_t i = 0; i < numRenderTargets; ++i)
+		for (uint32_t i = 0; i < numColorAttachments; ++i)
 		{
 			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 			VkAttachmentDescription attachmentDescription = {};

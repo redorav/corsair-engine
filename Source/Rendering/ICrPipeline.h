@@ -103,7 +103,12 @@ static_assert(sizeof(CrDepthStencilStateDescriptor) == 16, "CrDepthStencilStateD
 
 struct CrRenderTargetFormatDescriptor
 {
-	CrArray<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats;
+	CrArray<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats =
+	{
+		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid,
+		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid
+	};
+
 	cr3d::DataFormat::T depthFormat = cr3d::DataFormat::Invalid;
 	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
 };
@@ -122,8 +127,6 @@ struct CrGraphicsPipelineDescriptor
 		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
 		rasterizerState.cullMode  = cr3d::PolygonCullMode::Back;
 		
-		numRenderTargets          = 1;
-
 		padding                   = 0;
 		
 		// Don't put a loop here to initialize the color write masks. It helps the compiler
@@ -149,8 +152,7 @@ struct CrGraphicsPipelineDescriptor
 
 	cr3d::PrimitiveTopology        primitiveTopology : 4;
 	cr3d::SampleCount              sampleCount       : 4;
-	uint32_t                       numRenderTargets  : 4;
-	uint32_t                       padding           : 20;
+	uint32_t                       padding           : 24;
 
 	CrRasterizerStateDescriptor    rasterizerState = {};
 	CrBlendStateDescriptor         blendState = {};

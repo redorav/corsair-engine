@@ -86,7 +86,7 @@ public:
 	static bool FileExists(const char* filePath);
 
 	// Query if directory exists
-	static bool DirectoryExists(const char* filePath);
+	static bool DirectoryExists(const char* directoryPath);
 
 	// Create directory, including the tree that leads up to it
 	// If folder was created successfully or folder already exists, return true
@@ -97,7 +97,7 @@ public:
 	static bool CreateDirectorySingle(const char* directoryPath);
 
 	// Iterate over directory entries
-	static bool ForEachDirectoryEntry(const char* directoryName, const FileIteratorFn& fn);
+	static bool ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFn& fn);
 
 private:
 

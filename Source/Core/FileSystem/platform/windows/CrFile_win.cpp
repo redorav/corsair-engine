@@ -186,11 +186,11 @@ bool ICrFile::FileExists(const char* filePath)
 	}
 }
 
-bool ICrFile::DirectoryExists(const char* filePath)
+bool ICrFile::DirectoryExists(const char* directoryPath)
 {
 	WIN32_FILE_ATTRIBUTE_DATA attributeData;
 
-	if (GetFileAttributesExA(filePath, GetFileExInfoStandard, &attributeData))
+	if (GetFileAttributesExA(directoryPath, GetFileExInfoStandard, &attributeData))
 	{
 		return attributeData.dwFileAttributes != INVALID_FILE_ATTRIBUTES && (attributeData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 	}
@@ -220,12 +220,12 @@ bool ICrFile::CreateDirectorySingle(const char* directoryPath)
 	return false;
 }
 
-bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIteratorFn& fn)
+bool ICrFile::ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFn& fn)
 {
 	WIN32_FIND_DATAW findData;
 
 	CrFixedWString512 wPath;
-	wPath.append_convert(directoryName);
+	wPath.append_convert(directoryPath);
 	wPath.append(L"/*.*"); // Find everything inside this folder
 
 	// Find first file. Bear in mind "file" is a misnomer as it actually finds any entry,
@@ -245,7 +245,7 @@ bool ICrFile::ForEachDirectoryEntry(const char* directoryName, const FileIterato
 			if (!isDot && !isDoubleDot)
 			{
 				CrDirectoryEntry entry;
-				entry.directory = directoryName;
+				entry.directory = directoryPath;
 				entry.filename.append_convert<wchar_t>(findData.cFileName);
 				entry.isDirectory = findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 				continueIterating = fn(entry);

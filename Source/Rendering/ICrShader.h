@@ -251,8 +251,12 @@ StreamT& operator << (StreamT& stream, CrShaderBytecode& bytecode)
 	return stream;
 }
 
+typedef CrFixedString64 CrShaderDebugString;
+
 struct CrGraphicsShaderDescriptor
 {
+	CrShaderDebugString m_debugName;
+
 	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
 };
 
@@ -270,9 +274,16 @@ public:
 	const ICrShaderBindingLayout& GetBindingLayout() const
 	{
 		return *m_bindingTable.get();
-	}	
+	}
+
+	const char* GetDebugName() const
+	{
+		return m_debugName.c_str();
+	}
 
 protected:
+
+	CrShaderDebugString m_debugName;
 
 	CrUniquePtr<ICrShaderBindingLayout> m_bindingTable;
 
@@ -292,6 +303,7 @@ public:
 		{
 			m_bytecodes.push_back(bytecode);
 			m_hash <<= bytecode->GetHash();
+			m_debugName = graphicsShaderDescriptor.m_debugName;
 		}
 	}
 
@@ -316,6 +328,8 @@ protected:
 
 struct CrComputeShaderDescriptor
 {
+	CrShaderDebugString m_debugName;
+
 	CrShaderBytecodeSharedHandle m_bytecode;
 };
 
@@ -325,8 +339,9 @@ public:
 
 	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
-		m_bytecode = computeShaderDescriptor.m_bytecode;
-		m_hash = computeShaderDescriptor.m_bytecode->GetHash();
+		m_bytecode  = computeShaderDescriptor.m_bytecode;
+		m_hash      = computeShaderDescriptor.m_bytecode->GetHash();
+		m_debugName = computeShaderDescriptor.m_debugName;
 	}
 
 	const CrShaderBytecodeSharedHandle& GetBytecode() const

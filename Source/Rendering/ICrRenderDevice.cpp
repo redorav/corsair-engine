@@ -26,6 +26,7 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";
+	m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
 }
 
 ICrRenderDevice::~ICrRenderDevice()

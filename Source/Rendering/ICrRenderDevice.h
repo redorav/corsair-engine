@@ -25,6 +25,7 @@ namespace CrVendor
 struct CrRenderDeviceProperties
 {
 	CrVendor::T vendor = CrVendor::Unknown;
+	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
 	CrFixedString128 description;
 
 	uint32_t maxConstantBufferRange = 0;

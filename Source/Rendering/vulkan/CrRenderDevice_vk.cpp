@@ -607,24 +607,26 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	}
 
 	VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
-	graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShader->GetBytecodes().size();
-	graphicsPipelineCreateInfo.pStages = shaderStages;
+	graphicsPipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	graphicsPipelineCreateInfo.stageCount          = (uint32_t)graphicsShader->GetBytecodes().size();
+	graphicsPipelineCreateInfo.pStages             = shaderStages;
 
-	graphicsPipelineCreateInfo.layout = vulkanGraphicsPipeline->m_vkPipelineLayout;
-	graphicsPipelineCreateInfo.pVertexInputState = &vertexInputState;
-	graphicsPipelineCreateInfo.renderPass = vkCompatibleRenderPass;
+	graphicsPipelineCreateInfo.layout              = vulkanGraphicsPipeline->m_vkPipelineLayout;
+	graphicsPipelineCreateInfo.pVertexInputState   = &vertexInputState;
+	graphicsPipelineCreateInfo.renderPass          = vkCompatibleRenderPass;
 
 	graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 	graphicsPipelineCreateInfo.pRasterizationState = &rasterizerState;
-	graphicsPipelineCreateInfo.pColorBlendState = &colorBlendState;
-	graphicsPipelineCreateInfo.pMultisampleState = &multisampleState;
-	graphicsPipelineCreateInfo.pViewportState = &viewportState;
-	graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilState;
-	graphicsPipelineCreateInfo.pDynamicState = &dynamicState;
+	graphicsPipelineCreateInfo.pColorBlendState    = &colorBlendState;
+	graphicsPipelineCreateInfo.pMultisampleState   = &multisampleState;
+	graphicsPipelineCreateInfo.pViewportState      = &viewportState;
+	graphicsPipelineCreateInfo.pDepthStencilState  = &depthStencilState;
+	graphicsPipelineCreateInfo.pDynamicState       = &dynamicState;
 
 	vkResult = vkCreateGraphicsPipelines(m_vkDevice, m_vkPipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &vulkanGraphicsPipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
+
+	SetVkObjectName((uint64_t)vulkanGraphicsPipeline->m_vkPipeline, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, graphicsShader->GetDebugName());
 
 	vkDestroyRenderPass(m_vkDevice, vkCompatibleRenderPass, nullptr);
 
@@ -670,6 +672,8 @@ ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
 
 	vkResult = vkCreateComputePipelines(m_vkDevice, m_vkPipelineCache, 1, &computePipelineCreateInfo, nullptr, &vulkanComputePipeline->m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
+
+	SetVkObjectName((uint64_t)vulkanComputePipeline->m_vkPipeline, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, computeShader->GetDebugName());
 
 	return vulkanComputePipeline;
 }

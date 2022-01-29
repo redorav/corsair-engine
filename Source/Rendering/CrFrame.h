@@ -32,7 +32,7 @@ public:
 
 	void UpdateCamera();
 
-	void RecreateSwapchainAndDepth();
+	void RecreateSwapchainAndRenderTargets();
 
 private:
 

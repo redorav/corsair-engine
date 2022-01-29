@@ -268,7 +268,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	RecreateSwapchainAndDepth();
+	RecreateSwapchainAndRenderTargets();
 	
 	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
@@ -319,7 +319,7 @@ void CrFrame::Process()
 
 	if (swapchainResult == CrSwapchainResult::Invalid)
 	{
-		RecreateSwapchainAndDepth();
+		RecreateSwapchainAndRenderTargets();
 		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
@@ -654,7 +654,7 @@ void CrFrame::UpdateCamera()
 	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
 }
 
-void CrFrame::RecreateSwapchainAndDepth()
+void CrFrame::RecreateSwapchainAndRenderTargets()
 {
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();

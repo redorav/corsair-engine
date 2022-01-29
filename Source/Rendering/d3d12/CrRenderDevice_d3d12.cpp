@@ -187,7 +187,7 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS(const CrGraph
 	{
 		const CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
 
-		if (renderTargets.colorFormats[0] != cr3d::DataFormat::Invalid)
+		if (renderTargets.colorFormats[i] != cr3d::DataFormat::Invalid)
 		{
 			const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 			D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];

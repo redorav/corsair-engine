@@ -180,9 +180,7 @@ namespace cr3d
 			D32_Float_S8_Uint,
 
 			// Meta formats
-
 			Count,
-			Last = D32_Float_S8_Uint,
 			Invalid,
 		};
 	};

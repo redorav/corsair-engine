@@ -64,6 +64,12 @@ struct CrRenderPacketBatcher
 	CrRenderPacketBatcher(ICrCommandBuffer* commandBuffer)
 	{
 		m_commandBuffer = commandBuffer;
+		m_maxBatchSize = (uint32_t)m_matrices.size();
+	}
+
+	void SetMaximumBatchSize(uint32_t batchSize)
+	{
+		m_maxBatchSize = CrMin(batchSize, (uint32_t)m_matrices.size());
 	}
 
 	void AddRenderPacket(const CrRenderPacket& renderPacket)
@@ -73,7 +79,7 @@ struct CrRenderPacketBatcher
 			renderPacket.material != m_material ||
 			renderPacket.renderMesh != m_renderMesh;
 
-		bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_matrices.size();
+		bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_maxBatchSize;
 
 		if (stateMismatch || noMoreSpace)
 		{
@@ -143,6 +149,8 @@ struct CrRenderPacketBatcher
 	const ICrGraphicsPipeline* m_pipeline = nullptr;
 
 	ICrCommandBuffer* m_commandBuffer = nullptr;
+
+	uint32_t m_maxBatchSize = 0;
 
 	// Has to match the maximum number of matrices declared in the shader
 	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;

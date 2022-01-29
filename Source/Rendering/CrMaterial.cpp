@@ -1,38 +1,58 @@
 #include "CrRendering_pch.h"
 
-#include "CrMaterial.h"
+#include "Rendering/CrMaterial.h"
+#include "Rendering/CrRendererConfig.h"
+#include "Core/Logging/ICrDebug.h"
 
-static CrMaterialPassProperties MaterialPassProperties[CrMaterialPipelineVariant::Count];
-
-const CrMaterialPassProperties& CrMaterialPassProperties::GetProperties(CrMaterialPipelineVariant::T pipelineVariant)
+CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(CrMaterialPipelineVariant::T pipelineVariant)
 {
-	return MaterialPassProperties[pipelineVariant];
+	CrMaterialPassProperties materialPassProperties;
+
+	cr3d::DataFormat::T mainDepthFormat = CrRendererConfig::DepthBufferFormat;
+
+	if (pipelineVariant == CrMaterialPipelineVariant::Depth)
+	{
+		materialPassProperties.renderTargets.depthFormat = mainDepthFormat;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Depth;
+	}
+	else if (pipelineVariant == CrMaterialPipelineVariant::Shadow)
+	{
+		materialPassProperties.renderTargets.depthFormat = cr3d::DataFormat::D16_Unorm;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Depth;
+	}
+	else if (pipelineVariant == CrMaterialPipelineVariant::GBuffer)
+	{
+		materialPassProperties.renderTargets.colorFormats[0] = CrRendererConfig::GBufferAlbedoAOFormat;
+		materialPassProperties.renderTargets.colorFormats[1] = CrRendererConfig::GBufferNormalsFormat;
+		materialPassProperties.renderTargets.colorFormats[2] = CrRendererConfig::GBufferMaterialFormat;
+		materialPassProperties.renderTargets.depthFormat = mainDepthFormat;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::GBuffer;
+	}
+	else if (pipelineVariant == CrMaterialPipelineVariant::Transparency)
+	{
+		// TODO Change to cr3d::DataFormat::RG11B10_Float
+		materialPassProperties.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
+		materialPassProperties.renderTargets.depthFormat = mainDepthFormat;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Forward;
+	}
+	else if (pipelineVariant == CrMaterialPipelineVariant::UI)
+	{
+		materialPassProperties.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
+		materialPassProperties.renderTargets.depthFormat = mainDepthFormat;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Forward;
+	}
+	else if (pipelineVariant == CrMaterialPipelineVariant::Debug)
+	{
+		materialPassProperties.renderTargets.colorFormats[0] = CrRendererConfig::DebugShaderFormat;
+		materialPassProperties.renderTargets.depthFormat = mainDepthFormat;
+		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Debug;
+	}
+
+	CrAssert(materialPassProperties.renderTargets.colorFormats[0] != cr3d::DataFormat::Invalid || materialPassProperties.renderTargets.depthFormat != cr3d::DataFormat::Invalid);
+	CrAssert(materialPassProperties.shaderVariant != CrMaterialShaderVariant::Count);
+
+	return materialPassProperties;
 }
-
-static bool SetupGlobalUbershaderProperties()
-{
-	cr3d::DataFormat::T mainDepthFormat = cr3d::DataFormat::D32_Float_S8_Uint;
-
-	MaterialPassProperties[CrMaterialPipelineVariant::Depth].renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
-	MaterialPassProperties[CrMaterialPipelineVariant::Depth].renderTargets.depthFormat = mainDepthFormat;
-	MaterialPassProperties[CrMaterialPipelineVariant::Depth].shaderVariant = CrMaterialShaderVariant::Depth;
-
-	MaterialPassProperties[CrMaterialPipelineVariant::Shadow].renderTargets.depthFormat = cr3d::DataFormat::D16_Unorm;
-	MaterialPassProperties[CrMaterialPipelineVariant::Shadow].shaderVariant = CrMaterialShaderVariant::Depth;
-
-	MaterialPassProperties[CrMaterialPipelineVariant::GBuffer].renderTargets.colorFormats[0] = cr3d::DataFormat::RGBA8_Unorm;
-	MaterialPassProperties[CrMaterialPipelineVariant::GBuffer].renderTargets.depthFormat = mainDepthFormat;
-	MaterialPassProperties[CrMaterialPipelineVariant::GBuffer].shaderVariant = CrMaterialShaderVariant::GBuffer;
-
-	// TODO Change to cr3d::DataFormat::RG11B10_Float
-	MaterialPassProperties[CrMaterialPipelineVariant::Transparency].renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
-	MaterialPassProperties[CrMaterialPipelineVariant::Transparency].renderTargets.depthFormat = mainDepthFormat;
-	MaterialPassProperties[CrMaterialPipelineVariant::Transparency].shaderVariant = CrMaterialShaderVariant::Forward;
-
-	return true;
-}
-
-static bool DummySetupGlobalUbershaderProperties = SetupGlobalUbershaderProperties();
 
 void CrMaterial::AddTexture(const CrTextureSharedHandle& texture, Textures::T semantic)
 {

@@ -89,11 +89,10 @@ namespace CrMaterialPipelineVariant
 
 struct CrMaterialPassProperties
 {
-	static const CrMaterialPassProperties& GetProperties(CrMaterialPipelineVariant::T pipelineVariant);
+	static CrMaterialPassProperties GetMaterialPassProperties(CrMaterialPipelineVariant::T pipelineVariant);
 
 	CrRenderTargetFormatDescriptor renderTargets;
-
-	CrMaterialShaderVariant::T shaderVariant;
+	CrMaterialShaderVariant::T shaderVariant = CrMaterialShaderVariant::Count;
 };
 
 // High-level description of a material

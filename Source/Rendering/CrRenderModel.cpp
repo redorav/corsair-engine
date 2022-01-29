@@ -30,7 +30,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 		for (CrMaterialPipelineVariant::T pipelineVariant = CrMaterialPipelineVariant::First; pipelineVariant < CrMaterialPipelineVariant::Count; ++pipelineVariant)
 		{
-			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetProperties(pipelineVariant);
+			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(pipelineVariant);
 
 			CrGraphicsPipelineDescriptor pipelineDescriptor;
 			pipelineDescriptor.renderTargets = passProperties.renderTargets;

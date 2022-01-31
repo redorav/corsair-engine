@@ -24,7 +24,7 @@ CrTextureDescriptor::CrTextureDescriptor()
 
 }
 
-ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : m_usedMemory(0)
+ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : m_usedGPUMemory(0)
 {
 	m_renderDevice = renderDevice;
 

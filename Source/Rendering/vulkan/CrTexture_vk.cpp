@@ -274,7 +274,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			// Create a staging buffer
 			VkBufferCreateInfo stagingBufferCreateInfo = crvk::CreateVkBufferCreateInfo
 			(
-				0, imageMemoryRequirements.size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+				0, m_usedGPUMemory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
 				VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
 			);
 

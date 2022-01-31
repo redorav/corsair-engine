@@ -75,6 +75,8 @@ public:
 
 	uint32_t GetMipSliceOffset(uint32_t mip, uint32_t slice) const;
 
+	uint32_t GetUsedGPUMemory() const { return m_usedGPUMemory; }
+
 	// TODO
 	// How to do lock/unlock pairs for cubemaps, texture arrays, etc.
 	// Lock(mip, face)
@@ -103,7 +105,7 @@ protected:
 
 	uint32_t m_mipmapCount;
 
-	uint32_t m_usedMemory;
+	uint32_t m_usedGPUMemory;
 
 	cr3d::TextureUsageFlags m_usage;
 };

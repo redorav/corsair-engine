@@ -69,8 +69,8 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	: ICrCommandBuffer(commandQueue)
 {
 	// Command buffer device same as command queue device
-	CrCommandQueueVulkan* commandQueueVulkan = static_cast<CrCommandQueueVulkan*>(commandQueue);
-	m_vkDevice = commandQueueVulkan->GetVkDevice();
+	CrCommandQueueVulkan* vulkanCommandQueue = static_cast<CrCommandQueueVulkan*>(commandQueue);
+	m_vkDevice = vulkanCommandQueue->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
 	CrArray<VkDescriptorPoolSize, 4> typeCounts;
@@ -109,7 +109,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = commandQueueVulkan->GetVkCommandBufferPool();
+	commandBufferAllocateInfo.commandPool = vulkanCommandQueue->GetVkCommandBufferPool();
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1;
 
@@ -124,8 +124,8 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 	static auto renderPassAllocationFn = [](void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
 	{
-		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
-		return commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
+		CrCommandBufferVulkan* vulkanCommandBuffer = (CrCommandBufferVulkan*)pUserData;
+		return vulkanCommandBuffer->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
 	};
 
 	// We don't free because we reuse the memory every time the command buffer is reset
@@ -133,8 +133,8 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 	static auto renderPassReallocationFn = [](void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
 	{
-		CrCommandBufferVulkan* commandBufferVulkan = (CrCommandBufferVulkan*)pUserData;
-		void* memory = commandBufferVulkan->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
+		CrCommandBufferVulkan* vulkanCommandBuffer = (CrCommandBufferVulkan*)pUserData;
+		void* memory = vulkanCommandBuffer->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
 		memcpy(memory, pOriginal, size);
 		return memory;
 	};
@@ -147,11 +147,11 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
 {
-	CrCommandQueueVulkan* commandQueueVulkan = static_cast<CrCommandQueueVulkan*>(m_ownerCommandQueue);
+	CrCommandQueueVulkan* vulkanCommandQueue = static_cast<CrCommandQueueVulkan*>(m_ownerCommandQueue);
 
 	vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
 
-	vkFreeCommandBuffers(m_vkDevice, commandQueueVulkan->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
+	vkFreeCommandBuffers(m_vkDevice, vulkanCommandQueue->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
 }
 
 // TODO This should become CreateShaderResourceTable and should be cached, reused, etc
@@ -608,7 +608,7 @@ VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::BufferState::T /*bufferState*
 void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
 {
-	const CrHardwareGPUBufferVulkan* gpuBufferVulkan = static_cast<const CrHardwareGPUBufferVulkan*>(buffer->GetHardwareBuffer());
+	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(buffer->GetHardwareBuffer());
 
 	bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 	bufferMemoryBarrier.pNext = nullptr;
@@ -619,7 +619,7 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	bufferMemoryBarrier.srcAccessMask = CrVkBufferResourceStateTable[sourceState].accessMask;
 	bufferMemoryBarrier.dstAccessMask = CrVkBufferResourceStateTable[destinationState].accessMask;
 
-	bufferMemoryBarrier.buffer = gpuBufferVulkan->GetVkBuffer();
+	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
 	bufferMemoryBarrier.offset = buffer->GetByteOffset();
 	bufferMemoryBarrier.size   = buffer->GetSize();
 }
@@ -628,7 +628,7 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount, 
 	cr3d::TextureState::T sourceState, cr3d::TextureState::T destinationState)
 {
-	const CrTextureVulkan* textureVulkan = static_cast<const CrTextureVulkan*>(texture);
+	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
 
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	imageMemoryBarrier.pNext = nullptr;
@@ -641,8 +641,8 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 
 	imageMemoryBarrier.oldLayout                       = resourceStateInfoSource.imageLayout;
 	imageMemoryBarrier.newLayout                       = resourceStateInfoDestination.imageLayout;
-	imageMemoryBarrier.image                           = textureVulkan->GetVkImage();
-	imageMemoryBarrier.subresourceRange.aspectMask     = textureVulkan->GetVkImageAspectFlags();
+	imageMemoryBarrier.image                           = vulkanTexture->GetVkImage();
+	imageMemoryBarrier.subresourceRange.aspectMask     = vulkanTexture->GetVkImageAspectMask();
 	imageMemoryBarrier.subresourceRange.baseMipLevel   = mipmapStart;
 	imageMemoryBarrier.subresourceRange.levelCount     = mipmapCount;
 	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;

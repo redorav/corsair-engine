@@ -38,7 +38,7 @@ public:
 
 	VkImageView GetVkImageViewSingleMipAllSlices(uint32_t mip) const;
 
-	VkImageAspectFlags GetVkImageAspectFlags() const;
+	VkImageAspectFlags GetVkImageAspectMask() const;
 
 private:
 

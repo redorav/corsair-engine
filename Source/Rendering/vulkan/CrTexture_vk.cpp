@@ -447,7 +447,7 @@ VkImageView CrTextureVulkan::GetVkImageViewSingleMipAllSlices(uint32_t mip) cons
 	return m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip];
 }
 
-VkImageAspectFlags CrTextureVulkan::GetVkImageAspectFlags() const
+VkImageAspectFlags CrTextureVulkan::GetVkImageAspectMask() const
 {
 	return m_vkAspectMask;
 }

@@ -94,14 +94,14 @@ CrFileWindows::~CrFileWindows()
 	// Handle error
 }
 
-size_t CrFileWindows::Read(void* memory, size_t bytes) const
+size_t CrFileWindows::ReadPS(void* memory, size_t bytes) const
 {
 	DWORD numberOfBytesRead;
 	ReadFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesRead, nullptr);
 	return (size_t)numberOfBytesRead;
 }
 
-size_t CrFileWindows::Write(void* memory, size_t bytes) const
+size_t CrFileWindows::WritePS(const void* memory, size_t bytes) const
 {
 	DWORD numberOfBytesWritten;
 	WriteFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesWritten, nullptr);

@@ -54,12 +54,12 @@ CrFileANSI::~CrFileANSI()
 	fclose(m_file);
 }
 
-size_t CrFileANSI::Read(void* memory, size_t bytes) const
+size_t CrFileANSI::ReadPS(void* memory, size_t bytes) const
 {
 	return fread(memory, 1, bytes, m_file);
 }
 
-size_t CrFileANSI::Write(void* memory, size_t bytes) const
+size_t CrFileANSI::WritePS(void* memory, size_t bytes) const
 {
 	return fwrite(memory, 1, bytes, m_file);
 }

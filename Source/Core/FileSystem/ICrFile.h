@@ -2,6 +2,7 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/FileSystem/CrPath.h"
+#include "Core/Logging/ICrDebug.h"
 
 #include "Core/String/CrFixedString.h"
 
@@ -60,9 +61,9 @@ public:
 
 	virtual ~ICrFile() {}
 
-	virtual size_t Read(void* memory, size_t bytes) const = 0;
+	size_t Read(void* memory, size_t bytes) const;
 
-	virtual size_t Write(void* memory, size_t bytes) const = 0;
+	size_t Write(const void* memory, size_t bytes) const;
 
 	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) = 0;
 
@@ -101,6 +102,10 @@ public:
 
 private:
 
+	virtual size_t ReadPS(void* memory, size_t bytes) const = 0;
+
+	virtual size_t WritePS(const void* memory, size_t bytes) const = 0;
+
 	static ICrFile* OpenRaw(const char* filePath, FileOpenFlags::T openFlags);
 
 	CrPath m_filePath;
@@ -111,4 +116,16 @@ private:
 inline const char* ICrFile::GetFilePath() const
 {
 	return m_filePath.c_str();
+}
+
+inline size_t ICrFile::Read(void* memory, size_t bytes) const
+{
+	CrAssertMsg(m_openFlags & FileOpenFlags::Read, "File must have read flag");
+	return ReadPS(memory, bytes);
+}
+
+inline size_t ICrFile::Write(const void* memory, size_t bytes) const
+{
+	CrAssertMsg(m_openFlags & FileOpenFlags::Write, "File must have write flag");
+	return WritePS(memory, bytes);
 }

@@ -35,6 +35,16 @@ public:
 
 	const char* c_str() const { return m_pathString.c_str(); }
 
+	int compare(const char* s)
+	{
+		return m_pathString.compare(s);
+	}
+
+	int comparei(const char* s)
+	{
+		return m_pathString.comparei(s);
+	}
+
 	CrPath extension() const
 	{
 		size_t lastDot = m_pathString.find_last_of(".");

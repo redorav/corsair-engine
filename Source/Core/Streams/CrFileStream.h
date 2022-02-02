@@ -2,6 +2,7 @@
 
 #include "ICrStream.h"
 #include "Core/FileSystem/ICrFile.h"
+#include "Core/Logging/ICrDebug.h"
 
 template<CrStreamType::T StreamTypeT>
 class CrFileStream final : public ICrStream
@@ -41,17 +42,33 @@ public:
 	virtual CrFileStream& operator << (float& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 	virtual CrFileStream& operator << (double& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
 
-	virtual CrFileStream& operator << (CrStreamRawData& rawData) override
+	virtual CrFileStream& operator << (const bool& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const char& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+
+	virtual CrFileStream& operator << (const int8_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const int16_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const int32_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const int64_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+
+	virtual CrFileStream& operator << (const uint8_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const uint16_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const uint32_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const uint64_t& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+
+	virtual CrFileStream& operator << (const float& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+	virtual CrFileStream& operator << (const double& value) override { CrAssert(IsWriting()); Write(&value, sizeof(value)); return *this; }
+
+	virtual CrFileStream& operator << (CrStreamDataBlob& dataBlob) override
 	{
 		if(IsReading())
 		{
-			Read(&rawData.size, sizeof(rawData.size));
-			Read(rawData.data, rawData.size);
+			Read(&dataBlob.size, sizeof(dataBlob.size));
+			Read(dataBlob.data, dataBlob.size);
 		}
 		else
 		{
-			Write(&rawData.size, sizeof(rawData.size));
-			Write(rawData.data, rawData.size);
+			Write(&dataBlob.size, sizeof(dataBlob.size));
+			Write(dataBlob.data, dataBlob.size);
 		}
 
 		return *this;
@@ -86,7 +103,7 @@ public:
 		m_file->Read(dstBuffer, sizeBytes);
 	}
 
-	virtual void Write(void* srcBuffer, size_t sizeBytes) override
+	virtual void Write(const void* srcBuffer, size_t sizeBytes) override
 	{
 		m_file->Write(srcBuffer, sizeBytes);
 	}

@@ -12,11 +12,11 @@ namespace CrStreamType
 	};
 };
 
-struct CrStreamRawData
+struct CrStreamDataBlob
 {
-	CrStreamRawData() {}
-	CrStreamRawData(void* data, size_t size) : data(data), size((uint32_t)size) {}
-	CrStreamRawData(void* data, uint32_t size) : data(data), size(size) {}
+	CrStreamDataBlob() {}
+	CrStreamDataBlob(void* data, size_t size) : data(data), size((uint32_t)size) {}
+	CrStreamDataBlob(void* data, uint32_t size) : data(data), size(size) {}
 	void* data;
 	uint32_t size;
 };
@@ -48,13 +48,29 @@ public:
 
 	virtual ICrStream& operator << (CrString& value) = 0;
 
-	virtual ICrStream& operator << (CrStreamRawData& rawData) = 0;
+	virtual ICrStream& operator << (CrStreamDataBlob& dataBlob) = 0;
+
+	virtual ICrStream& operator << (const bool& value) = 0;
+	virtual ICrStream& operator << (const char& value) = 0;
+
+	virtual ICrStream& operator << (const int8_t& value) = 0;
+	virtual ICrStream& operator << (const int16_t& value) = 0;
+	virtual ICrStream& operator << (const int32_t& value) = 0;
+	virtual ICrStream& operator << (const int64_t& value) = 0;
+
+	virtual ICrStream& operator << (const uint8_t& value) = 0;
+	virtual ICrStream& operator << (const uint16_t& value) = 0;
+	virtual ICrStream& operator << (const uint32_t& value) = 0;
+	virtual ICrStream& operator << (const uint64_t& value) = 0;
+
+	virtual ICrStream& operator << (const float& value) = 0;
+	virtual ICrStream& operator << (const double& value) = 0;
 
 private:
 
 	virtual void Read(void* dstBuffer, size_t sizeBytes) = 0;
 
-	virtual void Write(void* srcBuffer, size_t sizeBytes) = 0;
+	virtual void Write(const void* srcBuffer, size_t sizeBytes) = 0;
 };
 
 // Add operators that work with any type of stream. This allows us
@@ -94,7 +110,8 @@ StreamT& operator << (StreamT& stream, CrVector<T>& value)
 	return stream;
 }
 
-template<typename StreamT, typename T, typename std::enable_if<std::is_enum<T>::value, bool>::type* = nullptr>
+// Stream enum types
+template<typename StreamT, typename T, typename std::enable_if<std::is_enum<T>::value || std::is_trivially_copyable<T>::value, bool>::type* = nullptr>
 StreamT& operator << (StreamT& stream, T& value)
 {
 	stream.IsReading() ? stream.Read(&value, sizeof(value)) : stream.Write(&value, sizeof(value)); return stream;

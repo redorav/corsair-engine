@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ICrStream.h"
+#include "Core/Logging/ICrDebug.h"
 
 template<CrStreamType::T StreamTypeT>
 class CrMemoryStream final : public ICrStream
@@ -30,20 +31,36 @@ public:
 	virtual CrMemoryStream& operator << (float& value) override { IsReading() ? Read(value) : Write(value); return *this; }
 	virtual CrMemoryStream& operator << (double& value) override { IsReading() ? Read(value) : Write(value); return *this; }
 
-	virtual CrMemoryStream& operator << (CrStreamRawData& rawData)
+	virtual CrMemoryStream& operator << (const bool& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const char& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+
+	virtual CrMemoryStream& operator << (const int8_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const int16_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const int32_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const int64_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+
+	virtual CrMemoryStream& operator << (const uint8_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const uint16_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const uint32_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const uint64_t& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+
+	virtual CrMemoryStream& operator << (const float& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+	virtual CrMemoryStream& operator << (const double& value) override { CrAssert(IsWriting()); Write(value); return *this; }
+
+	virtual CrMemoryStream& operator << (CrStreamDataBlob& dataBlob)
 	{
-		*this << rawData.size;
+		*this << dataBlob.size;
 
 		if (IsReading())
 		{
-			memcpy(rawData.data, m_currentPointer, rawData.size);
+			memcpy(dataBlob.data, m_currentPointer, dataBlob.size);
 		}
 		else
 		{
-			memcpy(m_currentPointer, rawData.data, rawData.size);
+			memcpy(m_currentPointer, dataBlob.data, dataBlob.size);
 		}
 
-		m_currentPointer += rawData.size;
+		m_currentPointer += dataBlob.size;
 
 		return *this;
 	}
@@ -74,7 +91,7 @@ public:
 		m_currentPointer += sizeBytes;
 	}
 
-	virtual void Write(void* srcBuffer, size_t sizeBytes) override
+	virtual void Write(const void* srcBuffer, size_t sizeBytes) override
 	{
 		memcpy(m_currentPointer, srcBuffer, sizeBytes);
 		m_currentPointer += sizeBytes;

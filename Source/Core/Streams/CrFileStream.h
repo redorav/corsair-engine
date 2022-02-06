@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ICrStream.h"
+
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
+#include "Core/SmartPointers/CrSharedPtr.h"
 
 template<CrStreamType::T StreamTypeT>
 class CrFileStream final : public ICrStream
@@ -12,9 +14,10 @@ public:
 	static bool IsReading() { return StreamTypeT == CrStreamType::Read; }
 	static bool IsWriting() { return StreamTypeT == CrStreamType::Write; }
 
+	// Initialize file stream from a path
 	CrFileStream(const char* filePath)
 	{
-		FileOpenFlags::T openFlags = FileOpenFlags::Read;
+		FileOpenFlags::T openFlags = FileOpenFlags::None;
 
 		switch (StreamTypeT)
 		{
@@ -23,7 +26,24 @@ public:
 			case CrStreamType::ReadWrite: openFlags = FileOpenFlags::Read | FileOpenFlags::Write | FileOpenFlags::ForceCreate; break;
 		}
 
-		m_file = ICrFile::OpenUnique(filePath, openFlags);
+		m_file = ICrFile::OpenFile(filePath, openFlags);
+	}
+
+	// Initialize file stream from an opened file. We need to make sure the required
+	// flags are set on the file
+	CrFileStream(const CrFileSharedHandle& file)
+	{
+		if (IsWriting())
+		{
+			CrAssertMsg(file->GetFlags() & FileOpenFlags::Write, "File needs the write flag");
+		}
+	
+		if (IsReading())
+		{
+			CrAssertMsg(file->GetFlags() & FileOpenFlags::Read, "File needs the read flag");
+		}
+
+		m_file = file;
 	}
 
 	virtual CrFileStream& operator << (bool& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
@@ -110,7 +130,7 @@ public:
 
 private:
 
-	CrFileUniqueHandle m_file;
+	CrFileSharedHandle m_file;
 };
 
 typedef CrFileStream<CrStreamType::Read> CrReadFileStream;

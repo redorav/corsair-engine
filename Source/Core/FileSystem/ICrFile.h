@@ -30,6 +30,7 @@ namespace FileOpenFlags
 {
 	enum T : uint32_t
 	{
+		None        = 0 << 0,
 		Read        = 1 << 0, // Read from the file
 		Write       = 1 << 1, // Write to the file
 		Append      = 1 << 2, // Append to the file
@@ -70,6 +71,8 @@ public:
 	virtual void Rewind() = 0;
 
 	virtual uint64_t GetSize() const = 0;
+
+	FileOpenFlags::T GetFlags() const { return m_openFlags; }
 
 	const char* GetFilePath() const;
 

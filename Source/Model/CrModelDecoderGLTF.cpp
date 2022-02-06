@@ -18,7 +18,7 @@
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-#include "Image/CrImageDecoderSTB.h"
+#include "Image/CrImageCodecSTB.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

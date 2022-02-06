@@ -12,8 +12,8 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrPath.h"
 
-#include "Image/CrImageDecoderDDS.h"
-#include "Image/CrImageDecoderSTB.h"
+#include "Image/CrImageCodecDDS.h"
+#include "Image/CrImageCodecSTB.h"
 
 #include "Model/ICrModelDecoder.h"
 #include "Model/CrModelDecoderASSIMP.h"

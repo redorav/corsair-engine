@@ -290,12 +290,12 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	uint8_t whiteTextureInitialData[4 * 4 * 4];
 	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
 
-	CrTextureDescriptor whiteTextureParams;
-	whiteTextureParams.width = 4;
-	whiteTextureParams.height = 4;
-	whiteTextureParams.initialData = whiteTextureInitialData;
-	whiteTextureParams.initialDataSize = sizeof(whiteTextureInitialData);
-	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureParams);
+	CrTextureDescriptor whiteTextureDescriptor;
+	whiteTextureDescriptor.width = 4;
+	whiteTextureDescriptor.height = 4;
+	whiteTextureDescriptor.initialData = whiteTextureInitialData;
+	whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
+	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
 
 	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
 

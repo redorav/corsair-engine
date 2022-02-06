@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrImageDecoder.h"
+#include "ICrImageCodec.h"
 
 class CrImageDecoderSTB final : public ICrImageDecoder
 {

@@ -1,4 +1,4 @@
-#include "CrImageDecoderDDS.h"
+#include "CrImageCodecDDS.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"

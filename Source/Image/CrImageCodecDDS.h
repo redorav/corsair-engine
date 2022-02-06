@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrImageDecoder.h"
+#include "ICrImageCodec.h"
 
 namespace ddspp
 {

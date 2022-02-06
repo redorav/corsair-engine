@@ -23,4 +23,6 @@ public:
 
 	// TODO Also allow image loading to take a data pointer, so we can do the upload directly via the map
 	static CrImageHandle LoadImageFromDisk(const CrPath& filePath);
+
+	static void SaveImageToDisk(const CrImageHandle& image, const CrPath& fullPath);
 };

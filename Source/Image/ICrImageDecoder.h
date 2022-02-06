@@ -1,16 +1,42 @@
 #pragma once
 
+#include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Image/CrImageForwardDeclarations.h"
 
 #include <stdint.h>
 
-class ICrImageDecoder
+class ICrImageCodec
+{
+	CrImageContainerFormat::T GetContainerFormat() const { return m_containerFormat; }
+
+private:
+
+	CrImageContainerFormat::T m_containerFormat;
+};
+
+class ICrImageDecoder : public ICrImageCodec
 {
 public:
 
 	virtual ~ICrImageDecoder() {}
 
-	virtual CrImageHandle Decode(const CrFileSharedHandle& file) = 0;
-	virtual CrImageHandle Decode(void* data, uint64_t dataSize) = 0;
+	// Decode image in file
+	virtual CrImageHandle Decode(const CrFileSharedHandle& file) const = 0;
+
+	// Decode image in provided data
+	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const = 0;
+};
+
+class ICrImageEncoder : public ICrImageCodec
+{
+public:
+
+	virtual ~ICrImageEncoder() {}
+
+	// Encode image to file
+	virtual void Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const = 0;
+
+	// Encode image in raw data
+	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const = 0;
 };

@@ -55,7 +55,7 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
-	if(CrFixedString8(".dds").comparei(extension.c_str()) == 0)
+	if(extension.comparei(".dds") == 0)
 	{
 		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
 	}
@@ -65,4 +65,27 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 	}
 
 	return imageDecoder->Decode(file);
+}
+
+void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath& fullPath)
+{
+	CrPath extension = fullPath.extension();
+
+	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+
+	if (file)
+	{
+		CrSharedPtr<ICrImageEncoder> imageEncoder;
+
+		if (extension.comparei(".dds") == 0)
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderDDS());
+		}
+		else
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB());
+		}
+
+		imageEncoder->Encode(image, file);
+	}
 }

@@ -83,9 +83,6 @@ namespace cr3d
 			RG11B10_Float,
 			RGB9E5_Float,
 
-			FirstUncompressed = R8_Unorm,
-			LastUncompressed = RGB9E5_Float,
-
 			//-----------
 			// Compressed
 			//-----------
@@ -169,9 +166,6 @@ namespace cr3d
 			PVRTC2_4BPP_Unorm,
 			PVRTC2_4BPP_SRGB,
 
-			FirstCompressed = BC1_RGB_Unorm,
-			LastCompressed = PVRTC2_4BPP_SRGB,
-
 			// Depth-stencil formats
 			D16_Unorm,
 			D24_Unorm_S8_Uint,
@@ -179,9 +173,27 @@ namespace cr3d
 			D32_Float,
 			D32_Float_S8_Uint,
 
-			// Meta formats
 			Count,
 			Invalid,
+
+			// Quickly check for ranges of texture formats
+			FirstUncompressed = R8_Unorm,
+			LastUncompressed  = RGB9E5_Float,
+
+			FirstCompressed = BC1_RGB_Unorm,
+			LastCompressed  = PVRTC2_4BPP_SRGB,
+
+			FirstBC = BC1_RGB_Unorm,
+			LastBC  = BC7_SRGB,
+
+			FirstETC_EAC = ETC2_RGB8_Unorm,
+			LastETC_EAC  = EAC_R11G11_Snorm,
+
+			FirstASTC = ASTC_4x4_Unorm,
+			LastASTC  = ASTC_12x12_SRGB,
+
+			FirstPVRTC = PVRTC1_2BPP_Unorm,
+			LastPVRTC  = PVRTC2_4BPP_SRGB,
 		};
 	};
 

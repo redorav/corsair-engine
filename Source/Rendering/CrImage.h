@@ -4,25 +4,61 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+namespace CrImageContainerFormat
+{
+	enum T : uint32_t
+	{
+		DDS,
+		PNG,
+		JPG,
+		TGA,
+		BMP,
+		HDR,
+		Count,
+		None,
+	};
+};
+
+struct CrImageDescriptor
+{
+	CrImageDescriptor();
+
+	uint32_t width;
+	uint32_t height;
+	uint32_t depth;
+	uint32_t mipmapCount;
+
+	uint8_t* data;
+	uint64_t dataSize;
+
+	cr3d::DataFormat::T format;
+	cr3d::TextureType type;
+};
+
 class CrImage
 {
 public:
 
 	CrImage();
 
-	uint32_t GetWidth();
+	CrImage(const CrImageDescriptor& descriptor);
 
-	uint32_t GetHeight();
+	uint32_t GetWidth() const { return m_width; }
 
-	uint32_t GetDepth();
+	uint32_t GetHeight() const { return m_height; }
 
-	cr3d::DataFormat::T GetFormat();
+	uint32_t GetDepth() const { return m_depth; }
 
-	const void* GetData();
+	cr3d::DataFormat::T GetFormat() const { return m_format; }
 
-	uint64_t GetDataSize();
+	cr3d::TextureType GetType() const { return m_type; }
 
-	// TODO need proper destruction
+	const uint8_t* GetData() const { return m_data.data(); }
+
+	uint64_t GetDataSize() const { return m_data.size(); }
+
+	uint32_t GetMipmapCount() const { return m_mipmapCount; }
+
 	~CrImage();
 
 public: // TODO remove
@@ -32,7 +68,7 @@ public: // TODO remove
 	uint32_t m_depth;
 	uint32_t m_mipmapCount;
 
-	CrVector<unsigned char> m_data;
+	CrVector<uint8_t> m_data;
 	cr3d::DataFormat::T m_format;
 	cr3d::TextureType m_type;
 };

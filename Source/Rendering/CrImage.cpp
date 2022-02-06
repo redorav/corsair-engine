@@ -1,39 +1,36 @@
 #include "CrRendering_pch.h"
 #include "CrImage.h"
 
+#include "Rendering/CrRendering.h"
+
+CrImageDescriptor::CrImageDescriptor()
+	: width(1)
+	, height(1)
+	, depth(1)
+	, mipmapCount(1)
+	, data(nullptr)
+	, dataSize(0)
+	, format(cr3d::DataFormat::RGBA8_Unorm)
+	, type(cr3d::TextureType::Tex2D)
+{
+
+}
+
 CrImage::CrImage() : m_width(1), m_height(1), m_depth(1), m_data(nullptr), m_format(cr3d::DataFormat::RGBA8_Unorm)
 {
 
 }
 
-uint32_t CrImage::GetWidth()
+CrImage::CrImage(const CrImageDescriptor& descriptor)
+	: m_width(descriptor.width)
+	, m_height(descriptor.height)
+	, m_depth(descriptor.depth)
+	, m_mipmapCount(descriptor.mipmapCount)
+	, m_format(descriptor.format)
+	, m_type(descriptor.type)
 {
-	return m_width;
-}
-
-uint32_t CrImage::GetHeight()
-{
-	return m_height;
-}
-
-uint32_t CrImage::GetDepth()
-{
-	return m_depth;
-}
-
-cr3d::DataFormat::T CrImage::GetFormat()
-{
-	return m_format;
-}
-
-const void* CrImage::GetData()
-{
-	return m_data.data();
-}
-
-uint64_t CrImage::GetDataSize()
-{
-	return m_data.size();
+	m_data.resize(descriptor.dataSize);
+	memcpy(m_data.data(), descriptor.data, m_data.size());
 }
 
 CrImage::~CrImage()

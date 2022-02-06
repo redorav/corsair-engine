@@ -3,16 +3,18 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 
-#include "Rendering/CrImage.h" // TODO Move to Image folder
+#include "Rendering/CrImage.h"
 #include "Rendering/CrRendering.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
 #pragma warning(push, 0)
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 #pragma warning(pop)
 
-CrImageHandle CrImageDecoderSTB::Decode(const CrFileSharedHandle& file)
+CrImageHandle CrImageDecoderSTB::Decode(const CrFileSharedHandle& file) const
 {
 	// Read file into memory
 	CrVector<unsigned char> fileData;
@@ -23,14 +25,16 @@ CrImageHandle CrImageDecoderSTB::Decode(const CrFileSharedHandle& file)
 	return image;
 }
 
-CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize)
+CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize) const
 {
-	// Use stb to load image
 	int comp, w, h;
 	unsigned char* dataPointer = stbi_load_from_memory((unsigned char*)data, (int)dataSize, &w, &h, &comp, STBI_rgb_alpha);
 
 	if (dataPointer)
 	{
+		CrImageDescriptor imageDescriptor; // TODO
+		(imageDescriptor);
+
 		CrImageHandle image = CrImageHandle(new CrImage());
 
 		uint32_t imageDataSize = w * h * STBI_rgb_alpha;
@@ -56,5 +60,40 @@ CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize)
 	else
 	{
 		return nullptr;
+	}
+}
+
+void CrImageEncoderSTB::Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const
+{
+	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
+
+	int width = image->GetWidth();
+	int height = image->GetHeight();
+	int strideBytes = channelCount * width;
+
+	int len;
+	unsigned char* pngData = stbi_write_png_to_mem((const unsigned char*)image->GetData(), strideBytes, width, height, channelCount, &len);
+
+	if (pngData)
+	{
+		file->Write(pngData, len);
+	}
+}
+
+void CrImageEncoderSTB::Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const
+{
+	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
+
+	int width = image->GetWidth();
+	int height = image->GetHeight();
+	int strideBytes = channelCount * width;
+
+	int len;
+	unsigned char* pngData = stbi_write_png_to_mem((const unsigned char*)image->GetData(), strideBytes, width, height, channelCount, &len);
+
+	if (pngData)
+	{
+		memcpy(data, pngData, dataSize);
+		stbi_image_free(pngData);
 	}
 }

@@ -65,12 +65,12 @@ struct CrRenderList
 
 	void Sort();
 
-	template<typename Fn>
-	void ForEachRenderPacket(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachRenderPacket(const FunctionT& function) const
 	{
 		for (const CrRenderPacket& renderPacket : m_renderPackets)
 		{
-			fn(renderPacket);
+			function(renderPacket);
 		}
 	}
 
@@ -123,12 +123,12 @@ public:
 	const CrRenderList& GetMainRenderList() const { return m_mainRenderList; }
 
 	// Traverse the model instances
-	template<typename Fn>
-	void ForEachModelInstance(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachModelInstance(const FunctionT& function) const
 	{
 		for (CrModelInstanceIndex instanceIndex(0); instanceIndex < m_numModelInstances; ++instanceIndex)
 		{
-			fn(this, instanceIndex);
+			function(this, instanceIndex);
 		}
 	}
 

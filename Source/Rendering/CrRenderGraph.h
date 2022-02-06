@@ -263,12 +263,12 @@ public:
 
 	void End();
 
-	template<typename Fn>
-	void ForEachPass(const Fn& fn)
+	template<typename FunctionT>
+	void ForEachPass(const FunctionT& function)
 	{
 		for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
 		{
-			fn(m_logicalPasses[logicalPassId.id]);
+			function(m_logicalPasses[logicalPassId.id]);
 		}
 	}
 

@@ -81,11 +81,30 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath
 		{
 			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderDDS());
 		}
-		else
+		else if(extension.comparei(".png") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB());
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::PNG));
+		}
+		else if (extension.comparei(".jpg") == 0)
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::JPG));
+		}
+		else if (extension.comparei(".hdr") == 0)
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::HDR));
+		}
+		else if (extension.comparei(".tga") == 0)
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::TGA));
+		}
+		else if (extension.comparei(".bmp") == 0)
+		{
+			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::BMP));
 		}
 
-		imageEncoder->Encode(image, file);
+		if (imageEncoder && imageEncoder->IsImageFormatSupported(image->GetFormat()))
+		{
+			imageEncoder->Encode(image, file);
+		}
 	}
 }

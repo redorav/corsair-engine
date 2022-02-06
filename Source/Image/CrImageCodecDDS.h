@@ -11,6 +11,8 @@ class CrImageDecoderDDS final : public ICrImageDecoder
 {
 public:
 
+	CrImageDecoderDDS();
+
 	virtual CrImageHandle Decode(const CrFileSharedHandle& file) const override;
 
 	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const override;
@@ -24,9 +26,13 @@ class CrImageEncoderDDS final : public ICrImageEncoder
 {
 public:
 
+	CrImageEncoderDDS();
+
 	virtual void Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const override;
 
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const override;
+
+	virtual bool IsImageFormatSupported(cr3d::DataFormat::T format) const override;
 
 private:
 

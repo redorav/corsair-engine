@@ -9,10 +9,6 @@ DXGI_FORMAT crd3d::GetDXGIFormat(cr3d::DataFormat::T format)
 {
 	switch (format)
 	{
-		//-------------
-		// Uncompressed
-		//-------------
-
 		// 8-bit formats
 		case cr3d::DataFormat::R8_Unorm:          return DXGI_FORMAT_R8_UNORM;
 		case cr3d::DataFormat::R8_Snorm:          return DXGI_FORMAT_R8_SNORM;

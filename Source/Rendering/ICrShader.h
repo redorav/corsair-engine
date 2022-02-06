@@ -90,8 +90,8 @@ public:
 
 	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
 
-	template<typename Fn>
-	void ForEachConstantBuffer(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachConstantBuffer(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_constantBufferOffset; i < m_constantBufferOffset + m_constantBufferCount; ++i)
 		{
@@ -99,8 +99,8 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachSampler(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachSampler(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_samplerOffset; i < m_samplerOffset + m_samplerCount; ++i)
 		{
@@ -108,8 +108,8 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachTexture(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachTexture(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_textureOffset; i < m_textureOffset + m_textureCount; ++i)
 		{
@@ -117,8 +117,8 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachRWTexture(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachRWTexture(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_rwTextureOffset; i < m_rwTextureOffset + m_rwTextureCount; ++i)
 		{
@@ -126,8 +126,8 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachStorageBuffer(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachStorageBuffer(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_storageBufferOffset; i < m_storageBufferOffset + m_storageBufferCount; ++i)
 		{
@@ -135,8 +135,8 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachRWStorageBuffer(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachRWStorageBuffer(const FunctionT& fn) const
 	{
 		for (uint8_t i = m_rwStorageBufferOffset; i < m_rwStorageBufferOffset + m_rwStorageBufferCount; ++i)
 		{
@@ -144,12 +144,12 @@ public:
 		}
 	}
 
-	template<typename Fn>
-	void ForEachRWDataBuffer(const Fn& fn) const
+	template<typename FunctionT>
+	void ForEachRWDataBuffer(const FunctionT& function) const
 	{
 		for (uint8_t i = m_rwDataBufferOffset; i < m_rwDataBufferOffset + m_rwDataBufferCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].rwDataBufferID, m_bindings[i].bindPoint);
+			function(m_bindings[i].stage, m_bindings[i].rwDataBufferID, m_bindings[i].bindPoint);
 		}
 	}
 

@@ -24,7 +24,7 @@ struct CrDirectoryEntry
 	bool isDirectory = false;
 };
 
-using FileIteratorFn = CrFixedFunction<32, bool(const CrDirectoryEntry& entry)>;
+using FileIteratorFunction = CrFixedFunction<32, bool(const CrDirectoryEntry& entry)>;
 
 namespace FileOpenFlags
 {
@@ -101,7 +101,7 @@ public:
 	static bool CreateDirectorySingle(const char* directoryPath);
 
 	// Iterate over directory entries
-	static bool ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFn& fn);
+	static bool ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFunction& function);
 
 private:
 

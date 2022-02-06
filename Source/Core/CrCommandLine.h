@@ -32,13 +32,13 @@ public:
 	}
 
 	// Iterate through the different values of options
-	template<typename Fn>
-	void for_each(const CrString& key, const Fn& fn)
+	template<typename FunctionT>
+	void for_each(const CrString& key, const FunctionT& function)
 	{
 		auto range = commandLineArgs.equal_range(key);
 		for (auto it = range.first; it != range.second; ++it)
 		{
-			fn(it->second);
+			function(it->second);
 		}
 	}
 

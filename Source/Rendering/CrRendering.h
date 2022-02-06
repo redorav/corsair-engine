@@ -201,11 +201,11 @@ namespace cr3d
 	template<typename T> constexpr const char* CrTypeName();
 	template<typename T> constexpr const char* CrTypeName() { return CrTypeName<T>(); }
 
-	template <> constexpr const char* CrTypeName<uint8_t>()		{ return "uint8_t"; }
-	template <> constexpr const char* CrTypeName<uint16_t>()	{ return "uint16_t"; }
-	template <> constexpr const char* CrTypeName<uint32_t>()	{ return "uint32_t"; }
-	template <> constexpr const char* CrTypeName<half>()		{ return "half"; }
-	template <> constexpr const char* CrTypeName<float>()		{ return "float"; }
+	template <> constexpr const char* CrTypeName<uint8_t>()  { return "uint8_t"; }
+	template <> constexpr const char* CrTypeName<uint16_t>() { return "uint16_t"; }
+	template <> constexpr const char* CrTypeName<uint32_t>() { return "uint32_t"; }
+	template <> constexpr const char* CrTypeName<half>()     { return "half"; }
+	template <> constexpr const char* CrTypeName<float>()    { return "float"; }
 
 	struct DataFormatInfo
 	{
@@ -216,135 +216,141 @@ namespace cr3d
 		uint32_t elementSizeB      : 7; // Bits
 		uint32_t elementSizeA      : 7; // Bits
 		uint32_t numComponents     : 3;
-		uint32_t compressed        : 1;
+		uint32_t compressed        : 1; // Whether format is compressed
+		uint32_t hdrFloat          : 1; // Whether format is floating point HDR (covers float, half and packed)
 		const char* name;
 	};
 
+	static_assert(sizeof(DataFormatInfo) == 8 + sizeof(DataFormatInfo::name), "Size mismatch");
+
 	template<typename type>
-	constexpr DataFormatInfo CreateDataFormatInfo(cr3d::DataFormat::T enumEntry, uint32_t numComponents, bool compressed)
+	constexpr DataFormatInfo CreateDataFormatInfo(cr3d::DataFormat::T enumEntry, uint32_t numComponents, bool compressed, bool hdrFloat)
 	{
 		return
 		{
 			enumEntry,
 			(uint32_t) sizeof(type) * numComponents,
 			(uint32_t) sizeof(type) * 8,
-			(uint32_t) sizeof(type) * 8,
-			(uint32_t) sizeof(type) * 8,
-			(uint32_t) sizeof(type) * 8,
+			(uint32_t) sizeof(type) * 8 * (numComponents > 1),
+			(uint32_t) sizeof(type) * 8 * (numComponents > 2),
+			(uint32_t) sizeof(type) * 8 * (numComponents > 3),
 			numComponents,
 			compressed,
-			CrTypeName<type>() };
+			hdrFloat,
+			CrTypeName<type>()
+		};
 	}
 
 	constexpr DataFormatInfo CreateDataFormatInfo
 	(
 		cr3d::DataFormat::T enumEntry, uint32_t dataSize, 
 		uint32_t elementSizeR, uint32_t elementSizeG, uint32_t elementSizeB, uint32_t elementSizeA, 
-		uint32_t numComponents, bool compressed, const char* name
+		uint32_t numComponents, bool compressed, bool hdrFloat, const char* name
 	)
 	{
-		return { enumEntry, dataSize, elementSizeR, elementSizeG, elementSizeB, elementSizeA, numComponents, compressed, name };
+		return { enumEntry, dataSize, elementSizeR, elementSizeG, elementSizeB, elementSizeA, numComponents, compressed, hdrFloat, name };
 	}
 
 	constexpr DataFormatInfo DataFormats[cr3d::DataFormat::Count] = 
 	{
 		// 8-bit formats
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Unorm, 1, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Snorm, 1, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Uint,  1, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Sint,  1, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Unorm, 1, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Snorm, 1, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Uint,  1, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Sint,  1, false, false),
 
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Unorm, 2, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Snorm, 2, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Uint,  2, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Sint,  2, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Unorm, 2, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Snorm, 2, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Uint,  2, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Sint,  2, false, false),
 
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Unorm, 4, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Snorm, 4, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Uint,  4, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Snorm, 4, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_SRGB,  4, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Unorm, 4, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Snorm, 4, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Uint,  4, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Sint,  4, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_SRGB,  4, false, false),
 
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::BGRA8_Unorm, 4, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::BGRA8_SRGB, 4, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::BGRA8_Unorm, 4, false, false),
+		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::BGRA8_SRGB, 4, false, false),
 
 		// 16-bit integer formats
 
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Unorm, 1, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Snorm, 1, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Uint,  1, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Sint,  1, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Unorm, 1, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Snorm, 1, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Uint,  1, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Sint,  1, false, false),
 
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Unorm, 2, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Snorm, 2, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Uint,  2, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Sint,  2, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Unorm, 2, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Snorm, 2, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Uint,  2, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Sint,  2, false, false),
 
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Unorm, 4, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Snorm, 4, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Uint,  4, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Sint,  4, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Unorm, 4, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Snorm, 4, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Uint,  4, false, false),
+		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Sint,  4, false, false),
 
 		// 16-bit float formats
 
-		CreateDataFormatInfo<half>(cr3d::DataFormat::R16_Float,    1, false),
-		CreateDataFormatInfo<half>(cr3d::DataFormat::RG16_Float,   2, false),
-		CreateDataFormatInfo<half>(cr3d::DataFormat::RGBA16_Float, 4, false),
+		CreateDataFormatInfo<half>(cr3d::DataFormat::R16_Float,    1, false, true),
+		CreateDataFormatInfo<half>(cr3d::DataFormat::RG16_Float,   2, false, true),
+		CreateDataFormatInfo<half>(cr3d::DataFormat::RGBA16_Float, 4, false, true),
 
 		// 32-bit integer formats
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Uint,    1, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Sint,    1, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Uint,   2, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Sint,   2, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Uint,  3, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Sint,  3, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Uint, 4, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Sint, 4, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Uint,    1, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Sint,    1, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Uint,   2, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Sint,   2, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Uint,  3, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Sint,  3, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Uint, 4, false, false),
+		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Sint, 4, false, false),
 
 		// 32-bit float formats
-		CreateDataFormatInfo<float>(cr3d::DataFormat::R32_Float,    1, false),
-		CreateDataFormatInfo<float>(cr3d::DataFormat::RG32_Float,   2, false),
-		CreateDataFormatInfo<float>(cr3d::DataFormat::RGB32_Float,  3, false),
-		CreateDataFormatInfo<float>(cr3d::DataFormat::RGBA32_Float, 4, false),
+		CreateDataFormatInfo<float>(cr3d::DataFormat::R32_Float,    1, false, true),
+		CreateDataFormatInfo<float>(cr3d::DataFormat::RG32_Float,   2, false, true),
+		CreateDataFormatInfo<float>(cr3d::DataFormat::RGB32_Float,  3, false, true),
+		CreateDataFormatInfo<float>(cr3d::DataFormat::RGBA32_Float, 4, false, true),
 
 		// TODO fix compressed and varying size formats - need to change bytes to bits, also explicit name
-		CreateDataFormatInfo(cr3d::DataFormat::RGB10A2_Unorm,     4, 10, 10, 10, 2, 4, false, "rgb10a2"),
-		CreateDataFormatInfo(cr3d::DataFormat::RGB10A2_Uint,      4, 10, 10, 10, 2, 4, false, "rgb10a2"),
-		CreateDataFormatInfo(cr3d::DataFormat::B5G5R5A1_Unorm,    2,  5,  5,  5, 1, 4, false, "rgb5a1"),
-		CreateDataFormatInfo(cr3d::DataFormat::BGRA4_Unorm,       2,  4,  4,  4, 4, 4, false, "rgba4"),
+		CreateDataFormatInfo(cr3d::DataFormat::RGB10A2_Unorm,     4, 10, 10, 10, 2, 4, false, false, "rgb10a2"),
+		CreateDataFormatInfo(cr3d::DataFormat::RGB10A2_Uint,      4, 10, 10, 10, 2, 4, false, false, "rgb10a2"),
+		CreateDataFormatInfo(cr3d::DataFormat::B5G6R5_Unorm,      2,  5,  6,  5, 0, 4, false, false, "r5g6b5"),
+		CreateDataFormatInfo(cr3d::DataFormat::B5G5R5A1_Unorm,    2,  5,  5,  5, 1, 4, false, false, "rgb5a1"),
+		CreateDataFormatInfo(cr3d::DataFormat::BGRA4_Unorm,       2,  4,  4,  4, 4, 4, false, false, "rgba4"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::RG11B10_Float,     4, 11, 11, 10, 0, 3, false, "rg11b10f"),
-		CreateDataFormatInfo(cr3d::DataFormat::RGB9E5_Float,      4,  9,  9,  9, 0, 3, false, "rgb9e5"),
+		CreateDataFormatInfo(cr3d::DataFormat::RG11B10_Float,     4, 11, 11, 10, 0, 3, false, true, "rg11b10f"),
+		CreateDataFormatInfo(cr3d::DataFormat::RGB9E5_Float,      4,  9,  9,  9, 0, 3, false, true, "rgb9e5"),
 
 		// TODO the compressed formats need reviewing
-		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGB_Unorm,     1,  8,  8,  8, 0, 3, true, "bc1"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGB_SRGB,      1,  8,  8,  8, 0, 3, true, "bc1"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGBA_Unorm,    1,  8,  8,  8, 8, 4, true, "bc1"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGBA_SRGB,     1,  8,  8,  8, 8, 4, true, "bc1"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGB_Unorm,     1,  8,  8,  8, 0, 3, true, false, "bc1"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGB_SRGB,      1,  8,  8,  8, 0, 3, true, false, "bc1"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGBA_Unorm,    1,  8,  8,  8, 8, 4, true, false, "bc1"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC1_RGBA_SRGB,     1,  8,  8,  8, 8, 4, true, false, "bc1"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC2_Unorm,         2,  8,  8,  8, 8, 4, true, "bc2"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC2_SRGB,          2,  8,  8,  8, 8, 4, true, "bc2"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC2_Unorm,         2,  8,  8,  8, 8, 4, true, false, "bc2"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC2_SRGB,          2,  8,  8,  8, 8, 4, true, false, "bc2"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC3_Unorm,         2,  8,  8,  8, 8, 4, true, "bc3"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC3_SRGB,          2,  8,  8,  8, 8, 4, true, "bc3"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC3_Unorm,         2,  8,  8,  8, 8, 4, true, false, "bc3"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC3_SRGB,          2,  8,  8,  8, 8, 4, true, false, "bc3"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC4_Unorm,         1,  8,  8,  8, 8, 4, true, "bc4"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC4_Snorm,         1,  8,  8,  8, 8, 4, true, "bc4"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC4_Unorm,         1,  8,  8,  8, 8, 4, true, false, "bc4"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC4_Snorm,         1,  8,  8,  8, 8, 4, true, false, "bc4"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC5_Unorm,         2,  8,  8,  8, 8, 4, true, "bc5"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC5_Snorm,         2,  8,  8,  8, 8, 4, true, "bc5"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC5_Unorm,         2,  8,  8,  8, 8, 4, true, false, "bc5"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC5_Snorm,         2,  8,  8,  8, 8, 4, true, false, "bc5"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC6H_UFloat,       2,  8,  8,  8, 8, 4, true, "bc6h"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC6H_SFloat,       2,  8,  8,  8, 8, 4, true, "bc6h"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC6H_UFloat,       2,  8,  8,  8, 8, 4, true, true, "bc6h"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC6H_SFloat,       2,  8,  8,  8, 8, 4, true, true, "bc6h"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::BC7_Unorm,         2,  8,  8,  8, 8, 4, true, "bc7"),
-		CreateDataFormatInfo(cr3d::DataFormat::BC7_SRGB,          2,  8,  8,  8, 8, 4, true, "bc7"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC7_Unorm,         2,  8,  8,  8, 8, 4, true, false, "bc7"),
+		CreateDataFormatInfo(cr3d::DataFormat::BC7_SRGB,          2,  8,  8,  8, 8, 4, true, false, "bc7"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8_Unorm,   4,  8,  8,  8, 8, 4, true, "etc2"),
-		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8_SRGB,    4,  8,  8,  8, 8, 4, true, "etc2"),
+		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8_Unorm,   4,  8,  8,  8, 8, 4, true, false, "etc2"),
+		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8_SRGB,    4,  8,  8,  8, 8, 4, true, false, "etc2"),
 
-		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8A1_Unorm, 4,  8,  8,  8, 8, 4, true, "etc2"),
-		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8A1_SRGB,  4,  8,  8,  8, 8, 4, true, "etc2")
+		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8A1_Unorm, 4,  8,  8,  8, 8, 4, true, false, "etc2"),
+		CreateDataFormatInfo(cr3d::DataFormat::ETC2_RGB8A1_SRGB,  4,  8,  8,  8, 8, 4, true, false, "etc2")
 	};
 
 	//static_assert(DataFormats[cr3d::DataFormat::Last].format == cr3d::DataFormat::Last, "");

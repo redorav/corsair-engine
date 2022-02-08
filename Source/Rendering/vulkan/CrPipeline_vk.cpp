@@ -47,19 +47,15 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		if (renderTarget.colorFormats[i] != cr3d::DataFormat::Invalid)
 		{
 			VkPipelineColorBlendAttachmentState& blendAttachment = blendAttachments.push_back();
-			blendAttachment.colorWriteMask = renderTargetBlend.colorWriteMask;
-			blendAttachment.blendEnable = renderTargetBlend.enable;
+			blendAttachment.colorWriteMask      = renderTargetBlend.colorWriteMask;
+			blendAttachment.blendEnable         = renderTargetBlend.enable;
+			blendAttachment.colorBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
+			blendAttachment.dstColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstColorBlendFactor);
+			blendAttachment.srcColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcColorBlendFactor);
 
-			if (renderTargetBlend.enable)
-			{
-				blendAttachment.colorBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
-				blendAttachment.dstColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstColorBlendFactor);
-				blendAttachment.srcColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcColorBlendFactor);
-
-				blendAttachment.alphaBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
-				blendAttachment.dstAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
-				blendAttachment.srcAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
-			}
+			blendAttachment.alphaBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
+			blendAttachment.dstAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
+			blendAttachment.srcAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
 		}
 		else
 		{

@@ -65,7 +65,7 @@ public:
 
 	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
 
-	bool mapped : 1;
+	bool mapped;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()
@@ -99,9 +99,9 @@ struct CrGPUBufferDescriptor
 	cr3d::BufferAccess::T access;
 };
 
-// A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that typically
-// will be smaller than the actual buffer it points to. It can also own a buffer and dispose of it suitably,
-// but this is a more infrequent case
+// A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
+// than the actual buffer it points to. It can also own a buffer and dispose of it suitably.
+// TODO One interesting feature we should add is a way to deallocate memory from a buffer we don't own
 class CrGPUBuffer : public CrGPUDeletable
 {
 public:
@@ -155,7 +155,7 @@ protected:
 
 	cr3d::BufferAccess::T m_access;
 
-	cr3d::BufferOwnership::T m_ownership : 2;
+	cr3d::BufferOwnership::T m_ownership;
 	
 	cr3d::DataFormat::T m_dataFormat;
 };

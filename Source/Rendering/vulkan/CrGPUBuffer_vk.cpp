@@ -32,11 +32,19 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	switch (descriptor.access)
 	{
-		case cr3d::BufferAccess::GPUOnly: vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY; break;
+		case cr3d::BufferAccess::GPUOnly:
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+			break;
 		case cr3d::BufferAccess::GPUWriteCPURead:
-		{
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_TO_CPU;
-
+			break;
+		case cr3d::BufferAccess::CPUOnly:
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+			break;
+		case cr3d::BufferAccess::CPUWriteGPURead:
+		{
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+			
 			// From the VMA documentation:
 			// Also, Windows drivers from all 3 * *PC * *GPU vendors(AMD, Intel, NVIDIA)
 			// currently provide `HOST_COHERENT` flag on all memory types that are
@@ -46,8 +54,6 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 			vmaAllocationCreateInfo.requiredFlags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 			break;
 		}
-		case cr3d::BufferAccess::CPUOnly: vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY; break;
-		case cr3d::BufferAccess::CPUWriteGPURead: vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU; break;
 		default: break;
 	}
 

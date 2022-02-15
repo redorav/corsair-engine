@@ -8,7 +8,7 @@ CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerD
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
-	m_vkDevice = vulkanRenderDevice->GetVkDevice();
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	VkSamplerCreateInfo createInfo = {};
 
@@ -41,7 +41,7 @@ CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerD
 	
 	createInfo.unnormalizedCoordinates = false; // Not all APIs support it and it has many restrictions in Vulkan (e.g. no anisotropy)
 
-	vkCreateSampler(m_vkDevice, &createInfo, nullptr, &m_vkSampler);
+	vkCreateSampler(vkDevice, &createInfo, nullptr, &m_vkSampler);
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkSampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, descriptor.name);
 }

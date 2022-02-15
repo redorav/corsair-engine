@@ -266,7 +266,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	rwTextureParams.name = "Colors RW Texture";
 	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
 
-	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
+	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::BufferAccess::GPUOnly, cr3d::DataFormat::RGBA8_Unorm, 128);
 
 	RecreateSwapchainAndRenderTargets();
 	
@@ -297,9 +297,9 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 	whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
 	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
 
-	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUWrite, 32);
+	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::BufferAccess::GPUOnly, 32);
 
-	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::BufferAccess::CPUWrite, 32);
+	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::BufferAccess::GPUOnly, 32);
 
 	// Initialize ImGui renderer
 	CrImGuiRendererInitParams imguiInitParams = {};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include "CrVMA.h"
 
 extern PFN_vkDebugMarkerSetObjectTagEXT		vkDebugMarkerSetObjectTag;
 extern PFN_vkDebugMarkerSetObjectNameEXT	vkDebugMarkerSetObjectName;

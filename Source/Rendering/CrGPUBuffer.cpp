@@ -4,12 +4,12 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
-{
-	access = descriptor.access;
-	usage = descriptor.usage;
-	mapped = false;
-}
+ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
+	: m_renderDevice(renderDevice)
+	, access(descriptor.access)
+	, usage(descriptor.usage)
+	, mapped(false)
+{}
 
 CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat)
 	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride), m_dataFormat(dataFormat)

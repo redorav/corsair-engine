@@ -13,11 +13,9 @@ public:
 
 	~CrSamplerVulkan();
 
-	VkSampler GetVkSampler() const { return m_sampler; }
+	VkSampler GetVkSampler() const { return m_vkSampler; }
 
 private:
 
-	VkDevice m_vkDevice;
-
-	VkSampler m_sampler;
+	VkSampler m_vkSampler;
 };

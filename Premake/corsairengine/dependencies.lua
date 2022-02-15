@@ -17,6 +17,7 @@ LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibStb          = DependenciesDirectory..'/stb'
 LibTinyGLTF     = DependenciesDirectory..'/tinygltf'
+LibVMA          = DependenciesDirectory..'/vma'
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibxxHash       = DependenciesDirectory..'/xxHash'
 
@@ -25,13 +26,6 @@ AssimpLibrary =
 	includeDirs = LibAssimp..IncludeDirectory..'include',
 	libDirs     = LibAssimp..BinaryDirectory,
 	libNames    = 'Assimp.'.._ACTION..'.release'
-}
-
-VulkanLibrary =
-{
-	includeDirs = LibVulkan..IncludeDirectory..'include',
-	libDirs = LibVulkan..BinaryDirectory,
-	libNames = 'vulkan-1'
 }
 
 D3D12Library =
@@ -66,7 +60,7 @@ EASTLLibrary =
 	{
 		"EASTL_ASSERT_ENABLED=1",
 	},
-	natvis = LibEASTL..IncludeDirectory..'doc/**.natvis',
+	natvis      = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,
 	libNames    = 'EASTL.'.._ACTION..'.release'
 }
@@ -145,6 +139,14 @@ TinyGLTFLibrary =
 	includeDirs = LibTinyGLTF..IncludeDirectory
 }
 
+VulkanLibrary =
+{
+	includeDirs = { LibVulkan..IncludeDirectory..'include', LibVMA..IncludeDirectory..'include' },
+	libDirs     = LibVulkan..BinaryDirectory,
+	natvis      = LibVMA..IncludeDirectory..'src/**.natvis',
+	libNames    = 'vulkan-1'
+}
+
 xxHashLibrary =
 {
 	includeDirs = LibxxHash..IncludeDirectory
@@ -152,7 +154,9 @@ xxHashLibrary =
 
 function AddLibraryIncludes(library)
 	includedirs(library.includeDirs)
-	if(library['defines']) then defines(library.defines) end
+	if(library['defines']) then
+		defines(library.defines)
+	end
 end
 
 -- Add files to the solution. This should generally not include cpp files

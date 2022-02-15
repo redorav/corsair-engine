@@ -6,10 +6,10 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
-	: ICrHardwareGPUBuffer(descriptor)
+CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
+	: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 {
-	m_d3d12Device = renderDevice->GetD3D12Device();
+	m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
 	D3D12_RESOURCE_STATES initialResourceState = D3D12_RESOURCE_STATE_COMMON;
 
@@ -19,10 +19,14 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDe
 
 	switch (descriptor.access)
 	{
-		case cr3d::BufferAccess::CPURead:
+		case cr3d::BufferAccess::GPUOnly:
+			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+			break;
+		case cr3d::BufferAccess::GPUWriteCPURead:
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
 			break;
-		case cr3d::BufferAccess::CPUWrite:
+		case cr3d::BufferAccess::CPUOnly:
+		case cr3d::BufferAccess::CPUWriteGPURead:
 			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 			initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;
 			break;
@@ -47,7 +51,6 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDe
 	resourceDesc.MipLevels = 1;
 	resourceDesc.SampleDesc = { 1, 0 };
 	resourceDesc.Width = bufferSize;
-
 
 	D3D12_CLEAR_VALUE optimizedClearValue = {};
 

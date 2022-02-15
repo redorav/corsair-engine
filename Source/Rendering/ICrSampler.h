@@ -26,7 +26,7 @@ struct CrSamplerDescriptor
 	float minLod;
 	float maxLod;
 
-	CrFixedString64 name;
+	CrFixedString128 name;
 };
 
 class ICrSampler : public CrGPUDeletable

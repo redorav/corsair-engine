@@ -1,6 +1,9 @@
 #include "CrRendering_pch.h"
-#include "CrVulkan.h"
 
+#define VMA_IMPLEMENTATION
+#include "CrVMA.h"
+
+#include "CrVulkan.h"
 #include "Core/Logging/ICrDebug.h"
 
 VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)

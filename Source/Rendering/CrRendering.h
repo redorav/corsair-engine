@@ -936,10 +936,10 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			Immutable = 1 << 0,
-			GPUWrite  = 1 << 1,
-			CPUWrite  = 1 << 2,
-			CPURead   = 1 << 3,
+			GPUOnly,         // Compressed textures, render targets, unordered access
+			GPUWriteCPURead, // GPU queries, feedback textures. Memory is coherent
+			CPUOnly,         // Staging buffers 
+			CPUWriteGPURead, // Streaming per-frame data like vertex/constant buffers
 		};
 	};
 

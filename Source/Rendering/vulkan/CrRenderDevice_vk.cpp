@@ -55,6 +55,21 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	// Also specifies desired queues.
 	CreateLogicalDevice();
 
+	VmaAllocatorCreateInfo allocatorCreateInfo = {};
+	allocatorCreateInfo.flags                          = 0; // Use to enable via certain extensions
+	allocatorCreateInfo.physicalDevice                 = m_vkPhysicalDevice;
+	allocatorCreateInfo.device                         = m_vkDevice;
+	allocatorCreateInfo.preferredLargeHeapBlockSize    = 0;
+	allocatorCreateInfo.pAllocationCallbacks           = nullptr;
+	allocatorCreateInfo.pDeviceMemoryCallbacks         = nullptr;
+	allocatorCreateInfo.pHeapSizeLimit                 = nullptr;
+	allocatorCreateInfo.pVulkanFunctions               = nullptr;
+	allocatorCreateInfo.instance                       = m_vkInstance;
+	allocatorCreateInfo.vulkanApiVersion               = VK_API_VERSION_1_0;
+	allocatorCreateInfo.pTypeExternalMemoryHandleTypes = nullptr;
+	
+	vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
+
 	// 5. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
@@ -98,6 +113,8 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 {
+	vmaDestroyAllocator(m_vmaAllocator);
+
 	// Store pipeline cache to disk
 	size_t pipelineCacheSize = 0;
 	vkGetPipelineCacheData(m_vkDevice, m_vkPipelineCache, &pipelineCacheSize, nullptr);

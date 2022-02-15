@@ -15,8 +15,6 @@ public:
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
 
-	static VkMemoryPropertyFlags GetVkMemoryPropertyFlags(cr3d::BufferAccess::T access);
-
 	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access);
 
 	VkIndexType GetVkIndexType() const;
@@ -25,21 +23,17 @@ public:
 
 	VkBufferView GetVkBufferView() const;
 
-	VkDeviceMemory GetVkMemory() const;
-	
 	virtual void* LockPS() override;
 
 	virtual void UnlockPS() override;
 
 private:
 
-	VkDevice m_vkDevice;
-
 	VkBuffer m_vkBuffer;
 
 	VkBufferView m_vkBufferView = nullptr;
 
-	VkDeviceMemory m_vkMemory;
+	VmaAllocation m_vmaAllocation;
 
 	VkIndexType m_vkIndexType; // Only used for index buffers
 };
@@ -57,9 +51,4 @@ inline VkBuffer CrHardwareGPUBufferVulkan::GetVkBuffer() const
 inline VkBufferView CrHardwareGPUBufferVulkan::GetVkBufferView() const
 {
 	return m_vkBufferView;
-}
-
-inline VkDeviceMemory CrHardwareGPUBufferVulkan::GetVkMemory() const
-{
-	return m_vkMemory;
 }

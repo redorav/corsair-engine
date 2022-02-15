@@ -26,6 +26,8 @@ public:
 
 	VkPhysicalDeviceProperties GetVkPhysicalDeviceProperties() const { return m_vkPhysicalDeviceProperties; }
 
+	VmaAllocator GetVmaAllocator() const { return m_vmaAllocator; }
+
 	uint32_t GetVkMemoryType(uint32_t typeBits, VkFlags properties) const;
 
 	// In Vulkan, we create the queues up-front with the device so we reserve previously created queue indices
@@ -71,6 +73,7 @@ private:
 
 	virtual void WaitIdlePS() override;
 
+	// TODO Move to RenderDeviceProperties
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
 
 	void RetrieveQueueFamilies();
@@ -111,6 +114,8 @@ private:
 
 	// Stores the different hardware limits reported by this device, e.g. maximum buffer or texture sizes, queue priorities, etc
 	VkPhysicalDeviceProperties m_vkPhysicalDeviceProperties;
+
+	VmaAllocator m_vmaAllocator;
 
 	// Queues
 	uint32_t m_maxCommandQueues = 0;

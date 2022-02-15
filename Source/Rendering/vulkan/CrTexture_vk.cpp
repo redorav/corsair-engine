@@ -12,14 +12,12 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	: ICrTexture(renderDevice, descriptor)
 	, m_vkImage(nullptr)
 	, m_vkImageView(nullptr)
-	, m_vkMemory(nullptr)
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
-	m_vkDevice = vulkanRenderDevice->GetVkDevice();
-
-	VkResult result;
-	m_vkFormat = crvk::GetVkFormat(m_format);
+	VkResult vkResult;
+	VkFormat vkFormat = crvk::GetVkFormat(m_format);
 
 	//-----------------
 	// Usage properties
@@ -52,12 +50,15 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		}
 	}
 
+	// All textures can be copied from the GPU to the CPU
+	usageFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
 	// TODO Validate that the image format supports the usages and provide an alternative
 
 	usageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT; // All images can be sampled
 
 	m_sampleCount = descriptor.sampleCount;
-	m_vkSamples = crvk::GetVkSampleCount(m_sampleCount);
+	VkSampleCountFlagBits vkSamples = crvk::GetVkSampleCount(m_sampleCount);
 
 	//----------------------
 	// Image type properties
@@ -119,23 +120,25 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// Create image and allocate memory
 	//---------------------------------
 
-	VkMemoryRequirements imageMemoryRequirements;
+	VkMemoryRequirements imageMemoryRequirements = {};
+	VmaAllocationInfo vmaAllocationInfo = {};
 
 	if (IsSwapchain())
 	{
 		m_vkImage = (VkImage)descriptor.extraDataPtr;
-		vkGetImageMemoryRequirements(m_vkDevice, m_vkImage, &imageMemoryRequirements);
+		vkGetImageMemoryRequirements(vkDevice, m_vkImage, &imageMemoryRequirements);
+		m_usedGPUMemory = (uint32_t)imageMemoryRequirements.size;
 	}
 	else
 	{
 		VkImageCreateInfo imageCreateInfo;
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageCreateInfo.pNext = nullptr;
-		imageCreateInfo.format = m_vkFormat;
+		imageCreateInfo.format = vkFormat;
 		imageCreateInfo.extent = { m_width, m_height, m_depth };
 		imageCreateInfo.mipLevels = m_mipmapCount;
 		imageCreateInfo.arrayLayers = arrayLayers;
-		imageCreateInfo.samples = m_vkSamples;
+		imageCreateInfo.samples = vkSamples;
 		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT; // TODO revise this usage
 		imageCreateInfo.flags = vkCreateFlags;
 		imageCreateInfo.imageType = vkImageType;
@@ -143,53 +146,37 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageCreateInfo.pQueueFamilyIndices = nullptr;
 		imageCreateInfo.queueFamilyIndexCount = 0;
 
-		VkMemoryPropertyFlags memoryFlags = 0;
+		VmaAllocationCreateInfo vmaAllocationCreateInfo = {};
 
 		if (descriptor.usage & cr3d::TextureUsage::CPUReadable)
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED; // TODO Condition on initialData
 
-			memoryFlags |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-			memoryFlags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+			// TODO This isn't right. Consider what we want to use it for
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 		}
 		else
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-			memoryFlags |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 		}
 
-		result = vkCreateImage(m_vkDevice, &imageCreateInfo, nullptr, &m_vkImage);
-		CrAssert(result == VK_SUCCESS);
-		
-		vkGetImageMemoryRequirements(m_vkDevice, m_vkImage, &imageMemoryRequirements); // http://gpuopen.com/vulkan-device-memory/
+		// http://gpuopen.com/vulkan-device-memory/
+		vkResult = vmaCreateImage(vulkanRenderDevice->GetVmaAllocator(), &imageCreateInfo, &vmaAllocationCreateInfo, &m_vkImage, &m_vmaAllocation, &vmaAllocationInfo);
+		CrAssert(vkResult == VK_SUCCESS);
 
-		VkMemoryAllocateInfo memAlloc;
-		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memAlloc.pNext = nullptr;
-		memAlloc.memoryTypeIndex = 0;
-		memAlloc.allocationSize = imageMemoryRequirements.size;
-
-		memAlloc.memoryTypeIndex = vulkanRenderDevice->GetVkMemoryType(imageMemoryRequirements.memoryTypeBits, memoryFlags);
-
-		// TODO Allocate from a pool as there are limited allocations
-		result = vkAllocateMemory(m_vkDevice, &memAlloc, nullptr, &m_vkMemory);
-		CrAssert(result == VK_SUCCESS);
-
-		result = vkBindImageMemory(m_vkDevice, m_vkImage, m_vkMemory, 0);
-		CrAssert(result == VK_SUCCESS);
+		m_usedGPUMemory = (uint32_t)vmaAllocationInfo.size; // Take note of GPU memory usage
 	}
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, descriptor.name.c_str());
-
-	m_usedGPUMemory = (uint32_t)imageMemoryRequirements.size; // Take note of GPU memory usage
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, descriptor.name);
 
 	//-----------------------
 	// Create the image views
 	//-----------------------
 
+	// TODO This needs reworking. Only create if mips or slices are > 1
 	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
 		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
@@ -210,7 +197,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		VkImageViewCreateInfo imageViewInfo;
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.pNext = nullptr;
-		imageViewInfo.format = m_vkFormat;
+		imageViewInfo.format = vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
 		imageViewInfo.components = {};
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
@@ -221,8 +208,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
 
-		result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_vkImageView);
-		CrAssert(result == VK_SUCCESS);
+		vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_vkImageView);
+		CrAssert(vkResult == VK_SUCCESS);
 	}
 
 	// Create views that can only see a single mip or slice. We can use this to either bind a single
@@ -232,7 +219,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		VkImageViewCreateInfo imageViewInfo;
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.pNext = nullptr;
-		imageViewInfo.format = m_vkFormat;
+		imageViewInfo.format = vkFormat;
 		imageViewInfo.flags = vkCreateFlags;
 		imageViewInfo.components = {};
 		imageViewInfo.viewType = vkImageViewType;
@@ -245,8 +232,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			imageViewInfo.subresourceRange.levelCount = 1;
 			imageViewInfo.subresourceRange.baseArrayLayer = 0;
 			imageViewInfo.subresourceRange.layerCount = m_depth;
-			result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip]);
-			CrAssertMsg(result == VK_SUCCESS, "Failed creating VkImageView");
+			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip]);
+			CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 
 			m_additionalTextureViews->m_vkImageSingleMipSlice[mip].resize(m_depth);
 
@@ -256,8 +243,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				imageViewInfo.subresourceRange.levelCount = 1;
 				imageViewInfo.subresourceRange.baseArrayLayer = slice;
 				imageViewInfo.subresourceRange.layerCount = 1;
-				result = vkCreateImageView(m_vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice]);
-				CrAssertMsg(result == VK_SUCCESS, "Failed creating VkImageView");
+				vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice]);
+				CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 			}
 		}
 	}
@@ -278,28 +265,28 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
 			);
 
-			result = vkCreateBuffer(m_vkDevice, &stagingBufferCreateInfo, nullptr, &stagingBuffer);
-			CrAssertMsg(result == VK_SUCCESS, "Failed creating VkBuffer");
+			vkResult = vkCreateBuffer(vkDevice, &stagingBufferCreateInfo, nullptr, &stagingBuffer);
+			CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkBuffer");
 
 			VkMemoryRequirements bufferMemoryRequirements;
-			vkGetBufferMemoryRequirements(m_vkDevice, stagingBuffer, &bufferMemoryRequirements);
+			vkGetBufferMemoryRequirements(vkDevice, stagingBuffer, &bufferMemoryRequirements);
 			CrAssert(descriptor.initialDataSize <= bufferMemoryRequirements.size);
 
 			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanRenderDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 			VkDeviceMemory stagingMemory;
-			result = vkAllocateMemory(m_vkDevice, &memAllocInfo, nullptr, &stagingMemory);
-			CrAssert(result == VK_SUCCESS);
+			vkResult = vkAllocateMemory(vkDevice, &memAllocInfo, nullptr, &stagingMemory);
+			CrAssert(vkResult == VK_SUCCESS);
 
-			result = vkBindBufferMemory(m_vkDevice, stagingBuffer, stagingMemory, 0);
-			CrAssert(result == VK_SUCCESS);
+			vkResult = vkBindBufferMemory(vkDevice, stagingBuffer, stagingMemory, 0);
+			CrAssert(vkResult == VK_SUCCESS);
 
 			// Copy into buffer
 			void* data;
-			result = vkMapMemory(m_vkDevice, stagingMemory, 0, bufferMemoryRequirements.size, 0, &data);
-			CrAssert(result == VK_SUCCESS);
+			vkResult = vkMapMemory(vkDevice, stagingMemory, 0, bufferMemoryRequirements.size, 0, &data);
+			CrAssert(vkResult == VK_SUCCESS);
 			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
-			vkUnmapMemory(m_vkDevice, stagingMemory);
+			vkUnmapMemory(vkDevice, stagingMemory);
 
 			// Setup buffer copy regions for each mip level
 			CrVector<VkBufferImageCopy> bufferCopyRegions;
@@ -371,60 +358,51 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			renderDevice->GetMainCommandQueue()->WaitIdle();
 
 			// Clean up staging resources
-			vkFreeMemory(m_vkDevice, stagingMemory, nullptr);
-			vkDestroyBuffer(m_vkDevice, stagingBuffer, nullptr);
+			vkFreeMemory(vkDevice, stagingMemory, nullptr);
+			vkDestroyBuffer(vkDevice, stagingBuffer, nullptr);
 		}
 		else if (m_usage & cr3d::TextureUsage::CPUReadable)
 		{
 			void* data;
-			result = vkMapMemory(m_vkDevice, m_vkMemory, 0, imageMemoryRequirements.size, 0, &data);
-			CrAssert(result == VK_SUCCESS);
+			vkResult = vmaMapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation, &data);
+			CrAssert(vkResult == VK_SUCCESS);
 			memcpy(data, descriptor.initialData, imageMemoryRequirements.size);
-			vkUnmapMemory(m_vkDevice, m_vkMemory);
+			vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
 		}
 	}
 }
 
 CrTextureVulkan::~CrTextureVulkan()
 {
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+
 	CrAssert(m_vkImageView);
 	CrAssert(m_vkImage);
 
 	// Don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
 	if (m_usage != cr3d::TextureUsage::SwapChain)
 	{
-		CrAssert(m_vkMemory);
-		vkDestroyImage(m_vkDevice, m_vkImage, nullptr);
-		vkFreeMemory(m_vkDevice, m_vkMemory, nullptr);
+		vmaDestroyImage(vulkanRenderDevice->GetVmaAllocator(), m_vkImage, m_vmaAllocation);
 	}
 
-	vkDestroyImageView(m_vkDevice, m_vkImageView, nullptr);
+	vkDestroyImageView(vkDevice, m_vkImageView, nullptr);
 
 	if (m_additionalTextureViews)
 	{
 		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageViewSingleMipAllSlices.size(); ++mip)
 		{
-			vkDestroyImageView(m_vkDevice, m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip], nullptr);
+			vkDestroyImageView(vkDevice, m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip], nullptr);
 		}
 
 		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageSingleMipSlice.size(); ++mip)
 		{
 			for (uint32_t slice = 0; slice < m_additionalTextureViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
 			{
-				vkDestroyImageView(m_vkDevice, m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
+				vkDestroyImageView(vkDevice, m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
 			}
 		}
 	}
-}
-
-VkFormat CrTextureVulkan::GetVkFormat() const
-{
-	return m_vkFormat;
-}
-
-VkSampleCountFlagBits CrTextureVulkan::GetVkSamples() const
-{
-	return m_vkSamples;
 }
 
 VkImage CrTextureVulkan::GetVkImage() const

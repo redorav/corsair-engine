@@ -84,7 +84,9 @@ public:
 
 	void FinalizeDeletionQueue();
 
+	//----------------------------
 	// Resource Creation Functions
+	//----------------------------
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
@@ -119,7 +121,9 @@ public:
 
 	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();
 
+	//------------------------------
 	// GPU Synchronization functions
+	//------------------------------
 
 	cr3d::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds) const;
 
@@ -129,6 +133,10 @@ public:
 
 	// Wait until all operations on all queues have completed
 	void WaitIdle();
+
+	//-------------------------------
+	// Properties and feature support
+	//-------------------------------
 
 	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const = 0;
 

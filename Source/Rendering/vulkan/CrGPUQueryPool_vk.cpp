@@ -36,7 +36,7 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 	CrHardwareGPUBufferDescriptor queryBufferDescriptor
 	(
 		cr3d::BufferUsage::TransferDst,
-		(cr3d::BufferAccess::T)(cr3d::BufferAccess::GPUWrite | cr3d::BufferAccess::CPURead),
+		cr3d::BufferAccess::GPUWriteCPURead,
 		descriptor.count,
 		m_querySize
 	);

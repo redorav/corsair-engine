@@ -26,10 +26,6 @@ public:
 
 	~CrTextureVulkan();
 
-	VkFormat GetVkFormat() const;
-
-	VkSampleCountFlagBits GetVkSamples() const;
-
 	VkImage GetVkImage() const;
 
 	VkImageView GetVkImageViewAllMipsSlices() const;
@@ -42,12 +38,6 @@ public:
 
 private:
 
-	VkDevice							m_vkDevice;
-
-	VkFormat							m_vkFormat;
-
-	VkSampleCountFlagBits				m_vkSamples;
-
 	VkImage								m_vkImage;
 
 	// Main view, can access all mips and slices
@@ -57,7 +47,7 @@ private:
 	// some memory per texture (almost 512 bytes)
 	CrUniquePtr<AdditionalTextureViews>	m_additionalTextureViews;
 
-	VkDeviceMemory						m_vkMemory;
+	VmaAllocation						m_vmaAllocation;
 
 	VkImageAspectFlags					m_vkAspectMask; // Bits that specify color, depth, stencil or sparse texture
 };

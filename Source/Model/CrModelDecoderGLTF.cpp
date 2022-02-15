@@ -110,7 +110,7 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 
 			// Create the buffer
 			cr3d::DataFormat::T format = ToDataFormat(indexAccessor.componentType);
-			CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWrite, format, (uint32_t)indexAccessor.count);
+			CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::BufferAccess::CPUWriteGPURead, format, (uint32_t)indexAccessor.count);
 
 			// Use the buffer view to copy the data
 			const tinygltf::BufferView& bufferView = modelData->bufferViews[indexAccessor.bufferView];
@@ -176,8 +176,8 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 			float3 maxVertex = float3(-FLT_MAX);
 
 			// Create the vertex buffer
-			CrVertexBufferSharedHandle positionBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, PositionVertexDescriptor, (uint32_t)positions.size());
-			CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWrite, AdditionalVertexDescriptor, (uint32_t)positions.size());
+			CrVertexBufferSharedHandle positionBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWriteGPURead, PositionVertexDescriptor, (uint32_t)positions.size());
+			CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::BufferAccess::CPUWriteGPURead, AdditionalVertexDescriptor, (uint32_t)positions.size());
 			
 			ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
 			ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();

@@ -46,7 +46,7 @@ class ICrHardwareGPUBuffer
 {
 public:
 
-	ICrHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+	ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	virtual ~ICrHardwareGPUBuffer() {}
 
@@ -65,19 +65,21 @@ public:
 
 	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
 
+	ICrRenderDevice* m_renderDevice;
+
 	bool mapped;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()
 {
-	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot map a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::BufferAccess::GPUOnly, "Cannot map a buffer with no CPU access");
 
 	return LockPS();
 }
 
 inline void ICrHardwareGPUBuffer::Unlock()
 {
-	CrAssertMsg(access & (cr3d::BufferAccess::CPURead | cr3d::BufferAccess::CPUWrite), "Cannot unmap a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::BufferAccess::GPUOnly, "Cannot unmap a buffer with no CPU access");
 
 	return UnlockPS();
 }

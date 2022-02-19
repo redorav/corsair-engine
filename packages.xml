@@ -46,6 +46,7 @@
 	
 	<package name="vma">
 		<version id="cebd53c" file="vma_2022_02_14_cebd53c.zip" repository="github"/>
+		<version id="042e65e" file="vma_2022_02_19_042e65e.zip" repository="github"/>
 	</package>
 	
 	<package name="vulkan">

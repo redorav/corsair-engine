@@ -10,7 +10,7 @@
 	<dependency name="spirv-reflect" version="4689b33"/>
 	<dependency name="stb" version="f54acd4"/>
 	<dependency name="tinygltf" version="298c37a"/>
-	<dependency name="vma" version="cebd53c"/>
+	<dependency name="vma" version="042e65e"/>
 	<dependency name="vulkan" version="1.2.189.2"/>
 	<dependency name="xxhash" version="c77920d"/>
 

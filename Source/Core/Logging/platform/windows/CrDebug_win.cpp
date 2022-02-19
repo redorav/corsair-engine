@@ -81,5 +81,15 @@ void CrDebugWindows::PrintCurrentProcessMemory(const char* file, unsigned long l
 	CloseHandle(hProcess);
 }
 
+static const CrDebugWindows* DebugWindows;
+
 // Create the global object for debug
-const ICrDebug* Debug = new CrDebugWindows();
+const ICrDebug* GetDebug()
+{
+	if (!DebugWindows)
+	{
+		DebugWindows = new CrDebugWindows();
+	}
+
+	return DebugWindows;
+}

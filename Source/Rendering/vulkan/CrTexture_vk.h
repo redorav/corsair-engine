@@ -9,6 +9,15 @@
 
 class ICrRenderDevice;
 
+// Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
+// This shows how to make the combinations but it tries to tie them with the point in the pipeline at which they
+// are used, whereas we decouple that and get fewer combinations
+struct CrVkImageStateInfo
+{
+	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
+	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
+};
+
 // TODO Create platform-independent so sync between platforms
 // Perhaps by storing void* as the view?
 struct AdditionalTextureViews
@@ -25,6 +34,8 @@ public:
 	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureVulkan();
+
+	static const CrVkImageStateInfo& GetVkImageStateInfo(cr3d::TextureState::T textureState);
 
 	VkImage GetVkImage() const;
 

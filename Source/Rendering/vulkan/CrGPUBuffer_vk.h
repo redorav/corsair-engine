@@ -5,6 +5,11 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+struct CrVkBufferStateInfo
+{
+	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
+};
+
 class CrRenderDeviceVulkan;
 
 class CrHardwareGPUBufferVulkan final : public ICrHardwareGPUBuffer
@@ -14,6 +19,8 @@ public:
 	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
+
+	static const CrVkBufferStateInfo& GetVkBufferStateInfo(cr3d::BufferState::T bufferState);
 
 	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access);
 

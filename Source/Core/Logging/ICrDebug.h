@@ -33,9 +33,9 @@ private:
 };
 
 // We create it in the platform-specific code, which is why we extern it here
-extern const ICrDebug* Debug;
+const ICrDebug* GetDebug();
 
-#define CrLog(format, ...) Debug->Log(__FILE__, __LINE__, __func__, format, __VA_ARGS__)
+#define CrLog(format, ...) GetDebug()->Log(__FILE__, __LINE__, __func__, format, __VA_ARGS__)
 
 #define ERROR_LOG
 #define WARNING_LOG
@@ -57,8 +57,8 @@ extern const ICrDebug* Debug;
 #define CrLogInfo(s) CrLog("[Info] %s", s)
 #endif
 
-#define CrAssertMsg(condition, message, ...) Debug->AssertMsg((condition), __FILE__, __LINE__, __func__, (message), __VA_ARGS__)
+#define CrAssertMsg(condition, message, ...) GetDebug()->AssertMsg((condition), __FILE__, __LINE__, __func__, (message), __VA_ARGS__)
 
 #define CrAssert(condition)	CrAssertMsg((condition), "")
 
-#define CrPrintProcessMemory(message, ...) if(Debug) Debug->PrintCurrentProcessMemory(__FILE__, __LINE__, __func__, (message), __VA_ARGS__)
+#define CrPrintProcessMemory(message, ...) GetDebug()->PrintCurrentProcessMemory(__FILE__, __LINE__, __func__, (message), __VA_ARGS__)

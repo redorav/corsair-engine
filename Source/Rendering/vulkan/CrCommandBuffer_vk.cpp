@@ -12,59 +12,6 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/Logging/ICrDebug.h"
 
-// Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
-// This shows how to make the combinations but it tries to tie them with the point in the pipeline at which they
-// are used, whereas we decouple that and get fewer combinations
-struct CrVkImageStateInfo
-{
-	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
-	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
-};
-
-struct CrVkBufferStateInfo
-{
-	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
-};
-
-CrArray<CrVkImageStateInfo, cr3d::TextureState::Count> CrVkImageResourceStateTable;
-CrArray<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTable;
-
-static bool PopulateVkResourceTable()
-{
-	CrVkImageResourceStateTable[cr3d::TextureState::Undefined]         = { VK_IMAGE_LAYOUT_UNDEFINED,                        VK_ACCESS_NONE_KHR };
-	CrVkImageResourceStateTable[cr3d::TextureState::ShaderInput]       = { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,         VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::RenderTarget]      = { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::RWTexture]         = { VK_IMAGE_LAYOUT_GENERAL,                          VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::Present]           = { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  0 };
-	CrVkImageResourceStateTable[cr3d::TextureState::DepthStencilRead]  = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,  VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::DepthStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::CopySource]        = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::CopyDestination]   = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::PreInitialized]    = { VK_IMAGE_LAYOUT_PREINITIALIZED,                   VK_ACCESS_HOST_WRITE_BIT };
-
-	// Validate the entries on boot
-	for (const CrVkImageStateInfo& resourceInfo : CrVkImageResourceStateTable) 
-	{
-		CrAssertMsg((resourceInfo.imageLayout != VK_IMAGE_LAYOUT_MAX_ENUM) && (resourceInfo.accessMask != VK_ACCESS_FLAG_BITS_MAX_ENUM), "Resource info entry is invalid");
-	}
-
-	CrVkBufferResourceStateTable[cr3d::BufferState::Undefined]       = { VK_ACCESS_NONE_KHR };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ShaderInput]     = { VK_ACCESS_SHADER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ReadWrite]       = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopySource]      = { VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopyDestination] = { VK_ACCESS_TRANSFER_WRITE_BIT };
-
-	for (const CrVkBufferStateInfo& resourceInfo : CrVkBufferResourceStateTable)
-	{
-		CrAssertMsg(resourceInfo.accessMask != VK_ACCESS_FLAG_BITS_MAX_ENUM, "Resource info entry is invalid");
-	}
-
-	return true;
-};
-
-// Here just to initialize the table
-static bool dummyPopulateVkResourceTable = PopulateVkResourceTable();
-
 CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 	: ICrCommandBuffer(commandQueue)
 {
@@ -424,8 +371,8 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 	attachmentDescription.storeOp        = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.storeOp);
 	attachmentDescription.stencilLoadOp  = crvk::GetVkAttachmentLoadOp(renderTargetDescriptor.stencilLoadOp);
 	attachmentDescription.stencilStoreOp = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.stencilStoreOp);
-	attachmentDescription.initialLayout  = CrVkImageResourceStateTable[renderTargetDescriptor.initialState].imageLayout;
-	attachmentDescription.finalLayout    = CrVkImageResourceStateTable[renderTargetDescriptor.finalState].imageLayout;
+	attachmentDescription.initialLayout  = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.initialState).imageLayout;
+	attachmentDescription.finalLayout    = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.finalState).imageLayout;
 
 	return attachmentDescription;
 }
@@ -616,8 +563,8 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-	bufferMemoryBarrier.srcAccessMask = CrVkBufferResourceStateTable[sourceState].accessMask;
-	bufferMemoryBarrier.dstAccessMask = CrVkBufferResourceStateTable[destinationState].accessMask;
+	bufferMemoryBarrier.srcAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(sourceState).accessMask;
+	bufferMemoryBarrier.dstAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
 
 	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
 	bufferMemoryBarrier.offset = buffer->GetByteOffset();
@@ -636,8 +583,8 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-	const CrVkImageStateInfo& resourceStateInfoSource = CrVkImageResourceStateTable[sourceState];
-	const CrVkImageStateInfo& resourceStateInfoDestination = CrVkImageResourceStateTable[destinationState];
+	const CrVkImageStateInfo& resourceStateInfoSource = CrTextureVulkan::GetVkImageStateInfo(sourceState);
+	const CrVkImageStateInfo& resourceStateInfoDestination = CrTextureVulkan::GetVkImageStateInfo(destinationState);
 
 	imageMemoryBarrier.oldLayout                       = resourceStateInfoSource.imageLayout;
 	imageMemoryBarrier.newLayout                       = resourceStateInfoDestination.imageLayout;

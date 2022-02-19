@@ -165,3 +165,28 @@ void CrHardwareGPUBufferVulkan::UnlockPS()
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 	vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
 }
+
+CrArray<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTable;
+
+static bool PopulateVkBufferResourceTable()
+{
+	CrVkBufferResourceStateTable[cr3d::BufferState::Undefined]       = { VK_ACCESS_NONE_KHR };
+	CrVkBufferResourceStateTable[cr3d::BufferState::ShaderInput]     = { VK_ACCESS_SHADER_READ_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::ReadWrite]       = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::CopySource]      = { VK_ACCESS_TRANSFER_READ_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::CopyDestination] = { VK_ACCESS_TRANSFER_WRITE_BIT };
+
+	for (const CrVkBufferStateInfo& resourceInfo : CrVkBufferResourceStateTable)
+	{
+		CrAssertMsg(resourceInfo.accessMask != VK_ACCESS_FLAG_BITS_MAX_ENUM, "Resource info entry is invalid");
+	}
+
+	return true;
+};
+
+static bool DummyPopulateVkBufferResourceTable = PopulateVkBufferResourceTable();
+
+const CrVkBufferStateInfo& CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(cr3d::BufferState::T bufferState)
+{
+	return CrVkBufferResourceStateTable[bufferState];
+}

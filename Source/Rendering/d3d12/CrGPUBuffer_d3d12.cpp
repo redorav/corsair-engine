@@ -19,14 +19,14 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	switch (descriptor.access)
 	{
-		case cr3d::BufferAccess::GPUOnly:
+		case cr3d::MemoryAccess::GPUOnly:
 			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 			break;
-		case cr3d::BufferAccess::GPUWriteCPURead:
+		case cr3d::MemoryAccess::GPUWriteCPURead:
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
 			break;
-		case cr3d::BufferAccess::CPUOnly:
-		case cr3d::BufferAccess::CPUWriteGPURead:
+		case cr3d::MemoryAccess::Staging:
+		case cr3d::MemoryAccess::CPUStreamToGPU:
 			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 			initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;
 			break;

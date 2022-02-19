@@ -15,18 +15,18 @@
 
 struct CrHardwareGPUBufferDescriptor
 {
-	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat)
+	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat)
 		: usage(usage), access(access), dataFormat(dataFormat), numElements(1), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
 
-	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t size)
+	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t size)
 		: usage(usage), access(access), numElements(1), stride(size) {}
 
-	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access, uint32_t numElements, uint32_t stride) 
+	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, uint32_t stride) 
 		: usage(usage), access(access), numElements(numElements), stride(stride) {}
 
 	cr3d::BufferUsage::T usage;
 
-	cr3d::BufferAccess::T access;
+	cr3d::MemoryAccess::T access;
 
 	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
 
@@ -61,7 +61,7 @@ public:
 	// TODO Make const. Once we've constructed this buffer we cannot change access or usage
 	cr3d::BufferUsage::T usage;
 
-	cr3d::BufferAccess::T access;
+	cr3d::MemoryAccess::T access;
 
 	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
 
@@ -72,21 +72,21 @@ public:
 
 inline void* ICrHardwareGPUBuffer::Lock()
 {
-	CrAssertMsg(access != cr3d::BufferAccess::GPUOnly, "Cannot map a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnly, "Cannot map a buffer with no CPU access");
 
 	return LockPS();
 }
 
 inline void ICrHardwareGPUBuffer::Unlock()
 {
-	CrAssertMsg(access != cr3d::BufferAccess::GPUOnly, "Cannot unmap a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnly, "Cannot unmap a buffer with no CPU access");
 
 	return UnlockPS();
 }
 
 struct CrGPUBufferDescriptor
 {
-	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access) : usage(usage), access(access) {}
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access) : usage(usage), access(access) {}
 
 	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
 
@@ -98,7 +98,7 @@ struct CrGPUBufferDescriptor
 
 	cr3d::BufferUsage::T usage;
 
-	cr3d::BufferAccess::T access;
+	cr3d::MemoryAccess::T access;
 };
 
 // A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
@@ -155,7 +155,7 @@ protected:
 
 	cr3d::BufferUsage::T m_usage;
 
-	cr3d::BufferAccess::T m_access;
+	cr3d::MemoryAccess::T m_access;
 
 	cr3d::BufferOwnership::T m_ownership;
 	
@@ -222,7 +222,7 @@ class CrVertexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, access), numVertices, vertexDescriptor.GetDataSize())
 		, m_vertexDescriptor(vertexDescriptor)
 	{}
@@ -242,7 +242,7 @@ class CrIndexBufferCommon : public CrGPUBuffer
 {
 public:
 
-	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
+	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, access), numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4) {}
 };
 
@@ -271,7 +271,7 @@ class CrStructuredBuffer : public CrGPUBufferType<Metadata>
 {
 public:
 
-	CrStructuredBuffer(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T bufferAccess, uint32_t numElements) 
+	CrStructuredBuffer(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T bufferAccess, uint32_t numElements) 
 		: CrGPUBufferType<Metadata>(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Structured, bufferAccess), numElements) {}
 
 	Metadata* Lock()
@@ -288,6 +288,6 @@ class CrDataBuffer : public CrGPUBuffer
 {
 public:
 
-	CrDataBuffer(ICrRenderDevice* renderDevice, cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+	CrDataBuffer(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Data, access), numElements, dataFormat) {}
 };

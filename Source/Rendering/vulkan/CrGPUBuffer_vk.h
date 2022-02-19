@@ -15,7 +15,7 @@ public:
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
 
-	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access);
+	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access);
 
 	VkIndexType GetVkIndexType() const;
 

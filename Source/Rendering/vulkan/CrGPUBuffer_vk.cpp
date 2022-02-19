@@ -32,19 +32,22 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	switch (descriptor.access)
 	{
-		case cr3d::BufferAccess::GPUOnly:
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+		case cr3d::MemoryAccess::GPUOnly:
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 			break;
-		case cr3d::BufferAccess::GPUWriteCPURead:
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_TO_CPU;
+		case cr3d::MemoryAccess::GPUWriteCPURead:
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
 			break;
-		case cr3d::BufferAccess::CPUOnly:
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+		case cr3d::MemoryAccess::Staging:
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
 			break;
-		case cr3d::BufferAccess::CPUWriteGPURead:
+		case cr3d::MemoryAccess::CPUStreamToGPU:
 		{
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
-			
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+
 			// From the VMA documentation:
 			// Also, Windows drivers from all 3 * *PC * *GPU vendors(AMD, Intel, NVIDIA)
 			// currently provide `HOST_COHERENT` flag on all memory types that are
@@ -93,7 +96,7 @@ CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
 	vmaDestroyBuffer(vulkanRenderDevice->GetVmaAllocator(), m_vkBuffer, m_vmaAllocation);
 }
 
-VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::BufferAccess::T access)
+VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access)
 {
 	VkBufferUsageFlags usageFlags = 0;
 
@@ -119,7 +122,7 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 
 	if (usage & cr3d::BufferUsage::Data)
 	{
-		if (access & cr3d::BufferAccess::GPUOnly)
+		if (access & cr3d::MemoryAccess::GPUOnly)
 		{
 			usageFlags |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
 		}

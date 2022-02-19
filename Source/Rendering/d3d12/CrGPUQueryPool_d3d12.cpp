@@ -30,7 +30,7 @@ CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(ICrRenderDevice* renderDevice, const Cr
 
 	CrAssertMsg(hResult == S_OK, "Failed to create query pool");
 
-	CrHardwareGPUBufferDescriptor queryBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::BufferAccess::GPUWriteCPURead, descriptor.count, m_querySize);
+	CrHardwareGPUBufferDescriptor queryBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
 
 	m_queryBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(d3d12RenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor));
 }

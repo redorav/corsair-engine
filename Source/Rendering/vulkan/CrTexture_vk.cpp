@@ -153,14 +153,14 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED; // TODO Condition on initialData
 
-			// TODO This isn't right. Consider what we want to use it for
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+			// TODO This isn't right. Introduce memory access to the texture descriptor and remove usage flag from TextureUsage
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
 		}
 		else
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 		}
 
 		// http://gpuopen.com/vulkan-device-memory/

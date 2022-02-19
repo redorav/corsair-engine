@@ -24,7 +24,7 @@ public:
 
 	cr3d::BufferUsage::T GetUsage() const;
 
-	cr3d::BufferAccess::T GetAccess() const;
+	cr3d::MemoryAccess::T GetAccess() const;
 
 protected:
 
@@ -34,7 +34,7 @@ protected:
 
 	cr3d::BufferUsage::T m_bufferUsage;
 
-	cr3d::BufferAccess::T m_bufferAccess;
+	cr3d::MemoryAccess::T m_bufferAccess;
 };
 
 inline ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
@@ -47,7 +47,7 @@ inline cr3d::BufferUsage::T CrGPUStackAllocator::GetUsage() const
 	return m_bufferUsage;
 }
 
-inline cr3d::BufferAccess::T CrGPUStackAllocator::GetAccess() const
+inline cr3d::MemoryAccess::T CrGPUStackAllocator::GetAccess() const
 {
 	return m_bufferAccess;
 }

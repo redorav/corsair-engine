@@ -90,7 +90,7 @@ public:
 
 	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
 
-	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
+	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
 	CrSamplerSharedHandle CreateSampler(const CrSamplerDescriptor& descriptor);
 
@@ -98,12 +98,12 @@ public:
 
 	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
-	CrVertexBufferSharedHandle CreateVertexBuffer(cr3d::BufferAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+	CrVertexBufferSharedHandle CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 	template<typename Metadata>
-	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements);
+	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
 
-	CrDataBufferSharedHandle CreateDataBuffer(cr3d::BufferAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
+	CrDataBufferSharedHandle CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
 
 	CrGraphicsShaderHandle CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const;
 
@@ -209,7 +209,7 @@ protected:
 };
 
 template<typename Metadata>
-CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::BufferAccess::T access, uint32_t numElements)
+CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
 {
 	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
 }

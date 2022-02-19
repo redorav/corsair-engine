@@ -909,10 +909,7 @@ namespace cr3d
 		Orthographic,
 		Perspective
 	};
-}
 
-namespace cr3d
-{
 	namespace BufferUsage
 	{
 		enum T : uint32_t
@@ -932,14 +929,14 @@ namespace cr3d
 		};
 	};
 
-	namespace BufferAccess
+	namespace MemoryAccess
 	{
 		enum T : uint32_t
 		{
-			GPUOnly,         // Compressed textures, render targets, unordered access
-			GPUWriteCPURead, // GPU queries, feedback textures. Memory is coherent
-			CPUOnly,         // Staging buffers 
-			CPUWriteGPURead, // Streaming per-frame data like vertex/constant buffers
+			GPUOnly,         // Device-only, non-mappable. Compressed textures, render targets, unordered access
+			GPUWriteCPURead, // CPU random access, cached. GPU queries, feedback textures
+			Staging,         // CPU random access. Staging buffer for upload or download
+			CPUStreamToGPU,  // Uncached, write-combined, coherent. Don't read on CPU. Streaming per-frame data like vertex/constant buffers
 		};
 	};
 

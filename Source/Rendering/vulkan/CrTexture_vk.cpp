@@ -23,29 +23,32 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// Usage properties
 	//-----------------
 
-	VkImageUsageFlags usageFlags = 0;
+	VkImageUsageFlags vkImageUsageFlags = 0;
 
 	if (IsDepthStencil())
 	{
-		usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		vkImageUsageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	}
 
 	if (IsRenderTarget())
 	{
-		usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		vkImageUsageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	}
 
 	if (IsUnorderedAccess())
 	{
-		usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+		vkImageUsageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
 	}
 
 	// All textures can be copied from the GPU to the CPU
-	usageFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	vkImageUsageFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
+	// TODO revise this usage
+	vkImageUsageFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
 	// TODO Validate that the image format supports the usages and provide an alternative
 
-	usageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT; // All images can be sampled
+	vkImageUsageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT; // All images can be sampled
 
 	m_sampleCount = descriptor.sampleCount;
 	VkSampleCountFlagBits vkSamples = crvk::GetVkSampleCount(m_sampleCount);
@@ -129,7 +132,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageCreateInfo.mipLevels = m_mipmapCount;
 		imageCreateInfo.arrayLayers = arrayLayers;
 		imageCreateInfo.samples = vkSamples;
-		imageCreateInfo.usage = usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT; // TODO revise this usage
+		imageCreateInfo.usage = vkImageUsageFlags;
 		imageCreateInfo.flags = vkCreateFlags;
 		imageCreateInfo.imageType = vkImageType;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;

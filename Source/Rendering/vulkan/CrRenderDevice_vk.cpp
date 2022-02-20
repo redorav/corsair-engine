@@ -513,22 +513,3 @@ void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjec
 		vkDebugMarkerSetObjectName(m_vkDevice, &nameInfo);
 	}
 }
-
-bool CrRenderDeviceVulkan::GetIsFeatureSupported(CrRenderingFeature::T feature) const
-{
-	switch (feature)
-	{
-		case CrRenderingFeature::Tessellation:
-			return m_vkDeviceSupportedFeatures.tessellationShader;
-		case CrRenderingFeature::GeometryShaders:
-			return m_vkDeviceSupportedFeatures.geometryShader;
-		case CrRenderingFeature::TextureCompressionBC:
-			return m_vkDeviceSupportedFeatures.textureCompressionBC;
-		case CrRenderingFeature::TextureCompressionETC:
-			return m_vkDeviceSupportedFeatures.textureCompressionETC2;
-		case CrRenderingFeature::TextureCompressionASTC:
-			return m_vkDeviceSupportedFeatures.textureCompressionASTC_LDR;
-	}
-
-	return false;
-}

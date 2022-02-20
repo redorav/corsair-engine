@@ -70,8 +70,6 @@ private:
 
 	virtual void WaitIdlePS() override;
 
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
-
 	// Heap for Render Target Views
 	CrDescriptorPoolD3D12 m_d3d12RTVHeap;
 

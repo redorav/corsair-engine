@@ -199,10 +199,3 @@ void CrRenderDeviceD3D12::WaitIdlePS()
 {
 	CrAssertMsg(true, "Not implemented");
 }
-
-bool CrRenderDeviceD3D12::GetIsFeatureSupported(CrRenderingFeature::T feature) const
-{
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(feature);
-	return false;
-}

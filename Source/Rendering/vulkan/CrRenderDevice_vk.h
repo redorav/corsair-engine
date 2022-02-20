@@ -73,8 +73,6 @@ private:
 
 	virtual void WaitIdlePS() override;
 
-	// TODO Move to RenderDeviceProperties
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const override;
 
 	void RetrieveQueueFamilies();
 

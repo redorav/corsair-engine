@@ -22,22 +22,6 @@ namespace CrVendor
 	};
 }
 
-struct CrRenderDeviceProperties
-{
-	CrVendor::T vendor = CrVendor::Unknown;
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
-	CrFixedString128 description;
-
-	uint32_t maxConstantBufferRange = 0;
-	uint32_t maxTextureDimension1D = 0;
-	uint32_t maxTextureDimension2D = 0;
-	uint32_t maxTextureDimension3D = 0;
-
-	uint64_t gpuMemoryBytes = 0;
-};
-
-namespace CrCommandQueueType { enum T : uint32_t; }
-
 namespace CrRenderingFeature
 {
 	enum T
@@ -50,8 +34,27 @@ namespace CrRenderingFeature
 		TextureCompressionBC,
 		TextureCompressionETC,
 		TextureCompressionASTC,
+		Count
 	};
 }
+
+struct CrRenderDeviceProperties
+{
+	CrVendor::T vendor = CrVendor::Unknown;
+	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+	CrFixedString128 description;
+
+	uint32_t maxConstantBufferRange = 0;
+	uint32_t maxTextureDimension1D = 0;
+	uint32_t maxTextureDimension2D = 0;
+	uint32_t maxTextureDimension3D = 0;
+
+	uint64_t gpuMemoryBytes = 0;
+
+	bool supportedFeatures[CrRenderingFeature::Count] = {};
+};
+
+namespace CrCommandQueueType { enum T : uint32_t; }
 
 inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
 {
@@ -137,8 +140,6 @@ public:
 	//-------------------------------
 	// Properties and feature support
 	//-------------------------------
-
-	virtual bool GetIsFeatureSupported(CrRenderingFeature::T feature) const = 0;
 
 	const CrRenderDeviceProperties& GetProperties() const;
 

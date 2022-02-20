@@ -38,7 +38,7 @@ CrVertexDescriptor UIVertexDescriptor =
 	CrVertexAttribute(CrVertexSemantic::Color, cr3d::DataFormat::RGBA8_Unorm, 0),
 };
 
-CrImGuiRenderer* CrImGuiRenderer::k_instance = nullptr;
+CrImGuiRenderer* ImGuiRenderer = nullptr;
 
 CrImGuiRenderer::CrImGuiRenderer()
 	: m_currentMaxIndexCount(0)
@@ -46,13 +46,23 @@ CrImGuiRenderer::CrImGuiRenderer()
 {
 }
 
-CrImGuiRenderer* CrImGuiRenderer::GetImGuiRenderer()
+void CrImGuiRenderer::Create(const CrImGuiRendererInitParams& initParams)
 {
-	if (!k_instance)
-	{
-		k_instance = new CrImGuiRenderer;
-	}
-	return k_instance;
+	CrAssert(ImGuiRenderer == nullptr);
+	ImGuiRenderer = new CrImGuiRenderer;
+	ImGuiRenderer->Initialize(initParams);
+}
+
+void CrImGuiRenderer::Destroy()
+{
+	CrAssert(ImGuiRenderer != nullptr);
+	delete ImGuiRenderer;
+}
+
+CrImGuiRenderer& CrImGuiRenderer::Get()
+{
+	CrAssert(ImGuiRenderer != nullptr);
+	return *ImGuiRenderer;
 }
 
 void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)

@@ -18,7 +18,11 @@ class CrImGuiRenderer
 {
 public:
 
-	static CrImGuiRenderer* GetImGuiRenderer();
+	static void Create(const CrImGuiRendererInitParams& initParams);
+
+	static void Destroy();
+
+	static CrImGuiRenderer& Get();
 
 	void Initialize(const CrImGuiRendererInitParams& initParams);
 
@@ -32,13 +36,9 @@ private:
 
 	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
 
-	~CrImGuiRenderer() = delete;
-
 	float4x4 ComputeProjectionMatrix(ImDrawData* data);
 
 	void UpdateBuffers(ImDrawData* data);
-
-	static CrImGuiRenderer* k_instance;
 
 	CrBuiltinGraphicsPipeline m_imguiGraphicsPipeline;
 

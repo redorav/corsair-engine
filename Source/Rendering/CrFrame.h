@@ -24,7 +24,9 @@ public:
 
 	~CrFrame();
 
-	void Init(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height);
+	void Initialize(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height);
+
+	void Deinitialize();
 
 	void Process();
 

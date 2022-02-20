@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 	CrPrintProcessMemory("After Render Device");
 
 	CrFrame frame;
-	frame.Init(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
+	frame.Initialize(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
 
 	CrInputHandlerSDL inputHandler;
 
@@ -136,6 +136,8 @@ int main(int argc, char* argv[])
 			frame.Process(); // Process the main loop
 		}
 	}
+
+	frame.Deinitialize();
 
 	return 0;
 }

@@ -156,7 +156,7 @@ struct CrRenderPacketBatcher
 	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
-void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
+void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
 {
 	HashingAssert();
 
@@ -168,12 +168,19 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
+	RecreateSwapchainAndRenderTargets();
+
 	// TODO Move block to rendering subsystem initialization function
 	{
 		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrMaterialCompiler::Get().Initialize();
 		CrPipelineStateManager::Get().Initialize(renderDevice.get());
+
+		// Initialize ImGui renderer
+		CrImGuiRendererInitParams imguiInitParams = {};
+		imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
+		CrImGuiRenderer::Create(imguiInitParams);
 	}
 
 	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
@@ -268,7 +275,7 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnly, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	RecreateSwapchainAndRenderTargets();
+	
 	
 	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
@@ -301,13 +308,13 @@ void CrFrame::Init(void* platformHandle, void* platformWindow, uint32_t width, u
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnly, 32);
 
-	// Initialize ImGui renderer
-	CrImGuiRendererInitParams imguiInitParams = {};
-	imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
-	CrImGuiRenderer::GetImGuiRenderer()->Initialize(imguiInitParams);
-
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
+}
+
+void CrFrame::Deinitialize()
+{
+	CrImGuiRenderer::Destroy();
 }
 
 void CrFrame::Process()
@@ -327,7 +334,7 @@ void CrFrame::Process()
 
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
-	CrImGuiRenderer::GetImGuiRenderer()->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
+	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
 	// Set up render graph to start recording passes
 	CrRenderGraphFrameParams frameParams;
@@ -485,7 +492,7 @@ void CrFrame::Process()
 	});
 
 	// Render ImGui
-	CrImGuiRenderer::GetImGuiRenderer()->Render(m_mainRenderGraph, swapchainTexture);
+	CrImGuiRenderer::Get().Render(m_mainRenderGraph, swapchainTexture);
 
 	// Create a render pass that transitions the frame. We need to give the render graph
 	// visibility over what's going to happen with the texture, but not necessarily

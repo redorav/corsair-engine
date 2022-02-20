@@ -86,9 +86,10 @@ void ICrRenderSystem::CreateRenderDevice()
 	// process. It's an unfortunate consequence of the virtual function abstraction
 	RenderSystem->m_mainDevice = CrRenderDeviceSharedHandle(RenderSystem->CreateRenderDevicePS(), [](ICrRenderDevice* renderDevice)
 	{
-		renderDevice->FinalizeDeletionQueue();
+		renderDevice->FinalizeDeletion();
 		delete renderDevice;
 	});
+
 	RenderSystem->m_mainDevice->InitializeDeletionQueue();
 }
 

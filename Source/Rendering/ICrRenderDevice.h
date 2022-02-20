@@ -82,7 +82,7 @@ public:
 
 	void ProcessDeletionQueue();
 
-	void FinalizeDeletionQueue();
+	void FinalizeDeletion();
 
 	//----------------------------
 	// Resource Creation Functions
@@ -215,7 +215,7 @@ protected:
 template<typename Metadata>
 CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
 {
-	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
+	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements), m_gpuDeletionCallback);
 }
 
 inline const CrCommandQueueSharedHandle& ICrRenderDevice::GetMainCommandQueue() const

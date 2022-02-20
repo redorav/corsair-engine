@@ -44,8 +44,10 @@ void ICrRenderDevice::ProcessDeletionQueue()
 	m_gpuDeletionQueue.Process();
 }
 
-void ICrRenderDevice::FinalizeDeletionQueue()
+void ICrRenderDevice::FinalizeDeletion()
 {
+	m_auxiliaryCommandBuffer = nullptr;
+
 	m_gpuDeletionQueue.Finalize();
 }
 
@@ -170,7 +172,7 @@ CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAcces
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 {
-	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements));
+	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements), m_gpuDeletionCallback);
 }
 
 cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds) const

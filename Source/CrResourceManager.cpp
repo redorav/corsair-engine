@@ -64,7 +64,14 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
 	}
 
-	return imageDecoder->Decode(file);
+	if (imageDecoder)
+	{
+		return imageDecoder->Decode(file);
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath& fullPath)

@@ -447,6 +447,12 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	VkResult vkResult = vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not create vkDevice");
 
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::Tessellation]           = m_vkDeviceSupportedFeatures.tessellationShader;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::GeometryShaders]        = m_vkDeviceSupportedFeatures.geometryShader;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionBC]   = m_vkDeviceSupportedFeatures.textureCompressionBC;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionETC]  = m_vkDeviceSupportedFeatures.textureCompressionETC2;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionASTC] = m_vkDeviceSupportedFeatures.textureCompressionASTC_LDR;
+
 	return vkResult;
 }
 

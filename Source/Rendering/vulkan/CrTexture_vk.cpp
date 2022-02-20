@@ -24,30 +24,20 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	//-----------------
 
 	VkImageUsageFlags usageFlags = 0;
-	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	if (IsSwapchain())
+	if (IsDepthStencil())
 	{
-		imageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	}
-	else
+
+	if (IsRenderTarget())
 	{
-		if (IsDepthStencil())
-		{
-			usageFlags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-			imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		}
+		usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	}
 
-		if (IsRenderTarget())
-		{
-			usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-			imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		}
-
-		if (IsUnorderedAccess())
-		{
-			usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
-		}
+	if (IsUnorderedAccess())
+	{
+		usageFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
 	}
 
 	// All textures can be copied from the GPU to the CPU
@@ -256,37 +246,13 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
-			VkBuffer stagingBuffer;
+			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)m_usedGPUMemory);
+			CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = CrSharedPtr<ICrHardwareGPUBuffer>(vulkanRenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor));
+			CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
-			// Create a staging buffer
-			VkBufferCreateInfo stagingBufferCreateInfo = crvk::CreateVkBufferCreateInfo
-			(
-				0, m_usedGPUMemory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-				VK_SHARING_MODE_EXCLUSIVE, 0, nullptr
-			);
-
-			vkResult = vkCreateBuffer(vkDevice, &stagingBufferCreateInfo, nullptr, &stagingBuffer);
-			CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkBuffer");
-
-			VkMemoryRequirements bufferMemoryRequirements;
-			vkGetBufferMemoryRequirements(vkDevice, stagingBuffer, &bufferMemoryRequirements);
-			CrAssert(descriptor.initialDataSize <= bufferMemoryRequirements.size);
-
-			VkMemoryAllocateInfo memAllocInfo = crvk::CreateVkMemoryAllocateInfo(bufferMemoryRequirements.size, vulkanRenderDevice->GetVkMemoryType(bufferMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-
-			VkDeviceMemory stagingMemory;
-			vkResult = vkAllocateMemory(vkDevice, &memAllocInfo, nullptr, &stagingMemory);
-			CrAssert(vkResult == VK_SUCCESS);
-
-			vkResult = vkBindBufferMemory(vkDevice, stagingBuffer, stagingMemory, 0);
-			CrAssert(vkResult == VK_SUCCESS);
-
-			// Copy into buffer
-			void* data;
-			vkResult = vkMapMemory(vkDevice, stagingMemory, 0, bufferMemoryRequirements.size, 0, &data);
-			CrAssert(vkResult == VK_SUCCESS);
+			void* data = stagingBuffer->Lock();
 			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
-			vkUnmapMemory(vkDevice, stagingMemory);
+			stagingBuffer->Unlock();
 
 			// Setup buffer copy regions for each mip level
 			CrVector<VkBufferImageCopy> bufferCopyRegions;
@@ -340,7 +306,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 
 			// Copy mip levels from staging buffer
-			vkCmdCopyBufferToImage(vulkanCmdBuffer->GetVkCommandBuffer(), stagingBuffer, m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+			vkCmdCopyBufferToImage(vulkanCmdBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
 
 			// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
 			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -356,10 +322,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			cmdBuffer->End();
 			cmdBuffer->Submit();
 			renderDevice->GetMainCommandQueue()->WaitIdle();
-
-			// Clean up staging resources
-			vkFreeMemory(vkDevice, stagingMemory, nullptr);
-			vkDestroyBuffer(vkDevice, stagingBuffer, nullptr);
 		}
 		else if (m_usage & cr3d::TextureUsage::CPUReadable)
 		{

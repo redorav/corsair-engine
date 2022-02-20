@@ -144,6 +144,8 @@ public:
 
 	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
 
+	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer() const;
+
 	const CrGPUDeletionCallbackType& GetGPUDeletionCallback() const
 	{
 		return m_gpuDeletionCallback;
@@ -197,6 +199,8 @@ protected:
 
 	CrCommandQueueSharedHandle m_mainCommandQueue;
 
+	CrCommandBufferSharedHandle m_auxiliaryCommandBuffer;
+
 	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
 
 	// The platform-specific code is able to determine whether
@@ -217,4 +221,9 @@ CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer
 inline const CrCommandQueueSharedHandle& ICrRenderDevice::GetMainCommandQueue() const
 {
 	return m_mainCommandQueue;
+}
+
+inline const CrCommandBufferSharedHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer() const
+{
+	return m_auxiliaryCommandBuffer;
 }

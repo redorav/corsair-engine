@@ -187,11 +187,12 @@ void CrRenderGraph::AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStag
 
 void CrRenderGraph::Execute()
 {
+	// Process all passes
 	for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
 	{
 		CrRenderGraphPass* renderGraphPass = &m_logicalPasses[logicalPassId.id];
 
-		// Process textures
+		// Process textures within a pass
 		for (uint32_t textureIndex = 0; textureIndex < renderGraphPass->textureUsages.size(); ++textureIndex)
 		{
 			const CrRenderGraphTextureUsage& textureUsage = renderGraphPass->textureUsages[textureIndex];
@@ -235,7 +236,7 @@ void CrRenderGraph::Execute()
 			m_textureLastUsedPass[texture->id.id] = logicalPassId;
 		}
 
-		// Process buffers
+		// Process buffers within a pass
 		for (uint32_t bufferIndex = 0; bufferIndex < renderGraphPass->bufferUsages.size(); ++bufferIndex)
 		{
 			const CrRenderGraphBufferUsage& bufferUsage = renderGraphPass->bufferUsages[bufferIndex];

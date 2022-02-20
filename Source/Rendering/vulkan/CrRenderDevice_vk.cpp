@@ -73,6 +73,8 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	// 5. Create main command queue. This will take care of the main command buffers and present
 	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
+	m_auxiliaryCommandBuffer = m_mainCommandQueue->CreateCommandBuffer();
+
 	// TODO This is per-device but it's currently global
 	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{

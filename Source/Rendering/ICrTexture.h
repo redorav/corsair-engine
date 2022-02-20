@@ -71,6 +71,8 @@ public:
 
 	uint32_t GetArraySize() const { return m_arraySize; }
 
+	cr3d::TextureState::T GetDefaultState() const { return m_defaultState; }
+
 	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
 	uint32_t GetMipSliceOffset(uint32_t mip, uint32_t slice) const;
@@ -106,6 +108,8 @@ protected:
 	uint32_t m_mipmapCount;
 
 	uint32_t m_usedGPUMemory;
+
+	cr3d::TextureState::T m_defaultState;
 
 	cr3d::TextureUsageFlags m_usage;
 };

@@ -18,6 +18,7 @@ CrTextureDescriptor::CrTextureDescriptor()
 	, type(cr3d::TextureType::Tex2D)
 	, usage(cr3d::TextureUsage::Default)
 	, initialData(nullptr)
+	, initialDataSize(0)
 	, extraData(0)
 	, extraDataPtr(nullptr)
 {
@@ -35,7 +36,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	m_type = descriptor.type;
 	m_sampleCount = descriptor.sampleCount;
 	m_arraySize = descriptor.arraySize;
-
+	
 	switch (descriptor.type)
 	{
 		case cr3d::TextureType::Volume:
@@ -64,6 +65,31 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 
 	m_format = descriptor.format;
 	m_usage = descriptor.usage;
+
+	// This is the state we expect the texture to be in by default, when not being used by
+	// a command buffer or render pass. It is the state the texture decays to after copy
+	// operations if not explicitly declared
+	if (IsRenderTarget())
+	{
+		m_defaultState = cr3d::TextureState::RenderTarget;
+	}
+	else if (IsDepthStencil())
+	{
+		m_defaultState = cr3d::TextureState::DepthStencilWrite;
+	}
+	else if (IsUnorderedAccess())
+	{
+		m_defaultState = cr3d::TextureState::RWTexture;
+	}
+	else if (IsSwapchain())
+	{
+		m_defaultState = cr3d::TextureState::Present;
+	}
+	else
+	{
+		// If none of the states above, assume we want to sample this texture
+		m_defaultState = cr3d::TextureState::ShaderInput;
+	}
 }
 
 uint32_t ICrTexture::GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)

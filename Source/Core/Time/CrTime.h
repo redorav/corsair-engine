@@ -65,8 +65,6 @@ private:
 	int64_t m_ticks = 0;
 };
 
-inline uint64_t CrTime::TicksPerSecond = CrTime::GetTicksPerSecond();
-
 inline int64_t CrTime::AsTicks() const
 {
 	return m_ticks;

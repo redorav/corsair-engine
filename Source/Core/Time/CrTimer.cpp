@@ -1,5 +1,7 @@
 #include "CrTimer.h"
 
+uint64_t CrTime::TicksPerSecond = CrTime::GetTicksPerSecond();
+
 CrTimer::CrTimer(Mode mode)
 {
 	Reset();

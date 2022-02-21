@@ -37,7 +37,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 
 	const CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
-	static_assert(cr3d::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats));
+	static_assert(cr3d::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats), "Array not large enough ");
 
 	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
 	{

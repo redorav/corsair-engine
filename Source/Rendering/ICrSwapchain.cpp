@@ -68,9 +68,9 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 	return AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
 }
 
-void ICrSwapchain::Present(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore)
+void ICrSwapchain::Present(const ICrGPUSemaphore* waitSemaphore)
 {
-	PresentPS(renderDevice, waitSemaphore);
+	PresentPS(waitSemaphore);
 }
 
 const CrTextureSharedHandle& ICrSwapchain::GetTexture(uint32_t index)

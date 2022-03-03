@@ -11,19 +11,13 @@ public:
 
 	~CrSwapchainVulkan();
 
-	virtual void PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore) override;
+	virtual void PresentPS(const ICrGPUSemaphore* waitSemaphore) override;
 
 	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) override;
 
 	VkSwapchainKHR GetVkSwapchain() const;
 
 private:
-
-	VkInstance			m_vkInstance = nullptr;
-
-	VkDevice			m_vkDevice = nullptr;
-
-	VkPhysicalDevice	m_vkPhysicalDevice = nullptr;
 
 	VkSurfaceKHR		m_vkSurface = nullptr;
 

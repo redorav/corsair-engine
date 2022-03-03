@@ -13,9 +13,9 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
-	m_vkInstance = vulkanDevice->GetVkInstance();
-	m_vkDevice = vulkanDevice->GetVkDevice();
-	m_vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
+	VkInstance vkInstance = vulkanDevice->GetVkInstance();
+	VkDevice vkDevice = vulkanDevice->GetVkDevice();
+	VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
 
 	VkResult result;
 
@@ -25,40 +25,40 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.platformHandle;
 	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.platformWindow;
-	result = vkCreateWin32SurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.platformWindow;
-	result = vkCreateAndroidSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateAndroidSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.connection = connection;
 	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.platformWindow;
 	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.platformHandle;
-	result = vkCreateXcbSurfaceKHR(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateXcbSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
 	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
 	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.platformWindow;
-	result = vkCreateViSurfaceNN(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateViSurfaceNN(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
 	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
-	result = vkCreateMacOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateMacOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_IOS_MVK)
 	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
-	result = vkCreateIOSSurfaceMVK(m_vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	result = vkCreateIOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #endif
 
 	CrAssertMsg(result == VK_SUCCESS, "Surface creation failed");
 
 	uint32_t queueFamilyCount;
-	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
+	vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
 
 	// We make an assumption here that Graphics queues can always present. The reason is that
 	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
@@ -66,15 +66,15 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	CrVector<VkBool32> supportsPresent(queueFamilyCount);
 	for (uint32_t i = 0; i < queueFamilyCount; i++)
 	{
-		vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
+		vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
 	}
 
 	// Get list of supported color formats and spaces for the surface (backbuffer)
 	{
 		uint32_t formatCount;
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
 		CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface formats");
 
 		CrAssertMsg(formatCount > 0, "Must have at least one preferred color space");
@@ -107,14 +107,14 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
-	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
+	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
 	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface capabilities");
 
 	uint32_t presentModeCount;
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
 
 	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
+	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
 	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface present modes");
 
 	VkExtent2D swapchainExtent;
@@ -212,20 +212,20 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainInfo.clipped               = true;
 	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
-	result = vkCreateSwapchainKHR(m_vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
+	result = vkCreateSwapchainKHR(vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
 	CrAssertMsg(result == VK_SUCCESS, "Swapchain creation failed");
 
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
 	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
 	if (oldSwapchain != nullptr)
 	{
-		vkDestroySwapchainKHR(m_vkDevice, oldSwapchain, nullptr);
+		vkDestroySwapchainKHR(vkDevice, oldSwapchain, nullptr);
 	}
 
-	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
+	result = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 
 	CrVector<VkImage> images(m_imageCount);
-	result = vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &m_imageCount, images.data());
+	result = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
@@ -247,14 +247,17 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 CrSwapchainVulkan::~CrSwapchainVulkan()
 {
-	vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
+	VkInstance vkInstance = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkInstance();
+	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
-	vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
+	vkDestroySwapchainKHR(vkDevice, m_vkSwapchain, nullptr);
+
+	vkDestroySurfaceKHR(vkInstance, m_vkSurface, nullptr);
 }
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
 {
-	VkResult res = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
+	VkResult res = vkAcquireNextImageKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSwapchain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
 
 	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
 	{
@@ -264,7 +267,7 @@ CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* s
 	return CrSwapchainResult::Success;
 }
 
-void CrSwapchainVulkan::PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore)
+void CrSwapchainVulkan::PresentPS(const ICrGPUSemaphore* waitSemaphore)
 {
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -279,5 +282,5 @@ void CrSwapchainVulkan::PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSem
 		presentInfo.waitSemaphoreCount = 1;
 	}
 
-	vkQueuePresentKHR(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkQueue(CrCommandQueueType::Graphics), &presentInfo);
+	vkQueuePresentKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkQueue(CrCommandQueueType::Graphics), &presentInfo);
 }

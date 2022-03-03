@@ -86,8 +86,6 @@ private:
 
 	CrVector<VkFramebuffer> m_usedFramebuffers;
 
-	VkDevice m_vkDevice;
-
 	VkCommandBuffer m_vkCommandBuffer;
 
 	VkDescriptorPool m_vkDescriptorPool;

@@ -14,7 +14,7 @@
 CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, CrCommandQueueType::T queueType)
 	: ICrCommandBuffer(vulkanRenderDevice, queueType)
 {
-	m_vkDevice = vulkanRenderDevice->GetVkDevice();
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
 	CrArray<VkDescriptorPoolSize, 4> typeCounts;
@@ -48,7 +48,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 
 	VkResult result = VK_SUCCESS;
 		
-	result = vkCreateDescriptorPool(m_vkDevice, &descriptorPoolInfo, nullptr, &m_vkDescriptorPool);
+	result = vkCreateDescriptorPool(vkDevice, &descriptorPoolInfo, nullptr, &m_vkDescriptorPool);
 	CrAssert(result == VK_SUCCESS);
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
@@ -57,7 +57,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1;
 
-	result = vkAllocateCommandBuffers(m_vkDevice, &commandBufferAllocateInfo, &m_vkCommandBuffer);
+	result = vkAllocateCommandBuffers(vkDevice, &commandBufferAllocateInfo, &m_vkCommandBuffer);
 	CrAssert(result == VK_SUCCESS);
 
 	// Set up render pass allocation resources. Each command buffer manages their own render passes
@@ -91,9 +91,11 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
 {
-	vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 
-	vkFreeCommandBuffers(m_vkDevice, static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkCommandPool(m_queueType), 1, &m_vkCommandBuffer);
+	vkDestroyDescriptorPool(vulkanRenderDevice->GetVkDevice(), m_vkDescriptorPool, nullptr);
+
+	vkFreeCommandBuffers(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkCommandPool(m_queueType), 1, &m_vkCommandBuffer);
 }
 
 // TODO This should become CreateShaderResourceTable and should be cached, reused, etc
@@ -104,6 +106,8 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 void CrCommandBufferVulkan::UpdateResourceTableVulkan
 (const CrShaderBindingLayoutVulkan& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout)
 {
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
 	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -113,7 +117,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	descriptorSetAllocInfo.pSetLayouts = &bindingLayout.m_vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
-	VkResult result = vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocInfo, &descriptorSet);
+	VkResult result = vkAllocateDescriptorSets(vulkanRenderDevice->GetVkDevice(), &descriptorSetAllocInfo, &descriptorSet);
 	CrAssert(result == VK_SUCCESS);
 
 	// 2. Get current resources and update the descriptor set
@@ -250,7 +254,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	CrAssert(descriptorCount < writeDescriptorSets.size());
 
-	vkUpdateDescriptorSets(m_vkDevice, descriptorCount, writeDescriptorSets.data(), 0, nullptr);
+	vkUpdateDescriptorSets(vulkanRenderDevice->GetVkDevice(), descriptorCount, writeDescriptorSets.data(), 0, nullptr);
 
 	// Bind descriptor sets describing shader binding points
 	// TODO We need an abstraction of a resource table, so that we can build it somewhere else, and simply bind it when we need to
@@ -374,6 +378,8 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
+	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
+
 	// Always process buffers and textures
 	FlushImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
 
@@ -438,7 +444,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 		renderPassInfo.pDependencies   = nullptr;
 
 		VkRenderPass& vkRenderPass = m_usedRenderPasses.push_back();
-		VkResult vkResult = vkCreateRenderPass(m_vkDevice, &renderPassInfo, &m_renderPassAllocationCallbacks, &vkRenderPass);
+		VkResult vkResult = vkCreateRenderPass(vkDevice, &renderPassInfo, &m_renderPassAllocationCallbacks, &vkRenderPass);
 		CrAssert(vkResult == VK_SUCCESS);
 
 		uint32_t width = !renderPassDescriptor.color.empty() ? renderPassDescriptor.color[0].texture->GetWidth() : renderPassDescriptor.depth.texture->GetWidth();
@@ -452,7 +458,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 		};
 
 		VkFramebuffer vkFramebuffer;
-		vkResult = vkCreateFramebuffer(m_vkDevice, &frameBufferCreateInfo, &m_renderPassAllocationCallbacks, &vkFramebuffer);
+		vkResult = vkCreateFramebuffer(vkDevice, &frameBufferCreateInfo, &m_renderPassAllocationCallbacks, &vkFramebuffer);
 		CrAssert(vkResult == VK_SUCCESS);
 
 		// Create render pass begin parameters
@@ -650,9 +656,11 @@ void CrCommandBufferVulkan::BeginPS()
 {
 	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called Begin() on a null command buffer");
 
+	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
+
 	// Reset the descriptor pool on a Begin(). The same command buffer can never be used more than once per frame, so resetting here makes sense. All resources are sent
 	// back to the descriptor pool. Beware that the validation layer has a memory leak: https://github.com/KhronosGroup/Vulkan-ValidationLayers/issues/236
-	vkResetDescriptorPool(m_vkDevice, m_vkDescriptorPool, 0);
+	vkResetDescriptorPool(vkDevice, m_vkDescriptorPool, 0);
 
 	VkCommandBufferBeginInfo commandBufferInfo;
 	commandBufferInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -664,12 +672,12 @@ void CrCommandBufferVulkan::BeginPS()
 	{
 		for (VkRenderPass pass : m_usedRenderPasses)
 		{
-			vkDestroyRenderPass(m_vkDevice, pass, &m_renderPassAllocationCallbacks);
+			vkDestroyRenderPass(vkDevice, pass, &m_renderPassAllocationCallbacks);
 		}
 
 		for (VkFramebuffer framebuffer : m_usedFramebuffers)
 		{
-			vkDestroyFramebuffer(m_vkDevice, framebuffer, &m_renderPassAllocationCallbacks);
+			vkDestroyFramebuffer(vkDevice, framebuffer, &m_renderPassAllocationCallbacks);
 		}
 	}
 

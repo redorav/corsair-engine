@@ -20,7 +20,7 @@ class ICrCommandBuffer : public CrGPUDeletable
 {
 public:
 
-	ICrCommandBuffer(ICrCommandQueue* commandQueue);
+	ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType);
 
 	virtual ~ICrCommandBuffer();
 
@@ -109,8 +109,6 @@ public:
 	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
 
 	void EndRenderPass();
-
-	const ICrCommandQueue* GetCommandQueue() const;
 
 	const CrGPUSemaphoreSharedHandle& GetCompletionSemaphore() const;
 
@@ -252,8 +250,6 @@ protected:
 
 	ICrRenderDevice*				m_renderDevice = nullptr;
 
-	ICrCommandQueue*				m_ownerCommandQueue = nullptr;
-
 	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
 
 	CrUniquePtr<CrGPUStackAllocator> m_vertexBufferGPUStack;
@@ -265,6 +261,8 @@ protected:
 
 	// Signal fence when execution completes
 	CrGPUFenceSharedHandle			m_completionFence;
+
+	CrCommandQueueType::T			m_queueType;
 
 	bool							m_submitted;
 };
@@ -424,11 +422,6 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
 {
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
-}
-
-inline const ICrCommandQueue* ICrCommandBuffer::GetCommandQueue() const
-{
-	return m_ownerCommandQueue;
 }
 
 inline const CrGPUSemaphoreSharedHandle& ICrCommandBuffer::GetCompletionSemaphore() const

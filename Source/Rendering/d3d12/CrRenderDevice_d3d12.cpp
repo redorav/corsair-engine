@@ -3,7 +3,6 @@
 #include "CrRenderSystem_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
 
-#include "CrCommandQueue_d3d12.h"
 #include "CrCommandBuffer_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
@@ -56,7 +55,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12CommandQueue));
+	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12GraphicsCommandQueue));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating command queue");
 
 	ID3D12InfoQueue* d3d12InfoQueue = NULL;
@@ -107,9 +106,9 @@ CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 
 }
 
-ICrCommandQueue* CrRenderDeviceD3D12::CreateCommandQueuePS(CrCommandQueueType::T type)
+ICrCommandBuffer* CrRenderDeviceD3D12::CreateCommandBufferPS(CrCommandQueueType::T type)
 {
-	return new CrCommandQueueD3D12(this, type);
+	return new CrCommandBufferD3D12(this, type);
 }
 
 ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()
@@ -189,6 +188,13 @@ cr3d::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fe
 	return cr3d::GPUFenceResult::Success;
 }
 
+void CrRenderDeviceD3D12::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+{
+	CrAssertMsg(true, "Not implemented");
+	unused_parameter(queueType);
+	unused_parameter(signalFence);
+}
+
 void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
 {
 	CrAssertMsg(true, "Not implemented");
@@ -198,4 +204,13 @@ void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
 void CrRenderDeviceD3D12::WaitIdlePS()
 {
 	CrAssertMsg(true, "Not implemented");
+}
+
+void CrRenderDeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+{
+	CrAssertMsg(true, "Not implemented");
+	unused_parameter(commandBuffer);
+	unused_parameter(waitSemaphore);
+	unused_parameter(signalSemaphore);
+	unused_parameter(signalFence);
 }

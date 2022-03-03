@@ -11,7 +11,6 @@
 #include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"
-#include "Rendering/ICrCommandQueue.h"
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/UI/CrImGuiRenderer.h"
@@ -320,7 +319,6 @@ void CrFrame::Deinitialize()
 void CrFrame::Process()
 {
 	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
-	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
@@ -516,7 +514,7 @@ void CrFrame::Process()
 
 	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
 
-	m_swapchain->Present(mainCommandQueue.get(), drawCommandBuffer->GetCompletionSemaphore().get());
+	m_swapchain->Present(renderDevice.get(), drawCommandBuffer->GetCompletionSemaphore().get());
 
 	m_renderWorld->EndRendering();
 
@@ -664,7 +662,6 @@ void CrFrame::UpdateCamera()
 void CrFrame::RecreateSwapchainAndRenderTargets()
 {
 	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
-	const CrCommandQueueSharedHandle& mainCommandQueue = renderDevice->GetMainCommandQueue();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
@@ -708,7 +705,7 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{
-		m_drawCmdBuffers[i] = mainCommandQueue->CreateCommandBuffer();
+		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(CrCommandQueueType::Graphics);
 	}
 
 	// Make sure all of this work is finished

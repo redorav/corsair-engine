@@ -1,6 +1,5 @@
 #include "CrRendering_pch.h"
 
-#include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrRenderDevice_vk.h"
 #include "CrTexture_vk.h"
@@ -12,12 +11,10 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
-	: ICrCommandBuffer(commandQueue)
+CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, CrCommandQueueType::T queueType)
+	: ICrCommandBuffer(vulkanRenderDevice, queueType)
 {
-	// Command buffer device same as command queue device
-	CrCommandQueueVulkan* vulkanCommandQueue = static_cast<CrCommandQueueVulkan*>(commandQueue);
-	m_vkDevice = vulkanCommandQueue->GetVkDevice();
+	m_vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
 	CrArray<VkDescriptorPoolSize, 4> typeCounts;
@@ -56,7 +53,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = vulkanCommandQueue->GetVkCommandBufferPool();
+	commandBufferAllocateInfo.commandPool = vulkanRenderDevice->GetVkCommandPool(queueType);
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1;
 
@@ -94,11 +91,9 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(ICrCommandQueue* commandQueue)
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
 {
-	CrCommandQueueVulkan* vulkanCommandQueue = static_cast<CrCommandQueueVulkan*>(m_ownerCommandQueue);
-
 	vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
 
-	vkFreeCommandBuffers(m_vkDevice, vulkanCommandQueue->GetVkCommandBufferPool(), 1, &m_vkCommandBuffer);
+	vkFreeCommandBuffers(m_vkDevice, static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkCommandPool(m_queueType), 1, &m_vkCommandBuffer);
 }
 
 // TODO This should become CreateShaderResourceTable and should be cached, reused, etc

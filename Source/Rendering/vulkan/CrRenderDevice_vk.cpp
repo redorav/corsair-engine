@@ -3,7 +3,6 @@
 #include "CrRenderSystem_vk.h"
 #include "CrRenderDevice_vk.h"
 
-#include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
@@ -71,9 +70,20 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
 
 	// 5. Create main command queue. This will take care of the main command buffers and present
-	m_mainCommandQueue = CreateCommandQueue(CrCommandQueueType::Graphics);
 
-	m_auxiliaryCommandBuffer = m_mainCommandQueue->CreateCommandBuffer();
+	// TODO Rework the queue indices
+	uint32_t commandQueueIndex = ReserveVkQueueIndex();
+	vkGetDeviceQueue(m_vkDevice, GetVkQueueFamilyIndex(), commandQueueIndex, &m_vkGraphicsQueue);
+
+	// Create a command pool from which the queue can allocate command buffers
+	VkCommandPoolCreateInfo cmdPoolInfo = {};
+	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	cmdPoolInfo.queueFamilyIndex = GetVkQueueFamilyIndex();
+	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO Transient or Reset? Check Metal and DX12
+	VkResult vkResult = vkCreateCommandPool(m_vkDevice, &cmdPoolInfo, nullptr, &m_vkGraphicsCommandPool);
+	CrAssert(vkResult == VK_SUCCESS);
+
+	m_auxiliaryCommandBuffer = CreateCommandBuffer(CrCommandQueueType::Graphics);
 
 	// TODO This is per-device but it's currently global
 	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
@@ -109,8 +119,8 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 		}
 	}
 
-	VkResult result = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
-	CrAssertMsg(result == VK_SUCCESS, "Failed to create pipeline cache");
+	vkResult = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline cache");
 }
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
@@ -151,6 +161,15 @@ cr3d::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* f
 	}
 }
 
+void CrRenderDeviceVulkan::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+{
+	CrAssert(signalFence != nullptr);
+
+	unused_parameter(queueType); // TODO Handle other queues
+	VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(signalFence)->GetVkFence());
+	CrAssert(result == VK_SUCCESS);
+}
+
 void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
 {
 	vkResetFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
@@ -159,6 +178,33 @@ void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
 void CrRenderDeviceVulkan::WaitIdlePS()
 {
 	vkDeviceWaitIdle(m_vkDevice);
+}
+
+void CrRenderDeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+{
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+
+	VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT; // TODO Need more control over this, probably best to put inside the semaphore object
+
+	if (waitSemaphore)
+	{
+		submitInfo.pWaitSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitDstStageMask = &waitStageMask;
+	}
+
+	if (signalSemaphore)
+	{
+		submitInfo.pSignalSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
+		submitInfo.signalSemaphoreCount = 1;
+	}
+
+	submitInfo.pCommandBuffers = &static_cast<const CrCommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer();
+
+	VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 1, &submitInfo, signalFence ? static_cast<const CrGPUFenceVulkan*>(signalFence)->GetVkFence() : nullptr);
+	CrAssert(result == VK_SUCCESS);
 }
 
 VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
@@ -274,9 +320,9 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	return result;
 }
 
-ICrCommandQueue* CrRenderDeviceVulkan::CreateCommandQueuePS(CrCommandQueueType::T type)
+ICrCommandBuffer* CrRenderDeviceVulkan::CreateCommandBufferPS(CrCommandQueueType::T type)
 {
-	return new CrCommandQueueVulkan(this, type);
+	return new CrCommandBufferVulkan(this, type);
 }
 
 ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()
@@ -356,7 +402,7 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 
 	// Select appropriate queues that can ideally do graphics, compute and copy. Some graphics hardware can have multiple queue types.
 	// We also create the logical device with the information of how many queues of a type we want. We create them up front and we retrieve
-	// them later via CreateCommandQueue(). This is different to what DX12/Metal do in that we need to allocate them ourselves up front.
+	// them later. This is different to what DX12/Metal do in that we need to allocate them ourselves up front.
 	uint32_t queueFamilyCount;
 	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
 
@@ -418,10 +464,8 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		enabledDeviceExtensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
 	}
 
-	// We allocate queues up front, which are later retrieved via CreateCommandQueues. We don't really
-	// allocate command queues on demand, we have them cached within the device at creation time. This
-	// scheme is a bit inflexible, and it means that the CrCommandQueue needs to relay this information
-	// back to the render device.
+	// We allocate queues up front, which are later retrieved. We don't really allocate command queues
+	// on demand, we have them cached within the device at creation time
 	CrVector<float> queuePriorities(m_maxCommandQueues);
 	VkDeviceQueueCreateInfo queueCreateInfo = {};
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -505,6 +549,28 @@ uint32_t CrRenderDeviceVulkan::GetVkQueueFamilyIndex() const
 {
 	// TODO Need to return an index based on type of queue, capabilities, etc.
 	return m_commandQueueFamilyIndex;
+}
+
+VkQueue CrRenderDeviceVulkan::GetVkQueue(CrCommandQueueType::T queueType) const
+{
+	CrAssertMsg(queueType == CrCommandQueueType::Graphics, "Graphics queue not implemented");
+
+	switch (queueType)
+	{
+		case CrCommandQueueType::Graphics: return m_vkGraphicsQueue;
+		default: return m_vkGraphicsQueue;
+	}
+}
+
+VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queueType) const
+{
+	CrAssertMsg(queueType == CrCommandQueueType::Graphics, "Graphics queue not implemented");
+
+	switch (queueType)
+	{
+		case CrCommandQueueType::Graphics: return m_vkGraphicsCommandPool;
+		default: return m_vkGraphicsCommandPool;
+	}
 }
 
 void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const CrFixedString128& name) const

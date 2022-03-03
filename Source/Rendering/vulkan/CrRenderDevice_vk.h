@@ -37,11 +37,15 @@ public:
 
 	uint32_t GetVkQueueFamilyIndex() const;
 
+	VkQueue GetVkQueue(CrCommandQueueType::T queueType) const;
+
+	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
+
 	void SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const CrFixedString128& name) const;
 
 private:
 
-	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) override;
+	virtual ICrCommandBuffer* CreateCommandBufferPS(CrCommandQueueType::T type) override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 
@@ -69,10 +73,17 @@ private:
 
 	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
 
+	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
+
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;
 
 	virtual void WaitIdlePS() override;
 
+	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
+
+	virtual CrSharedPtr<ICrHardwareGPUBuffer> DownloadTextureImmediatePS(const ICrTexture* texture, uint32_t mip, uint32_t slice) override;
+
+	virtual void UploadTextureImmediatePS(const ICrHardwareGPUBuffer* stagingBuffer, const ICrTexture* texture) override;
 
 	void RetrieveQueueFamilies();
 
@@ -119,4 +130,7 @@ private:
 	uint32_t m_maxCommandQueues = 0;
 	uint32_t m_commandQueueFamilyIndex = 0; // Index of the queue out of the available ones for our hardware
 	uint32_t m_numCommandQueues;
+
+	VkQueue m_vkGraphicsQueue;
+	VkCommandPool m_vkGraphicsCommandPool;
 };

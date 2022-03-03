@@ -1,7 +1,6 @@
 #include "CrRendering_pch.h"
 
 #include "CrSwapchain_vk.h"
-#include "CrCommandQueue_vk.h"
 #include "CrTexture_vk.h"
 #include "CrRenderDevice_vk.h"
 #include "CrGPUSynchronization_vk.h"
@@ -265,7 +264,7 @@ CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* s
 	return CrSwapchainResult::Success;
 }
 
-void CrSwapchainVulkan::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
+void CrSwapchainVulkan::PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore)
 {
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -280,5 +279,5 @@ void CrSwapchainVulkan::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore*
 		presentInfo.waitSemaphoreCount = 1;
 	}
 
-	vkQueuePresentKHR(static_cast<CrCommandQueueVulkan*>(queue)->GetVkQueue(), &presentInfo);
+	vkQueuePresentKHR(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkQueue(CrCommandQueueType::Graphics), &presentInfo);
 }

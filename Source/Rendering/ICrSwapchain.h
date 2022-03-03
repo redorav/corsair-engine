@@ -48,13 +48,13 @@ public:
 
 	CrSwapchainResult AcquireNextImage(uint64_t timeoutNanoseconds = UINT64_MAX);
 
-	void Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore);
+	void Present(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore);
 
 	const CrTextureSharedHandle& GetTexture(uint32_t index);
 
 protected:
 
-	virtual void PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore) = 0;
+	virtual void PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore) = 0;
 
 	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 

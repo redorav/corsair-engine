@@ -22,7 +22,7 @@ public:
 
 	// This command queue isn't really used for anything other than to build the swapchain and do other tasks
 	// that the device used to do but now requires a queue. Don't use for actual rendering
-	ID3D12CommandQueue* GetD3DDirectCommandQueue() const { return m_d3d12CommandQueue; }
+	ID3D12CommandQueue* GetD3DDirectCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
 
 	crd3d::DescriptorD3D12 AllocateRTVDescriptor();
 
@@ -38,7 +38,7 @@ public:
 
 private:
 
-	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) override;
+	virtual ICrCommandBuffer* CreateCommandBufferPS(CrCommandQueueType::T type) override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 
@@ -66,9 +66,13 @@ private:
 
 	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
 
+	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
+
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;
 
 	virtual void WaitIdlePS() override;
+
+	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
 	// Heap for Render Target Views
 	CrDescriptorPoolD3D12 m_d3d12RTVHeap;
@@ -79,7 +83,7 @@ private:
 	// Non-shader visible heap for Samplers
 	CrDescriptorPoolD3D12 m_d3d12SamplerHeap;
 
-	ID3D12CommandQueue* m_d3d12CommandQueue;
+	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue;
 
 	// This is effectively the physical device
 	IDXGIAdapter1* m_dxgiAdapter;

@@ -68,10 +68,9 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 	return AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
 }
 
-void ICrSwapchain::Present(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
+void ICrSwapchain::Present(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore)
 {
-	CrAssertMsg(queue != nullptr, "Must have a command queue to present");
-	PresentPS(queue, waitSemaphore);
+	PresentPS(renderDevice, waitSemaphore);
 }
 
 const CrTextureSharedHandle& ICrSwapchain::GetTexture(uint32_t index)

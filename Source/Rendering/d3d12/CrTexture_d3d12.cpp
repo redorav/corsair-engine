@@ -1,6 +1,5 @@
 #include "CrRendering_pch.h"
 
-#include "CrCommandQueue_d3d12.h"
 #include "CrCommandBuffer_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrRenderDevice_d3d12.h"

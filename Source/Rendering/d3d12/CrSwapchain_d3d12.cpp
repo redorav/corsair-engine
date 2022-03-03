@@ -2,7 +2,6 @@
 
 #include "CrRenderSystem_d3d12.h"
 #include "CrSwapchain_d3d12.h"
-#include "CrCommandQueue_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
 #include "CrGPUSynchronization_d3d12.h"
@@ -79,8 +78,8 @@ CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(const ICrGPUSemaphore* si
 	return CrSwapchainResult::Success;
 }
 
-void CrSwapchainD3D12::PresentPS(ICrCommandQueue* queue, const ICrGPUSemaphore* waitSemaphore)
+void CrSwapchainD3D12::PresentPS(ICrRenderDevice* renderDevice, const ICrGPUSemaphore* waitSemaphore)
 {
-	unused_parameter(queue);
+	unused_parameter(renderDevice);
 	unused_parameter(waitSemaphore);
 }

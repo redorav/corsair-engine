@@ -91,7 +91,7 @@ public:
 	// Resource Creation Functions
 	//----------------------------
 
-	CrCommandQueueSharedHandle CreateCommandQueue(CrCommandQueueType::T type);
+	CrCommandBufferSharedHandle CreateCommandBuffer(CrCommandQueueType::T type);
 
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -132,6 +132,8 @@ public:
 
 	cr3d::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
 
+	void SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence);
+
 	void ResetFence(ICrGPUFence* fence);
 
 	// Wait until all operations on all queues have completed
@@ -143,7 +145,8 @@ public:
 
 	const CrRenderDeviceProperties& GetProperties() const;
 
-	const CrCommandQueueSharedHandle& GetMainCommandQueue() const;
+
+	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
 	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer() const;
 
@@ -154,7 +157,7 @@ public:
 
 protected:
 
-	virtual ICrCommandQueue* CreateCommandQueuePS(CrCommandQueueType::T type) = 0;
+	virtual ICrCommandBuffer* CreateCommandBufferPS(CrCommandQueueType::T type) = 0;
 
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 
@@ -178,14 +181,19 @@ protected:
 	
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
 
+	// Synchronization
+
 	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const = 0;
 
 	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
 
-	virtual void WaitIdlePS() = 0;
+	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
+	virtual void WaitIdlePS() = 0;
+
+	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
 	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 
 	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
@@ -197,8 +205,6 @@ protected:
 	const ICrRenderSystem* m_renderSystem;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
-
-	CrCommandQueueSharedHandle m_mainCommandQueue;
 
 	CrCommandBufferSharedHandle m_auxiliaryCommandBuffer;
 

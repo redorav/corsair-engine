@@ -1,6 +1,5 @@
 #include "CrRendering_pch.h"
 
-#include "ICrCommandQueue.h"
 #include "ICrCommandBuffer.h"
 #include "ICrRenderDevice.h"
 #include "ICrPipeline.h"
@@ -11,14 +10,10 @@
 
 #include "Core/CrMacros.h"
 
-ICrCommandBuffer::ICrCommandBuffer(ICrCommandQueue* commandQueue)
+ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType)
+	: m_renderDevice(renderDevice)
+	, m_queueType(queueType)
 {
-	// Set the owner. The command buffer needs to know its owner to be able to assert deletion later (Vulkan and DX12 have the concept
-	// of a command buffer pool and it needs to point to this pool)
-	m_ownerCommandQueue = commandQueue;
-
-	m_renderDevice = commandQueue->GetRenderDevice();
-
 	// Initialize GPU buffer stack allocators - for streaming
 	// TODO it is possible to create these lazily on allocation instead
 	// to avoid having every command buffer allocate these if they
@@ -86,7 +81,7 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 	m_submitted = true;
 
 	// Submission will signal the internal semaphore of this command buffer
-	m_ownerCommandQueue->SubmitCommandBuffer(this, waitSemaphore, m_completionSemaphore.get(), m_completionFence.get());
+	m_renderDevice->SubmitCommandBuffer(this, waitSemaphore, m_completionSemaphore.get(), m_completionFence.get());
 }
 
 CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size)

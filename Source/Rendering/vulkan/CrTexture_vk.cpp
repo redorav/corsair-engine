@@ -1,6 +1,5 @@
 #include "CrRendering_pch.h"
 
-#include "CrCommandQueue_vk.h"
 #include "CrCommandBuffer_vk.h"
 #include "CrTexture_vk.h"
 #include "CrRenderDevice_vk.h"
@@ -251,80 +250,82 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		{
 			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)m_usedGPUMemory);
 			CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = CrSharedPtr<ICrHardwareGPUBuffer>(vulkanRenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor));
-			CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
+			//CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 			void* data = stagingBuffer->Lock();
 			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
 			stagingBuffer->Unlock();
 
-			// Setup buffer copy regions for each mip level
-			CrVector<VkBufferImageCopy> bufferCopyRegions;
+			renderDevice->UploadTextureImmediate(stagingBuffer.get(), this);
 
-			for (uint32_t mip = 0; mip < m_mipmapCount; mip++)
-			{
-				VkBufferImageCopy bufferCopyRegion;
-				bufferCopyRegion.imageSubresource.aspectMask = m_vkAspectMask;
-				bufferCopyRegion.imageSubresource.mipLevel = mip;
-				bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
-				bufferCopyRegion.imageSubresource.layerCount = m_arraySize;
-				bufferCopyRegion.imageExtent = { CrMax(m_width >> mip, 1u), CrMax(m_height >> mip, 1u), CrMax(m_depth >> mip, 1u) };
-				bufferCopyRegion.imageOffset = { 0, 0, 0 };
-
-				// TODO Fix this is dds-specific
-				bufferCopyRegion.bufferOffset = GetMipSliceOffset(mip, 0);
-				bufferCopyRegion.bufferRowLength = 0;
-				bufferCopyRegion.bufferImageHeight = 0;
-				bufferCopyRegions.push_back(bufferCopyRegion);
-			}
-
-			VkImageSubresourceRange subresourceRange;
-			subresourceRange.aspectMask = m_vkAspectMask;
-			subresourceRange.baseMipLevel = 0;
-			subresourceRange.levelCount = m_mipmapCount;
-			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = m_arraySize; // TODO
-
-			// TODO Rework how this all works. We shouldn't be stalling here or creating new command buffers.
-			// However, changing this requires more framework to be in place
-			CrCommandBufferSharedHandle cmdBuffer = renderDevice->GetAuxiliaryCommandBuffer();
-			CrCommandBufferVulkan* vulkanCmdBuffer = static_cast<CrCommandBufferVulkan*>(cmdBuffer.get());
-			vulkanCmdBuffer->Begin();
-			{
-				// Transition the texture image layout to transfer target, so we can safely copy our buffer data to it.
-				VkImageMemoryBarrier imageMemoryBarrier;
-				imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-				imageMemoryBarrier.pNext = nullptr;
-				imageMemoryBarrier.image = m_vkImage;
-				imageMemoryBarrier.subresourceRange = subresourceRange;
-				imageMemoryBarrier.srcAccessMask = 0;
-				imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-				imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-				imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-				imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-				// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-				// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
-				// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-				vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
-
-				// Copy mip levels from staging buffer
-				vkCmdCopyBufferToImage(vulkanCmdBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
-
-				// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
-				imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-				imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-				imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-				// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-				// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-				// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
-				vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
-			}
-			vulkanCmdBuffer->End();
-			vulkanCmdBuffer->Submit();
-			renderDevice->GetMainCommandQueue()->WaitIdle();
+			// // TODO Rework how this all works. We shouldn't be stalling here or creating new command buffers.
+			// // However, changing this requires more framework to be in place
+			// CrCommandBufferSharedHandle cmdBuffer = renderDevice->GetAuxiliaryCommandBuffer();
+			// CrCommandBufferVulkan* vulkanCmdBuffer = static_cast<CrCommandBufferVulkan*>(cmdBuffer.get());
+			// vulkanCmdBuffer->Begin();
+			// {
+			// 	VkImageSubresourceRange subresourceRange;
+			// 	subresourceRange.aspectMask     = m_vkAspectMask;
+			// 	subresourceRange.baseMipLevel   = 0;
+			// 	subresourceRange.levelCount     = m_mipmapCount;
+			// 	subresourceRange.baseArrayLayer = 0;
+			// 	subresourceRange.layerCount     = m_arraySize; // TODO
+			// 
+			// 	// Transition the texture image layout to transfer target, so we can safely copy our buffer data to it.
+			// 	VkImageMemoryBarrier imageMemoryBarrier;
+			// 	imageMemoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			// 	imageMemoryBarrier.pNext               = nullptr;
+			// 	imageMemoryBarrier.image               = m_vkImage;
+			// 	imageMemoryBarrier.subresourceRange    = subresourceRange;
+			// 	imageMemoryBarrier.srcAccessMask       = 0;
+			// 	imageMemoryBarrier.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+			// 	imageMemoryBarrier.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+			// 	imageMemoryBarrier.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			// 	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// 
+			// 	// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// 	// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
+			// 	// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			// 	vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+			// 
+			// 	// Setup buffer copy regions for each mip level
+			// 	CrVector<VkBufferImageCopy> bufferCopyRegions;
+			// 
+			// 	for (uint32_t mip = 0; mip < m_mipmapCount; mip++)
+			// 	{
+			// 		VkBufferImageCopy bufferCopyRegion;
+			// 		bufferCopyRegion.imageSubresource.aspectMask = m_vkAspectMask;
+			// 		bufferCopyRegion.imageSubresource.mipLevel = mip;
+			// 		bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+			// 		bufferCopyRegion.imageSubresource.layerCount = m_arraySize;
+			// 		bufferCopyRegion.imageExtent = { CrMax(m_width >> mip, 1u), CrMax(m_height >> mip, 1u), CrMax(m_depth >> mip, 1u) };
+			// 		bufferCopyRegion.imageOffset = { 0, 0, 0 };
+			// 
+			// 		// TODO Fix this is dds-specific
+			// 		bufferCopyRegion.bufferOffset = GetMipSliceOffset(mip, 0);
+			// 		bufferCopyRegion.bufferRowLength = 0;
+			// 		bufferCopyRegion.bufferImageHeight = 0;
+			// 		bufferCopyRegions.push_back(bufferCopyRegion);
+			// 	}
+			// 
+			// 	// Copy mip levels from staging buffer
+			// 	vkCmdCopyBufferToImage(vulkanCmdBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+			// 
+			// 	// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
+			// 	imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			// 	imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			// 	imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			// 	imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			// 
+			// 	// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// 	// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			// 	// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+			// 	vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+			// }
+			// vulkanCmdBuffer->End();
+			// vulkanCmdBuffer->Submit();
+			// renderDevice->GetMainCommandQueue()->WaitIdle();
 		}
 		else if (m_usage & cr3d::TextureUsage::CPUReadable)
 		{

@@ -1025,3 +1025,24 @@ enum class CrRenderTargetStoreOp
 {
 	Store, DontCare
 };
+
+namespace CrCommandQueueType
+{
+	// Queues are each a subset of the other
+	//  ______________
+	// |   Graphics   |
+	// |  __________  |
+	// | |  Compute | |
+	// | |  ______  | |
+	// | | | Copy | | |
+	// | | |______| | |
+	// | |__________| |
+	// |______________|
+
+	enum T : uint32_t
+	{
+		Graphics,
+		Compute,
+		Copy
+	};
+};

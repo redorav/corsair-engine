@@ -1,6 +1,5 @@
 #include "CrRendering_pch.h"
 
-#include "CrCommandQueue_d3d12.h"
 #include "CrCommandBuffer_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
 #include "CrTexture_d3d12.h"
@@ -8,14 +7,12 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrCommandBufferD3D12::CrCommandBufferD3D12(ICrCommandQueue* commandQueue)
-	: ICrCommandBuffer(commandQueue)
+CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType)
+	: ICrCommandBuffer(renderDevice, queueType)
 {
-	ICrRenderDevice* renderDevice = commandQueue->GetRenderDevice();
-
 	m_d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
 
-	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(commandQueue->GetType());
+	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(queueType);
 
 	m_d3d12Device->CreateCommandAllocator(d3dc12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator));
 

@@ -23,7 +23,7 @@ class CrCommandBufferVulkan final : public ICrCommandBuffer
 {
 public:
 
-	CrCommandBufferVulkan(ICrCommandQueue* commandQueue);
+	CrCommandBufferVulkan(CrRenderDeviceVulkan* renderDevice, CrCommandQueueType::T queueType);
 
 	virtual ~CrCommandBufferVulkan() override;
 

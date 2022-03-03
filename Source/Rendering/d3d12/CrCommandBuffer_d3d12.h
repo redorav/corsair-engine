@@ -17,7 +17,7 @@ class CrCommandBufferD3D12 final : public ICrCommandBuffer
 {
 public:
 
-	CrCommandBufferD3D12(ICrCommandQueue* commandQueue);
+	CrCommandBufferD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType);
 
 private:
 

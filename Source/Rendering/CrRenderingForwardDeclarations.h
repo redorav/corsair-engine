@@ -36,6 +36,8 @@ class ICrRenderSystem;
 class ICrRenderDevice;
 using CrRenderDeviceSharedHandle = CrSharedPtr<ICrRenderDevice>;
 
+namespace CrCommandQueueType { enum T : uint32_t; }
+
 class ICrTexture;
 using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
 struct CrTextureDescriptor;

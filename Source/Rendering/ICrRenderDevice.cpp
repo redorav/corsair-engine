@@ -2,7 +2,7 @@
 
 #include "ICrRenderSystem.h"
 #include "ICrRenderDevice.h"
-#include "ICrCommandQueue.h"
+#include "ICrCommandBuffer.h"
 #include "ICrSwapchain.h"
 #include "ICrSampler.h"
 #include "ICrTexture.h"
@@ -51,9 +51,9 @@ void ICrRenderDevice::FinalizeDeletion()
 	m_gpuDeletionQueue.Finalize();
 }
 
-CrCommandQueueSharedHandle ICrRenderDevice::CreateCommandQueue(CrCommandQueueType::T type)
+CrCommandBufferSharedHandle ICrRenderDevice::CreateCommandBuffer(CrCommandQueueType::T type)
 {
-	return CrCommandQueueSharedHandle(CreateCommandQueuePS(type));
+	return CrCommandBufferSharedHandle(CreateCommandBufferPS(type));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
@@ -185,6 +185,11 @@ cr3d::GPUFenceResult ICrRenderDevice::GetFenceStatus(ICrGPUFence* fence) const
 	return GetFenceStatusPS(fence);
 }
 
+void ICrRenderDevice::SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+{
+	return SignalFencePS(queueType, signalFence);
+}
+
 void ICrRenderDevice::ResetFence(ICrGPUFence* fence)
 {
 	ResetFencePS(fence);
@@ -198,6 +203,12 @@ void ICrRenderDevice::WaitIdle()
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
 {
 	return m_renderDeviceProperties;
+}
+
+
+void ICrRenderDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+{
+	SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 }
 
 void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize)

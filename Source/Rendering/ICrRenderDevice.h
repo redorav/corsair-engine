@@ -225,11 +225,6 @@ CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer
 	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements), m_gpuDeletionCallback);
 }
 
-inline const CrCommandQueueSharedHandle& ICrRenderDevice::GetMainCommandQueue() const
-{
-	return m_mainCommandQueue;
-}
-
 inline const CrCommandBufferSharedHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer() const
 {
 	return m_auxiliaryCommandBuffer;

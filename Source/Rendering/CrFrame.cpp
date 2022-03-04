@@ -512,9 +512,9 @@ void CrFrame::Process()
 
 	drawCommandBuffer->End();
 
-	drawCommandBuffer->Submit(m_swapchain->GetCurrentPresentCompleteSemaphore().get());
+	drawCommandBuffer->Submit();
 
-	m_swapchain->Present(drawCommandBuffer->GetCompletionSemaphore().get());
+	m_swapchain->Present();
 
 	m_renderWorld->EndRendering();
 

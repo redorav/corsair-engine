@@ -573,15 +573,16 @@ VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queue
 	}
 }
 
-void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const CrFixedString128& name) const
+void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const char* name) const
 {
-	if (vkDebugMarkerSetObjectName && !name.empty())
+	if (vkDebugMarkerSetObjectName && name && name[0] != 0)
 	{
 		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
 		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
 		nameInfo.objectType = objectType;
 		nameInfo.object = vkObject;
-		nameInfo.pObjectName = name.c_str();
+		nameInfo.pObjectName = name;
 		vkDebugMarkerSetObjectName(m_vkDevice, &nameInfo);
 	}
+}
 }

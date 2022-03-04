@@ -18,6 +18,14 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/)
 	: m_renderDevice(renderDevice)
+	, m_imageCount(0)
+	, m_width(0)
+	, m_height(0)
+
+	// The initialization value is important to start at 0 on the first call to present
+	, m_currentSemaphoreIndex((uint32_t)-1)
+	, m_currentBufferIndex(0)
+	, m_imageAcquired(false)
 {
 
 }
@@ -68,9 +76,9 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 	return AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
 }
 
-void ICrSwapchain::Present(const ICrGPUSemaphore* waitSemaphore)
+void ICrSwapchain::Present()
 {
-	PresentPS(waitSemaphore);
+	PresentPS();
 }
 
 const CrTextureSharedHandle& ICrSwapchain::GetTexture(uint32_t index)

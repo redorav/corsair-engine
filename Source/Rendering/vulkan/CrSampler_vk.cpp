@@ -43,7 +43,7 @@ CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerD
 
 	vkCreateSampler(vkDevice, &createInfo, nullptr, &m_vkSampler);
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkSampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, descriptor.name);
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkSampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, descriptor.name.c_str());
 }
 
 CrSamplerVulkan::~CrSamplerVulkan()

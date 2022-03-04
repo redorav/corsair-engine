@@ -34,8 +34,6 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueue
 		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 	}
 
-	m_completionSemaphore = m_renderDevice->CreateGPUSemaphore();
-
 	m_completionFence = m_renderDevice->CreateGPUFence();
 
 	m_submitted = false;
@@ -81,7 +79,7 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 	m_submitted = true;
 
 	// Submission will signal the internal semaphore of this command buffer
-	m_renderDevice->SubmitCommandBuffer(this, waitSemaphore, m_completionSemaphore.get(), m_completionFence.get());
+	m_renderDevice->SubmitCommandBuffer(this, waitSemaphore, nullptr, m_completionFence.get());
 }
 
 CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size)

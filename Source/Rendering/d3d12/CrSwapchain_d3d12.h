@@ -11,7 +11,7 @@ public:
 
 	~CrSwapchainD3D12();
 
-	virtual void PresentPS(const ICrGPUSemaphore* waitSemaphore) override;
+	virtual void PresentPS() override;
 
 	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) override;
 

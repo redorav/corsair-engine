@@ -17,7 +17,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 	VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
 
-	VkResult result;
+	VkResult vkResult;
 
 	// Create a surface for the supplied window handle
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
@@ -25,37 +25,37 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.platformHandle;
 	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.platformWindow;
-	result = vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.platformWindow;
-	result = vkCreateAndroidSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateAndroidSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.connection = connection;
 	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.platformWindow;
 	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.platformHandle;
-	result = vkCreateXcbSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateXcbSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
 	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
 	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.platformWindow;
-	result = vkCreateViSurfaceNN(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateViSurfaceNN(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
 	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
-	result = vkCreateMacOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateMacOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_IOS_MVK)
 	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
-	result = vkCreateIOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
+	vkResult = vkCreateIOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #endif
 
-	CrAssertMsg(result == VK_SUCCESS, "Surface creation failed");
+	CrAssertMsg(vkResult == VK_SUCCESS, "Surface creation failed");
 
 	uint32_t queueFamilyCount;
 	vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
@@ -72,10 +72,10 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	// Get list of supported color formats and spaces for the surface (backbuffer)
 	{
 		uint32_t formatCount;
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
+		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
-		result = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
-		CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface formats");
+		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
+		CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface formats");
 
 		CrAssertMsg(formatCount > 0, "Must have at least one preferred color space");
 
@@ -107,15 +107,16 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
-	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
-	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface capabilities");
+	vkResult = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface capabilities");
 
 	uint32_t presentModeCount;
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
+	vkResult = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve present modes count");
 
 	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
-	result = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
-	CrAssertMsg(result == VK_SUCCESS, "Could not retrieve surface present modes");
+	vkResult = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface present modes");
 
 	VkExtent2D swapchainExtent;
 
@@ -212,8 +213,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainInfo.clipped               = true;
 	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
-	result = vkCreateSwapchainKHR(vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
-	CrAssertMsg(result == VK_SUCCESS, "Swapchain creation failed");
+	vkResult = vkCreateSwapchainKHR(vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Swapchain creation failed");
 
 	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
 	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
@@ -222,10 +223,10 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		vkDestroySwapchainKHR(vkDevice, oldSwapchain, nullptr);
 	}
 
-	result = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
+	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 
 	CrVector<VkImage> images(m_imageCount);
-	result = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
+	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 
@@ -233,7 +234,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.name = "Swapchain Texture";
+	swapchainTextureParams.name = swapchainDescriptor.name.c_str();
+	swapchainTextureParams.name += " Texture";
 	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
@@ -257,6 +259,7 @@ CrSwapchainVulkan::~CrSwapchainVulkan()
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
 {
+	// Acquire image signals the semaphore we pass in
 	VkResult res = vkAcquireNextImageKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSwapchain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
 
 	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
@@ -267,20 +270,20 @@ CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* s
 	return CrSwapchainResult::Success;
 }
 
-void CrSwapchainVulkan::PresentPS(const ICrGPUSemaphore* waitSemaphore)
+void CrSwapchainVulkan::PresentPS()
 {
+	VkQueue vkQueue = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkQueue(CrCommandQueueType::Graphics);
+	CrGPUSemaphoreVulkan* vulkanSemaphore = static_cast<CrGPUSemaphoreVulkan*>(GetCurrentPresentCompleteSemaphore().get());
+
+	// Present image (swap buffers)
+	// TODO Put this on the device and batch submit swapchains
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.pNext = nullptr;
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_vkSwapchain;
 	presentInfo.pImageIndices = &m_currentBufferIndex;
-
-	if (waitSemaphore)
-	{
-		presentInfo.pWaitSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
-		presentInfo.waitSemaphoreCount = 1;
-	}
-
-	vkQueuePresentKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkQueue(CrCommandQueueType::Graphics), &presentInfo);
+	presentInfo.pWaitSemaphores = &vulkanSemaphore->GetVkSemaphore();
+	presentInfo.waitSemaphoreCount = 1;
+	vkQueuePresentKHR(vkQueue, &presentInfo);
 }

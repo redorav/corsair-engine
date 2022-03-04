@@ -110,10 +110,6 @@ public:
 
 	void EndRenderPass();
 
-	const CrGPUSemaphoreSharedHandle& GetCompletionSemaphore() const;
-
-	const CrGPUFenceSharedHandle& GetCompletionFence() const;
-
 protected:
 
 	virtual void BeginPS() = 0;
@@ -255,9 +251,6 @@ protected:
 	CrUniquePtr<CrGPUStackAllocator> m_vertexBufferGPUStack;
 
 	CrUniquePtr<CrGPUStackAllocator> m_indexBufferGPUStack;
-
-	// Signal semaphore when execution completes
-	CrGPUSemaphoreSharedHandle		m_completionSemaphore;
 
 	// Signal fence when execution completes
 	CrGPUFenceSharedHandle			m_completionFence;
@@ -422,16 +415,6 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
 {
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
-}
-
-inline const CrGPUSemaphoreSharedHandle& ICrCommandBuffer::GetCompletionSemaphore() const
-{
-	return m_completionSemaphore;
-}
-
-inline const CrGPUFenceSharedHandle& ICrCommandBuffer::GetCompletionFence() const
-{
-	return m_completionFence;
 }
 
 template<typename MetaType>

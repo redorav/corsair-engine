@@ -64,7 +64,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 	vkResult = vmaCreateBuffer(vulkanRenderDevice->GetVmaAllocator(), &bufferCreateInfo, &vmaAllocationCreateInfo, &m_vkBuffer, &m_vmaAllocation, &vmaAllocationInfo);
 	CrAssert(vkResult == VK_SUCCESS);
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, descriptor.name);
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, descriptor.name.c_str());
 
 	if (descriptor.usage & cr3d::BufferUsage::Data)
 	{

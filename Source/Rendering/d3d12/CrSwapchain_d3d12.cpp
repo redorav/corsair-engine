@@ -78,7 +78,6 @@ CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(const ICrGPUSemaphore* si
 	return CrSwapchainResult::Success;
 }
 
-void CrSwapchainD3D12::PresentPS(const ICrGPUSemaphore* waitSemaphore)
+void CrSwapchainD3D12::PresentPS()
 {
-	unused_parameter(waitSemaphore);
 }

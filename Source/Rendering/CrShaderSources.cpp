@@ -40,7 +40,7 @@ void CrShaderSources::Initialize()
 	const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 	// Load all the files in this directory and put them in a hashmap based on filename
-	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), [this](const CrDirectoryEntry& entry)
+	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), false, [this](const CrDirectoryEntry& entry)
 	{
 		if (!entry.isDirectory)
 		{

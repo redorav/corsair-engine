@@ -220,7 +220,7 @@ bool ICrFile::CreateDirectorySingle(const char* directoryPath)
 	return false;
 }
 
-bool ICrFile::ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFunction& function)
+bool ICrFile::ForEachDirectoryEntry(const char* directoryPath, bool recursive, const FileIteratorFunction& function)
 {
 	WIN32_FIND_DATAW findData;
 
@@ -248,6 +248,16 @@ bool ICrFile::ForEachDirectoryEntry(const char* directoryPath, const FileIterato
 				entry.directory = directoryPath;
 				entry.filename.append_convert<wchar_t>(findData.cFileName);
 				entry.isDirectory = findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+
+				if (recursive && entry.isDirectory)
+				{
+					CrFixedString512 wSubPath;
+					wSubPath.append(directoryPath);
+					wSubPath.append("/");
+					wSubPath.append(entry.filename.c_str());
+					ForEachDirectoryEntry(wSubPath.c_str(), recursive, function);
+				}
+
 				continueIterating = function(entry);
 			}
 

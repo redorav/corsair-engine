@@ -22,11 +22,11 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 	CrVector<CrShaderInfo> shaderInfos;
 
 	// Find every .shaders file in the specified directory
-	ICrFile::ForEachDirectoryEntry(builtinShadersDescriptor.inputPath.c_str(), [&compilationJobs, &builtinShadersDescriptor, &shaderInfos](const CrDirectoryEntry& entry)
+	ICrFile::ForEachDirectoryEntry(builtinShadersDescriptor.inputPath.c_str(), true, [&compilationJobs, &builtinShadersDescriptor, &shaderInfos](const CrDirectoryEntry& entry)
 	{
 		if (entry.filename.extension() == ".shaders")
 		{
-			CrPath shadersFilePath = builtinShadersDescriptor.inputPath / entry.filename;
+			CrPath shadersFilePath = CrPath(entry.directory) / entry.filename;
 
 			// Load .shaders file
 			CrFileSharedHandle file = ICrFile::OpenFile(shadersFilePath.c_str(), FileOpenFlags::Read);

@@ -101,7 +101,7 @@ public:
 	static bool CreateDirectorySingle(const char* directoryPath);
 
 	// Iterate over directory entries
-	static bool ForEachDirectoryEntry(const char* directoryPath, const FileIteratorFunction& function);
+	static bool ForEachDirectoryEntry(const char* directoryPath, bool recursive, const FileIteratorFunction& function);
 
 private:
 

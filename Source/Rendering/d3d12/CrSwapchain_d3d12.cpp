@@ -62,7 +62,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 		ID3D12Resource* surfaceResource;
 		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));
 		swapchainTextureParams.extraDataPtr = surfaceResource; // Swapchain resource
-		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
+		m_textures.push_back(renderDevice->CreateTexture(swapchainTextureParams));
 	}
 }
 

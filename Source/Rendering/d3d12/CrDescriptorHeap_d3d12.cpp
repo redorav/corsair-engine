@@ -48,7 +48,15 @@ void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, c
 	m_descriptorHeap->SetName(wideStringName);
 
 	m_heapStart.cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_heapStart.gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	if (heapDescriptor.flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+	{
+		m_heapStart.gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	}
+	else
+	{
+		m_heapStart.gpuHandle.ptr = (UINT64)-1;
+	}
 }
 
 void CrDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor)

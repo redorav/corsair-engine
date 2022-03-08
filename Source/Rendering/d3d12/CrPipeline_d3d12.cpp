@@ -75,7 +75,15 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	}
 
 	d3d12PipelineStateDescriptor.NumRenderTargets = numRenderTargets;
-	d3d12PipelineStateDescriptor.DSVFormat = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.depthFormat);
+
+	if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
+	{
+		d3d12PipelineStateDescriptor.DSVFormat = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.depthFormat);
+	}
+	else
+	{
+		d3d12PipelineStateDescriptor.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	}
 
 	DXGI_SAMPLE_DESC& sampleDesc = d3d12PipelineStateDescriptor.SampleDesc;
 	sampleDesc.Count = crd3d::GetD3D12SampleCount(pipelineDescriptor.sampleCount);
@@ -162,7 +170,8 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 			inputElementDescriptor.SemanticIndex = semanticData.index;
 		}
 
-		inputElementDescriptor.Format = crd3d::GetDXGIFormat((cr3d::DataFormat::T)vertexAttribute.format);
+		cr3d::DataFormat::T semanticFormat = (cr3d::DataFormat::T)vertexAttribute.format;
+		inputElementDescriptor.Format = crd3d::GetDXGIFormat(semanticFormat);
 		inputElementDescriptor.InputSlot = vertexAttribute.streamId;
 		inputElementDescriptor.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 		inputElementDescriptor.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA; // Per-instance vertex data

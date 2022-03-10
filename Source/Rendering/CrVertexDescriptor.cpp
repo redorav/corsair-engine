@@ -22,10 +22,10 @@ namespace CrVertexSemantic
 
 	bool CreateVertexSemanticData()
 	{
-		VertexSemanticData[CrVertexSemantic::Position]  = Data(CrVertexSemantic::Position, "POSITION");
-		VertexSemanticData[CrVertexSemantic::Normal]    = Data(CrVertexSemantic::Normal, "NORMAL");
-		VertexSemanticData[CrVertexSemantic::Tangent]   = Data(CrVertexSemantic::Tangent, "TANGENT");
-		VertexSemanticData[CrVertexSemantic::Color]     = Data(CrVertexSemantic::Color, "COLOR");
+		VertexSemanticData[CrVertexSemantic::Position]  = Data(CrVertexSemantic::Position,  "POSITION");
+		VertexSemanticData[CrVertexSemantic::Normal]    = Data(CrVertexSemantic::Normal,    "NORMAL");
+		VertexSemanticData[CrVertexSemantic::Tangent]   = Data(CrVertexSemantic::Tangent,   "TANGENT");
+		VertexSemanticData[CrVertexSemantic::Color]     = Data(CrVertexSemantic::Color,     "COLOR");
 		VertexSemanticData[CrVertexSemantic::TexCoord0] = Data(CrVertexSemantic::TexCoord0, "TEXCOORD0");
 
 		for (uint32_t s = 0; s < VertexSemanticData.size(); ++s)

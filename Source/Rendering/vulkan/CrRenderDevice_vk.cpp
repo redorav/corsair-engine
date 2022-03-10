@@ -585,4 +585,3 @@ void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjec
 		vkDebugMarkerSetObjectName(m_vkDevice, &nameInfo);
 	}
 }
-}

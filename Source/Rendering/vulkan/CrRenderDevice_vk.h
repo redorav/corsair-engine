@@ -81,10 +81,6 @@ private:
 
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
-	virtual CrSharedPtr<ICrHardwareGPUBuffer> DownloadTextureImmediatePS(const ICrTexture* texture, uint32_t mip, uint32_t slice) override;
-
-	virtual void UploadTextureImmediatePS(const ICrHardwareGPUBuffer* stagingBuffer, const ICrTexture* texture) override;
-
 	void RetrieveQueueFamilies();
 
 	VkResult SelectPhysicalDevice();

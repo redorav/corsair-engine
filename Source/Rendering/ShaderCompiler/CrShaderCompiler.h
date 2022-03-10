@@ -8,7 +8,13 @@
 
 struct CompilationDescriptor
 {
-	CompilationDescriptor() {}
+	CompilationDescriptor()
+	: platform(cr::Platform::Count)
+	, graphicsApi(cr3d::GraphicsApi::Count)
+	, shaderStage(cr3d::ShaderStage::Count)
+	, buildReflection(true)
+	, processed(false)
+	{}
 
 	void Process() const;
 
@@ -20,11 +26,11 @@ struct CompilationDescriptor
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;
-	bool buildReflection = true;
+	bool buildReflection;
 
 private:
 
-	mutable bool processed = true;
+	mutable bool processed;
 };
 
 class CrShaderCompiler

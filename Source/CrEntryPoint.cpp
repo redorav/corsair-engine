@@ -110,6 +110,18 @@ int main(int argc, char* argv[])
 					applicationRunning = false;
 					break;
 				}
+				case SDL_WINDOWEVENT:
+				{
+					switch (event.window.event)
+					{
+						case SDL_WINDOWEVENT_MINIMIZED: CrLog("Window minimized"); break;
+						case SDL_WINDOWEVENT_MAXIMIZED: CrLog("Window maximized"); break;
+						case SDL_WINDOWEVENT_RESTORED: CrLog("Window restored"); break;
+						case SDL_WINDOWEVENT_RESIZED: CrLog("Window resized"); break;
+						case SDL_WINDOWEVENT_SIZE_CHANGED: CrLog("Window size changed"); break;
+					}
+					break;
+				}
 				case SDL_CONTROLLERDEVICEADDED:
 				case SDL_CONTROLLERDEVICEREMOVED:
 				case SDL_KEYDOWN:

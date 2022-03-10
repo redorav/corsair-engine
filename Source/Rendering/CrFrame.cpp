@@ -480,15 +480,6 @@ void CrFrame::Process()
 		colorBuffer.Unlock();
 		commandBuffer->BindConstantBuffer(&colorBuffer);
 
-		CrGPUBufferType<DynamicLight> dynamicLightBuffer = commandBuffer->AllocateConstantBuffer<DynamicLight>();
-		DynamicLight* dynamicLightBufferData = dynamicLightBuffer.Lock();
-		{
-			dynamicLightBufferData->positionRadius = float4(1.0f, 1.0f, 1.0f, 0.0f);
-			dynamicLightBufferData->color = float4(1.0f, 0.25f, 0.25f, 0.0f);
-		}
-		dynamicLightBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&dynamicLightBuffer);
-
 		CrGPUBufferType<Camera> cameraDataBuffer = commandBuffer->AllocateConstantBuffer<Camera>();
 		Camera* cameraData2 = cameraDataBuffer.Lock();
 		{
@@ -867,7 +858,6 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
-	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
 	swapchainDescriptor.format = CrRendererConfig::SwapchainFormat;
 	swapchainDescriptor.requestedBufferCount = 3;
 	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);

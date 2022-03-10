@@ -153,31 +153,18 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 			float squaredDistance = dot(cameraToMesh, cameraToMesh);
 
-			ICrGraphicsPipeline* pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
-
 			uint32_t depthUint = *reinterpret_cast<uint32_t*>(&squaredDistance);
 
 			// TODO How to do fading?
 			// TODO How to do LOD selection?
-			
-			// Set up sort key
-			// Sorting is implementing in ascending order, so a lower depth sorts first
-			CrStandardSortKey depthSortKey;
-			depthSortKey.depth    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
-			depthSortKey.pipeline = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
-			depthSortKey.mesh     = (uint16_t)((uintptr_t)renderMesh >> 3);
-			depthSortKey.material = (uint16_t)((uintptr_t)material >> 3);
 
 			CrRenderPacket mainPacket;
-			mainPacket.sortKey      = depthSortKey;
 			mainPacket.transforms   = transforms;
-			mainPacket.pipeline     = pipeline;
 			mainPacket.renderMesh   = renderMesh;
 			mainPacket.material     = material;
 			mainPacket.numInstances = 1;
 
 			// Create render packets and add to the render lists
-			m_mainRenderList.AddPacket(mainPacket);
 			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
 			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 			m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
@@ -189,7 +176,6 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 	}
 
 	// Sort the render lists
-	m_mainRenderList.Sort();
 	for (CrRenderList& renderList : m_renderLists)
 	{
 		renderList.Sort();
@@ -203,7 +189,6 @@ void CrRenderWorld::BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& rende
 
 void CrRenderWorld::EndRendering()
 {
-	m_mainRenderList.Clear();
 	for (CrRenderList& renderList : m_renderLists)
 	{
 		renderList.Clear();

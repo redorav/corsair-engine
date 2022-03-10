@@ -37,10 +37,6 @@ struct CrStandardSortKey
 	{
 		struct
 		{
-			uint64_t depth : 16;
-			uint64_t mesh : 16;
-			uint64_t material : 16; // TODO Change to resource table
-			uint64_t pipeline : 16;
 			uint64_t depthKey    : 16;
 			uint64_t meshKey     : 16;
 			uint64_t materialKey : 16; // TODO Change to resource table
@@ -150,7 +146,6 @@ public:
 
 	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
 
-	const CrRenderList& GetMainRenderList() const { return m_mainRenderList; }
 	const CrRenderList& GetRenderList(CrRenderListUsage::T usage) const { return m_renderLists[usage]; }
 
 	// Traverse the model instances
@@ -213,6 +208,5 @@ private:
 
 	// Render lists containing visible rendering packets
 
-	CrRenderList m_mainRenderList;
 	CrRenderList m_renderLists[CrRenderListUsage::Count];
 };

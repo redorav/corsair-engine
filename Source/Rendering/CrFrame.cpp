@@ -290,6 +290,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	{
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
+		copyTextureGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		m_copyTexturePipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 

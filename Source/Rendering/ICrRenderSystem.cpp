@@ -30,15 +30,23 @@ ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDes
 	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
 	// rest of the engine interacts with them and not the raw data that was passed in, 
 	// as the metadata needs to be serialized, etc.
+
+	m_builtinShaderBytecodes.resize(CrBuiltinShaders::Count);
+
 	for (uint32_t i = 0; i < CrBuiltinShaders::Count; ++i)
 	{
 		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetBuiltinShaderMetadata((CrBuiltinShaders::T)i, m_graphicsApi);
 
-		CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
-
-		const CrShaderBytecodeSharedHandle& bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
-		shaderBytecodeStream << *bytecode.get();
-		m_builtinShaderBytecodes.push_back(bytecode);
+		// Builtin shaders without code are not an error. Sometimes we need shader code 
+		// that is specific to an API and we leave the entry blank. This only happens
+		// on multi-API platforms which is quite rare
+		if (metadata.shaderCode)
+		{
+			CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
+			const CrShaderBytecodeSharedHandle& bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
+			shaderBytecodeStream << *bytecode.get();
+			m_builtinShaderBytecodes[i] = bytecode;
+		}
 	}
 }
 

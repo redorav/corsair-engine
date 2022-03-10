@@ -420,7 +420,7 @@ namespace cr3d
 
 	namespace ShaderStage
 	{
-		// Most shaders won't have Hull/Domain or Geometry, for performance we'll reorder them
+		// Most shaders only have Vertex and Pixel shader, reorder for performance
 		enum T : uint32_t
 		{
 			Vertex   = 0,
@@ -429,8 +429,9 @@ namespace cr3d
 			Domain   = 3,
 			Geometry = 4,
 			Compute  = 5,
+			RootSignature = 6, // D3D12 only
 			GraphicsStageCount = Geometry + 1,
-			Count = Compute + 1
+			Count = Compute + 1,
 		};
 
 		inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; } // Pre-increment
@@ -448,6 +449,7 @@ namespace cr3d
 				case cr3d::ShaderStage::Domain:   return lowercase ? "domain"   : "Domain";
 				case cr3d::ShaderStage::Geometry: return lowercase ? "geometry" : "Geometry";
 				case cr3d::ShaderStage::Compute:  return lowercase ? "compute"  : "Compute";
+				case cr3d::ShaderStage::RootSignature:  return lowercase ? "rootsignature" : "RootSignature";
 				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}

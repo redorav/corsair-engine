@@ -65,7 +65,6 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				CrShaderCompilationJob compilationJob;
 				CompilationDescriptor& compilationDescriptor = compilationJob.compilationDescriptor;
 				compilationDescriptor.inputPath = hlslFilePath;
-				compilationDescriptor.graphicsApi = builtinShadersDescriptor.graphicsApis[0];
 				compilationDescriptor.platform = builtinShadersDescriptor.platform;
 
 				cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
@@ -92,6 +91,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 					else if (stageValue == "Hull")     { shaderStage = cr3d::ShaderStage::Hull; }
 					else if (stageValue == "Domain")   { shaderStage = cr3d::ShaderStage::Domain; }
 					else if (stageValue == "Compute")  { shaderStage = cr3d::ShaderStage::Compute; }
+					else if (stageValue == "RootSignature") { shaderStage = cr3d::ShaderStage::RootSignature; }
 					else { continue; }
 
 					compilationDescriptor.shaderStage = shaderStage;
@@ -104,12 +104,12 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				ryml::NodeRef definesNode = shader["defines"];
 				if (definesNode.is_keyval())
 				{
-					c4::csubstr defineValue = definesNode.val();
+					const c4::csubstr& defineValue = definesNode.val();
 					compilationDescriptor.defines.push_back(CrString(defineValue.str, defineValue.len));
 				}
 				else if (definesNode.is_seq())
 				{
-					for (ryml::NodeRef defineNode : definesNode.children())
+					for (const ryml::NodeRef& defineNode : definesNode.children())
 					{
 						c4::csubstr defineValue = defineNode.val();
 						compilationDescriptor.defines.push_back(CrString(defineValue.str, defineValue.len));
@@ -146,6 +146,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 					compilationDescriptor.outputPath = binaryFilePath;
 					compilationDescriptor.tempPath = tempPath;
 					compilationDescriptor.graphicsApi = graphicsApi;
+
 					compilationJobs[i].push_back(compilationJob);
 				}
 			}
@@ -160,12 +161,23 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 	{
 		for (const CrShaderCompilationJob& compilationJob : graphicsApiCompilationJobs)
 		{
-			CrString compilationStatus;
-			bool success = CrShaderCompiler::Compile(compilationJob.compilationDescriptor, compilationStatus);
+			const CompilationDescriptor& compilationDescriptor = compilationJob.compilationDescriptor;
 
-			if (!success)
+			// Add conditions here under which a job cannot be compiled. We still need to process it to add the entry
+			// to the builtin shader table. This means e.g. the Vulkan backend has a dummy entry for a root signature
+			// This generally only happens on Desktop, where we support multiple APIs
+			bool excludeCompilationJob =
+				compilationDescriptor.shaderStage == cr3d::ShaderStage::RootSignature && compilationDescriptor.graphicsApi != cr3d::GraphicsApi::D3D12;
+
+			if (!excludeCompilationJob)
 			{
-				CrShaderCompilerUtilities::QuitWithMessage(compilationStatus.c_str());
+				CrString compilationStatus;
+				bool success = CrShaderCompiler::Compile(compilationDescriptor, compilationStatus);
+
+				if (!success)
+				{
+					CrShaderCompilerUtilities::QuitWithMessage(compilationStatus.c_str());
+				}
 			}
 		}
 	}
@@ -251,15 +263,13 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			{
 				uint64_t codeSize = file->GetSize();
 
-				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + eastl::to_string(codeSize) + "]";
-
-				builtinShaderDataCpp += shaderBinaryName + " =\n{";
-
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderName + "ShaderCode, " + eastl::to_string(codeSize) + "),\n";
-
 				CrVector<uint8_t> shaderBinaryData;
 				shaderBinaryData.resize(codeSize);
 				file->Read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
+
+				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + eastl::to_string(codeSize) + "]";
+				builtinShaderDataCpp += shaderBinaryName + " =\n{";
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderName + "ShaderCode, " + eastl::to_string(codeSize) + "),\n";
 
 				for (uint32_t i = 0; i < codeSize; ++i)
 				{
@@ -278,6 +288,10 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 				// Close file and delete original binary
 				file = nullptr;
 				ICrFile::FileDelete(compilationDescriptor.outputPath.c_str());
+			}
+			else
+			{
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", nullptr, " + eastl::to_string(0) + "),\n";
 			}
 		}
 

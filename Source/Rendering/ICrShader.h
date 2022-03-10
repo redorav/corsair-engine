@@ -71,11 +71,11 @@ struct CrShaderBindingLayoutResources
 	CrFixedVector<CrShaderBinding, 32> rwDataBuffers;
 };
 
-// A class that represents the resources needed by every stage. It is designed to be 
-// fast to loop through in order to rebuild tables quickly. Resources are sorted
-// according to type. This is not the resource table, just the binding points. 
-// It also doesn't contain any names, but points to the builtins that the engine knows
-// about
+// Represents the resources needed by every stage. It is designed to be 
+// fast iterate in order to rebuild tables quickly. Resources are sorted
+// according to type. This is not a resource table, just the binding points,
+// owned by the shader. It also doesn't contain any names, but points to the 
+// builtins that the engine knows about
 class ICrShaderBindingLayout
 {
 public:

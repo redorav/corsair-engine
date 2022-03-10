@@ -4,7 +4,7 @@
 struct VS_IN_UI
 {
 	float2 position : POSITION;
-	float2 uv       : UV;
+	float2 uv       : TEXCOORD0;
 	float4 color    : COLOR;
 };
 
@@ -12,7 +12,7 @@ struct VS_OUT_UI
 {
 	float4 hwPosition : SV_Position;
 	float4 color      : COLOR;
-	float2 uv         : UV;
+	float2 uv         : TEXCOORD0;
 };
 
 struct UIData

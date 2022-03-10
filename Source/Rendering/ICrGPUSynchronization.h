@@ -8,6 +8,8 @@
 // Synchronization between host and device
 // Direction is device -> host
 // e.g. GPU signals and CPU waits
+// Vulkan: vkFence
+// D3D12: ID3D12Fence
 class ICrGPUFence
 {
 public:
@@ -19,6 +21,8 @@ public:
 // Direction is device -> device
 // e.g. Graphics queue signals, compute queue receives
 // e.g. Graphics queue signals, graphics queue receives
+// Vulkan: vkSemaphore
+// D3D12: ID3D12Fence
 class ICrGPUSemaphore
 {
 public:

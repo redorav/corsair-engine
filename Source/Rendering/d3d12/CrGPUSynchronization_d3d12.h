@@ -28,4 +28,5 @@ public:
 
 private:
 
+	ID3D12Fence* m_d3d12Fence;
 };

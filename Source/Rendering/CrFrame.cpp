@@ -19,7 +19,6 @@
 
 #include "Rendering/CrCamera.h"
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrMaterial.h"
@@ -31,6 +30,8 @@
 #include "Rendering/CrCPUStackAllocator.h"
 
 #include "Rendering/CrRenderGraph.h"
+
+#include "Rendering/CrRendererConfig.h"
 
 #include "Input/CrInputManager.h"
 
@@ -71,7 +72,9 @@ struct CrRenderPacketBatcher
 		m_maxBatchSize = CrMin(batchSize, (uint32_t)m_matrices.size());
 	}
 
-	void AddRenderPacket(const CrRenderPacket& renderPacket)
+	// Adds a render packet to the batcher and tries to batch it with preceding packets
+	// If unable to batch or buffer is full, flush and repeat
+	void ProcessRenderPacket(const CrRenderPacket& renderPacket)
 	{
 		bool stateMismatch =
 			renderPacket.pipeline != m_pipeline ||
@@ -274,8 +277,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnly, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	
-	
 	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 	lineGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
@@ -363,8 +364,11 @@ void CrFrame::Process()
 	drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
-	
+
 	CrRenderGraphTextureId depthTexture;
+	CrRenderGraphTextureId gBufferAlbedoAO;
+	CrRenderGraphTextureId gBufferNormals;
+	CrRenderGraphTextureId gBufferMaterial;
 	CrRenderGraphTextureId swapchainTexture;
 	CrRenderGraphTextureId preSwapchainTexture;
 
@@ -380,7 +384,81 @@ void CrFrame::Process()
 		CrRenderGraphTextureDescriptor preSwapchainDescriptor;
 		preSwapchainDescriptor.texture = m_preSwapchainTexture.get();
 		preSwapchainTexture = m_mainRenderGraph.CreateTexture("Pre Swapchain", preSwapchainDescriptor);
+
+		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor;
+		gBufferAlbedoDescriptor.texture = m_gbufferAlbedoAOTexture.get();
+		gBufferAlbedoAO = m_mainRenderGraph.CreateTexture("GBuffer Albedo AO", gBufferAlbedoDescriptor);
+
+		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor;
+		gBufferNormalsDescriptor.texture = m_gbufferNormalsTexture.get();
+		gBufferNormals = m_mainRenderGraph.CreateTexture("GBuffer Normals", gBufferNormalsDescriptor);
+
+		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor;
+		gBufferMaterialDescriptor.texture = m_gbufferMaterialTexture.get();
+		gBufferMaterial = m_mainRenderGraph.CreateTexture("GBuffer Material", gBufferMaterialDescriptor);
 	}
+
+	m_mainRenderGraph.AddRenderPass("GBuffer Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.AddRenderTarget(gBufferAlbedoAO, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+		renderGraph.AddRenderTarget(gBufferNormals, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+		renderGraph.AddRenderTarget(gBufferMaterial, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+	},
+	[this, gBufferAlbedoAO](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		ICrTexture* gBufferAlbedoAOTexture = renderGraph.GetPhysicalTexture(gBufferAlbedoAO);
+
+		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)gBufferAlbedoAOTexture->GetWidth(), (float)gBufferAlbedoAOTexture->GetHeight()));
+		commandBuffer->SetScissor(CrScissor(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
+
+		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
+		Color* theColorData2 = colorBuffer.Lock();
+		{
+			theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		colorBuffer.Unlock();
+		commandBuffer->BindConstantBuffer(&colorBuffer);
+
+		CrGPUBufferType<Camera> cameraDataBuffer = commandBuffer->AllocateConstantBuffer<Camera>();
+		Camera* cameraData2 = cameraDataBuffer.Lock();
+		{
+			*cameraData2 = m_cameraConstantData;
+		}
+		cameraDataBuffer.Unlock();
+		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
+
+		CrGPUBufferType<Instance> identityConstantBuffer = commandBuffer->AllocateConstantBuffer<Instance>();
+		Instance* identityTransformData = identityConstantBuffer.Lock();
+		{
+			identityTransformData->local2World[0] = float4x4::identity();
+		}
+		identityConstantBuffer.Unlock();
+
+		const CrRenderList& gBufferRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::GBuffer);
+
+		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
+
+		gBufferRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+		{
+			renderPacketBatcher.ProcessRenderPacket(renderPacket);
+		});
+
+		// Execute the last batch
+		renderPacketBatcher.ExecuteBatch();
+	});
+
+	m_mainRenderGraph.AddRenderPass("GBuffer Lighting Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.AddTexture(gBufferAlbedoAO, cr3d::ShaderStageFlags::Pixel);
+	},
+	[this](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* /*commandBuffer*/)
+	{
+	});
 
 	m_mainRenderGraph.AddRenderPass("Main Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
@@ -419,14 +497,20 @@ void CrFrame::Process()
 		cameraDataBuffer.Unlock();
 		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
 
+		CrGPUBufferType<Instance> identityConstantBuffer = commandBuffer->AllocateConstantBuffer<Instance>();
+		Instance* identityTransformData = identityConstantBuffer.Lock();
+		{
+			identityTransformData->local2World[0] = float4x4::identity();
+		}
+		identityConstantBuffer.Unlock();
 
-		const CrRenderList& mainRenderList = m_renderWorld->GetMainRenderList();
+		const CrRenderList& forwardRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::Forward);
 
 		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
 
-		mainRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+		forwardRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 		{
-			renderPacketBatcher.AddRenderPacket(renderPacket);
+			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
 		// Execute the last batch
@@ -482,6 +566,46 @@ void CrFrame::Process()
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 
+	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
+	debugShaderTextureDescriptor.texture = m_debugShaderTexture.get();
+	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
+
+	m_mainRenderGraph.AddRenderPass("Mouse Instance ID", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
+	[&](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.AddRenderTarget(debugShaderTextureId, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
+	},
+	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		const ICrTexture* debugShaderTexture = renderGraph.GetPhysicalTexture(debugShaderTextureId);
+
+		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)debugShaderTexture->GetWidth(), (float)debugShaderTexture->GetHeight()));
+		commandBuffer->SetScissor(CrScissor(0, 0, debugShaderTexture->GetWidth(), debugShaderTexture->GetHeight()));
+
+		const CrRenderList& mouseSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::MouseSelection);
+
+		// We don't batch here to get unique ids
+		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
+		renderPacketBatcher.SetMaximumBatchSize(1);
+
+		mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+		{
+			CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+			DebugShader* debugShaderData = debugShaderBuffer.Lock();
+			{
+				debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
+			}
+			debugShaderBuffer.Unlock();
+			commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+
+			renderPacketBatcher.ProcessRenderPacket(renderPacket);
+		});
+
+		// Execute last batch
+		renderPacketBatcher.ExecuteBatch();
+	});
+
 	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)
 	{},
@@ -504,7 +628,7 @@ void CrFrame::Process()
 	},
 	[](const CrRenderGraph&, ICrCommandBuffer*)
 	{
-		
+
 	});
 
 	m_mainRenderGraph.Execute();
@@ -573,9 +697,74 @@ void CrFrame::DrawDebugUI()
 
 			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
 			ImGui::Text("GPU: %s (%llu%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
-			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds());
+			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
+
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			ImGuiTableFlags tableFlags = 0;
+			tableFlags |= ImGuiTableFlags_Resizable;
+			tableFlags |= ImGuiTableFlags_BordersOuter;
+			tableFlags |= ImGuiTableFlags_BordersV;
+			tableFlags |= ImGuiTableFlags_ScrollY;
+
+			if (ImGui::BeginTable("##table1", 3, tableFlags))
+			{
+				// Set up header rows
+				ImGui::TableSetupColumn("GPU Pass Name");
+				ImGui::TableSetupColumn("Duration");
+				ImGui::TableSetupColumn("Timeline");
+				ImGui::TableHeadersRow();
+
+				// Exit header row
+				ImGui::TableNextRow();
+
+				// Make sure we take padding into account when calculating initial positions
+				ImGui::TableSetColumnIndex(2);
+				ImVec2 timebarSize = ImVec2(ImGui::CalcItemWidth() + ImGui::GetStyle().FramePadding.x * 2 + 1, ImGui::GetFrameHeight());
+				ImVec2 initialTimebarPosition = ImGui::GetCursorScreenPos();
+				initialTimebarPosition.x -= ImGui::GetStyle().FramePadding.x;
+				initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
+
+				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition](const CrRenderGraphPass& pass)
+				{
+					CrGPUInterval interval = m_timingQueryTracker->GetResultForFrame(CrHash(pass.name.c_str()));
+
+					if (pass.type != CrRenderGraphPassType::Behavior)
+					{
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text(pass.name.c_str());
+
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text("%lfms", interval.durationNanoseconds / 1e6);
+
+						ImGui::TableSetColumnIndex(2);
+						
+						{
+							initialTimebarPosition.y = ImGui::GetCursorScreenPos().y;
+							initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
+
+							float millisecondMax = 1.0f;
+							float durationMillisecondsScaled = CrClamp((float)interval.durationNanoseconds / 1e6f / millisecondMax, 0.0f, 1.0f);
+
+							float durationPixels = durationMillisecondsScaled * timebarSize.x;
+							ImVec2 finalPosition = ImVec2(initialTimebarPosition.x + durationPixels, initialTimebarPosition.y + timebarSize.y);
+
+							int4 iColor = pass.color * 255.0f;
+							ImU32 imColor = ImGui::GetColorU32(IM_COL32(iColor.x, iColor.y, iColor.z, 255));
+
+							drawList->AddRectFilledMultiColor(initialTimebarPosition, finalPosition, imColor, imColor, imColor, imColor);
+
+							initialTimebarPosition.x = finalPosition.x;
+						}
+
+						ImGui::TableNextRow();
+					}
+				});
+
+				ImGui::EndTable();
+			}
 
 			ImGui::End();
 		}
@@ -673,33 +862,74 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	m_swapchain = nullptr;
 
 	CrSwapchainDescriptor swapchainDescriptor = {};
+	swapchainDescriptor.name = "Main Swapchain";
 	swapchainDescriptor.platformWindow = m_platformWindow;
 	swapchainDescriptor.platformHandle = m_platformHandle;
 	swapchainDescriptor.requestedWidth = m_width;
 	swapchainDescriptor.requestedHeight = m_height;
 	swapchainDescriptor.format = cr3d::DataFormat::BGRA8_Unorm;
+	swapchainDescriptor.format = CrRendererConfig::SwapchainFormat;
 	swapchainDescriptor.requestedBufferCount = 3;
 	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
 
 	// 2. Recreate depth stencil texture
+	CrTextureDescriptor depthTextureDescriptor;
+	depthTextureDescriptor.width = m_swapchain->GetWidth();
+	depthTextureDescriptor.height = m_swapchain->GetHeight();
+	depthTextureDescriptor.format = CrRendererConfig::DepthBufferFormat;
+	depthTextureDescriptor.usage = cr3d::TextureUsage::DepthStencil;
+	depthTextureDescriptor.name = "Depth Texture D32S8";
 
-	CrTextureDescriptor depthTexParams;
-	depthTexParams.width = m_swapchain->GetWidth();
-	depthTexParams.height = m_swapchain->GetHeight();
-	depthTexParams.format = cr3d::DataFormat::D32_Float_S8_Uint;
-	depthTexParams.usage = cr3d::TextureUsage::DepthStencil;
-	depthTexParams.name = "Depth Texture D32S8";
-
-	m_depthStencilTexture = renderDevice->CreateTexture(depthTexParams); // Create the depth buffer
+	m_depthStencilTexture = renderDevice->CreateTexture(depthTextureDescriptor); // Create the depth buffer
 
 	{
-		CrTextureDescriptor preSwapchainTexParams;
-		preSwapchainTexParams.width = m_swapchain->GetWidth();
-		preSwapchainTexParams.height = m_swapchain->GetHeight();
-		preSwapchainTexParams.format = m_swapchain->GetFormat();
-		preSwapchainTexParams.usage = cr3d::TextureUsage::RenderTarget;
-		preSwapchainTexParams.name = "Pre Swapchain";
-		m_preSwapchainTexture = renderDevice->CreateTexture(preSwapchainTexParams);
+		CrTextureDescriptor preSwapchainDescriptor;
+		preSwapchainDescriptor.width = m_swapchain->GetWidth();
+		preSwapchainDescriptor.height = m_swapchain->GetHeight();
+		preSwapchainDescriptor.format = m_swapchain->GetFormat();
+		preSwapchainDescriptor.usage = cr3d::TextureUsage::RenderTarget;
+		preSwapchainDescriptor.name = "Pre Swapchain";
+		m_preSwapchainTexture = renderDevice->CreateTexture(preSwapchainDescriptor);
+	}
+
+	{
+		CrTextureDescriptor albedoAODescriptor;
+		albedoAODescriptor.width = m_swapchain->GetWidth();
+		albedoAODescriptor.height = m_swapchain->GetHeight();
+		albedoAODescriptor.format = CrRendererConfig::GBufferAlbedoAOFormat;
+		albedoAODescriptor.usage = cr3d::TextureUsage::RenderTarget;
+		albedoAODescriptor.name = "GBuffer Albedo AO";
+		m_gbufferAlbedoAOTexture = renderDevice->CreateTexture(albedoAODescriptor);
+	}
+
+	{
+		CrTextureDescriptor normalsDescriptor;
+		normalsDescriptor.width  = m_swapchain->GetWidth();
+		normalsDescriptor.height = m_swapchain->GetHeight();
+		normalsDescriptor.format = CrRendererConfig::GBufferNormalsFormat;
+		normalsDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
+		normalsDescriptor.name   = "GBuffer Normals";
+		m_gbufferNormalsTexture  = renderDevice->CreateTexture(normalsDescriptor);
+	}
+
+	{
+		CrTextureDescriptor materialDescriptor;
+		materialDescriptor.width  = m_swapchain->GetWidth();
+		materialDescriptor.height = m_swapchain->GetHeight();
+		materialDescriptor.format = CrRendererConfig::GBufferMaterialFormat;
+		materialDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
+		materialDescriptor.name   = "GBuffer Material";
+		m_gbufferMaterialTexture  = renderDevice->CreateTexture(materialDescriptor);
+	}
+
+	{
+		CrTextureDescriptor instanceIDDescriptor;
+		instanceIDDescriptor.width  = m_swapchain->GetWidth();
+		instanceIDDescriptor.height = m_swapchain->GetHeight();
+		instanceIDDescriptor.format = CrRendererConfig::DebugShaderFormat;
+		instanceIDDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
+		instanceIDDescriptor.name   = "Model Instance ID";
+		m_debugShaderTexture        = renderDevice->CreateTexture(instanceIDDescriptor);
 	}
 
 	// 4. Recreate command buffers

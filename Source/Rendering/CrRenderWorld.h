@@ -20,6 +20,19 @@ class CrCPUStackAllocator;
 
 struct CrStandardSortKey
 {
+	CrStandardSortKey() {}
+
+	CrStandardSortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
+	{
+		// Set up sort key
+		// Sorting is implementing in ascending order, so a lower depth sorts first
+
+		depthKey    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
+		pipelineKey = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
+		meshKey     = (uint16_t)((uintptr_t)renderMesh >> 3);
+		materialKey = (uint16_t)((uintptr_t)material >> 3);
+	}
+
 	union
 	{
 		struct
@@ -28,6 +41,10 @@ struct CrStandardSortKey
 			uint64_t mesh : 16;
 			uint64_t material : 16; // TODO Change to resource table
 			uint64_t pipeline : 16;
+			uint64_t depthKey    : 16;
+			uint64_t meshKey     : 16;
+			uint64_t materialKey : 16; // TODO Change to resource table
+			uint64_t pipelineKey : 16;
 		};
 
 		uint64_t key = 0;
@@ -45,10 +62,23 @@ struct CrRenderPacket
 	const CrRenderMesh* renderMesh;
 	const CrMaterial* material; // TODO Replace with resource table (textures, constants, etc)
 	const ICrGraphicsPipeline* pipeline;
+	const void* extra = nullptr; // Use this to piggyback extra data
 
 	// This decides how many instances are rendered of this mesh, and also
 	// how many transforms are in the transform array
 	uint32_t numInstances;
+};
+
+// Render list names. Each render list is populated when processing the model instance
+namespace CrRenderListUsage
+{
+	enum T
+	{
+		Forward,
+		GBuffer,
+		MouseSelection,
+		Count
+	};
 };
 
 // A collection of render packets to be rendered
@@ -121,6 +151,7 @@ public:
 	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
 
 	const CrRenderList& GetMainRenderList() const { return m_mainRenderList; }
+	const CrRenderList& GetRenderList(CrRenderListUsage::T usage) const { return m_renderLists[usage]; }
 
 	// Traverse the model instances
 	template<typename FunctionT>
@@ -183,4 +214,5 @@ private:
 	// Render lists containing visible rendering packets
 
 	CrRenderList m_mainRenderList;
+	CrRenderList m_renderLists[CrRenderListUsage::Count];
 };

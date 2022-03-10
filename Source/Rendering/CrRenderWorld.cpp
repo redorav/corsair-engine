@@ -29,6 +29,7 @@ CrRenderWorld::CrRenderWorld()
 CrRenderWorld::~CrRenderWorld()
 {
 	CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
+	//CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
 }
 
 CrRenderModelInstance CrRenderWorld::CreateModelInstance()
@@ -177,11 +178,22 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 			// Create render packets and add to the render lists
 			m_mainRenderList.AddPacket(mainPacket);
+			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
+			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+			m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
+
+			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
+			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+			m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 		}
 	}
 
 	// Sort the render lists
 	m_mainRenderList.Sort();
+	for (CrRenderList& renderList : m_renderLists)
+	{
+		renderList.Sort();
+	}
 }
 
 void CrRenderWorld::BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& renderingStream)
@@ -192,6 +204,10 @@ void CrRenderWorld::BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& rende
 void CrRenderWorld::EndRendering()
 {
 	m_mainRenderList.Clear();
+	for (CrRenderList& renderList : m_renderLists)
+	{
+		renderList.Clear();
+	}
 }
 
 void CrRenderList::Clear()

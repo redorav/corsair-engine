@@ -56,6 +56,12 @@ private:
 	CrTextureSharedHandle m_depthStencilTexture;
 	CrTextureSharedHandle m_preSwapchainTexture;
 
+	CrTextureSharedHandle m_gbufferAlbedoAOTexture;
+	CrTextureSharedHandle m_gbufferNormalsTexture;
+	CrTextureSharedHandle m_gbufferMaterialTexture;
+
+	CrTextureSharedHandle m_debugShaderTexture;
+
 	CrSamplerSharedHandle m_linearClampSamplerHandle;
 	CrSamplerSharedHandle m_linearWrapSamplerHandle;
 	CrSamplerSharedHandle m_pointClampSamplerHandle;

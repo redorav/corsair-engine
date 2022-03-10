@@ -75,6 +75,16 @@ cbuffer Instance
 	Instance cb_Instance;
 };
 
+struct DebugShader
+{
+	float4 debugProperties; // .x Debug Shader Mode, .y Global Instance Id
+};
+
+cbuffer DebugShader
+{
+	DebugShader cb_DebugShader;
+};
+
 SamplerState AllPointClampSampler;
 SamplerState AllLinearClampSampler;
 SamplerState AllAnisotropicClampSampler;

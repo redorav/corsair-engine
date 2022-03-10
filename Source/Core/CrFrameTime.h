@@ -15,6 +15,10 @@ public:
 
 	static CrTime GetFrameDeltaAverage();
 
+	static CrTime GetFrameDeltaMin();
+
+	static CrTime GetFrameDeltaMax();
+
 	static uint64_t GetFrameCount();
 
 private:
@@ -24,6 +28,10 @@ private:
 	static CrTime			m_frameDelta;
 
 	static CrTime			m_frameDeltaAverage;
+
+	static CrTime			m_frameDeltaMin;
+
+	static CrTime			m_frameDeltaMax;
 
 	static CrTime			m_framePreviousEndTime;
 

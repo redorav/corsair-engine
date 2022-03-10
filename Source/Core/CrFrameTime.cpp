@@ -10,6 +10,8 @@ CrTime CrFrameTime::m_framePreviousEndTime;
 uint64_t CrFrameTime::m_lastUpdatedFrameCount;
 CrTime CrFrameTime::m_lastUpdatedTime;
 CrTime CrFrameTime::m_frameDeltaAverage;
+CrTime CrFrameTime::m_frameDeltaMin;
+CrTime CrFrameTime::m_frameDeltaMax;
 
 uint32_t			CrFrameTime::m_deltaHistoryIndex;
 CrArray<CrTime, 30> CrFrameTime::m_frameDeltaHistory;
@@ -33,12 +35,19 @@ void CrFrameTime::IncrementFrameCount()
 
 	m_frameDelta = currentTime - m_framePreviousEndTime;
 	m_framePreviousEndTime = currentTime;
+
+	if (m_frameCount > 0)
+	{
+		m_frameDeltaMin = m_frameDelta < m_frameDeltaMin ? m_frameDelta : m_frameDeltaMin;
+		m_frameDeltaMax = m_frameDelta > m_frameDeltaMax ? m_frameDelta : m_frameDeltaMax;
+	}
+
 	m_frameCount = (m_frameCount + 1) % UINT64_MAX;
 
 	// Update average
 
 	m_frameDeltaHistory[m_deltaHistoryIndex] = m_frameDelta;
-	m_deltaHistoryIndex = (m_deltaHistoryIndex + 1) % m_frameDeltaHistory.size();
+	m_deltaHistoryIndex = (m_deltaHistoryIndex + 1) % (uint32_t)m_frameDeltaHistory.size();
 
 	m_frameDeltaAverage = CrTime();
 
@@ -58,6 +67,16 @@ CrTime CrFrameTime::GetFrameDelta()
 CrTime CrFrameTime::GetFrameDeltaAverage()
 {
 	return m_frameDeltaAverage;
+}
+
+CrTime CrFrameTime::GetFrameDeltaMin()
+{
+	return m_frameDeltaMin;
+}
+
+CrTime CrFrameTime::GetFrameDeltaMax()
+{
+	return m_frameDeltaMax;
 }
 
 uint64_t CrFrameTime::GetFrameCount()

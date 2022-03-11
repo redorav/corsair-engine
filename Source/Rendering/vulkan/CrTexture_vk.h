@@ -6,6 +6,7 @@
 #include "Core/Containers/CrVector.h"
 
 #include <vulkan/vulkan.h>
+#include "CrVMA.h"
 
 class ICrRenderDevice;
 
@@ -53,7 +54,7 @@ private:
 
 	// This is optional as only render targets and RW textures need them, but can take up
 	// some memory per texture (almost 512 bytes)
-	CrUniquePtr<CrVkAdditionalTextureViews>	m_additionalTextureViews;
+	CrUniquePtr<CrVkAdditionalTextureViews>	m_additionalViews;
 
 	VmaAllocation						m_vmaAllocation;
 

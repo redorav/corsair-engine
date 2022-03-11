@@ -7,6 +7,7 @@
 // To counter it we define NOMINMAX, etc. globally
 #include <vulkan/vulkan.h>
 #include "vulkan/CrVulkan.h"
+#include "vulkan/CrVMA.h"
 #endif
 
 #if defined(D3D12_API)

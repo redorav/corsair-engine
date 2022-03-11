@@ -171,7 +171,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// TODO This needs reworking. Only create if mips or slices are > 1
 	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
-		m_additionalTextureViews = CrUniquePtr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
+		m_additionalViews = CrUniquePtr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
 	}
 
 	if (IsDepthStencil()) // TODO sparse textures
@@ -206,7 +206,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	// Create views that can only see a single mip or slice. We can use this to either bind a single
 	// mip/slice as a texture, or to bind texture as a render target.
-	if (m_additionalTextureViews)
+	if (m_additionalViews)
 	{
 		VkImageViewCreateInfo imageViewInfo;
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -224,10 +224,10 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			imageViewInfo.subresourceRange.levelCount = 1;
 			imageViewInfo.subresourceRange.baseArrayLayer = 0;
 			imageViewInfo.subresourceRange.layerCount = m_depth;
-			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip]);
+			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageViewSingleMipAllSlices[mip]);
 			CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 
-			m_additionalTextureViews->m_vkImageSingleMipSlice[mip].resize(m_depth);
+			m_additionalViews->m_vkImageSingleMipSlice[mip].resize(m_arraySize);
 
 			for (uint32_t slice = 0; slice < m_depth; ++slice)
 			{
@@ -235,7 +235,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				imageViewInfo.subresourceRange.levelCount = 1;
 				imageViewInfo.subresourceRange.baseArrayLayer = slice;
 				imageViewInfo.subresourceRange.layerCount = 1;
-				vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice]);
+				vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageSingleMipSlice[mip][slice]);
 				CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 			}
 		}
@@ -352,18 +352,18 @@ CrTextureVulkan::~CrTextureVulkan()
 
 	vkDestroyImageView(vkDevice, m_vkImageView, nullptr);
 
-	if (m_additionalTextureViews)
+	if (m_additionalViews)
 	{
-		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageViewSingleMipAllSlices.size(); ++mip)
+		for (uint32_t mip = 0; mip < m_additionalViews->m_vkImageViewSingleMipAllSlices.size(); ++mip)
 		{
-			vkDestroyImageView(vkDevice, m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip], nullptr);
+			vkDestroyImageView(vkDevice, m_additionalViews->m_vkImageViewSingleMipAllSlices[mip], nullptr);
 		}
 
-		for (uint32_t mip = 0; mip < m_additionalTextureViews->m_vkImageSingleMipSlice.size(); ++mip)
+		for (uint32_t mip = 0; mip < m_additionalViews->m_vkImageSingleMipSlice.size(); ++mip)
 		{
-			for (uint32_t slice = 0; slice < m_additionalTextureViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
+			for (uint32_t slice = 0; slice < m_additionalViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
 			{
-				vkDestroyImageView(vkDevice, m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
+				vkDestroyImageView(vkDevice, m_additionalViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
 			}
 		}
 	}
@@ -381,12 +381,12 @@ VkImageView CrTextureVulkan::GetVkImageViewAllMipsSlices() const
 
 VkImageView CrTextureVulkan::GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const
 {
-	return m_additionalTextureViews->m_vkImageSingleMipSlice[mip][slice];
+	return m_additionalViews->m_vkImageSingleMipSlice[mip][slice];
 }
 
 VkImageView CrTextureVulkan::GetVkImageViewSingleMipAllSlices(uint32_t mip) const
 {
-	return m_additionalTextureViews->m_vkImageViewSingleMipAllSlices[mip];
+	return m_additionalViews->m_vkImageViewSingleMipAllSlices[mip];
 }
 
 VkImageAspectFlags CrTextureVulkan::GetVkImageAspectMask() const

@@ -63,13 +63,17 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	{
 		d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+		//d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
-		//D3D12_MESSAGE_ID blockedIds[] = {};
-		//D3D12_INFO_QUEUE_FILTER filter = {};
-		//filter.DenyList.pIDList = nullptr;
-		//filter.DenyList.NumIDs = 0;
-		//d3d12InfoQueue->AddRetrievalFilterEntries(&filter);
-		//d3d12InfoQueue->AddStorageFilterEntries(&filter);
+		D3D12_MESSAGE_ID blockedIds[] =
+		{
+			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE, // https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
+		};
+		D3D12_INFO_QUEUE_FILTER filter = {};
+		filter.DenyList.pIDList = blockedIds;
+		filter.DenyList.NumIDs = sizeof_array(blockedIds);
+		d3d12InfoQueue->AddRetrievalFilterEntries(&filter);
+		d3d12InfoQueue->AddStorageFilterEntries(&filter);
 		d3d12InfoQueue->Release();
 	}
 

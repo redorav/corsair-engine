@@ -237,12 +237,12 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.name = swapchainDescriptor.name.c_str();
-	swapchainTextureParams.name += " Texture";
 	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
+		swapchainTextureParams.name = swapchainDescriptor.name.c_str();
+		swapchainTextureParams.name.append_sprintf(" Texture %i", i);
 		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
 		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
 	}

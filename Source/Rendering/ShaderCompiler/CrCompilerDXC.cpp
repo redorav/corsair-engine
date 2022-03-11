@@ -63,7 +63,7 @@ void CrCompilerDXC::CreateCommonDXCCommandLine(const CompilationDescriptor& comp
 
 	CrProcessDescriptor processDescriptor;
 	commandLine += dxcPath.c_str();
-	commandLine += " -O3 ";
+	commandLine += " -O3 -WX ";
 
 	commandLine += "-E ";
 	commandLine += compilationDescriptor.entryPoint.c_str();

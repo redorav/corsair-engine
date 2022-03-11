@@ -71,7 +71,7 @@ void* CrHardwareGPUBufferD3D12::LockPS()
 {
 	void* data = nullptr;
 	HRESULT hResult = m_d3dBufferResource->Map(0, nullptr, &data);
-	CrAssertMsg(hResult == VK_SUCCESS, "Failed to map buffer");
+	CrAssertMsg(hResult == S_OK, "Failed to map buffer");
 	return data;
 }
 

@@ -129,7 +129,7 @@ void CrRenderGraph::AddDepthStencilTarget
 (
 	CrRenderGraphTextureId textureId, 
 	CrRenderTargetLoadOp loadOp, CrRenderTargetStoreOp storeOp, float depthClearValue, 
-	CrRenderTargetLoadOp stencilLoadOp, CrRenderTargetStoreOp stencilStoreOp, uint32_t stencilClearValue,
+	CrRenderTargetLoadOp stencilLoadOp, CrRenderTargetStoreOp stencilStoreOp, uint8_t stencilClearValue,
 	uint32_t mipmap, uint32_t slice
 )
 {

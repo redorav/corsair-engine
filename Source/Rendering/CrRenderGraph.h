@@ -57,7 +57,7 @@ struct CrRenderGraphTextureUsage
 
 	float4 clearColor;
 	float depthClearValue = 0.0f;
-	uint32_t stencilClearValue = 0;
+	uint8_t stencilClearValue = 0;
 
 	CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load;
 	CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store;
@@ -237,7 +237,7 @@ public:
 		float depthClearValue = 0.0f,
 		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare, 
 		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare, 
-		uint32_t stencilClearValue = 0,
+		uint8_t stencilClearValue = 0,
 		uint32_t mipmap = 0, uint32_t slice = 0
 	);
 

@@ -34,7 +34,7 @@ struct CrRenderTargetDescriptor
 
 	float4 clearColor;
 	float depthClearValue;
-	uint32_t stencilClearValue;
+	uint8_t stencilClearValue;
 
 	CrRenderTargetLoadOp loadOp;
 	CrRenderTargetStoreOp storeOp;

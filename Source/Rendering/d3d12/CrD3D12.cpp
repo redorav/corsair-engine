@@ -396,3 +396,31 @@ D3D12_COMMAND_LIST_TYPE crd3d::GetD3D12CommandQueueType(CrCommandQueueType::T co
 			return D3D12_COMMAND_LIST_TYPE_DIRECT;
 	}
 }
+
+D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE crd3d::GetD3D12BeginningAccessType(CrRenderTargetLoadOp loadOp)
+{
+	switch (loadOp)
+	{
+		case CrRenderTargetLoadOp::Clear:
+			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+		case CrRenderTargetLoadOp::DontCare:
+			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_DISCARD;
+		case CrRenderTargetLoadOp::Load:
+			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_PRESERVE;
+		default:
+			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_NO_ACCESS;
+	}
+}
+
+D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp)
+{
+	switch (storeOp)
+	{
+		case CrRenderTargetStoreOp::DontCare:
+			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_DISCARD;
+		case CrRenderTargetStoreOp::Store:
+			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
+		default:
+			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_NO_ACCESS;
+	}
+}

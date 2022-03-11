@@ -32,6 +32,10 @@ namespace crd3d
 
 	D3D12_COMMAND_LIST_TYPE GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType);
 
+	D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE GetD3D12BeginningAccessType(CrRenderTargetLoadOp loadOp);
+
+	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
+
 	// A shader-visible heap will have two handles, CPU and GPU. The CPU handle is what we use to update
 	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer
 	struct DescriptorD3D12

@@ -406,7 +406,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			hlslpp::store(colorAttachment.clearColor, clearValues.push_back().color.float32);
 		}
 
-		if (renderPassDescriptor.depth.texture != nullptr)
+		if (renderPassDescriptor.depth.texture)
 		{
 			const CrRenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
 			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };

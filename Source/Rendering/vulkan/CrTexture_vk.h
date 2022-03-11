@@ -20,10 +20,9 @@ struct CrVkImageStateInfo
 
 // TODO Create platform-independent so sync between platforms
 // Perhaps by storing void* as the view?
-struct AdditionalTextureViews
+struct CrVkAdditionalTextureViews
 {
 	CrArray<CrVector<VkImageView>, ICrTexture::MaxMipmaps>	m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
-
 	CrArray<VkImageView, ICrTexture::MaxMipmaps>			m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
 };
 
@@ -56,7 +55,7 @@ private:
 
 	// This is optional as only render targets and RW textures need them, but can take up
 	// some memory per texture (almost 512 bytes)
-	CrUniquePtr<AdditionalTextureViews>	m_additionalTextureViews;
+	CrUniquePtr<CrVkAdditionalTextureViews>	m_additionalTextureViews;
 
 	VmaAllocation						m_vmaAllocation;
 

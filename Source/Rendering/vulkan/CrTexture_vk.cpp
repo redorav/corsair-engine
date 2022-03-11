@@ -171,7 +171,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// TODO This needs reworking. Only create if mips or slices are > 1
 	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
-		m_additionalTextureViews = CrUniquePtr<AdditionalTextureViews>(new AdditionalTextureViews());
+		m_additionalTextureViews = CrUniquePtr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
 	}
 
 	if (IsDepthStencil()) // TODO sparse textures

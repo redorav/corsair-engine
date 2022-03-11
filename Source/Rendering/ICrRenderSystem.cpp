@@ -23,9 +23,8 @@
 static CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
+	: m_descriptor(renderSystemDescriptor)
 {
-	m_graphicsApi = renderSystemDescriptor.graphicsApi;
-
 	// Load builtin shaders here. The render system is only instantiated once and knows
 	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
 	// rest of the engine interacts with them and not the raw data that was passed in, 
@@ -35,7 +34,7 @@ ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDes
 
 	for (uint32_t i = 0; i < CrBuiltinShaders::Count; ++i)
 	{
-		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetBuiltinShaderMetadata((CrBuiltinShaders::T)i, m_graphicsApi);
+		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetBuiltinShaderMetadata((CrBuiltinShaders::T)i, m_descriptor.graphicsApi);
 
 		// Builtin shaders without code are not an error. Sometimes we need shader code 
 		// that is specific to an API and we leave the entry blank. This only happens
@@ -101,9 +100,14 @@ void ICrRenderSystem::CreateRenderDevice()
 	RenderSystem->m_mainDevice->InitializeDeletionQueue();
 }
 
+bool ICrRenderSystem::GetValidationEnabled()
+{
+	return RenderSystem->m_descriptor.enableValidation;
+}
+
 cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()
 {
-	return RenderSystem->m_graphicsApi;
+	return RenderSystem->m_descriptor.graphicsApi;
 }
 
 const CrShaderBytecodeSharedHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)

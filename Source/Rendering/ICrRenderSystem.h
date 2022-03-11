@@ -11,7 +11,7 @@
 struct CrRenderSystemDescriptor 
 {
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Vulkan;
-	bool enableValidation = false; // e.g. Vulkan layers
+	bool enableValidation = false; // e.g. Vulkan layers, D3D debug layer
 	bool enableDebuggingTool = false; // e.g. renderdoc
 };
 
@@ -33,6 +33,8 @@ public:
 
 	static void CreateRenderDevice();
 
+	static bool GetValidationEnabled();
+
 	static cr3d::GraphicsApi::T GetGraphicsApi();
 
 	static const CrShaderBytecodeSharedHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
@@ -43,7 +45,7 @@ protected:
 
 	CrRenderDeviceSharedHandle m_mainDevice;
 
-	cr3d::GraphicsApi::T m_graphicsApi = cr3d::GraphicsApi::Count;
+	CrRenderSystemDescriptor m_descriptor;
 
 	virtual ICrRenderDevice* CreateRenderDevicePS() const = 0;
 };

@@ -58,23 +58,26 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12GraphicsCommandQueue));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating command queue");
 
-	ID3D12InfoQueue* d3d12InfoQueue = NULL;
-	if (SUCCEEDED(m_d3d12Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&d3d12InfoQueue)))
+	if (ICrRenderSystem::GetValidationEnabled())
 	{
-		d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-		d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-		//d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-
-		D3D12_MESSAGE_ID blockedIds[] =
+		ID3D12InfoQueue* d3d12InfoQueue = NULL;
+		if (SUCCEEDED(m_d3d12Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&d3d12InfoQueue)))
 		{
-			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE, // https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
-		};
-		D3D12_INFO_QUEUE_FILTER filter = {};
-		filter.DenyList.pIDList = blockedIds;
-		filter.DenyList.NumIDs = sizeof_array(blockedIds);
-		d3d12InfoQueue->AddRetrievalFilterEntries(&filter);
-		d3d12InfoQueue->AddStorageFilterEntries(&filter);
-		d3d12InfoQueue->Release();
+			d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+			d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+			//d3d12InfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+
+			D3D12_MESSAGE_ID blockedIds[] =
+			{
+				D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE, // https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
+			};
+			D3D12_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.pIDList = blockedIds;
+			filter.DenyList.NumIDs = sizeof_array(blockedIds);
+			d3d12InfoQueue->AddRetrievalFilterEntries(&filter);
+			d3d12InfoQueue->AddStorageFilterEntries(&filter);
+			d3d12InfoQueue->Release();
+		}
 	}
 
 	// Descriptor pool for render target views

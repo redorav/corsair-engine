@@ -18,8 +18,6 @@ struct CrVkImageStateInfo
 	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
 };
 
-// TODO Create platform-independent so sync between platforms
-// Perhaps by storing void* as the view?
 struct CrVkAdditionalTextureViews
 {
 	CrArray<CrVector<VkImageView>, ICrTexture::MaxMipmaps>	m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.

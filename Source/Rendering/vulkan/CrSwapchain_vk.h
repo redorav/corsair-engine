@@ -13,11 +13,19 @@ public:
 
 	virtual void PresentPS() override;
 
-	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) override;
+	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) override;
 
 	VkSwapchainKHR GetVkSwapchain() const;
 
 private:
+
+	// Semaphores are signaled when present completes
+	CrVector<CrGPUSemaphoreSharedHandle> m_presentCompleteSemaphores;
+
+	// We need to have another index for the semaphore because we don't really know
+	// the buffer index until we have acquired the image, but we need to signal the
+	// semaphore during that call
+	uint32_t m_currentSemaphoreIndex;
 
 	VkSurfaceKHR		m_vkSurface = nullptr;
 

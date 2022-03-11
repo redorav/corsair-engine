@@ -10,6 +10,9 @@
 
 CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 	: ICrSwapchain(renderDevice, swapchainDescriptor)
+
+	// The initialization value is important to start at 0 on the first call to present
+	, m_currentSemaphoreIndex((uint32_t)-1)
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 
@@ -244,7 +247,12 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
 	}
 
-	CreatePresentSemaphores(m_imageCount);
+	m_presentCompleteSemaphores.resize(m_imageCount);
+
+	for (CrGPUSemaphoreSharedHandle& waitSemaphore : m_presentCompleteSemaphores)
+	{
+		waitSemaphore = m_renderDevice->CreateGPUSemaphore();
+	}
 }
 
 CrSwapchainVulkan::~CrSwapchainVulkan()
@@ -257,10 +265,15 @@ CrSwapchainVulkan::~CrSwapchainVulkan()
 	vkDestroySurfaceKHR(vkInstance, m_vkSurface, nullptr);
 }
 
-CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
+CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
+	m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
+
+	const ICrGPUSemaphore* signalSemaphore = m_presentCompleteSemaphores[m_currentSemaphoreIndex].get();
+
 	// Acquire image signals the semaphore we pass in
-	VkResult res = vkAcquireNextImageKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSwapchain, timeoutNanoseconds, static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
+	VkResult res = vkAcquireNextImageKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSwapchain, timeoutNanoseconds, 
+		static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
 
 	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
 	{
@@ -273,7 +286,7 @@ CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(const ICrGPUSemaphore* s
 void CrSwapchainVulkan::PresentPS()
 {
 	VkQueue vkQueue = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkQueue(CrCommandQueueType::Graphics);
-	CrGPUSemaphoreVulkan* vulkanSemaphore = static_cast<CrGPUSemaphoreVulkan*>(GetCurrentPresentCompleteSemaphore().get());
+	CrGPUSemaphoreVulkan* waitSemaphore = static_cast<CrGPUSemaphoreVulkan*>(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get());
 
 	// Present image (swap buffers)
 	// TODO Put this on the device and batch submit swapchains
@@ -283,7 +296,7 @@ void CrSwapchainVulkan::PresentPS()
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_vkSwapchain;
 	presentInfo.pImageIndices = &m_currentBufferIndex;
-	presentInfo.pWaitSemaphores = &vulkanSemaphore->GetVkSemaphore();
+	presentInfo.pWaitSemaphores = &waitSemaphore->GetVkSemaphore();
 	presentInfo.waitSemaphoreCount = 1;
 	vkQueuePresentKHR(vkQueue, &presentInfo);
 }

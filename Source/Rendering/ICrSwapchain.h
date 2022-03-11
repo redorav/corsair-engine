@@ -55,18 +55,11 @@ protected:
 
 	virtual void PresentPS() = 0;
 
-	virtual CrSwapchainResult AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
-
-	void CreatePresentSemaphores(uint32_t imageCount);
-
-	const CrGPUSemaphoreSharedHandle& GetCurrentPresentCompleteSemaphore() const;
+	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 
 	ICrRenderDevice*						m_renderDevice = nullptr;
 
 	CrVector<CrTextureSharedHandle>			m_textures;
-
-	// Semaphores are signaled when present completes
-	CrVector<CrGPUSemaphoreSharedHandle>	m_presentCompleteSemaphores;
 
 	uint32_t								m_imageCount;
 
@@ -75,11 +68,6 @@ protected:
 	uint32_t m_width;
 
 	uint32_t m_height;
-
-	// We need to have another index for the semaphore because we don't really know
-	// the buffer index until we have acquired the image, but we need to signal the
-	// semaphore during that call
-	uint32_t m_currentSemaphoreIndex;
 
 	uint32_t m_currentBufferIndex; // Active frame buffer index
 

@@ -71,9 +71,8 @@ CrSwapchainD3D12::~CrSwapchainD3D12()
 
 }
 
-CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(const ICrGPUSemaphore* signalSemaphore, uint64_t timeoutNanoseconds)
+CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	unused_parameter(signalSemaphore);
 	unused_parameter(timeoutNanoseconds);
 	return CrSwapchainResult::Success;
 }

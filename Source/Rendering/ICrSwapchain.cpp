@@ -21,23 +21,10 @@ ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescr
 	, m_imageCount(0)
 	, m_width(0)
 	, m_height(0)
-
-	// The initialization value is important to start at 0 on the first call to present
-	, m_currentSemaphoreIndex((uint32_t)-1)
 	, m_currentBufferIndex(0)
 	, m_imageAcquired(false)
 {
 
-}
-
-void ICrSwapchain::CreatePresentSemaphores(uint32_t imageCount)
-{
-	m_presentCompleteSemaphores.resize(imageCount);
-
-	for (CrGPUSemaphoreSharedHandle& waitSemaphore : m_presentCompleteSemaphores)
-	{
-		waitSemaphore = m_renderDevice->CreateGPUSemaphore();
-	}
 }
 
 cr3d::DataFormat::T ICrSwapchain::GetFormat() const
@@ -65,15 +52,9 @@ uint32_t ICrSwapchain::GetCurrentFrameIndex() const
 	return m_currentBufferIndex;
 }
 
-const CrGPUSemaphoreSharedHandle& ICrSwapchain::GetCurrentPresentCompleteSemaphore() const
-{
-	return m_presentCompleteSemaphores[m_currentSemaphoreIndex];
-}
-
 CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 {
-	m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
-	return AcquireNextImagePS(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get(), timeoutNanoseconds);
+	return AcquireNextImagePS(timeoutNanoseconds);
 }
 
 void ICrSwapchain::Present()

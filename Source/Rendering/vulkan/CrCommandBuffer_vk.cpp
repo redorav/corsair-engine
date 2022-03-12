@@ -327,8 +327,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 	if (m_currentState.m_graphicsPipelineDirty)
 	{
 		// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
-		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline)->m_vkPipeline);
-
+		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline)->GetVkPipeline());
 		m_currentState.m_graphicsPipelineDirty = false;
 	}
 
@@ -340,7 +339,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	const CrShaderBindingLayoutVulkan& bindingLayout = static_cast<const CrShaderBindingLayoutVulkan&>(currentGraphicsShader->GetBindingLayout());
 
-	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->m_vkPipelineLayout);
+	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->GetVkPipelineLayout());
 }
 
 void CrCommandBufferVulkan::FlushComputeRenderStatePS()
@@ -352,11 +351,11 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 	if (m_currentState.m_computePipelineDirty)
 	{
 		// In Vulkan we specify the type of pipeline. In D3D12 for instance they are separate objects
-		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline)->m_vkPipeline);
+		vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline)->GetVkPipeline());
 		m_currentState.m_computePipelineDirty = false;
 	}
 
-	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->m_vkPipelineLayout);
+	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->GetVkPipelineLayout());
 }
 
 static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDescriptor& renderTargetDescriptor)

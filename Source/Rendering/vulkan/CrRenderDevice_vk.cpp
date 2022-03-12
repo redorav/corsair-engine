@@ -161,13 +161,19 @@ cr3d::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* f
 	}
 }
 
-void CrRenderDeviceVulkan::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+void CrRenderDeviceVulkan::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* fence)
 {
-	CrAssert(signalFence != nullptr);
+	CrAssert(fence != nullptr);
 
-	unused_parameter(queueType); // TODO Handle other queues
-	VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(signalFence)->GetVkFence());
-	CrAssert(result == VK_SUCCESS);
+	if (queueType == CrCommandQueueType::Graphics)
+	{
+		VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+		CrAssert(result == VK_SUCCESS);
+	}
+	else
+	{
+		CrAssertMsg(false, "Not implemented");
+	}
 }
 
 void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)

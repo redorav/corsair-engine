@@ -28,7 +28,6 @@ CrRenderWorld::CrRenderWorld()
 
 CrRenderWorld::~CrRenderWorld()
 {
-	CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
 	//CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
 }
 

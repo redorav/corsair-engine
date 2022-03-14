@@ -19,6 +19,7 @@ LibStb          = DependenciesDirectory..'/stb'
 LibTinyGLTF     = DependenciesDirectory..'/tinygltf'
 LibVMA          = DependenciesDirectory..'/vma'
 LibVulkan       = DependenciesDirectory..'/vulkan'
+LibWinPixEventRuntime = DependenciesDirectory..'/winpixeventruntime'
 LibxxHash       = DependenciesDirectory..'/xxHash'
 
 AssimpLibrary =
@@ -145,6 +146,14 @@ VulkanLibrary =
 	libDirs     = LibVulkan..BinaryDirectory,
 	natvis      = LibVMA..IncludeDirectory..'src/**.natvis',
 	libNames    = 'vulkan-1'
+}
+
+WinPixEventRuntimeLibrary =
+{
+	includeDirs = { LibWinPixEventRuntime..IncludeDirectory },
+	libDirs = { LibWinPixEventRuntime..BinaryDirectory },
+	libNames = 'WinPixEventRuntime',
+	dlls = LibWinPixEventRuntime..BinaryDirectory..'WinPixEventRuntime.dll'
 }
 
 xxHashLibrary =

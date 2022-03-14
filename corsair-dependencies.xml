@@ -12,6 +12,7 @@
 	<dependency name="tinygltf" version="298c37a"/>
 	<dependency name="vma" version="042e65e"/>
 	<dependency name="vulkan" version="1.2.189.2"/>
+	<dependency name="winpixeventruntime" version="1.0.220124001"/>
 	<dependency name="xxhash" version="c77920d"/>
 
 </dependencies>

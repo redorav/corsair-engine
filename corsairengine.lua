@@ -253,6 +253,7 @@ project (ProjectCorsairEngine)
 	-- todo platform filters
 	LinkLibrary(VulkanLibrary)
 	LinkLibrary(D3D12Library)
+	LinkLibrary(WinPixEventRuntimeLibrary)
 
 	-- Copy necessary files or DLLs
 	postbuildcommands
@@ -301,6 +302,12 @@ project(ProjectCrRendering)
 		files { SourceRenderingDirectory..'/vulkan/*' }
 		files { SourceRenderingDirectory..'/d3d12/*' }
 		AddLibraryIncludes(VulkanLibrary)
+		AddLibraryIncludes(WinPixEventRuntimeLibrary)
+		
+		postbuildcommands
+		{
+			CopyFileCommand(path.getabsolute(WinPixEventRuntimeLibrary.dlls), '%{cfg.buildtarget.directory}'),
+		}
 		
 	filter { 'platforms:'..VulkanOSX }
 		files { SourceRenderingDirectory..'/vulkan/*' }

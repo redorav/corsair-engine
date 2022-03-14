@@ -54,6 +54,10 @@
 		<version id="1.2.189.2" file="vulkan_1.2.189.2.zip" repository="github"/>
 	</package>
 	
+	<package name="winpixeventruntime">
+		<version id="1.0.220124001" file="winpixeventruntime_1.0.220124001.zip" repository="github"/>
+	</package>
+	
 	<package name="xxhash">
 		<version id="c77920d" file="xxhash_2020_05_28_c77920d.zip" repository="github"/>
 	</package>

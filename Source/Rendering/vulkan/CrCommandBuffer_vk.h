@@ -73,8 +73,7 @@ private:
 
 	virtual void EndRenderPassPS() override;
 
-	template<typename T, typename S>
-	void FlushImageAndBufferBarriers(const T& buffers, const S& textures);
+	void FlushImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
 
 	void UpdateResourceTableVulkan(const CrShaderBindingLayoutVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout);
 

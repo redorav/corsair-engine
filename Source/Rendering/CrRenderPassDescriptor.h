@@ -90,6 +90,11 @@ struct CrRenderPassTextureDescriptor
 
 struct CrRenderPassDescriptor
 {
+	static const uint32_t MaxTransitionCount = 32;
+
+	typedef CrFixedVector<CrRenderPassBufferDescriptor, MaxTransitionCount> BufferTransitionVector;
+	typedef CrFixedVector<CrRenderPassTextureDescriptor, MaxTransitionCount> TextureTransitionVector;
+
 	cr3d::RenderPassType::T type;
 	
 	CrRenderPassNameString debugName;
@@ -99,10 +104,10 @@ struct CrRenderPassDescriptor
 	CrRenderTargetDescriptor depth;
 
 	// Transitions when beginning a pass
-	CrFixedVector<CrRenderPassBufferDescriptor, 32> beginBuffers;
-	CrFixedVector<CrRenderPassTextureDescriptor, 32> beginTextures;
+	BufferTransitionVector beginBuffers;
+	TextureTransitionVector beginTextures;
 
 	// Transitions when ending a pass
-	CrFixedVector<CrRenderPassBufferDescriptor, 32> endBuffers;
-	CrFixedVector<CrRenderPassTextureDescriptor, 32> endTextures;
+	BufferTransitionVector endBuffers;
+	TextureTransitionVector endTextures;
 };

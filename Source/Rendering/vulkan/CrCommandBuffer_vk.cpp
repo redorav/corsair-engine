@@ -600,8 +600,7 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 
 // Create the image and buffer barriers for the buffer and texture transitions specified in the arrays
 // They're all calculated and batched together for efficiency
-template<typename T, typename S>
-void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const T& buffers, const S& textures)
+void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures)
 {
 	// VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT specifies no stage of execution when specified in the first scope
 	// VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT specifies no stage of execution when specified in the second scope
@@ -609,7 +608,7 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const T& buffers, const 
 	VkPipelineStageFlags destStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
 	// Buffer barriers
-	CrFixedVector<VkBufferMemoryBarrier, decltype(CrRenderPassDescriptor::beginBuffers)::kMaxSize> bufferMemoryBarriers;
+	CrFixedVector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> bufferMemoryBarriers;
 
 	for (const CrRenderPassBufferDescriptor& bufferDescriptor : buffers)
 	{
@@ -620,7 +619,7 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const T& buffers, const 
 	}
 
 	// Image barriers
-	CrFixedVector<VkImageMemoryBarrier, decltype(CrRenderPassDescriptor::beginTextures)::kMaxSize> imageMemoryBarriers;
+	CrFixedVector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> imageMemoryBarriers;
 
 	for (const CrRenderPassTextureDescriptor& textureDescriptor : textures)
 	{

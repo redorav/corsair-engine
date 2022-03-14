@@ -307,32 +307,36 @@ void CrRenderGraph::Execute()
 					case cr3d::TextureState::RenderTarget:
 					{
 						CrRenderTargetDescriptor renderTargetDescriptor;
-						renderTargetDescriptor.texture = m_textureResources[textureId.id].descriptor.texture;
-						renderTargetDescriptor.mipmap = textureUsage.mipmapStart;
-						renderTargetDescriptor.slice = textureUsage.sliceStart;
-						renderTargetDescriptor.clearColor = textureUsage.clearColor;
-						renderTargetDescriptor.loadOp = textureUsage.loadOp;
-						renderTargetDescriptor.storeOp = textureUsage.storeOp;
+						renderTargetDescriptor.texture      = m_textureResources[textureId.id].descriptor.texture;
+						renderTargetDescriptor.mipmap       = textureUsage.mipmapStart;
+						renderTargetDescriptor.slice        = textureUsage.sliceStart;
+						renderTargetDescriptor.clearColor   = textureUsage.clearColor;
+						renderTargetDescriptor.loadOp       = textureUsage.loadOp;
+						renderTargetDescriptor.storeOp      = textureUsage.storeOp;
 						renderTargetDescriptor.initialState = transitionInfo.initialState;
-						renderTargetDescriptor.finalState = transitionInfo.finalState;
+						renderTargetDescriptor.usageState   = transitionInfo.usageState;
+						renderTargetDescriptor.finalState   = transitionInfo.finalState;
+
 						renderPassDescriptor.color.push_back(renderTargetDescriptor);
 						break;
 					}
 					case cr3d::TextureState::DepthStencilWrite:
 					{
 						CrRenderTargetDescriptor depthDescriptor;
-						depthDescriptor.texture = m_textureResources[textureId.id].descriptor.texture;
-						depthDescriptor.mipmap = textureUsage.mipmapStart;
-						depthDescriptor.slice = textureUsage.sliceStart;
-						depthDescriptor.depthClearValue = textureUsage.depthClearValue;
+						depthDescriptor.texture           = m_textureResources[textureId.id].descriptor.texture;
+						depthDescriptor.mipmap            = textureUsage.mipmapStart;
+						depthDescriptor.slice             = textureUsage.sliceStart;
+						depthDescriptor.depthClearValue   = textureUsage.depthClearValue;
 						depthDescriptor.stencilClearValue = textureUsage.stencilClearValue;
-						depthDescriptor.loadOp = textureUsage.loadOp;
-						depthDescriptor.storeOp = textureUsage.storeOp;
-						depthDescriptor.stencilLoadOp = textureUsage.stencilLoadOp;
-						depthDescriptor.stencilStoreOp = textureUsage.stencilStoreOp;
-						depthDescriptor.initialState = transitionInfo.initialState;
-						depthDescriptor.finalState = transitionInfo.finalState;
-						renderPassDescriptor.depth = depthDescriptor;
+						depthDescriptor.loadOp            = textureUsage.loadOp;
+						depthDescriptor.storeOp           = textureUsage.storeOp;
+						depthDescriptor.stencilLoadOp     = textureUsage.stencilLoadOp;
+						depthDescriptor.stencilStoreOp    = textureUsage.stencilStoreOp;
+						depthDescriptor.initialState      = transitionInfo.initialState;
+						depthDescriptor.usageState        = transitionInfo.usageState;
+						depthDescriptor.finalState        = transitionInfo.finalState;
+
+						renderPassDescriptor.depth        = depthDescriptor;
 						break;
 					}
 					case cr3d::TextureState::RWTexture:

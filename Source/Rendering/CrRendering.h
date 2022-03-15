@@ -494,6 +494,24 @@ namespace cr3d
 			PreInitialized,    // Linear content. Never a destination
 			Count
 		};
+
+		inline const char* ToString(cr3d::TextureState::T textureState)
+		{
+			switch (textureState)
+			{
+				case Undefined: return "Undefined";
+				case ShaderInput: return "ShaderInput";
+				case RenderTarget: return "RenderTarget";
+				case RWTexture: return "RWTexture";
+				case Present: return "Present";
+				case DepthStencilRead: return "DepthStencilRead";
+				case DepthStencilWrite: return "DepthStencilWrite";
+				case CopySource: return "CopySource";
+				case CopyDestination: return "CopyDestination";
+				case PreInitialized: return "PreInitialized";
+				default: return "";
+			}
+		}
 	};
 
 	namespace BufferState

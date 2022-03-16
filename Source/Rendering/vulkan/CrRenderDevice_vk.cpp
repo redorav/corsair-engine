@@ -511,11 +511,6 @@ bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extensio
 	return m_supportedDeviceExtensions.count(extension) > 0;
 }
 
-bool CrRenderDeviceVulkan::IsDepthStencilFormatSupported(VkFormat depthFormat)
-{
-	return m_supportedDepthStencilFormats.count(depthFormat) > 0;
-}
-
 uint32_t CrRenderDeviceVulkan::GetVkMemoryType(uint32_t typeBits, VkFlags properties) const
 {
 	for (uint32_t i = 0; i < VK_MAX_MEMORY_TYPES; i++)

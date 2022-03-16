@@ -91,9 +91,6 @@ private:
 
 	bool IsVkDeviceExtensionSupported(const CrString& extension);
 
-	// TODO Make platform-independent
-	bool IsDepthStencilFormatSupported(VkFormat depthFormat);
-
 	// Came from RenderSystem. This is the instance this device was created from
 	VkInstance m_vkInstance;
 

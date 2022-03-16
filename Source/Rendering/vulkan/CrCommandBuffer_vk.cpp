@@ -269,7 +269,15 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 	if (m_currentState.m_indexBufferDirty)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer);
-		vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), m_currentState.m_indexBufferOffset, vulkanGPUBuffer->GetVkIndexType());
+		VkIndexType indexType = VK_INDEX_TYPE_UINT32;
+		switch (m_currentState.m_indexBufferStride)
+		{
+			case 4: indexType = VK_INDEX_TYPE_UINT32; break;
+			case 2: indexType = VK_INDEX_TYPE_UINT16; break;
+			case 1: indexType = VK_INDEX_TYPE_UINT8_EXT; break;
+		}
+		
+		vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), m_currentState.m_indexBufferOffset, indexType);
 		m_currentState.m_indexBufferDirty = false;
 	}
 

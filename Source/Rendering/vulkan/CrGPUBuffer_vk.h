@@ -41,14 +41,7 @@ private:
 	VkBufferView m_vkBufferView = nullptr;
 
 	VmaAllocation m_vmaAllocation;
-
-	VkIndexType m_vkIndexType; // Only used for index buffers
 };
-
-inline VkIndexType CrHardwareGPUBufferVulkan::GetVkIndexType() const
-{
-	return m_vkIndexType;
-}
 
 inline VkBuffer CrHardwareGPUBufferVulkan::GetVkBuffer() const
 {

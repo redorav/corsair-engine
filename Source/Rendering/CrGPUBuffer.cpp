@@ -9,12 +9,20 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 	, access(descriptor.access)
 	, usage(descriptor.usage)
 	, mapped(false)
+	, dataFormat(descriptor.dataFormat)
+	, sizeBytes(descriptor.numElements * descriptor.stride)
+	, strideBytes(descriptor.stride)
 {}
 
+// This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
+// is not public, and lives here to cater for the two public-facing constructors
 CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat)
 	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride), m_dataFormat(dataFormat)
 {
-	CrAssertMsg((descriptor.usage & cr3d::BufferUsage::Index) ? (stride == 2 || stride == 4) : true, "Index buffers must have a stride of 2 or 4 bytes");
+	if (descriptor.usage & cr3d::BufferUsage::Index)
+	{
+		CrAssertMsg((stride == 2 && dataFormat == cr3d::DataFormat::R16_Uint) || (stride == 4 && dataFormat == cr3d::DataFormat::R32_Uint), "Invalid format for index buffer");
+	}
 
 	if (descriptor.existingHardwareGPUBuffer)
 	{

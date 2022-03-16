@@ -102,9 +102,9 @@ public:
 
 	CrGPUBuffer AllocateConstantBuffer(uint32_t size);
 
-	CrGPUBuffer AllocateVertexBuffer(uint32_t size);
+	CrGPUBuffer AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
-	CrGPUBuffer AllocateIndexBuffer(uint32_t size);
+	CrGPUBuffer AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat);
 
 	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
 
@@ -183,11 +183,13 @@ protected:
 	struct VertexBufferBinding
 	{
 		VertexBufferBinding() {}
-		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t offset)
-			: vertexBuffer(vertexBuffer), offset(offset) {}
+		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t size, uint32_t offset, uint32_t stride)
+			: vertexBuffer(vertexBuffer), size(size), offset(offset), stride(stride) {}
 
 		const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
+		uint32_t size = 0;
 		uint32_t offset = 0;
+		uint32_t stride = 0;
 	};
 
 	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
@@ -202,6 +204,7 @@ protected:
 
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
+		uint32_t                        m_indexBufferStride;
 		bool                            m_indexBufferDirty = false;
 
 		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
@@ -294,17 +297,22 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 	{
 		m_currentState.m_indexBuffer = indexBuffer->GetHardwareBuffer();
 		m_currentState.m_indexBufferOffset = indexBuffer->GetByteOffset();
+		m_currentState.m_indexBufferStride = indexBuffer->GetStride();
 		m_currentState.m_indexBufferDirty = true;
 	}
 }
 
 inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId)
 {
+	CrAssertMsg(vertexBuffer->GetStride() < 2048, "Stride is too large");
+
 	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
 		m_currentState.m_vertexBuffers[streamId].offset != vertexBuffer->GetByteOffset())
 	{
 		m_currentState.m_vertexBuffers[streamId].vertexBuffer = vertexBuffer->GetHardwareBuffer();
+		m_currentState.m_vertexBuffers[streamId].size = vertexBuffer->GetSize();
 		m_currentState.m_vertexBuffers[streamId].offset = vertexBuffer->GetByteOffset();
+		m_currentState.m_vertexBuffers[streamId].stride = vertexBuffer->GetStride();
 		m_currentState.m_vertexBufferDirty = true;
 	}
 }

@@ -194,8 +194,8 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		}
 
 		// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-		CrGPUBuffer indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount);
-		CrGPUBuffer vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount);
+		CrGPUBuffer indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
+		CrGPUBuffer vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
 
 		// Update contents:
 		ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.Lock();

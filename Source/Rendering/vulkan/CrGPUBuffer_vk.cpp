@@ -9,11 +9,6 @@
 CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
 	: ICrHardwareGPUBuffer(vulkanRenderDevice, descriptor)
 {
-	if (descriptor.usage & cr3d::BufferUsage::Index)
-	{
-		m_vkIndexType = descriptor.stride == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
-	}
-
 	VkResult vkResult = VK_SUCCESS;
 
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();

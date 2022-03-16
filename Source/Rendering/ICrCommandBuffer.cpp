@@ -23,13 +23,16 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueue
 		constantBufferStack.name = "Constant Buffer Stack";
 		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
 
-		uint32_t maxIndices = 1024 * 1024; // 1 MB for indices
+		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size
+		// of each index that we use. We'll assume 32-bit indices for the index buffer, 3 vertices per index and a stride
+		// of 4 bytes for each vertex
+		uint32_t maxIndexData = 1024 * 1024 * cr3d::DataFormats[cr3d::DataFormat::R32_Uint].dataOrBlockSize;
 
-		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices * 3);
+		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxIndexData * 3, 4);
 		vertexBufferStack.name = "Vertex Buffer Stack";
 		m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
-		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, 2);
+		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndexData);
 		indexBufferStack.name = "Index Buffer Stack";
 		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 	}
@@ -82,15 +85,16 @@ void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
 	m_renderDevice->SubmitCommandBuffer(this, waitSemaphore, nullptr, m_completionFence.get());
 }
 
-CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size)
+CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t sizeBytes)
 {
-	CrStackAllocation<void> allocation = stackAllocator->AllocateAligned(size, 256);
+	// TODO Fix alignment
+	CrStackAllocation<void> allocation = stackAllocator->AllocateAligned(sizeBytes, 256);
 
-	CrGPUBufferDescriptor params(stackAllocator->GetUsage(), stackAllocator->GetAccess());
-	params.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();
-	params.memory = allocation.memory;
-	params.offset = allocation.offset;
-	return params;
+	CrGPUBufferDescriptor descriptor(stackAllocator->GetUsage(), stackAllocator->GetAccess());
+	descriptor.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();
+	descriptor.memory = allocation.memory;
+	descriptor.offset = allocation.offset;
+	return descriptor;
 }
 
 void ICrCommandBuffer::BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
@@ -113,19 +117,21 @@ void ICrCommandBuffer::ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint3
 	ResolveGPUQueriesPS(queryPool, start, count);
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
+CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), size), size);
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), sizeBytes), 1, sizeBytes);
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateVertexBuffer(uint32_t size)
+CrGPUBuffer ICrCommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_vertexBufferGPUStack.get(), size), size);
+	uint32_t sizeBytes = vertexCount * stride;
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_vertexBufferGPUStack.get(), sizeBytes), vertexCount, stride);
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t size)
+CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), size), size, 2);
+	uint32_t sizeBytes = indexCount * cr3d::DataFormats[indexFormat].dataOrBlockSize;
+	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), sizeBytes), indexCount, indexFormat);
 }
 
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)

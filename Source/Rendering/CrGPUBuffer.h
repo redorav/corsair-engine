@@ -15,20 +15,20 @@
 
 struct CrHardwareGPUBufferDescriptor
 {
-	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat)
-		: usage(usage), access(access), dataFormat(dataFormat), numElements(1), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
-
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t size)
-		: usage(usage), access(access), numElements(1), stride(size) {}
+		: usage(usage), access(access), numElements(1), stride(size), dataFormat(cr3d::DataFormat::Invalid) {}
 
-	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, uint32_t stride) 
-		: usage(usage), access(access), numElements(numElements), stride(stride) {}
+	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, uint32_t stride)
+		: usage(usage), access(access), numElements(numElements), stride(stride), dataFormat(cr3d::DataFormat::Invalid) {}
+
+	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, cr3d::DataFormat::T dataFormat)
+		: usage(usage), access(access), numElements(numElements), dataFormat(dataFormat), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
 
 	cr3d::BufferUsage::T usage;
 
 	cr3d::MemoryAccess::T access;
 
-	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
+	cr3d::DataFormat::T dataFormat;
 
 	uint32_t numElements;
 
@@ -58,16 +58,26 @@ public:
 
 	virtual void UnlockPS() = 0;
 
+	uint32_t GetSizeBytes() const { return sizeBytes; }
+
+	uint32_t GetStrideBytes() const { return strideBytes; }
+
+	cr3d::DataFormat::T GetDataFormat() const { return dataFormat; }
+
+	ICrRenderDevice* m_renderDevice;
+
 	// TODO Make const. Once we've constructed this buffer we cannot change access or usage
 	cr3d::BufferUsage::T usage;
 
 	cr3d::MemoryAccess::T access;
 
-	cr3d::DataFormat::T dataFormat = cr3d::DataFormat::Count;
-
-	ICrRenderDevice* m_renderDevice;
+	cr3d::DataFormat::T dataFormat;
 
 	bool mapped;
+
+	uint32_t sizeBytes;
+
+	uint32_t strideBytes;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()
@@ -108,16 +118,12 @@ class CrGPUBuffer : public CrGPUDeletable
 {
 public:
 
-	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t size)
-		: CrGPUBuffer(renderDevice, descriptor, 1, size) {}
-
+	// Vertex buffers don't have a single fixed format but we can supply a stride
 	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride)
-		: CrGPUBuffer(renderDevice, descriptor, numElements, stride, cr3d::DataFormat::Count) {}
+		: CrGPUBuffer(renderDevice, descriptor, numElements, stride, cr3d::DataFormat::Invalid) {}
 
 	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, cr3d::DataFormat::T dataFormat)
 		: CrGPUBuffer(renderDevice, descriptor, numElements, cr3d::DataFormats[dataFormat].dataOrBlockSize, dataFormat) {}
-
-	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat);
 
 	~CrGPUBuffer();
 
@@ -160,6 +166,10 @@ protected:
 	cr3d::BufferOwnership::T m_ownership;
 	
 	cr3d::DataFormat::T m_dataFormat;
+
+private:
+
+	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat);
 };
 
 inline const ICrHardwareGPUBuffer* CrGPUBuffer::GetHardwareBuffer() const
@@ -243,7 +253,7 @@ class CrIndexBufferCommon : public CrGPUBuffer
 public:
 
 	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, access), numIndices, dataFormat == cr3d::DataFormat::R16_Uint ? 2 : 4) {}
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, access), numIndices, dataFormat) {}
 };
 
 using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;

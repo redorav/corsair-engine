@@ -424,3 +424,23 @@ const CrVkImageStateInfo& CrTextureVulkan::GetVkImageStateInfo(cr3d::TextureStat
 {
 	return CrVkImageResourceStateTable[textureState];
 }
+
+VkPipelineStageFlags CrTextureVulkan::GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages)
+{
+	VkPipelineStageFlags pipelineFlags = 0;
+
+	if (textureState == cr3d::TextureState::RenderTarget)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	}
+	else if (textureState == cr3d::TextureState::DepthStencilWrite)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	}
+	else if (textureState == cr3d::TextureState::ShaderInput || textureState == cr3d::TextureState::RWTexture)
+	{
+		pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(shaderStages);
+	}
+
+	return pipelineFlags;
+}

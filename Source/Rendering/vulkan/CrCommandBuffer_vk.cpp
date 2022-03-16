@@ -494,72 +494,6 @@ void CrCommandBufferVulkan::EndRenderPassPS()
 	FlushImageAndBufferBarriers(m_currentState.m_currentRenderPass.endBuffers, m_currentState.m_currentRenderPass.endTextures);
 }
 
-VkPipelineStageFlags GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderStageFlags::T shaderStages)
-{
-	VkPipelineStageFlags pipelineFlags = 0;
-
-	if (shaderStages & cr3d::ShaderStageFlags::Vertex)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
-	}
-
-	if (shaderStages & cr3d::ShaderStageFlags::Pixel)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-
-	if (shaderStages & cr3d::ShaderStageFlags::Hull)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
-	}
-
-	if (shaderStages & cr3d::ShaderStageFlags::Domain)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
-	}
-
-	if (shaderStages & cr3d::ShaderStageFlags::Geometry)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
-	}
-
-	if (shaderStages & cr3d::ShaderStageFlags::Compute)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
-	}
-
-	return pipelineFlags;
-}
-
-VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages)
-{
-	VkPipelineStageFlags pipelineFlags = 0;
-
-	if (textureState == cr3d::TextureState::RenderTarget)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	}
-	else if (textureState == cr3d::TextureState::DepthStencilWrite)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-	}
-	else if (textureState == cr3d::TextureState::ShaderInput || textureState == cr3d::TextureState::RWTexture)
-	{
-		pipelineFlags |= GetVkPipelineStageFlagsFromShaderStages(shaderStages);
-	}
-
-	return pipelineFlags;
-}
-
-VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::BufferState::T /*bufferState*/, cr3d::ShaderStageFlags::T shaderStages)
-{
-	VkPipelineStageFlags pipelineFlags = 0;
-
-	pipelineFlags |= GetVkPipelineStageFlagsFromShaderStages(shaderStages);
-
-	return pipelineFlags;
-}
-
 void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
 {
@@ -622,8 +556,8 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescri
 	{
 		VkBufferMemoryBarrier& bufferMemoryBarrier = bufferMemoryBarriers.push_back();
 		PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor.buffer, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
-		srcStageMask |= GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
-		destStageMask |= GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
+		srcStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
+		destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
 	}
 
 	// Image barriers
@@ -634,8 +568,8 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescri
 		VkImageMemoryBarrier& imageMemoryBarrier = imageMemoryBarriers.push_back();
 		PopulateVkImageBarrier(imageMemoryBarrier, textureDescriptor.texture, textureDescriptor.mipmapStart, textureDescriptor.mipmapCount,
 			textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState, textureDescriptor.destinationState);
-		srcStageMask |= GetVkPipelineStageFlags(textureDescriptor.sourceState, textureDescriptor.sourceShaderStages);
-		destStageMask |= GetVkPipelineStageFlags(textureDescriptor.destinationState, textureDescriptor.destinationShaderStages);
+		srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.sourceState, textureDescriptor.sourceShaderStages);
+		destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.destinationState, textureDescriptor.destinationShaderStages);
 	}
 
 	if (!imageMemoryBarriers.empty() || !bufferMemoryBarriers.empty())

@@ -24,6 +24,8 @@ public:
 
 	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access);
 
+	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);
+
 	VkIndexType GetVkIndexType() const;
 
 	VkBuffer GetVkBuffer() const;

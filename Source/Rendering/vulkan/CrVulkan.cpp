@@ -605,6 +605,43 @@ VkAttachmentStoreOp crvk::GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp)
 	}
 }
 
+VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderStageFlags::T shaderStages)
+{
+	VkPipelineStageFlags pipelineFlags = 0;
+
+	if (shaderStages & cr3d::ShaderStageFlags::Vertex)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+	}
+
+	if (shaderStages & cr3d::ShaderStageFlags::Pixel)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+
+	if (shaderStages & cr3d::ShaderStageFlags::Hull)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
+	}
+
+	if (shaderStages & cr3d::ShaderStageFlags::Domain)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
+	}
+
+	if (shaderStages & cr3d::ShaderStageFlags::Geometry)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
+	}
+
+	if (shaderStages & cr3d::ShaderStageFlags::Compute)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+	}
+
+	return pipelineFlags;
+}
+
 VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
 (
 	VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage,

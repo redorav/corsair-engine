@@ -35,6 +35,8 @@ public:
 
 	static const CrVkImageStateInfo& GetVkImageStateInfo(cr3d::TextureState::T textureState);
 
+	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages);
+
 	VkImage GetVkImage() const;
 
 	VkImageView GetVkImageViewAllMipsSlices() const;

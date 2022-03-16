@@ -145,6 +145,15 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 	return usageFlags;
 }
 
+VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(cr3d::BufferState::T /*bufferState*/ , cr3d::ShaderStageFlags::T shaderStages)
+{
+	VkPipelineStageFlags pipelineFlags = 0;
+
+	pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(shaderStages);
+
+	return pipelineFlags;
+}
+
 void* CrHardwareGPUBufferVulkan::LockPS()
 {
 	void* data = nullptr;

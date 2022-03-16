@@ -76,13 +76,13 @@ void ICrCommandBuffer::End()
 	EndPS();
 }
 
-void ICrCommandBuffer::Submit(const ICrGPUSemaphore* waitSemaphore)
+void ICrCommandBuffer::Submit()
 {
 	// We need this flag to be able to reset fences properly during the begin
 	m_submitted = true;
 
 	// Submission will signal the internal semaphore of this command buffer
-	m_renderDevice->SubmitCommandBuffer(this, waitSemaphore, nullptr, m_completionFence.get());
+	m_renderDevice->SubmitCommandBuffer(this, nullptr, nullptr, m_completionFence.get());
 }
 
 CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t sizeBytes)

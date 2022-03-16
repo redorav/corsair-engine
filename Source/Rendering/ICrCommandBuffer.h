@@ -28,7 +28,7 @@ public:
 
 	void End();
 
-	void Submit(const ICrGPUSemaphore* waitSemaphore = nullptr);
+	void Submit();
 
 	void SetViewport(const CrViewport& viewport);
 

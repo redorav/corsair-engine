@@ -118,7 +118,7 @@ public:
 
 	CrGPUQueryPoolHandle CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
 
-	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+	ICrHardwareGPUBuffer* CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor);
 
 	CrGPUFenceSharedHandle CreateGPUFence();
 

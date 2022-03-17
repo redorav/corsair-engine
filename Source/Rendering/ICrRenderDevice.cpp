@@ -129,7 +129,12 @@ CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDes
 	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor));
 }
 
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+CrGPUHardwareBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+{
+	return CrGPUHardwareBufferHandle(CreateHardwareGPUBufferPS(descriptor), m_gpuDeletionCallback);
+}
+
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
 	return CreateHardwareGPUBufferPS(descriptor);
 }

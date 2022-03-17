@@ -36,7 +36,7 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
 		hardwareGPUBufferDescriptor.dataFormat = dataFormat;
 
-		m_buffer = renderDevice->CreateHardwareGPUBuffer(hardwareGPUBufferDescriptor);
+		m_buffer = renderDevice->CreateHardwareGPUBufferPointer(hardwareGPUBufferDescriptor);
 		m_memory = nullptr;
 		m_byteOffset = 0;
 		m_ownership = cr3d::BufferOwnership::Owning;

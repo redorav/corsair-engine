@@ -104,7 +104,9 @@ struct CrShaderReflectionHeader;
 
 // GPU Buffers
 class ICrHardwareGPUBuffer;
+using CrGPUHardwareBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
 struct CrHardwareGPUBufferDescriptor;
+
 class CrGPUBuffer;
 struct CrGPUBufferDescriptor;
 class CrGPUStackAllocator;

@@ -16,7 +16,7 @@ CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice, const Cr
 	, m_bufferAccess(gpuBufferDescriptor.access)
 {
 	m_size = gpuBufferDescriptor.numElements * gpuBufferDescriptor.stride;
-	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBuffer(gpuBufferDescriptor));
+	m_hardwareBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(m_renderDevice->CreateHardwareGPUBufferPointer(gpuBufferDescriptor));
 }
 
 void CrGPUStackAllocator::Begin()

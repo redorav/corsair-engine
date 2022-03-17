@@ -41,7 +41,7 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 		m_querySize
 	);
 
-	m_queryBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(vulkanRenderDevice->CreateHardwareGPUBufferUnique(queryBufferDescriptor));
+	m_queryBuffer = CrUniquePtr<ICrHardwareGPUBuffer>(vulkanRenderDevice->CreateHardwareGPUBufferPointer(queryBufferDescriptor));
 
 	m_timestampPeriod = vulkanRenderDevice->GetVkPhysicalDeviceProperties().limits.timestampPeriod;
 }

@@ -22,9 +22,9 @@ public:
 
 	static const char* GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi);
 
-	void Initialize(const ICrRenderDevice* renderDevice);
+	void Initialize(ICrRenderDevice* renderDevice);
 
-	const ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
+	ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
 
 	CrShaderBytecodeSharedHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 
@@ -38,5 +38,5 @@ public:
 
 protected:
 
-	const ICrRenderDevice* m_renderDevice;
+	ICrRenderDevice* m_renderDevice;
 };

@@ -129,12 +129,12 @@ ICrGPUSemaphore* CrRenderDeviceD3D12::CreateGPUSemaphorePS()
 	return nullptr;
 }
 
-ICrGraphicsShader* CrRenderDeviceD3D12::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+ICrGraphicsShader* CrRenderDeviceD3D12::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
 	return new CrGraphicsShaderD3D12(this, graphicsShaderDescriptor);
 }
 
-ICrComputeShader* CrRenderDeviceD3D12::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+ICrComputeShader* CrRenderDeviceD3D12::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor)
 {
 	return new CrComputeShaderD3D12(this, computeShaderDescriptor);
 }
@@ -180,7 +180,7 @@ ICrGPUQueryPool* CrRenderDeviceD3D12::CreateGPUQueryPoolPS(const CrGPUQueryPoolD
 	return nullptr;
 }
 
-cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
+cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	CrAssertMsg(true, "Not implemented");
 	unused_parameter(fence);

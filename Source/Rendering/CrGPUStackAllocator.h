@@ -16,7 +16,10 @@ public:
 
 	~CrGPUStackAllocator()
 	{
-		End();
+		if (m_currentPointer)
+		{
+			End();
+		}
 	}
 
 	void Begin();

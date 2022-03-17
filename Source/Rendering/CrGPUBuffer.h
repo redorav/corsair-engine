@@ -42,7 +42,7 @@ struct CrHardwareGPUBufferDescriptor
 // to allocate a relatively big buffer and suballocate from there, it is not intended to
 // be created other than by lower level systems. From there one can reserve an offset and
 // a size, and APIs can bind appropriately
-class ICrHardwareGPUBuffer
+class ICrHardwareGPUBuffer : public CrGPUDeletable
 {
 public:
 
@@ -114,7 +114,7 @@ struct CrGPUBufferDescriptor
 // A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
 // than the actual buffer it points to. It can also own a buffer and dispose of it suitably.
 // TODO One interesting feature we should add is a way to deallocate memory from a buffer we don't own
-class CrGPUBuffer : public CrGPUDeletable
+class CrGPUBuffer
 {
 public:
 

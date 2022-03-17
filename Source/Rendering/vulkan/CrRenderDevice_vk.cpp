@@ -86,7 +86,7 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	m_auxiliaryCommandBuffer = CreateCommandBuffer(CrCommandQueueType::Graphics);
 
 	// TODO This is per-device but it's currently global
-	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	if (renderSystem->GetValidationEnabled() && IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{
 		vkDebugMarkerSetObjectTag  = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
 		vkDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
@@ -137,7 +137,7 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 	StorePipelineCache(pipelineCacheData.data(), pipelineCacheSize);
 }
 
-cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
+cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	VkResult result = vkWaitForFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence(), true, timeoutNanoseconds);
 
@@ -341,12 +341,12 @@ ICrGPUSemaphore* CrRenderDeviceVulkan::CreateGPUSemaphorePS()
 	return new CrGPUSemaphoreVulkan(this);
 }
 
-ICrGraphicsShader* CrRenderDeviceVulkan::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+ICrGraphicsShader* CrRenderDeviceVulkan::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
 	return new CrGraphicsShaderVulkan(this, graphicsShaderDescriptor);
 }
 
-ICrComputeShader* CrRenderDeviceVulkan::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+ICrComputeShader* CrRenderDeviceVulkan::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor)
 {
 	return new CrComputeShaderVulkan(this, computeShaderDescriptor);
 }

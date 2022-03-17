@@ -66,12 +66,12 @@ CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
 	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS());
 }
 
-CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) const
+CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
 	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
 }
 
-CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor) const
+CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
 {
 	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
 }
@@ -141,7 +141,7 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBufferPointer(const CrHa
 
 CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
-	return CrIndexBufferSharedHandle(new CrIndexBufferCommon(this, access, dataFormat, numIndices), m_gpuDeletionCallback);
+	return CrIndexBufferSharedHandle(new CrIndexBufferCommon(this, access, dataFormat, numIndices));
 }
 
 CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
@@ -172,15 +172,15 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& 
 
 CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 {
-	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, access, vertexDescriptor, numVertices), m_gpuDeletionCallback);
+	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, access, vertexDescriptor, numVertices));
 }
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 {
-	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements), m_gpuDeletionCallback);
+	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements));
 }
 
-cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds) const
+cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	return WaitForFencePS(fence, timeoutNanoseconds);
 }

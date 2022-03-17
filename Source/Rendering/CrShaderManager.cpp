@@ -74,7 +74,7 @@ CrPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::G
 	return shaderCachePath;
 }
 
-void CrShaderManager::Initialize(const ICrRenderDevice* renderDevice)
+void CrShaderManager::Initialize(ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

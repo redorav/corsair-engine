@@ -33,7 +33,9 @@ public:
 
 	static void CreateRenderDevice();
 
-	static bool GetValidationEnabled();
+	static bool GetIsValidationEnabled();
+
+	static bool GetIsDebuggingToolEnabled();
 
 	static cr3d::GraphicsApi::T GetGraphicsApi();
 

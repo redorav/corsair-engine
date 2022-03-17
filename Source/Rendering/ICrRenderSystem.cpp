@@ -100,9 +100,14 @@ void ICrRenderSystem::CreateRenderDevice()
 	RenderSystem->m_mainDevice->InitializeDeletionQueue();
 }
 
-bool ICrRenderSystem::GetValidationEnabled()
+bool ICrRenderSystem::GetIsValidationEnabled()
 {
 	return RenderSystem->m_descriptor.enableValidation;
+}
+
+bool ICrRenderSystem::GetIsDebuggingToolEnabled()
+{
+	return RenderSystem->m_descriptor.enableDebuggingTool;
 }
 
 cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()

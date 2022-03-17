@@ -99,9 +99,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	bool enableRenderdoc = renderSystemDescriptor.enableDebuggingTool;
-
-	if (enableRenderdoc)
+	if (renderSystemDescriptor.enableDebuggingTool && IsVkInstanceLayerSupported("VK_LAYER_RENDERDOC_Capture"))
 	{
 		m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
 	}

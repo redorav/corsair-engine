@@ -18,6 +18,8 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#include "UnitTests/CrCoreUnitTests.h"
+
 uint32_t screenWidth = 1280;
 uint32_t screenHeight = 720;
 
@@ -57,6 +59,8 @@ int main(int argc, char* argv[])
 	}
 
 	CrGlobalPaths::SetupGlobalPaths(argv[0], dataPath.c_str());
+
+	CrCoreUnitTests::RunCrPathUnitTests();
 
 	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
 

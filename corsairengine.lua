@@ -5,6 +5,7 @@ SourceDirectory          = 'Source'
 ToolsDirectory           = 'Tools'
 ShaderCompilerDirectory  = ToolsDirectory..'/Shader Compiler'
 MathDirectory            = SourceDirectory..'/Math'
+SourceUnitTestsDirectory = SourceDirectory..'/UnitTests'
 SourceRenderingDirectory = SourceDirectory..'/Rendering'
 SourceShadersDirectory   = SourceRenderingDirectory..'/Shaders'
 WorkspaceDirectory       = 'Workspace/'.._ACTION
@@ -32,6 +33,7 @@ ProjectCrInput          = 'CrInput'
 ProjectCrDebug          = 'CrDebug'
 ProjectCrImage          = 'CrImage'
 ProjectCrModel          = 'CrModel'
+ProjectUnitTests        = 'CrUnitTests'
 
 -- Generated Code Directories
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
@@ -236,7 +238,16 @@ project (ProjectCorsairEngine)
 		SourceDirectory..'/*.h', SourceDirectory..'/*.cpp'
 	}
 
-	links { ProjectCrCore, ProjectCrRendering, ProjectCrImage, ProjectCrInput, ProjectCrModel }
+	-- Libraries from other projects
+	links
+	{
+		ProjectCrCore,
+		ProjectCrRendering,
+		ProjectCrImage,
+		ProjectCrInput,
+		ProjectCrModel,
+		ProjectUnitTests
+	}
 	
 	-- Only executables should link to any libraries
 	-- Otherwise we'll get bloated libs and slow link times
@@ -492,6 +503,16 @@ project(ProjectCrCore)
 project('Natvis')
 	kind('StaticLib')
 	AddLibraryNatvis(EASTLLibrary)
+
+group('UnitTests')
+
+project(ProjectUnitTests)
+	kind('StaticLib')
+	
+	files
+	{
+		SourceUnitTestsDirectory..'/**'
+	}
 
 --[[group('.Solution Generation')
 

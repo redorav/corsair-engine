@@ -14,7 +14,10 @@ public:
 
 	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
-	virtual ~CrGPUStackAllocator() {}
+	~CrGPUStackAllocator()
+	{
+		End();
+	}
 
 	void Begin();
 

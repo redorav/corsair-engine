@@ -47,8 +47,8 @@ public:
 
 	CrPath extension() const
 	{
-		size_t lastDot = m_pathString.find_last_of(".");
-		if (lastDot != m_pathString.npos)
+		size_t lastDot;
+		if (has_extension_internal(lastDot))
 		{
 			return CrPath(*this, lastDot, m_pathString.length() - lastDot);
 		}
@@ -74,24 +74,24 @@ public:
 		return m_pathString.find_last_of(s);
 	}
 
-	// https://en.cppreference.com/w/cpp/filesystem/path/extension
-	// If the filename() component of the generic - format path contains a period(.), and is not one of the special filesystem elements dot 
-	// or dot - dot, then the extension is the substring beginning at the rightmost period(including the period) and until the end of the pathname.
-	// If the first character in the filename is a period, that period is ignored(a filename like ".profile" is not treated as an extension)
-	// If the pathname is either . or .., or if filename() does not contain the.character, then empty path is returned.
 	bool has_extension() const
 	{
-		size_t lastDot = m_pathString.find_last_of(".");
-
-		return lastDot != m_pathString.npos && // If there is a dot
-		       lastDot > 0 && // That last dot is not at the beginning of the path
-		       m_pathString[lastDot - 1] != '/' && // And the previous character is neither a / nor a . (special characters)
-		       m_pathString[lastDot - 1] != '.';
+		size_t lastDot;
+		return has_extension_internal(lastDot);
 	}
 
 	CrPath parent_path() const
 	{
-		return CrPath(*this, m_pathString.find_last_of("/"));
+		size_t lastSeparator = m_pathString.find_last_of("/");
+
+		if (lastSeparator != m_pathString.npos)
+		{
+			return CrPath(*this, lastSeparator);
+		}
+		else
+		{
+			return CrPath();
+		}
 	}
 
 	CrPath& remove_filename()
@@ -109,12 +109,11 @@ public:
 	// Replaces the extension with replacement or removes it when the default value of replacement is used.
 	// Firstly, if this path has an extension(), it is removed from the generic-format view of the pathname.
 	// Then, a dot character is appended to the generic-format view of the pathname, if replacement is not empty and does not begin with a dot character.
-	// Then replacement is appended as if by operator+=(replacement).
+	// Then replacement is appended as if by operator += (replacement).
 	CrPath& replace_extension(const char* extension)
 	{
-		size_t lastDot = m_pathString.find_last_of(".");
-
-		if (has_extension())
+		size_t lastDot;
+		if (has_extension_internal(lastDot))
 		{
 			m_pathString.resize(lastDot);
 		}
@@ -201,6 +200,36 @@ public:
 	}
 
 private:
+
+	// https://en.cppreference.com/w/cpp/filesystem/path/extension
+	// If the filename() component of the generic - format path contains a period(.), and is not one of the special filesystem elements dot 
+	// or dot-dot, then the extension is the substring beginning at the rightmost period (including the period) and until the end of the pathname.
+	// If the first character in the filename is a period, that period is ignored (a filename like ".profile" is not treated as an extension)
+	// If the pathname is either . or .., or if filename() does not contain the . character, then empty path is returned.
+	bool has_extension_internal(size_t& lastDot) const
+	{
+		lastDot = m_pathString.find_last_of(".");
+		size_t lastSeparator = m_pathString.find_last_of("/");
+
+		if (lastDot != m_pathString.npos && // If there is a dot
+			lastDot > 0 && // The dot is not at the beginning of the path
+			m_pathString[lastDot - 1] != '/' && // And the previous character is neither a / nor a . (special characters)
+			m_pathString[lastDot - 1] != '.')
+		{
+			if (lastSeparator != m_pathString.npos)
+			{
+				return lastDot > lastSeparator;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	void AddTrailingSeparator()
 	{

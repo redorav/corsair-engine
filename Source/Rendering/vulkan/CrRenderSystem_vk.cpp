@@ -84,29 +84,36 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 
-	if (renderSystemDescriptor.enableValidation)
+	if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
 	{
-		if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
-		{
-			enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-		}
-		else
-		{
-			CrLog("Graphics validation layer %s not found", VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-		}
+		enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 	}
 
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	if (renderSystemDescriptor.enableDebuggingTool && IsVkInstanceLayerSupported("VK_LAYER_RENDERDOC_Capture"))
+	if (renderSystemDescriptor.enableDebuggingTool)
 	{
-		m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
+		if (IsVkInstanceLayerSupported("VK_LAYER_RENDERDOC_Capture"))
+		{
+			m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
+		}
+		else
+		{
+			CrLog("Renderdoc layer VK_LAYER_RENDERDOC_Capture not found");
+		}
 	}
 
-	if (renderSystemDescriptor.enableValidation && IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
+	if (renderSystemDescriptor.enableValidation)
 	{
-		m_instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
+		if (IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
+		{
+			m_instanceLayers.push_back("VK_LAYER_KHRONOS_validation");
+		}
+		else
+		{
+			CrLog("Graphics validation layer VK_LAYER_KHRONOS_validation not found");
+		}
 	}
 
 	instanceCreateInfo.enabledLayerCount = (uint32_t)m_instanceLayers.size();

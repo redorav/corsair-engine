@@ -17,7 +17,7 @@
 #include "Rendering/CrCPUStackAllocator.h"
 
 class CrTextureVulkan;
-class CrShaderBindingLayoutVulkan;
+class ICrShaderBindingLayout;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
 {
@@ -75,7 +75,7 @@ private:
 
 	void FlushImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
 
-	void UpdateResourceTableVulkan(const CrShaderBindingLayoutVulkan& bindingTable, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout);
+	void UpdateResourceTableVulkan(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout);
 
 	CrCPUStackAllocator m_renderPassAllocator;
 

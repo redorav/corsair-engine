@@ -104,7 +104,7 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 // properly because if these tables persist across frames, they should have the same
 // lifetime as the resources they contain
 void CrCommandBufferVulkan::UpdateResourceTableVulkan
-(const CrShaderBindingLayoutVulkan& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkPipelineLayout vkPipelineLayout)
+(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout)
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 
@@ -114,7 +114,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	descriptorSetAllocInfo.pNext = nullptr;
 	descriptorSetAllocInfo.descriptorPool = m_vkDescriptorPool;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	descriptorSetAllocInfo.pSetLayouts = &bindingLayout.m_vkDescriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
 	VkDescriptorSet descriptorSet;
 	VkResult result = vkAllocateDescriptorSets(vulkanRenderDevice->GetVkDevice(), &descriptorSetAllocInfo, &descriptorSet);
@@ -264,7 +264,8 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 {
 	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->GetShader();
+	const CrGraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
+	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<CrGraphicsShaderVulkan*>(graphicsShader.get());
 	
 	if (m_currentState.m_indexBufferDirty)
 	{
@@ -338,16 +339,14 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 		m_currentState.m_stencilRefDirty = false;
 	}
 
-	const CrShaderBindingLayoutVulkan& bindingLayout = static_cast<const CrShaderBindingLayoutVulkan&>(currentGraphicsShader->GetBindingLayout());
-
-	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->GetVkPipelineLayout());
+	UpdateResourceTableVulkan(graphicsShader->GetBindingLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsShader->GetVkDescriptorSetLayout(), vulkanGraphicsPipeline->GetVkPipelineLayout());
 }
 
 void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 {
 	const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
-	const CrComputeShaderHandle& currentComputeShader = vulkanComputePipeline->m_shader;
-	const CrShaderBindingLayoutVulkan& bindingLayout = static_cast<const CrShaderBindingLayoutVulkan&>(currentComputeShader->GetBindingLayout());
+	const CrComputeShaderHandle& computeShader = vulkanComputePipeline->GetShader();
+	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<CrComputeShaderVulkan*>(computeShader.get());
 
 	if (m_currentState.m_computePipelineDirty)
 	{
@@ -356,7 +355,7 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 		m_currentState.m_computePipelineDirty = false;
 	}
 
-	UpdateResourceTableVulkan(bindingLayout, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->GetVkPipelineLayout());
+	UpdateResourceTableVulkan(computeShader->GetBindingLayout(), VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputeShader->GetVkDescriptorSetLayout(), vulkanComputePipeline->GetVkPipelineLayout());
 }
 
 static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDescriptor& renderTargetDescriptor)

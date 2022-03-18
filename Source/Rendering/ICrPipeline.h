@@ -193,6 +193,8 @@ public:
 
 	virtual ~ICrComputePipeline() {}
 
+	const CrComputeShaderHandle& GetShader() const { return m_shader; }
+
 	// TODO PRIVATE
 
 	CrComputeShaderHandle m_shader;

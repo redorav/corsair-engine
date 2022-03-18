@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayoutBinding* layoutBindings, uint32_t layoutBindingCount, CrShaderBindingLayoutVulkan* bindingLayout)
+static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayoutBinding* layoutBindings, uint32_t layoutBindingCount, VkDescriptorSetLayout* vkDescriptorSetLayout)
 {
 	VkDescriptorSetLayoutCreateInfo descriptorLayout;
 	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -16,7 +16,7 @@ static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayout
 	descriptorLayout.bindingCount = layoutBindingCount;
 	descriptorLayout.pBindings = layoutBindings;
 
-	VkResult vkResult = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &bindingLayout->m_vkDescriptorSetLayout);
+	VkResult vkResult = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, vkDescriptorSetLayout);
 	CrAssert(vkResult == VK_SUCCESS);
 }
 
@@ -88,10 +88,9 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 		}
 	}
 
-	CrShaderBindingLayoutVulkan* vulkanBindingLayout = new CrShaderBindingLayoutVulkan(resources);
-	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), vulkanBindingLayout);
+	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(vulkanBindingLayout);
+	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
 
 CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
@@ -100,6 +99,8 @@ CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
 	{
 		vkDestroyShaderModule(m_vkDevice, vkShaderModule, nullptr);
 	}
+
+	vkDestroyDescriptorSetLayout(m_vkDevice, m_vkDescriptorSetLayout, nullptr);
 }
 
 CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
@@ -134,14 +135,15 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, cons
 		layoutBindings.push_back(layoutBinding);
 	});
 
-	CrShaderBindingLayoutVulkan* vulkanBindingTable = new CrShaderBindingLayoutVulkan(resources);
-	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), vulkanBindingTable);
+	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
 	// Create the optimized shader resource table
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(vulkanBindingTable);
+	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
 
 CrComputeShaderVulkan::~CrComputeShaderVulkan()
 {
 	vkDestroyShaderModule(m_vkDevice, m_vkShaderModule, nullptr);
+
+	vkDestroyDescriptorSetLayout(m_vkDevice, m_vkDescriptorSetLayout, nullptr);
 }

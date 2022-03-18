@@ -169,7 +169,7 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		shaderStages[usedShaderStages++] = shaderStageCreateInfo;
 	}
 
-	const CrShaderBindingLayoutVulkan& bindingTable = static_cast<const CrShaderBindingLayoutVulkan&>(graphicsShader->GetBindingLayout());
+	VkDescriptorSetLayout descriptorSetLayouts[] = { vulkanGraphicsShader->GetVkDescriptorSetLayout() };
 
 	// Pipeline Resource Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -177,7 +177,7 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	pipelineLayoutCreateInfo.pNext                  = nullptr;
 	pipelineLayoutCreateInfo.flags                  = 0;
 	pipelineLayoutCreateInfo.setLayoutCount         = 1; // TODO Handle when we have more than one layout
-	pipelineLayoutCreateInfo.pSetLayouts            = &bindingTable.m_vkDescriptorSetLayout;
+	pipelineLayoutCreateInfo.pSetLayouts            = descriptorSetLayouts;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges    = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
@@ -327,20 +327,19 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
 
-CrComputePipelineVulkan::CrComputePipelineVulkan
-(
-	const CrRenderDeviceVulkan* vulkanRenderDevice, const ICrComputeShader* computeShader
-)
+CrComputePipelineVulkan::CrComputePipelineVulkan(const CrRenderDeviceVulkan* vulkanRenderDevice, const ICrComputeShader* computeShader)
 {
+	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader);
+
 	VkPipelineShaderStageCreateInfo shaderStage = {};
 	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
 	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader)->GetVkShaderModule();
 	shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
-	const CrShaderBindingLayoutVulkan& bindingTable = static_cast<const CrShaderBindingLayoutVulkan&>(computeShader->GetBindingLayout());
-
 	VkResult vkResult;
+
+	VkDescriptorSetLayout descriptorSetLayouts[] = { vulkanComputeShader->GetVkDescriptorSetLayout() };
 
 	// Pipeline Resource Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -348,7 +347,7 @@ CrComputePipelineVulkan::CrComputePipelineVulkan
 	pipelineLayoutCreateInfo.pNext = nullptr;
 	pipelineLayoutCreateInfo.flags = 0;
 	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Handle when we have more than one layout
-	pipelineLayoutCreateInfo.pSetLayouts = &bindingTable.m_vkDescriptorSetLayout;
+	pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?

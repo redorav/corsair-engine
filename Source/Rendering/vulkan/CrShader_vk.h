@@ -5,17 +5,6 @@
 
 class ICrRenderDevice;
 
-class CrShaderBindingLayoutVulkan final : public ICrShaderBindingLayout
-{
-public:
-
-	CrShaderBindingLayoutVulkan(const CrShaderBindingLayoutResources& resources) : ICrShaderBindingLayout(resources) {}
-
-	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
-	// The layout is also needed when allocating descriptor sets from a pool.
-	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-};
-
 class CrGraphicsShaderVulkan final : public ICrGraphicsShader
 {
 public:
@@ -24,7 +13,9 @@ public:
 
 	~CrGraphicsShaderVulkan();
 
-	const CrVector<VkShaderModule>& GetVkShaderModules() const;
+	const CrVector<VkShaderModule>& GetVkShaderModules() const { return m_vkShaderModules; }
+
+	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 
 private:
 
@@ -32,13 +23,10 @@ private:
 
 	CrVector<VkShaderModule> m_vkShaderModules;
 
+	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
+	// The layout is also needed when allocating descriptor sets from a pool.
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
 };
-
-inline const CrVector<VkShaderModule>& CrGraphicsShaderVulkan::GetVkShaderModules() const
-{
-	return m_vkShaderModules;
-}
 
 class CrComputeShaderVulkan final : public ICrComputeShader
 {
@@ -48,7 +36,9 @@ public:
 
 	~CrComputeShaderVulkan();
 
-	const VkShaderModule GetVkShaderModule() const;
+	const VkShaderModule GetVkShaderModule() const { return m_vkShaderModule; }
+
+	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 
 private:
 
@@ -58,8 +48,3 @@ private:
 
 	VkDescriptorSetLayout m_vkDescriptorSetLayout;
 };
-
-inline const VkShaderModule CrComputeShaderVulkan::GetVkShaderModule() const
-{
-	return m_vkShaderModule;
-}

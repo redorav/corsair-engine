@@ -58,7 +58,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12GraphicsCommandQueue));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating command queue");
 
-	if (ICrRenderSystem::GetValidationEnabled())
+	if (ICrRenderSystem::GetIsValidationEnabled())
 	{
 		ID3D12InfoQueue* d3d12InfoQueue = NULL;
 		if (SUCCEEDED(m_d3d12Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&d3d12InfoQueue)))

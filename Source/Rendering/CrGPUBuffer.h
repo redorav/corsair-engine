@@ -137,6 +137,8 @@ public:
 
 	uint32_t GetByteOffset() const;
 
+	cr3d::DataFormat::T GetFormat() const;
+
 	bool HasUsage(cr3d::BufferUsage::T usage) const;
 
 	void* Lock();
@@ -205,6 +207,11 @@ inline uint32_t CrGPUBuffer::GetByteOffset() const
 inline int32_t CrGPUBuffer::GetGlobalIndex() const
 {
 	return m_globalIndex;
+}
+
+inline cr3d::DataFormat::T CrGPUBuffer::GetFormat() const
+{
+	return m_dataFormat;
 }
 
 template<typename MetaType>

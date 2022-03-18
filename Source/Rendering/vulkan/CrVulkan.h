@@ -12,6 +12,17 @@ namespace crvk
 {
 	VkFormat GetVkFormat(cr3d::DataFormat::T format);
 
+	inline VkIndexType GetVkIndexType(cr3d::DataFormat::T format)
+	{
+		switch (format)
+		{
+			case cr3d::DataFormat::R32_Uint: return VK_INDEX_TYPE_UINT32;
+			case cr3d::DataFormat::R16_Uint: return VK_INDEX_TYPE_UINT16;
+			case cr3d::DataFormat::R8_Uint: return VK_INDEX_TYPE_UINT8_EXT;
+			default: return VK_INDEX_TYPE_UINT32;
+		}
+	}
+
 	cr3d::DataFormat::T GetDataFormat(VkFormat vkFormat);
 
 	VkSamplerAddressMode GetVkAddressMode(cr3d::AddressMode addressMode);

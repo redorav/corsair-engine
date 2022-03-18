@@ -3,123 +3,43 @@
 #include "CrRenderDevice_vk.h"
 
 #include "Rendering/CrShaderResourceMetadata.h"
+#include "Rendering/ICrShader.inl"
 
 #include "Core/Logging/ICrDebug.h"
 
-static ICrShaderBindingLayout* CreateBindingLayout
-(
-	const ICrRenderDevice* renderDevice, 
-	const CrFixedVector<CrShaderReflectionHeader, cr3d::ShaderStage::Count>& reflectionHeaders
-)
+static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayoutBinding* layoutBindings, uint32_t layoutBindingCount, CrShaderBindingLayoutVulkan* bindingLayout)
 {
-	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
-	CrShaderBindingLayoutResources resources;
-
-	for (uint32_t k = 0; k < reflectionHeaders.size(); ++k)
-	{
-		const CrShaderReflectionHeader& reflectionHeader = reflectionHeaders[k];
-
-		for (uint32_t i = 0; i < reflectionHeader.resources.size(); ++i)
-		{
-			const CrShaderReflectionResource& resource = reflectionHeader.resources[i];
-
-			cr3d::ShaderStage::T stage = reflectionHeader.shaderStage;
-
-			switch (resource.type)
-			{
-				case cr3d::ShaderResourceType::ConstantBuffer:
-				{
-					const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(resource.name);
-					resources.constantBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::Sampler:
-				{
-					const SamplerMetadata& metadata = CrShaderMetadata::GetSampler(resource.name);
-					resources.samplers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::Texture:
-				{
-					const TextureMetadata& metadata = CrShaderMetadata::GetTexture(resource.name);
-					resources.textures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::RWTexture:
-				{
-					const RWTextureMetadata& metadata = CrShaderMetadata::GetRWTexture(resource.name);
-					resources.rwTextures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::StorageBuffer:
-				{
-					const StorageBufferMetadata& metadata = CrShaderMetadata::GetStorageBuffer(resource.name);
-					resources.storageBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::RWStorageBuffer:
-				{
-					const RWStorageBufferMetadata& metadata = CrShaderMetadata::GetRWStorageBuffer(resource.name);
-					resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-				case cr3d::ShaderResourceType::RWDataBuffer:
-				{
-					const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
-					resources.rwDataBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-					break;
-				}
-			}
-
-			VkDescriptorSetLayoutBinding layoutBinding;
-			layoutBinding.binding = resource.bindPoint;
-			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
-			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
-			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
-			layoutBinding.pImmutableSamplers = nullptr;
-
-			layoutBindings.push_back(layoutBinding);
-		}
-	}
-
-	CrShaderBindingLayoutVulkan* vulkanBindingTable = new CrShaderBindingLayoutVulkan(resources);
-
 	VkDescriptorSetLayoutCreateInfo descriptorLayout;
 	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorLayout.pNext = nullptr;
 	descriptorLayout.flags = 0;
-	descriptorLayout.bindingCount = (uint32_t)layoutBindings.size();
-	descriptorLayout.pBindings = layoutBindings.data();
+	descriptorLayout.bindingCount = layoutBindingCount;
+	descriptorLayout.pBindings = layoutBindings;
 
-	VkResult result = vkCreateDescriptorSetLayout(
-		static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), &descriptorLayout, nullptr,
-		&static_cast<CrShaderBindingLayoutVulkan*>(vulkanBindingTable)->m_vkDescriptorSetLayout);
-
-	CrAssert(result == VK_SUCCESS);
-
-	return vulkanBindingTable;
+	VkResult vkResult = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, &bindingLayout->m_vkDescriptorSetLayout);
+	CrAssert(vkResult == VK_SUCCESS);
 }
 
-CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
+	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
+	CrShaderBindingLayoutResources resources;
 	uint32_t currentBindingPoint = 0;
-	CrFixedVector<CrShaderReflectionHeader, cr3d::ShaderStage::Count> reflectionHeaders;
 
 	// Create the shader modules and parse reflection information
 	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		// Modify the reflection and the bytecode itself. We need to do this to get consecutive
 		// binding points once different shader stages are brought together
-		reflectionHeaders.push_back(shaderBytecode->GetReflection());
-		CrShaderReflectionHeader& reflectionModified = reflectionHeaders.back();
+		CrShaderReflectionHeader reflectionHeader = shaderBytecode->GetReflection();
 
 		// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
 		CrVector<unsigned char> bytecodeModified = shaderBytecode->GetBytecode();
 
-		for (CrShaderReflectionResource& resource : reflectionModified.resources)
+		for (CrShaderReflectionResource& resource : reflectionHeader.resources)
 		{
 			resource.bindPoint = (uint8_t)currentBindingPoint;
 			*((uint32_t*)&(bytecodeModified.data()[resource.bytecodeOffset])) = currentBindingPoint;
@@ -139,27 +59,39 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevi
 		CrAssert(vkResult == VK_SUCCESS);
 
 		m_vkShaderModules.push_back(vkShaderModule);
-	}
 
-	const CrShaderReflectionHeader& vertexReflection = reflectionHeaders[0];
-
-	if (vertexReflection.shaderStage == cr3d::ShaderStage::Vertex)
-	{
-		for (uint32_t i = 0; i < vertexReflection.stageInputs.size(); ++i)
+		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderReflectionResource& resource)
 		{
-			const CrShaderInterfaceVariable& interfaceVariable = vertexReflection.stageInputs[i];
+			VkDescriptorSetLayoutBinding layoutBinding;
+			layoutBinding.binding = resource.bindPoint;
+			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+			layoutBinding.pImmutableSamplers = nullptr;
 
-			// We don't want to register built-ins
-			if (interfaceVariable.type == cr3d::ShaderInterfaceBuiltinType::None)
+			layoutBindings.push_back(layoutBinding);
+		});
+
+		if (reflectionHeader.shaderStage == cr3d::ShaderStage::Vertex)
+		{
+			for (uint32_t i = 0; i < reflectionHeader.stageInputs.size(); ++i)
 			{
-				CrVertexInput& input = m_inputSignature.inputs.push_back();
-				input.semantic = CrVertexSemantic::FromString(interfaceVariable.name.c_str());
+				const CrShaderInterfaceVariable& interfaceVariable = reflectionHeader.stageInputs[i];
+
+				// We don't want to register built-ins
+				if (interfaceVariable.type == cr3d::ShaderInterfaceBuiltinType::None)
+				{
+					CrVertexInput& input = m_inputSignature.inputs.push_back();
+					input.semantic = CrVertexSemantic::FromString(interfaceVariable.name.c_str());
+				}
 			}
 		}
 	}
 
-	// Create the optimized shader resource table
-	m_bindingTable = CrUniquePtr<ICrShaderBindingLayout>(CreateBindingLayout(renderDevice, reflectionHeaders));
+	CrShaderBindingLayoutVulkan* vulkanBindingLayout = new CrShaderBindingLayoutVulkan(resources);
+	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), vulkanBindingLayout);
+
+	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(vulkanBindingLayout);
 }
 
 CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
@@ -170,13 +102,12 @@ CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
 	}
 }
 
-CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
+CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	: ICrComputeShader(renderDevice, computeShaderDescriptor)
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
-	CrFixedVector<CrShaderReflectionHeader, cr3d::ShaderStage::Count> reflectionHeaders;
-	reflectionHeaders.push_back(computeShaderDescriptor.m_bytecode->GetReflection());
+	const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
 
 	VkShaderModuleCreateInfo moduleCreateInfo;
 	moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -188,6 +119,29 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(const ICrRenderDevice* renderDevice
 	VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &m_vkShaderModule);
 	CrAssert(vkResult == VK_SUCCESS);
 
+	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
+	CrShaderBindingLayoutResources resources;
+
+	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderReflectionResource& resource)
+	{
+		VkDescriptorSetLayoutBinding layoutBinding;
+		layoutBinding.binding = resource.bindPoint;
+		layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+		layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+		layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+		layoutBinding.pImmutableSamplers = nullptr;
+
+		layoutBindings.push_back(layoutBinding);
+	});
+
+	CrShaderBindingLayoutVulkan* vulkanBindingTable = new CrShaderBindingLayoutVulkan(resources);
+	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), vulkanBindingTable);
+
 	// Create the optimized shader resource table
-	m_bindingTable = CrUniquePtr<ICrShaderBindingLayout>(CreateBindingLayout(renderDevice, reflectionHeaders));
+	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(vulkanBindingTable);
+}
+
+CrComputeShaderVulkan::~CrComputeShaderVulkan()
+{
+	vkDestroyShaderModule(m_vkDevice, m_vkShaderModule, nullptr);
 }

@@ -20,7 +20,7 @@ class CrGraphicsShaderVulkan final : public ICrGraphicsShader
 {
 public:
 
-	CrGraphicsShaderVulkan(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	~CrGraphicsShaderVulkan();
 
@@ -44,7 +44,9 @@ class CrComputeShaderVulkan final : public ICrComputeShader
 {
 public:
 
-	CrComputeShaderVulkan(const ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+	CrComputeShaderVulkan(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+
+	~CrComputeShaderVulkan();
 
 	const VkShaderModule GetVkShaderModule() const;
 

@@ -50,3 +50,13 @@ ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResour
 		m_bindings.insert(m_bindings.end(), resources.rwDataBuffers.begin(), resources.rwDataBuffers.end());
 	}
 }
+
+ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+{
+	for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
+	{
+		m_bytecodes.push_back(bytecode);
+		m_hash <<= bytecode->GetHash();
+		m_debugName = graphicsShaderDescriptor.m_debugName;
+	}
+}

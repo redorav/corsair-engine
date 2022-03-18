@@ -7,7 +7,7 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
 
-CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(const ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
 	m_d3d12Device = static_cast<const CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
@@ -18,8 +18,8 @@ CrGraphicsShaderD3D12::~CrGraphicsShaderD3D12()
 
 }
 
-CrComputeShaderD3D12::CrComputeShaderD3D12(const ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
+CrComputeShaderD3D12::CrComputeShaderD3D12(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	: ICrComputeShader(renderDevice, computeShaderDescriptor)
 {
-	m_d3d12Device = static_cast<const CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
+	m_d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
 }

@@ -153,6 +153,9 @@ public:
 		}
 	}
 
+	template<typename FunctionT>
+	static void AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function);
+
 private:
 
 	uint8_t				m_constantBufferOffset = 0;
@@ -273,7 +276,7 @@ public:
 
 	const ICrShaderBindingLayout& GetBindingLayout() const
 	{
-		return *m_bindingTable.get();
+		return *m_bindingLayout.get();
 	}
 
 	const char* GetDebugName() const
@@ -285,7 +288,7 @@ protected:
 
 	CrShaderDebugString m_debugName;
 
-	CrUniquePtr<ICrShaderBindingLayout> m_bindingTable;
+	CrUniquePtr<ICrShaderBindingLayout> m_bindingLayout;
 
 	// Hash produced from the bytecodes belonging to this shader
 	CrHash m_hash;
@@ -297,15 +300,7 @@ class ICrGraphicsShader : public ICrShader
 {
 public:
 
-	ICrGraphicsShader(const ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
-	{
-		for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
-		{
-			m_bytecodes.push_back(bytecode);
-			m_hash <<= bytecode->GetHash();
-			m_debugName = graphicsShaderDescriptor.m_debugName;
-		}
-	}
+	ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	virtual ~ICrGraphicsShader() {}
 
@@ -337,7 +332,7 @@ class ICrComputeShader : public ICrShader
 {
 public:
 
-	ICrComputeShader(const ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
+	ICrComputeShader(ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
 		m_bytecode  = computeShaderDescriptor.m_bytecode;
 		m_hash      = computeShaderDescriptor.m_bytecode->GetHash();

@@ -204,7 +204,7 @@ protected:
 
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
-		uint32_t                        m_indexBufferStride;
+		cr3d::DataFormat::T             m_indexBufferFormat;
 		bool                            m_indexBufferDirty = false;
 
 		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
@@ -297,7 +297,7 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 	{
 		m_currentState.m_indexBuffer = indexBuffer->GetHardwareBuffer();
 		m_currentState.m_indexBufferOffset = indexBuffer->GetByteOffset();
-		m_currentState.m_indexBufferStride = indexBuffer->GetStride();
+		m_currentState.m_indexBufferFormat = indexBuffer->GetFormat();
 		m_currentState.m_indexBufferDirty = true;
 	}
 }

@@ -264,7 +264,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 {
 	const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->m_shader;
+	const CrGraphicsShaderHandle& currentGraphicsShader = vulkanGraphicsPipeline->GetShader();
 	
 	if (m_currentState.m_indexBufferDirty)
 	{

@@ -21,8 +21,6 @@ public:
 	~CrGraphicsShaderD3D12();
 
 private:
-
-	ID3D12Device* m_d3d12Device;
 };
 
 class CrComputeShaderD3D12 final : public ICrComputeShader
@@ -32,6 +30,4 @@ public:
 	CrComputeShaderD3D12(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
 
 private:
-
-	ID3D12Device* m_d3d12Device;
 };

@@ -1,4 +1,5 @@
 #include "CrRendering_pch.h"
+
 #include "CrPipeline_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
 #include "CrShader_d3d12.h"
@@ -16,6 +17,8 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	d3d12PipelineStateDescriptor.PrimitiveTopologyType = crd3d::GetD3D12PrimitiveTopologyType(pipelineDescriptor.primitiveTopology);
 	d3d12PipelineStateDescriptor.NodeMask = 0;
 
+	m_d3d12PrimitiveTopology = crd3d::GetD3D12PrimitiveTopology(pipelineDescriptor.primitiveTopology);
+
 	D3D12_RASTERIZER_DESC& rasterizerDesc = d3d12PipelineStateDescriptor.RasterizerState;
 	rasterizerDesc.FillMode = crd3d::GetD3D12PolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
 	rasterizerDesc.CullMode = crd3d::GetD3D12PolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
@@ -26,12 +29,13 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	rasterizerDesc.DepthClipEnable = pipelineDescriptor.rasterizerState.depthClipEnable;
 	rasterizerDesc.MultisampleEnable = pipelineDescriptor.rasterizerState.multisampleEnable;
 	rasterizerDesc.AntialiasedLineEnable = pipelineDescriptor.rasterizerState.antialiasedLineEnable;
-	rasterizerDesc.ForcedSampleCount = 1;
+	rasterizerDesc.ForcedSampleCount = 0;
 	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
 	uint32_t numRenderTargets = 0;
 
 	D3D12_BLEND_DESC& blendDesc = d3d12PipelineStateDescriptor.BlendState;
+	blendDesc = {};
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.IndependentBlendEnable = false;
 
@@ -42,11 +46,11 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
 	{
 		const CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
+		D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
 		if (renderTargets.colorFormats[i] != cr3d::DataFormat::Invalid)
 		{
 			const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-			D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
 			renderTargetDesc.BlendEnable = renderTargetBlend.enable;
 			renderTargetDesc.LogicOpEnable = false;
@@ -70,7 +74,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 		}
 		else
 		{
-			break;
+			d3d12PipelineStateDescriptor.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
 		}
 	}
 
@@ -87,7 +91,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 
 	DXGI_SAMPLE_DESC& sampleDesc = d3d12PipelineStateDescriptor.SampleDesc;
 	sampleDesc.Count = crd3d::GetD3D12SampleCount(pipelineDescriptor.sampleCount);
-	sampleDesc.Quality = 1;
+	sampleDesc.Quality = 0;
 
 	D3D12_DEPTH_STENCIL_DESC& depthStencilDesc = d3d12PipelineStateDescriptor.DepthStencilState;
 	depthStencilDesc.DepthEnable = pipelineDescriptor.depthStencilState.depthTestEnable;
@@ -113,14 +117,10 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	// Only useful for triangle strips
 	d3d12PipelineStateDescriptor.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 
-	d3d12PipelineStateDescriptor.CachedPSO.pCachedBlob = nullptr;
-	d3d12PipelineStateDescriptor.CachedPSO.CachedBlobSizeInBytes = 0;
-
+	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const CrGraphicsShaderD3D12* d3d12GraphicsShader = static_cast<const CrGraphicsShaderD3D12*>(graphicsShader);
-
-	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = d3d12GraphicsShader->GetBytecodes();
+	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 	d3d12PipelineStateDescriptor.VS = {};
 	d3d12PipelineStateDescriptor.PS = {};
@@ -189,7 +189,18 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
 }
 
-CrComputePipelineD3D12::CrComputePipelineD3D12(const CrRenderDeviceD3D12* /*d3d12RenderDevice*/, const ICrComputeShader* /*computeShader*/)
+CrComputePipelineD3D12::CrComputePipelineD3D12(const CrRenderDeviceD3D12* d3d12RenderDevice, const ICrComputeShader* computeShader)
 {
+	D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
+	d3d12PipelineStateDescriptor.NodeMask = 0;
+	d3d12PipelineStateDescriptor.CachedPSO = {};
+	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
+	const CrShaderBytecodeSharedHandle& bytecode = computeShader->GetBytecode();
+	d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size()};
+
+	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12ComputeRootSignature();
+
+	HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateComputePipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
+	CrAssertMsg(hResult == S_OK, "Failed to create compute pipeline");
 }

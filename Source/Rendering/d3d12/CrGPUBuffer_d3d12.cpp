@@ -24,6 +24,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 			break;
 		case cr3d::MemoryAccess::GPUWriteCPURead:
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+			initialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
 			break;
 		case cr3d::MemoryAccess::Staging:
 		case cr3d::MemoryAccess::CPUStreamToGPU:
@@ -38,8 +39,6 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	heapProperties.CreationNodeMask = 1;
 	heapProperties.VisibleNodeMask = 1;
 
-	uint32_t bufferSize = descriptor.numElements * descriptor.stride;
-
 	D3D12_RESOURCE_DESC resourceDesc;
 	resourceDesc.Alignment = 0;
 	resourceDesc.DepthOrArraySize = 1;
@@ -50,19 +49,13 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.SampleDesc = { 1, 0 };
-	resourceDesc.Width = bufferSize;
+	resourceDesc.Width = sizeBytes;
 
 	D3D12_CLEAR_VALUE optimizedClearValue = {};
 
 	HRESULT hResult = S_OK;
 
-	hResult = m_d3d12Device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE, 
-		&resourceDesc,
-		initialResourceState,
-		nullptr,
-		IID_PPV_ARGS(&m_d3dBufferResource));
+	hResult = m_d3d12Device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialResourceState, nullptr, IID_PPV_ARGS(&m_d3dBufferResource));
 
 	CrAssertMsg(hResult == S_OK, "Failed to create buffer");
 }

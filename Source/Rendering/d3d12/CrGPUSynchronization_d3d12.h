@@ -13,7 +13,13 @@ public:
 
 	~CrGPUFenceD3D12();
 
+	ID3D12Fence* GetD3D12Fence() const { return m_d3d12Fence; }
+
+	HANDLE GetFenceEvent() const { return m_fenceEvent; }
+
 private:
+
+	HANDLE m_fenceEvent;
 
 	ID3D12Fence* m_d3d12Fence;
 };

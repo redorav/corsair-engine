@@ -22,7 +22,7 @@ public:
 
 	// This command queue isn't really used for anything other than to build the swapchain and do other tasks
 	// that the device used to do but now requires a queue. Don't use for actual rendering
-	ID3D12CommandQueue* GetD3DDirectCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
+	ID3D12CommandQueue* GetD3D12GraphicsCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
 
 	crd3d::DescriptorD3D12 AllocateRTVDescriptor();
 
@@ -35,6 +35,8 @@ public:
 	crd3d::DescriptorD3D12 AllocateSamplerDescriptor();
 
 	void FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor);
+
+	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
 
 private:
 
@@ -75,13 +77,15 @@ private:
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
 	// Heap for Render Target Views
-	CrDescriptorPoolD3D12 m_d3d12RTVHeap;
+	CrDescriptorPoolD3D12 m_rtvPool;
 
 	// Heap for Depth Stencil Views
-	CrDescriptorPoolD3D12 m_d3d12DSVHeap;
+	CrDescriptorPoolD3D12 m_dsvPool;
 
-	// Non-shader visible heap for Samplers
-	CrDescriptorPoolD3D12 m_d3d12SamplerHeap;
+	// Heap for Samplers
+	CrDescriptorPoolD3D12 m_samplerPool;
+
+	CrGPUFenceSharedHandle m_waitIdleFence;
 
 	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue;
 
@@ -93,30 +97,30 @@ private:
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()
 {
-	return m_d3d12RTVHeap.Allocate();
+	return m_rtvPool.Allocate();
 }
 
 inline void CrRenderDeviceD3D12::FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
-	m_d3d12RTVHeap.Free(descriptor);
+	m_rtvPool.Free(descriptor);
 }
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateDSVDescriptor()
 {
-	return m_d3d12DSVHeap.Allocate();
+	return m_dsvPool.Allocate();
 }
 
 inline void CrRenderDeviceD3D12::FreeDSVDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
-	m_d3d12DSVHeap.Free(descriptor);
+	m_dsvPool.Free(descriptor);
 }
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateSamplerDescriptor()
 {
-	return m_d3d12SamplerHeap.Allocate();
+	return m_samplerPool.Allocate();
 }
 
 inline void CrRenderDeviceD3D12::FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
-	m_d3d12SamplerHeap.Free(descriptor);
+	m_samplerPool.Free(descriptor);
 }

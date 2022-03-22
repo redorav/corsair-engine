@@ -86,7 +86,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		rtvDescriptorHeapDescriptor.name = "RTV Descriptor";
 		rtvDescriptorHeapDescriptor.numDescriptors = 1024;
 		rtvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		m_d3d12RTVHeap.Initialize(this, rtvDescriptorHeapDescriptor);
+		m_rtvPool.Initialize(this, rtvDescriptorHeapDescriptor);
 	}
 
 	// Descriptor pool for depth stencil views
@@ -95,7 +95,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		dsvDescriptorHeapDescriptor.name = "DSV Descriptor";
 		dsvDescriptorHeapDescriptor.numDescriptors = 512;
 		dsvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-		m_d3d12DSVHeap.Initialize(this, dsvDescriptorHeapDescriptor);
+		m_dsvPool.Initialize(this, dsvDescriptorHeapDescriptor);
 	}
 
 	// Descriptor pool for samplers
@@ -113,6 +113,13 @@ CrRenderDeviceD3D12::~CrRenderDeviceD3D12()
 
 }
 
+void CrRenderDeviceD3D12::SetD3D12ObjectName(ID3D12Object* object, const char* name)
+{
+	CrFixedWString128 wName;
+	wName.append_convert<char>(name);
+	object->SetName(wName.c_str());
+}
+
 ICrCommandBuffer* CrRenderDeviceD3D12::CreateCommandBufferPS(CrCommandQueueType::T type)
 {
 	return new CrCommandBufferD3D12(this, type);
@@ -125,7 +132,7 @@ ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()
 
 ICrGPUSemaphore* CrRenderDeviceD3D12::CreateGPUSemaphorePS()
 {
-	CrAssertMsg(true, "Not implemented");
+	CrAssertMsg(false, "Not implemented");
 	return nullptr;
 }
 
@@ -169,55 +176,96 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS
 
 ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const ICrComputeShader* computeShader)
 {
-	CrAssertMsg(true, "Not implemented");
 	return new CrComputePipelineD3D12(this, computeShader);
 }
 
 ICrGPUQueryPool* CrRenderDeviceD3D12::CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(queryPoolDescriptor);
-	return nullptr;
+	return new CrGPUQueryPoolD3D12(this, queryPoolDescriptor);
 }
 
 cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(fence);
-	unused_parameter(timeoutNanoseconds);
-	return cr3d::GPUFenceResult::Success;
+	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+	ID3D12Fence* d3d12Fence = d3dFence->GetD3D12Fence();
+
+	DWORD waitResult = 0;
+	UINT64 currentValue = d3d12Fence->GetCompletedValue();
+
+	if (currentValue < 1)
+	{
+		d3d12Fence->SetEventOnCompletion(1, d3dFence->GetFenceEvent());
+		waitResult = WaitForSingleObjectEx(d3dFence->GetFenceEvent(), (DWORD)timeoutNanoseconds, FALSE);
+	}
+
+	if (waitResult == 0)
+	{
+		return cr3d::GPUFenceResult::Success;
+	}
+	else
+	{
+		return cr3d::GPUFenceResult::TimeoutOrNotReady;
+	}
 }
 
 cr3d::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fence) const
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(fence);
-	return cr3d::GPUFenceResult::Success;
+	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+
+	if (d3dFence->GetD3D12Fence()->GetCompletedValue() == 1)
+	{
+		return cr3d::GPUFenceResult::Success;
+	}
+	else
+	{
+		return cr3d::GPUFenceResult::TimeoutOrNotReady;
+	}
 }
 
-void CrRenderDeviceD3D12::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+void CrRenderDeviceD3D12::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* fence)
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(queueType);
-	unused_parameter(signalFence);
+	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+
+	// To signal a fence, we set its value to 1. Note that we're using fences like Vulkan
+	// uses fences, there are no values
+	if (queueType == CrCommandQueueType::Graphics)
+	{
+		m_d3d12GraphicsCommandQueue->Signal(d3dFence->GetD3D12Fence(), 1);
+	}
+	else
+	{
+		CrAssertMsg(false, "Not implemented");
+	}
 }
 
 void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(fence);
+	// To reset the fence we signal it on the CPU side back to 0, and also
+	// manually reset the event. This is manual so we can wait for the same
+	// fence in multiple sites
+	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+	d3dFence->GetD3D12Fence()->Signal(0);
+	ResetEvent(d3dFence->GetFenceEvent());
 }
 
 void CrRenderDeviceD3D12::WaitIdlePS()
 {
-	CrAssertMsg(true, "Not implemented");
+	// Signal a fence and immediately wait for it
+	SignalFence(CrCommandQueueType::Graphics, m_waitIdleFence.get());
+
+	WaitForFence(m_waitIdleFence.get(), UINT64_MAX);
 }
 
 void CrRenderDeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
-	CrAssertMsg(true, "Not implemented");
-	unused_parameter(commandBuffer);
 	unused_parameter(waitSemaphore);
 	unused_parameter(signalSemaphore);
-	unused_parameter(signalFence);
+
+	// Signal fence so we can wait for it on next use
+	SignalFencePS(CrCommandQueueType::Graphics, signalFence);
+
+	const CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<const CrCommandBufferD3D12*>(commandBuffer);
+
+	ID3D12CommandList* d3d12CommandList = { d3d12CommandBuffer->GetD3D12CommandList() };
+	m_d3d12GraphicsCommandQueue->ExecuteCommandLists(1, &d3d12CommandList);
 }

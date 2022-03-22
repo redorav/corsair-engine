@@ -26,9 +26,9 @@ uint32_t CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const CrDescriptorHeapD
 	}
 }
 
-void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& heapDescriptor)
+void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& heapDescriptor)
 {
-	m_d3d12Device = renderDeviceD3D12->GetD3D12Device();
+	m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
 	m_descriptorStride = m_d3d12Device->GetDescriptorHandleIncrementSize(heapDescriptor.type);
 
@@ -43,9 +43,7 @@ void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, c
 	HRESULT hResult = m_d3d12Device->CreateDescriptorHeap(&d3d12HeapDescriptor, IID_PPV_ARGS(&m_descriptorHeap));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating descriptor heap");
 
-	wchar_t wideStringName[128];
-	mbstowcs(wideStringName, heapDescriptor.name, sizeof(wideStringName) / sizeof(wideStringName[0]));
-	m_descriptorHeap->SetName(wideStringName);
+	d3d12RenderDevice->SetD3D12ObjectName(m_descriptorHeap, heapDescriptor.name);
 
 	m_heapStart.cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -61,34 +59,24 @@ void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, c
 
 void CrDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor)
 {
-	uint32_t maxDescriptorsPerHeap = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
-	uint32_t numHeaps = (uint32_t) ceilf(descriptor.numDescriptors / (float)maxDescriptorsPerHeap);
+	CrAssertMsg(descriptor.numDescriptors <= maxDescriptors, "Exceeded maximum numbers of descriptors");
 
-	m_descriptorHeaps.resize(numHeaps);
+	CrDescriptorHeapDescriptor singleHeapDescriptor;
+	singleHeapDescriptor.name = descriptor.name;
+	singleHeapDescriptor.numDescriptors = maxDescriptors;
+	singleHeapDescriptor.type = descriptor.type;
+	singleHeapDescriptor.flags = descriptor.flags;
+	m_descriptorHeap.Initialize(renderDeviceD3D12, singleHeapDescriptor);
 
-	m_availableDescriptors.resize(numHeaps * maxDescriptorsPerHeap);
+	crd3d::DescriptorD3D12 heapStart = m_descriptorHeap.GetHeapStart();
 
-	uint32_t numDescriptors = 0;
-
-	for(uint32_t i = 0; i < m_descriptorHeaps.size(); ++i)
+	m_availableDescriptors.resize(maxDescriptors);
+	for (uint32_t j = 0; j < m_availableDescriptors.size(); ++j)
 	{
-		CrDescriptorHeapD3D12& descriptorHeap = m_descriptorHeaps[i];
-		CrDescriptorHeapDescriptor singleHeapDescriptor;
-		singleHeapDescriptor.name = descriptor.name;
-		singleHeapDescriptor.numDescriptors = maxDescriptorsPerHeap;
-		singleHeapDescriptor.type = descriptor.type;
-		singleHeapDescriptor.flags = descriptor.flags;
-		descriptorHeap.Initialize(renderDeviceD3D12, singleHeapDescriptor);
-
-		crd3d::DescriptorD3D12 heapStart = descriptorHeap.GetHeapStart();
-
-		for (uint32_t j = 0; j < maxDescriptorsPerHeap; ++j)
-		{
-			m_availableDescriptors[numDescriptors].cpuHandle.ptr = heapStart.cpuHandle.ptr + j * descriptorHeap.GetDescriptorStride();
-			m_availableDescriptors[numDescriptors].gpuHandle.ptr = heapStart.gpuHandle.ptr + j * descriptorHeap.GetDescriptorStride();
-			numDescriptors++;
-		}
+		m_availableDescriptors[j].cpuHandle.ptr = heapStart.cpuHandle.ptr + j * m_descriptorHeap.GetDescriptorStride();
+		m_availableDescriptors[j].gpuHandle.ptr = heapStart.gpuHandle.ptr + j * m_descriptorHeap.GetDescriptorStride();
 	}
 }
 
@@ -102,4 +90,24 @@ crd3d::DescriptorD3D12 CrDescriptorPoolD3D12::Allocate()
 void CrDescriptorPoolD3D12::Free(crd3d::DescriptorD3D12 descriptor)
 {
 	m_availableDescriptors.push_back(descriptor);
+}
+
+CrDescriptorStreamD3D12::CrDescriptorStreamD3D12()
+	: m_currentDescriptor(0)
+{
+	
+}
+
+crd3d::DescriptorD3D12 CrDescriptorStreamD3D12::Allocate()
+{
+	crd3d::DescriptorD3D12 descriptor = m_descriptorHeap.GetHeapStart();
+	descriptor.cpuHandle.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
+	descriptor.gpuHandle.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
+	m_currentDescriptor++;
+	return descriptor;
+}
+
+void CrDescriptorStreamD3D12::Reset()
+{
+	m_currentDescriptor = 0;
 }

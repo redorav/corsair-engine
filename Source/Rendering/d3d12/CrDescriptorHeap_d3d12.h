@@ -24,6 +24,8 @@ public:
 
 	uint32_t GetDescriptorStride() const { return m_descriptorStride; }
 
+	ID3D12DescriptorHeap* GetD3D12DescriptorHeap() const { return m_descriptorHeap; }
+
 private:
 
 	ID3D12Device* m_d3d12Device;
@@ -49,9 +51,11 @@ public:
 
 	void Free(crd3d::DescriptorD3D12 descriptor);
 
+	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+
 private:
 
-	CrVector<CrDescriptorHeapD3D12> m_descriptorHeaps;
+	CrDescriptorHeapD3D12 m_descriptorHeap;
 
 	CrVector<crd3d::DescriptorD3D12> m_availableDescriptors;
 };
@@ -62,5 +66,17 @@ class CrDescriptorStreamD3D12
 {
 public:
 
+	CrDescriptorStreamD3D12();
+
+	crd3d::DescriptorD3D12 Allocate();
+
+	void Reset();
+
+	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+
+private:
+
 	CrDescriptorHeapD3D12 m_descriptorHeap;
+
+	uint32_t m_currentDescriptor;
 };

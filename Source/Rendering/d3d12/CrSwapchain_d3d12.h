@@ -17,5 +17,11 @@ public:
 
 private:
 
-	IDXGISwapChain1* m_d3d12Swapchain;
+	ID3D12Fence* m_d3d12Fence;
+
+	HANDLE m_fenceEvent;
+
+	CrVector<UINT64> m_fenceValues;
+
+	IDXGISwapChain3* m_d3d12Swapchain;
 };

@@ -12,7 +12,7 @@
 
 CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : ICrSwapchain(renderDevice, swapchainDescriptor)
 {
-	CrRenderDeviceD3D12* d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice);
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 
 	DXGI_SWAP_CHAIN_DESC1 d3d12SwapchainDescriptor = {};
 	d3d12SwapchainDescriptor.BufferCount = swapchainDescriptor.requestedBufferCount;
@@ -33,15 +33,21 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC d3d12FullscreenDescriptor = {};
 
+	IDXGISwapChain1* swapchain;
+
 	HRESULT hResult = static_cast<const CrRenderSystemD3D12*>(ICrRenderSystem::Get())->GetDXGIFactory()->CreateSwapChainForHwnd
 	(
-		d3d12Device->GetD3DDirectCommandQueue(),
+		d3d12RenderDevice->GetD3D12GraphicsCommandQueue(),
 		(HWND)swapchainDescriptor.platformWindow,
 		&d3d12SwapchainDescriptor,
 		nullptr, // TODO Handle fullscreen
 		nullptr,
-		&m_d3d12Swapchain
+		&swapchain
 	);
+
+	// Cast to an upgraded swapchain with more functionality
+	swapchain->QueryInterface(IID_PPV_ARGS(&m_d3d12Swapchain));
+	swapchain->Release();
 
 	CrAssertMsg(SUCCEEDED(hResult), "Swapchain creation failed");
 
@@ -54,29 +60,65 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.name = "Swapchain Texture";
 	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
+		swapchainTextureParams.name = swapchainDescriptor.name.c_str();
+		swapchainTextureParams.name.append_sprintf(" Texture %i", i);
+
 		ID3D12Resource* surfaceResource;
 		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));
 		swapchainTextureParams.extraDataPtr = surfaceResource; // Swapchain resource
 		m_textures.push_back(renderDevice->CreateTexture(swapchainTextureParams));
+
+		m_fenceValues.push_back();
 	}
+
+	d3d12RenderDevice->GetD3D12Device()->CreateFence(m_fenceValues[m_currentBufferIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
+
+	m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 
 CrSwapchainD3D12::~CrSwapchainD3D12()
 {
+	m_d3d12Swapchain->Release();
 
+	m_d3d12Fence->Release();
+
+	CloseHandle(m_fenceEvent);
 }
 
 CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	unused_parameter(timeoutNanoseconds);
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	ID3D12CommandQueue* commandQueue = d3d12RenderDevice->GetD3D12GraphicsCommandQueue();
+
+	// Signal the fence
+	const UINT64 currentFenceValue = m_fenceValues[m_currentBufferIndex];
+	commandQueue->Signal(m_d3d12Fence, currentFenceValue);
+
+	// Update the buffer index
+	m_currentBufferIndex = m_d3d12Swapchain->GetCurrentBackBufferIndex();
+
+	// If the next frame is not ready to be rendered yet, wait until it is ready.
+	if (m_d3d12Fence->GetCompletedValue() < m_fenceValues[m_currentBufferIndex])
+	{
+		m_d3d12Fence->SetEventOnCompletion(m_fenceValues[m_currentBufferIndex], m_fenceEvent);
+		WaitForSingleObjectEx(m_fenceEvent, (DWORD)timeoutNanoseconds, FALSE);
+	}
+
+	// Set the fence value for the next frame.
+	m_fenceValues[m_currentBufferIndex] = currentFenceValue + 1;
+
 	return CrSwapchainResult::Success;
 }
 
+// https://docs.microsoft.com/en-us/windows/win32/direct3ddxgi/dxgi-present
 void CrSwapchainD3D12::PresentPS()
 {
+	UINT syncInternal = 1;
+	UINT flags = 0;
+
+	m_d3d12Swapchain->Present(syncInternal, flags);
 }

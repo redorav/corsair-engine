@@ -36,6 +36,21 @@ namespace crd3d
 
 	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
 
+	// https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/d3dx12.h
+	// Copied from D3D12CalcSubresource
+	constexpr UINT CalculateSubresource(UINT MipSlice, UINT ArraySlice, UINT PlaneSlice, UINT MipLevels, UINT ArraySize)
+	{
+		return MipSlice + ArraySlice * MipLevels + PlaneSlice * MipLevels * ArraySize;
+	}
+
+	// Copied from D3D12DecomposeSubresource
+	constexpr void DecomposeSubresource(UINT Subresource, UINT MipLevels, UINT ArraySize, UINT& MipSlice, UINT& ArraySlice, UINT& PlaneSlice) noexcept
+	{
+		MipSlice = Subresource % MipLevels;
+		ArraySlice = (Subresource / MipLevels) % ArraySize;
+		PlaneSlice = Subresource / (MipLevels * ArraySize);
+	}
+
 	// A shader-visible heap will have two handles, CPU and GPU. The CPU handle is what we use to update
 	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer
 	struct DescriptorD3D12

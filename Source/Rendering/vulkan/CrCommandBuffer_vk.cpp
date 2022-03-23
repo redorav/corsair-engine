@@ -149,8 +149,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		dynamicOffsets[dynamicOffsetCount] = binding.offsetBytes;
 		dynamicOffsetCount++;
 
-		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
-		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
 		descriptorCount++;
 		bufferCount++;

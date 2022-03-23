@@ -83,7 +83,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	// Descriptor pool for render target views
 	{
 		CrDescriptorHeapDescriptor rtvDescriptorHeapDescriptor;
-		rtvDescriptorHeapDescriptor.name = "RTV Descriptor";
+		rtvDescriptorHeapDescriptor.name = "RTV Descriptor Heap";
 		rtvDescriptorHeapDescriptor.numDescriptors = 1024;
 		rtvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		m_rtvPool.Initialize(this, rtvDescriptorHeapDescriptor);
@@ -92,7 +92,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	// Descriptor pool for depth stencil views
 	{
 		CrDescriptorHeapDescriptor dsvDescriptorHeapDescriptor;
-		dsvDescriptorHeapDescriptor.name = "DSV Descriptor";
+		dsvDescriptorHeapDescriptor.name = "DSV Descriptor Heap";
 		dsvDescriptorHeapDescriptor.numDescriptors = 512;
 		dsvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		m_dsvPool.Initialize(this, dsvDescriptorHeapDescriptor);
@@ -101,7 +101,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	// Descriptor pool for samplers
 	{
 		CrDescriptorHeapDescriptor samplerDescriptorHeapDescriptor;
-		samplerDescriptorHeapDescriptor.name = "Sampler Descriptor";
+		samplerDescriptorHeapDescriptor.name = "Sampler Descriptor Heap";
 		samplerDescriptorHeapDescriptor.numDescriptors = 2048;
 		samplerDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 		m_samplerPool.Initialize(this, samplerDescriptorHeapDescriptor);

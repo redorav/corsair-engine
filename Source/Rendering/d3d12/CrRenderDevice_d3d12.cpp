@@ -104,7 +104,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		samplerDescriptorHeapDescriptor.name = "Sampler Descriptor";
 		samplerDescriptorHeapDescriptor.numDescriptors = 2048;
 		samplerDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-		m_d3d12SamplerHeap.Initialize(this, samplerDescriptorHeapDescriptor);
+		m_samplerPool.Initialize(this, samplerDescriptorHeapDescriptor);
 	}
 }
 

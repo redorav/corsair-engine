@@ -152,63 +152,72 @@ void CrShaderSources::Initialize()
 		bool success = true;
 
 		// Prime the ubershader source with the entry file
-		m_resolvedUbershaderSource = m_shaderSources.find(UbershaderEntryFile)->second;
+		const auto ubershaderEntryIterator = m_shaderSources.find(UbershaderEntryFile);
 
-		// For every include declaration, substitute with the actual source
-		size_t includePosition = m_resolvedUbershaderSource.find("#include");
-
-		while (includePosition != m_resolvedUbershaderSource.npos)
+		if (ubershaderEntryIterator != m_shaderSources.end())
 		{
-			// Find the end of the line
-			size_t endLine = m_resolvedUbershaderSource.find('\n', includePosition);
+			m_resolvedUbershaderSource = ubershaderEntryIterator->second;
 
-			// If there is no end line, we could be at the end of the file. Always
-			// assume there is an endLine
-			if (endLine == m_resolvedUbershaderSource.npos)
+			// For every include declaration, substitute with the actual source
+			size_t includePosition = m_resolvedUbershaderSource.find("#include");
+
+			while (includePosition != m_resolvedUbershaderSource.npos)
 			{
-				endLine = m_resolvedUbershaderSource.length();
-			}
+				// Find the end of the line
+				size_t endLine = m_resolvedUbershaderSource.find('\n', includePosition);
 
-			bool includeSuccess = false;
-
-			// The include declaration may be malformed so be a little defensive about it
-			// We need to get the shader inside the quotes, look it up in the source cache,
-			// and replace the include declaration with the block of code behind it. Includes
-			// may be repeated, which is fine
-			size_t startQuote = m_resolvedUbershaderSource.find('"', includePosition);
-
-			if (startQuote != m_resolvedUbershaderSource.npos)
-			{
-				size_t endQuote = m_resolvedUbershaderSource.find('"', startQuote + 1);
-
-				if (endQuote != m_resolvedUbershaderSource.npos)
+				// If there is no end line, we could be at the end of the file. Always
+				// assume there is an endLine
+				if (endLine == m_resolvedUbershaderSource.npos)
 				{
-					// Get the filename of the include
-					const CrString includeFilename = m_resolvedUbershaderSource.substr(startQuote + 1, endQuote - startQuote - 1);
+					endLine = m_resolvedUbershaderSource.length();
+				}
 
-					const auto& includeFilenameIter = m_shaderSources.find(includeFilename);
+				bool includeSuccess = false;
 
-					// If the include filename is in the cache, we may proceed to inject it
-					if (includeFilenameIter != m_shaderSources.end())
+				// The include declaration may be malformed so be a little defensive about it
+				// We need to get the shader inside the quotes, look it up in the source cache,
+				// and replace the include declaration with the block of code behind it. Includes
+				// may be repeated, which is fine
+				size_t startQuote = m_resolvedUbershaderSource.find('"', includePosition);
+
+				if (startQuote != m_resolvedUbershaderSource.npos)
+				{
+					size_t endQuote = m_resolvedUbershaderSource.find('"', startQuote + 1);
+
+					if (endQuote != m_resolvedUbershaderSource.npos)
 					{
-						const CrString& includedSourceFile = m_shaderSources.find(includeFilename)->second;
-						m_resolvedUbershaderSource.replace(includePosition, endLine - includePosition, includedSourceFile);
-						includeSuccess = true;
-					}
-					else
-					{
-						CrLog("Include file %s not found", includeFilename.c_str());
+						// Get the filename of the include
+						const CrString includeFilename = m_resolvedUbershaderSource.substr(startQuote + 1, endQuote - startQuote - 1);
+
+						const auto& includeFilenameIter = m_shaderSources.find(includeFilename);
+
+						// If the include filename is in the cache, we may proceed to inject it
+						if (includeFilenameIter != m_shaderSources.end())
+						{
+							const CrString& includedSourceFile = m_shaderSources.find(includeFilename)->second;
+							m_resolvedUbershaderSource.replace(includePosition, endLine - includePosition, includedSourceFile);
+							includeSuccess = true;
+						}
+						else
+						{
+							CrLog("Include file %s not found", includeFilename.c_str());
+						}
 					}
 				}
+
+				success &= includeSuccess;
+				includePosition = m_resolvedUbershaderSource.find("#include", includePosition + 1);
 			}
 
-			success &= includeSuccess;
-			includePosition = m_resolvedUbershaderSource.find("#include", includePosition + 1);
+			if (!success)
+			{
+				CrLog("Error parsing include declaration. Could not resolve ubershader include");
+			}
 		}
-
-		if (!success)
+		else
 		{
-			CrLog("Error parsing include declaration. Could not resolve ubershader include");
+			CrLog("Ubershader entry file not found in sources");
 		}
 	}
 }

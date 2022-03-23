@@ -147,7 +147,7 @@ void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int
 	// TODO Bind constant buffers to specific stages
 	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::GraphicsStageCount; ++stage)
 	{
-		m_currentState.m_constantBuffers[stage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetByteOffset());
+		m_currentState.m_constantBuffers[stage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
 	}
 }
 

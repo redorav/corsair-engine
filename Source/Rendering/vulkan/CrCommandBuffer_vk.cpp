@@ -135,7 +135,6 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		const ConstantBufferMetadata& constantBufferMeta = CrShaderMetadata::GetConstantBuffer(id);
 		const ConstantBufferBinding& binding = m_currentState.GetConstantBufferBinding(stage, id);
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
@@ -145,9 +144,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
 		bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
-		bufferInfo.range = (VkDeviceSize)constantBufferMeta.size; // TODO take this from bound buffer
+		bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
-		dynamicOffsets[dynamicOffsetCount] = binding.byteOffset;
+		dynamicOffsets[dynamicOffsetCount] = binding.offsetBytes;
 		dynamicOffsetCount++;
 
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet

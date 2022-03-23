@@ -156,6 +156,20 @@ public:
 	template<typename FunctionT>
 	static void AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function);
 
+	uint8_t GetConstantBufferCount() const { return m_constantBufferCount; }
+
+	uint8_t GetSamplerCount() const { return m_samplerCount; }
+
+	uint8_t GetTextureCount() const { return m_textureCount; }
+
+	uint8_t GetRWTextureCount() const { return m_rwTextureCount; }
+
+	uint8_t GetStorageBufferCount() const { return m_storageBufferCount; }
+
+	uint8_t GetRWStorageBufferCount() const { return m_rwStorageBufferCount; }
+
+	uint8_t GetRWDataBufferCount() const { return m_rwDataBufferCount; }
+
 private:
 
 	uint8_t				m_constantBufferOffset = 0;

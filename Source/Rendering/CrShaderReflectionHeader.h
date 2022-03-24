@@ -48,6 +48,15 @@ StreamT& operator << (StreamT& stream, CrShaderInterfaceVariable& resource)
 
 struct CrShaderReflectionHeader
 {
+	template<typename Function>
+	void ForEachResource(const Function& function)
+	{
+		for (CrShaderReflectionResource& resource : resources)
+		{
+			function(resource);
+		}
+	}
+
 	CrShaderReflectionVersion::T version = CrShaderReflectionVersion::CurrentVersion;
 
 	CrString entryPoint;

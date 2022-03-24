@@ -39,12 +39,12 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 		// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
 		CrVector<unsigned char> bytecodeModified = shaderBytecode->GetBytecode();
 
-		for (CrShaderReflectionResource& resource : reflectionHeader.resources)
+		reflectionHeader.ForEachResource([&](CrShaderReflectionResource& resource)
 		{
 			resource.bindPoint = (uint8_t)currentBindingPoint;
 			*((uint32_t*)&(bytecodeModified.data()[resource.bytecodeOffset])) = currentBindingPoint;
 			currentBindingPoint++;
-		}
+		});
 
 		// Create shader modules from the modified bytecode
 		VkShaderModuleCreateInfo moduleCreateInfo;

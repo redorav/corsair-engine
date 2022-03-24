@@ -48,8 +48,8 @@ StreamT& operator << (StreamT& stream, CrShaderInterfaceVariable& resource)
 
 struct CrShaderReflectionHeader
 {
-	template<typename Function>
-	void ForEachResource(const Function& function)
+	template<typename FunctionT>
+	void ForEachResource(const FunctionT& function)
 	{
 		for (CrShaderReflectionResource& resource : resources)
 		{

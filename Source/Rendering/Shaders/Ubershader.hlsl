@@ -83,7 +83,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 #if (EMaterialShaderVariant == EMaterialShaderVariant_Debug)
 	if (cb_DebugShader.debugProperties.x == 0)
 	{
-		litSurface = float4(cb_DebugShader.debugProperties.y / 65535.0, 0.0, 0.0, 0.0);
+		litSurface = float3(cb_DebugShader.debugProperties.y / 65535.0, 0.0, 0.0);
 	}
 #elif (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);

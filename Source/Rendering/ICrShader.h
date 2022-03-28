@@ -79,13 +79,12 @@ struct CrShaderBindingLayoutResources
 // according to type. This is not a resource table, just the binding points,
 // owned by the shader. It also doesn't contain any names, but points to the 
 // builtins that the engine knows about
-class ICrShaderBindingLayout
+class ICrShaderBindingLayout final
 {
 public:
 
 	ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources);
 
-	virtual ~ICrShaderBindingLayout() {}
 
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 

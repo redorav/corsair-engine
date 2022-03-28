@@ -126,7 +126,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 
 CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
 {
-	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor));
+	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor), m_gpuDeletionCallback);
 }
 
 CrGPUHardwareBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)

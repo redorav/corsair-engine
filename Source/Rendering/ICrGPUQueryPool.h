@@ -1,6 +1,8 @@
 #pragma once
 
-#include "CrRenderingForwardDeclarations.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrGPUDeletable.h"
+
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrTypedId.h"
@@ -28,7 +30,7 @@ struct CrGPUQueryPoolDescriptor
 
 // Pool that contains queries of the type passed in as a template
 // The template must be one of the interfaces provided above
-class ICrGPUQueryPool
+class ICrGPUQueryPool : public CrGPUDeletable
 {
 public:
 

@@ -5,58 +5,52 @@
 template<typename FunctionT>
 inline void ICrShaderBindingLayout::AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function)
 {
-	for (uint32_t i = 0; i < reflectionHeader.resources.size(); ++i)
+	for (const CrShaderReflectionResource& resource : reflectionHeader.constantBuffers)
 	{
-		const CrShaderReflectionResource& resource = reflectionHeader.resources[i];
+		const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(resource.name);
+		resources.constantBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
 
-		cr3d::ShaderStage::T stage = reflectionHeader.shaderStage;
+	for (const CrShaderReflectionResource& resource : reflectionHeader.samplers)
+	{
+		const SamplerMetadata& metadata = CrShaderMetadata::GetSampler(resource.name);
+		resources.samplers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
 
-		switch (resource.type)
-		{
-			case cr3d::ShaderResourceType::ConstantBuffer:
-			{
-				const ConstantBufferMetadata& metadata = CrShaderMetadata::GetConstantBuffer(resource.name);
-				resources.constantBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::Sampler:
-			{
-				const SamplerMetadata& metadata = CrShaderMetadata::GetSampler(resource.name);
-				resources.samplers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::Texture:
-			{
-				const TextureMetadata& metadata = CrShaderMetadata::GetTexture(resource.name);
-				resources.textures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::RWTexture:
-			{
-				const RWTextureMetadata& metadata = CrShaderMetadata::GetRWTexture(resource.name);
-				resources.rwTextures.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::StorageBuffer:
-			{
-				const StorageBufferMetadata& metadata = CrShaderMetadata::GetStorageBuffer(resource.name);
-				resources.storageBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::RWStorageBuffer:
-			{
-				const RWStorageBufferMetadata& metadata = CrShaderMetadata::GetRWStorageBuffer(resource.name);
-				resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-			case cr3d::ShaderResourceType::RWDataBuffer:
-			{
-				const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
-				resources.rwDataBuffers.push_back(CrShaderBinding(resource.bindPoint, stage, metadata.id));
-				break;
-			}
-		}
+	for (const CrShaderReflectionResource& resource : reflectionHeader.textures)
+	{
+		const TextureMetadata& metadata = CrShaderMetadata::GetTexture(resource.name);
+		resources.textures.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
 
-		function(stage, resource);
+	for (const CrShaderReflectionResource& resource : reflectionHeader.rwTextures)
+	{
+		const RWTextureMetadata& metadata = CrShaderMetadata::GetRWTexture(resource.name);
+		resources.rwTextures.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
+
+	for (const CrShaderReflectionResource& resource : reflectionHeader.storageBuffers)
+	{
+		const StorageBufferMetadata& metadata = CrShaderMetadata::GetStorageBuffer(resource.name);
+		resources.storageBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
+
+	for (const CrShaderReflectionResource& resource : reflectionHeader.rwStorageBuffers)
+	{
+		const RWStorageBufferMetadata& metadata = CrShaderMetadata::GetRWStorageBuffer(resource.name);
+		resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
+	}
+
+	for (const CrShaderReflectionResource& resource : reflectionHeader.rwDataBuffers)
+	{
+		const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
+		resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		function(reflectionHeader.shaderStage, resource);
 	}
 }

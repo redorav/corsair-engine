@@ -155,6 +155,34 @@ cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const SpvReflectInter
 	}
 }
 
+void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const CrShaderReflectionResource& resource)
+{
+	switch (resource.type)
+	{
+		case cr3d::ShaderResourceType::ConstantBuffer:
+			reflectionHeader.constantBuffers.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::Sampler:
+			reflectionHeader.samplers.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::Texture:
+			reflectionHeader.textures.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::RWTexture:
+			reflectionHeader.rwTextures.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::StorageBuffer:
+			reflectionHeader.storageBuffers.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::RWStorageBuffer:
+			reflectionHeader.rwStorageBuffers.push_back(resource);
+			break;
+		case cr3d::ShaderResourceType::RWDataBuffer:
+			reflectionHeader.rwDataBuffers.push_back(resource);
+			break;
+	}
+}
+
 bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
 	CrProcessDescriptor processDescriptor;
@@ -206,7 +234,8 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 					resource.type = GetShaderResourceType(binding);
 					resource.bindPoint = (uint8_t)binding.binding;
 					resource.bytecodeOffset = binding.word_offset.binding * 4; // Turn into a byte offset
-					reflectionHeader.resources.push_back(resource);
+
+					InsertResourceIntoHeader(reflectionHeader, resource);
 				}
 			}
 
@@ -372,7 +401,8 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 					resource.type = GetShaderResourceType(resourceDescriptor);
 					resource.bindPoint = (uint8_t)resourceDescriptor.BindPoint;
 					resource.bytecodeOffset = 0;
-					reflectionHeader.resources.push_back(resource);
+
+					InsertResourceIntoHeader(reflectionHeader, resource);
 				}
 
 				const auto ProcessInterfaceVariable = [](const D3D12_SIGNATURE_PARAMETER_DESC& parameterDescriptor, CrVector<CrShaderInterfaceVariable>& interfaceVariables)

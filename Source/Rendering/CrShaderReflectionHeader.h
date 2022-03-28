@@ -51,7 +51,37 @@ struct CrShaderReflectionHeader
 	template<typename FunctionT>
 	void ForEachResource(const FunctionT& function)
 	{
-		for (CrShaderReflectionResource& resource : resources)
+		for (CrShaderReflectionResource& resource : constantBuffers)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : samplers)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : textures)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : rwTextures)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : storageBuffers)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : rwStorageBuffers)
+		{
+			function(resource);
+		}
+
+		for (CrShaderReflectionResource& resource : rwDataBuffers)
 		{
 			function(resource);
 		}
@@ -61,7 +91,15 @@ struct CrShaderReflectionHeader
 
 	CrString entryPoint;
 	cr3d::ShaderStage::T shaderStage;
-	CrVector<CrShaderReflectionResource> resources;
+	
+	CrVector<CrShaderReflectionResource> constantBuffers;
+	CrVector<CrShaderReflectionResource> samplers;
+	CrVector<CrShaderReflectionResource> textures;
+	CrVector<CrShaderReflectionResource> rwTextures;
+	CrVector<CrShaderReflectionResource> storageBuffers;
+	CrVector<CrShaderReflectionResource> rwStorageBuffers;
+	CrVector<CrShaderReflectionResource> rwDataBuffers;
+
 	CrVector<CrShaderInterfaceVariable> stageInputs;
 	CrVector<CrShaderInterfaceVariable> stageOutputs;
 
@@ -77,7 +115,14 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionHeader& reflectionHeade
 	stream << reflectionHeader.entryPoint;
 	stream << reflectionHeader.shaderStage;
 
-	stream << reflectionHeader.resources;
+	stream << reflectionHeader.constantBuffers;
+	stream << reflectionHeader.samplers;
+	stream << reflectionHeader.textures;
+	stream << reflectionHeader.rwTextures;
+	stream << reflectionHeader.storageBuffers;
+	stream << reflectionHeader.rwStorageBuffers;
+	stream << reflectionHeader.rwDataBuffers;
+
 	stream << reflectionHeader.stageInputs;
 	stream << reflectionHeader.stageOutputs;
 

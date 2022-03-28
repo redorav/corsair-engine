@@ -21,29 +21,29 @@ struct CrShaderBinding
 	CrShaderBinding() {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, ConstantBuffers::T constantBufferID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::ConstantBuffer), constantBufferID(constantBufferID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::ConstantBuffer), constantBufferID(constantBufferID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Samplers::T samplerID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Sampler), samplerID(samplerID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::Sampler), samplerID(samplerID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Textures::T textureID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::Texture), textureID(textureID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::Texture), textureID(textureID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTextures::T rwTextureID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, StorageBuffers::T storageBufferID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::StorageBuffer), storageBufferID(storageBufferID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::StorageBuffer), storageBufferID(storageBufferID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWStorageBuffers::T rwStorageBufferID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
 
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWDataBuffers::T rwDataBufferID)
-		: bindPoint(bindPoint), stage(stage), type(cr3d::ShaderResourceType::RWDataBuffer), rwDataBufferID(rwDataBufferID) {}
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWDataBuffer), rwDataBufferID(rwDataBufferID) {}
 
+	uint8_t stage : 4; // cr3d::ShaderStage::T
+	uint8_t type : 4; // cr3d::ShaderResourceType::T
 	bindpoint_t bindPoint;
-	cr3d::ShaderStage::T stage : 4;
-	cr3d::ShaderResourceType::T type : 4;
 	union
 	{
 		ConstantBuffers::T constantBufferID;
@@ -55,6 +55,9 @@ struct CrShaderBinding
 		RWDataBuffers::T rwDataBufferID;
 	};
 };
+
+static_assert(cr3d::ShaderStage::Count < 16);
+static_assert(cr3d::ShaderResourceType::Count < 16);
 
 // We use this table to bucket resources before passing
 // them on (sorted) to the shader binding layout.
@@ -91,56 +94,56 @@ public:
 	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
 
 	template<typename FunctionT>
-	void ForEachConstantBuffer(const FunctionT& fn) const
+	void ForEachConstantBuffer(const FunctionT& function) const
 	{
 		for (uint8_t i = m_constantBufferOffset; i < m_constantBufferOffset + m_constantBufferCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].constantBufferID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].constantBufferID, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
-	void ForEachSampler(const FunctionT& fn) const
+	void ForEachSampler(const FunctionT& function) const
 	{
 		for (uint8_t i = m_samplerOffset; i < m_samplerOffset + m_samplerCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].samplerID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].samplerID, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
-	void ForEachTexture(const FunctionT& fn) const
+	void ForEachTexture(const FunctionT& function) const
 	{
 		for (uint8_t i = m_textureOffset; i < m_textureOffset + m_textureCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].textureID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].textureID, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
-	void ForEachRWTexture(const FunctionT& fn) const
+	void ForEachRWTexture(const FunctionT& function) const
 	{
 		for (uint8_t i = m_rwTextureOffset; i < m_rwTextureOffset + m_rwTextureCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].rwTextureID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwTextureID, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
-	void ForEachStorageBuffer(const FunctionT& fn) const
+	void ForEachStorageBuffer(const FunctionT& function) const
 	{
 		for (uint8_t i = m_storageBufferOffset; i < m_storageBufferOffset + m_storageBufferCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].storageBufferID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].storageBufferID, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
-	void ForEachRWStorageBuffer(const FunctionT& fn) const
+	void ForEachRWStorageBuffer(const FunctionT& function) const
 	{
 		for (uint8_t i = m_rwStorageBufferOffset; i < m_rwStorageBufferOffset + m_rwStorageBufferCount; ++i)
 		{
-			fn(m_bindings[i].stage, m_bindings[i].rwStorageBufferID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwStorageBufferID, m_bindings[i].bindPoint);
 		}
 	}
 
@@ -149,7 +152,7 @@ public:
 	{
 		for (uint8_t i = m_rwDataBufferOffset; i < m_rwDataBufferOffset + m_rwDataBufferCount; ++i)
 		{
-			function(m_bindings[i].stage, m_bindings[i].rwDataBufferID, m_bindings[i].bindPoint);
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwDataBufferID, m_bindings[i].bindPoint);
 		}
 	}
 

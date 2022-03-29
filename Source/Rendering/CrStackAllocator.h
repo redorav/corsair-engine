@@ -36,7 +36,7 @@ inline CrStackAllocation<void> CrStackAllocator::Allocate(size_t size)
 
 inline CrStackAllocation<void> CrStackAllocator::AllocateAligned(size_t size, size_t alignment)
 {
-	uint8_t* bufferPointer = AlignUpPow2(m_currentPointer, alignment); // Copy the current pointer, with the correct alignment
+	uint8_t* bufferPointer = CrAlignUpPow2(m_currentPointer, alignment); // Copy the current pointer, with the correct alignment
 	m_currentPointer = bufferPointer + size; // Reserve as many bytes as needed by the buffer
 	CrAssertMsg(m_currentPointer < m_memoryBasePointer + m_size, "Ran out of memory in stream");
 	uint32_t offset = static_cast<uint32_t>(bufferPointer - m_memoryBasePointer); // Work out the offset

@@ -92,12 +92,6 @@ public:
 		uint8_t count;
 	};
 
-	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
-
-	static const uint32_t MaxStageTextures = 64; // Maximum textures per stage
-
-	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
-
 	template<typename FunctionT, typename ResourceID>
 	void ForEachResourceType(cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
 	{
@@ -111,7 +105,7 @@ public:
 	template<typename FunctionT, typename ResourceID>
 	void ForEachResourceType(cr3d::ShaderStage::T shaderStage, cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
 	{
-		const ShaderResourceOffset& resourceOffset = m_stageResourceOffsets[resourceType][shaderStage];
+		const ShaderResourceOffset& resourceOffset = m_stageResourceOffsets[resourceType][GetStageIndex(shaderStage)];
 		for (uint8_t i = resourceOffset.offset; i < resourceOffset.offset + resourceOffset.count; ++i)
 		{
 			function((cr3d::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
@@ -163,13 +157,13 @@ public:
 	template<typename FunctionT>
 	static void AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function);
 
-	uint8_t GetConstantBufferCount(cr3d::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[cr3d::ShaderResourceType::ConstantBuffer][shaderStage].count; }
-	uint8_t GetSamplerCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Sampler][shaderStage].count; }
-	uint8_t GetTextureCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Texture][shaderStage].count; }
-	uint8_t GetRWTextureCount(cr3d::ShaderStage::T shaderStage)       const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWTexture][shaderStage].count; }
-	uint8_t GetStorageBufferCount(cr3d::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[cr3d::ShaderResourceType::StorageBuffer][shaderStage].count; }
-	uint8_t GetRWStorageBufferCount(cr3d::ShaderStage::T shaderStage) const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer][shaderStage].count; }
-	uint8_t GetRWDataBufferCount(cr3d::ShaderStage::T shaderStage)    const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWDataBuffer][shaderStage].count; }
+	uint8_t GetConstantBufferCount(cr3d::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[cr3d::ShaderResourceType::ConstantBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetSamplerCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Sampler][GetStageIndex(shaderStage)].count; }
+	uint8_t GetTextureCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Texture][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWTextureCount(cr3d::ShaderStage::T shaderStage)       const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWTexture][GetStageIndex(shaderStage)].count; }
+	uint8_t GetStorageBufferCount(cr3d::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[cr3d::ShaderResourceType::StorageBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWStorageBufferCount(cr3d::ShaderStage::T shaderStage) const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWDataBufferCount(cr3d::ShaderStage::T shaderStage)    const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWDataBuffer][GetStageIndex(shaderStage)].count; }
 
 private:
 

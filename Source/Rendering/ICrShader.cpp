@@ -6,49 +6,41 @@
 
 CrShaderCompilerDefines CrShaderCompilerDefines::Dummy;
 
+template<typename ResourcesT>
+void ICrShaderBindingLayout::ProcessResourceArray(cr3d::ShaderResourceType::T resourceType, const ResourcesT& resources)
+{
+	m_resourceOffsets[resourceType].offset = (uint8_t)m_bindings.size();
+	m_resourceOffsets[resourceType].count = (uint8_t)resources.size();
+
+	cr3d::ShaderStage::T currentStage = cr3d::ShaderStage::Count;
+	uint32_t currentStageIndex = 0;
+	uint8_t currentOffset = 0;
+
+	for (const CrShaderBinding& shaderBinding : resources)
+	{
+		if (shaderBinding.stage != currentStage)
+		{
+			currentStage = (cr3d::ShaderStage::T)shaderBinding.stage;
+			currentStageIndex = GetStageIndex(currentStage);
+			m_stageResourceOffsets[resourceType][currentStageIndex].offset = currentOffset;
+		}
+
+		m_stageResourceOffsets[resourceType][currentStageIndex].count++;
+		m_bindings.push_back(shaderBinding);
+	}
+}
+
 ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources)
 {
-	size_t totalResourceCount =
-		resources.constantBuffers.size() + 
-		resources.samplers.size() + 
-		resources.textures.size() + 
-		resources.rwTextures.size() + 
-		resources.storageBuffers.size() + 
-		resources.rwStorageBuffers.size() + 
-		resources.dataBuffers.size() + 
-		resources.rwDataBuffers.size();
-
-	CrAssert(totalResourceCount < m_bindings.capacity());
-
-	{
-		m_constantBufferOffset = (uint8_t)m_bindings.size();
-		m_constantBufferCount = (uint8_t)resources.constantBuffers.size();
-		m_bindings.insert(m_bindings.end(), resources.constantBuffers.begin(), resources.constantBuffers.end());
-
-		m_samplerOffset = (uint8_t)m_bindings.size();
-		m_samplerCount = (uint8_t)resources.samplers.size();
-		m_bindings.insert(m_bindings.end(), resources.samplers.begin(), resources.samplers.end());
-
-		m_textureOffset = (uint8_t)m_bindings.size();
-		m_textureCount = (uint8_t)resources.textures.size();
-		m_bindings.insert(m_bindings.end(), resources.textures.begin(), resources.textures.end());
-
-		m_rwTextureOffset = (uint8_t)m_bindings.size();
-		m_rwTextureCount = (uint8_t)resources.rwTextures.size();
-		m_bindings.insert(m_bindings.end(), resources.rwTextures.begin(), resources.rwTextures.end());
-
-		m_storageBufferOffset = (uint8_t)m_bindings.size();
-		m_storageBufferCount = (uint8_t)resources.storageBuffers.size();
-		m_bindings.insert(m_bindings.end(), resources.storageBuffers.begin(), resources.storageBuffers.end());
-
-		m_rwStorageBufferOffset = (uint8_t)m_bindings.size();
-		m_rwStorageBufferCount = (uint8_t)resources.rwStorageBuffers.size();
-		m_bindings.insert(m_bindings.end(), resources.rwStorageBuffers.begin(), resources.rwStorageBuffers.end());
-
-		m_rwDataBufferOffset = (uint8_t)m_bindings.size();
-		m_rwDataBufferCount = (uint8_t)resources.rwDataBuffers.size();
-		m_bindings.insert(m_bindings.end(), resources.rwDataBuffers.begin(), resources.rwDataBuffers.end());
-	}
+	// We assume shader stages are sequential at this point. That is, any resources are packed
+	// by shader stage (i.e. all vertex shader constant buffers together)
+	ProcessResourceArray(cr3d::ShaderResourceType::ConstantBuffer, resources.constantBuffers);
+	ProcessResourceArray(cr3d::ShaderResourceType::Sampler, resources.samplers);
+	ProcessResourceArray(cr3d::ShaderResourceType::Texture, resources.textures);
+	ProcessResourceArray(cr3d::ShaderResourceType::RWTexture, resources.rwTextures);
+	ProcessResourceArray(cr3d::ShaderResourceType::StorageBuffer, resources.storageBuffers);
+	ProcessResourceArray(cr3d::ShaderResourceType::RWStorageBuffer, resources.rwStorageBuffers);
+	ProcessResourceArray(cr3d::ShaderResourceType::RWDataBuffer, resources.rwDataBuffers);
 }
 
 ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)

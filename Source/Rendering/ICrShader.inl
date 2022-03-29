@@ -50,7 +50,7 @@ inline void ICrShaderBindingLayout::AddResources(const CrShaderReflectionHeader&
 	for (const CrShaderReflectionResource& resource : reflectionHeader.rwDataBuffers)
 	{
 		const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
-		resources.rwStorageBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		resources.rwDataBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
 		function(reflectionHeader.shaderStage, resource);
 	}
 }

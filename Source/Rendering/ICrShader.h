@@ -53,6 +53,7 @@ struct CrShaderBinding
 		StorageBuffers::T storageBufferID;
 		RWStorageBuffers::T rwStorageBufferID;
 		RWDataBuffers::T rwDataBufferID;
+		uint8_t id;
 	};
 };
 
@@ -85,6 +86,11 @@ public:
 
 	ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources);
 
+	struct ShaderResourceOffset
+	{
+		uint8_t offset;
+		uint8_t count;
+	};
 
 	static const uint32_t MaxStageConstantBuffers = 14; // Maximum constant buffers per stage
 
@@ -92,108 +98,101 @@ public:
 
 	static const uint32_t MaxStageSamplers = 16; // Maximum samplers per stage
 
+	template<typename FunctionT, typename ResourceID>
+	void ForEachResourceType(cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
+	{
+		const ShaderResourceOffset& resourceOffset = m_resourceOffsets[resourceType];
+		for (uint8_t i = resourceOffset.offset; i < resourceOffset.offset + resourceOffset.count; ++i)
+		{
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
+		}
+	}
+
+	template<typename FunctionT, typename ResourceID>
+	void ForEachResourceType(cr3d::ShaderStage::T shaderStage, cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
+	{
+		const ShaderResourceOffset& resourceOffset = m_stageResourceOffsets[resourceType][shaderStage];
+		for (uint8_t i = resourceOffset.offset; i < resourceOffset.offset + resourceOffset.count; ++i)
+		{
+			function((cr3d::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
+		}
+	}
+
 	template<typename FunctionT>
 	void ForEachConstantBuffer(const FunctionT& function) const
 	{
-		for (uint8_t i = m_constantBufferOffset; i < m_constantBufferOffset + m_constantBufferCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].constantBufferID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, ConstantBuffers::T>(cr3d::ShaderResourceType::ConstantBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachSampler(const FunctionT& function) const
 	{
-		for (uint8_t i = m_samplerOffset; i < m_samplerOffset + m_samplerCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].samplerID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, Samplers::T>(cr3d::ShaderResourceType::Sampler, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachTexture(const FunctionT& function) const
 	{
-		for (uint8_t i = m_textureOffset; i < m_textureOffset + m_textureCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].textureID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, Textures::T>(cr3d::ShaderResourceType::Texture, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWTexture(const FunctionT& function) const
 	{
-		for (uint8_t i = m_rwTextureOffset; i < m_rwTextureOffset + m_rwTextureCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwTextureID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, RWTextures::T>(cr3d::ShaderResourceType::RWTexture, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachStorageBuffer(const FunctionT& function) const
 	{
-		for (uint8_t i = m_storageBufferOffset; i < m_storageBufferOffset + m_storageBufferCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].storageBufferID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, StorageBuffers::T>(cr3d::ShaderResourceType::StorageBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWStorageBuffer(const FunctionT& function) const
 	{
-		for (uint8_t i = m_rwStorageBufferOffset; i < m_rwStorageBufferOffset + m_rwStorageBufferCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwStorageBufferID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, RWStorageBuffers::T>(cr3d::ShaderResourceType::RWStorageBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWDataBuffer(const FunctionT& function) const
 	{
-		for (uint8_t i = m_rwDataBufferOffset; i < m_rwDataBufferOffset + m_rwDataBufferCount; ++i)
-		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, m_bindings[i].rwDataBufferID, m_bindings[i].bindPoint);
-		}
+		ForEachResourceType<FunctionT, RWDataBuffers::T>(cr3d::ShaderResourceType::RWDataBuffer, function);
 	}
 
 	template<typename FunctionT>
 	static void AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function);
 
-	uint8_t GetConstantBufferCount() const { return m_constantBufferCount; }
-
-	uint8_t GetSamplerCount() const { return m_samplerCount; }
-
-	uint8_t GetTextureCount() const { return m_textureCount; }
-
-	uint8_t GetRWTextureCount() const { return m_rwTextureCount; }
-
-	uint8_t GetStorageBufferCount() const { return m_storageBufferCount; }
-
-	uint8_t GetRWStorageBufferCount() const { return m_rwStorageBufferCount; }
-
-	uint8_t GetRWDataBufferCount() const { return m_rwDataBufferCount; }
+	uint8_t GetConstantBufferCount(cr3d::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[cr3d::ShaderResourceType::ConstantBuffer][shaderStage].count; }
+	uint8_t GetSamplerCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Sampler][shaderStage].count; }
+	uint8_t GetTextureCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Texture][shaderStage].count; }
+	uint8_t GetRWTextureCount(cr3d::ShaderStage::T shaderStage)       const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWTexture][shaderStage].count; }
+	uint8_t GetStorageBufferCount(cr3d::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[cr3d::ShaderResourceType::StorageBuffer][shaderStage].count; }
+	uint8_t GetRWStorageBufferCount(cr3d::ShaderStage::T shaderStage) const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer][shaderStage].count; }
+	uint8_t GetRWDataBufferCount(cr3d::ShaderStage::T shaderStage)    const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWDataBuffer][shaderStage].count; }
 
 private:
 
-	uint8_t				m_constantBufferOffset = 0;
-	uint8_t				m_constantBufferCount = 0;
+	template<typename ResourcesT>
+	void ProcessResourceArray(cr3d::ShaderResourceType::T resourceType, const ResourcesT& resources);
 
-	uint8_t				m_samplerOffset = 0;
-	uint8_t				m_samplerCount = 0;
+	static uint32_t GetStageIndex(cr3d::ShaderStage::T stage)
+	{
+		switch (stage)
+		{
+			case cr3d::ShaderStage::Compute: return 0;
+			default: return (uint32_t)stage;
+		}
+	}
 
-	uint8_t				m_textureOffset = 0;
-	uint8_t				m_textureCount = 0;
+	// todo convert all previous entries into resource offsets
+	CrArray<ShaderResourceOffset, cr3d::ShaderResourceType::Count> m_resourceOffsets;
 
-	uint8_t				m_rwTextureOffset = 0;
-	uint8_t				m_rwTextureCount = 0;
-
-	uint8_t				m_storageBufferOffset = 0;
-	uint8_t				m_storageBufferCount = 0;
-
-	uint8_t				m_rwStorageBufferOffset = 0;
-	uint8_t				m_rwStorageBufferCount = 0;
-
-	uint8_t				m_rwDataBufferOffset = 0;
-	uint8_t				m_rwDataBufferCount = 0;
+	// This might seem a little wasteful but it can address the array below at a much smaller memory cost
+	// than trying to pack resources indexed by stage count directly. There is a size and an offset for 
+	// every resource type, for every stage. Some resource stages overlap, such as compute and graphics, 
+	// so we don't take up unnecessary space
+	CrArray<CrArray<ShaderResourceOffset, cr3d::ShaderStage::GraphicsStageCount>, cr3d::ShaderResourceType::Count> m_stageResourceOffsets;
 
 	CrFixedVector<CrShaderBinding, 64> m_bindings;
 };

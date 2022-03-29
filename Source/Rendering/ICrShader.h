@@ -119,9 +119,21 @@ public:
 	}
 
 	template<typename FunctionT>
+	void ForEachConstantBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, ConstantBuffers::T>(shaderStage, cr3d::ShaderResourceType::ConstantBuffer, function);
+	}
+
+	template<typename FunctionT>
 	void ForEachSampler(const FunctionT& function) const
 	{
 		ForEachResourceType<FunctionT, Samplers::T>(cr3d::ShaderResourceType::Sampler, function);
+	}
+
+	template<typename FunctionT>
+	void ForEachSampler(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, Samplers::T>(shaderStage, cr3d::ShaderResourceType::Sampler, function);
 	}
 
 	template<typename FunctionT>
@@ -131,9 +143,21 @@ public:
 	}
 
 	template<typename FunctionT>
+	void ForEachTexture(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, Textures::T>(shaderStage, cr3d::ShaderResourceType::Texture, function);
+	}
+
+	template<typename FunctionT>
 	void ForEachRWTexture(const FunctionT& function) const
 	{
 		ForEachResourceType<FunctionT, RWTextures::T>(cr3d::ShaderResourceType::RWTexture, function);
+	}
+
+	template<typename FunctionT>
+	void ForEachRWTexture(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, RWTextures::T>(shaderStage, cr3d::ShaderResourceType::RWTexture, function);
 	}
 
 	template<typename FunctionT>
@@ -143,9 +167,21 @@ public:
 	}
 
 	template<typename FunctionT>
+	void ForEachStorageBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, StorageBuffers::T>(shaderStage, cr3d::ShaderResourceType::StorageBuffer, function);
+	}
+
+	template<typename FunctionT>
 	void ForEachRWStorageBuffer(const FunctionT& function) const
 	{
 		ForEachResourceType<FunctionT, RWStorageBuffers::T>(cr3d::ShaderResourceType::RWStorageBuffer, function);
+	}
+
+	template<typename FunctionT>
+	void ForEachRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, RWStorageBuffers::T>(shaderStage, cr3d::ShaderResourceType::RWStorageBuffer, function);
 	}
 
 	template<typename FunctionT>
@@ -155,7 +191,23 @@ public:
 	}
 
 	template<typename FunctionT>
+	void ForEachRWDataBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	{
+		ForEachResourceType<FunctionT, RWDataBuffers::T>(shaderStage, cr3d::ShaderResourceType::RWDataBuffer, function);
+	}
+
+	template<typename FunctionT>
 	static void AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function);
+
+	uint8_t GetTotalResourceCount() const { return m_totalResourceCount; }
+
+	uint8_t GetConstantBufferCount()  const { return m_resourceOffsets[cr3d::ShaderResourceType::ConstantBuffer].count; }
+	uint8_t GetSamplerCount()         const { return m_resourceOffsets[cr3d::ShaderResourceType::Sampler].count; }
+	uint8_t GetTextureCount()         const { return m_resourceOffsets[cr3d::ShaderResourceType::Texture].count; }
+	uint8_t GetRWTextureCount()       const { return m_resourceOffsets[cr3d::ShaderResourceType::RWTexture].count; }
+	uint8_t GetStorageBufferCount()   const { return m_resourceOffsets[cr3d::ShaderResourceType::StorageBuffer].count; }
+	uint8_t GetRWStorageBufferCount() const { return m_resourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer].count; }
+	uint8_t GetRWDataBufferCount()    const { return m_resourceOffsets[cr3d::ShaderResourceType::RWDataBuffer].count; }
 
 	uint8_t GetConstantBufferCount(cr3d::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[cr3d::ShaderResourceType::ConstantBuffer][GetStageIndex(shaderStage)].count; }
 	uint8_t GetSamplerCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Sampler][GetStageIndex(shaderStage)].count; }
@@ -179,7 +231,10 @@ private:
 		}
 	}
 
-	// todo convert all previous entries into resource offsets
+	// Total number of resources
+	uint8_t m_totalResourceCount = 0;
+
+	// Number of resources and offset per resource type
 	CrArray<ShaderResourceOffset, cr3d::ShaderResourceType::Count> m_resourceOffsets;
 
 	// This might seem a little wasteful but it can address the array below at a much smaller memory cost

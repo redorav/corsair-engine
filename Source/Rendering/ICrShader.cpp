@@ -28,6 +28,8 @@ void ICrShaderBindingLayout::ProcessResourceArray(cr3d::ShaderResourceType::T re
 		m_stageResourceOffsets[resourceType][currentStageIndex].count++;
 		m_bindings.push_back(shaderBinding);
 	}
+
+	m_totalResourceCount += m_resourceOffsets[resourceType].count;
 }
 
 ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResources& resources)

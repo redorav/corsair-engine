@@ -55,6 +55,14 @@ namespace crd3d
 	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer
 	struct DescriptorD3D12
 	{
+		DescriptorD3D12 operator + (uint32_t offset) const
+		{
+			DescriptorD3D12 descriptor = *this;
+			descriptor.cpuHandle.ptr += offset;
+			descriptor.gpuHandle.ptr += offset;
+			return descriptor;
+		}
+
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 	};

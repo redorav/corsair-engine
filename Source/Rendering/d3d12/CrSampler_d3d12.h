@@ -12,13 +12,13 @@ class CrSamplerD3D12 final : public ICrSampler
 {
 public:
 
+	CrSamplerD3D12(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+
 	~CrSamplerD3D12();
 
-	crd3d::DescriptorD3D12 GetD3D12Sampler() const { return m_d3d12Sampler; }
-
-	CrSamplerD3D12(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+	const D3D12_SAMPLER_DESC& GetD3D12Sampler() const { return m_d3d12Sampler; }
 
 private:
 
-	crd3d::DescriptorD3D12 m_d3d12Sampler;
+	D3D12_SAMPLER_DESC m_d3d12Sampler;
 };

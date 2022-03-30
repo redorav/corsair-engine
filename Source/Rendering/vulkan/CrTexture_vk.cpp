@@ -369,31 +369,6 @@ CrTextureVulkan::~CrTextureVulkan()
 	}
 }
 
-VkImage CrTextureVulkan::GetVkImage() const
-{
-	return m_vkImage;
-}
-
-VkImageView CrTextureVulkan::GetVkImageViewAllMipsSlices() const
-{
-	return m_vkImageView;
-}
-
-VkImageView CrTextureVulkan::GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const
-{
-	return m_additionalViews->m_vkImageSingleMipSlice[mip][slice];
-}
-
-VkImageView CrTextureVulkan::GetVkImageViewSingleMipAllSlices(uint32_t mip) const
-{
-	return m_additionalViews->m_vkImageViewSingleMipAllSlices[mip];
-}
-
-VkImageAspectFlags CrTextureVulkan::GetVkImageAspectMask() const
-{
-	return m_vkAspectMask;
-}
-
 CrArray<CrVkImageStateInfo, cr3d::TextureState::Count> CrVkImageResourceStateTable;
 
 static bool PopulateVkImageResourceTable()

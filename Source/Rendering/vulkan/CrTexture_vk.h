@@ -37,15 +37,15 @@ public:
 
 	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages);
 
-	VkImage GetVkImage() const;
+	VkImage GetVkImage() const { return m_vkImage; }
 
-	VkImageView GetVkImageViewAllMipsSlices() const;
+	VkImageView GetVkImageViewAllMipsSlices() const { return m_vkImageView; }
 
-	VkImageView GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const;
+	VkImageView GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const { return m_additionalViews->m_vkImageSingleMipSlice[mip][slice]; }
 
-	VkImageView GetVkImageViewSingleMipAllSlices(uint32_t mip) const;
+	VkImageView GetVkImageViewSingleMipAllSlices(uint32_t mip) const { return m_additionalViews->m_vkImageViewSingleMipAllSlices[mip]; }
 
-	VkImageAspectFlags GetVkImageAspectMask() const;
+	VkImageAspectFlags GetVkImageAspectMask() const { return m_vkAspectMask; }
 
 private:
 

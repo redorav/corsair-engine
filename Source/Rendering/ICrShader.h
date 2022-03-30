@@ -235,13 +235,13 @@ private:
 	uint8_t m_totalResourceCount = 0;
 
 	// Number of resources and offset per resource type
-	CrArray<ShaderResourceOffset, cr3d::ShaderResourceType::Count> m_resourceOffsets;
+	CrArray<ShaderResourceOffset, cr3d::ShaderResourceType::Count> m_resourceOffsets = {};
 
 	// This might seem a little wasteful but it can address the array below at a much smaller memory cost
 	// than trying to pack resources indexed by stage count directly. There is a size and an offset for 
 	// every resource type, for every stage. Some resource stages overlap, such as compute and graphics, 
 	// so we don't take up unnecessary space
-	CrArray<CrArray<ShaderResourceOffset, cr3d::ShaderStage::GraphicsStageCount>, cr3d::ShaderResourceType::Count> m_stageResourceOffsets;
+	CrArray<CrArray<ShaderResourceOffset, cr3d::ShaderStage::GraphicsStageCount>, cr3d::ShaderResourceType::Count> m_stageResourceOffsets = {};
 
 	CrFixedVector<CrShaderBinding, 64> m_bindings;
 };

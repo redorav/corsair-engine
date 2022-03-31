@@ -83,8 +83,6 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	VkResult vkResult = vkCreateCommandPool(m_vkDevice, &cmdPoolInfo, nullptr, &m_vkGraphicsCommandPool);
 	CrAssert(vkResult == VK_SUCCESS);
 
-	m_auxiliaryCommandBuffer = CreateCommandBuffer(CrCommandQueueType::Graphics);
-
 	// TODO This is per-device but it's currently global
 	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 	{

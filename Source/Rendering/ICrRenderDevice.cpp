@@ -34,9 +34,11 @@ ICrRenderDevice::~ICrRenderDevice()
 
 }
 
-void ICrRenderDevice::InitializeDeletionQueue()
+void ICrRenderDevice::Initialize()
 {
 	m_gpuDeletionQueue.Initialize(this);
+
+	m_auxiliaryCommandBuffer = CreateCommandBuffer(CrCommandQueueType::Graphics);
 }
 
 void ICrRenderDevice::ProcessDeletionQueue()

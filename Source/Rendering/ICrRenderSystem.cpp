@@ -97,7 +97,7 @@ void ICrRenderSystem::CreateRenderDevice()
 		delete renderDevice;
 	});
 
-	RenderSystem->m_mainDevice->InitializeDeletionQueue();
+	RenderSystem->m_mainDevice->Initialize();
 }
 
 bool ICrRenderSystem::GetIsValidationEnabled()

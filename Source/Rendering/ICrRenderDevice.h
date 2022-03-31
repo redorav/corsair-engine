@@ -81,7 +81,7 @@ public:
 
 	virtual ~ICrRenderDevice();
 
-	void InitializeDeletionQueue();
+	void Initialize();
 
 	void ProcessDeletionQueue();
 

@@ -248,7 +248,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
-			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)descriptor.initialDataSize);
+			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)imageMemoryRequirements.size);
 			CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = vulkanRenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor);
 			CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
@@ -258,9 +258,9 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			
 			// TODO Rework how this all works. We shouldn't be stalling here or creating new command buffers.
 			// However, changing this requires more framework to be in place
-			CrCommandBufferSharedHandle cmdBuffer = renderDevice->GetAuxiliaryCommandBuffer();
-			CrCommandBufferVulkan* vulkanCmdBuffer = static_cast<CrCommandBufferVulkan*>(cmdBuffer.get());
-			vulkanCmdBuffer->Begin();
+			const CrCommandBufferSharedHandle& commandBuffer = renderDevice->GetAuxiliaryCommandBuffer();
+			CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(commandBuffer.get());
+			vulkanCommandBuffer->Begin();
 			{
 				VkImageSubresourceRange subresourceRange;
 				subresourceRange.aspectMask     = m_vkAspectMask;
@@ -285,7 +285,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
 				// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
 				// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-				vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+				vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 			
 				// Setup buffer copy regions for each mip level
 				CrVector<VkBufferImageCopy> bufferCopyRegions;
@@ -308,7 +308,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				}
 			
 				// Copy mip levels from staging buffer
-				vkCmdCopyBufferToImage(vulkanCmdBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+				vkCmdCopyBufferToImage(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
 			
 				// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
 				imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -319,10 +319,10 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
 				// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
 				// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
-				vkCmdPipelineBarrier(vulkanCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+				vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 			}
-			vulkanCmdBuffer->End();
-			vulkanCmdBuffer->Submit();
+			vulkanCommandBuffer->End();
+			vulkanCommandBuffer->Submit();
 			renderDevice->WaitIdle();
 		}
 		else if (m_usage & cr3d::TextureUsage::CPUReadable)

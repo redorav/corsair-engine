@@ -248,7 +248,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	{
 		if (m_usage & cr3d::TextureUsage::Default)
 		{
-			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)imageMemoryRequirements.size);
+			CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)m_usedGPUMemory);
 			CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = vulkanRenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor);
 			CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 

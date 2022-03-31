@@ -12,7 +12,9 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 	, dataFormat(descriptor.dataFormat)
 	, sizeBytes(descriptor.numElements * descriptor.stride)
 	, strideBytes(descriptor.stride)
-{}
+{
+	CrAssertMsg(sizeBytes > 0, "Size must be greater than zero");
+}
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
 // is not public, and lives here to cater for the two public-facing constructors

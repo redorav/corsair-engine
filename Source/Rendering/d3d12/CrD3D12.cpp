@@ -140,11 +140,11 @@ D3D12_FILTER crd3d::GetD3DFilter(cr3d::Filter minFilter, cr3d::Filter magFilter,
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_MAG_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
 		}
-		else if (minFilter == cr3d::Filter::Linear)
+		else if (minFilter == cr3d::Filter::Linear && magFilter == cr3d::Filter::Point)
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 		}
-		else if (magFilter == cr3d::Filter::Linear)
+		else if (minFilter == cr3d::Filter::Point && magFilter == cr3d::Filter::Linear)
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT : D3D12_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
 		}
@@ -163,11 +163,11 @@ D3D12_FILTER crd3d::GetD3DFilter(cr3d::Filter minFilter, cr3d::Filter magFilter,
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_MAG_MIP_POINT : D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 		}
-		else if (minFilter == cr3d::Filter::Linear)
+		else if (minFilter == cr3d::Filter::Linear && magFilter == cr3d::Filter::Point)
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_LINEAR_MAG_MIP_POINT : D3D12_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 		}
-		else if (magFilter == cr3d::Filter::Linear)
+		else if (minFilter == cr3d::Filter::Point && magFilter == cr3d::Filter::Linear)
 		{
 			return mipFilter == cr3d::Filter::Point ? D3D12_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT : D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR;
 		}

@@ -22,7 +22,7 @@ struct CrTextureDescriptor
 	cr3d::SampleCount sampleCount;
 	cr3d::TextureType type;
 	cr3d::TextureUsageFlags usage;
-	const void* initialData; // TODO do better
+	const uint8_t* initialData; // TODO do better
 	uint64_t initialDataSize; // TODO delete from here
 
 	// This extra data exists to be able to pass platform-specific information

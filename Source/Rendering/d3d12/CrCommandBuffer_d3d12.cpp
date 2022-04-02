@@ -2,8 +2,15 @@
 
 #include "CrCommandBuffer_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
+#include "CrPipeline_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
+#include "CrShader_d3d12.h"
+
+#include "Core/CrAlignment.h"
+
+#define USE_PIX
+#include "WinPixEventRuntime/pix3.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -69,6 +76,30 @@ void CrCommandBufferD3D12::ClearRenderTargetPS(const ICrTexture* renderTarget, c
 	unused_parameter(sliceCount);
 }
 
+void CrCommandBufferD3D12::BeginDebugEventPS(const char* eventName, const float4& color)
+{
+	float4 color255 = color * 255.0f;
+	BYTE r = (BYTE)(color255.r);
+	BYTE g = (BYTE)(color255.g);
+	BYTE b = (BYTE)(color255.b);
+
+	PIXBeginEvent(m_d3d12GraphicsCommandList, PIX_COLOR(r, g, b), eventName);
+}
+
+void CrCommandBufferD3D12::EndDebugEventPS()
+{
+	PIXEndEvent(m_d3d12GraphicsCommandList);
+}
+
+void CrCommandBufferD3D12::InsertDebugMarkerPS(const char* markerName, const float4& color)
+{
+	float4 color255 = color * 255.0f;
+	BYTE r = (BYTE)(color255.r);
+	BYTE g = (BYTE)(color255.g);
+	BYTE b = (BYTE)(color255.b);
+
+	PIXSetMarker(m_d3d12GraphicsCommandList, PIX_COLOR(r, g, b), markerName);
+}
 void CrCommandBufferD3D12::EndPS()
 {
 	

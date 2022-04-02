@@ -83,23 +83,6 @@ inline void CrCommandBufferD3D12::DispatchPS(uint32_t threadGroupCountX, uint32_
 	m_d3d12GraphicsCommandList->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
 
-inline void CrCommandBufferD3D12::BeginDebugEventPS(const char* eventName, const float4& color)
-{
-	unused_parameter(eventName);
-	unused_parameter(color);
-}
-
-inline void CrCommandBufferD3D12::EndDebugEventPS()
-{
-	
-}
-
-inline void CrCommandBufferD3D12::InsertDebugMarkerPS(const char* markerName, const float4& color)
-{
-	unused_parameter(markerName);
-	unused_parameter(color);
-}
-
 inline void CrCommandBufferD3D12::BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
 	const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);

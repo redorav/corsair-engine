@@ -20,13 +20,14 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	rasterizerState.sType            = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizerState.pNext            = nullptr;
 	rasterizerState.flags            = 0;
-	rasterizerState.depthClampEnable = false;
 	rasterizerState.polygonMode      = crvk::GetVkPolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
 	rasterizerState.cullMode         = crvk::GetVkPolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
 	rasterizerState.frontFace        = crvk::GetVkFrontFace(pipelineDescriptor.rasterizerState.frontFace);
 
+	// Depth clamp is the opposite of depth clip. See discussion here https://github.com/gpuweb/gpuweb/issues/2100
+	rasterizerState.depthClampEnable = !pipelineDescriptor.rasterizerState.depthClipEnable;
+
 	// TODO Complete this section
-	rasterizerState.depthClampEnable = pipelineDescriptor.rasterizerState.depthClipEnable;
 	rasterizerState.lineWidth = 1.0f;
 	//rasterizerState.rasterizerDiscardEnable = false;
 	//rasterizerState.depthBiasEnable = false;

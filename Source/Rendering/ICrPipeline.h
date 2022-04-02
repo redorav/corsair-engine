@@ -126,6 +126,7 @@ struct CrGraphicsPipelineDescriptor
 		rasterizerState.fillMode  = cr3d::PolygonFillMode::Fill;
 		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
 		rasterizerState.cullMode  = cr3d::PolygonCullMode::Back;
+		rasterizerState.depthClipEnable = true;
 		
 		padding                   = 0;
 		

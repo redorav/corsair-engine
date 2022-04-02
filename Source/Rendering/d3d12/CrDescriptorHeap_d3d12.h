@@ -66,13 +66,17 @@ class CrDescriptorStreamD3D12
 {
 public:
 
+	void Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor);
+
 	CrDescriptorStreamD3D12();
 
-	crd3d::DescriptorD3D12 Allocate();
+	crd3d::DescriptorD3D12 Allocate(uint32_t count);
 
 	void Reset();
 
 	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+
+	uint32_t GetNumDescriptors() const { return m_currentDescriptor; }
 
 private:
 

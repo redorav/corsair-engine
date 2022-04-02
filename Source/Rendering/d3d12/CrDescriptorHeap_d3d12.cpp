@@ -63,12 +63,12 @@ void CrDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, c
 
 	CrAssertMsg(descriptor.numDescriptors <= maxDescriptors, "Exceeded maximum numbers of descriptors");
 
-	CrDescriptorHeapDescriptor singleHeapDescriptor;
-	singleHeapDescriptor.name = descriptor.name;
-	singleHeapDescriptor.numDescriptors = maxDescriptors;
-	singleHeapDescriptor.type = descriptor.type;
-	singleHeapDescriptor.flags = descriptor.flags;
-	m_descriptorHeap.Initialize(renderDeviceD3D12, singleHeapDescriptor);
+	CrDescriptorHeapDescriptor heapDescriptor;
+	heapDescriptor.name = descriptor.name;
+	heapDescriptor.numDescriptors = maxDescriptors;
+	heapDescriptor.type = descriptor.type;
+	heapDescriptor.flags = descriptor.flags;
+	m_descriptorHeap.Initialize(renderDeviceD3D12, heapDescriptor);
 
 	crd3d::DescriptorD3D12 heapStart = m_descriptorHeap.GetHeapStart();
 
@@ -98,12 +98,24 @@ CrDescriptorStreamD3D12::CrDescriptorStreamD3D12()
 	
 }
 
-crd3d::DescriptorD3D12 CrDescriptorStreamD3D12::Allocate()
+void CrDescriptorStreamD3D12::Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor)
+{
+	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+
+	CrDescriptorHeapDescriptor heapDescriptor;
+	heapDescriptor.name           = descriptor.name;
+	heapDescriptor.numDescriptors = maxDescriptors;
+	heapDescriptor.type           = descriptor.type;
+	heapDescriptor.flags          = descriptor.flags;
+	m_descriptorHeap.Initialize(renderDeviceD3D12, heapDescriptor);
+}
+
+crd3d::DescriptorD3D12 CrDescriptorStreamD3D12::Allocate(uint32_t count)
 {
 	crd3d::DescriptorD3D12 descriptor = m_descriptorHeap.GetHeapStart();
 	descriptor.cpuHandle.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
 	descriptor.gpuHandle.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
-	m_currentDescriptor++;
+	m_currentDescriptor += count;
 	return descriptor;
 }
 

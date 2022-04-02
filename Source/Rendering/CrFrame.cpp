@@ -54,7 +54,8 @@
 bool HashingAssert()
 {
 	CrGraphicsPipelineDescriptor defaultDescriptor;
-	CrAssertMsg(CrHash(&defaultDescriptor) == CrHash(9947262013370124668), "Failed to hash known pipeline descriptor!");
+	CrHash defaultDescriptorHash = CrHash(&defaultDescriptor);
+	CrAssertMsg(defaultDescriptorHash == CrHash(16322922871074920531), "Failed to hash known pipeline descriptor!");
 	return true;
 }
 

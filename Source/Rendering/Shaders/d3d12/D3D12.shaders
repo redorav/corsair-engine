@@ -1,0 +1,7 @@
+RootSignatureGraphics:
+  entrypoint: RootSignatureGraphics
+  stage: RootSignature
+  
+RootSignatureCompute:
+  entrypoint: RootSignatureCompute
+  stage: RootSignature

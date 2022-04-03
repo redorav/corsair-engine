@@ -181,9 +181,8 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	inputLayoutDescriptor.pInputElementDescs = inputElementDescriptors.data();
 	inputLayoutDescriptor.NumElements = vertexDescriptor.GetAttributeCount();
 
-	// TODO Decide on an adequate strategy for the root signatures
-	// ID3D12RootSignature* pRootSignature;
-	d3d12PipelineStateDescriptor.pRootSignature = nullptr;
+	// Get root signature from the global root signature repository
+	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12GraphicsRootSignature();
 
 	HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
 	CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");

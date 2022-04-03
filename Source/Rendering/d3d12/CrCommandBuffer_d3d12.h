@@ -4,6 +4,7 @@
 #include "Rendering/CrRendering.h"
 #include "CrGPUBuffer_d3d12.h"
 #include "CrGPUQueryPool_d3d12.h"
+#include "CrDescriptorHeap_d3d12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrMacros.h"
@@ -13,11 +14,15 @@ class CrIndexBufferCommon;
 class ICrGraphicsPipeline;
 class CrTextureD3D12;
 
+typedef CrFixedVector<D3D12_RESOURCE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrBarrierVectorD3D12;
+
 class CrCommandBufferD3D12 final : public ICrCommandBuffer
 {
 public:
 
 	CrCommandBufferD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType);
+
+	ID3D12GraphicsCommandList4* GetD3D12CommandList() const { return m_d3d12GraphicsCommandList; }
 
 private:
 
@@ -61,11 +66,40 @@ private:
 
 	virtual void EndRenderPassPS() override;
 
+	void ProcessTextureAndBufferBarriers
+	(
+		const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
+		const CrRenderPassDescriptor::TextureTransitionVector& textures,
+		CrBarrierVectorD3D12& transitions
+	);
+
+	void ProcessRenderTargetBarrier
+	(
+		const CrRenderTargetDescriptor& renderTargetDescriptor, 
+		cr3d::TextureState::T initialState,
+		cr3d::TextureState::T finalState, 
+		CrBarrierVectorD3D12& resourceBarriers
+	);
+
+	D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
+
+	CrDescriptorStreamD3D12 m_CBV_SRV_UAV_ShaderVisibleDescriptorStream;
+
+	CrDescriptorStreamD3D12 m_CBV_SRV_UAV_DescriptorStream;
+
+	CrDescriptorStreamD3D12 m_samplerShaderVisibleDescriptorStream;
+
+	CrDescriptorStreamD3D12 m_samplerDescriptorStream;
+
+	ID3D12DescriptorHeap* m_CBV_SRV_UAV_DescriptorHeap;
+
+	ID3D12DescriptorHeap* m_samplerDescriptorHeap;
+
 	ID3D12Device* m_d3d12Device;
 
 	ID3D12CommandAllocator* m_d3d12CommandAllocator;
 
-	ID3D12GraphicsCommandList* m_d3d12GraphicsCommandList;
+	ID3D12GraphicsCommandList4* m_d3d12GraphicsCommandList;
 };
 
 inline void CrCommandBufferD3D12::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)

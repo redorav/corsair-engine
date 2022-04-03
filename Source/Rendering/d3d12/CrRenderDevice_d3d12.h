@@ -24,6 +24,10 @@ public:
 	// that the device used to do but now requires a queue. Don't use for actual rendering
 	ID3D12CommandQueue* GetD3D12GraphicsCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
 
+	ID3D12RootSignature* GetD3D12GraphicsRootSignature() const { return m_d3d12GraphicsRootSignature; }
+
+	ID3D12RootSignature* GetD3D12ComputeRootSignature() const { return m_d3d12ComputeRootSignature; }
+
 	crd3d::DescriptorD3D12 AllocateRTVDescriptor();
 
 	void FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor);
@@ -89,7 +93,10 @@ private:
 
 	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue;
 
-	// This is effectively the physical device
+	ID3D12RootSignature* m_d3d12GraphicsRootSignature;
+
+	ID3D12RootSignature* m_d3d12ComputeRootSignature;
+
 	IDXGIAdapter1* m_dxgiAdapter;
 
 	ID3D12Device* m_d3d12Device;

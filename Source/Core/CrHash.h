@@ -88,36 +88,6 @@ inline CrHash operator << (CrHash first, CrHash second)
 	return CrHash(hashes, sizeof(hashes));
 }
 
-// Auto Hashable is a class that allows arbitrary structs to be hashed easily
-// It ensures padding is 0 so that copying or creating new instances doesn't 
-// alter the hash. However, it comes at a cost since the structure needs to
-// be memset
-template<typename T>
-class CrAutoHashable
-{
-public:
-
-	CrAutoHashable()
-	{
-		memset(this, 0, sizeof(T));
-	}
-
-	CrHash GetHash() const
-	{
-		return m_hash;
-	}
-
-	void Hash()
-	{
-		m_hash.Reset(); // The hash also takes part in the hashing because it's stored. Reset for consistent hashing
-		m_hash = CrHash((T*)this, sizeof(T));
-	}
-
-private:
-
-	CrHash m_hash;
-};
-
 namespace eastl
 {
 	template<>

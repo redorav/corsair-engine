@@ -14,18 +14,18 @@ class ICrRenderDevice;
 struct CrD3D12AdditionalTextureViews
 {
 	// SRVs
-	CrArray<CrVector<D3D12_SHADER_RESOURCE_VIEW_DESC>, ICrTexture::MaxMipmaps>	m_d3d12SRVSingleMipSlice;
-	CrArray<D3D12_SHADER_RESOURCE_VIEW_DESC, ICrTexture::MaxMipmaps>			m_d3d12SRVSingleMipAllSlices;
+	CrArray<CrVector<D3D12_SHADER_RESOURCE_VIEW_DESC>, cr3d::MaxMipmaps> m_d3d12SRVSingleMipSlice;
+	CrArray<D3D12_SHADER_RESOURCE_VIEW_DESC, cr3d::MaxMipmaps> m_d3d12SRVSingleMipAllSlices;
 
 	// RTVs
-	CrArray<CrVector<crd3d::DescriptorD3D12>, ICrTexture::MaxMipmaps>	m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
-	CrArray<crd3d::DescriptorD3D12, ICrTexture::MaxMipmaps>				m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
+	CrArray<CrVector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
+	CrArray<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
 
 	// DSVs
-	crd3d::DescriptorD3D12												m_d3d12DSVSingleMipSlice;
+	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSlice;
 
 	// UAVs
-	CrArray<D3D12_UNORDERED_ACCESS_VIEW_DESC, ICrTexture::MaxMipmaps>	m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
+	CrArray<D3D12_UNORDERED_ACCESS_VIEW_DESC, cr3d::MaxMipmaps>	m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 };
 
 class CrTextureD3D12 final : public ICrTexture

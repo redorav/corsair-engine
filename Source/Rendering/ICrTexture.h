@@ -37,8 +37,6 @@ class ICrTexture : public CrGPUDeletable
 {
 public:
 
-	static const uint32_t MaxMipmaps = 14;
-
 	virtual ~ICrTexture();
 
 	bool IsRenderTarget() const { return (m_usage & cr3d::TextureUsage::RenderTarget) != 0; }

@@ -4,9 +4,10 @@
 
 namespace cr3d
 {
-	static constexpr uint32_t MaxRenderTargets = 8;
-	static constexpr uint32_t MaxVertexStreams = 8;
-	static constexpr uint32_t MaxVertexAttributes = 8;
+	static constexpr uint32_t MaxRenderTargets = 8; // Maximum render targets we can bind
+	static constexpr uint32_t MaxVertexStreams = 8; // Maximum vertex streams per vertex shader
+	static constexpr uint32_t MaxVertexAttributes = 8; // Maximum vertex attributes per vertex shader
+	static constexpr uint32_t MaxMipmaps = 14; // Maximum mipmaps per texture (16384x16384)
 
 	namespace DataFormat
 	{

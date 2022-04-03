@@ -500,8 +500,8 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 {
-	const CrGraphicsPipelineD3D12* d3dComputePipeline = static_cast<const CrGraphicsPipelineD3D12*>(m_currentState.m_computePipeline);
-	// const CrGraphicsShaderHandle& currentComputeShader = d3dComputePipeline->GetShader();
+	const CrComputePipelineD3D12* d3dComputePipeline = static_cast<const CrComputePipelineD3D12*>(m_currentState.m_computePipeline);
+	// const CrComputeShaderHandle& currentComputeShader = d3dComputePipeline->GetShader();
 
 	if (m_currentState.m_computePipelineDirty)
 	{

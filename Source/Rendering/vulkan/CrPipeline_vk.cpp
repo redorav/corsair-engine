@@ -6,8 +6,9 @@
 CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 (
 	const CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-	const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor
+	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
+	: ICrGraphicsPipeline(graphicsShader, vertexDescriptor)
 {
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -151,7 +152,7 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
-	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader);
+	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader.get());
 
 	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
@@ -328,14 +329,15 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
 
-CrComputePipelineVulkan::CrComputePipelineVulkan(const CrRenderDeviceVulkan* vulkanRenderDevice, const ICrComputeShader* computeShader)
+CrComputePipelineVulkan::CrComputePipelineVulkan(const CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
+	: ICrComputePipeline(computeShader)
 {
-	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader);
+	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader.get());
 
 	VkPipelineShaderStageCreateInfo shaderStage = {};
 	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader)->GetVkShaderModule();
+	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader.get())->GetVkShaderModule();
 	shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
 	VkResult vkResult;

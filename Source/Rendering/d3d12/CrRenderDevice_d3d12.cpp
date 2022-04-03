@@ -182,13 +182,13 @@ ICrTexture* CrRenderDeviceD3D12::CreateTexturePS(const CrTextureDescriptor& para
 
 ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS
 (
-	const CrGraphicsPipelineDescriptor& pipelineDescriptor, const ICrGraphicsShader* graphicsShader, const CrVertexDescriptor& vertexDescriptor
+	const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
 {
 	return new CrGraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const ICrComputeShader* computeShader)
+ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const CrComputeShaderHandle& computeShader)
 {
 	return new CrComputePipelineD3D12(this, computeShader);
 }

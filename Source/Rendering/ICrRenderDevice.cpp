@@ -82,10 +82,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 {
 	CrTimer pipelineCreationTime;
 
-	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader.get(), vertexDescriptor));
-
-	pipeline->m_shader = graphicsShader;
-	pipeline->m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
+	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
 	// Print out a message that includes meaningful information
 	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = graphicsShader->GetBytecodes();
@@ -114,8 +111,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 {
 	CrTimer pipelineCreationTime;
 
-	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader.get()));
-	computePipeline->m_shader = computeShader;
+	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
 
 	CrFixedString128 entryPoint("(");
 	entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());

@@ -167,13 +167,15 @@ class ICrGraphicsPipeline
 {
 public:
 
+	ICrGraphicsPipeline(const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+
 	virtual ~ICrGraphicsPipeline() {}
 
 	const CrGraphicsShaderHandle& GetShader() const { return m_shader; }
 
 	uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
 
-	// TODO PRIVATE
+private:
 
 	CrGraphicsShaderHandle m_shader;
 	
@@ -192,11 +194,13 @@ class ICrComputePipeline
 {
 public:
 
+	ICrComputePipeline(const CrComputeShaderHandle& computeShader) : m_shader(computeShader) {}
+
 	virtual ~ICrComputePipeline() {}
 
 	const CrComputeShaderHandle& GetShader() const { return m_shader; }
 
-	// TODO PRIVATE
+private:
 
 	CrComputeShaderHandle m_shader;
 };

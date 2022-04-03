@@ -13,7 +13,6 @@
 #include "CrGPUQueryPool_vk.h"
 
 #include "Core/CrCommandLine.h"
-
 #include "Core/Logging/ICrDebug.h"
 
 PFN_vkDebugMarkerSetObjectTagEXT	vkDebugMarkerSetObjectTag = nullptr;
@@ -372,18 +371,14 @@ ICrTexture* CrRenderDeviceVulkan::CreateTexturePS(const CrTextureDescriptor& des
 ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 (
 	const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-	const ICrGraphicsShader* graphicsShader,
+	const CrGraphicsShaderHandle& graphicsShader,
 	const CrVertexDescriptor& vertexDescriptor
 )
 {
 	return new CrGraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS
-(
-	const CrComputePipelineDescriptor& /*pipelineDescriptor*/,
-	const ICrComputeShader* computeShader
-)
+ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const CrComputeShaderHandle& computeShader)
 {
 	return new CrComputePipelineVulkan(this, computeShader);
 }

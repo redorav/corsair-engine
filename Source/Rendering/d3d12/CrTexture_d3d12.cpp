@@ -311,11 +311,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 	if (descriptor.initialData)
 	{
-		// Get necessary buffer size to fit the full texture inside
-		UINT64 intermediateBufferSize = 0;
-		d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints(&resourceDescriptor, 0, subResourceCount, 0, nullptr, nullptr, nullptr, &intermediateBufferSize);
-
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)intermediateBufferSize);
+		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)totalBytes);
 		CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 

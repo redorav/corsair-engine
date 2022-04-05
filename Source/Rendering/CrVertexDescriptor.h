@@ -193,7 +193,7 @@ struct CrVertexDescriptor
 
 	CrHash ComputeHash() const
 	{
-		return CrHash(this);
+		return CrHash(*this);
 	}
 
 private:

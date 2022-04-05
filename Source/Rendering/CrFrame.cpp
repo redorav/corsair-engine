@@ -54,7 +54,7 @@
 bool HashingAssert()
 {
 	CrGraphicsPipelineDescriptor defaultDescriptor;
-	CrHash defaultDescriptorHash = CrHash(&defaultDescriptor);
+	CrHash defaultDescriptorHash = CrHash(defaultDescriptor);
 	CrAssertMsg(defaultDescriptorHash == CrHash(16322922871074920531), "Failed to hash known pipeline descriptor!");
 	return true;
 }
@@ -721,7 +721,7 @@ void CrFrame::DrawDebugUI()
 
 				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition](const CrRenderGraphPass& pass)
 				{
-					CrGPUInterval interval = m_timingQueryTracker->GetResultForFrame(CrHash(pass.name.c_str()));
+					CrGPUInterval interval = m_timingQueryTracker->GetResultForFrame(CrHash(pass.name.c_str(), pass.name.length()));
 
 					if (pass.type != CrRenderGraphPassType::Behavior)
 					{

@@ -30,20 +30,20 @@ public:
 	}
 
 	template<typename T>
-	CrHash(T* data)
+	CrHash(const T& data)
 	{
-		m_hash = ComputeHash<T>(data, sizeof(T));
+		m_hash = ComputeHash<T>(&data, sizeof(T));
 	}
 
 	template<typename T>
-	CrHash(T* data, uint64_t dataSize)
+	CrHash(const T* data, uint64_t dataSize)
 	{
 		m_hash = ComputeHash<T>(data, dataSize);
 	}
 
-	CrHash(const char* data)
+	CrHash(const char* data, uint32_t length)
 	{
-		m_hash = ComputeHash<const char>(data, strlen(data));
+		m_hash = ComputeHash<const char>(data, length);
 	}
 
 	CrHash& operator <<= (CrHash other)
@@ -66,18 +66,22 @@ public:
 	// TODO Select hash function at compile time based on the size of datatype.
 	// http://aras-p.info/blog/2016/08/09/More-Hash-Function-Tests/
 	template<typename T>
-	static uint64_t ComputeHash(T* data)
+	static uint64_t ComputeHash(const T* data)
 	{
 		return XXH64(data, sizeof(T), HashSeed);
 	}
 
 	template<typename T>
-	static uint64_t ComputeHash(T* data, uint64_t dataSize)
+	static uint64_t ComputeHash(const T* data, uint64_t dataSize)
 	{
 		return XXH64(data, dataSize, HashSeed);
 	}
 
 private:
+
+	// Don't hash pointers directly
+	template<typename T> CrHash(const T* data);
+	template<typename T> CrHash(T* data);
 
 	uint64_t m_hash;
 };

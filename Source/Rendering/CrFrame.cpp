@@ -648,19 +648,15 @@ struct CrSizeUnit
 	const char* unit;
 };
 
-CrSizeUnit GetSizeUnit(uint64_t bytes)
+CrSizeUnit GetGPUMemorySizeUnit(uint64_t bytes)
 {
 	if (bytes > 1024 * 1024 * 1024)
 	{
-		return { bytes / (1024 * 1024 * 1024), "GB" };
+		return { bytes / (1024 * 1024), "MB" };
 	}
 	else if (bytes > 1024 * 1024)
 	{
-		return { bytes / (1024 * 1024), "MB" };
-	}
-	else if (bytes > 1024)
-	{
-		return { bytes / 1024, "KB" };
+		return { bytes / (1024), "KB" };
 	}
 	else
 	{
@@ -685,10 +681,10 @@ void CrFrame::DrawDebugUI()
 			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage(); 
 
 			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
-			CrSizeUnit sizeUnit = GetSizeUnit(properties.gpuMemoryBytes);
+			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
 			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
-			ImGui::Text("GPU: %s (%llu%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
+			ImGui::Text("GPU: %s (%llu %s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());

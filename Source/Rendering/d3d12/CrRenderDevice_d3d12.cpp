@@ -46,13 +46,23 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		}
 	}
 
-	m_renderDeviceProperties.vendor = GetVendorFromVendorID(selectedAdapterDescriptor.VendorId);
-	m_renderDeviceProperties.description.append_convert<wchar_t>(selectedAdapterDescriptor.Description);
-
 	HRESULT hResult = S_OK;
 
 	hResult = D3D12CreateDevice(m_dxgiAdapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_d3d12Device));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating D3D12 device");
+
+	// Parse render device properties
+	m_renderDeviceProperties.vendor = GetVendorFromVendorID(selectedAdapterDescriptor.VendorId);
+	m_renderDeviceProperties.description.append_convert<wchar_t>(selectedAdapterDescriptor.Description);
+	m_renderDeviceProperties.gpuMemoryBytes = selectedAdapterDescriptor.DedicatedVideoMemory;
+
+	// Check architecture
+	D3D12_FEATURE_DATA_ARCHITECTURE d3d12Architecture;
+	d3d12Architecture.NodeIndex = 0;
+	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &d3d12Architecture, sizeof(d3d12Architecture)) == S_OK)
+	{
+		m_renderDeviceProperties.isUMA = d3d12Architecture.UMA;
+	}
 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;

@@ -270,6 +270,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;
 	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;
 	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties.limits.maxImageDimension3D;
+	m_renderDeviceProperties.isUMA = m_vkPhysicalDeviceProperties.deviceType & VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
 
 	// A pipeline cache belonging to renderdoc is invalid (it never has the same hash), so we don't want to 
 	// store it or even delete a previous cache just because renderdoc can't use or create one.

@@ -42,6 +42,7 @@ struct CrRenderDeviceProperties
 {
 	CrVendor::T vendor = CrVendor::Unknown;
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+	bool isUMA = false; // Whether a unified memory architecture is used here
 	CrFixedString128 description;
 
 	uint32_t maxConstantBufferRange = 0;

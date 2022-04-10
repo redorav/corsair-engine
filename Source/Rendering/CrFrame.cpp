@@ -359,10 +359,13 @@ void CrFrame::Process()
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
 
-	drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
-	drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
-	drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
-	drawCommandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
+	for (cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Vertex; shaderStage < cr3d::ShaderStage::Count; ++shaderStage)
+	{
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
+	}
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
 

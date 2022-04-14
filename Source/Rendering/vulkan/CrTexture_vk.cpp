@@ -86,7 +86,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		if (arrayLayers > 1)
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-			vkCreateFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
 		}
 		else
 		{
@@ -100,7 +99,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		if (arrayLayers > 1)
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-			vkCreateFlags |= VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT_KHR;
 		}
 		else
 		{

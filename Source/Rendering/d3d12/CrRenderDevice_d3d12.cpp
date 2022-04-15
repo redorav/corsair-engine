@@ -280,6 +280,91 @@ void CrRenderDeviceD3D12::WaitIdlePS()
 	WaitForFence(m_waitIdleFence.get(), UINT64_MAX);
 }
 
+uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
+{
+	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(texture);
+
+	D3D12_RESOURCE_DESC resourceDescriptor = d3d12Texture->GetD3D12Resource()->GetDesc();
+
+	UINT64 stagingBufferSizeBytes;
+	m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, d3d12Texture->GetD3D12SubresourceCount(), 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
+
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)stagingBufferSizeBytes);
+	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+
+	CrTextureUpload textureUpload;
+	textureUpload.buffer = stagingBuffer;
+	textureUpload.mipmapStart = 0;
+	textureUpload.mipmapCount = texture->GetMipmapCount();
+	textureUpload.sliceStart = 0;
+	textureUpload.sliceCount = texture->GetArraySize();
+
+	CrHash textureHash(&texture, sizeof(texture));
+
+	// Add to the open uploads for when we end the texture upload
+	m_openTextureUploads.insert({ textureHash, textureUpload });
+
+	return (uint8_t*)stagingBuffer->Lock();
+}
+
+void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* texture)
+{
+	CrHash textureHash(&texture, sizeof(texture));
+	const auto textureUploadIter = m_openTextureUploads.find(textureHash);
+	if (textureUploadIter != m_openTextureUploads.end())
+	{
+		const CrTextureUpload& textureUpload = textureUploadIter->second;
+
+		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(texture);
+		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.buffer.get());
+
+		d3d12StagingBuffer->Unlock();
+
+		const CrCommandBufferSharedHandle& commandBuffer = m_auxiliaryCommandBuffer;
+		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(commandBuffer.get());
+		d3d12CommandBuffer->Begin();
+		{
+			D3D12_RESOURCE_DESC resourceDescriptor = d3d12Texture->GetD3D12Resource()->GetDesc();
+
+			cr3d::DataFormat::T format = texture->GetFormat();
+
+			uint32_t blockWidth = cr3d::DataFormats[format].blockWidth;
+			uint32_t blockHeight = cr3d::DataFormats[format].blockHeight;
+
+			for (uint32_t slice = textureUpload.sliceStart; slice < textureUpload.sliceCount; ++slice)
+			{
+				for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapCount; ++mip)
+				{
+					cr3d::MipmapLayout mipmapLayout = texture->GetHardwareMipSliceLayout(mip, slice);
+
+					D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
+					textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Buffer();
+					textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+					textureCopySource.PlacedFootprint.Offset = mipmapLayout.offsetBytes;
+					textureCopySource.PlacedFootprint.Footprint.Format   = crd3d::GetDXGIFormat(format);
+					textureCopySource.PlacedFootprint.Footprint.Width    = CrMax(blockWidth, texture->GetWidth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Height   = CrMax(blockHeight, texture->GetHeight() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Depth    = CrMax(1u, texture->GetDepth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.RowPitch = mipmapLayout.rowPitchBytes;
+
+					D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
+					textureCopyDestination.pResource = d3d12Texture->GetD3D12Resource();
+					textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+					textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, texture->GetMipmapCount(), texture->GetArraySize());
+
+					d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
+				}
+			}
+		}
+		d3d12CommandBuffer->End();
+		d3d12CommandBuffer->Submit();
+		WaitIdle();
+
+		// Cast to const_iterator to conform to EASTL's interface
+		m_openTextureUploads.erase((CrHashMap<CrHash, CrTextureUpload>::const_iterator)textureUploadIter);
+	}
+}
+
 void CrRenderDeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
 	unused_parameter(waitSemaphore);

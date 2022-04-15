@@ -10,6 +10,8 @@
 #include "Core/String/CrFixedString.h"
 #include "Core/String/CrString.h"
 #include "Core/Function/CrFixedFunction.h"
+#include "Core/Containers/CrHashMap.h"
+#include "Core/CrHash.h"
 
 namespace CrVendor
 {
@@ -71,6 +73,19 @@ inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
 			return CrVendor::Unknown;
 	}
 }
+
+// Texture uploads encapsulate the idea that platforms have
+// an optimal texture format but for some (PC mainly) we can
+// only provide the data in a linear format
+struct CrTextureUpload
+{
+	CrGPUHardwareBufferHandle buffer;
+	ICrTexture* texture;
+	uint32_t mipmapStart;
+	uint32_t mipmapCount;
+	uint32_t sliceStart;
+	uint32_t sliceCount;
+};
 
 typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
 
@@ -142,16 +157,21 @@ public:
 	// Wait until all operations on all queues have completed
 	void WaitIdle();
 
+	//------------------------------
+	// Download and Upload functions
+	//------------------------------
+	
+	uint8_t* BeginTextureUpload(const ICrTexture* texture);
+
+	void EndTextureUpload(const ICrTexture* texture);
+
 	//-------------------------------
 	// Properties and feature support
 	//-------------------------------
 
 	const CrRenderDeviceProperties& GetProperties() const;
 
-
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
-
-	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer() const;
 
 	const CrGPUDeletionCallbackType& GetGPUDeletionCallback() const
 	{
@@ -196,7 +216,20 @@ protected:
 
 	virtual void WaitIdlePS() = 0;
 
+	//------------------------------
+	// Download and Upload functions
+	//------------------------------
+
+	// Begins a texture upload. Prepares a buffer and returns a pointer to the beginning of the memory.
+	// External code then populates the given memory
+	virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) = 0;
+
+	// Ends a texture upload. The render device keeps track of the requested upload and matches it to
+	// schedule an upload that is guaranteed to be visible on the next texture usage
+	virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
+
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
+
 	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 
 	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
@@ -213,6 +246,9 @@ protected:
 
 	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
 
+	// Texture uploads that have begun to be populated with data but haven't been committed yet
+	CrHashMap<CrHash, CrTextureUpload> m_openTextureUploads;
+
 	// The platform-specific code is able to determine whether
 	// the pipeline is valid or not
 	bool m_isValidPipelineCache;
@@ -226,9 +262,4 @@ template<typename Metadata>
 CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
 {
 	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
-}
-
-inline const CrCommandBufferSharedHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer() const
-{
-	return m_auxiliaryCommandBuffer;
 }

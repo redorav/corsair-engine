@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "Core/String/CrFixedString.h"
+#include "Core/Containers/CrArray.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Rendering/CrRendering.h"
@@ -71,16 +72,21 @@ public:
 
 	cr3d::TextureState::T GetDefaultState() const { return m_defaultState; }
 
-	static uint32_t GetMipSliceOffset(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
+	static cr3d::MipmapLayout GetGenericMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
-	uint32_t GetMipSliceOffset(uint32_t mip, uint32_t slice) const;
+	cr3d::MipmapLayout GetGenericMipSliceLayout(uint32_t mip, uint32_t slice) const;
 
-	uint32_t GetUsedGPUMemory() const { return m_usedGPUMemory; }
+	cr3d::MipmapLayout GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const;
 
-	// TODO
-	// How to do lock/unlock pairs for cubemaps, texture arrays, etc.
-	// Lock(mip, face)
-	// Unlock()
+	uint32_t GetUsedGPUMemory() const { return m_usedGPUMemoryBytes; }
+
+	void CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* sourceData, uint32_t mip, uint32_t slice);
+
+	void CopyIntoTextureMemory
+	(
+		uint8_t* destinationData, const uint8_t* sourceData, 
+		uint32_t startMip, uint32_t mipCount, uint32_t startSlice, uint32_t sliceCount
+	);
 
 protected:
 
@@ -105,11 +111,17 @@ protected:
 
 	uint32_t m_mipmapCount;
 
-	uint32_t m_usedGPUMemory;
+	// Must be populated by the platform-specific implementation. This is the texture size as reported
+	// by the hardware and takes into account padding, etc Used for reporting
+	uint32_t m_usedGPUMemoryBytes;
 
 	cr3d::TextureState::T m_defaultState;
 
 	cr3d::TextureUsageFlags m_usage;
+
+	// Mipmap layout that is platform-dependent
+	CrArray<cr3d::MipmapLayout, cr3d::MaxMipmaps> m_hardwareMipmapLayouts;
+
+	// Distance between two consecutive slices
+	uint32_t m_slicePitchBytes;
 };
-
-

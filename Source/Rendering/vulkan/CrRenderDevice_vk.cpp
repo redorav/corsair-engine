@@ -183,6 +183,115 @@ void CrRenderDeviceVulkan::WaitIdlePS()
 	vkDeviceWaitIdle(m_vkDevice);
 }
 
+uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
+{
+	uint32_t stagingBufferMemory = texture->GetUsedGPUMemory();
+
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)stagingBufferMemory);
+	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
+
+	CrTextureUpload textureUpload;
+	textureUpload.buffer = stagingBuffer;
+	textureUpload.mipmapStart = 0;
+	textureUpload.mipmapCount = texture->GetMipmapCount();
+	textureUpload.sliceStart = 0;
+	textureUpload.sliceCount = texture->GetArraySize();
+
+	CrHash textureHash(&texture, sizeof(texture));
+
+	// Add to the open uploads for when we end the texture upload
+	m_openTextureUploads.insert({ textureHash, textureUpload });
+
+	return (uint8_t*)vulkanStagingBuffer->Lock();
+}
+
+void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
+{
+	CrHash textureHash(&texture, sizeof(texture));
+	const auto textureUploadIter = m_openTextureUploads.find(textureHash);
+	if (textureUploadIter != m_openTextureUploads.end())
+	{
+		const CrTextureUpload& textureUpload = textureUploadIter->second;
+
+		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
+		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.buffer.get());
+
+		vulkanStagingBuffer->Unlock();
+
+		const CrCommandBufferSharedHandle& commandBuffer = m_auxiliaryCommandBuffer;
+		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(commandBuffer.get());
+		vulkanCommandBuffer->Begin();
+		{
+			VkImageAspectFlags vkImageAspectMask = vulkanTexture->GetVkImageAspectMask();
+
+			// Transition the texture image layout to transfer target, so we can safely copy our buffer data into it
+			VkImageSubresourceRange subresourceRange;
+			subresourceRange.aspectMask     = vkImageAspectMask;
+			subresourceRange.baseMipLevel   = textureUpload.mipmapStart;
+			subresourceRange.levelCount     = textureUpload.mipmapCount;
+			subresourceRange.baseArrayLayer = textureUpload.sliceStart;
+			subresourceRange.layerCount     = textureUpload.sliceCount;
+
+			VkImageMemoryBarrier imageMemoryBarrier;
+			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			imageMemoryBarrier.pNext = nullptr;
+			imageMemoryBarrier.image = vulkanTexture->GetVkImage();
+			imageMemoryBarrier.subresourceRange = subresourceRange;
+			imageMemoryBarrier.srcAccessMask = 0;
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
+			// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+
+			// Setup buffer copy regions for each mip level
+			CrFixedVector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
+			
+			for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapStart + textureUpload.mipmapCount; mip++)
+			{
+				VkBufferImageCopy bufferCopyRegion;
+				bufferCopyRegion.imageSubresource.aspectMask = vkImageAspectMask;
+				bufferCopyRegion.imageSubresource.mipLevel = mip;
+				bufferCopyRegion.imageSubresource.baseArrayLayer = textureUpload.sliceStart;
+				bufferCopyRegion.imageSubresource.layerCount = textureUpload.sliceCount;
+				bufferCopyRegion.imageExtent = { CrMax(texture->GetWidth() >> mip, 1u), CrMax(texture->GetHeight() >> mip, 1u), CrMax(texture->GetDepth() >> mip, 1u) };
+				bufferCopyRegion.imageOffset = { 0, 0, 0 };
+
+				bufferCopyRegion.bufferOffset = texture->GetGenericMipSliceLayout(mip, 0).offsetBytes;
+				bufferCopyRegion.bufferRowLength = 0;
+				bufferCopyRegion.bufferImageHeight = 0;
+				bufferCopyRegions.push_back(bufferCopyRegion);
+			}
+
+			// Copy mip levels from staging buffer into texture memory
+			vkCmdCopyBufferToImage(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanTexture->GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+
+			// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+		}
+		vulkanCommandBuffer->End();
+		vulkanCommandBuffer->Submit();
+		WaitIdle();
+
+		// Cast to const_iterator to conform to EASTL's interface
+		m_openTextureUploads.erase((CrHashMap<CrHash, CrTextureUpload>::const_iterator)textureUploadIter);
+	}
+}
+
 void CrRenderDeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
 	VkSubmitInfo submitInfo = {};

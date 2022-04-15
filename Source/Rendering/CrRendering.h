@@ -980,6 +980,15 @@ namespace cr3d
 		TimeoutOrNotReady, // Fence is unsignaled right now or timed out (not ready)
 		Error              // Some error occurred
 	};
+
+	struct MipmapLayout
+	{
+		uint32_t GetMipSize() const { return rowPitchBytes * heightInPixelsBlocks; }
+
+		uint32_t rowPitchBytes;        // Distance in bytes between rows
+		uint32_t offsetBytes;          // Where this mipmap begins
+		uint32_t heightInPixelsBlocks; // Height in pixels or blocks if compressed
+	};
 }
 
 struct CrScissor

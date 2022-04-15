@@ -79,6 +79,10 @@ private:
 
 	virtual void WaitIdlePS() override;
 
+	virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) override;
+
+	virtual void EndTextureUploadPS(const ICrTexture* texture) override;
+
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
 	void RetrieveQueueFamilies();

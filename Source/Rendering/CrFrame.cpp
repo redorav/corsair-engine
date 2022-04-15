@@ -304,6 +304,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	whiteTextureDescriptor.height = 4;
 	whiteTextureDescriptor.initialData = whiteTextureInitialData;
 	whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
+	whiteTextureDescriptor.name = "Default White Texture";
 	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
 
 	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnly, 32);

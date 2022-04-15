@@ -17,49 +17,49 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 
-	D3D12_RESOURCE_DESC resourceDescriptor = {};
-	resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	resourceDescriptor.Width = m_width;
-	resourceDescriptor.Height = m_height;
-	resourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
-	resourceDescriptor.Format = dxgiFormat;
-	resourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
-	resourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	D3D12_RESOURCE_DESC d3d12ResourceDescriptor = {};
+	d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	d3d12ResourceDescriptor.Width = m_width;
+	d3d12ResourceDescriptor.Height = m_height;
+	d3d12ResourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
+	d3d12ResourceDescriptor.Format = dxgiFormat;
+	d3d12ResourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
+	d3d12ResourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
 	if (IsDepthStencil())
 	{
-		resourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 	}
 	
 	if (IsRenderTarget())
 	{
-		resourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 	}
 
 	if (IsUnorderedAccess())
 	{
-		resourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	}
 
 	if (IsCubemap())
 	{
-		resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		resourceDescriptor.DepthOrArraySize = (UINT16)(6 * m_arraySize);
+		d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)(6 * m_arraySize);
 	}
 	else if(IsVolumeTexture())
 	{
-		resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
-		resourceDescriptor.DepthOrArraySize = (UINT16)m_depth;
+		d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_depth;
 	}
 	else if (Is1DTexture())
 	{
-		resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE1D;
-		resourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
+		d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE1D;
+		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
 	}
 	else
 	{
-		resourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		resourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
+		d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
 	}
 
 	if (IsSwapchain())
@@ -68,8 +68,6 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	}
 	else
 	{
-		D3D12_RESOURCE_ALLOCATION_INFO resourceAllocationInfo = d3d12Device->GetResourceAllocationInfo(0, 1, &resourceDescriptor);
-
 		// TODO Create resource heap in render device to use CreatePlacedResource
 		D3D12_HEAP_PROPERTIES heapProperties = {};
 		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -78,7 +76,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
-			&resourceDescriptor,
+			&d3d12ResourceDescriptor,
 			D3D12_RESOURCE_STATE_COMMON,
 			nullptr,
 			IID_PPV_ARGS(&m_d3d12Resource)
@@ -288,80 +286,47 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name.c_str());
 
-	uint32_t subResourceCount = resourceDescriptor.MipLevels;
-	if (resourceDescriptor.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D)
-	{
-		subResourceCount *= resourceDescriptor.DepthOrArraySize;
-	}
+	// Calculate number of subresources by computing the last subresource in the resource
+	m_d3d12SubresourceCount = crd3d::CalculateSubresource(m_mipmapCount - 1, m_arraySize - 1, 0, m_mipmapCount, m_arraySize) + 1;
 
-	// Query the layout. We only care about the first 32 subresources because we only need info for the mip levels for the first two faces / slices
-	const uint32_t MaxSubresources = 32;
-	D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
-	UINT numRows[MaxSubresources];
-	UINT64 rowSizeInBytes[MaxSubresources];
-	UINT64 totalBytes;
-	d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints
-	(
-		&resourceDescriptor,
-		0, // First subresource
-		subResourceCount < MaxSubresources ? subResourceCount : MaxSubresources,
-		0, // base offset
-		subresourceFootprints, numRows, rowSizeInBytes, &totalBytes
-	);
+	D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo = d3d12RenderDevice->GetD3D12Device()->GetResourceAllocationInfo(0, 1, &d3d12ResourceDescriptor);
+	m_usedGPUMemoryBytes = (uint32_t)d3d12ResourceAllocationInfo.SizeInBytes;
+
+	// Prepare the hardware mipmap layout
+	{
+		// Calculate twice the number of subresources for array textures, so we can calculate the slice pitch
+		const uint32_t MaxSubresources = 2 * cr3d::MaxMipmaps;
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
+		UINT numRows[MaxSubresources];
+		d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints(&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
+
+		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
+		{
+			uint32_t subresourceIndex = crd3d::CalculateSubresource(mip, 0, 0, m_mipmapCount, m_arraySize);
+			cr3d::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
+			mipmapLayout.rowPitchBytes        = subresourceFootprints[subresourceIndex].Footprint.RowPitch;
+			mipmapLayout.offsetBytes          = (uint32_t)subresourceFootprints[subresourceIndex].Offset;
+			mipmapLayout.heightInPixelsBlocks = numRows[subresourceIndex];
+		}
+
+		if (m_arraySize > 1)
+		{
+			// The offset for the first mip of the second slice is the distance between slices
+			m_slicePitchBytes = (uint32_t)subresourceFootprints[m_mipmapCount].Offset;
+		}
+		else
+		{
+			m_slicePitchBytes = 0;
+		}
+	}
 
 	if (descriptor.initialData)
 	{
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)totalBytes);
-		CrSharedPtr<ICrHardwareGPUBuffer> stagingBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(stagingBufferDescriptor);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
-
-		// TODO Rework how this all works. We shouldn't be stalling here or creating new command buffers.
-		// However, changing this requires more framework to be in place
-		const CrCommandBufferSharedHandle& comandBuffer = d3d12RenderDevice->GetAuxiliaryCommandBuffer();
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(comandBuffer.get());
-		d3d12CommandBuffer->Begin();
+		uint8_t* textureData = m_renderDevice->BeginTextureUpload(this);
 		{
-			uint8_t* data = (uint8_t*)stagingBuffer->Lock();
-
-			for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
-			{
-				uint32_t subresourceIndex = crd3d::CalculateSubresource(mip, 0, 0, m_mipmapCount, m_arraySize);
-
-				const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& subresourceFootprint = subresourceFootprints[subresourceIndex];
-				uint32_t rowCount = numRows[subresourceIndex];
-				uint32_t rowPitch = subresourceFootprint.Footprint.RowPitch;
-				uint32_t srcRowPitch = subresourceFootprints[0].Footprint.RowPitch >> mip; // TODO Fix this awful hack
-
-				for (uint32_t row = 0; row < rowCount; ++row)
-				{
-					memcpy
-					(
-						data + subresourceFootprint.Offset + rowPitch * row,
-						descriptor.initialData + GetMipSliceOffset(mip, 0) + srcRowPitch * row, // TODO This is DDS-specific
-						rowSizeInBytes[subresourceIndex]
-					);
-				}
-
-				D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
-				textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Buffer();
-				textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-				textureCopySource.PlacedFootprint = subresourceFootprints[subresourceIndex];
-
-				D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
-				textureCopyDestination.pResource = m_d3d12Resource;
-				textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-				textureCopyDestination.SubresourceIndex = subresourceIndex;
-
-				d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
-			}
-
-			stagingBuffer->Unlock();
-
-			// TODO Handle transition to default state
+			CopyIntoTextureMemory(textureData, descriptor.initialData, 0, m_mipmapCount, 0, m_arraySize);
 		}
-		d3d12CommandBuffer->End();
-		d3d12CommandBuffer->Submit();
-		renderDevice->WaitIdle();
+		m_renderDevice->EndTextureUpload(this);
 	}
 }
 

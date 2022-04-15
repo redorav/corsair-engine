@@ -203,11 +203,21 @@ void ICrRenderDevice::WaitIdle()
 	WaitIdlePS();
 }
 
+uint8_t* ICrRenderDevice::BeginTextureUpload(const ICrTexture* texture)
+{
+	return BeginTextureUploadPS(texture);
+}
+
+
+void ICrRenderDevice::EndTextureUpload(const ICrTexture* texture)
+{
+	return EndTextureUploadPS(texture);
+}
+
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
 {
 	return m_renderDeviceProperties;
 }
-
 
 void ICrRenderDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {

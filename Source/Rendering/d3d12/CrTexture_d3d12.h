@@ -52,12 +52,16 @@ public:
 
 	const D3D12_UNORDERED_ACCESS_VIEW_DESC& GetD3D12UnorderedAccessView(uint32_t mip) const { return m_additionalViews->m_d3d12UAVSingleMipAllSlices[mip]; }
 
+	uint32_t GetD3D12SubresourceCount() const { return m_d3d12SubresourceCount; }
+
 private:
 
 	// Main resource view, can access all mips and slices
 	D3D12_SHADER_RESOURCE_VIEW_DESC m_d3d12ShaderResourceView;
 
 	CrUniquePtr<CrD3D12AdditionalTextureViews> m_additionalViews;
+
+	uint32_t m_d3d12SubresourceCount;
 
 	ID3D12Resource* m_d3d12Resource;
 };

@@ -45,6 +45,11 @@ public:
 		return m_pathString.comparei(s);
 	}
 
+	bool empty() const
+	{
+		return m_pathString.empty();
+	}
+
 	CrPath extension() const
 	{
 		size_t lastDot;

@@ -142,7 +142,7 @@ workspace 'Corsair Engine'
 		GraphicsApis = { GraphicsApiVulkan, GraphicsApiD3D12 }
 		defines
 		{
-			'WINDOWS_TARGET',
+			'WINDOWS_PLATFORM',
 			'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR',
 			'D3D12_API'
 		}
@@ -150,27 +150,27 @@ workspace 'Corsair Engine'
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
 		architecture 'x64'
-		defines { 'VULKAN_API', 'VK_USE_PLATFORM_MACOS_MVK', 'MAC_TARGET' }
+		defines { 'VULKAN_API', 'VK_USE_PLATFORM_MACOS_MVK', 'MAC_PLATFORM' }
 		
 	--filter { 'platforms:'..VulkanAndroid }
 		--system 'android'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_ANDROID_KHR', 'ANDROID_TARGET' }
+		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_ANDROID_KHR', 'ANDROID_PLATFORM' }
 		
 	--filter { 'platforms:'..VulkanLinux }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_XCB_KHR', 'LINUX_TARGET' }
+		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_XCB_KHR', 'LINUX_PLATFORM' }
 		
 	--filter { 'platforms:'..VulkanIOS }
 		--system 'ios'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_IOS_MVK', 'IOS_TARGET' }
+		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_IOS_MVK', 'IOS_PLATFORM' }
 		
 	--filter { 'platforms:'..VulkanSwitch }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_VI_NN', 'SWITCH_TARGET' }
+		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_VI_NN', 'SWITCH_PLATFORM' }
 		
 	filter {}
 	
@@ -306,8 +306,9 @@ project(ProjectCrRendering)
 	}
 	
 	AddLibraryIncludes(AssimpLibrary)
-	AddLibraryIncludes(SPIRVReflectLibrary)
 	AddLibraryIncludes(ImguiLibrary)
+	AddLibraryIncludes(SPIRVReflectLibrary)
+	AddLibraryIncludes(RenderDocLibrary)
 	
 	filter { 'platforms:'..DesktopWin64 }
 		files { SourceRenderingDirectory..'/vulkan/*' }
@@ -421,8 +422,8 @@ project(ProjectShaderCompiler)
 	
 	LinkLibrary(EASTLLibrary)
 	
-	AddLibraryIncludes(LibRapidYAML)
-	LinkLibrary(LibRapidYAML)
+	AddLibraryIncludes(RapidYAMLLibrary)
+	LinkLibrary(RapidYAMLLibrary)
 
 	-- Copy the shader compiler into a known directory
 	postbuildcommands

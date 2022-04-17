@@ -31,6 +31,10 @@
 		<version id="4a8fb19" file="rapidyaml_2021_12_09_4a8fb19.zip" repository="github"/>
 	</package>
 	
+	<package name="renderdoc">
+		<version id="1.5.0" file="renderdoc_1.5.0.zip" repository="github"/>
+	</package>
+	
 	<package name="spirv-reflect">
 		<version id="c955ab3" file="spirv_reflect_2021_01_25_c955ab3.zip" repository="github"/>
 		<version id="4689b33" file="spirv-reflect_2022_01_10_4689b33.zip" repository="github"/>

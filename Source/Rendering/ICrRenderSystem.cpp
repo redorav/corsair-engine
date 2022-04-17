@@ -25,6 +25,15 @@ static CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)
 {
+	if (renderSystemDescriptor.enableRenderDoc)
+	{
+		m_renderDoc.Initialize(renderSystemDescriptor);
+	}
+	else if (renderSystemDescriptor.enablePIX && renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12)
+	{
+		m_pix.Initialize(renderSystemDescriptor);
+	}
+
 	// Load builtin shaders here. The render system is only instantiated once and knows
 	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
 	// rest of the engine interacts with them and not the raw data that was passed in, 
@@ -105,9 +114,9 @@ bool ICrRenderSystem::GetIsValidationEnabled()
 	return RenderSystem->m_descriptor.enableValidation;
 }
 
-bool ICrRenderSystem::GetIsDebuggingToolEnabled()
+bool ICrRenderSystem::GetIsRenderDocEnabled()
 {
-	return RenderSystem->m_descriptor.enableDebuggingTool;
+	return RenderSystem->m_descriptor.enableRenderDoc;
 }
 
 cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()

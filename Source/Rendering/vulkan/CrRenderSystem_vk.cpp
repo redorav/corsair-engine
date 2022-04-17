@@ -92,18 +92,6 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	if (renderSystemDescriptor.enableDebuggingTool)
-	{
-		if (IsVkInstanceLayerSupported("VK_LAYER_RENDERDOC_Capture"))
-		{
-			m_instanceLayers.push_back("VK_LAYER_RENDERDOC_Capture");
-		}
-		else
-		{
-			CrLog("Renderdoc layer VK_LAYER_RENDERDOC_Capture not found");
-		}
-	}
-
 	if (renderSystemDescriptor.enableValidation)
 	{
 		if (IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))

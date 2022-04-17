@@ -13,6 +13,7 @@ LibHalf         = DependenciesDirectory..'/half'
 LibHlslpp       = DependenciesDirectory..'/hlslpp'
 LibImGui        = DependenciesDirectory..'/imgui'
 LibRapidYAML    = DependenciesDirectory..'/rapidyaml'
+LibRenderDoc    = DependenciesDirectory..'/renderdoc'
 LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibStb          = DependenciesDirectory..'/stb'
@@ -103,7 +104,7 @@ ImguiLibrary =
 	libNames    = 'ImGui.'.._ACTION..'.release'
 }
 
-LibRapidYAML =
+RapidYAMLLibrary =
 {
 	includeDirs = 
 	{
@@ -112,6 +113,11 @@ LibRapidYAML =
 	},
 	libDirs     = LibRapidYAML..BinaryDirectory,
 	libNames    = 'rapidyaml.'.._ACTION..'.release'
+}
+
+RenderDocLibrary =
+{
+	includeDirs = { LibRenderDoc..IncludeDirectory }
 }
 
 SDL2Library =

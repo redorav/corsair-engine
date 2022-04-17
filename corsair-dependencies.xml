@@ -6,6 +6,7 @@
 	<dependency name="half" version="1.12.0"/>
 	<dependency name="imgui" version="58075c4"/>
 	<dependency name="rapidyaml" version="4a8fb19"/>
+	<dependency name="renderdoc" version="1.5.0"/>
 	<dependency name="sdl2" version="2.0.14"/>
 	<dependency name="spirv-reflect" version="4689b33"/>
 	<dependency name="stb" version="f54acd4"/>

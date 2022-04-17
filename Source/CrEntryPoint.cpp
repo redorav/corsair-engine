@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 	const CrString& dataPath          = crcore::CommandLine("-root");
 	const CrString& graphicsApiString = crcore::CommandLine("-graphicsapi");
 	bool enableGraphicsValidation     = crcore::CommandLine["-debugGraphics"];
-	bool enableRenderdoc              = crcore::CommandLine["-renderdoc"];
+	bool enableRenderDoc              = crcore::CommandLine["-renderdoc"];
+	bool enablePIX                    = crcore::CommandLine["-pix"];
 
 	CrString resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())
@@ -85,7 +86,8 @@ int main(int argc, char* argv[])
 	}
 
 	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
-	renderSystemDescriptor.enableDebuggingTool = enableRenderdoc;
+	renderSystemDescriptor.enableRenderDoc  = enableRenderDoc;
+	renderSystemDescriptor.enablePIX        = enablePIX;
 
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
 	ICrRenderSystem::CreateRenderDevice();

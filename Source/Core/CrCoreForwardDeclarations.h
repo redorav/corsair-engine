@@ -56,6 +56,7 @@ namespace eastl
 	// Strings
 	template <typename T, typename Allocator> class basic_string;
 	typedef basic_string<char, allocator> string;
+	typedef basic_string<wchar_t, allocator> wstring;
 
 	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_string;
 
@@ -137,6 +138,7 @@ using CrUniquePtr = eastl::unique_ptr<T, D>;
 
 // Strings
 using CrString = eastl::string;
+using CrWString = eastl::wstring;
 
 // Take care to take the null terminator into account, i.e. a fixed string 
 // of 16 has 15 usable characters

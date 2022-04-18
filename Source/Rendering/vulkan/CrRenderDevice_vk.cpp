@@ -15,12 +15,6 @@
 #include "Core/CrCommandLine.h"
 #include "Core/Logging/ICrDebug.h"
 
-PFN_vkDebugMarkerSetObjectTagEXT	vkDebugMarkerSetObjectTag = nullptr;
-PFN_vkDebugMarkerSetObjectNameEXT	vkDebugMarkerSetObjectName = nullptr;
-PFN_vkCmdDebugMarkerBeginEXT		vkCmdDebugMarkerBegin = nullptr;
-PFN_vkCmdDebugMarkerEndEXT			vkCmdDebugMarkerEnd = nullptr;
-PFN_vkCmdDebugMarkerInsertEXT		vkCmdDebugMarkerInsert = nullptr;
-
 // https://zeux.io/2019/07/17/serializing-pipeline-cache/
 // https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#pipelines-cache-header
 struct VkPipelineCacheHeader
@@ -81,16 +75,6 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO Transient or Reset? Check Metal and DX12
 	VkResult vkResult = vkCreateCommandPool(m_vkDevice, &cmdPoolInfo, nullptr, &m_vkGraphicsCommandPool);
 	CrAssert(vkResult == VK_SUCCESS);
-
-	// TODO This is per-device but it's currently global
-	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
-	{
-		vkDebugMarkerSetObjectTag  = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectTagEXT");
-		vkDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(m_vkDevice, "vkDebugMarkerSetObjectNameEXT");
-		vkCmdDebugMarkerBegin      = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerBeginEXT");
-		vkCmdDebugMarkerEnd        = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerEndEXT");
-		vkCmdDebugMarkerInsert     = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr(m_vkDevice, "vkCmdDebugMarkerInsertEXT");
-	}
 
 	// Load serialized pipeline cache from disk. This pipeline cache is invalid if the uuid doesn't match
 	CrVector<char> pipelineCacheData;
@@ -677,15 +661,15 @@ VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queue
 	}
 }
 
-void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const char* name) const
+void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const
 {
-	if (vkDebugMarkerSetObjectName && name && name[0] != 0)
+	if (vkSetDebugUtilsObjectName && name && name[0] != 0)
 	{
-		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+		VkDebugUtilsObjectNameInfoEXT nameInfo = {};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		nameInfo.objectType = objectType;
-		nameInfo.object = vkObject;
+		nameInfo.objectHandle = vkObject;
 		nameInfo.pObjectName = name;
-		vkDebugMarkerSetObjectName(m_vkDevice, &nameInfo);
+		vkSetDebugUtilsObjectName(m_vkDevice, &nameInfo);
 	}
 }

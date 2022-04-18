@@ -8,6 +8,18 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName    = nullptr;
+PFN_vkSetDebugUtilsObjectTagEXT     vkSetDebugUtilsObjectTag     = nullptr;
+PFN_vkQueueBeginDebugUtilsLabelEXT  vkQueueBeginDebugUtilsLabel  = nullptr;
+PFN_vkQueueEndDebugUtilsLabelEXT    vkQueueEndDebugUtilsLabel    = nullptr;
+PFN_vkQueueInsertDebugUtilsLabelEXT vkQueueInsertDebugUtilsLabel = nullptr;
+PFN_vkCmdBeginDebugUtilsLabelEXT    vkCmdBeginDebugUtilsLabel    = nullptr;
+PFN_vkCmdEndDebugUtilsLabelEXT      vkCmdEndDebugUtilsLabel      = nullptr;
+PFN_vkCmdInsertDebugUtilsLabelEXT   vkCmdInsertDebugUtilsLabel   = nullptr;
+PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessenger  = nullptr;
+PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = nullptr;
+PFN_vkSubmitDebugUtilsMessageEXT    vkSubmitDebugUtilsMessage    = nullptr;
+
 CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
 	VkApplicationInfo appInfo = {};
@@ -84,9 +96,9 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 
-	if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+	if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
 	{
-		enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		enabledExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
@@ -110,6 +122,21 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	VkResult res = vkCreateInstance(&instanceCreateInfo, nullptr, &m_vkInstance);
 
 	CrAssertMsg(res == VK_SUCCESS, "Error creating vkInstance");
+
+	if (IsVkInstanceExtensionSupported(VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+	{
+		vkSetDebugUtilsObjectName    = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetInstanceProcAddr(m_vkInstance, "vkSetDebugUtilsObjectNameEXT");
+		vkSetDebugUtilsObjectTag     = (PFN_vkSetDebugUtilsObjectTagEXT)vkGetInstanceProcAddr(m_vkInstance, "vkSetDebugUtilsObjectTagEXT");
+		vkQueueBeginDebugUtilsLabel  = (PFN_vkQueueBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkQueueBeginDebugUtilsLabelEXT");
+		vkQueueEndDebugUtilsLabel    = (PFN_vkQueueEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkQueueEndDebugUtilsLabelEXT");
+		vkQueueInsertDebugUtilsLabel = (PFN_vkQueueInsertDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkQueueInsertDebugUtilsLabelEXT");
+		vkCmdBeginDebugUtilsLabel    = (PFN_vkCmdBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkCmdBeginDebugUtilsLabelEXT");
+		vkCmdEndDebugUtilsLabel      = (PFN_vkCmdEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkCmdEndDebugUtilsLabelEXT");
+		vkCmdInsertDebugUtilsLabel   = (PFN_vkCmdInsertDebugUtilsLabelEXT)vkGetInstanceProcAddr(m_vkInstance, "vkCmdInsertDebugUtilsLabelEXT");
+		vkCreateDebugUtilsMessenger  = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_vkInstance, "vkCreateDebugUtilsMessengerEXT");
+		vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_vkInstance, "vkDestroyDebugUtilsMessengerEXT");
+		vkSubmitDebugUtilsMessage    = (PFN_vkSubmitDebugUtilsMessageEXT)vkGetInstanceProcAddr(m_vkInstance, "vkSubmitDebugUtilsMessageEXT");
+	}
 }
 
 bool CrRenderSystemVulkan::IsVkInstanceExtensionSupported(const CrString& extension)

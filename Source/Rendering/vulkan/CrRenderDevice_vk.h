@@ -41,7 +41,7 @@ public:
 
 	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
 
-	void SetVkObjectName(uint64_t vkObject, VkDebugReportObjectTypeEXT objectType, const char* name) const;
+	void SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const;
 
 private:
 

@@ -160,7 +160,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		m_usedGPUMemoryBytes = (uint32_t)vmaAllocationInfo.size; // Take note of GPU memory usage
 	}
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, descriptor.name.c_str());
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_OBJECT_TYPE_IMAGE, descriptor.name.c_str());
 
 	//-----------------------
 	// Create the image views

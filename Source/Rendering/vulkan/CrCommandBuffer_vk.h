@@ -117,33 +117,33 @@ inline void CrCommandBufferVulkan::DispatchPS(uint32_t threadGroupCountX, uint32
 
 inline void CrCommandBufferVulkan::BeginDebugEventPS(const char* eventName, const float4& color)
 {
-	if (vkCmdDebugMarkerBegin)
+	if (vkCmdBeginDebugUtilsLabel)
 	{
-		VkDebugMarkerMarkerInfoEXT markerInfo = {};
-		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-		store(color, markerInfo.color);
-		markerInfo.pMarkerName = eventName;
-		vkCmdDebugMarkerBegin(m_vkCommandBuffer, &markerInfo);
+		VkDebugUtilsLabelEXT debugUtilsLabel = {};
+		debugUtilsLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		store(color, debugUtilsLabel.color);
+		debugUtilsLabel.pLabelName = eventName;
+		vkCmdBeginDebugUtilsLabel(m_vkCommandBuffer, &debugUtilsLabel);
 	}
 }
 
 inline void CrCommandBufferVulkan::EndDebugEventPS()
 {
-	if (vkCmdDebugMarkerEnd)
+	if (vkCmdEndDebugUtilsLabel)
 	{
-		vkCmdDebugMarkerEnd(m_vkCommandBuffer);
+		vkCmdEndDebugUtilsLabel(m_vkCommandBuffer);
 	}
 }
 
 inline void CrCommandBufferVulkan::InsertDebugMarkerPS(const char* markerName, const float4& color)
 {
-	if (vkCmdDebugMarkerInsert)
+	if (vkCmdInsertDebugUtilsLabel)
 	{
-		VkDebugMarkerMarkerInfoEXT markerInfo = {};
-		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-		store(color, markerInfo.color);
-		markerInfo.pMarkerName = markerName;
-		vkCmdDebugMarkerInsert(m_vkCommandBuffer, &markerInfo);
+		VkDebugUtilsLabelEXT debugUtilsLabel = {};
+		debugUtilsLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		store(color, debugUtilsLabel.color);
+		debugUtilsLabel.pLabelName = markerName;
+		vkCmdInsertDebugUtilsLabel(m_vkCommandBuffer, &debugUtilsLabel);
 	}
 }
 

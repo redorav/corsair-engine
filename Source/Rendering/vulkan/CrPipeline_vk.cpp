@@ -324,7 +324,7 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	vkResult = vkCreateGraphicsPipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &graphicsPipelineCreateInfo, nullptr, &m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, graphicsShader->GetDebugName());
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShader->GetDebugName());
 
 	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
@@ -366,5 +366,5 @@ CrComputePipelineVulkan::CrComputePipelineVulkan(const CrRenderDeviceVulkan* vul
 	vkResult = vkCreateComputePipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &computePipelineCreateInfo, nullptr, &m_vkPipeline);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, computeShader->GetDebugName());
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShader->GetDebugName());
 }

@@ -2,11 +2,17 @@
 
 #include <vulkan/vulkan.h>
 
-extern PFN_vkDebugMarkerSetObjectTagEXT		vkDebugMarkerSetObjectTag;
-extern PFN_vkDebugMarkerSetObjectNameEXT	vkDebugMarkerSetObjectName;
-extern PFN_vkCmdDebugMarkerBeginEXT			vkCmdDebugMarkerBegin;
-extern PFN_vkCmdDebugMarkerEndEXT			vkCmdDebugMarkerEnd;
-extern PFN_vkCmdDebugMarkerInsertEXT		vkCmdDebugMarkerInsert;
+extern PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName;
+extern PFN_vkSetDebugUtilsObjectTagEXT     vkSetDebugUtilsObjectTag;
+extern PFN_vkQueueBeginDebugUtilsLabelEXT  vkQueueBeginDebugUtilsLabel;
+extern PFN_vkQueueEndDebugUtilsLabelEXT    vkQueueEndDebugUtilsLabel;
+extern PFN_vkQueueInsertDebugUtilsLabelEXT vkQueueInsertDebugUtilsLabel;
+extern PFN_vkCmdBeginDebugUtilsLabelEXT    vkCmdBeginDebugUtilsLabel;
+extern PFN_vkCmdEndDebugUtilsLabelEXT      vkCmdEndDebugUtilsLabel;
+extern PFN_vkCmdInsertDebugUtilsLabelEXT   vkCmdInsertDebugUtilsLabel;
+extern PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessenger;
+extern PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger;
+extern PFN_vkSubmitDebugUtilsMessageEXT    vkSubmitDebugUtilsMessage;
 
 namespace crvk
 {

@@ -23,22 +23,29 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
-	CrSharedPtr<ICrModelDecoder> modelDecoder;
-	CrPath extension = fullPath.extension();
-	if (CrFixedString8(".gltf").comparei(extension.c_str()) == 0 || CrFixedString8(".glb").comparei(extension.c_str()) == 0)
+	if (file)
 	{
-		modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
+		CrSharedPtr<ICrModelDecoder> modelDecoder;
+		CrPath extension = fullPath.extension();
+		if (CrFixedString8(".gltf").comparei(extension.c_str()) == 0 || CrFixedString8(".glb").comparei(extension.c_str()) == 0)
+		{
+			modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
+		}
+		else
+		{
+			modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
+		}
+
+		CrRenderModelSharedHandle model = modelDecoder->Decode(file);
+
+		model->ComputeBoundingBoxFromMeshes();
+
+		return model;
 	}
 	else
 	{
-		modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
+		return nullptr;
 	}
-
-	CrRenderModelSharedHandle model = modelDecoder->Decode(file);
-
-	model->ComputeBoundingBoxFromMeshes();
-
-	return model;
 }
 
 CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
@@ -55,13 +62,16 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
-	if(extension.comparei(".dds") == 0)
+	if (file)
 	{
-		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
-	}
-	else
-	{
-		imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
+		if (extension.comparei(".dds") == 0)
+		{
+			imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
+		}
+		else
+		{
+			imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
+		}
 	}
 
 	if (imageDecoder)

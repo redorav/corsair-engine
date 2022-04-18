@@ -1,6 +1,7 @@
 <dependencies>
 
 	<dependency name="assimp" version="80799bd"/>
+	<dependency name="dxc" version="1.6.2112"/>
 	<dependency name="eastl" version="fad5471"/>
 	<dependency name="glslang" version="6624e13"/>
 	<dependency name="half" version="1.12.0"/>

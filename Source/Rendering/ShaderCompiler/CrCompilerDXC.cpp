@@ -7,8 +7,10 @@
 #pragma warning(push)
 #pragma warning(disable : 5204)
 #include <atlbase.h> // Common COM helpers.
-#include "dxc/dxcapi.h" // Use quotes to explicitly use version in dependencies. Be sure to link with dxcompiler.lib
-#include <d3d12shader.h>
+
+// Make sure we use version in dependencies of these two files. Be sure to link with dxcompiler.lib
+#include "inc/dxcapi.h"
+#include "inc/d3d12shader.h"
 #pragma warning(pop)
 
 #include "CrShaderCompiler.h"

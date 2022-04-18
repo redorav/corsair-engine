@@ -7,6 +7,7 @@ IncludeDirectory = '/Include/'
 -- Library Directories
 LibAssimp       = DependenciesDirectory..'/assimp'
 LibDdspp        = DependenciesDirectory..'/ddspp'
+LibDxc          = DependenciesDirectory..'/dxc'
 LibEASTL        = DependenciesDirectory..'/eastl'
 LibGlslang      = DependenciesDirectory..'/glslang'
 LibHalf         = DependenciesDirectory..'/half'
@@ -40,13 +41,13 @@ DdsppLibrary =
 	includeDirs = LibDdspp..IncludeDirectory
 }
 
--- Vulkan comes with the dxc parsing library, and it is regularly updated. To avoid extra complexity,
--- we'll source it from there
+-- We used to source this from the Vulkan SDK. However, it's updated less frequently than the releases in the DirectXCompiler repository
+-- so we now keep these separate. The one in the repository supports Vulkan too now
 DxcLibrary =
 {
-	includeDirs = LibVulkan..IncludeDirectory..'include',
-	libDirs = LibVulkan..BinaryDirectory,
-	libNames = {'dxcompiler'}
+	includeDirs = LibDxc..IncludeDirectory,
+	libDirs = LibDxc..BinaryDirectory,
+	libNames = { 'dxcompiler' }
 }
 
 EASTLLibrary =

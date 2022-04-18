@@ -6,6 +6,10 @@
 		<version id="80799bd" file="assimp_2017_12_11_80799bd.zip" repository="github"/>
 	</package>
 	
+	<package name="dxc">
+		<version id="1.6.2112" file="dxc_1.6.2112.zip" repository="github"/>
+	</package>
+	
 	<package name="eastl">
 		<version id="fad5471" file="eastl_2021_01_18_fad5471.zip" repository="github"/>
 	</package>

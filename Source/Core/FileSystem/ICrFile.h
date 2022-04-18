@@ -83,11 +83,17 @@ public:
 	// Functions like FileExists also would want to be part of the file device
 	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
+	// Copy a file to a different locatioin
+	static bool FileCopy(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);
+
 	// Unconditionally delete a file. If successfully deleted or file didn't exist, return true
 	static bool FileDelete(const char* filePath);
 
 	// Query if file exists
 	static bool FileExists(const char* filePath);
+
+	// Move a file to a different location
+	static bool FileMove(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);
 
 	// Query if directory exists
 	static bool DirectoryExists(const char* directoryPath);

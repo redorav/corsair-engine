@@ -152,6 +152,16 @@ uint64_t CrFileWindows::GetSize() const
 	return m_fileSize;
 }
 
+bool ICrFile::FileCopy(const char* sourcefilePath, const char* destinationFilePath, bool replace)
+{
+	if (replace)
+	{
+		DeleteFileA(destinationFilePath);
+	}
+
+	return CopyFileA(sourcefilePath, destinationFilePath, true) != 0;
+}
+
 bool ICrFile::FileDelete(const char* filePath)
 {
 	bool success = DeleteFileA(filePath);
@@ -184,6 +194,11 @@ bool ICrFile::FileExists(const char* filePath)
 	{
 		return false;
 	}
+}
+
+bool ICrFile::FileMove(const char* sourcefilePath, const char* destinationFilePath, bool replace)
+{
+	return MoveFileExA(sourcefilePath, destinationFilePath, replace ? MOVEFILE_REPLACE_EXISTING : 0) != 0;
 }
 
 bool ICrFile::DirectoryExists(const char* directoryPath)

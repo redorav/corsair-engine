@@ -11,17 +11,17 @@ struct CrSamplerDescriptor
 {
 	CrSamplerDescriptor();
 
-	cr3d::Filter minFilter         : 1;
-	cr3d::Filter magFilter         : 1;
-	cr3d::Filter mipmapFilter      : 1;
-	cr3d::AddressMode addressModeU : 3;
-	cr3d::AddressMode addressModeV : 3;
-	cr3d::AddressMode addressModeW : 3;
-	uint32_t enableAnisotropy      : 1;
-	uint32_t enableCompare         : 1;
-	cr3d::CompareOp compareOp      : 3;
-	cr3d::BorderColor borderColor  : 2;
-	uint32_t maxAnisotropy         : 6;
+	cr3d::Filter minFilter;
+	cr3d::Filter magFilter;
+	cr3d::Filter mipmapFilter;
+	cr3d::AddressMode addressModeU;
+	cr3d::AddressMode addressModeV;
+	cr3d::AddressMode addressModeW;
+	uint32_t enableAnisotropy;
+	uint32_t enableCompare;
+	cr3d::CompareOp compareOp;
+	cr3d::BorderColor borderColor;
+	uint32_t maxAnisotropy;
 	float mipLodBias;
 	float minLod;
 	float maxLod;

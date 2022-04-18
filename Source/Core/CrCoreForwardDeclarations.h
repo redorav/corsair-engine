@@ -152,6 +152,8 @@ using CrFixedString128   = CrFixedString<128>;
 using CrFixedString256   = CrFixedString<256>;
 using CrFixedString512   = CrFixedString<512>;
 using CrFixedString1024  = CrFixedString<1024>;
+using CrFixedString2048  = CrFixedString<2048>;
+using CrFixedString4096  = CrFixedString<4096>;
 
 template<int N>
 using CrFixedWString     = eastl::fixed_string<wchar_t, N, false, eastl::allocator>;
@@ -164,6 +166,8 @@ using CrFixedWString128  = CrFixedWString<128>;
 using CrFixedWString256  = CrFixedWString<256>;
 using CrFixedWString512  = CrFixedWString<512>;
 using CrFixedWString1024 = CrFixedWString<1024>;
+using CrFixedWString2048 = CrFixedWString<2048>;
+using CrFixedWString4096 = CrFixedWString<4096>;
 
 // Functional
 template<int SIZE_IN_BYTES, typename R>

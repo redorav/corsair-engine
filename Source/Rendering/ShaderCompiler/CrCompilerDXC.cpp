@@ -57,7 +57,7 @@ static CrString FindDXCPath()
 	return "";
 }
 
-void CrCompilerDXC::CreateCommonDXCCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString512& commandLine)
+void CrCompilerDXC::CreateCommonDXCCommandLine(const CompilationDescriptor& compilationDescriptor, CrFixedString2048& commandLine)
 {
 	CrString dxcPath = FindDXCPath();
 

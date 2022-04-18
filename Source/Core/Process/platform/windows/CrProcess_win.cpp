@@ -36,7 +36,7 @@ CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 
 	// Convert to wchar_t
 	// CreateProcessW can modify the incoming string so we need a temporary buffer
-	CrFixedWString512 convertedCommandLine;
+	CrFixedWString2048 convertedCommandLine;
 	convertedCommandLine.append_convert(processDescriptor.commandLine);
 
 	HANDLE stdOutRead = nullptr;

@@ -6,7 +6,7 @@
 
 struct CrProcessDescriptor
 {
-	CrFixedString512 commandLine;
+	CrFixedString2048 commandLine;
 };
 
 enum class CrProcessResult

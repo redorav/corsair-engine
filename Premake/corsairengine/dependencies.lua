@@ -28,7 +28,7 @@ AssimpLibrary =
 {
 	includeDirs = LibAssimp..IncludeDirectory..'include',
 	libDirs     = LibAssimp..BinaryDirectory,
-	libNames    = 'Assimp.'.._ACTION..'.release'
+	libNames    = 'Assimp.vs2019.release'
 }
 
 D3D12Library =
@@ -65,14 +65,14 @@ EASTLLibrary =
 	},
 	natvis      = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,
-	libNames    = 'EASTL.'.._ACTION..'.release'
+	libNames    = 'EASTL.vs2019.release'
 }
 
 GlslangLibrary =
 {
 	includeDirs = LibGlslang..IncludeDirectory,
 	libDirs     = LibGlslang..BinaryDirectory,
-	libNames    = 'Glslang.'.._ACTION..'.release'
+	libNames    = 'Glslang.vs2019.release'
 }
 
 HalfLibrary =
@@ -102,7 +102,7 @@ ImguiLibrary =
 {
 	includeDirs = LibImGui..IncludeDirectory,
 	libDirs     = LibImGui..BinaryDirectory,
-	libNames    = 'ImGui.'.._ACTION..'.release'
+	libNames    = 'ImGui.vs2019.release'
 }
 
 RapidYAMLLibrary =
@@ -113,7 +113,7 @@ RapidYAMLLibrary =
 		LibRapidYAML..IncludeDirectory..'ext/c4core/src',
 	},
 	libDirs     = LibRapidYAML..BinaryDirectory,
-	libNames    = 'rapidyaml.'.._ACTION..'.release'
+	libNames    = 'rapidyaml.vs2019.release'
 }
 
 RenderDocLibrary =
@@ -134,7 +134,7 @@ SPIRVReflectLibrary =
 {
 	includeDirs = LibSPIRVReflect..IncludeDirectory,
 	libDirs     = LibSPIRVReflect..BinaryDirectory,
-	libNames    = 'SPIRV-Reflect.'.._ACTION..'.release'
+	libNames    = 'SPIRV-Reflect.vs2019.release'
 }
 
 StbLibrary =

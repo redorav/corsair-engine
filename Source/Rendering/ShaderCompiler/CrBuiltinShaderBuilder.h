@@ -10,7 +10,7 @@ struct CrBuiltinShadersDescriptor
 
 	// Path where builtin shader binaries are output
 	CrPath outputPath;
-	
+
 	// We can build builtin shaders for multiple APIs for certain platforms such as Windows
 	// which builds Vulkan and D3D12
 	CrVector<cr3d::GraphicsApi::T> graphicsApis;

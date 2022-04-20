@@ -41,13 +41,13 @@ DdsppLibrary =
 	includeDirs = LibDdspp..IncludeDirectory
 }
 
--- We used to source this from the Vulkan SDK. However, it's updated less frequently than the releases in the DirectXCompiler repository
--- so we now keep these separate. The one in the repository supports Vulkan too now
+-- https://github.com/microsoft/DirectXShaderCompiler
 DxcLibrary =
 {
 	includeDirs = LibDxc..IncludeDirectory,
-	libDirs = LibDxc..BinaryDirectory,
-	libNames = { 'dxcompiler' }
+	libDirs     = LibDxc..BinaryDirectory,
+	libNames    = { 'dxcompiler' },
+	dlls        = { LibDxc..BinaryDirectory..'dxcompiler.dll', LibDxc..BinaryDirectory..'dxil.dll' }
 }
 
 EASTLLibrary =

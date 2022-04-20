@@ -429,7 +429,9 @@ project(ProjectShaderCompiler)
 	postbuildcommands
 	{
 		'{mkdir} \"'..path.getabsolute(ShaderCompilerDirectory).."\"",
-		CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory))
+		CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory)),
+		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[1]), '%{cfg.buildtarget.directory}'),
+		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[2]), '%{cfg.buildtarget.directory}')
 	}
 
 group('Math')

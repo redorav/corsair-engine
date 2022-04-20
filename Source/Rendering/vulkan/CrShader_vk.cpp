@@ -1,6 +1,9 @@
 #include "CrRendering_pch.h"
 #include "CrShader_vk.h"
 #include "CrRenderDevice_vk.h"
+#include "CrVulkan.h"
+
+#include "renderdoc_app.h"
 
 #include "Rendering/CrShaderResourceMetadata.h"
 #include "Rendering/ICrShader.inl"
@@ -27,36 +30,43 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;
-	uint32_t currentBindingPoint = 0;
 
 	// Create the shader modules and parse reflection information
 	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		// Modify the reflection and the bytecode itself. We need to do this to get consecutive
 		// binding points once different shader stages are brought together
-		CrShaderReflectionHeader reflectionHeader = shaderBytecode->GetReflection();
+		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 
 		// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
-		CrVector<unsigned char> bytecodeModified = shaderBytecode->GetBytecode();
-
-		reflectionHeader.ForEachResource([&](CrShaderReflectionResource& resource)
-		{
-			resource.bindPoint = (uint8_t)currentBindingPoint;
-			*((uint32_t*)&(bytecodeModified.data()[resource.bytecodeOffset])) = currentBindingPoint;
-			currentBindingPoint++;
-		});
+		const CrVector<uint8_t>& bytecode = shaderBytecode->GetBytecode();
 
 		// Create shader modules from the modified bytecode
 		VkShaderModuleCreateInfo moduleCreateInfo;
 		moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		moduleCreateInfo.pNext = nullptr;
-		moduleCreateInfo.codeSize = bytecodeModified.size();
-		moduleCreateInfo.pCode = (uint32_t*)bytecodeModified.data();
+		moduleCreateInfo.codeSize = bytecode.size();
+		moduleCreateInfo.pCode = (uint32_t*)bytecode.data();
 		moduleCreateInfo.flags = 0;
 
 		VkShaderModule vkShaderModule;
 		VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
 		CrAssert(vkResult == VK_SUCCESS);
+
+		if (vkSetDebugUtilsObjectTag)
+		{
+			VkDebugUtilsObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT };
+			tagInfo.objectType = VK_OBJECT_TYPE_SHADER_MODULE;
+			tagInfo.objectHandle = (uint64_t)vkShaderModule;
+			tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;
+
+			CrString tagName = eastl::to_string(reflectionHeader.bytecodeHash) + ".pdb";
+
+			tagInfo.pTag = tagName.c_str();
+			tagInfo.tagSize = tagName.length();
+
+			vkSetDebugUtilsObjectTag(m_vkDevice, &tagInfo);
+		}
 
 		m_vkShaderModules.push_back(vkShaderModule);
 

@@ -41,6 +41,12 @@ public:
 
 	static CrString ExecutableDirectory;
 
+	static CrPath PDBDirectory;
+
+	static CrPath PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
+
+	static const CrPath& GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi);
+
 	static void Initialize();
 
 	static void Finalize();

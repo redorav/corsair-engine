@@ -266,7 +266,7 @@ public:
 
 	CrShaderBytecode() {}
 
-	const CrVector<unsigned char>& GetBytecode() const
+	const CrVector<uint8_t>& GetBytecode() const
 	{
 		return m_bytecode;
 	}

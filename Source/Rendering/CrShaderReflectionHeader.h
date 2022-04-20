@@ -25,7 +25,6 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionResource& resource)
 {
 	stream << resource.bindPoint;
 	stream << resource.type;
-	stream << resource.bytecodeOffset;
 	stream << resource.name;
 	return stream;
 }
@@ -91,6 +90,7 @@ struct CrShaderReflectionHeader
 
 	CrString entryPoint;
 	cr3d::ShaderStage::T shaderStage;
+	uint64_t bytecodeHash = (uint64_t)-1;
 	
 	CrVector<CrShaderReflectionResource> constantBuffers;
 	CrVector<CrShaderReflectionResource> samplers;
@@ -114,6 +114,7 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionHeader& reflectionHeade
 	stream << reflectionHeader.version;
 	stream << reflectionHeader.entryPoint;
 	stream << reflectionHeader.shaderStage;
+	stream << reflectionHeader.bytecodeHash;
 
 	stream << reflectionHeader.constantBuffers;
 	stream << reflectionHeader.samplers;

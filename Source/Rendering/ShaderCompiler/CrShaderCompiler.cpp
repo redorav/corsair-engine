@@ -14,6 +14,7 @@
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/String/CrStringUtilities.h"
 #include "Core/CrMacros.h"
+#include "Core/CrGlobalPaths.h"
 
 #include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
@@ -62,9 +63,18 @@ void CompilationDescriptor::Process() const
 
 CrString CrShaderCompiler::ExecutableDirectory;
 
+CrPath CrShaderCompiler::PDBDirectory;
+
+CrPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
+
 const CrString& CrShaderCompiler::GetExecutableDirectory()
 {
 	return ExecutableDirectory;
+}
+
+const CrPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi)
+{
+	return PDBDirectories[platform][graphicsApi];
 }
 
 void CrShaderCompiler::Initialize()
@@ -164,7 +174,7 @@ static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 // Usage:
 // -input sourceFile.hlsl : Source file to be compiled
 // -output outputFile.bin : Destination the compiled shader is written to
-// -entryPoint main_px    : Entry point for the compiled shader
+// -entryPoint MainPS     : Entry point for the compiled shader
 // -stage pixel           : Shader stage this entry point runs in
 // -platform windows      : Platform to compile this shader for
 // -graphicsapi vulkan    : Graphics API for this platform
@@ -174,6 +184,8 @@ static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 // 
 // -metadata metadataPath : Where C++ metadata is stored
 // -builtin               : Build builtin shaders
+// -pdb pdbPath           : Create a PDB for this shader and store in pdbPath
+//                          The PDB is uniquely identified with a hash stored in the reflection data
 
 int main(int argc, char* argv[])
 {
@@ -188,10 +200,11 @@ int main(int argc, char* argv[])
 	CrPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
 	bool buildBuiltinShaders          = commandLine["-builtin"];
-	bool buildReflection              = commandLine["-reflection"];
 	const CrString& entryPoint        = commandLine("-entrypoint");
 	const CrString& shaderStageString = commandLine("-stage");
 	const CrString& platformString    = commandLine("-platform");
+
+	CrShaderCompiler::PDBDirectory    = commandLine("-pdb").c_str();
 
 	CrVector<CrString> graphicsApiStrings;
 	commandLine.for_each("-graphicsapi", [&graphicsApiStrings](const CrString& value)
@@ -205,10 +218,14 @@ int main(int argc, char* argv[])
 		defines.push_back(value);
 	});
 
+	// If no PDB directory was supplied, use the temp folder
+	if (CrShaderCompiler::PDBDirectory.empty())
+	{
+		CrShaderCompiler::PDBDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Shader PDBs";
+	}
+
 	CrString inputPath = inputFilePath.c_str();
 	CrString outputPath = outputFilePath.c_str();
-
-	CrShaderCompiler::Initialize();
 
 	if (inputPath.empty())
 	{
@@ -219,6 +236,28 @@ int main(int argc, char* argv[])
 	{
 		CrShaderCompilerUtilities::QuitWithMessage("Error: no output specified\n");
 	}
+
+	cr::Platform::T platform = ParsePlatform(platformString);
+
+	if (!CrShaderCompiler::PDBDirectory.empty())
+	{
+		for (const CrString& graphicsApiString : graphicsApiStrings)
+		{
+			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+			CrPath& pdbPath = CrShaderCompiler::PDBDirectories[platform][graphicsApi];
+			pdbPath = CrShaderCompiler::PDBDirectory;
+			pdbPath /= cr::Platform::ToString(platform);
+			pdbPath += "_";
+			pdbPath += cr3d::GraphicsApi::ToString(graphicsApi);
+
+			if (!ICrFile::DirectoryExists(pdbPath.c_str()))
+			{
+				ICrFile::CreateDirectories(pdbPath.c_str());
+			}
+		}
+	}
+
+	CrShaderCompiler::Initialize();
 
 	// If we've been asked to create metadata
 	if (buildMetadata)
@@ -244,8 +283,6 @@ int main(int argc, char* argv[])
 	}
 	else if (buildBuiltinShaders)
 	{
-		cr::Platform::T platform = ParsePlatform(platformString);
-
 		if (platform == cr::Platform::Count)
 		{
 			CrShaderCompilerUtilities::QuitWithMessage("No platform specified\n");
@@ -273,8 +310,6 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cr::Platform::T platform = ParsePlatform(platformString);
-
 		if (platform == cr::Platform::Count)
 		{
 			CrShaderCompilerUtilities::QuitWithMessage("No platform specified\n");
@@ -311,7 +346,6 @@ int main(int argc, char* argv[])
 		compilationDescriptor.platform        = platform;
 		compilationDescriptor.graphicsApi     = graphicsApi;
 		compilationDescriptor.shaderStage     = shaderStage;
-		compilationDescriptor.buildReflection = buildReflection;
 
 		CrString compilationStatus;
 		bool success = CrShaderCompiler::Compile(compilationDescriptor, compilationStatus);

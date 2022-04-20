@@ -4,8 +4,6 @@
 
 #include "Core/FileSystem/CrPath.h"
 
-#include <filesystem>
-
 #if defined(_WIN32)
 #include <windows.h>
 #include <shlobj.h>

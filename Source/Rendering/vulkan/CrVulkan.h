@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "CrRendering.h" 
+
 extern PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName;
 extern PFN_vkSetDebugUtilsObjectTagEXT     vkSetDebugUtilsObjectTag;
 extern PFN_vkQueueBeginDebugUtilsLabelEXT  vkQueueBeginDebugUtilsLabel;

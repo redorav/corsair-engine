@@ -1,7 +1,5 @@
 #pragma once
 
-#include "CrRendering.h" // TODO Remove from here
-
 #if defined(VULKAN_API)
 // Vulkan on Windows includes windows.h which defines things like min and max, aside from being very big.
 // To counter it we define NOMINMAX, etc. globally

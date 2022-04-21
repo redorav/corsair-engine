@@ -1,3 +1,5 @@
+#include "CrShaderCompiler_pch.h"
+
 #include "CrShaderMetadataBuilder.h"
 #include "CrShaderCompilerUtilities.h"
 

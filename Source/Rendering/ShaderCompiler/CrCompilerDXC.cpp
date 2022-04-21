@@ -1,3 +1,5 @@
+#include "CrShaderCompiler_pch.h"
+
 #include "CrCompilerDXC.h"
 
 // SPIR-V Reflection

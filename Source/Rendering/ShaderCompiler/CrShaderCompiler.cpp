@@ -1,4 +1,6 @@
-﻿#include "CrShaderCompiler.h"
+﻿#include "CrShaderCompiler_pch.h"
+
+#include "CrShaderCompiler.h"
 #include "CrShaderMetadataBuilder.h"
 #include "CrBuiltinShaderBuilder.h"
 #include "CrShaderCompilerUtilities.h"

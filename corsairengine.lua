@@ -326,6 +326,10 @@ project(ProjectCrRendering)
 	
 	filter {}
 
+------------------------------------
+-- Shader metadata generation job --
+------------------------------------
+
 local GeneratedShadersDirectoryAbsolute = path.getabsolute(GeneratedShadersDirectory)
 
 local hlslFiles = os.matchfiles(SourceShadersDirectory..'/**.hlsl')
@@ -335,10 +339,6 @@ project(ProjectShaders)
 	kind('StaticLib')
 	files { SourceShadersDirectory..'/**.hlsl', SourceShadersDirectory..'/**.shaders' }
 	dependson { ProjectShaderCompiler }
-
-	---------------------------------
-	-- Create metadata generation job
-	---------------------------------
 	
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/Metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/'..ShaderMetadataFilename
@@ -367,13 +367,13 @@ project(ProjectShaders)
 		
 	filter {}
 
+-----------------------------------
+-- Builtin shader generation job --
+-----------------------------------
+
 project(ProjectBuiltinShaders)
 	kind('StaticLib')
 	dependson { ProjectShaderCompiler }
-
-	---------------------------------------
-	-- Create builtin shader generation job
-	---------------------------------------
 
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/BuiltinShaders'
 	local builtinShaderCommandLine =
@@ -404,10 +404,10 @@ project(ProjectBuiltinShaders)
 
 project(ProjectShaderCompiler)
 	kind('ConsoleApp')
-	files
-	{
-		SourceShaderCompilerDirectory..'/**',
-	}
+	files { SourceShaderCompilerDirectory..'/**' }
+	
+	pchheader('CrShaderCompiler_pch.h')
+	pchsource(SourceShaderCompilerDirectory..'/CrShaderCompiler_pch.cpp')
 	
 	links { ProjectCrCore }
 

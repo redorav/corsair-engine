@@ -4,7 +4,6 @@
 #include "Core/Containers/CrVectorSet.h"
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrArray.h"
-#include "Core/Containers/CrBitSet.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderModel.h"

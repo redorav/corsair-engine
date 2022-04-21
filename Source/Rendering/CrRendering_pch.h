@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CrRendering.h"
+#include "CrRendering.h" // TODO Remove from here
 
 #if defined(VULKAN_API)
 // Vulkan on Windows includes windows.h which defines things like min and max, aside from being very big.
@@ -13,5 +13,7 @@
 #if defined(D3D12_API)
 #include <d3d12.h>
 #include <dxgi1_4.h>
-//#include <d3dx12.h>
 #endif
+
+#include "Core/PCH/CrEASTLPch.h"
+#include "Math/CrMathPch.h"

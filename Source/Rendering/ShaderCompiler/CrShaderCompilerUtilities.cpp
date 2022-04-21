@@ -1,3 +1,5 @@
+#include "CrShaderCompiler_pch.h"
+
 #include "CrShaderCompilerUtilities.h"
 
 #include "Core/String/CrString.h"

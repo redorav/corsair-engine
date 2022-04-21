@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <initializer_list>
+#include <initializer_list> // TODO Remove this
 
 #include <hlsl++.h>
 using namespace hlslpp;

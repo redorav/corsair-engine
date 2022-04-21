@@ -150,14 +150,14 @@ struct HLSLResources
 		}
 	}
 
-	std::vector<SpvReflectDescriptorBinding> constantBuffers;
-	std::vector<SpvReflectDescriptorBinding> samplers;
-	std::vector<SpvReflectDescriptorBinding> textures;
-	std::vector<SpvReflectDescriptorBinding> rwTextures;
-	std::vector<SpvReflectDescriptorBinding> storageBuffers;
-	std::vector<SpvReflectDescriptorBinding> rwStorageBuffers;
-	std::vector<SpvReflectDescriptorBinding> dataBuffers;
-	std::vector<SpvReflectDescriptorBinding> rwDataBuffers;
+	CrVector<SpvReflectDescriptorBinding> constantBuffers;
+	CrVector<SpvReflectDescriptorBinding> samplers;
+	CrVector<SpvReflectDescriptorBinding> textures;
+	CrVector<SpvReflectDescriptorBinding> rwTextures;
+	CrVector<SpvReflectDescriptorBinding> storageBuffers;
+	CrVector<SpvReflectDescriptorBinding> rwStorageBuffers;
+	CrVector<SpvReflectDescriptorBinding> dataBuffers;
+	CrVector<SpvReflectDescriptorBinding> rwDataBuffers;
 
 	//std::vector<SpvReflectDescriptorBinding> stageInputs;
 	//std::vector<SpvReflectDescriptorBinding> stageOutputs;

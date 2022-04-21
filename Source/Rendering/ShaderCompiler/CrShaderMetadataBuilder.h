@@ -2,12 +2,10 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include <vector>
-
 struct SpvReflectDescriptorBinding;
 struct SpvReflectTypeDescription;
 
-typedef std::vector<SpvReflectDescriptorBinding> ResourceVector;
+typedef CrVector<SpvReflectDescriptorBinding> ResourceVector;
 
 struct CompilationDescriptor;
 struct HLSLResources;

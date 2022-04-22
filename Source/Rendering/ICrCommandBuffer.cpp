@@ -23,16 +23,17 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueue
 		constantBufferStack.name = "Constant Buffer Stack";
 		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
 
-		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size
-		// of each index that we use. We'll assume 32-bit indices for the index buffer, 3 vertices per index and a stride
-		// of 4 bytes for each vertex
-		uint32_t maxIndexData = 1024 * 1024 * cr3d::DataFormats[cr3d::DataFormat::R32_Uint].dataOrBlockSize;
+		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size of each vertex and index
+		// TODO We need a more flexible approach as this takes up a lot of memory per command buffer. It would be smart to have a pool in the device
+		// and lazily allocate them or something similar
+		uint32_t maxVertices = 1024 * 1024;
+		uint32_t maxIndices = maxVertices * 3;
 
-		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxIndexData * 3, 4);
+		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
 		vertexBufferStack.name = "Vertex Buffer Stack";
 		m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
-		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndexData);
+		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, cr3d::DataFormats[cr3d::DataFormat::R16_Uint].dataOrBlockSize);
 		indexBufferStack.name = "Index Buffer Stack";
 		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 	}

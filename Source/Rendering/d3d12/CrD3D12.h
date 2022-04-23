@@ -63,6 +63,12 @@ namespace crd3d
 			return descriptor;
 		}
 
+		DescriptorD3D12& operator += (uint32_t offset)
+		{
+			*this = *this + offset;
+			return *this;
+		}
+
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 	};

@@ -14,18 +14,19 @@ void ICrShaderBindingLayout::ProcessResourceArray(cr3d::ShaderResourceType::T re
 
 	cr3d::ShaderStage::T currentStage = cr3d::ShaderStage::Count;
 	uint32_t currentStageIndex = 0;
-	uint8_t currentOffset = 0;
+	uint32_t currentOffset = m_resourceOffsets[resourceType].offset;
 
 	for (const CrShaderBinding& shaderBinding : resources)
 	{
-		if (shaderBinding.stage != currentStage)
+		if (currentStage != shaderBinding.stage)
 		{
 			currentStage = (cr3d::ShaderStage::T)shaderBinding.stage;
 			currentStageIndex = GetStageIndex(currentStage);
-			m_stageResourceOffsets[resourceType][currentStageIndex].offset = currentOffset;
+			m_stageResourceOffsets[resourceType][currentStageIndex].offset = (uint8_t)currentOffset;
 		}
-
+			
 		m_stageResourceOffsets[resourceType][currentStageIndex].count++;
+		currentOffset++;
 		m_bindings.push_back(shaderBinding);
 	}
 

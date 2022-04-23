@@ -119,6 +119,8 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		m_samplerPool.Initialize(this, samplerDescriptorHeapDescriptor);
 	}
 
+	// Create root signatures
+
  	const CrShaderBytecodeSharedHandle& graphicsRootSignatureBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);
 	hResult = m_d3d12Device->CreateRootSignature(0, graphicsRootSignatureBytecode->GetBytecode().data(), graphicsRootSignatureBytecode->GetBytecode().size(),
 		__uuidof(ID3D12RootSignature), (void**)&m_d3d12GraphicsRootSignature);

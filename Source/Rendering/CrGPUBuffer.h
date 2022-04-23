@@ -139,6 +139,8 @@ public:
 
 	cr3d::DataFormat::T GetFormat() const;
 
+	cr3d::BufferUsage::T GetUsage() const;
+
 	bool HasUsage(cr3d::BufferUsage::T usage) const;
 
 	void* Lock();
@@ -184,9 +186,14 @@ inline uint32_t CrGPUBuffer::GetNumElements() const
 	return m_numElements;
 }
 
+inline cr3d::BufferUsage::T CrGPUBuffer::GetUsage() const
+{
+	return m_usage;
+}
+
 inline bool CrGPUBuffer::HasUsage(cr3d::BufferUsage::T usage) const
 {
-	return (m_usage | usage) != 0;
+	return (m_usage & usage) != 0;
 }
 
 inline uint32_t CrGPUBuffer::GetStride() const

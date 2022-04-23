@@ -471,7 +471,8 @@ namespace cr3d
 			Hull     = 1 << ShaderStage::Hull,
 			Domain   = 1 << ShaderStage::Domain,
 			Geometry = 1 << ShaderStage::Geometry,
-			Compute  = 1 << ShaderStage::Compute
+			Compute  = 1 << ShaderStage::Compute,
+			Graphics = Vertex | Pixel | Hull | Domain | Geometry
 		};
 
 		inline ShaderStageFlags::T operator | (ShaderStageFlags::T flag1, ShaderStageFlags::T flag2)
@@ -525,7 +526,7 @@ namespace cr3d
 		{
 			Undefined,
 			ShaderInput, // StructuredBuffer, Buffer, ByteAddressBuffer
-			ReadWrite, // RWStructuredBuffer, RWBuffer, RWByteAddressBuffer
+			ReadWrite,   // RWStructuredBuffer, RWBuffer, RWByteAddressBuffer
 			CopySource,
 			CopyDestination,
 			Count

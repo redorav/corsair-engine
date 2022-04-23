@@ -228,7 +228,7 @@ void CrRenderGraph::Execute()
 			else
 			{
 				transitionInfo.initialState = cr3d::TextureState::Undefined;
-				transitionInfo.initialShaderStages = cr3d::ShaderStageFlags::None;
+				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
 			}
 
 			renderGraphPass->textureTransitions.insert({ texture->id.id, transitionInfo });
@@ -246,6 +246,8 @@ void CrRenderGraph::Execute()
 			transitionInfo.name = buffer->name;
 			transitionInfo.usageState = bufferUsage.usageState;
 			transitionInfo.finalState = bufferUsage.usageState; // Initialize final state to current state until we have more information
+			transitionInfo.usageShaderStages = bufferUsage.shaderStages;
+			transitionInfo.finalShaderStages = bufferUsage.shaderStages;
 
 			CrRenderPassId lastUsedPassId = m_bufferLastUsedPass[buffer->id.id];
 
@@ -259,7 +261,10 @@ void CrRenderGraph::Execute()
 				// Inject the final and initial states with usage states
 				CrRenderGraphBufferTransition& lastUsedTransitionInfo = lastUsedPass->bufferTransitions.find(buffer->id.id)->second;
 				lastUsedTransitionInfo.finalState = bufferUsage.usageState;
+				lastUsedTransitionInfo.finalShaderStages = bufferUsage.shaderStages;
+
 				transitionInfo.initialState = lastUsedTransitionInfo.usageState;
+				transitionInfo.initialShaderStages = lastUsedTransitionInfo.usageShaderStages;
 			}
 			// If we didn't find the resource it means we're the first to access it
 			// In normal circumstances this could be an error (i.e. we access a
@@ -267,6 +272,7 @@ void CrRenderGraph::Execute()
 			else
 			{
 				transitionInfo.initialState = cr3d::BufferState::Undefined;
+				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
 			}
 
 			renderGraphPass->bufferTransitions.insert({ buffer->id.id, transitionInfo });

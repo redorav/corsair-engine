@@ -276,7 +276,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	rwTextureParams.name = "Colors RW Texture";
 	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
 
-	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnly, cr3d::DataFormat::RGBA8_Unorm, 128);
+	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
 	CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 	lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
@@ -307,10 +307,10 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	whiteTextureDescriptor.name = "Default White Texture";
 	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
 
-	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnly, 32);
 
-	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnly, 32);
+	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnlyWrite, 32);
 
+	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnlyRead, 32);
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 }

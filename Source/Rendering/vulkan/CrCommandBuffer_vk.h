@@ -2,8 +2,6 @@
 
 #include "Rendering/ICrCommandBuffer.h"
 
-#include "CrGPUBuffer_vk.h"
-
 #include "CrPipeline_vk.h"
 
 #include "CrGPUQueryPool_vk.h"
@@ -41,15 +39,15 @@ private:
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
 
-	//void DrawIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
-
 	virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
-
-	//void DrawIndexedIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
 
 	virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) override;
 
-	//void DispatchIndirectPS(CrIndirectArgs* indirectArgs) override;
+	virtual void DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+
+	virtual void DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+
+	virtual void DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset) override;
 
 	virtual void BeginDebugEventPS(const char* eventName, const float4& color) override;
 
@@ -157,20 +155,4 @@ inline void CrCommandBufferVulkan::EndTimestampQueryPS(const ICrGPUQueryPool* qu
 {
 	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
 	vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), query.id);
-}
-
-inline void CrCommandBufferVulkan::ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
-{
-	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
-	vkCmdResetQueryPool(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count);
-}
-
-inline void CrCommandBufferVulkan::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
-{
-	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vulkanQueryPool->GetResultsBuffer());
-
-	// The wait flag here doesn't wait on the CPU, rather the GPU will ensure query results are all ready before resolving. In practice this means
-	// it won't try to reorder the copy on the GPU to a point before the query was actually finished
-	vkCmdCopyQueryPoolResults(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanQueryPool->GetQuerySize(), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
 }

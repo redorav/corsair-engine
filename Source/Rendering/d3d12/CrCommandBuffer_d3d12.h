@@ -34,15 +34,15 @@ private:
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
 
-	//void DrawIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
-
 	virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) override;
-
-	//void DrawIndexedIndirectPS(CrIndirectArgs* indirectArgs, uint32_t indirectArgsOffset) override;
 
 	virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) override;
 
-	//void DispatchIndirectPS(CrIndirectArgs* indirectArgs) override;
+	virtual void DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+
+	virtual void DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+
+	virtual void DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset) override;
 
 	virtual void BeginDebugEventPS(const char* eventName, const float4& color) override;
 
@@ -80,6 +80,18 @@ private:
 		cr3d::TextureState::T finalState, 
 		CrBarrierVectorD3D12& resourceBarriers
 	);
+
+	void WriteCBV(const ConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
+
+	void WriteTextureSRV(const ICrTexture* texture, crd3d::DescriptorD3D12 srvHandle);
+
+	void WriteSamplerView(const ICrSampler* sampler, crd3d::DescriptorD3D12 samplerHandle);
+
+	void WriteRWTextureUAV(const RWTextureBinding& rwTextureBinding, crd3d::DescriptorD3D12 uavHandle);
+
+	void WriteStorageBufferSRV(const StorageBufferBinding& binding, crd3d::DescriptorD3D12 srvHandle);
+
+	void WriteRWStorageBufferUAV(const StorageBufferBinding& binding, crd3d::DescriptorD3D12 uavHandle);
 
 	D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 

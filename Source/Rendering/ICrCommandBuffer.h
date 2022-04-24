@@ -70,11 +70,13 @@ public:
 
 	void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance);
 
-	void FlushGraphicsRenderState();
-
 	void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ);
 
-	void FlushComputeRenderState();
+	void DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+
+	void DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+
+	void DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset);
 
 	void BeginDebugEvent(const char* eventName, const float4& color);
 
@@ -91,6 +93,14 @@ public:
 
 	void ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);
 
+	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
+
+	void EndRenderPass();
+
+	void FlushGraphicsRenderState();
+
+	void FlushComputeRenderState();
+
 	template<typename MetaType>
 	CrGPUBufferType<MetaType> AllocateConstantBuffer();
 
@@ -106,10 +116,6 @@ public:
 
 	CrGPUBuffer AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat);
 
-	void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
-
-	void EndRenderPass();
-
 protected:
 
 	virtual void BeginPS() = 0;
@@ -123,6 +129,12 @@ protected:
 	virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
 
 	virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) = 0;
+
+	virtual void DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
+
+	virtual void DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
+
+	virtual void DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset) = 0;
 
 	virtual void BeginDebugEventPS(const char* eventName, const float4& color) = 0;
 
@@ -164,11 +176,18 @@ protected:
 	{
 		StorageBufferBinding() {}
 
-		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t size, uint32_t byteOffset) : buffer(buffer), size(size), byteOffset(byteOffset) {}
+		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, cr3d::BufferUsage::T usage, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
+			: buffer(buffer), usage(usage), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
+		{
+			sizeBytes = numElements * strideBytes;
+		}
 
 		const ICrHardwareGPUBuffer* buffer = nullptr;
-		uint32_t byteOffset = 0;
-		uint32_t size = 0;
+		cr3d::BufferUsage::T usage;
+		uint32_t numElements = 0;
+		uint32_t offsetBytes = 0;
+		uint32_t sizeBytes = 0;
+		uint32_t strideBytes = 0;
 	};
 
 	struct RWTextureBinding
@@ -361,6 +380,33 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 	CrRenderingStatistics::AddVertices(indexCount * instanceCount);
 }
 
+inline void ICrCommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+{
+	FlushGraphicsRenderState();
+
+	DrawIndirectPS(indirectBuffer, offset, count);
+
+	CrRenderingStatistics::AddDrawcall();
+	// We cannot add the vertices here because we don't know them
+}
+
+inline void ICrCommandBuffer::DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+{
+	FlushGraphicsRenderState();
+
+	DrawIndexedIndirectPS(indirectBuffer, offset, count);
+
+	CrRenderingStatistics::AddDrawcall();
+	// We cannot add the vertices here because we don't know them
+}
+
+inline void ICrCommandBuffer::DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
+{
+	FlushComputeRenderState();
+
+	DispatchIndirectPS(indirectBuffer, offset);
+}
+
 inline void ICrCommandBuffer::FlushGraphicsRenderState()
 {
 	FlushGraphicsRenderStatePS();
@@ -413,12 +459,14 @@ inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, co
 
 inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, const StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer)
 {
-	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetSize(), buffer->GetByteOffset());
+	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = 
+		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer)
 {
-	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetSize(), buffer->GetByteOffset());
+	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = 
+		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)

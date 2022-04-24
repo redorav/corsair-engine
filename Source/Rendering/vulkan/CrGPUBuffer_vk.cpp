@@ -27,7 +27,8 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	switch (descriptor.access)
 	{
-		case cr3d::MemoryAccess::GPUOnly:
+		case cr3d::MemoryAccess::GPUOnlyWrite:
+		case cr3d::MemoryAccess::GPUOnlyRead:
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 			break;
 		case cr3d::MemoryAccess::GPUWriteCPURead:
@@ -117,7 +118,7 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 
 	if (usage & cr3d::BufferUsage::Data)
 	{
-		if (access & cr3d::MemoryAccess::GPUOnly)
+		if (access & cr3d::MemoryAccess::GPUOnlyWrite)
 		{
 			usageFlags |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
 		}
@@ -145,11 +146,16 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 	return usageFlags;
 }
 
-VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(cr3d::BufferState::T /*bufferState*/ , cr3d::ShaderStageFlags::T shaderStages)
+VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(cr3d::BufferState::T bufferState , cr3d::ShaderStageFlags::T shaderStages)
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
 	pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(shaderStages);
+
+	if (bufferState == cr3d::BufferState::IndirectArgument)
+	{
+		pipelineFlags |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
+	}
 
 	return pipelineFlags;
 }
@@ -174,11 +180,12 @@ CrArray<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTa
 
 static bool PopulateVkBufferResourceTable()
 {
-	CrVkBufferResourceStateTable[cr3d::BufferState::Undefined]       = { VK_ACCESS_NONE_KHR };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ShaderInput]     = { VK_ACCESS_SHADER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ReadWrite]       = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopySource]      = { VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopyDestination] = { VK_ACCESS_TRANSFER_WRITE_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::Undefined]        = { VK_ACCESS_NONE_KHR };
+	CrVkBufferResourceStateTable[cr3d::BufferState::ShaderInput]      = { VK_ACCESS_SHADER_READ_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::ReadWrite]        = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::CopySource]       = { VK_ACCESS_TRANSFER_READ_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::CopyDestination]  = { VK_ACCESS_TRANSFER_WRITE_BIT };
+	CrVkBufferResourceStateTable[cr3d::BufferState::IndirectArgument] = { VK_ACCESS_INDIRECT_COMMAND_READ_BIT } ;
 
 	for (const CrVkBufferStateInfo& resourceInfo : CrVkBufferResourceStateTable)
 	{

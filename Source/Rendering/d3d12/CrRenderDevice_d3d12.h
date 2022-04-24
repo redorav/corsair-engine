@@ -28,6 +28,12 @@ public:
 
 	ID3D12RootSignature* GetD3D12ComputeRootSignature() const { return m_d3d12ComputeRootSignature; }
 
+	ID3D12CommandSignature* GetD3D12DrawIndirectCommandSignature() const { return m_d3d12DrawIndirectCommandSignature; }
+
+	ID3D12CommandSignature* GetD3D12DrawIndexedIndirectCommandSignature() const { return m_d3d12DrawIndexedIndirectCommandSignature; }
+
+	ID3D12CommandSignature* GetD3D12DispatchIndirectCommandSignature() const { return m_d3d12DispatchIndirectCommandSignature; }
+
 	crd3d::DescriptorD3D12 AllocateRTVDescriptor();
 
 	void FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor);
@@ -100,6 +106,12 @@ private:
 	ID3D12RootSignature* m_d3d12GraphicsRootSignature;
 
 	ID3D12RootSignature* m_d3d12ComputeRootSignature;
+
+	ID3D12CommandSignature* m_d3d12DrawIndirectCommandSignature;
+
+	ID3D12CommandSignature* m_d3d12DrawIndexedIndirectCommandSignature;
+
+	ID3D12CommandSignature* m_d3d12DispatchIndirectCommandSignature;
 
 	IDXGIAdapter1* m_dxgiAdapter;
 

@@ -26,6 +26,11 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 		CrAssertMsg((stride == 2 && dataFormat == cr3d::DataFormat::R16_Uint) || (stride == 4 && dataFormat == cr3d::DataFormat::R32_Uint), "Invalid format for index buffer");
 	}
 
+	if (descriptor.usage & cr3d::BufferUsage::Indirect)
+	{
+		CrAssertMsg(descriptor.usage & (cr3d::BufferUsage::Structured | cr3d::BufferUsage::Byte), "Must specify structured or byte buffer to write to an indirect buffer");
+	}
+
 	if (descriptor.existingHardwareGPUBuffer)
 	{
 		m_buffer = descriptor.existingHardwareGPUBuffer;

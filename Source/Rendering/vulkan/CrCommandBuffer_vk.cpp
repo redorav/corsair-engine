@@ -5,6 +5,7 @@
 #include "CrTexture_vk.h"
 #include "CrSampler_vk.h"
 #include "CrShader_vk.h"
+#include "CrGPUBuffer_vk.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/CrShaderResourceMetadata.h"
 
@@ -211,7 +212,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
 		bufferInfo.offset = 0;
-		bufferInfo.range = (VkDeviceSize)binding.size;
+		bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
 		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
@@ -227,8 +228,8 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-		bufferInfo.offset = 0;
-		bufferInfo.range = (VkDeviceSize)binding.size;
+		bufferInfo.offset = binding.offsetBytes;
+		bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 	
 		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
 		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
@@ -257,6 +258,22 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	// Bind descriptor sets describing shader binding points
 	// TODO We need an abstraction of a resource table, so that we can build it somewhere else, and simply bind it when we need to
 	vkCmdBindDescriptorSets(m_vkCommandBuffer, vkPipelineBindPoint, vkPipelineLayout, 0, 1, &descriptorSet, dynamicOffsetCount, dynamicOffsets.data());
+}
+
+void CrCommandBufferVulkan::ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+	vkCmdResetQueryPool(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count);
+}
+
+void CrCommandBufferVulkan::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+{
+	const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vulkanQueryPool->GetResultsBuffer());
+
+	// The wait flag here doesn't wait on the CPU, rather the GPU will ensure query results are all ready before resolving. In practice this means
+	// it won't try to reorder the copy on the GPU to a point before the query was actually finished
+	vkCmdCopyQueryPoolResults(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count, vulkanGPUBuffer->GetVkBuffer(), 0, vulkanQueryPool->GetQuerySize(), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
 }
 
 void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
@@ -634,6 +651,24 @@ void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, 
 
 	// TODO Image layout needs to be correct
 	vkCmdClearColorImage(m_vkCommandBuffer, static_cast<const CrTextureVulkan*>(renderTarget)->GetVkImage(), VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageSubResourceRange);
+}
+
+void CrCommandBufferVulkan::DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+{
+	VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+	vkCmdDrawIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndirectCommand));
+}
+
+void CrCommandBufferVulkan::DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+{
+	VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+	vkCmdDrawIndexedIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndexedIndirectCommand));
+}
+
+void CrCommandBufferVulkan::DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
+{
+	VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+	vkCmdDispatchIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset);
 }
 
 void CrCommandBufferVulkan::EndPS()

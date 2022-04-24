@@ -19,7 +19,8 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	switch (descriptor.access)
 	{
-		case cr3d::MemoryAccess::GPUOnly:
+		case cr3d::MemoryAccess::GPUOnlyWrite:
+		case cr3d::MemoryAccess::GPUOnlyRead:
 			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 			break;
 		case cr3d::MemoryAccess::GPUWriteCPURead:
@@ -50,6 +51,11 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	resourceDesc.MipLevels = 1;
 	resourceDesc.SampleDesc = { 1, 0 };
 	resourceDesc.Width = sizeBytes;
+
+	if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+	{
+		resourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
 
 	D3D12_CLEAR_VALUE optimizedClearValue = {};
 

@@ -82,14 +82,14 @@ public:
 
 inline void* ICrHardwareGPUBuffer::Lock()
 {
-	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnly, "Cannot map a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnlyWrite && access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot map a buffer with no CPU access");
 
 	return LockPS();
 }
 
 inline void ICrHardwareGPUBuffer::Unlock()
 {
-	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnly, "Cannot unmap a buffer with no CPU access");
+	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnlyWrite && access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot unmap a buffer with no CPU access");
 
 	return UnlockPS();
 }

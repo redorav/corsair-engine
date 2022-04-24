@@ -529,6 +529,7 @@ namespace cr3d
 			ReadWrite,   // RWStructuredBuffer, RWBuffer, RWByteAddressBuffer
 			CopySource,
 			CopyDestination,
+			IndirectArgument, // Use buffer as argument to indirect draw/dispatch
 			Count
 		};
 	};
@@ -724,7 +725,7 @@ namespace cr3d
 
 	enum class QueryType : uint32_t
 	{
-		Timestamp,       // Time parts of the frame
+		Timestamp,    // Time parts of the frame
 		Occlusion,    // Measure occlusion
 		Predication,  // Use for predication queries
 		PipelineStats // Use to measure stats in the pipeline
@@ -953,13 +954,19 @@ namespace cr3d
 			// Compound
 			Storage = Structured | Byte,
 		};
+
+		inline BufferUsage::T operator | (BufferUsage::T flag1, BufferUsage::T flag2)
+		{
+			return (BufferUsage::T)((uint32_t)flag1 | (uint32_t)flag2);
+		}
 	};
 
 	namespace MemoryAccess
 	{
 		enum T : uint32_t
 		{
-			GPUOnly,         // Device-only, non-mappable. Compressed textures, render targets, unordered access
+			GPUOnlyRead,     // Device-only, non-mappable. No unordered access, only copy operations. Use for loaded resources
+			GPUOnlyWrite,    // Device-only, non-mappable. Unordered access
 			GPUWriteCPURead, // CPU random access, cached. GPU queries, feedback textures
 			Staging,         // CPU random access. Staging buffer for upload or download
 			CPUStreamToGPU,  // Uncached, write-combined, coherent. Don't read on CPU. Streaming per-frame data like vertex/constant buffers

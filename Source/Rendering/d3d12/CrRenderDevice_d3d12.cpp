@@ -131,6 +131,50 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		__uuidof(ID3D12RootSignature), (void**)&m_d3d12ComputeRootSignature);
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating compute root signature");
 
+	// Create command signatures
+
+	// DrawIndirect
+	{
+		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
+		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW;
+
+		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
+		descriptor.ByteStride = sizeof(D3D12_DRAW_ARGUMENTS);
+		descriptor.NumArgumentDescs = 1;
+		descriptor.pArgumentDescs = &indirectArgument;
+
+		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndirectCommandSignature);
+		CrAssertMsg(hResult == S_OK, "Error creating command signature");
+	}
+
+	// DrawIndexedIndirect
+	{
+		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
+		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
+		descriptor.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
+		descriptor.NumArgumentDescs = 1;
+		descriptor.pArgumentDescs = &indirectArgument;
+
+		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndexedIndirectCommandSignature);
+		CrAssertMsg(hResult == S_OK, "Error creating command signature");
+	}
+	
+	// DispatchIndirect
+	{
+		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
+		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH;
+
+		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
+		descriptor.ByteStride = sizeof(D3D12_DISPATCH_ARGUMENTS);
+		descriptor.NumArgumentDescs = 1;
+		descriptor.pArgumentDescs = &indirectArgument;
+
+		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DispatchIndirectCommandSignature);
+		CrAssertMsg(hResult == S_OK, "Error creating command signature");
+	}
+
 	m_waitIdleFence = CreateGPUFence();
 }
 

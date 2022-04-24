@@ -143,7 +143,7 @@ struct CrRenderGraphPass;
 using CrRenderPassId = CrTypedId<CrRenderGraphPass, uint32_t>;
 
 struct CrRenderGraphTextureResource;
-using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint32_t>;
+using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint16_t>;
 
 struct CrRenderGraphBufferResource;
-using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint32_t>;
+using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint16_t>;

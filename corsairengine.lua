@@ -434,16 +434,6 @@ project(ProjectShaderCompiler)
 		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[2]), '%{cfg.buildtarget.directory}')
 	}
 
-group('Math')
-	
-project(ProjectCrMath)
-	kind('StaticLib')
-	files { MathDirectory..'/**' }
-	includedirs { MathDirectory }
-	
-	AddLibraryFiles(HlslppLibrary)
-	AddLibraryNatvis(HlslppLibrary)
-
 group('Image')
 
 SourceImageDirectory = SourceDirectory..'/Image'
@@ -453,20 +443,7 @@ project(ProjectCrImage)
 	files{ 	SourceImageDirectory..'/**' }
 
 	AddLibraryIncludes(StbLibrary)
-	
-group('Input')
 
-SourceInputDirectory = SourceDirectory..'/Input'
-
-project(ProjectCrInput)
-	kind('StaticLib')
-
-	files { SourceInputDirectory..'/**' }
-	
-	AddLibraryIncludes(SDL2Library)
-
-	filter {}
-	
 group('Model')
 
 SourceModelDirectory = SourceDirectory..'/Model'
@@ -492,6 +469,8 @@ project(ProjectCrCore)
 		xxHashLibrary.includeDirs..'/xxhash.h'
 	}
 
+	AddLibraryNatvis(EASTLLibrary)
+
 	ExcludePlatformSpecificCode(SourceCoreDirectory)
 	
 	filter { 'system:windows' }
@@ -501,11 +480,25 @@ project(ProjectCrCore)
 		files { SourceCoreDirectory..'/**/ansi/**' }
 
 	filter {}
+	
+SourceInputDirectory = SourceDirectory..'/Input'
 
--- Create a dummy project for all the natvis files to be in, instead of the individual project folders
-project('Natvis')
+project(ProjectCrInput)
 	kind('StaticLib')
-	AddLibraryNatvis(EASTLLibrary)
+
+	files { SourceInputDirectory..'/**' }
+	
+	AddLibraryIncludes(SDL2Library)
+
+	filter {}
+	
+project(ProjectCrMath)
+	kind('StaticLib')
+	files { MathDirectory..'/**' }
+	includedirs { MathDirectory }
+	
+	AddLibraryFiles(HlslppLibrary)
+	AddLibraryNatvis(HlslppLibrary)
 
 group('UnitTests')
 

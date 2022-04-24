@@ -687,8 +687,8 @@ void CrFrame::DrawDebugUI()
 			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
+			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, cr3d::GraphicsApi::ToString(properties.graphicsApi));
 			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
-			ImGui::Text("GPU: %s (%llu %s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit);
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
@@ -714,12 +714,14 @@ void CrFrame::DrawDebugUI()
 
 				// Make sure we take padding into account when calculating initial positions
 				ImGui::TableSetColumnIndex(2);
-				ImVec2 timebarSize = ImVec2(ImGui::CalcItemWidth() + ImGui::GetStyle().FramePadding.x * 2 + 1, ImGui::GetFrameHeight());
+				ImVec2 timebarSize = ImVec2(ImGui::GetItemRectSize().x, ImGui::GetFrameHeight());
 				ImVec2 initialTimebarPosition = ImGui::GetCursorScreenPos();
 				initialTimebarPosition.x -= ImGui::GetStyle().FramePadding.x;
 				initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
 
-				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition](const CrRenderGraphPass& pass)
+				CrGPUInterval totalFrameDuration = m_timingQueryTracker->GetFrameDuration();
+
+				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition, totalFrameDuration](const CrRenderGraphPass& pass)
 				{
 					CrGPUInterval interval = m_timingQueryTracker->GetResultForFrame(CrHash(pass.name.c_str(), pass.name.length()));
 
@@ -737,8 +739,7 @@ void CrFrame::DrawDebugUI()
 							initialTimebarPosition.y = ImGui::GetCursorScreenPos().y;
 							initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
 
-							float millisecondMax = 1.0f;
-							float durationMillisecondsScaled = CrClamp((float)interval.durationNanoseconds / 1e6f / millisecondMax, 0.0f, 1.0f);
+							float durationMillisecondsScaled = CrClamp((float)(interval.durationNanoseconds / totalFrameDuration.durationNanoseconds), 0.0f, 1.0f);
 
 							float durationPixels = durationMillisecondsScaled * timebarSize.x;
 							ImVec2 finalPosition = ImVec2(initialTimebarPosition.x + durationPixels, initialTimebarPosition.y + timebarSize.y);

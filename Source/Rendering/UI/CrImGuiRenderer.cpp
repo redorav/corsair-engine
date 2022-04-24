@@ -131,7 +131,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		io.KeyMap[ImGuiKey_Space]       = KeyboardKey::Space;
 		io.KeyMap[ImGuiKey_Enter]       = KeyboardKey::Intro;
 		io.KeyMap[ImGuiKey_Escape]      = KeyboardKey::Escape;
-		io.KeyMap[ImGuiKey_KeyPadEnter] = KeyboardKey::KeypadEnter;
+		io.KeyMap[ImGuiKey_KeypadEnter] = KeyboardKey::KeypadEnter;
 		io.KeyMap[ImGuiKey_A]           = KeyboardKey::A;
 		io.KeyMap[ImGuiKey_C]           = KeyboardKey::C;
 		io.KeyMap[ImGuiKey_V]           = KeyboardKey::V;

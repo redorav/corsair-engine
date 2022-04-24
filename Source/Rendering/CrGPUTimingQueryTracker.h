@@ -32,7 +32,9 @@ public:
 
 	CrGPUTimingRequest AllocateTimingRequest(CrHash hash);
 
-	CrGPUInterval GetResultForFrame(CrHash hash);
+	CrGPUInterval GetResultForFrame(CrHash hash) const;
+
+	CrGPUInterval GetFrameDuration() const;
 
 	ICrGPUQueryPool* GetCurrentQueryPool() const;
 
@@ -64,4 +66,7 @@ private:
 	// Intervals resolved for the current raw data. Starting time is with respect to the
 	// query inserted by the tracker on Begin()
 	CrHashMap<CrHash, CrGPUInterval> m_timingIntervals;
+
+	// Total time this frame took
+	CrGPUInterval m_totalFrameInterval;
 };

@@ -186,10 +186,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrImGuiRenderer::Create(imguiInitParams);
 	}
 
-	CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
-	CrRenderModelSharedHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
-	CrRenderModelSharedHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
-
 	// Create the rendering scratch. Start with 10MB
 	m_renderingStream = CrSharedPtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
 	m_renderingStream->Initialize(10 * 1024 * 1024);
@@ -197,39 +193,48 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	// Create a render world
 	m_renderWorld = CrMakeShared<CrRenderWorld>();
 
-	const uint32_t numModels = 100;
+	bool loadData = true;
 
-	for (uint32_t i = 0; i < numModels; ++i)
+	if (loadData)
 	{
-		CrRenderModelInstance modelInstance = m_renderWorld->CreateModelInstance();
+		CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
+		CrRenderModelSharedHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
+		CrRenderModelSharedHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
 
-		float angle = 1.61803f * i;
-		float radius = 300.0f * i / numModels;
+		const uint32_t numModels = 100;
 
-		float x = radius * sinf(angle);
-		float z = radius * cosf(angle);
-
-		float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
-
-		m_renderWorld->SetTransform(modelInstance.GetId(), transformMatrix);
-
-		int r = rand();
-		CrRenderModelSharedHandle renderModel;
-
-		if (r < RAND_MAX / 3)
+		for (uint32_t i = 0; i < numModels; ++i)
 		{
-			renderModel = nyraModel;
-		}
-		else if (r < 2 * RAND_MAX / 3)
-		{
-			renderModel = jainaModel;
-		}
-		else
-		{
-			renderModel = damagedHelmet;
-		}
+			CrRenderModelInstance modelInstance = m_renderWorld->CreateModelInstance();
 
-		m_renderWorld->SetRenderModel(modelInstance.GetId(), renderModel);
+			float angle = 1.61803f * i;
+			float radius = 300.0f * i / numModels;
+
+			float x = radius * sinf(angle);
+			float z = radius * cosf(angle);
+
+			float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
+
+			m_renderWorld->SetTransform(modelInstance.GetId(), transformMatrix);
+
+			int r = rand();
+			CrRenderModelSharedHandle renderModel;
+
+			if (r < RAND_MAX / 3)
+			{
+				renderModel = nyraModel;
+			}
+			else if (r < 2 * RAND_MAX / 3)
+			{
+				renderModel = jainaModel;
+			}
+			else
+			{
+				renderModel = damagedHelmet;
+			}
+
+			m_renderWorld->SetRenderModel(modelInstance.GetId(), renderModel);
+		}
 	}
 
 	m_camera = CrSharedPtr<CrCamera>(new CrCamera());

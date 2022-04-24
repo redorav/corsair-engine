@@ -23,6 +23,24 @@ static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayout
 	CrAssert(vkResult == VK_SUCCESS);
 }
 
+static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, const CrShaderReflectionHeader& reflectionHeader)
+{
+	if (vkSetDebugUtilsObjectTag)
+	{
+		VkDebugUtilsObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT };
+		tagInfo.objectType = VK_OBJECT_TYPE_SHADER_MODULE;
+		tagInfo.objectHandle = (uint64_t)vkShaderModule;
+		tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;
+
+		CrString tagName = eastl::to_string(reflectionHeader.bytecodeHash) + ".pdb";
+
+		tagInfo.pTag = tagName.c_str();
+		tagInfo.tagSize = tagName.length();
+
+		vkSetDebugUtilsObjectTag(vkDevice, &tagInfo);
+	}
+}
+
 CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
@@ -53,20 +71,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 		VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
 		CrAssert(vkResult == VK_SUCCESS);
 
-		if (vkSetDebugUtilsObjectTag)
-		{
-			VkDebugUtilsObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT };
-			tagInfo.objectType = VK_OBJECT_TYPE_SHADER_MODULE;
-			tagInfo.objectHandle = (uint64_t)vkShaderModule;
-			tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;
-
-			CrString tagName = eastl::to_string(reflectionHeader.bytecodeHash) + ".pdb";
-
-			tagInfo.pTag = tagName.c_str();
-			tagInfo.tagSize = tagName.length();
-
-			vkSetDebugUtilsObjectTag(m_vkDevice, &tagInfo);
-		}
+		SetVulkanPDBPath(m_vkDevice, vkShaderModule, reflectionHeader);
 
 		m_vkShaderModules.push_back(vkShaderModule);
 
@@ -129,6 +134,8 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, cons
 
 	VkResult vkResult = vkCreateShaderModule(m_vkDevice, &moduleCreateInfo, nullptr, &m_vkShaderModule);
 	CrAssert(vkResult == VK_SUCCESS);
+
+	SetVulkanPDBPath(m_vkDevice, m_vkShaderModule, reflectionHeader);
 
 	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;

@@ -42,7 +42,7 @@ public:
 	const CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
 	{
 		const CrRenderMeshSharedHandle& renderMesh = m_renderMeshes[meshIndex];
-		uint32_t materialIndex = (*m_materialMap.find(renderMesh.get())).second;
+		uint32_t materialIndex = m_renderMeshMaterialIndex[meshIndex];
 		const CrMaterialSharedHandle& material = m_materials[materialIndex];
 
 		return CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
@@ -69,8 +69,6 @@ private:
 
 	CrBoundingBox m_boundingBox;
 
-	CrHashMap<CrRenderMesh*, uint8_t> m_materialMap;
-
 	CrHashMap<CrRenderMesh*, uint8_t> m_pipelineMap;
 
 	// A model has access to a collection of render meshes, each with a material attached.
@@ -79,6 +77,8 @@ private:
 	// state knows everything about where it's going to be rendered (it needs to)
 
 	CrVector<CrRenderMeshSharedHandle> m_renderMeshes;
+
+	CrVector<uint8_t> m_renderMeshMaterialIndex;
 
 	CrVector<CrMaterialSharedHandle> m_materials;
 

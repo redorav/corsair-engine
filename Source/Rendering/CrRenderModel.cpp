@@ -20,13 +20,13 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	m_pipelines.resize(descriptor.meshes.size());
 
 	// For every combination of mesh and material, create the necessary pipeline objects
-	for (uint32_t i = 0; i < descriptor.meshes.size(); ++i)
+	for (uint32_t meshIndex = 0; meshIndex < descriptor.meshes.size(); ++meshIndex)
 	{
-		const CrRenderMeshSharedHandle& mesh = descriptor.meshes[i];
-		const CrMaterialSharedHandle& material = descriptor.materials[descriptor.materialIndices[i]];
+		const CrRenderMeshSharedHandle& mesh = descriptor.meshes[meshIndex];
+		const CrMaterialSharedHandle& material = descriptor.materials[descriptor.materialIndices[meshIndex]];
 
 		m_renderMeshes.push_back(mesh);
-		m_materialMap.insert(CrPair<CrRenderMesh*, uint8_t>(mesh.get(), (uint8_t)descriptor.materialIndices[i]));
+		m_renderMeshMaterialIndex.push_back((uint8_t)descriptor.materialIndices[meshIndex]);
 
 		for (CrMaterialPipelineVariant::T pipelineVariant = CrMaterialPipelineVariant::First; pipelineVariant < CrMaterialPipelineVariant::Count; ++pipelineVariant)
 		{
@@ -39,7 +39,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 			CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
-			m_pipelines[i][pipelineVariant] = pipeline;
+			m_pipelines[meshIndex][pipelineVariant] = pipeline;
 		}
 	}
 }

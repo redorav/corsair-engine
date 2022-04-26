@@ -172,6 +172,10 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 				}
 			}
 
+			bool hasPositions = !positions.empty();
+			bool hasNormals   = !normals.empty();
+			bool hasTextureCoords       = !texCoords.empty();
+
 			float3 minVertex = float3(FLT_MAX);
 			float3 maxVertex = float3(-FLT_MAX);
 
@@ -184,24 +188,42 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 			{
 				for (size_t vertexIndex = 0; vertexIndex < positions.size(); ++vertexIndex)
 				{
-					const GLTFFloat3& position = positions[vertexIndex];
-					const GLTFFloat3& normal   = normals[vertexIndex];
-					const GLTFFloat2& texCoord = texCoords[vertexIndex];
-					positionBufferData[vertexIndex].position = { (half)position.x, (half)position.y, (half)position.z };
-
-					minVertex = min(minVertex, float3(position.x, position.y, position.z));
-					maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
-
-					additionalBufferData[vertexIndex].normal =
+					if (hasPositions)
 					{
-						(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f),
-						(uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f),
-						0
-					};
+						const GLTFFloat3& position = positions[vertexIndex];
+						positionBufferData[vertexIndex].position = { (half)position.x, (half)position.y, (half)position.z };
 
-					additionalBufferData[vertexIndex].tangent = { 0, 0, 0, 0 };
-					additionalBufferData[vertexIndex].uv = { (half)texCoord.x, (half)texCoord.y };
+						minVertex = min(minVertex, float3(position.x, position.y, position.z));
+						maxVertex = max(maxVertex, float3(position.x, position.y, position.z));
+					}
+
+					if (hasNormals)
+					{
+						const GLTFFloat3& normal = normals[vertexIndex];
+
+						additionalBufferData[vertexIndex].normal =
+						{
+							(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f),
+							(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f),
+							(uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f),
+							0
+						};
+					}
+					else
+					{
+						additionalBufferData[vertexIndex].normal = { 0, 255, 0, 0 };
+					}
+
+					if (hasTextureCoords)
+					{
+						const GLTFFloat2& texCoord = texCoords[vertexIndex];
+						additionalBufferData[vertexIndex].tangent = { 0, 0, 0, 0 };
+						additionalBufferData[vertexIndex].uv = { (half)texCoord.x, (half)texCoord.y };
+					}
+					else
+					{
+						additionalBufferData[vertexIndex].uv = { 0.0_h, 0.0_h };
+					}
 				}
 			}
 			positionBuffer->Unlock();

@@ -108,6 +108,8 @@ using CrGPUHardwareBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
 struct CrHardwareGPUBufferDescriptor;
 
 class CrGPUBuffer;
+using CrGPUBufferSharedHandle = CrSharedPtr<CrGPUBuffer>;
+
 struct CrGPUBufferDescriptor;
 class CrGPUStackAllocator;
 

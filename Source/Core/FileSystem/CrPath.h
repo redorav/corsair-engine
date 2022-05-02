@@ -175,7 +175,9 @@ public:
 
 	CrPath operator + (const CrPath& path) const
 	{
-		return *this + path.c_str();
+		CrPath newPath = *this;
+		newPath.m_pathString += path.m_pathString;
+		return newPath;
 	}
 
 	CrPath& operator += (const char* str)
@@ -194,13 +196,23 @@ public:
 
 	CrPath operator / (const CrPath& path) const
 	{
-		return *this / path.c_str();
+		CrPath newPath = *this;
+		newPath.AddTrailingSeparator();
+		newPath.m_pathString += path.m_pathString;
+		return newPath;
 	}
 
 	CrPath& operator /= (const char* str)
 	{
 		AddTrailingSeparator();
 		m_pathString += str;
+		return *this;
+	}
+
+	CrPath& operator /= (const CrPath& path)
+	{
+		AddTrailingSeparator();
+		m_pathString += path.m_pathString;
 		return *this;
 	}
 

@@ -291,7 +291,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	{
 		CrComputePipelineDescriptor computePipelineDescriptor;
-		m_computePipeline = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::ExampleCompute);
+		m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::ExampleCompute);
 	}
 
 	{
@@ -301,21 +301,112 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		m_copyTexturePipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 
-	uint8_t whiteTextureInitialData[4 * 4 * 4];
-	memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
+	{
+		CrComputePipelineDescriptor computePipelineDescriptor;
+		m_createIndirectArguments = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::CreateIndirectArguments);
+	}
 
-	CrTextureDescriptor whiteTextureDescriptor;
-	whiteTextureDescriptor.width = 4;
-	whiteTextureDescriptor.height = 4;
-	whiteTextureDescriptor.initialData = whiteTextureInitialData;
-	whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
-	whiteTextureDescriptor.name = "Default White Texture";
-	m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
+	{
+		uint8_t whiteTextureInitialData[4 * 4 * 4];
+		memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
 
+		CrTextureDescriptor whiteTextureDescriptor;
+		whiteTextureDescriptor.width = 4;
+		whiteTextureDescriptor.height = 4;
+		whiteTextureDescriptor.initialData = whiteTextureInitialData;
+		whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
+		whiteTextureDescriptor.name = "Default White Texture";
+		m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
+	}
+
+	{
+		uint8_t normalMapInitialData[4 * 4 * 4];
+
+		for (uint32_t x = 0; x < 4; ++x)
+		{
+			for (uint32_t y = 0; y < 4; ++y)
+			{
+				normalMapInitialData[y * 4 * 4 + x * 4 + 0] = 128;
+				normalMapInitialData[y * 4 * 4 + x * 4 + 1] = 128;
+				normalMapInitialData[y * 4 * 4 + x * 4 + 2] = 255;
+				normalMapInitialData[y * 4 * 4 + x * 4 + 3] = 255;
+			}
+		}
+
+		CrTextureDescriptor defaultNormalTextureDescriptor;
+		defaultNormalTextureDescriptor.width = 4;
+		defaultNormalTextureDescriptor.height = 4;
+		defaultNormalTextureDescriptor.format = cr3d::DataFormat::RGBA8_Unorm;
+		defaultNormalTextureDescriptor.initialData = (const uint8_t*)normalMapInitialData;
+		defaultNormalTextureDescriptor.initialDataSize = sizeof(normalMapInitialData);
+		defaultNormalTextureDescriptor.name = "Default Normal Map Texture";
+		m_defaultNormalMapTexture = renderDevice->CreateTexture(defaultNormalTextureDescriptor);
+	}
+
+	{
+		CrTextureDescriptor colorfulVolumeTextureDescriptor;
+		colorfulVolumeTextureDescriptor.width = 4;
+		colorfulVolumeTextureDescriptor.height = 4;
+		colorfulVolumeTextureDescriptor.depth = 4;
+		colorfulVolumeTextureDescriptor.type = cr3d::TextureType::Volume;
+
+		uint8_t colorfulVolumeTextureInitialData[4 * 4 * 4 * 4];
+		for (uint32_t z = 0; z < 4; ++z)
+		{
+			for (uint32_t x = 0; x < 4; ++x)
+			{
+				for (uint32_t y = 0; y < 4; ++y)
+				{
+					colorfulVolumeTextureInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 0] = z == 0 ? 0xff : 0;
+					colorfulVolumeTextureInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 1] = z == 1 ? 0xff : 0;
+					colorfulVolumeTextureInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 2] = z == 2 ? 0xff : 0;
+					colorfulVolumeTextureInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 3] = z == 3 ? 0xff : 0;
+				}
+			}
+		}
+
+		colorfulVolumeTextureDescriptor.name = "Colorful Volume Texture";
+		colorfulVolumeTextureDescriptor.initialData = colorfulVolumeTextureInitialData;
+		colorfulVolumeTextureDescriptor.initialDataSize = sizeof(colorfulVolumeTextureInitialData);
+		m_colorfulVolumeTexture = renderDevice->CreateTexture(colorfulVolumeTextureDescriptor);
+	}
+
+	{
+		CrTextureDescriptor colorfulTextureArrayDescriptor;
+		colorfulTextureArrayDescriptor.width = 4;
+		colorfulTextureArrayDescriptor.height = 4;
+		colorfulTextureArrayDescriptor.type = cr3d::TextureType::Tex2D;
+		colorfulTextureArrayDescriptor.arraySize = 4;
+		colorfulTextureArrayDescriptor.mipmapCount = 3;
+
+		uint8_t colorfulTextureArrayInitialData[4 * 4 * 4 * 4];
+		for (uint32_t z = 0; z < 4; ++z)
+		{
+			for (uint32_t x = 0; x < 4; ++x)
+			{
+				for (uint32_t y = 0; y < 4; ++y)
+				{
+					colorfulTextureArrayInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 0] = z == 0 ? 0xff : 0;
+					colorfulTextureArrayInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 1] = z == 1 ? 0xff : 0;
+					colorfulTextureArrayInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 2] = z == 2 ? 0xff : 0;
+					colorfulTextureArrayInitialData[z * 4 * 4 * 4 + y * 4 * 4 + x * 4 + 3] = z == 3 ? 0xff : 0;
+				}
+			}
+		}
+
+		colorfulTextureArrayDescriptor.name = "Colorful Texture Array";
+		colorfulTextureArrayDescriptor.initialData = colorfulTextureArrayInitialData;
+		colorfulTextureArrayDescriptor.initialDataSize = sizeof(colorfulTextureArrayInitialData);
+		m_colorfulTextureArray = renderDevice->CreateTexture(colorfulTextureArrayDescriptor);
+	}
 
 	m_rwStructuredBuffer = renderDevice->CreateStructuredBuffer<ExampleRWStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnlyWrite, 32);
 
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnlyRead, 32);
+
+	CrGPUBufferDescriptor argumentsDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
+	m_indirectDispatchArguments = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), argumentsDescriptor, 3, 4));
+
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 }
@@ -362,7 +453,7 @@ void CrFrame::Process()
 
 	// TODO Find a good place to obtain default resources
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
-	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultWhiteTexture.get());
+	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultNormalMapTexture.get());
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
 
 	for (cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Vertex; shaderStage < cr3d::ShaderStage::Count; ++shaderStage)
@@ -547,7 +638,7 @@ void CrFrame::Process()
 	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
 	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
-	const ICrComputePipeline* computePipeline = m_computePipeline.get();
+	const ICrComputePipeline* exampleComputePipeline = m_exampleComputePipeline.get();
 
 	m_mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
@@ -559,12 +650,52 @@ void CrFrame::Process()
 	},
 	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		commandBuffer->BindComputePipelineState(computePipeline);
+		commandBuffer->BindComputePipelineState(exampleComputePipeline);
 		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
 		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
 		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));
 		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTexture3DCompute, m_colorfulVolumeTexture.get());
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTextureArrayCompute, m_colorfulTextureArray.get());
 		commandBuffer->Dispatch(1, 1, 1);
+	});
+
+	CrRenderGraphBufferDescriptor indirectArgumentsBufferDescriptor;
+	indirectArgumentsBufferDescriptor.buffer = m_indirectDispatchArguments.get();
+	CrRenderGraphBufferId indirectArgumentsBuffer = m_mainRenderGraph.CreateBuffer("Indirect Arguments", indirectArgumentsBufferDescriptor);
+
+	m_mainRenderGraph.AddRenderPass("Indirect Arguments Create", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	[&](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddRWBuffer(indirectArgumentsBuffer, cr3d::ShaderStageFlags::Compute);
+	},
+	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->BindComputePipelineState(m_createIndirectArguments.get());
+		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleIndirectBuffer, renderGraph.GetPhysicalBuffer(indirectArgumentsBuffer));
+		commandBuffer->Dispatch(1, 1, 1);
+	});
+	
+	m_mainRenderGraph.AddRenderPass("Indirect Arguments Consume", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	[&](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWBuffer(rwStructuredBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWBuffer(colorsRWDataBuffer, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWTexture(colorsRWTexture, cr3d::ShaderStageFlags::Compute, 0, 1, 0, 1);
+	},
+	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		commandBuffer->BindComputePipelineState(exampleComputePipeline);
+		commandBuffer->BindStorageBuffer(cr3d::ShaderStage::Compute, StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
+		commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
+		commandBuffer->BindRWDataBuffer(cr3d::ShaderStage::Compute, RWDataBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWDataBuffer));
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTexture3DCompute, m_colorfulVolumeTexture.get());
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTextureArrayCompute, m_colorfulTextureArray.get());
+	
+		const CrGPUBuffer* gpuBuffer = renderGraph.GetPhysicalBuffer(indirectArgumentsBuffer);
+		commandBuffer->DispatchIndirect(gpuBuffer->GetHardwareBuffer(), 0);
 	});
 
 	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
@@ -786,7 +917,7 @@ void CrFrame::UpdateCamera()
 
 	if (keyboard.keyPressed[KeyboardKey::LeftShift])
 	{
-		translationSpeed *= 3.0f;
+		translationSpeed *= 10.0f;
 	}
 
 	// TODO Hack to get a bit of movement on the camera

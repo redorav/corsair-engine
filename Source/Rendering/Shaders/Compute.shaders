@@ -1,3 +1,7 @@
 ExampleCompute:
   entrypoint: MainCS
   stage: Compute
+
+CreateIndirectArguments:
+  entrypoint: CreateIndirectArgumentsCS
+  stage: Compute

@@ -46,10 +46,18 @@ private:
 
 	// TODO Temporary
 	CrBuiltinGraphicsPipeline m_linePipeline;
-	CrBuiltinComputePipeline m_computePipeline;
+	CrBuiltinComputePipeline m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 
+	CrBuiltinComputePipeline m_createIndirectArguments;
+
 	CrTextureSharedHandle m_defaultWhiteTexture;
+
+	CrTextureSharedHandle m_defaultNormalMapTexture;
+
+	CrTextureSharedHandle m_colorfulVolumeTexture;
+
+	CrTextureSharedHandle m_colorfulTextureArray;
 
 	CrSwapchainSharedHandle m_swapchain;
 
@@ -74,6 +82,8 @@ private:
 	CrStructuredBufferSharedHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
 
 	CrDataBufferSharedHandle m_colorsRWDataBuffer;
+
+	CrGPUBufferSharedHandle m_indirectDispatchArguments;
 
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;

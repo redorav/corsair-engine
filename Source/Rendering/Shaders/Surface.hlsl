@@ -4,9 +4,9 @@
 struct Surface
 {
 	// Geometric Properties
-	float3 vertexNormalLocal;
-	float3 vertexTangentLocal;
-	float3 vertexBitangentLocal;
+	float3 vertexNormalWorld;
+	float3 vertexTangentWorld;
+	float3 vertexBitangentWorld;
 
 	float3 pixelNormalTangent;
 

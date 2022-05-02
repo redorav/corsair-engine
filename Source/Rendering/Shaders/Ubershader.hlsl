@@ -20,23 +20,32 @@ VS_OUT UbershaderVS(VS_IN IN)
 {
 	VS_OUT output;
 	
+	float4x4 local2WorldMatrix = cb_Instance.local2World[IN.instanceID];
+	
 	#if defined(NO_TRANSFORM)
 	output.hwPosition = float4(IN.pos.xyz, 1);
 	#else
 
-	float4 localPosition = float4(IN.pos.xyz, 1);
+	float4 positionLocal = float4(IN.pos.xyz, 1);
 
-	float4 worldPosition = mul(localPosition, cb_Instance.local2World[IN.instanceID]);
+	float4 positionWorld = mul(positionLocal, local2WorldMatrix);
 
-	float4 viewPosition = mul(worldPosition, cb_Camera.world2View);
+	float4 positionView = mul(positionWorld, cb_Camera.world2View);
 
-    output.hwPosition = mul(viewPosition, cb_Camera.view2Projection);
+	output.hwPosition = mul(positionView, cb_Camera.view2Projection);
 	#endif
+	
+	// Careful with this code and non-uniform scaling
+	float3 vertexNormalLocal = IN.normal.xyz * 2.0 - 1.0;
+	float3 vertexNormalWorld = mul(float4(vertexNormalLocal, 0.0), local2WorldMatrix).xyz;
+	
+	float3 vertexTangentLocal = IN.tangent.xyz * 2.0 - 1.0;
+	float3 vertexTangentWorld = mul(float4(vertexTangentLocal, 0.0), local2WorldMatrix).xyz;
 
 	output.color   = IN.color;
 	output.uv      = IN.uv;
-	output.normal  = IN.normal.xyz * 2.0 - 1.0;
-	output.tangent = IN.tangent.xyz * 2.0 - 1.0;
+	output.normal  = vertexNormalWorld.xyz;
+	output.tangent = vertexTangentWorld.xyz;
 	
 	return output;
 }
@@ -50,18 +59,18 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	Surface surface;
 	
 	// Interpolants
-	surface.vertexNormalLocal = IN.normal.xyz;
-	surface.vertexTangentLocal = IN.tangent.xyz;
-	surface.vertexBitangentLocal = cross(surface.vertexNormalLocal, surface.vertexTangentLocal);
+	surface.vertexNormalWorld = IN.normal.xyz;
+	surface.vertexTangentWorld = IN.tangent.xyz;
+	surface.vertexBitangentWorld = cross(surface.vertexNormalWorld, surface.vertexTangentWorld);
 	
-	surface.vertexNormalLocal = normalize(surface.vertexNormalLocal);
-	surface.vertexTangentLocal = normalize(surface.vertexTangentLocal);
-	surface.vertexBitangentLocal = normalize(surface.vertexBitangentLocal);
+	surface.vertexNormalWorld = normalize(surface.vertexNormalWorld);
+	surface.vertexTangentWorld = normalize(surface.vertexTangentWorld);
+	surface.vertexBitangentWorld = normalize(surface.vertexBitangentWorld);
 	
-	float3x3 tbn = float3x3(surface.vertexTangentLocal, surface.vertexBitangentLocal, surface.vertexNormalLocal);
+	float3x3 tbn = float3x3(surface.vertexTangentWorld, surface.vertexBitangentWorld, surface.vertexNormalWorld);
 	
 	// Texture reads
-	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy) * IN.color;
 	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	

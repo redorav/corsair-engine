@@ -9,6 +9,8 @@ cr3d::DataFormat::T CrRendererConfig::GBufferAlbedoAOFormat = cr3d::DataFormat::
 cr3d::DataFormat::T CrRendererConfig::GBufferNormalsFormat = cr3d::DataFormat::RGBA8_Unorm;
 cr3d::DataFormat::T CrRendererConfig::GBufferMaterialFormat = cr3d::DataFormat::RGBA8_Unorm;
 
+cr3d::DataFormat::T CrRendererConfig::LightingFormat = cr3d::DataFormat::RG11B10_Float;
+
 // Debug Shader
 cr3d::DataFormat::T CrRendererConfig::DebugShaderFormat = cr3d::DataFormat::RGBA16_Unorm;
 

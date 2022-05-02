@@ -49,6 +49,8 @@ private:
 	CrBuiltinComputePipeline m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 
+	CrBuiltinGraphicsPipeline m_directionalLightPipeline;
+
 	CrBuiltinComputePipeline m_createIndirectArguments;
 
 	CrTextureSharedHandle m_defaultWhiteTexture;
@@ -67,6 +69,8 @@ private:
 	CrTextureSharedHandle m_gbufferAlbedoAOTexture;
 	CrTextureSharedHandle m_gbufferNormalsTexture;
 	CrTextureSharedHandle m_gbufferMaterialTexture;
+
+	CrTextureSharedHandle m_lightingTexture;
 
 	CrTextureSharedHandle m_debugShaderTexture;
 

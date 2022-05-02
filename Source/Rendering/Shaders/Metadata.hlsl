@@ -4,6 +4,7 @@
 #include "Compute.hlsl"
 #include "CopyTexture.hlsl"
 #include "Imgui.hlsl"
+#include "GBuffer.hlsl"
 #include "Ubershader.hlsl"
 
 float4 metadata() : SV_Target0

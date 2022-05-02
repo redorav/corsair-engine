@@ -19,7 +19,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	m_renderMeshes.reserve(descriptor.meshes.size());
 	m_pipelines.resize(descriptor.meshes.size());
 
-	// For every combination of mesh and material, create the necessary pipeline objects
+	// For every mesh-material combination, create the necessary pipeline objects
 	for (uint32_t meshIndex = 0; meshIndex < descriptor.meshes.size(); ++meshIndex)
 	{
 		const CrRenderMeshSharedHandle& mesh = descriptor.meshes[meshIndex];

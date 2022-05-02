@@ -307,6 +307,14 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	{
+		CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
+		directionalLightPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
+		directionalLightPipelineDescriptor.depthStencilState.depthTestEnable = false;
+		m_directionalLightPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), 
+			directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
+	}
+
+	{
 		uint8_t whiteTextureInitialData[4 * 4 * 4];
 		memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
 
@@ -472,6 +480,7 @@ void CrFrame::Process()
 	CrRenderGraphTextureId gBufferMaterial;
 	CrRenderGraphTextureId swapchainTexture;
 	CrRenderGraphTextureId preSwapchainTexture;
+	CrRenderGraphTextureId lightingTexture;
 
 	{
 		CrRenderGraphTextureDescriptor depthDescriptor;
@@ -497,6 +506,10 @@ void CrFrame::Process()
 		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor;
 		gBufferMaterialDescriptor.texture = m_gbufferMaterialTexture.get();
 		gBufferMaterial = m_mainRenderGraph.CreateTexture("GBuffer Material", gBufferMaterialDescriptor);
+
+		CrRenderGraphTextureDescriptor lightingDescriptor;
+		lightingDescriptor.texture = m_lightingTexture.get();
+		lightingTexture = m_mainRenderGraph.CreateTexture("Lighting HDR", lightingDescriptor);
 	}
 
 	m_mainRenderGraph.AddRenderPass("GBuffer Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -554,11 +567,29 @@ void CrFrame::Process()
 	m_mainRenderGraph.AddRenderPass("GBuffer Lighting Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
-		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.AddRenderTarget(lightingTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f));
 		renderGraph.AddTexture(gBufferAlbedoAO, cr3d::ShaderStageFlags::Pixel);
+		renderGraph.AddTexture(gBufferNormals, cr3d::ShaderStageFlags::Pixel);
+		renderGraph.AddTexture(gBufferMaterial, cr3d::ShaderStageFlags::Pixel);
 	},
-	[this](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* /*commandBuffer*/)
+	[this, gBufferAlbedoAO, gBufferNormals, gBufferMaterial]
+	(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
+		CrGPUBufferType<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
+		DynamicLightCB* lightData = lightConstantBuffer.Lock();
+		{
+			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
+			lightData->radiance = float4(1.0f, 1.0f, 1.0f, 0.0f);
+		}
+		lightConstantBuffer.Unlock();
+
+		commandBuffer->BindConstantBuffer(&lightConstantBuffer);
+
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
+		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
+		commandBuffer->BindGraphicsPipelineState(m_directionalLightPipeline.get());
+		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
 	m_mainRenderGraph.AddRenderPass("Main Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -1048,6 +1079,16 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 		materialDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
 		materialDescriptor.name   = "GBuffer Material";
 		m_gbufferMaterialTexture  = renderDevice->CreateTexture(materialDescriptor);
+	}
+
+	{
+		CrTextureDescriptor lightingDescriptor;
+		lightingDescriptor.width  = m_swapchain->GetWidth();
+		lightingDescriptor.height = m_swapchain->GetHeight();
+		lightingDescriptor.format = CrRendererConfig::LightingFormat;
+		lightingDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
+		lightingDescriptor.name   = "Lighting HDR";
+		m_lightingTexture = renderDevice->CreateTexture(lightingDescriptor);
 	}
 
 	{

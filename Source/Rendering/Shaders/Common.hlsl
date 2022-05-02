@@ -119,15 +119,15 @@ RWBuffer<int> ExampleRWBuffer;
 ByteAddressBuffer ExampleByteBuffer;
 RWByteAddressBuffer ExampleRWByteBuffer;
 
-struct DynamicLight
+struct DynamicLightCB
 {
 	float4 positionRadius;
-	float4 color;
+	float4 radiance;
 };
 
-cbuffer DynamicLight
+cbuffer DynamicLightCB
 {
-	DynamicLight cb_DynamicLight;
+	DynamicLightCB cb_DynamicLight;
 };
 
 #endif

@@ -25,6 +25,8 @@ public:
 
 	const CrPath& GetUbershaderTempDirectory() const;
 
+	const CrHash GetUbershaderHash() const;
+
 private:
 
 	CrHashMap<CrString, CrPath> m_shaderPaths;
@@ -36,9 +38,6 @@ private:
 	// Path to the temp folder for built ubershaders
 	CrPath m_ubershaderTempDirectory;
 
-	// Path of the ubershader hash
-	CrPath m_ubershaderHashPath;
-
 	// Ubershader source with resolved includes
 	CrString m_resolvedUbershaderSource;
 
@@ -46,6 +45,6 @@ private:
 	// the final binary (in order to hash it)
 	CrString m_hashableUbershaderSource;
 
-	// Ubershader hash (used to determine whether shaders in cache are usable)
+	// Ubershader hash computed with current sources (used to determine whether shaders in cache are usable)
 	CrHash m_ubershaderHash;
 };

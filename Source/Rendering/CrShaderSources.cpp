@@ -109,41 +109,7 @@ void CrShaderSources::Initialize()
 
 	m_ubershaderHash = CrHash(m_hashableUbershaderSource.c_str(), m_hashableUbershaderSource.length());
 
-	m_ubershaderHashPath = m_ubershaderTempDirectory / "Ubershader.hash";
-
-	bool createHashFile = false;
-
-	// If we have a hash, check whether we've produced the same hash. If so, the cache is valid
-	// If not, create the hash file and store it
-	if (CrFileSharedHandle hashFile = ICrFile::OpenFile(m_ubershaderHashPath.c_str(), FileOpenFlags::Read))
-	{
-		CrHash hashInFile;
-		hashFile->Read((void*)&hashInFile, sizeof(hashInFile));
-
-		CrLog("Ubershader Hash: %ull", m_ubershaderHash.GetHash());
-
-		// If we have the same hash, the cache is valid and we don't need to do anything about it
-		// If not, delete the contents of the folder and start again
-		if (hashInFile == m_ubershaderHash)
-		{
-			//CrLog("Same ubershader hash");
-		}
-		else
-		{
-			createHashFile = true;
-			//CrLog("Different ubershader hash");
-		}
-	}
-	else
-	{
-		createHashFile = true;
-	}
-
-	if(createHashFile)
-	{
-		CrFileSharedHandle hashFile = ICrFile::OpenFile(m_ubershaderHashPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-		hashFile->Write((void*)&m_ubershaderHash, sizeof(m_ubershaderHash));
-	}
+	CrLog("Ubershader - Computed Hash: %ull", m_ubershaderHash.GetHash());
 
 	// Resolve ubershader includes upfront. The only thing that really changes an ubershader
 	// is defines that we can either pass in from the compiler or inject at the top of the file
@@ -230,4 +196,9 @@ const CrString& CrShaderSources::GetUbershaderSource() const
 const CrPath& CrShaderSources::GetUbershaderTempDirectory() const
 {
 	return m_ubershaderTempDirectory;
+}
+
+const CrHash CrShaderSources::GetUbershaderHash() const
+{
+	return m_ubershaderHash;
 }

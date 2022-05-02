@@ -44,8 +44,6 @@ private:
 
 	CrTextureSharedHandle m_fontAtlas;
 
-	CrSamplerSharedHandle m_uiSamplerState;
-
 	// Imgui's vertex and index buffers grow if more vertices
 	// are needed, but never shrink
 	uint32_t m_currentMaxIndexCount;

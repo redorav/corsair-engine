@@ -2,6 +2,7 @@
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
+#include "Rendering/CrRenderingResources.h"
 #include "Rendering/CrFrame.h"
 
 #include "Core/CrCommandLine.h"
@@ -92,7 +93,11 @@ int main(int argc, char* argv[])
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
 	ICrRenderSystem::CreateRenderDevice();
 
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+
 	CrPrintProcessMemory("After Render Device");
+
+	CrGlobalRenderResources::Get().Initialize(renderDevice.get());
 
 	CrFrame frame;
 	frame.Initialize(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
@@ -154,6 +159,8 @@ int main(int argc, char* argv[])
 			frame.Process(); // Process the main loop
 		}
 	}
+
+	CrGlobalRenderResources::Get().Deinitialize();
 
 	frame.Deinitialize();
 

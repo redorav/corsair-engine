@@ -19,11 +19,11 @@
 #include "Core/CrPlatform.h"
 #include "Core/Streams/CrFileStream.h"
 
-static CrShaderManager g_shaderManager;
+static CrShaderManager ShaderManager;
 
 CrShaderManager& CrShaderManager::Get()
 {
-	return g_shaderManager;
+	return ShaderManager;
 }
 
 const char* CrShaderManager::GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi)

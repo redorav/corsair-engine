@@ -3,8 +3,10 @@
 #include "CrImGuiRenderer.h"
 
 #include "Input/CrInputManager.h"
+
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
+
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/CrShaderManager.h"
@@ -16,6 +18,8 @@
 #include "Rendering/ICrSampler.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/CrRenderGraph.h"
+#include "Rendering/CrRenderingResources.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "imgui.h"
@@ -140,11 +144,6 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 		io.KeyMap[ImGuiKey_Z]           = KeyboardKey::Z;
 	}
 	
-	// Default linear clamp sampler state:
-	CrSamplerDescriptor descriptor;
-	descriptor.name = "Imgui Sampler State";
-	m_uiSamplerState = renderDevice->CreateSampler(descriptor);
-
 	// Default resolution for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f);
 }
@@ -217,7 +216,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
 		commandBuffer->BindIndexBuffer(&indexBuffer);
 		commandBuffer->BindVertexBuffer(&vertexBuffer, 0);
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, m_uiSamplerState.get());
+		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());
 
 		// Projection matrix. TODO: this could be cached.
 		CrGPUBufferType<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();

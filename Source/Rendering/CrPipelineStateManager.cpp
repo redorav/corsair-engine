@@ -8,11 +8,11 @@
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"
 
-static CrPipelineStateManager g_pipelineStateManager;
+static CrPipelineStateManager PipelineStateManager;
 
 CrPipelineStateManager& CrPipelineStateManager::Get()
 {
-	return g_pipelineStateManager;
+	return PipelineStateManager;
 }
 
 CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline

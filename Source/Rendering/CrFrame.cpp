@@ -32,6 +32,7 @@
 #include "Rendering/CrRenderGraph.h"
 
 #include "Rendering/CrRendererConfig.h"
+#include "Rendering/CrRenderingResources.h"
 
 #include "Input/CrInputManager.h"
 
@@ -239,40 +240,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	m_camera = CrSharedPtr<CrCamera>(new CrCamera());
 
-	{
-		CrSamplerDescriptor descriptor;
-		descriptor.name = "Linear Clamp Sampler";
-		m_linearClampSamplerHandle = renderDevice->CreateSampler(descriptor);
-	}
-
-	{
-		CrSamplerDescriptor descriptor;
-		descriptor.addressModeU = cr3d::AddressMode::Wrap;
-		descriptor.addressModeV = cr3d::AddressMode::Wrap;
-		descriptor.addressModeW = cr3d::AddressMode::Wrap;
-		descriptor.name = "Linear Wrap Sampler";
-		m_linearWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
-	}
-
-	{
-		CrSamplerDescriptor descriptor;
-		descriptor.name = "Point Clamp Sampler";
-		descriptor.magFilter = cr3d::Filter::Point;
-		descriptor.minFilter = cr3d::Filter::Point;
-		m_pointClampSamplerHandle = renderDevice->CreateSampler(descriptor);
-	}
-
-	{
-		CrSamplerDescriptor descriptor;
-		descriptor.name = "Linear Wrap Sampler";
-		descriptor.magFilter = cr3d::Filter::Point;
-		descriptor.minFilter = cr3d::Filter::Point;
-		descriptor.addressModeU = cr3d::AddressMode::Wrap;
-		descriptor.addressModeV = cr3d::AddressMode::Wrap;
-		descriptor.addressModeW = cr3d::AddressMode::Wrap;
-		m_pointWrapSamplerHandle = renderDevice->CreateSampler(descriptor);
-	}
-
 	CrTextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
 	rwTextureParams.height = 64;
@@ -466,10 +433,10 @@ void CrFrame::Process()
 
 	for (cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Vertex; shaderStage < cr3d::ShaderStage::Count; ++shaderStage)
 	{
-		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearClampSampler, m_linearClampSamplerHandle.get());
-		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearWrapSampler, m_linearWrapSamplerHandle.get());
-		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointClampSampler, m_pointClampSamplerHandle.get());
-		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointWrapSampler, m_pointWrapSamplerHandle.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearClampSampler, CrRenderingResources::Get().AllLinearClampSampler.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllLinearWrapSampler, CrRenderingResources::Get().AllLinearWrapSampler.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointClampSampler, CrRenderingResources::Get().AllPointClampSampler.get());
+		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointWrapSampler, CrRenderingResources::Get().AllPointWrapSampler.get());
 	}
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());

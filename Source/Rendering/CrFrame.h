@@ -74,11 +74,6 @@ private:
 
 	CrTextureSharedHandle m_debugShaderTexture;
 
-	CrSamplerSharedHandle m_linearClampSamplerHandle;
-	CrSamplerSharedHandle m_linearWrapSamplerHandle;
-	CrSamplerSharedHandle m_pointClampSamplerHandle;
-	CrSamplerSharedHandle m_pointWrapSamplerHandle;
-
 	CrTextureSharedHandle m_colorsRWTexture;
 
 	CrStructuredBufferSharedHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;

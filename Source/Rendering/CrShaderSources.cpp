@@ -23,7 +23,7 @@ void CrShaderSources::Initialize()
 {
 	// Create ubershader temp directory
 	m_ubershaderTempDirectory = CrGlobalPaths::GetTempEngineDirectory();
-	m_ubershaderTempDirectory /= "UbershaderTemp";
+	m_ubershaderTempDirectory /= "Ubershader Temp";
 
 	ICrFile::CreateDirectories(m_ubershaderTempDirectory.c_str());
 

@@ -22,7 +22,7 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	: m_renderSystem(renderSystem)
 	, m_isValidPipelineCache(false)
 {
-	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "PipelineCache/";
+	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Pipeline Cache/";
 	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";

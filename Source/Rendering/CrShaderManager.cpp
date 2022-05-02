@@ -68,7 +68,7 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 
 CrPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
 {
-	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "CompiledShaders/";
+	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "Compiled Shaders/";
 	CrString folderName = CrString(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
 	shaderCachePath /= folderName.c_str();
 	return shaderCachePath;

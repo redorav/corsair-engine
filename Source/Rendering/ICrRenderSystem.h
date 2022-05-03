@@ -8,9 +8,9 @@
 
 #include "Rendering/ICrRenderDevice.h"
 
-#include "Rendering/CrRenderDoc.h"
+#include "Rendering/FrameCapture/CrRenderDoc.h"
 
-#include "Rendering/CrPIX.h"
+#include "Rendering/FrameCapture/CrPIX.h"
 
 struct CrRenderSystemDescriptor 
 {

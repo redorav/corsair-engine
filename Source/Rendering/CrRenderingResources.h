@@ -22,4 +22,11 @@ public:
 	CrSamplerSharedHandle AllPointClampSampler;
 
 	CrSamplerSharedHandle AllPointWrapSampler;
+
+	CrTextureSharedHandle WhiteSmallTexture;
+
+	CrTextureSharedHandle BlackSmallTexture;
+
+	// Points up in tangent space
+	CrTextureSharedHandle NormalsSmallTexture;
 };

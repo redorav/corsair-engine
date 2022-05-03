@@ -53,10 +53,6 @@ private:
 
 	CrBuiltinComputePipeline m_createIndirectArguments;
 
-	CrTextureSharedHandle m_defaultWhiteTexture;
-
-	CrTextureSharedHandle m_defaultNormalMapTexture;
-
 	CrTextureSharedHandle m_colorfulVolumeTexture;
 
 	CrTextureSharedHandle m_colorfulTextureArray;

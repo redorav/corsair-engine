@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 
 	CrPrintProcessMemory("After Render Device");
 
-	CrGlobalRenderResources::Get().Initialize(renderDevice.get());
+	CrRenderingResources::Get().Initialize(renderDevice.get());
 
 	CrFrame frame;
 	frame.Initialize(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	CrGlobalRenderResources::Get().Deinitialize();
+	CrRenderingResources::Get().Deinitialize();
 
 	frame.Deinitialize();
 

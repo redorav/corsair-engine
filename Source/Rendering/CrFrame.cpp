@@ -282,43 +282,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	{
-		uint8_t whiteTextureInitialData[4 * 4 * 4];
-		memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
-
-		CrTextureDescriptor whiteTextureDescriptor;
-		whiteTextureDescriptor.width = 4;
-		whiteTextureDescriptor.height = 4;
-		whiteTextureDescriptor.initialData = whiteTextureInitialData;
-		whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
-		whiteTextureDescriptor.name = "Default White Texture";
-		m_defaultWhiteTexture = renderDevice->CreateTexture(whiteTextureDescriptor);
-	}
-
-	{
-		uint8_t normalMapInitialData[4 * 4 * 4];
-
-		for (uint32_t x = 0; x < 4; ++x)
-		{
-			for (uint32_t y = 0; y < 4; ++y)
-			{
-				normalMapInitialData[y * 4 * 4 + x * 4 + 0] = 128;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 1] = 128;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 2] = 255;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 3] = 255;
-			}
-		}
-
-		CrTextureDescriptor defaultNormalTextureDescriptor;
-		defaultNormalTextureDescriptor.width = 4;
-		defaultNormalTextureDescriptor.height = 4;
-		defaultNormalTextureDescriptor.format = cr3d::DataFormat::RGBA8_Unorm;
-		defaultNormalTextureDescriptor.initialData = (const uint8_t*)normalMapInitialData;
-		defaultNormalTextureDescriptor.initialDataSize = sizeof(normalMapInitialData);
-		defaultNormalTextureDescriptor.name = "Default Normal Map Texture";
-		m_defaultNormalMapTexture = renderDevice->CreateTexture(defaultNormalTextureDescriptor);
-	}
-
-	{
 		CrTextureDescriptor colorfulVolumeTextureDescriptor;
 		colorfulVolumeTextureDescriptor.width = 4;
 		colorfulVolumeTextureDescriptor.height = 4;
@@ -427,9 +390,9 @@ void CrFrame::Process()
 	drawCommandBuffer->Begin();
 
 	// TODO Find a good place to obtain default resources
-	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, m_defaultWhiteTexture.get());
-	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, m_defaultNormalMapTexture.get());
-	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, m_defaultWhiteTexture.get());
+	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
+	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, CrRenderingResources::Get().NormalsSmallTexture.get());
+	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
 
 	for (cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Vertex; shaderStage < cr3d::ShaderStage::Count; ++shaderStage)
 	{

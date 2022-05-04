@@ -45,7 +45,7 @@ public:
 
 private:
 
-	virtual ICrCommandBuffer* CreateCommandBufferPS(CrCommandQueueType::T type) override;
+	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
 

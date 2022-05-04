@@ -14,18 +14,20 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType)
-	: ICrCommandBuffer(renderDevice, queueType)
+CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
+	: ICrCommandBuffer(renderDevice, descriptor)
 	, m_CBV_SRV_UAV_DescriptorHeap(nullptr)
 	, m_samplerDescriptorHeap(nullptr)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 
-	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(queueType);
+	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(descriptor.queueType);
 
 	d3d12RenderDevice->GetD3D12Device()->CreateCommandAllocator(d3dc12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator));
 
 	d3d12RenderDevice->GetD3D12Device()->CreateCommandList(0, d3dc12CommandListType, m_d3d12CommandAllocator, nullptr, IID_PPV_ARGS(&m_d3d12GraphicsCommandList));
+
+	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12GraphicsCommandList, descriptor.name.c_str());
 
 	m_d3d12GraphicsCommandList->Close();
 

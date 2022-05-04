@@ -389,7 +389,6 @@ void CrFrame::Process()
 
 	drawCommandBuffer->Begin();
 
-	// TODO Find a good place to obtain default resources
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::DiffuseTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::NormalTexture0, CrRenderingResources::Get().NormalsSmallTexture.get());
 	drawCommandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SpecularTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
@@ -1035,7 +1034,11 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{
-		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(CrCommandQueueType::Graphics);
+		CrCommandBufferDescriptor descriptor;
+		descriptor.dynamicConstantBufferSizeBytes = 8 * 1024 * 1024; // 8 MB
+		descriptor.dynamicVertexBufferSizeVertices = 1024 * 1024; // 1 million vertices
+		descriptor.name.append_sprintf("Draw Command Buffer %i", i);
+		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(descriptor);
 	}
 
 	// Make sure all of this work is finished

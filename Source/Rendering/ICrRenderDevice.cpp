@@ -38,7 +38,9 @@ void ICrRenderDevice::Initialize()
 {
 	m_gpuDeletionQueue.Initialize(this);
 
-	m_auxiliaryCommandBuffer = CreateCommandBuffer(CrCommandQueueType::Graphics);
+	CrCommandBufferDescriptor descriptor;
+	descriptor.name.append("Auxiliary Command Buffer");
+	m_auxiliaryCommandBuffer = CreateCommandBuffer(descriptor);
 }
 
 void ICrRenderDevice::ProcessDeletionQueue()
@@ -53,9 +55,10 @@ void ICrRenderDevice::FinalizeDeletion()
 	m_gpuDeletionQueue.Finalize();
 }
 
-CrCommandBufferSharedHandle ICrRenderDevice::CreateCommandBuffer(CrCommandQueueType::T type)
+
+CrCommandBufferSharedHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
 {
-	return CrCommandBufferSharedHandle(CreateCommandBufferPS(type));
+	return CrCommandBufferSharedHandle(CreateCommandBufferPS(descriptor));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()

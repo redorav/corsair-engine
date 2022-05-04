@@ -190,9 +190,9 @@ void CrRenderDeviceD3D12::SetD3D12ObjectName(ID3D12Object* object, const char* n
 	object->SetName(wName.c_str());
 }
 
-ICrCommandBuffer* CrRenderDeviceD3D12::CreateCommandBufferPS(CrCommandQueueType::T type)
+ICrCommandBuffer* CrRenderDeviceD3D12::CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor)
 {
-	return new CrCommandBufferD3D12(this, type);
+	return new CrCommandBufferD3D12(this, descriptor);
 }
 
 ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()

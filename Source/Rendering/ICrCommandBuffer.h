@@ -16,11 +16,24 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
+struct CrCommandBufferDescriptor
+{
+	CrCommandQueueType::T queueType = CrCommandQueueType::Graphics;
+
+	CrFixedString64 name;
+
+	// Use this to stream per-frame vertex data (includes index buffer)
+	uint32_t dynamicVertexBufferSizeVertices = 0;
+
+	// Use this to stream per-frame constant buffer data
+	uint32_t dynamicConstantBufferSizeBytes = 0;
+};
+
 class ICrCommandBuffer : public CrGPUDeletable
 {
 public:
 
-	ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType);
+	ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor);
 
 	virtual ~ICrCommandBuffer();
 

@@ -10,32 +10,38 @@
 
 #include "Core/CrMacros.h"
 
-ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType)
+ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
 	: m_renderDevice(renderDevice)
-	, m_queueType(queueType)
+	, m_queueType(descriptor.queueType)
 {
 	// Initialize GPU buffer stack allocators - for streaming
 	// TODO it is possible to create these lazily on allocation instead
 	// to avoid having every command buffer allocate these if they
 	// aren't going to be used
 	{
-		CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::MemoryAccess::CPUStreamToGPU, 8 * 1024 * 1024); // 8 MB
-		constantBufferStack.name = "Constant Buffer Stack";
-		m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+		if (descriptor.dynamicConstantBufferSizeBytes > 0)
+		{
+			CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::MemoryAccess::CPUStreamToGPU, descriptor.dynamicConstantBufferSizeBytes);
+			constantBufferStack.name = "Constant Buffer Stack";
+			m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+		}
 
 		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size of each vertex and index
 		// TODO We need a more flexible approach as this takes up a lot of memory per command buffer. It would be smart to have a pool in the device
 		// and lazily allocate them or something similar
-		uint32_t maxVertices = 1024 * 1024;
-		uint32_t maxIndices = maxVertices * 3;
+		if (descriptor.dynamicVertexBufferSizeVertices > 0)
+		{
+			uint32_t maxVertices = descriptor.dynamicVertexBufferSizeVertices;
+			uint32_t maxIndices = maxVertices * 3;
 
-		CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
-		vertexBufferStack.name = "Vertex Buffer Stack";
-		m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
+			CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
+			vertexBufferStack.name = "Vertex Buffer Stack";
+			m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
-		CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, cr3d::DataFormats[cr3d::DataFormat::R16_Uint].dataOrBlockSize);
-		indexBufferStack.name = "Index Buffer Stack";
-		m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
+			CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, cr3d::DataFormats[cr3d::DataFormat::R16_Uint].dataOrBlockSize);
+			indexBufferStack.name = "Index Buffer Stack";
+			m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
+		}
 	}
 
 	m_completionFence = m_renderDevice->CreateGPUFence();
@@ -53,9 +59,17 @@ void ICrCommandBuffer::Begin()
 	// Reset current state. When beginning a new command buffer 
 	// any bound state is also reset, and our tracking must match
 	m_currentState = CurrentState();
-	m_constantBufferGPUStack->Begin();
-	m_vertexBufferGPUStack->Begin();
-	m_indexBufferGPUStack->Begin();
+
+	if (m_constantBufferGPUStack)
+	{
+		m_constantBufferGPUStack->Begin();
+	}
+
+	if (m_vertexBufferGPUStack)
+	{
+		m_vertexBufferGPUStack->Begin();
+		m_indexBufferGPUStack->Begin();
+	}
 
 	// If we previously submitted this command buffer, we need to wait
 	// for the fence to become signaled before we can start recording
@@ -71,9 +85,17 @@ void ICrCommandBuffer::Begin()
 
 void ICrCommandBuffer::End()
 {
-	m_constantBufferGPUStack->End();
-	m_vertexBufferGPUStack->End();
-	m_indexBufferGPUStack->End();
+	if (m_constantBufferGPUStack)
+	{
+		m_constantBufferGPUStack->End();
+	}
+
+	if (m_vertexBufferGPUStack)
+	{
+		m_vertexBufferGPUStack->End();
+		m_indexBufferGPUStack->End();
+	}
+
 	EndPS();
 }
 

@@ -72,7 +72,10 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	VkCommandPoolCreateInfo cmdPoolInfo = {};
 	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmdPoolInfo.queueFamilyIndex = GetVkQueueFamilyIndex();
-	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // TODO Transient or Reset? Check Metal and DX12
+
+	// Apparently it's better to not specify the RESET flag
+	// https://www.reddit.com/r/vulkan/comments/5zwfot/whats_your_command_buffer_allocation_strategy/
+	cmdPoolInfo.flags = 0;
 	VkResult vkResult = vkCreateCommandPool(m_vkDevice, &cmdPoolInfo, nullptr, &m_vkGraphicsCommandPool);
 	CrAssert(vkResult == VK_SUCCESS);
 
@@ -417,9 +420,9 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	return result;
 }
 
-ICrCommandBuffer* CrRenderDeviceVulkan::CreateCommandBufferPS(CrCommandQueueType::T type)
+ICrCommandBuffer* CrRenderDeviceVulkan::CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor)
 {
-	return new CrCommandBufferVulkan(this, type);
+	return new CrCommandBufferVulkan(this, descriptor);
 }
 
 ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()

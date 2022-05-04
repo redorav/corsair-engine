@@ -107,7 +107,7 @@ public:
 	// Resource Creation Functions
 	//----------------------------
 
-	CrCommandBufferSharedHandle CreateCommandBuffer(CrCommandQueueType::T type);
+	CrCommandBufferSharedHandle CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
 	CrIndexBufferSharedHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -180,7 +180,7 @@ public:
 
 protected:
 
-	virtual ICrCommandBuffer* CreateCommandBufferPS(CrCommandQueueType::T type) = 0;
+	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
 
 	virtual ICrGPUFence* CreateGPUFencePS() = 0;
 

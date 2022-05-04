@@ -12,8 +12,8 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, CrCommandQueueType::T queueType)
-	: ICrCommandBuffer(vulkanRenderDevice, queueType)
+CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrCommandBufferDescriptor& descriptor)
+	: ICrCommandBuffer(vulkanRenderDevice, descriptor)
 {
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
@@ -54,12 +54,14 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = vulkanRenderDevice->GetVkCommandPool(queueType);
+	commandBufferAllocateInfo.commandPool = vulkanRenderDevice->GetVkCommandPool(descriptor.queueType);
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1;
 
 	result = vkAllocateCommandBuffers(vkDevice, &commandBufferAllocateInfo, &m_vkCommandBuffer);
 	CrAssert(result == VK_SUCCESS);
+
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, descriptor.name.c_str());
 
 	// Set up render pass allocation resources. Each command buffer manages their own render passes
 

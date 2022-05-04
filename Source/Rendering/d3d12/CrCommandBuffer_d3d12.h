@@ -20,7 +20,7 @@ class CrCommandBufferD3D12 final : public ICrCommandBuffer
 {
 public:
 
-	CrCommandBufferD3D12(ICrRenderDevice* renderDevice, CrCommandQueueType::T queueType);
+	CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor);
 
 	ID3D12GraphicsCommandList4* GetD3D12CommandList() const { return m_d3d12GraphicsCommandList; }
 

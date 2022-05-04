@@ -21,7 +21,7 @@ class CrCommandBufferVulkan final : public ICrCommandBuffer
 {
 public:
 
-	CrCommandBufferVulkan(CrRenderDeviceVulkan* renderDevice, CrCommandQueueType::T queueType);
+	CrCommandBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrCommandBufferDescriptor& descriptor);
 
 	virtual ~CrCommandBufferVulkan() override;
 

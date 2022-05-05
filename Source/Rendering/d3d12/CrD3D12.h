@@ -36,6 +36,8 @@ namespace crd3d
 
 	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
 
+	D3D12_RESOURCE_STATES GetTextureState(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages);
+
 	// https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/d3dx12.h
 	// Copied from D3D12CalcSubresource
 	constexpr UINT CalculateSubresource(UINT MipSlice, UINT ArraySlice, UINT PlaneSlice, UINT MipLevels, UINT ArraySize)

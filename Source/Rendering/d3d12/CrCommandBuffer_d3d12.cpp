@@ -66,41 +66,6 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 	}
 }
 
-D3D12_RESOURCE_STATES GetTextureState(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages)
-{
-	switch (textureState)
-	{
-		case cr3d::TextureState::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
-		case cr3d::TextureState::ShaderInput:
-		{
-			D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COMMON;
-
-			// If the pixel shader is using the resource
-			if (shaderStages & cr3d::ShaderStageFlags::Pixel)
-			{
-				resourceState |= D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-			}
-
-			// If any other stages are using the resource
-			if ((shaderStages & ~cr3d::ShaderStageFlags::Pixel) != 0)
-			{
-				resourceState |= D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			}
-
-			return resourceState;
-		}
-		case cr3d::TextureState::RenderTarget:      return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case cr3d::TextureState::RWTexture:         return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		case cr3d::TextureState::Present:           return D3D12_RESOURCE_STATE_PRESENT;
-		case cr3d::TextureState::DepthStencilRead:  return D3D12_RESOURCE_STATE_DEPTH_READ;
-		case cr3d::TextureState::DepthStencilWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureState::CopySource:        return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case cr3d::TextureState::CopyDestination:   return D3D12_RESOURCE_STATE_COPY_DEST;
-		case cr3d::TextureState::PreInitialized:    return D3D12_RESOURCE_STATE_COMMON; // TODO Delete
-		default: return D3D12_RESOURCE_STATE_COMMON;
-	}
-}
-
 void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 (
 	const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
@@ -116,8 +81,8 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 		textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-		textureBarrier.Transition.StateBefore = GetTextureState(descriptor.sourceState, descriptor.sourceShaderStages);
-		textureBarrier.Transition.StateAfter  = GetTextureState(descriptor.destinationState, descriptor.destinationShaderStages);
+		textureBarrier.Transition.StateBefore = crd3d::GetTextureState(descriptor.sourceState, descriptor.sourceShaderStages);
+		textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(descriptor.destinationState, descriptor.destinationShaderStages);
 		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
 		(
 			descriptor.mipmapStart, descriptor.sliceStart, 0,
@@ -145,8 +110,8 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-	textureBarrier.Transition.StateBefore = GetTextureState(initialState, cr3d::ShaderStageFlags::None);
-	textureBarrier.Transition.StateAfter  = GetTextureState(finalState, cr3d::ShaderStageFlags::None);
+	textureBarrier.Transition.StateBefore = crd3d::GetTextureState(initialState, cr3d::ShaderStageFlags::None);
+	textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(finalState, cr3d::ShaderStageFlags::None);
 	textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
 	(
 		renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,

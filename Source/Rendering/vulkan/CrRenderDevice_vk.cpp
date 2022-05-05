@@ -73,9 +73,10 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
 	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmdPoolInfo.queueFamilyIndex = GetVkQueueFamilyIndex();
 
-	// Apparently it's better to not specify the RESET flag
+	// TODO Apparently it's better to not specify the RESET flag and reset the command pool, but we don't
+	// do that at the moment
 	// https://www.reddit.com/r/vulkan/comments/5zwfot/whats_your_command_buffer_allocation_strategy/
-	cmdPoolInfo.flags = 0;
+	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	VkResult vkResult = vkCreateCommandPool(m_vkDevice, &cmdPoolInfo, nullptr, &m_vkGraphicsCommandPool);
 	CrAssert(vkResult == VK_SUCCESS);
 

@@ -532,6 +532,20 @@ namespace cr3d
 			IndirectArgument, // Use buffer as argument to indirect draw/dispatch
 			Count
 		};
+
+		inline const char* ToString(cr3d::BufferState::T bufferState)
+		{
+			switch (bufferState)
+			{
+				case Undefined: return "Undefined";
+				case ShaderInput: return "ShaderInput";
+				case ReadWrite: return "ReadWrite";
+				case CopySource: return "CopySource";
+				case CopyDestination: return "CopyDestination";
+				case IndirectArgument: return "IndirectArgument";
+				default: return "";
+			}
+		}
 	};
 
 	namespace RenderPassType

@@ -2,7 +2,7 @@
 
 #include "Core/Containers/CrVector.h"
 #include "Core/String/CrString.h"
-#include "Math/CrMath.h"
+#include "Math/CrHlslpp.h"
 
 class CrTransform;
 

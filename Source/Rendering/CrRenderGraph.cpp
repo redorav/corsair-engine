@@ -1,11 +1,14 @@
 #include "CrRendering_pch.h"
 
 #include "CrRenderGraph.h"
+
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrGPUQueryPool.h"
 #include "Rendering/CrGPUTimingQueryTracker.h"
 
 #include "Core/Logging/ICrDebug.h"
+
+#include "Math/CrMath.h"
 
 CrRenderGraph::CrRenderGraph()
 {

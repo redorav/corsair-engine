@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include <malloc.h>
 
 // EASTL requires the user to implement a couple of operator new to name memory allocations and other details

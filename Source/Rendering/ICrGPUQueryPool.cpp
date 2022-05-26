@@ -1,7 +1,9 @@
 #include "CrRendering_pch.h"
 
-#include "ICrGPUQueryPool.h"
-#include "ICrCommandBuffer.h"
+#include "Rendering/ICrGPUQueryPool.h"
+#include "Rendering/ICrCommandBuffer.h"
+
+#include "Math/CrMath.h"
 
 void ICrGPUQueryPool::Resolve(ICrCommandBuffer* commandBuffer)
 {

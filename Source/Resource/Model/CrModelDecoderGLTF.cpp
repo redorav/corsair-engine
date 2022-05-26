@@ -1,3 +1,5 @@
+#include "CrResource_pch.h"
+
 #include "CrModelDecoderGLTF.h"
 
 #include "Core/FileSystem/CrPath.h"
@@ -18,13 +20,14 @@
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-#include "Image/CrImageCodecSTB.h"
+#include "Resource/Image/CrImageCodecSTB.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #define TINYGLTF_IMPLEMENTATION
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
+#define TINYGLTF_USE_CPP14
 #include "tiny_gltf.h"
 
 #include <string.h>

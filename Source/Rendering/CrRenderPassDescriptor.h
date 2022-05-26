@@ -4,6 +4,8 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Math/CrHlslpp.h"
+
 using CrRenderPassNameString = CrFixedString32;
 
 // For render target descriptors, the usage is implicit to some extent. Color render targets always

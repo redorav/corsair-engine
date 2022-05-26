@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "Core/FileSystem/CrPath.h"
 
 void CrPath::Normalize()

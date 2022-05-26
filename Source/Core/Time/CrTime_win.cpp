@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrTime.h"
 
 #include <windows.h>

@@ -15,6 +15,8 @@
 #include "Core/CrCommandLine.h"
 #include "Core/Logging/ICrDebug.h"
 
+#include "Math/CrMath.h"
+
 // https://zeux.io/2019/07/17/serializing-pipeline-cache/
 // https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#pipelines-cache-header
 struct VkPipelineCacheHeader

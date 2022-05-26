@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrTimer.h"
 
 uint64_t CrTime::TicksPerSecond = CrTime::GetTicksPerSecond();

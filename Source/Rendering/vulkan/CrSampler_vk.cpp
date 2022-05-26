@@ -3,6 +3,8 @@
 #include "CrRenderDevice_vk.h"
 #include "CrVulkan.h"
 
+#include "Math/CrMath.h"
+
 // See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
 CrSamplerVulkan::CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {

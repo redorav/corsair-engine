@@ -28,11 +28,10 @@ ProjectCrRendering      = 'CrRendering'
 ProjectShaderCompiler   = 'CrShaderCompiler'
 ProjectShaders          = 'CrShaders'
 ProjectBuiltinShaders   = 'CrBuiltinShaders'
+ProjectCrResource       = 'CrResource'
 ProjectCrCore           = 'CrCore'
 ProjectCrInput          = 'CrInput'
 ProjectCrDebug          = 'CrDebug'
-ProjectCrImage          = 'CrImage'
-ProjectCrModel          = 'CrModel'
 ProjectUnitTests        = 'CrUnitTests'
 
 -- Generated Code Directories
@@ -243,9 +242,8 @@ project (ProjectCorsairEngine)
 	{
 		ProjectCrCore,
 		ProjectCrRendering,
-		ProjectCrImage,
+		ProjectCrResource,
 		ProjectCrInput,
-		ProjectCrModel,
 		ProjectUnitTests
 	}
 	
@@ -435,25 +433,23 @@ project(ProjectShaderCompiler)
 		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[2]), '%{cfg.buildtarget.directory}')
 	}
 
-group('Image')
+group('Resource')
 
-SourceImageDirectory = SourceDirectory..'/Image'
+SourceResourceDirectory = SourceDirectory..'/Resource'
+SourceImageDirectory = SourceResourceDirectory..'/Image'
+SourceModelDirectory = SourceResourceDirectory..'/Model'
 
-project(ProjectCrImage)
+project(ProjectCrResource)
 	kind('StaticLib')
-	files{ 	SourceImageDirectory..'/**' }
+	pchheader('CrResource_pch.h')
+	pchsource(SourceResourceDirectory..'/CrResource_pch.cpp')
+	dependson { ProjectShaders }
+	files
+	{
+		SourceResourceDirectory..'/**'
+	}
 
 	AddLibraryIncludes(StbLibrary)
-
-group('Model')
-
-SourceModelDirectory = SourceDirectory..'/Model'
-
-project(ProjectCrModel)
-	kind('StaticLib')
-	dependson { ProjectShaders }
-	files { SourceModelDirectory..'/**' }
-
 	AddLibraryIncludes(TinyGLTFLibrary)
 	AddLibraryIncludes(AssimpLibrary)
 
@@ -463,6 +459,9 @@ SourceCoreDirectory = SourceDirectory..'/Core'
 
 project(ProjectCrCore)
 	kind('StaticLib')
+	
+	pchheader('CrCore_pch.h')
+	pchsource(SourceCoreDirectory..'/CrCore_pch.cpp')
 	
 	files
 	{

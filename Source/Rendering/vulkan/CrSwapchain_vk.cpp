@@ -8,6 +8,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+#include "Math/CrMath.h"
+
 CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 	: ICrSwapchain(renderDevice, swapchainDescriptor)
 

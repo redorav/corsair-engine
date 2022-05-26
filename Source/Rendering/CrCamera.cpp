@@ -1,6 +1,8 @@
 #include "CrRendering_pch.h"
 
 #include "CrCamera.h"
+#include "Math/CrMath.h"
+#include "Math/CrHlslpp.h"
 
 CrCamera::CrCamera() : CrEntity()
 , m_view2WorldMatrix(float4x4::identity())

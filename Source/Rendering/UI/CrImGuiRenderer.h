@@ -6,6 +6,8 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrBuiltinPipeline.h"
 
+#include "Math/CrHlslpp.h"
+
 struct ImDrawData;
 
 struct CrImGuiRendererInitParams

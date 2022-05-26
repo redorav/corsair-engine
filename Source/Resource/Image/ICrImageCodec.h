@@ -2,7 +2,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Image/CrImageForwardDeclarations.h"
+#include "Resource/Image/CrImageForwardDeclarations.h"
 
 #include <stdint.h>
 

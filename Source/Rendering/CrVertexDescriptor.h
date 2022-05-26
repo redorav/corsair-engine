@@ -8,6 +8,8 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Math/CrVectorT.h"
+
 // These are the vertex semantics that we can use. They need to mirror the vertex semantics
 // in the shader
 // TODO It would be good to have a shared file that has the names

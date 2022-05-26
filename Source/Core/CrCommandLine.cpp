@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrCommandLine.h"
 
 #if defined(_WIN32)

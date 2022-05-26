@@ -14,4 +14,5 @@
 #endif
 
 #include "Core/PCH/CrEASTLPch.h"
+#include <xxhash.h>
 #include "Math/CrMathPch.h"

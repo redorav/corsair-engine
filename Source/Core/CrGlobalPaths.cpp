@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrGlobalPaths.h"
 
 #include "GlobalVariables.h" // TODO Rename to GeneratedPaths.h

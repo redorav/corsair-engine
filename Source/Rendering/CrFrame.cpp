@@ -34,22 +34,23 @@
 #include "Rendering/CrRendererConfig.h"
 #include "Rendering/CrRenderingResources.h"
 
+#include "Rendering/CrVertexDescriptor.h"
+#include "Rendering/CrCommonVertexLayouts.h"
+
 #include "Input/CrInputManager.h"
 
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 #include "Core/CrGlobalPaths.h"
+#include "Core/FileSystem/CrPath.h"
 
 #include "CrResourceManager.h"
 
 #include "imgui.h"
 
-#include "Core/FileSystem/CrPath.h"
-
-#include "Rendering/CrVertexDescriptor.h"
-#include "Rendering/CrCommonVertexLayouts.h"
-
 #include "GeneratedShaders/BuiltinShaders.h"
+
+#include "Math/CrMath.h"
 
 // TODO Put somewhere else
 bool HashingAssert()

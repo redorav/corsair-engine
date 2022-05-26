@@ -2,10 +2,10 @@
 #include "ICrTexture.h"
 
 #include "Core/CrMacros.h"
-
 #include "Core/SmartPointers/CrSharedPtr.h"
-
 #include "Core/Logging/ICrDebug.h"
+
+#include "Math/CrMath.h"
 
 CrTextureDescriptor::CrTextureDescriptor()
 	: width(1)

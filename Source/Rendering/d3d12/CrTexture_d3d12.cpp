@@ -6,8 +6,9 @@
 #include "CrD3D12.h"
 
 #include "Core/CrAlignment.h"
-
 #include "Core/Logging/ICrDebug.h"
+
+#include "Math/CrMath.h"
 
 CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Math/CrHlslpp.h"
+
 struct CrBoundingBox
 {
 	CrBoundingBox() {}

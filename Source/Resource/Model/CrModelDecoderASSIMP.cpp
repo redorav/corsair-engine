@@ -1,3 +1,5 @@
+#include "CrResource_pch.h"
+
 #include "CrModelDecoderASSIMP.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
@@ -16,6 +18,8 @@
 #include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
+
+#include "Math/CrHlslpp.h"
 
 warnings_off
 #include <assimp/Importer.hpp>

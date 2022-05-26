@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrFile_win.h"
 
 #include "Core/Logging/ICrDebug.h"

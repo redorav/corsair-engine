@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "Core/Process/CrProcess.h"
 
 #include <windows.h>

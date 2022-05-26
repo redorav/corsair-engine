@@ -12,12 +12,12 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrPath.h"
 
-#include "Image/CrImageCodecDDS.h"
-#include "Image/CrImageCodecSTB.h"
+#include "Resource/Image/CrImageCodecDDS.h"
+#include "Resource/Image/CrImageCodecSTB.h"
 
-#include "Model/ICrModelDecoder.h"
-#include "Model/CrModelDecoderASSIMP.h"
-#include "Model/CrModelDecoderGLTF.h"
+#include "Resource/Model/ICrModelDecoder.h"
+#include "Resource/Model/CrModelDecoderASSIMP.h"
+#include "Resource/Model/CrModelDecoderGLTF.h"
 
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {

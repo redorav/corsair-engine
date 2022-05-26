@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrFrameTime.h"
 
 #include "Core/String/CrString.h"

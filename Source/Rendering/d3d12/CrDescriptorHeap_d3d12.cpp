@@ -5,6 +5,8 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrAlignment.h"
 
+#include "Math/CrMath.h"
+
 uint32_t CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const CrDescriptorHeapDescriptor& descriptor)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/direct3d12/hardware-support?redirectedfrom=MSDN

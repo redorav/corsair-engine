@@ -2,7 +2,6 @@
 
 #include "CrRenderSystem_d3d12.h"
 #include "CrRenderDevice_d3d12.h"
-
 #include "CrCommandBuffer_d3d12.h"
 #include "CrTexture_d3d12.h"
 #include "CrSampler_d3d12.h"
@@ -11,12 +10,13 @@
 #include "CrGPUSynchronization_d3d12.h"
 #include "CrShader_d3d12.h"
 #include "CrPipeline_d3d12.h"
-
 #include "CrD3D12.h"
 
 #include "Core/CrMacros.h"
 
 #include "GeneratedShaders/BuiltinShaders.h"
+
+#include "Math/CrMath.h"
 
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
 {

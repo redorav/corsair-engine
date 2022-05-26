@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "ICrFile.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"

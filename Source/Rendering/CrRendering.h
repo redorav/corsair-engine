@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/CrMath.h"
+#include "Math/CrHalf.h"
 
 namespace cr3d
 {

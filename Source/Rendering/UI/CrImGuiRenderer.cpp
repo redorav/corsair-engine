@@ -2,8 +2,7 @@
 
 #include "CrImGuiRenderer.h"
 
-#include "Input/CrInputManager.h"
-
+#include "Core/Input/CrInputManager.h"
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 

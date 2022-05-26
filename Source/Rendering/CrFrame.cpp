@@ -37,8 +37,7 @@
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-#include "Input/CrInputManager.h"
-
+#include "Core/Input/CrInputManager.h"
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 #include "Core/CrGlobalPaths.h"

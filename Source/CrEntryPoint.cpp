@@ -1,10 +1,9 @@
-#include "Input/CrInputManager.h"
-
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrRenderingResources.h"
 #include "Rendering/CrFrame.h"
 
+#include "Core/Input/CrInputManager.h"
 #include "Core/CrCommandLine.h"
 #include "Core/Logging/ICrDebug.h"
 
@@ -15,7 +14,7 @@
 #include "ICrOSWindow.h"
 
 // TODO SDL-specific
-#include "Input/CrInputHandlerSDL.h"
+#include "Core/Input/CrInputHandlerSDL.h"
 #include <SDL.h>
 #include <SDL_syswm.h>
 

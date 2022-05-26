@@ -1,3 +1,5 @@
+#include "CrCore_pch.h"
+
 #include "CrInputHandlerSDL.h"
 
 CrInputHandlerSDL::CrInputHandlerSDL()

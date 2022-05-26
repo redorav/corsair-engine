@@ -30,8 +30,6 @@ ProjectShaders          = 'CrShaders'
 ProjectBuiltinShaders   = 'CrBuiltinShaders'
 ProjectCrResource       = 'CrResource'
 ProjectCrCore           = 'CrCore'
-ProjectCrInput          = 'CrInput'
-ProjectCrDebug          = 'CrDebug'
 ProjectUnitTests        = 'CrUnitTests'
 
 -- Generated Code Directories
@@ -243,7 +241,6 @@ project (ProjectCorsairEngine)
 		ProjectCrCore,
 		ProjectCrRendering,
 		ProjectCrResource,
-		ProjectCrInput,
 		ProjectUnitTests
 	}
 	
@@ -470,6 +467,7 @@ project(ProjectCrCore)
 	}
 
 	AddLibraryNatvis(EASTLLibrary)
+	AddLibraryIncludes(SDL2Library)
 
 	ExcludePlatformSpecificCode(SourceCoreDirectory)
 	
@@ -480,18 +478,7 @@ project(ProjectCrCore)
 		files { SourceCoreDirectory..'/**/ansi/**' }
 
 	filter {}
-	
-SourceInputDirectory = SourceDirectory..'/Input'
 
-project(ProjectCrInput)
-	kind('StaticLib')
-
-	files { SourceInputDirectory..'/**' }
-	
-	AddLibraryIncludes(SDL2Library)
-
-	filter {}
-	
 project(ProjectCrMath)
 	kind('StaticLib')
 	files { MathDirectory..'/**' }

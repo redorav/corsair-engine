@@ -29,7 +29,7 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 		CrPath extension = fullPath.extension();
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
-			modelDecoder = CrMakeShared<CrModelDecoderGLTF>();
+			modelDecoder = CrMakeShared<CrModelDecoderTinyGLTF>();
 		}
 		else
 		{

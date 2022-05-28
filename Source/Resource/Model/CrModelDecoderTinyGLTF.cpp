@@ -242,7 +242,7 @@ CrRenderMeshSharedHandle LoadMesh(const tinygltf::Model* modelData, const tinygl
 	return mesh;
 }
 
-CrRenderModelSharedHandle CrModelDecoderGLTF::Decode(const CrFileSharedHandle& file)
+CrRenderModelSharedHandle CrModelDecoderTinyGLTF::Decode(const CrFileSharedHandle& file)
 {
 	tinygltf::TinyGLTF gltfLoader;
 	tinygltf::Model gltfModel;

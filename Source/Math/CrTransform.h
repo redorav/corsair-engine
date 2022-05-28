@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Math/CrHlslpp.h"
+#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppQuaternion.h"
+#include "Math/CrHlslppMatrixFloat.h"
 
 class CrTransform
 {

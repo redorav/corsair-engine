@@ -6,8 +6,6 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrBuiltinPipeline.h"
 
-#include "Math/CrHlslpp.h"
-
 struct ImDrawData;
 
 struct CrImGuiRendererInitParams
@@ -37,8 +35,6 @@ private:
 	CrImGuiRenderer();
 
 	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
-
-	float4x4 ComputeProjectionMatrix(ImDrawData* data);
 
 	void UpdateBuffers(ImDrawData* data);
 

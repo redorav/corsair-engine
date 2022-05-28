@@ -9,6 +9,8 @@
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrRenderModelInstance.h"
 
+#include "Math/CrHlslppMatrixFloat.h"
+
 class CrRenderModelInstance;
 using CrRenderModelInstanceHandle = CrSharedPtr<CrRenderModelInstance>;
 
@@ -133,8 +135,8 @@ public:
 	void DestroyModelInstance(CrModelInstanceId instanceId);
 
 	// Set properties on the model instance, either through the instance id or the instance index
-	void SetTransform(CrModelInstanceIndex instanceId, float4x4 transform) { m_modelInstanceTransforms[instanceId.id] = transform; }
-	void SetTransform(CrModelInstanceId instanceId, float4x4 transform) { SetTransform(GetModelInstanceIndex(instanceId), transform); }
+	void SetTransform(CrModelInstanceIndex instanceId, const float4x4& transform) { m_modelInstanceTransforms[instanceId.id] = transform; }
+	void SetTransform(CrModelInstanceId instanceId, const float4x4& transform) { SetTransform(GetModelInstanceIndex(instanceId), transform); }
 	float4x4 GetTransform(CrModelInstanceIndex instanceId) const { return m_modelInstanceTransforms[instanceId.id]; }
 	float4x4 GetTransform(CrModelInstanceId instanceId) const { return GetTransform(GetModelInstanceIndex(instanceId)); }
 

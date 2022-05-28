@@ -26,6 +26,8 @@
 #include "Core/CrGlobalPaths.h"
 #include "GeneratedShaders/BuiltinShaders.h"
 
+#include "Math/CrHlslppMatrixFloat.h"
+
 // Based on ImDrawVert
 struct UIVertex
 {
@@ -40,6 +42,20 @@ CrVertexDescriptor UIVertexDescriptor =
 	CrVertexAttribute(CrVertexSemantic::TexCoord0, cr3d::DataFormat::RG32_Float, 0),
 	CrVertexAttribute(CrVertexSemantic::Color, cr3d::DataFormat::RGBA8_Unorm, 0),
 };
+
+float4x4 ComputeProjectionMatrix(ImDrawData* data)
+{
+	float L = data->DisplayPos.x;
+	float R = data->DisplayPos.x + data->DisplaySize.x;
+	float T = data->DisplayPos.y;
+	float B = data->DisplayPos.y + data->DisplaySize.y;
+	return float4x4(
+		float4(2.0f / (R - L), 0.0f, 0.0f, 0.0f),
+		float4(0.0f, 2.0f / (T - B), 0.0f, 0.0f),
+		float4(0.0f, 0.0f, 0.5f, 0.0f),
+		float4((R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f)
+	);
+}
 
 CrImGuiRenderer* ImGuiRenderer = nullptr;
 
@@ -268,18 +284,4 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 			acumVtxOffset += drawList->VtxBuffer.Size;
 		}
 	});
-}
-
-float4x4 CrImGuiRenderer::ComputeProjectionMatrix(ImDrawData* data)
-{
-	float L = data->DisplayPos.x;
-	float R = data->DisplayPos.x + data->DisplaySize.x;
-	float T = data->DisplayPos.y;
-	float B = data->DisplayPos.y + data->DisplaySize.y;
-	return float4x4(
-		float4(2.0f / (R - L),		0.0f,				0.0f, 0.0f),
-		float4(0.0f,				2.0f / (T - B),		0.0f, 0.0f),
-		float4(0.0f,				0.0f,				0.5f, 0.0f),
-		float4((R + L) / (L - R), (T + B) / (B - T),	0.5f, 1.0f)
-	);
 }

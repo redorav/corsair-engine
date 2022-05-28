@@ -254,6 +254,8 @@ project (ProjectCorsairEngine)
 	LinkLibrary(SDL2Library)
 	
 	LinkLibrary(EASTLLibrary)
+	
+	AddLibraryIncludes(ImguiLibrary)
 	LinkLibrary(ImguiLibrary)
 
 	-- todo platform filters

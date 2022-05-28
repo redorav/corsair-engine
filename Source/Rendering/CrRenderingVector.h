@@ -1,6 +1,9 @@
 #pragma once
 
-#include "hlsl++.h"
+#include <hlsl++_vector_float.h>
+#include <hlsl++_vector_int.h>
+#include <hlsl++_matrix_float.h>
+#include <hlsl++_dependent.h>
 
 // These vectors are simple structs that allow us to interface with shaders. hlsl++ is no good when it comes to this task
 // for two reasons:

@@ -29,6 +29,14 @@ namespace StorageBuffers { enum T : uint8_t; }
 namespace RWStorageBuffers { enum T : uint8_t; }
 namespace RWDataBuffers { enum T : uint8_t; }
 
+struct ConstantBufferMetadata;
+struct SamplerMetadata;
+struct TextureMetadata;
+struct RWTextureMetadata;
+struct StorageBufferMetadata;
+struct RWStorageBufferMetadata;
+struct RWDataBufferMetadata;
+
 // Forward declare the necessary types for the rendering core
 
 class ICrRenderSystem;

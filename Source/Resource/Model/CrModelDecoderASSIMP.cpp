@@ -19,8 +19,6 @@
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
-#include "Math/CrHlslpp.h"
-
 warnings_off
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

@@ -2,7 +2,9 @@
 
 #include "CrCamera.h"
 #include "Math/CrMath.h"
-#include "Math/CrHlslpp.h"
+#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppQuaternion.h"
+#include "Math/CrHlslppMatrixFloat.h"
 
 CrCamera::CrCamera() : CrEntity()
 , m_view2WorldMatrix(float4x4::identity())

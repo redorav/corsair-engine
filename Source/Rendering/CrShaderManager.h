@@ -6,10 +6,6 @@
 
 class ICrRenderDevice;
 
-struct ConstantBufferMetadata;
-struct TextureMetadata;
-struct SamplerMetadata;
-
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 class ICrShaderBindingLayout;

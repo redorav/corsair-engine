@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/CrHlslpp.h"
+#include "Math/CrHlslppVectorFloat.h"
 
 struct CrBoundingBox
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/CrShaderResourceMetadata.h"
+#include "GeneratedShaders/ShaderMetadata.h"
 
 template<typename FunctionT>
 inline void ICrShaderBindingLayout::AddResources(const CrShaderReflectionHeader& reflectionHeader, CrShaderBindingLayoutResources& resources, const FunctionT& function)

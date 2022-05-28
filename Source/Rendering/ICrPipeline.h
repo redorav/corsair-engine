@@ -1,11 +1,10 @@
 #pragma once
 
 #include "CrRenderingForwardDeclarations.h"
+#include "CrRendering.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
-
 #include "Core/CrHash.h"
-
 #include "Core/Containers/CrArray.h"
 
 struct CrRasterizerStateDescriptor

@@ -1,5 +1,3 @@
-#include "CrRendering_pch.h"
-
 #include "CrFrame.h"
 
 #include "Rendering/ICrRenderSystem.h"
@@ -43,9 +41,9 @@
 #include "Core/CrGlobalPaths.h"
 #include "Core/FileSystem/CrPath.h"
 
-#include "CrResourceManager.h"
+#include "Resource/CrResourceManager.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
 #include "GeneratedShaders/BuiltinShaders.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "CrResourceManager.h"
+#include "Resource/CrResourceManager.h"
 
 class ICrModelDecoder
 {

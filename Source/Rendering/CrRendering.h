@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO Remove define
 #include "Math/CrHalf.h"
 
 namespace cr3d

@@ -1,128 +1,37 @@
 #pragma once
 
-#include "GeneratedShaders/ShaderMetadata.h"
+#include "Core/CrCoreForwardDeclarations.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrShaderMetadata
 {
 public:
 
-	static const ConstantBufferMetadata& GetConstantBuffer(const CrString& name)
-	{
-		auto cBuffer = ConstantBufferTable.find(name);
+	static const ConstantBufferMetadata& GetConstantBuffer(const CrString& name);
 
-		if (cBuffer != ConstantBufferTable.end())
-		{
-			return (*cBuffer).second;
-		}
+	static const ConstantBufferMetadata& GetConstantBuffer(ConstantBuffers::T id);
 
-		return InvalidConstantBufferMetaInstance;
-	}
+	static const SamplerMetadata& GetSampler(const CrString& name);
 
-	static const ConstantBufferMetadata& GetConstantBuffer(ConstantBuffers::T id)
-	{
-		return ConstantBufferMetaTable[id];
-	}
+	static const SamplerMetadata& GetSampler(Samplers::T id);
 
+	static const TextureMetadata& GetTexture(const CrString& name);
 
-	static const SamplerMetadata& GetSampler(const CrString& name)
-	{
-		auto samplerMetadata = SamplerTable.find(name);
+	static const TextureMetadata& GetTexture(Textures::T id);
 
-		if (samplerMetadata != SamplerTable.end())
-		{
-			return (*samplerMetadata).second;
-		}
+	static const RWTextureMetadata& GetRWTexture(const CrString& name);
 
-		return InvalidSamplerMetaInstance;
-	}
+	static const RWTextureMetadata& GetRWTexture(RWTextures::T id);
 
-	static const SamplerMetadata& GetSampler(Samplers::T id)
-	{
-		return SamplerMetaTable[id];
-	}
+	static const StorageBufferMetadata& GetStorageBuffer(const CrString& name);
 
-	static const TextureMetadata& GetTexture(const CrString& name)
-	{
-		auto textureMetadata = TextureTable.find(name);
+	static const StorageBufferMetadata& GetStorageBuffer(StorageBuffers::T id);
 
-		if (textureMetadata != TextureTable.end())
-		{
-			return (*textureMetadata).second;
-		}
+	static const RWStorageBufferMetadata& GetRWStorageBuffer(const CrString& name);
 
-		return InvalidTextureMetaInstance;
-	}
+	static const RWStorageBufferMetadata& GetRWStorageBuffer(RWStorageBuffers::T id);
 
-	static const TextureMetadata& GetTexture(Textures::T id)
-	{
-		return TextureMetaTable[id];
-	}
+	static const RWDataBufferMetadata& GetRWDataBuffer(const CrString& name);
 
-	static const RWTextureMetadata& GetRWTexture(const CrString& name)
-	{
-		auto rwTextureMetadata = RWTextureTable.find(name);
-
-		if (rwTextureMetadata != RWTextureTable.end())
-		{
-			return (*rwTextureMetadata).second;
-		}
-
-		return InvalidRWTextureMetaInstance;
-	}
-
-	static const RWTextureMetadata& GetRWTexture(RWTextures::T id)
-	{
-		return RWTextureMetaTable[id];
-	}
-
-	static const StorageBufferMetadata& GetStorageBuffer(const CrString& name)
-	{
-		auto storageBufferMetadata = StorageBufferTable.find(name);
-
-		if (storageBufferMetadata != StorageBufferTable.end())
-		{
-			return (*storageBufferMetadata).second;
-		}
-
-		return InvalidStorageBufferMetaInstance;
-	}
-
-	static const StorageBufferMetadata& GetStorageBuffer(StorageBuffers::T id)
-	{
-		return StorageBufferMetaTable[id];
-	}
-
-	static const RWStorageBufferMetadata& GetRWStorageBuffer(const CrString& name)
-	{
-		auto rwStorageBufferMetadata = RWStorageBufferTable.find(name);
-
-		if (rwStorageBufferMetadata != RWStorageBufferTable.end())
-		{
-			return (*rwStorageBufferMetadata).second;
-		}
-
-		return InvalidRWStorageBufferMetaInstance;
-	}
-
-	static const RWStorageBufferMetadata& GetRWStorageBuffer(RWStorageBuffers::T id)
-	{
-		return RWStorageBufferMetaTable[id];
-	}
-
-	static const RWDataBufferMetadata& GetRWDataBuffer(const CrString& name)
-	{
-		auto rwDataBufferMetadata = RWDataBufferTable.find(name);
-
-		if (rwDataBufferMetadata != RWDataBufferTable.end())
-		{
-			return (*rwDataBufferMetadata).second;
-		}
-
-		return InvalidRWDataBufferMetaInstance;
-	}
-
-	static const RWDataBufferMetadata& GetRWDataBuffer(RWDataBuffers::T id)
-	{
-		return RWDataBufferMetaTable[id];
-	}
+	static const RWDataBufferMetadata& GetRWDataBuffer(RWDataBuffers::T id);
 };

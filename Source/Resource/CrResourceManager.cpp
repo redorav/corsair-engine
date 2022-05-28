@@ -1,3 +1,5 @@
+#include "CrResource_pch.h"
+
 #include "CrResourceManager.h"
 
 #include "Rendering/CrImage.h"

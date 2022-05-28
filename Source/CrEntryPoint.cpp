@@ -1,7 +1,7 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrRenderingResources.h"
-#include "Rendering/CrFrame.h"
+#include "CrFrame.h"
 
 #include "Core/Input/CrInputManager.h"
 #include "Core/CrCommandLine.h"

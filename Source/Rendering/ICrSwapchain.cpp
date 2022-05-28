@@ -1,9 +1,10 @@
 #include "CrRendering_pch.h"
 
 #include "ICrSwapchain.h"
-#include "ICrRenderDevice.h"
 
 #include "Core/Logging/ICrDebug.h"
+
+class ICrRenderDevice;
 
 CrSwapchainDescriptor::CrSwapchainDescriptor()
 	: platformWindow(nullptr)

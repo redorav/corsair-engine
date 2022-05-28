@@ -2,6 +2,8 @@
 
 #include "ICrRenderSystem.h"
 
+#include "ICrRenderDevice.h"
+
 // Include all the necessary platforms here
 
 #if defined(VULKAN_API)

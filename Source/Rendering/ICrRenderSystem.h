@@ -6,7 +6,7 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
-#include "Rendering/ICrRenderDevice.h"
+#include "Core/Containers/CrVector.h"
 
 #include "Rendering/FrameCapture/CrRenderDoc.h"
 

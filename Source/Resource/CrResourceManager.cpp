@@ -5,8 +5,6 @@
 #include "Rendering/CrImage.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrGPUBuffer.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrRenderSystem.h"
 #include "Rendering/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"

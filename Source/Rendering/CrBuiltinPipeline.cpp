@@ -2,6 +2,7 @@
 
 #include "Rendering/CrBuiltinPipeline.h"
 #include "Rendering/ICrRenderSystem.h"
+#include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/CrPipelineStateManager.h"
 #include "GeneratedShaders/BuiltinShaders.h"

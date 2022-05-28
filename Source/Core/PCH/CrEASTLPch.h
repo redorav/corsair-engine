@@ -15,8 +15,7 @@
 #include <EASTL/unique_ptr.h>
 
 // Explicit instantiations of commonly used templates
-template class eastl::fixed_string<char, 128, false, eastl::allocator>;
-template class eastl::fixed_string<char, 512, false, eastl::allocator>;
-
+template class eastl::fixed_string<char, 32, false, eastl::allocator>;
+template class eastl::fixed_string<char, 64, false, eastl::allocator>;
 template class eastl::fixed_string<char, 128, false, eastl::allocator>;
 template class eastl::fixed_string<char, 512, false, eastl::allocator>;

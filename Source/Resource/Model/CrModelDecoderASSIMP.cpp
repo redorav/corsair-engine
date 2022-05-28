@@ -95,6 +95,7 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 	bool hasTextureCoords      = mesh->HasTextureCoords(0);
 	bool hasNormals            = mesh->HasNormals();
 	bool hasTangentsBitangents = mesh->HasTangentsAndBitangents();
+	bool hasColor              = mesh->HasVertexColors(0);
 
 	CrVertexBufferSharedHandle positionBuffer   = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
 	CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
@@ -155,6 +156,22 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			else
 			{
 				additionalBufferData[j].uv = { 0.0_h, 0.0_h };
+			}
+
+			if (hasColor)
+			{
+				const aiColor4D& color = mesh->mColors[0][j];
+				additionalBufferData[j].color =
+				{
+					(uint8_t)(color.r * 255), 
+					(uint8_t)(color.g * 255), 
+					(uint8_t)(color.b * 255), 
+					(uint8_t)(color.a * 255)
+				};
+			}
+			else
+			{
+				additionalBufferData[j].color = { 255, 255, 255, 255 };
 			}
 		}
 	}

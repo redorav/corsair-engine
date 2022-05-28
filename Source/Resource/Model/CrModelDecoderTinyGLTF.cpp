@@ -1,6 +1,6 @@
 #include "CrResource_pch.h"
 
-#include "CrModelDecoderGLTF.h"
+#include "CrModelDecoderTinyGLTF.h"
 
 #include "Core/FileSystem/CrPath.h"
 #include "Core/SmartPointers/CrSharedPtr.h"

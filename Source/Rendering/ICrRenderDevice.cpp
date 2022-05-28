@@ -18,6 +18,8 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"
 
+#include "Rendering/CrGPUDeletionQueue.h"
+
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	: m_renderSystem(renderSystem)
 	, m_isValidPipelineCache(false)
@@ -27,6 +29,9 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";
 	m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
+
+	m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue->AddToQueue(deletable); };
+	m_gpuDeletionQueue = CrUniquePtr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
 }
 
 ICrRenderDevice::~ICrRenderDevice()
@@ -36,7 +41,7 @@ ICrRenderDevice::~ICrRenderDevice()
 
 void ICrRenderDevice::Initialize()
 {
-	m_gpuDeletionQueue.Initialize(this);
+	m_gpuDeletionQueue->Initialize(this);
 
 	CrCommandBufferDescriptor descriptor;
 	descriptor.name.append("Auxiliary Command Buffer");
@@ -45,16 +50,15 @@ void ICrRenderDevice::Initialize()
 
 void ICrRenderDevice::ProcessDeletionQueue()
 {
-	m_gpuDeletionQueue.Process();
+	m_gpuDeletionQueue->Process();
 }
 
 void ICrRenderDevice::FinalizeDeletion()
 {
 	m_auxiliaryCommandBuffer = nullptr;
 
-	m_gpuDeletionQueue.Finalize();
+	m_gpuDeletionQueue->Finalize();
 }
-
 
 CrCommandBufferSharedHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
 {

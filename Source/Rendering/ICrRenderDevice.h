@@ -3,7 +3,6 @@
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrGPUDeletionQueue.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrSharedPtr.h"
@@ -87,6 +86,8 @@ struct CrTextureUpload
 	uint32_t sliceCount;
 };
 
+class CrGPUDeletionQueue;
+class CrGPUDeletable;
 typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
 
 class ICrRenderDevice
@@ -234,9 +235,9 @@ protected:
 
 	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
 
-	CrGPUDeletionCallbackType m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue.AddToQueue(deletable); };
+	CrGPUDeletionCallbackType m_gpuDeletionCallback;
 
-	CrGPUDeletionQueue m_gpuDeletionQueue;
+	CrUniquePtr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
 	const ICrRenderSystem* m_renderSystem;
 

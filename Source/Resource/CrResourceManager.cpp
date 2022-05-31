@@ -17,7 +17,7 @@
 
 #include "Resource/Model/ICrModelDecoder.h"
 #include "Resource/Model/CrModelDecoderASSIMP.h"
-#include "Resource/Model/CrModelDecoderTinyGLTF.h"
+#include "Resource/Model/CrModelDecoderCGLTF.h"
 
 CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {
@@ -29,7 +29,7 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 		CrPath extension = fullPath.extension();
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
-			modelDecoder = CrMakeShared<CrModelDecoderTinyGLTF>();
+			modelDecoder = CrMakeShared<CrModelDecoderCGLTF>();
 		}
 		else
 		{

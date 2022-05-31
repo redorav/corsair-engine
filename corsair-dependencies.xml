@@ -1,6 +1,7 @@
 <dependencies>
 
 	<dependency name="assimp" version="80799bd"/>
+	<dependency name="cgltf" version="2819427"/>
 	<dependency name="dxc" version="1.6.2112"/>
 	<dependency name="eastl" version="fad5471"/>
 	<dependency name="glslang" version="6624e13"/>
@@ -11,7 +12,6 @@
 	<dependency name="sdl2" version="2.0.14"/>
 	<dependency name="spirv-reflect" version="4689b33"/>
 	<dependency name="stb" version="f54acd4"/>
-	<dependency name="tinygltf" version="298c37a"/>
 	<dependency name="vma" version="042e65e"/>
 	<dependency name="vulkan" version="1.2.189.2"/>
 	<dependency name="winpixeventruntime" version="1.0.220124001"/>

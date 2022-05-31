@@ -449,7 +449,7 @@ project(ProjectCrResource)
 	}
 
 	AddLibraryIncludes(StbLibrary)
-	AddLibraryIncludes(TinyGLTFLibrary)
+	AddLibraryIncludes(CGLTFLibrary)
 	AddLibraryIncludes(AssimpLibrary)
 
 group('Core')

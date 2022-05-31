@@ -6,6 +6,7 @@ IncludeDirectory = '/Include/'
 
 -- Library Directories
 LibAssimp       = DependenciesDirectory..'/assimp'
+LibCGLTF        = DependenciesDirectory..'/cgltf'
 LibDdspp        = DependenciesDirectory..'/ddspp'
 LibDxc          = DependenciesDirectory..'/dxc'
 LibEASTL        = DependenciesDirectory..'/eastl'
@@ -18,7 +19,6 @@ LibRenderDoc    = DependenciesDirectory..'/renderdoc'
 LibSDL2         = DependenciesDirectory..'/sdl2'
 LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
 LibStb          = DependenciesDirectory..'/stb'
-LibTinyGLTF     = DependenciesDirectory..'/tinygltf'
 LibVMA          = DependenciesDirectory..'/vma'
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibWinPixEventRuntime = DependenciesDirectory..'/winpixeventruntime'
@@ -29,6 +29,11 @@ AssimpLibrary =
 	includeDirs = LibAssimp..IncludeDirectory..'include',
 	libDirs     = LibAssimp..BinaryDirectory,
 	libNames    = 'Assimp.vs2019.release'
+}
+
+CGLTFLibrary =
+{
+	includeDirs = LibCGLTF..IncludeDirectory
 }
 
 D3D12Library =
@@ -138,11 +143,6 @@ SPIRVReflectLibrary =
 StbLibrary =
 {
 	includeDirs = LibStb..IncludeDirectory
-}
-
-TinyGLTFLibrary = 
-{
-	includeDirs = LibTinyGLTF..IncludeDirectory
 }
 
 VulkanLibrary =

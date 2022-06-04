@@ -11,7 +11,7 @@ VS_OUT BasicVS(VS_IN Input)
     VS_OUT output;
     
     #if defined(NO_TRANSFORM)
-	output.hwPosition = float4(IN.pos.xyz, 1);
+	output.hwPosition = float4(Input.pos.xyz, 1);
 	#else
     float4 localPosition = float4(Input.pos.xyz, 1);
     float4 worldPosition = mul(localPosition, cb_Instance.local2World[Input.instanceID]);

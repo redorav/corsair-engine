@@ -2,6 +2,11 @@ BasicVS:
   entrypoint: BasicVS
   stage: Vertex
 
+BasicNoTransformVS:
+  entrypoint: BasicVS
+  stage: Vertex
+  defines: "NO_TRANSFORM"
+
 BasicPS:
   entrypoint: BasicPS
   stage: Pixel

@@ -465,10 +465,10 @@ void CrFrame::Process()
 		commandBuffer->SetScissor(CrScissor(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
 
 		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
-		Color* theColorData2 = colorBuffer.Lock();
+		Color* colorData2 = colorBuffer.Lock();
 		{
-			theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-			theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			colorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		colorBuffer.Unlock();
 		commandBuffer->BindConstantBuffer(&colorBuffer);
@@ -497,8 +497,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
-		// Execute the last batch
-		renderPacketBatcher.ExecuteBatch();
+		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
 	});
 
 	m_mainRenderGraph.AddRenderPass("GBuffer Lighting Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -541,10 +540,10 @@ void CrFrame::Process()
 		commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 
 		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
-		Color* theColorData2 = colorBuffer.Lock();
+		Color* colorData = colorBuffer.Lock();
 		{
-			theColorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-			theColorData2->tint2 = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			colorData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+			colorData->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		colorBuffer.Unlock();
 		commandBuffer->BindConstantBuffer(&colorBuffer);
@@ -573,8 +572,8 @@ void CrFrame::Process()
 			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
-		// Execute the last batch
-		renderPacketBatcher.ExecuteBatch();
+		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+	});
 	});
 
 	m_mainRenderGraph.AddRenderPass("Copy Pass", float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -702,8 +701,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
-		// Execute last batch
-		renderPacketBatcher.ExecuteBatch();
+		renderPacketBatcher.ExecuteBatch(); // Execute last batch
 	});
 
 	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
@@ -953,7 +951,7 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
 
-	// 1. Destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
+	// Destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
 	// that becomes available after (once the pointer assignment happens and the resource is destroyed). Right after, create
 	// the new swapchain
 	m_swapchain = nullptr;
@@ -968,7 +966,7 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	swapchainDescriptor.requestedBufferCount = 3;
 	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
 
-	// 2. Recreate depth stencil texture
+	// Recreate depth stencil texture
 	CrTextureDescriptor depthTextureDescriptor;
 	depthTextureDescriptor.width = m_swapchain->GetWidth();
 	depthTextureDescriptor.height = m_swapchain->GetHeight();
@@ -976,8 +974,9 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	depthTextureDescriptor.usage = cr3d::TextureUsage::DepthStencil;
 	depthTextureDescriptor.name = "Depth Texture D32S8";
 
-	m_depthStencilTexture = renderDevice->CreateTexture(depthTextureDescriptor); // Create the depth buffer
+	m_depthStencilTexture = renderDevice->CreateTexture(depthTextureDescriptor);
 
+	// Recreate render targets
 	{
 		CrTextureDescriptor preSwapchainDescriptor;
 		preSwapchainDescriptor.width = m_swapchain->GetWidth();
@@ -1029,16 +1028,16 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor instanceIDDescriptor;
-		instanceIDDescriptor.width  = m_swapchain->GetWidth();
-		instanceIDDescriptor.height = m_swapchain->GetHeight();
-		instanceIDDescriptor.format = CrRendererConfig::DebugShaderFormat;
-		instanceIDDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
-		instanceIDDescriptor.name   = "Model Instance ID";
-		m_debugShaderTexture        = renderDevice->CreateTexture(instanceIDDescriptor);
+		CrTextureDescriptor debugShaderDescriptor;
+		debugShaderDescriptor.width  = m_swapchain->GetWidth();
+		debugShaderDescriptor.height = m_swapchain->GetHeight();
+		debugShaderDescriptor.format = CrRendererConfig::DebugShaderFormat;
+		debugShaderDescriptor.usage  = cr3d::TextureUsage::RenderTarget;
+		debugShaderDescriptor.name   = "Model Instance ID";
+		m_debugShaderTexture         = renderDevice->CreateTexture(debugShaderDescriptor);
 	}
 
-	// 4. Recreate command buffers
+	// Recreate command buffers
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{

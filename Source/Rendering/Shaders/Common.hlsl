@@ -28,8 +28,8 @@ struct VS_IN_FULLSCREEN
 
 struct VS_OUT_FULLSCREEN
 {
-    float4 hwPosition : SV_Position;
-    float2 uv : TEXCOORD0;
+    float4 hwPosition	: SV_Position;
+    float2 uv			: TEXCOORD0;
 };
 
 struct Camera
@@ -46,7 +46,7 @@ cbuffer Camera
 struct Color
 {
 	float4 color;
-	float4 tint2;
+	float4 tint;
 };
 
 cbuffer Color
@@ -57,7 +57,7 @@ cbuffer Color
 struct Engine
 {
 	float4 color;
-	float4 tint2;
+	float4 tint;
 };
 
 cbuffer Engine

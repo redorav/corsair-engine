@@ -3,7 +3,6 @@
 #include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/ICrRenderDevice.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrSharedPtr.h"

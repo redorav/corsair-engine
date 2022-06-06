@@ -186,6 +186,16 @@ void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassD
 		BeginDebugEvent(m_currentState.m_currentRenderPass.debugName.c_str(), m_currentState.m_currentRenderPass.debugColor);
 	}
 
+	// Validation
+	for (uint32_t i = 0; i < renderPassDescriptor.color.size(); ++i)
+	{
+		const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
+		if (renderTargetDescriptor.loadOp == CrRenderTargetLoadOp::Load && renderTargetDescriptor.initialState == cr3d::TextureState::Undefined)
+		{
+			CrAssertMsg(false, "Invalid combination");
+		}
+	}
+
 	BeginRenderPassPS(renderPassDescriptor);
 }
 

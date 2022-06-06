@@ -27,6 +27,19 @@ static_assert(sizeof(CrRasterizerStateDescriptor) == 16, "CrRasterizerStateDescr
 
 struct CrRenderTargetBlendDescriptor
 {
+	CrRenderTargetBlendDescriptor()
+	{
+		// We default to standard alpha blending, where colors are blended and alpha is replaced
+		bits = 0;
+		srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
+		dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+		srcAlphaBlendFactor = cr3d::BlendFactor::One;
+		dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
+		colorWriteMask      = cr3d::ColorWriteComponent::All;
+		colorBlendOp        = cr3d::BlendOp::Add;
+		alphaBlendOp        = cr3d::BlendOp::Add;
+	}
+
 	union
 	{
 		struct

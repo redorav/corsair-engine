@@ -90,16 +90,29 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
     float3 litSurface = surface.albedoSRGB.xyz; // * NdotL; // +surface.F0 * pow(;
 
 #if (EMaterialShaderVariant == EMaterialShaderVariant_Debug)
-	if (cb_DebugShader.debugProperties.x == 0)
+
+	float debugShaderMode = cb_DebugShader.debugProperties.x;
+
+	const float DebugShaderModeInstanceID = 0;
+	const float DebugShaderModeFlatColor = 1;
+
+	if (debugShaderMode == 0)
 	{
 		litSurface = float3(cb_DebugShader.debugProperties.y / 65535.0, 0.0, 0.0);
 	}
-#elif (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
+	else if (debugShaderMode == 1)
+	{
+		litSurface = float3(1.0, 0.0, 0.0);
+	}
+
+#endif
+
+#if (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, 1.0);
 	pixelOutput.materialTarget = float4(surface.F0, surface.roughness);
 #else
-    pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint2.a);
+    pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint.a);
 #endif
 	
 	return pixelOutput;

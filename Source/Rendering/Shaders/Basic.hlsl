@@ -1,8 +1,7 @@
 #ifndef BASIC_HLSL
 #define BASIC_HLSL
 
-// Basic shaders used for core operations like rendering lines, flat colors,
-// fullscreen quads, etc
+// Basic shaders used for core operations like rendering lines, flat colors, fullscreen quads, etc
 
 #include "Common.hlsl"
 

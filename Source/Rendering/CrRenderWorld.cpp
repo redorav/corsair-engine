@@ -111,6 +111,8 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 
 void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 {
+	m_visibleModelInstances.clear();
+
 	for (CrModelInstanceIndex instanceIndex(0); instanceIndex < m_numModelInstances; ++instanceIndex)
 	{
 		const CrRenderModelSharedHandle& renderModel = GetRenderModel(instanceIndex);
@@ -122,17 +124,22 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		// Check for instance visibility. Only check if number of instances > 1, otherwise we duplicate work
 		if (meshCount > 1)
 		{
-			if (!CrVisibility::ObbProjection(modelBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			CrBoxVertices modelProjectedCorners;
+			CrVisibility::ComputeObbProjection(modelBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix(), modelProjectedCorners);
+
+			if (!CrVisibility::AreProjectedPointsOnScreen(modelProjectedCorners))
 			{
 				continue;
 			}
 		}
 
 		// Allocate more transforms depending on what the model instance provides
-		float4x4* transforms = (float4x4*)m_renderingStream->Allocate(sizeof(float4x4)).memory;
+		float4x4* transforms = m_renderingStream->Allocate<float4x4>(1).memory;
 		transforms[0] = transform;
 
-		for (uint32_t meshIndex = 0; meshIndex < renderModel->GetRenderMeshCount(); ++meshIndex)
+		m_visibleModelInstances.push_back(instanceIndex);
+
+		for (uint32_t meshIndex = 0; meshIndex < meshCount; ++meshIndex)
 		{
 			const auto& meshMaterial       = renderModel->GetRenderMeshMaterial(meshIndex);
 			const CrRenderMesh* renderMesh = meshMaterial.first.get();
@@ -140,8 +147,11 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 			const CrBoundingBox& meshBoundingBox = renderMesh->GetBoundingBox();
 
+			CrBoxVertices meshProjectedCorners;
+			CrVisibility::ComputeObbProjection(meshBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix(), meshProjectedCorners);
+
 			// Compute mesh visibility and don't render if outside frustum
-			if (!CrVisibility::ObbProjection(meshBoundingBox, transform, m_camera->GetWorld2ProjectionMatrix()))
+			if (!CrVisibility::AreProjectedPointsOnScreen(meshProjectedCorners))
 			{
 				continue;
 			}

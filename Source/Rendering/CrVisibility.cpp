@@ -6,10 +6,13 @@
 
 #include "Math/CrHlslppMatrixFloat.h"
 
-// Calculates the Obb in projection space and effectively does the same calculations as a vertex shader would do
-// to determine whether any part of the bounding box is inside the camera.
-// TODO This function can be optimized further
-bool CrVisibility::ObbProjection(const CrBoundingBox& obb, const float4x4& worldTransform, const float4x4& viewProjectionMatrix)
+// These projected corners are before the division by w
+void CrVisibility::ComputeObbProjection
+(
+	const CrBoundingBox& obb,
+	const float4x4& worldTransform,
+	const float4x4& viewProjectionMatrix,
+	CrArray<float4, 8>& projectedCorners)
 {
 	float4x4 worldViewProjectionMatrix = mul(worldTransform, viewProjectionMatrix);
 
@@ -29,15 +32,39 @@ bool CrVisibility::ObbProjection(const CrBoundingBox& obb, const float4x4& world
 		float4(cornerMax.x, cornerMin.yzw)
 	};
 
+	for (uint32_t i = 0; i < boxVertices.size(); ++i)
+	{
+		projectedCorners[i] = mul(boxVertices[i], worldViewProjectionMatrix);
+	}
+}
+
+bool CrVisibility::AreProjectedPointsOnScreen(const CrBoxVertices& projectedCorners)
+{
 	float3 outsideLeft = float3(1.0f, 1.0f, 1.0f);
 	float3 outsideRight = float3(1.0f, 1.0f, 1.0f);
 
-	for (uint32_t i = 0; i < boxVertices.size(); ++i)
+	for (uint32_t i = 0; i < projectedCorners.size(); ++i)
 	{
-		float4 projectedPosition = mul(boxVertices[i], worldViewProjectionMatrix);
+		const float4& projectedPosition = projectedCorners[i];
 		outsideLeft = outsideLeft * (projectedPosition.xyz < float3(-projectedPosition.ww, 0.0f));
 		outsideRight = outsideRight * (projectedPosition.xyz > float3(projectedPosition.www));
 	}
 
 	return !(any(outsideLeft) || any(outsideRight));
+}
+
+// Calculates the Obb in projection space and effectively does the same calculations as a vertex shader would do
+// to determine whether any part of the bounding box is inside the camera.
+// TODO This function can be optimized further
+bool CrVisibility::IsObbInFrustum
+(
+	const CrBoundingBox& obb, 
+	const float4x4& worldTransform, 
+	const float4x4& viewProjectionMatrix
+)
+{
+	CrArray<float4, 8> projectedCorners;
+	ComputeObbProjection(obb, worldTransform, viewProjectionMatrix, projectedCorners);
+
+	return AreProjectedPointsOnScreen(projectedCorners);
 }

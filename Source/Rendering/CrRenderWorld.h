@@ -161,6 +161,17 @@ public:
 
 	void ComputeVisibilityAndRenderPackets();
 
+	// Traverse visible model instances
+	template<typename FunctionT>
+	void ForEachVisibleModelInstance(const FunctionT& function) const
+	{
+		for (uint32_t visibleIndex = 0; visibleIndex < m_visibleModelInstances.size(); ++visibleIndex)
+		{
+			CrModelInstanceIndex instanceIndex = m_visibleModelInstances[visibleIndex];
+			function(this, instanceIndex, visibleIndex);
+		}
+	}
+
 	void BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& renderingStream);
 
 	void EndRendering();
@@ -210,4 +221,7 @@ private:
 	// Render lists containing visible rendering packets
 
 	CrRenderList m_renderLists[CrRenderListUsage::Count];
+
+	// Visible model instances
+	CrVector<CrModelInstanceIndex> m_visibleModelInstances;
 };

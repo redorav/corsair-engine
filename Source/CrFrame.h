@@ -45,7 +45,9 @@ private:
 	uint32_t m_height = 0;
 
 	// TODO Temporary
-	CrBuiltinGraphicsPipeline m_linePipeline;
+	CrBuiltinGraphicsPipeline m_line2DPipeline;
+	CrBuiltinGraphicsPipeline m_line3DPipeline;
+
 	CrBuiltinComputePipeline m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 

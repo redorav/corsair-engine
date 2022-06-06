@@ -54,17 +54,6 @@ cbuffer Color
 	Color cb_Color;
 };
 
-struct Engine
-{
-	float4 color;
-	float4 tint;
-};
-
-cbuffer Engine
-{
-	Engine cb_Engine;
-};
-
 struct Instance
 {
 	row_major float4x4 local2World[128];

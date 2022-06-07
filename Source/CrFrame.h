@@ -59,6 +59,9 @@ private:
 
 	CrTextureSharedHandle m_colorfulTextureArray;
 
+	// Editor Shaders
+	CrBuiltinGraphicsPipeline m_editorEdgeSelectionPipeline;
+
 	CrSwapchainSharedHandle m_swapchain;
 
 	CrTextureSharedHandle m_depthStencilTexture;

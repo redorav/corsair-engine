@@ -48,6 +48,7 @@
 #include "GeneratedShaders/BuiltinShaders.h"
 
 #include "Math/CrMath.h"
+#include "Math/CrHalf.h"
 
 // TODO Put somewhere else
 bool HashingAssert()
@@ -285,6 +286,16 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	{
+		CrGraphicsPipelineDescriptor editorEdgeSelectionPipelineDescriptor;
+		editorEdgeSelectionPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
+		editorEdgeSelectionPipelineDescriptor.depthStencilState.depthTestEnable = false;
+		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
+		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
+		m_editorEdgeSelectionPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(),
+			editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
+	}
+
+	{
 		CrTextureDescriptor colorfulVolumeTextureDescriptor;
 		colorfulVolumeTextureDescriptor.width = 4;
 		colorfulVolumeTextureDescriptor.height = 4;
@@ -381,6 +392,9 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
+	bool isMouseClicked = CrInput.GetMouseState().buttonPressed[MouseButton::Left];
+	m_renderWorld->SetSelected(CrModelInstanceId(0), isMouseClicked);
+
 	// Set up render graph to start recording passes
 	CrRenderGraphFrameParams frameRenderGraphParams;
 	frameRenderGraphParams.commandBuffer = drawCommandBuffer;
@@ -408,6 +422,32 @@ void CrFrame::Process()
 		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointClampSampler, CrRenderingResources::Get().AllPointClampSampler.get());
 		drawCommandBuffer->BindSampler(shaderStage, Samplers::AllPointWrapSampler, CrRenderingResources::Get().AllPointWrapSampler.get());
 	}
+
+	// Set up default values for common constant buffers
+
+	CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
+	Color* colorData2 = colorBuffer.Lock();
+	{
+		colorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	colorBuffer.Unlock();
+	drawCommandBuffer->BindConstantBuffer(&colorBuffer);
+
+	CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
+	Camera* cameraData = cameraDataBuffer.Lock();
+	{
+		*cameraData = m_cameraConstantData;
+	}
+	cameraDataBuffer.Unlock();
+	drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
+
+	CrGPUBufferType<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
+	Instance* identityTransformData = identityConstantBuffer.Lock();
+	{
+		identityTransformData->local2World[0] = float4x4::identity();
+	}
+	identityConstantBuffer.Unlock();
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
 
@@ -464,30 +504,6 @@ void CrFrame::Process()
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)gBufferAlbedoAOTexture->GetWidth(), (float)gBufferAlbedoAOTexture->GetHeight()));
 		commandBuffer->SetScissor(CrScissor(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
 
-		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
-		Color* colorData2 = colorBuffer.Lock();
-		{
-			colorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-			colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		colorBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&colorBuffer);
-
-		CrGPUBufferType<Camera> cameraDataBuffer = commandBuffer->AllocateConstantBuffer<Camera>();
-		Camera* cameraData2 = cameraDataBuffer.Lock();
-		{
-			*cameraData2 = m_cameraConstantData;
-		}
-		cameraDataBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
-
-		CrGPUBufferType<Instance> identityConstantBuffer = commandBuffer->AllocateConstantBuffer<Instance>();
-		Instance* identityTransformData = identityConstantBuffer.Lock();
-		{
-			identityTransformData->local2World[0] = float4x4::identity();
-		}
-		identityConstantBuffer.Unlock();
-
 		const CrRenderList& gBufferRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::GBuffer);
 
 		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
@@ -539,30 +555,6 @@ void CrFrame::Process()
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 		commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 
-		CrGPUBufferType<Color> colorBuffer = commandBuffer->AllocateConstantBuffer<Color>();
-		Color* colorData = colorBuffer.Lock();
-		{
-			colorData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-			colorData->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		colorBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&colorBuffer);
-
-		CrGPUBufferType<Camera> cameraDataBuffer = commandBuffer->AllocateConstantBuffer<Camera>();
-		Camera* cameraData2 = cameraDataBuffer.Lock();
-		{
-			*cameraData2 = m_cameraConstantData;
-		}
-		cameraDataBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&cameraDataBuffer);
-
-		CrGPUBufferType<Instance> identityConstantBuffer = commandBuffer->AllocateConstantBuffer<Instance>();
-		Instance* identityTransformData = identityConstantBuffer.Lock();
-		{
-			identityTransformData->local2World[0] = float4x4::identity();
-		}
-		identityConstantBuffer.Unlock();
-
 		const CrRenderList& forwardRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::Forward);
 
 		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
@@ -574,13 +566,64 @@ void CrFrame::Process()
 
 		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
 	});
-	});
+
+	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
+	debugShaderTextureDescriptor.texture = m_debugShaderTexture.get();
+	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
+
+	const CrRenderList& edgeSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::EdgeSelection);
+
+	if (edgeSelectionRenderList.Size() > 0)
+	{
+		m_mainRenderGraph.AddRenderPass("Edge Selection Render", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		[=](CrRenderGraph& renderGraph)
+		{
+			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+			renderGraph.AddRenderTarget(debugShaderTextureId, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
+		},
+		[this, edgeSelectionRenderList](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		{
+			commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
+			commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+
+			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
+
+			CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+			DebugShader* debugShaderData = debugShaderBuffer.Lock();
+			{
+				debugShaderData->debugProperties = float4(1.0f, 0.0f, 0.0f, 0.0f);
+			}
+			debugShaderBuffer.Unlock();
+			commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+
+			edgeSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+			{
+				renderPacketBatcher.ProcessRenderPacket(renderPacket);
+			});
+
+			renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+		});
+
+		m_mainRenderGraph.AddRenderPass("Edge Selection Resolve", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		[=](CrRenderGraph& renderGraph)
+		{
+			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store, float4(0.0f));
+			renderGraph.AddTexture(debugShaderTextureId, cr3d::ShaderStageFlags::Pixel);
+		},
+		[this, debugShaderTextureId]
+		(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+		{
+			commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
+			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline.get());
+			commandBuffer->Draw(3, 1, 0, 0);
+		});
+	}
 
 	m_mainRenderGraph.AddRenderPass("Copy Pass", float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddTexture(preSwapchainTexture, cr3d::ShaderStageFlags::Pixel);
-		renderGraph.AddRenderTarget(swapchainTexture);
+		renderGraph.AddRenderTarget(swapchainTexture, CrRenderTargetLoadOp::DontCare, CrRenderTargetStoreOp::Store, float4(0.0f));
 	},
 	[this, preSwapchainTexture](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
@@ -665,10 +708,6 @@ void CrFrame::Process()
 		commandBuffer->DispatchIndirect(gpuBuffer->GetHardwareBuffer(), 0);
 	});
 
-	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
-	debugShaderTextureDescriptor.texture = m_debugShaderTexture.get();
-	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
-
 	m_mainRenderGraph.AddRenderPass("Mouse Instance ID", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
 	[&](CrRenderGraph& renderGraph)
 	{
@@ -690,15 +729,18 @@ void CrFrame::Process()
 
 		mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 		{
-			CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-			DebugShader* debugShaderData = debugShaderBuffer.Lock();
+			if (renderPacket.extra)
 			{
-				debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
-			}
-			debugShaderBuffer.Unlock();
-			commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+				CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+				DebugShader* debugShaderData = debugShaderBuffer.Lock();
+				{
+					debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
+				}
+				debugShaderBuffer.Unlock();
+				commandBuffer->BindConstantBuffer(&debugShaderBuffer);
 
-			renderPacketBatcher.ProcessRenderPacket(renderPacket);
+				renderPacketBatcher.ProcessRenderPacket(renderPacket);
+			}
 		});
 
 		renderPacketBatcher.ExecuteBatch(); // Execute last batch
@@ -814,12 +856,14 @@ void CrFrame::DrawDebugUI()
 				// Exit header row
 				ImGui::TableNextRow();
 
+				ImVec2 framePadding = ImGui::GetStyle().FramePadding;
+
 				// Make sure we take padding into account when calculating initial positions
 				ImGui::TableSetColumnIndex(2);
 				ImVec2 timebarSize = ImVec2(ImGui::GetItemRectSize().x, ImGui::GetFrameHeight());
 				ImVec2 initialTimebarPosition = ImGui::GetCursorScreenPos();
-				initialTimebarPosition.x -= ImGui::GetStyle().FramePadding.x;
-				initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
+				initialTimebarPosition.x -= framePadding.x;
+				initialTimebarPosition.y -= framePadding.y;
 
 				CrGPUInterval totalFrameDuration = m_timingQueryTracker->GetFrameDuration();
 
@@ -838,10 +882,11 @@ void CrFrame::DrawDebugUI()
 						ImGui::TableSetColumnIndex(2);
 						
 						{
+							// Update timebar position
 							initialTimebarPosition.y = ImGui::GetCursorScreenPos().y;
 							initialTimebarPosition.y -= ImGui::GetStyle().FramePadding.y;
 
-							float durationMillisecondsScaled = CrClamp((float)(interval.durationNanoseconds / totalFrameDuration.durationNanoseconds), 0.0f, 1.0f);
+							float durationMillisecondsScaled = (float)(interval.durationNanoseconds / totalFrameDuration.durationNanoseconds);
 
 							float durationPixels = durationMillisecondsScaled * timebarSize.x;
 							ImVec2 finalPosition = ImVec2(initialTimebarPosition.x + durationPixels, initialTimebarPosition.y + timebarSize.y);

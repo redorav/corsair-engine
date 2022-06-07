@@ -14,6 +14,7 @@
 
 CrRenderWorld::CrRenderWorld()
 {
+	// TODO Make sure when we create a model instance all of these are updated
 	m_modelInstanceTransforms.resize(1000);
 	m_renderModels.resize(1000);
 	m_modelInstanceObbs.resize(1000);
@@ -21,6 +22,8 @@ CrRenderWorld::CrRenderWorld()
 	// Defaults to invalid id
 	m_modelInstanceIdToIndex.resize(1000);
 	m_modelInstanceIndexToId.resize(1000);
+
+	m_modelInstanceEditorProperties.resize(1000);
 
 	m_maxModelInstanceId = CrModelInstanceId(0);
 	m_numModelInstances = CrModelInstanceIndex(0);
@@ -47,7 +50,7 @@ CrRenderModelInstance CrRenderWorld::CreateModelInstance()
 		m_maxModelInstanceId.id++;
 	}
 
-	// Initialize some members top sensible defaults
+	// Initialize some members to sensible defaults
 	m_modelInstanceTransforms[m_numModelInstances.id] = float4x4::identity();
 
 	// Initialize remapping tables
@@ -78,9 +81,10 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 
 	// We want them always well packed. Take the index where the data lived for the destroyed model instance
 	// and copy the data belonging to the last model instance in the array
-	m_modelInstanceTransforms[destroyedInstanceIndex.id] = m_modelInstanceTransforms[lastInstanceIndex.id];
-	m_renderModels[destroyedInstanceIndex.id]            = m_renderModels[lastInstanceIndex.id];
-	m_modelInstanceObbs[destroyedInstanceIndex.id]       = m_modelInstanceObbs[lastInstanceIndex.id];
+	m_modelInstanceTransforms[destroyedInstanceIndex.id]       = m_modelInstanceTransforms[lastInstanceIndex.id];
+	m_renderModels[destroyedInstanceIndex.id]                  = m_renderModels[lastInstanceIndex.id];
+	m_modelInstanceObbs[destroyedInstanceIndex.id]             = m_modelInstanceObbs[lastInstanceIndex.id];
+	m_modelInstanceEditorProperties[destroyedInstanceIndex.id] = m_modelInstanceEditorProperties[lastInstanceIndex.id];
 
 	// Free references (no need to zero out data that doesn't have a smart pointer)
 	m_renderModels[lastInstanceIndex.id]   = nullptr;
@@ -107,6 +111,26 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	
 	// Decrement number of model instances
 	m_numModelInstances.id--;
+}
+
+void CrRenderWorld::SetSelected(CrModelInstanceIndex instanceIndex, bool isSelected)
+{
+	m_modelInstanceEditorProperties[instanceIndex.id].isSelected = isSelected;
+}
+
+void CrRenderWorld::SetSelected(CrModelInstanceId instanceId, bool isSelected)
+{
+	SetSelected(GetModelInstanceIndex(instanceId), isSelected);
+}
+
+bool CrRenderWorld::GetSelected(CrModelInstanceIndex instanceIndex) const
+{
+	return m_modelInstanceEditorProperties[instanceIndex.id].isSelected;
+}
+
+bool CrRenderWorld::GetSelected(CrModelInstanceId instanceId) const
+{
+	return GetSelected(GetModelInstanceIndex(instanceId));
 }
 
 void CrRenderWorld::ComputeVisibilityAndRenderPackets()
@@ -138,6 +162,8 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		transforms[0] = transform;
 
 		m_visibleModelInstances.push_back(instanceIndex);
+
+		bool isEditorSelected = GetSelected(instanceIndex);
 
 		for (uint32_t meshIndex = 0; meshIndex < meshCount; ++meshIndex)
 		{
@@ -181,6 +207,13 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
 			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 			m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
+
+			if (isEditorSelected)
+			{
+				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
+				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				m_renderLists[CrRenderListUsage::EdgeSelection].AddPacket(mainPacket);
+			}
 		}
 	}
 

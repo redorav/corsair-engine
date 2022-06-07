@@ -67,6 +67,7 @@ cbuffer Instance
 struct DebugShader
 {
 	float4 debugProperties; // .x Debug Shader Mode, .y Global Instance Id
+	float4 debugColor;
 };
 
 cbuffer DebugShader

@@ -30,6 +30,7 @@ void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64
 	ICrGPUQueryPool* oldestPool = GetOldestQueryPool();
 	m_timestampData.resize(oldestPool->GetActiveQueryCount());
 	m_timingIntervals.clear();
+	m_timingRequests[m_currentPoolIndex].clear();
 
 	if (!m_timestampData.empty())
 	{

@@ -73,7 +73,10 @@ namespace CrRenderListUsage
 	{
 		Forward,
 		GBuffer,
+
+		// Editor Render Lists
 		MouseSelection,
+		EdgeSelection,
 		Count
 	};
 };
@@ -104,6 +107,11 @@ struct CrRenderList
 private:
 
 	CrVector<CrRenderPacket> m_renderPackets;
+};
+
+struct CrModelInstanceEditorProperties
+{
+	bool isSelected;
 };
 
 // CrRenderWorld is where all rendering primitives live, e.g. model instances,
@@ -144,6 +152,12 @@ public:
 	void SetRenderModel(CrModelInstanceId instanceId, const CrRenderModelSharedHandle& renderModel) { SetRenderModel(GetModelInstanceIndex(instanceId), renderModel); }
 	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceIndex instanceIndex) const { return m_renderModels[instanceIndex.id]; }
 	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
+
+	// Editor properties
+	void SetSelected(CrModelInstanceIndex instanceIndex, bool isSelected);
+	void SetSelected(CrModelInstanceId instanceId, bool isSelected);
+	bool GetSelected(CrModelInstanceIndex instanceIndex) const;
+	bool GetSelected(CrModelInstanceId instanceId) const;
 
 	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
 
@@ -186,21 +200,23 @@ private:
 
 	// Model Instance Data
 
-	CrVector<float4x4> m_modelInstanceTransforms;
+	CrVector<float4x4>                  m_modelInstanceTransforms;
 
 	CrVector<CrRenderModelSharedHandle> m_renderModels;
 
-	CrVector<CrBoundingBox> m_modelInstanceObbs;
+	CrVector<CrBoundingBox>             m_modelInstanceObbs;
 
-	CrVector<CrModelInstanceIndex> m_modelInstanceIdToIndex;
+	CrVector<CrModelInstanceIndex>      m_modelInstanceIdToIndex;
 
-	CrVector<CrModelInstanceId> m_modelInstanceIndexToId;
+	CrVector<CrModelInstanceId>         m_modelInstanceIndexToId;
 
-	CrModelInstanceId m_maxModelInstanceId;
+	CrVector<CrModelInstanceEditorProperties> m_modelInstanceEditorProperties;
 
-	CrModelInstanceIndex m_numModelInstances;
+	CrModelInstanceId                   m_maxModelInstanceId;
 
-	CrModelInstanceId m_lastAvailableId;
+	CrModelInstanceIndex                m_numModelInstances;
+
+	CrModelInstanceId                   m_lastAvailableId;
 
 	// Lights Data
 	CrVector<float4x4> m_lightTransforms;

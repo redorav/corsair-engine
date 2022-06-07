@@ -4,6 +4,7 @@
 #include "Common.hlsl"
 #include "Surface.hlsl"
 
+Texture2D GBufferDepthTexture;
 Texture2D GBufferAlbedoAOTexture;
 Texture2D GBufferNormalsTexture;
 Texture2D GBufferMaterialTexture;

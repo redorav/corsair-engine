@@ -6,6 +6,7 @@
 #include "Imgui.hlsl"
 #include "GBuffer.hlsl"
 #include "Ubershader.hlsl"
+#include "Editor.hlsl"
 
 float4 metadata() : SV_Target0
 {	

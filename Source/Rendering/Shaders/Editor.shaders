@@ -1,0 +1,3 @@
+EditorEdgeSelectionPS:
+  entrypoint: EditorEdgeSelectionPS
+  stage: Pixel

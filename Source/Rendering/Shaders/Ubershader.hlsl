@@ -96,11 +96,11 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	const float DebugShaderModeInstanceID = 0;
 	const float DebugShaderModeFlatColor = 1;
 
-	if (debugShaderMode == 0)
+	if (debugShaderMode == DebugShaderModeInstanceID)
 	{
 		litSurface = float3(cb_DebugShader.debugProperties.y / 65535.0, 0.0, 0.0);
 	}
-	else if (debugShaderMode == 1)
+	else if (debugShaderMode == DebugShaderModeFlatColor)
 	{
 		litSurface = float3(1.0, 0.0, 0.0);
 	}

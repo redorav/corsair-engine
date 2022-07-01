@@ -19,7 +19,6 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 
 	D3D12_RESOURCE_DESC d3d12ResourceDescriptor = {};
-	d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	d3d12ResourceDescriptor.Width = m_width;
 	d3d12ResourceDescriptor.Height = m_height;
 	d3d12ResourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
@@ -179,7 +178,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 			if (IsCubemap())
 			{
-				uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;				
+				uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 				uavDescriptor.Texture2DArray.FirstArraySlice = 0;
 				uavDescriptor.Texture2DArray.ArraySize = m_arraySize * 6;
 				uavDescriptor.Texture2DArray.PlaneSlice = 0;

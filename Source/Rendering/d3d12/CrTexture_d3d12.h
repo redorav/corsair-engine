@@ -63,5 +63,5 @@ private:
 
 	uint32_t m_d3d12SubresourceCount;
 
-	ID3D12Resource* m_d3d12Resource;
+	ID3D12Resource* m_d3d12Resource = nullptr;
 };

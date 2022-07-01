@@ -89,7 +89,7 @@ struct CrShaderReflectionHeader
 	CrShaderReflectionVersion::T version = CrShaderReflectionVersion::CurrentVersion;
 
 	CrString entryPoint;
-	cr3d::ShaderStage::T shaderStage;
+	cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
 	uint64_t bytecodeHash = (uint64_t)-1;
 	
 	CrVector<CrShaderReflectionResource> constantBuffers;

@@ -17,8 +17,8 @@ struct CrStreamDataBlob
 	CrStreamDataBlob() {}
 	CrStreamDataBlob(void* data, size_t size) : data(data), size((uint32_t)size) {}
 	CrStreamDataBlob(void* data, uint32_t size) : data(data), size(size) {}
-	void* data;
-	uint32_t size;
+	void* data = nullptr;
+	uint32_t size = 0;
 };
 
 // This pure virtual interface is used to enforce the functions in the

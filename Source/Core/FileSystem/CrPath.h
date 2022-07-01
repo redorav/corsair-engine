@@ -226,13 +226,14 @@ private:
 	bool has_extension_internal(size_t& lastDot) const
 	{
 		lastDot = m_pathString.find_last_of(".");
-		size_t lastSeparator = m_pathString.find_last_of("/");
 
 		if (lastDot != m_pathString.npos && // If there is a dot
 			lastDot > 0 && // The dot is not at the beginning of the path
 			m_pathString[lastDot - 1] != '/' && // And the previous character is neither a / nor a . (special characters)
 			m_pathString[lastDot - 1] != '.')
 		{
+			size_t lastSeparator = m_pathString.find_last_of("/");
+
 			if (lastSeparator != m_pathString.npos)
 			{
 				return lastDot > lastSeparator;

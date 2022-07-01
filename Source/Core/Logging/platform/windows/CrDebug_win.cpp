@@ -55,7 +55,7 @@ void CrDebugWindows::PrintCurrentProcessMemory(const char* file, unsigned long l
 	va_end(args);
 
 	DWORD processID = GetCurrentProcessId();
-	HANDLE hProcess = hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
 
 	PROCESS_MEMORY_COUNTERS pmc;
 	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))

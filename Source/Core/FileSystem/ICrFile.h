@@ -15,7 +15,7 @@ using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 struct CrDirectoryEntry
 {
 	// Points to the directory passed in to the find function. Useful to build full path
-	const char* directory;
+	const char* directory = nullptr;
 
 	// Name of the file
 	CrPath filename;

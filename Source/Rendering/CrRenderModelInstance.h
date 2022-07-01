@@ -9,10 +9,13 @@ class CrRenderModelInstance
 {
 public:
 
-	CrRenderModelInstance() : m_instanceId(CrModelInstanceId::MaxId) {}
+	CrRenderModelInstance() 
+		: m_instanceId(CrModelInstanceId::MaxId)
+		, m_visibilityId(0xffffffff) {}
 
 	CrRenderModelInstance(CrModelInstanceId instanceId)
-		: m_instanceId(instanceId) {}
+		: m_instanceId(instanceId)
+		, m_visibilityId(0xffffffff) {}
 
 	CrModelInstanceId GetId() const { return m_instanceId; }
 

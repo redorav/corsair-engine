@@ -24,6 +24,7 @@ ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescr
 	, m_height(0)
 	, m_currentBufferIndex(0)
 	, m_imageAcquired(false)
+	, m_format(cr3d::DataFormat::Invalid)
 {
 
 }

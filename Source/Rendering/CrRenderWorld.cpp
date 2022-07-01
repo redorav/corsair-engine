@@ -64,7 +64,7 @@ CrRenderModelInstance CrRenderWorld::CreateModelInstance()
 
 void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 {
-	CrAssertMsg(instanceId.id >= 0, "Invalid model instance id");
+	CrAssertMsg(instanceId.id < CrModelInstanceId::MaxId, "Invalid model instance id");
 	CrAssertMsg(m_numModelInstances.id > 0, "Destroying more model instances than were created");
 
 	// Instance id and index of the model instance about to be destroyed

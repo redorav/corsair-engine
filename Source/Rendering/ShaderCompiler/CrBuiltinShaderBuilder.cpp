@@ -86,7 +86,6 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				if (stageNode.is_keyval())
 				{
 					c4::csubstr stageValue = stageNode.val();
-					stageName = CrString(stageValue.str, stageValue.len);
 					if (stageValue == "Vertex")        { shaderStage = cr3d::ShaderStage::Vertex; }
 					else if (stageValue == "Pixel")    { shaderStage = cr3d::ShaderStage::Pixel; }
 					else if (stageValue == "Geometry") { shaderStage = cr3d::ShaderStage::Geometry; }

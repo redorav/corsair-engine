@@ -79,12 +79,13 @@ CrProcess::CrProcess(const CrProcessDescriptor& processDescriptor) : CrProcess()
 	{
 		CloseHandle(startupInfo.hStdOutput);
 		CloseHandle(processInfo.hThread);
-		result     = processResult ? CrProcessResult::Success : CrProcessResult::Error;
+		result     = CrProcessResult::Success;
 		hProcess   = processInfo.hProcess;
 		hStdInput  = stdOutRead;
 	}
 	else
 	{
+		result = CrProcessResult::Error;
 		PrintLastWindowsError();
 	}
 }

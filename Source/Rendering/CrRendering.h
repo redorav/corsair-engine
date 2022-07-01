@@ -895,36 +895,47 @@ namespace cr3d
 			case DataFormat::ASTC_6x5_Unorm:
 			case DataFormat::ASTC_6x5_SRGB:
 				blockWidth = 6; blockHeight = 5;
+				break;
 			case DataFormat::ASTC_6x6_Unorm:
 			case DataFormat::ASTC_6x6_SRGB:
 				blockWidth = 6; blockHeight = 6;
+				break;
 			case DataFormat::ASTC_8x5_Unorm:
 			case DataFormat::ASTC_8x5_SRGB:
 				blockWidth = 8; blockHeight = 5;
+				break;
 			case DataFormat::ASTC_8x6_Unorm:
 			case DataFormat::ASTC_8x6_SRGB:
 				blockWidth = 8; blockHeight = 6;
+				break;
 			case DataFormat::ASTC_8x8_Unorm:
 			case DataFormat::ASTC_8x8_SRGB:
 				blockWidth = 8; blockHeight = 8;
+				break;
 			case DataFormat::ASTC_10x5_Unorm:
 			case DataFormat::ASTC_10x5_SRGB:
 				blockWidth = 10; blockHeight = 5;
+				break;
 			case DataFormat::ASTC_10x6_Unorm:
 			case DataFormat::ASTC_10x6_SRGB:
 				blockWidth = 10; blockHeight = 6;
+				break;
 			case DataFormat::ASTC_10x8_Unorm:
 			case DataFormat::ASTC_10x8_SRGB:
 				blockWidth = 10; blockHeight = 8;
+				break;
 			case DataFormat::ASTC_10x10_Unorm:
 			case DataFormat::ASTC_10x10_SRGB:
 				blockWidth = 10; blockHeight = 10;
+				break;
 			case DataFormat::ASTC_12x10_Unorm:
 			case DataFormat::ASTC_12x10_SRGB:
 				blockWidth = 12; blockHeight = 10;
+				break;
 			case DataFormat::ASTC_12x12_Unorm:
 			case DataFormat::ASTC_12x12_SRGB:
 				blockWidth = 12; blockHeight = 12;
+				break;
 			default:
 				blockWidth = 1; blockHeight = 1;
 			break;

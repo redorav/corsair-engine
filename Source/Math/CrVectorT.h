@@ -7,7 +7,7 @@ template<class T, uint32_t N>
 struct VectorT
 {
 	VectorT<T, N>() {}
-	VectorT<T, N>(std::initializer_list<T> l) {}
+	VectorT<T, N>(std::initializer_list<T>) {}
 	static_assert(N < 4, "Do not use this with sizes other than 2, 3 and 4! Specializations are below.");
 };
 
@@ -34,6 +34,6 @@ struct VectorT<T, 2>
 {
 	VectorT<T, 2>() {}
 	VectorT<T, 2>(std::initializer_list<T> l) : x(*l.begin()), y(*(l.begin() + 1)) {}
-	VectorT<T, 2>(T x, T y, T z, T w) : x(x), y(y) {}
+	VectorT<T, 2>(T x, T y) : x(x), y(y) {}
 	T x, y;
 };

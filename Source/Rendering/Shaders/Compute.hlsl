@@ -13,13 +13,6 @@ Texture2DArray ExampleTextureArrayCompute;
 
 RWByteAddressBuffer ExampleIndirectBuffer;
 
-struct DispatchIndirectArguments
-{
-	uint dispatchX;
-	uint dispatchY;
-	uint dispatchZ;
-};
-
 RWStructuredBuffer<DispatchIndirectArguments> ExampleDispatchIndirect;
 
 struct ComputeStruct

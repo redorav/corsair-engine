@@ -32,6 +32,14 @@ struct VS_OUT_FULLSCREEN
     float2 uv			: TEXCOORD0;
 };
 
+struct CS_IN
+{
+	uint3 groupId			: SV_GroupID;			// Index of the thread group a compute shader thread is executing in
+	uint3 groupThreadId		: SV_GroupThreadID;		// Index for an individual thread within a thread group (local to the group)
+	uint  groupIndex		: SV_GroupIndex;		// Flattened version of SV_GroupThreadID
+	uint3 dispatchThreadId	: SV_DispatchThreadID;	// SV_GroupID * numthreads + SV_GroupThreadID - The global thread index
+};
+
 struct Camera
 {
 	row_major float4x4 view2Projection;

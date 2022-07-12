@@ -45,7 +45,7 @@ public:
 
 	void SetViewport(const CrViewport& viewport);
 
-	void SetScissor(const CrScissor& scissor);
+	void SetScissor(const CrRectangle& scissor);
 
 	void SetStencilRef(uint32_t stencilRef);
 
@@ -247,7 +247,7 @@ protected:
 		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = false;
 
-		CrScissor                       m_scissor;
+		CrRectangle                     m_scissor;
 		bool                            m_scissorDirty = true;
 
 		CrViewport                      m_viewport;
@@ -309,7 +309,7 @@ inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
 	}
 }
 
-inline void ICrCommandBuffer::SetScissor(const CrScissor& scissor)
+inline void ICrCommandBuffer::SetScissor(const CrRectangle& scissor)
 {
 	if (m_currentState.m_scissor != scissor)
 	{

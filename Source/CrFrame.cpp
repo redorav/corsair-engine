@@ -502,7 +502,7 @@ void CrFrame::Process()
 		ICrTexture* gBufferAlbedoAOTexture = renderGraph.GetPhysicalTexture(gBufferAlbedoAO);
 
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)gBufferAlbedoAOTexture->GetWidth(), (float)gBufferAlbedoAOTexture->GetHeight()));
-		commandBuffer->SetScissor(CrScissor(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
+		commandBuffer->SetScissor(CrRectangle(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
 
 		const CrRenderList& gBufferRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::GBuffer);
 
@@ -553,7 +553,7 @@ void CrFrame::Process()
 	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
-		commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+		commandBuffer->SetScissor(CrRectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 
 		const CrRenderList& forwardRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::Forward);
 
@@ -584,7 +584,7 @@ void CrFrame::Process()
 		[this, edgeSelectionRenderList](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
 			commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
-			commandBuffer->SetScissor(CrScissor(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
+			commandBuffer->SetScissor(CrRectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
 
 			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
 

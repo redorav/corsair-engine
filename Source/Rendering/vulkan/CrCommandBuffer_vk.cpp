@@ -317,7 +317,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_scissorDirty)
 	{
-		const CrScissor& scissor = m_currentState.m_scissor;
+		const CrRectangle& scissor = m_currentState.m_scissor;
 		VkRect2D vkRect2D = { { (int32_t)scissor.x, (int32_t)scissor.y }, { scissor.width, scissor.height } };
 		vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &vkRect2D);
 		m_currentState.m_scissorDirty = false;

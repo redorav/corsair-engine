@@ -1025,28 +1025,6 @@ namespace cr3d
 	};
 }
 
-struct CrScissor
-{
-	CrScissor() : x(0), y(0), width(0), height(0) {}
-
-	CrScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
-
-	bool operator == (const CrScissor& scissor)
-	{
-		return x == scissor.x && y == scissor.y && width == scissor.width && height == scissor.height;
-	}
-
-	bool operator != (const CrScissor& scissor)
-	{
-		return !(*this == scissor);
-	}
-
-	uint32_t x;
-	uint32_t y;
-	uint32_t width;
-	uint32_t height;
-};
-
 struct CrViewport
 {
 	CrViewport() : x(0.0f), y(0.0f), width(1.0f), height(1.0f), minDepth(0.0f), maxDepth(1.0f) {}
@@ -1076,11 +1054,26 @@ struct CrViewport
 	float maxDepth;
 };
 
-// TODO Unify with scissor
-struct CrRect2D
+struct CrRectangle
 {
-	int32_t x, y;
-	uint32_t width, height;
+	CrRectangle() {}
+
+	CrRectangle(int32_t x, int32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
+
+	bool operator == (const CrRectangle& rect)
+	{
+		return x == rect.x && y == rect.y && width == rect.width && height == rect.height;
+	}
+
+	bool operator != (const CrRectangle& rect)
+	{
+		return !(*this == rect);
+	}
+
+	int32_t x = 0;
+	int32_t y = 0;
+	uint32_t width = 0;
+	uint32_t height = 0;
 };
 
 // todo put in cr3d

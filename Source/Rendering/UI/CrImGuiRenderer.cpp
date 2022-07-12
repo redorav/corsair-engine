@@ -263,7 +263,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 					// Generic rendering.
 					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
 					commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
-					commandBuffer->SetScissor(CrScissor(x, y, width, height));
+					commandBuffer->SetScissor(CrRectangle(x, y, width, height));
 					commandBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
 				}
 				else

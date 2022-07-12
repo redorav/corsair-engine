@@ -157,21 +157,33 @@ CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::Dat
 	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), sizeBytes), indexCount, indexFormat);
 }
 
+// TODO Delete this function and bind constant buffers to specific stages
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)
 {
 	BindConstantBuffer(constantBuffer, constantBuffer->GetGlobalIndex());
 }
 
+// TODO Delete this function and bind constant buffers to specific stages
 void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int32_t globalIndex)
 {
+	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage <= cr3d::ShaderStage::Compute; ++stage)
+	{
+		BindConstantBuffer(stage, constantBuffer, globalIndex);
+	}
+}
+
+void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer)
+{
+	BindConstantBuffer(shaderStage, constantBuffer, constantBuffer->GetGlobalIndex());
+}
+
+void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer, int32_t globalIndex)
+{
+	CrAssertMsg(constantBuffer != nullptr, "Buffer is null");
 	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
 	CrAssertMsg(globalIndex != -1, "Global index not set");
 
-	// TODO Bind constant buffers to specific stages
-	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage < cr3d::ShaderStage::GraphicsStageCount; ++stage)
-	{
-		m_currentState.m_constantBuffers[stage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
-	}
+	m_currentState.m_constantBuffers[shaderStage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
 }
 
 void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)

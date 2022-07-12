@@ -63,6 +63,10 @@ public:
 
 	void BindConstantBuffer(const CrGPUBuffer* constantBuffer, int32_t globalIndex);
 
+	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer);
+
+	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer, int32_t globalIndex);
+
 	void BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler);
 
 	void BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture);
@@ -454,21 +458,21 @@ inline void ICrCommandBuffer::InsertDebugMarker(const char* markerName, const fl
 
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
-	CrAssertMsg(sampler != nullptr, "Sampler is nullptr");
+	CrAssertMsg(sampler != nullptr, "Sampler is null");
 
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
 }
 
 inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture)
 {
-	CrAssertMsg(texture != nullptr, "Texture is nullptr");
+	CrAssertMsg(texture != nullptr, "Texture is null");
 
 	m_currentState.m_textures[shaderStage][textureIndex] = texture;
 }
 
 inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T textureIndex, const ICrTexture* texture, uint32_t mip)
 {
-	CrAssertMsg(texture != nullptr, "Texture is nullptr");
+	CrAssertMsg(texture != nullptr, "Texture is null");
 	CrAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag!");
 	CrAssertMsg(texture->GetMipmapCount() > mip, "Texture doesn't have enough mipmaps!");
 
@@ -477,7 +481,7 @@ inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, co
 
 inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, const StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is nullptr");
+	CrAssertMsg(buffer != nullptr, "Buffer is null");
 
 	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = 
 		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
@@ -485,7 +489,7 @@ inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage
 
 inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is nullptr");
+	CrAssertMsg(buffer != nullptr, "Buffer is null");
 
 	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = 
 		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
@@ -493,7 +497,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is nullptr");
+	CrAssertMsg(buffer != nullptr, "Buffer is null");
 
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
 }

@@ -51,6 +51,9 @@ private:
 	CrBuiltinComputePipeline m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 
+	// Gets the vaue of the instance id at the mouse position and stores it in a buffer
+	CrBuiltinComputePipeline m_mouseSelectionResolvePipeline;
+
 	CrBuiltinGraphicsPipeline m_directionalLightPipeline;
 
 	CrBuiltinComputePipeline m_createIndirectArguments;
@@ -74,6 +77,8 @@ private:
 	CrTextureSharedHandle m_lightingTexture;
 
 	CrTextureSharedHandle m_debugShaderTexture;
+
+	CrGPUBufferSharedHandle m_mouseSelectionBuffer;
 
 	CrTextureSharedHandle m_colorsRWTexture;
 

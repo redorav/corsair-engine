@@ -165,6 +165,16 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		bool isEditorSelected = GetSelected(instanceIndex);
 
+		uint32_t* instanceIdPtr = nullptr;
+		bool computeMouseSelection = GetMouseSelectionEnabled();
+
+		if (computeMouseSelection)
+		{
+			CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
+			instanceIdPtr = m_renderingStream->Allocate<uint32_t>(1).memory;
+			((uint32_t*)instanceIdPtr)[0] = instanceId.id;
+		}
+
 		for (uint32_t meshIndex = 0; meshIndex < meshCount; ++meshIndex)
 		{
 			const auto& meshMaterial       = renderModel->GetRenderMeshMaterial(meshIndex);
@@ -208,6 +218,15 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 			m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 
+			if (computeMouseSelection)
+			{
+				// TODO Reduce list using bound selection
+				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
+				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				mainPacket.extra = instanceIdPtr;
+				m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
+			}
+
 			if (isEditorSelected)
 			{
 				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
@@ -235,6 +254,17 @@ void CrRenderWorld::EndRendering()
 	{
 		renderList.Clear();
 	}
+}
+
+void CrRenderWorld::SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle)
+{
+	m_computeMouseSelection = enable;
+	m_mouseSelectionBoundingRectangle = boundingRectangle;
+}
+
+bool CrRenderWorld::GetMouseSelectionEnabled() const
+{
+	return m_computeMouseSelection;
 }
 
 void CrRenderList::Clear()

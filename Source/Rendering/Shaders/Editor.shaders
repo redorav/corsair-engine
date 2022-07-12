@@ -1,3 +1,7 @@
 EditorEdgeSelectionPS:
   entrypoint: EditorEdgeSelectionPS
   stage: Pixel
+
+EditorMouseSelectionResolveCS:
+  entrypoint: EditorResolveMouseSelectionCS
+  stage: Compute

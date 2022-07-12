@@ -98,7 +98,8 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 
 	if (debugShaderMode == DebugShaderModeInstanceID)
 	{
-		litSurface = float3(cb_DebugShader.debugProperties.y / 65535.0, 0.0, 0.0);
+		float normalizedInstanceId = cb_DebugShader.debugProperties.y / 65535.0;
+		litSurface = float3(normalizedInstanceId, normalizedInstanceId, normalizedInstanceId);
 	}
 	else if (debugShaderMode == DebugShaderModeFlatColor)
 	{

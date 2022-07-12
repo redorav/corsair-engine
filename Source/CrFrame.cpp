@@ -261,8 +261,11 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	{
-		CrComputePipelineDescriptor computePipelineDescriptor;
-		m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::ExampleCompute);
+		m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::ExampleCompute);
+	}
+
+	{
+		m_mouseSelectionResolvePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::EditorMouseSelectionResolveCS);
 	}
 
 	{
@@ -359,6 +362,9 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	CrGPUBufferDescriptor argumentsDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
 	m_indirectDispatchArguments = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), argumentsDescriptor, 3, 4));
 
+	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
+	m_mouseSelectionBuffer = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 3, 4));
+
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 }
@@ -392,8 +398,12 @@ void CrFrame::Process()
 
 	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
-	bool isMouseClicked = CrInput.GetMouseState().buttonPressed[MouseButton::Left];
+	const MouseState& mouseState = CrInput.GetMouseState();
+	bool isMouseClicked = mouseState.buttonPressed[MouseButton::Left];
 	m_renderWorld->SetSelected(CrModelInstanceId(0), isMouseClicked);
+
+	CrRectangle mouseRectangle(mouseState.position.x - 10, mouseState.position.y - 10, 20, 20);
+	m_renderWorld->SetMouseSelectionEnabled(isMouseClicked, mouseRectangle);
 
 	// Set up render graph to start recording passes
 	CrRenderGraphFrameParams frameRenderGraphParams;
@@ -535,8 +545,7 @@ void CrFrame::Process()
 		}
 		lightConstantBuffer.Unlock();
 
-		commandBuffer->BindConstantBuffer(&lightConstantBuffer);
-
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &lightConstantBuffer);
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
@@ -570,6 +579,10 @@ void CrFrame::Process()
 	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
 	debugShaderTextureDescriptor.texture = m_debugShaderTexture.get();
 	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
+
+	CrRenderGraphBufferDescriptor mouseSelectionBufferDescriptor;
+	mouseSelectionBufferDescriptor.buffer = m_mouseSelectionBuffer.get();
+	CrRenderGraphBufferId mouseSelectionBufferId = m_mainRenderGraph.CreateBuffer("Mouse Selection Buffer", mouseSelectionBufferDescriptor);
 
 	const CrRenderList& edgeSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::EdgeSelection);
 
@@ -613,7 +626,7 @@ void CrFrame::Process()
 		[this, debugShaderTextureId]
 		(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 		{
-			commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::SelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
+			commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::EditorSelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
 			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline.get());
 			commandBuffer->Draw(3, 1, 0, 0);
 		});
@@ -708,43 +721,73 @@ void CrFrame::Process()
 		commandBuffer->DispatchIndirect(gpuBuffer->GetHardwareBuffer(), 0);
 	});
 
-	m_mainRenderGraph.AddRenderPass("Mouse Instance ID", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
-	[&](CrRenderGraph& renderGraph)
+	if (m_renderWorld->GetMouseSelectionEnabled())
 	{
-		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
-		renderGraph.AddRenderTarget(debugShaderTextureId, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
-	},
-	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
-	{
-		const ICrTexture* debugShaderTexture = renderGraph.GetPhysicalTexture(debugShaderTextureId);
-
-		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)debugShaderTexture->GetWidth(), (float)debugShaderTexture->GetHeight()));
-		commandBuffer->SetScissor(CrScissor(0, 0, debugShaderTexture->GetWidth(), debugShaderTexture->GetHeight()));
-
-		const CrRenderList& mouseSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::MouseSelection);
-
-		// We don't batch here to get unique ids
-		CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
-		renderPacketBatcher.SetMaximumBatchSize(1);
-
-		mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+		m_mainRenderGraph.AddRenderPass("Mouse Instance ID", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
+		[&](CrRenderGraph& renderGraph)
 		{
-			if (renderPacket.extra)
-			{
-				CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-				DebugShader* debugShaderData = debugShaderBuffer.Lock();
-				{
-					debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
-				}
-				debugShaderBuffer.Unlock();
-				commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+			renderGraph.AddRenderTarget(debugShaderTextureId, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(1.0f, 1.0f, 1.0f, 1.0f));
+		},
+		[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+		{
+			const ICrTexture* debugShaderTexture = renderGraph.GetPhysicalTexture(debugShaderTextureId);
 
-				renderPacketBatcher.ProcessRenderPacket(renderPacket);
-			}
+			commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)debugShaderTexture->GetWidth(), (float)debugShaderTexture->GetHeight()));
+			commandBuffer->SetScissor(CrRectangle(0, 0, debugShaderTexture->GetWidth(), debugShaderTexture->GetHeight()));
+
+			const CrRenderList& mouseSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::MouseSelection);
+
+			// We don't batch here to get unique ids
+			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
+			renderPacketBatcher.SetMaximumBatchSize(1);
+
+			mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
+			{
+				if (renderPacket.extra)
+				{
+					CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+					DebugShader* debugShaderData = debugShaderBuffer.Lock();
+					{
+						debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
+					}
+					debugShaderBuffer.Unlock();
+					commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+
+					renderPacketBatcher.ProcessRenderPacket(renderPacket);
+				}
+			});
+
+			renderPacketBatcher.ExecuteBatch(); // Execute last batch
 		});
 
-		renderPacketBatcher.ExecuteBatch(); // Execute last batch
-	});
+		const ICrComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline.get();
+		int32_t mouseX = mouseState.position.x;
+		int32_t mouseY = mouseState.position.y;
+
+		m_mainRenderGraph.AddRenderPass("Resolve Selected Instance", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Compute,
+		[&](CrRenderGraph& renderGraph)
+		{
+			renderGraph.AddRWBuffer(mouseSelectionBufferId, cr3d::ShaderStageFlags::Compute);
+			renderGraph.AddTexture(debugShaderTextureId, cr3d::ShaderStageFlags::Compute);
+		},
+		[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+		{
+			CrGPUBufferType<MouseSelection> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelection>(1);
+			MouseSelection* mouseSelectionData = mouseSelectionBuffer.Lock();
+			{
+				mouseSelectionData->mouseCoordinates.x = mouseX;
+				mouseSelectionData->mouseCoordinates.y = mouseY;
+			}
+			mouseSelectionBuffer.Unlock();
+
+			commandBuffer->BindComputePipelineState(mouseSelectionResolvePipeline);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Compute, &mouseSelectionBuffer);
+			commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::EditorInstanceIDTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
+			commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::EditorSelectedInstanceID, renderGraph.GetPhysicalBuffer(mouseSelectionBufferId));
+			commandBuffer->Dispatch(1, 1, 1);
+		});
+	}
 
 	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)

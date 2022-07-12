@@ -4,7 +4,7 @@
 #include "Common.hlsl"
 #include "GBuffer.hlsl"
 
-Texture2D SelectionTexture;
+Texture2D EditorSelectionTexture;
 
 float4 EditorEdgeSelectionPS(VS_OUT_FULLSCREEN input) : SV_Target0
 {
@@ -16,7 +16,7 @@ float4 EditorEdgeSelectionPS(VS_OUT_FULLSCREEN input) : SV_Target0
 	{
 		for (int j = -1; j <= 1; ++j)
 		{
-			float4 color = SelectionTexture.Load(int3(input.hwPosition.xy + int2(i, j), 0));
+			float4 color = EditorSelectionTexture.Load(int3(input.hwPosition.xy + int2(i, j), 0));
 			bool isAnyColor = any(color);
 			colorSamples += isAnyColor;
 			totalSamples++;
@@ -32,6 +32,29 @@ float4 EditorEdgeSelectionPS(VS_OUT_FULLSCREEN input) : SV_Target0
 	{
 		return float4(0.0, 0.0, 0.0, 0.0);
 	}
+}
+
+Texture2D EditorInstanceIDTexture;
+RWByteAddressBuffer EditorSelectedInstanceID;
+
+struct MouseSelection
+{
+	int4 mouseCoordinates; // .xy mouse coordinates
+};
+
+cbuffer MouseSelection
+{
+	MouseSelection cb_MouseSelection;
+};
+
+[numthreads(1, 1, 1)]
+void EditorResolveMouseSelectionCS(CS_IN input)
+{
+	int2 mouseCoordinates = cb_MouseSelection.mouseCoordinates.xy;
+
+	float instanceID = (EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x + 0.5) * 65535.0;
+	
+	EditorSelectedInstanceID.Store(0, (uint) instanceID);
 }
 
 #endif

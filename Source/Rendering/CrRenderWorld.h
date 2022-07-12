@@ -190,6 +190,12 @@ public:
 
 	void EndRendering();
 
+	// Editor
+
+	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
+
+	bool GetMouseSelectionEnabled() const;
+
 private:
 
 	CrModelInstanceIndex GetModelInstanceIndex(CrModelInstanceId instanceId) const
@@ -210,7 +216,7 @@ private:
 
 	CrVector<CrModelInstanceId>         m_modelInstanceIndexToId;
 
-	CrVector<CrModelInstanceEditorProperties> m_modelInstanceEditorProperties;
+	
 
 	CrModelInstanceId                   m_maxModelInstanceId;
 
@@ -240,4 +246,12 @@ private:
 
 	// Visible model instances
 	CrVector<CrModelInstanceIndex> m_visibleModelInstances;
+
+	// Editor support
+
+	CrVector<CrModelInstanceEditorProperties> m_modelInstanceEditorProperties;
+
+	bool m_computeMouseSelection = false;
+
+	CrRectangle m_mouseSelectionBoundingRectangle;
 };

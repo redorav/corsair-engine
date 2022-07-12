@@ -78,6 +78,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	{
 		uint32_t formatCount;
 		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
+		CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface formats");
+
 		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
 		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
 		CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface formats");
@@ -229,9 +231,11 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	}
 
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
 	CrVector<VkImage> images(m_imageCount);
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
 	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
 

@@ -321,7 +321,6 @@ static bool PopulateVkImageResourceTable()
 	CrVkImageResourceStateTable[cr3d::TextureState::DepthStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
 	CrVkImageResourceStateTable[cr3d::TextureState::CopySource]        = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
 	CrVkImageResourceStateTable[cr3d::TextureState::CopyDestination]   = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::PreInitialized]    = { VK_IMAGE_LAYOUT_PREINITIALIZED,                   VK_ACCESS_HOST_WRITE_BIT };
 
 	// Validate the entries on boot
 	for (const CrVkImageStateInfo& resourceInfo : CrVkImageResourceStateTable)

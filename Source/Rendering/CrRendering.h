@@ -498,7 +498,6 @@ namespace cr3d
 			DepthStencilWrite, // Write to depth
 			CopySource,        // Use as source of copy operation
 			CopyDestination,   // Use as destination of copy operation
-			PreInitialized,    // Linear content. Never a destination
 			Count
 		};
 
@@ -515,7 +514,6 @@ namespace cr3d
 				case DepthStencilWrite: return "DepthStencilWrite";
 				case CopySource: return "CopySource";
 				case CopyDestination: return "CopyDestination";
-				case PreInitialized: return "PreInitialized";
 				default: return "";
 			}
 		}

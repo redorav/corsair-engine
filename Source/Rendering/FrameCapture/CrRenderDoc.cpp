@@ -90,6 +90,10 @@ void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescrip
 		pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress((HMODULE)m_renderDocModule, "RENDERDOC_GetAPI");
 		RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_5_0, (void**)&m_renderDocApi);
 
+		RENDERDOC_InputButton captureButtons[] = { eRENDERDOC_Key_F10, eRENDERDOC_Key_F12 };
+
+		m_renderDocApi->SetCaptureKeys(captureButtons, sizeof_array(captureButtons));
+
 		if (renderSystemDescriptor.enableValidation)
 		{
 			m_renderDocApi->SetCaptureOptionU32(eRENDERDOC_Option_APIValidation, 1);

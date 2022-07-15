@@ -13,6 +13,7 @@
 ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
 	: m_renderDevice(renderDevice)
 	, m_queueType(descriptor.queueType)
+	, m_submitted(false)
 {
 	// Initialize GPU buffer stack allocators - for streaming
 	// TODO it is possible to create these lazily on allocation instead
@@ -45,8 +46,6 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 	}
 
 	m_completionFence = m_renderDevice->CreateGPUFence();
-
-	m_submitted = false;
 }
 
 ICrCommandBuffer::~ICrCommandBuffer()

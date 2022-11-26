@@ -17,6 +17,7 @@
 	
 	<package name="eastl">
 		<version id="fad5471" file="eastl_2021_01_18_fad5471.zip" repository="github"/>
+		<version id="db16065" file="eastl_2022_11_26_db16065.zip" repository="github"/>
 	</package>
 	
 	<package name="glslang">

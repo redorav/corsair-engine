@@ -209,9 +209,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 
 		vulkanStagingBuffer->Unlock();
 
-		const CrCommandBufferSharedHandle& commandBuffer = m_auxiliaryCommandBuffer;
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(commandBuffer.get());
-		vulkanCommandBuffer->Begin();
+		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
 			VkImageAspectFlags vkImageAspectMask = vulkanTexture->GetVkImageAspectMask();
 
@@ -273,9 +271,6 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 			// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
 			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 		}
-		vulkanCommandBuffer->End();
-		vulkanCommandBuffer->Submit();
-		WaitIdle();
 
 		// Cast to const_iterator to conform to EASTL's interface
 		m_openTextureUploads.erase((CrHashMap<CrHash, CrTextureUpload>::const_iterator)textureUploadIter);

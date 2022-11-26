@@ -392,6 +392,8 @@ void CrFrame::Process()
 		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 	}
 
+	renderDevice->ProcessQueuedCommands();
+
 	CrRenderingStatistics::Reset();
 
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
@@ -814,20 +816,31 @@ void CrFrame::Process()
 
 	});
 
+	// Execute the render graph
 	m_mainRenderGraph.Execute();
 
+	// End the timing query tracker (inserts last timing query)
 	m_timingQueryTracker->EndFrame(drawCommandBuffer);
 
+	// End command buffer recording
 	drawCommandBuffer->End();
 
+	// Submit command buffer (should be reworked)
 	drawCommandBuffer->Submit();
 
+	// Present the swapchain
 	m_swapchain->Present();
 
+	// Clears render lists
 	m_renderWorld->EndRendering();
 
+	// Clears all the resources of the render graph
 	m_mainRenderGraph.End();
 
+	// Processes deferred GPU commands
+	renderDevice->ProcessQueuedCommands();
+
+	// Processes deferred deletion of resources
 	renderDevice->ProcessDeletionQueue();
 
 	CrFrameTime::IncrementFrameCount();

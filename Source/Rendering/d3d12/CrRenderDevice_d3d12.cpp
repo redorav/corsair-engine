@@ -366,9 +366,7 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* texture)
 
 		d3d12StagingBuffer->Unlock();
 
-		const CrCommandBufferSharedHandle& commandBuffer = m_auxiliaryCommandBuffer;
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(commandBuffer.get());
-		d3d12CommandBuffer->Begin();
+		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
 			D3D12_RESOURCE_DESC resourceDescriptor = d3d12Texture->GetD3D12Resource()->GetDesc();
 
@@ -402,9 +400,6 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* texture)
 				}
 			}
 		}
-		d3d12CommandBuffer->End();
-		d3d12CommandBuffer->Submit();
-		WaitIdle();
 
 		// Cast to const_iterator to conform to EASTL's interface
 		m_openTextureUploads.erase((CrHashMap<CrHash, CrTextureUpload>::const_iterator)textureUploadIter);

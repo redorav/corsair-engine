@@ -104,6 +104,10 @@ public:
 
 	void FinalizeDeletion();
 
+	void ProcessQueuedCommands();
+
+	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer();
+
 	//----------------------------
 	// Resource Creation Functions
 	//----------------------------
@@ -243,10 +247,6 @@ protected:
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 
-	CrCommandBufferSharedHandle m_auxiliaryCommandBuffer;
-
-	CrVector<CrCommandQueueSharedHandle> m_commandQueues;
-
 	// Texture uploads that have begun to be populated with data but haven't been committed yet
 	CrHashMap<CrHash, CrTextureUpload> m_openTextureUploads;
 
@@ -257,6 +257,18 @@ protected:
 	CrString m_pipelineCacheDirectory;
 
 	CrString m_pipelineCacheFilename;
+
+private:
+
+	// Auxiliary command buffers. Subclasses don't need to know about the implementation details,
+	// they queue work onto the auxiliary command buffer (via the getter)
+	CrCommandBufferSharedHandle m_auxiliaryCommandBuffer;
+
+	CrVector<CrCommandBufferSharedHandle> m_auxiliaryCommandBuffers;
+
+	uint32_t m_auxiliaryCommandBufferIndex = 0;
+
+	uint32_t m_auxiliaryCommandBufferCount = 0;
 };
 
 template<typename Metadata>

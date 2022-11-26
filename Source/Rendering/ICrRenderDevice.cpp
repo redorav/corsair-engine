@@ -43,14 +43,46 @@ void ICrRenderDevice::Initialize()
 {
 	m_gpuDeletionQueue->Initialize(this);
 
-	CrCommandBufferDescriptor descriptor;
-	descriptor.name.append("Auxiliary Command Buffer");
-	m_auxiliaryCommandBuffer = CreateCommandBuffer(descriptor);
+	m_auxiliaryCommandBufferCount = 3; // TODO Pass in or make dynamic
+
+	for (uint32_t i = 0; i < m_auxiliaryCommandBufferCount; ++i)
+	{
+		CrCommandBufferDescriptor descriptor;
+		descriptor.name.append("Render Device Auxiliary Command Buffer %i", i);
+		m_auxiliaryCommandBuffers.push_back(CreateCommandBuffer(descriptor));
+	}
+}
+
+const CrCommandBufferSharedHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer()
+{
+	// If we don't have an auxiliary command buffer, get one from the pool
+	if (!m_auxiliaryCommandBuffer)
+	{
+		m_auxiliaryCommandBufferIndex = (m_auxiliaryCommandBufferIndex + 1) % m_auxiliaryCommandBufferCount;
+
+		m_auxiliaryCommandBuffer = m_auxiliaryCommandBuffers[m_auxiliaryCommandBufferIndex];
+
+		m_auxiliaryCommandBuffer->Begin();
+	}
+
+	return m_auxiliaryCommandBuffer;
 }
 
 void ICrRenderDevice::ProcessDeletionQueue()
 {
 	m_gpuDeletionQueue->Process();
+}
+
+void ICrRenderDevice::ProcessQueuedCommands()
+{
+	// If we have an auxiliary command buffer, it means we queued some commands
+	// and we need to submit the buffer now
+	if (m_auxiliaryCommandBuffer)
+	{
+		m_auxiliaryCommandBuffer->End();
+		m_auxiliaryCommandBuffer->Submit();
+		m_auxiliaryCommandBuffer = nullptr;
+	}
 }
 
 void ICrRenderDevice::FinalizeDeletion()

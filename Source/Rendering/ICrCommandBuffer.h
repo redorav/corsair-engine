@@ -182,7 +182,7 @@ protected:
 	{
 		ConstantBufferBinding() {}
 
-		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes,uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
+		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
 
 		const ICrHardwareGPUBuffer* buffer = nullptr;
 		uint32_t offsetBytes = 0;

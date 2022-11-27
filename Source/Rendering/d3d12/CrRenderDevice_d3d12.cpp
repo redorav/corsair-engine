@@ -320,6 +320,9 @@ void CrRenderDeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
 
 void CrRenderDeviceD3D12::WaitIdlePS()
 {
+	// Reset wait idle fence
+	ResetFence(m_waitIdleFence.get());
+
 	// Signal a fence and immediately wait for it
 	SignalFence(CrCommandQueueType::Graphics, m_waitIdleFence.get());
 

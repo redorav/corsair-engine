@@ -108,9 +108,9 @@ public:
 
 	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer();
 
-	//----------------------------
-	// Resource Creation Functions
-	//----------------------------
+	//------------------
+	// Resource Creation
+	//------------------
 
 	CrCommandBufferSharedHandle CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
@@ -147,9 +147,9 @@ public:
 
 	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();
 
-	//------------------------------
-	// GPU Synchronization functions
-	//------------------------------
+	//--------------------
+	// GPU Synchronization
+	//--------------------
 
 	cr3d::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
 
@@ -162,9 +162,9 @@ public:
 	// Wait until all operations on all queues have completed
 	void WaitIdle();
 
-	//------------------------------
-	// Download and Upload functions
-	//------------------------------
+	//--------------------
+	// Download and Upload
+	//--------------------
 	
 	uint8_t* BeginTextureUpload(const ICrTexture* texture);
 

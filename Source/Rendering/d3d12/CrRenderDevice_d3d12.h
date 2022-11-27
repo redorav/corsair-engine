@@ -50,6 +50,10 @@ public:
 
 private:
 
+	//------------------
+	// Resource Creation
+	//------------------
+
 	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
 	virtual ICrGPUFence* CreateGPUFencePS() override;
@@ -74,6 +78,10 @@ private:
 
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) override;
 
+	//--------------------
+	// GPU Synchronization
+	//--------------------
+
 	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
 	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
@@ -83,6 +91,10 @@ private:
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;
 
 	virtual void WaitIdlePS() override;
+
+	//--------------------
+	// Download and Upload
+	//--------------------
 
 	virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) override;
 

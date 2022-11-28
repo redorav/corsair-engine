@@ -48,11 +48,11 @@ cbuffer MouseSelection
 };
 
 [numthreads(1, 1, 1)]
-void EditorResolveMouseSelectionCS(CS_IN input)
+void EditorMouseSelectionResolveCS(CS_IN input)
 {
 	int2 mouseCoordinates = cb_MouseSelection.mouseCoordinates.xy;
 
-	float instanceID = (EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x + 0.5) * 65535.0;
+	float instanceID = EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x * 65535.0 + 0.5;
 	
 	EditorSelectedInstanceID.Store(0, (uint) instanceID);
 }

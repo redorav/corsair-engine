@@ -117,7 +117,14 @@ namespace crinput
 
 struct MouseState
 {
+	// Whether mouse button was clicked (held and lifted)
+	CrBitset<MouseButton::Count, uint8_t> buttonClicked;
+
+	// Whether mouse button was pressed this tick (started to hold)
 	CrBitset<MouseButton::Count, uint8_t> buttonPressed;
+
+	// Whether mouse button is held down
+	CrBitset<MouseButton::Count, uint8_t> buttonHeld;
 
 	crinput::int2 position;
 
@@ -154,6 +161,9 @@ public:
 		m_mouseState.relativePosition.y = 0;
 		m_mouseState.mouseWheel.x = 0;
 		m_mouseState.mouseWheel.y = 0;
+
+		m_mouseState.buttonClicked = 0;
+		m_mouseState.buttonPressed = 0;
 	}
 
 	const MouseState& GetMouseState() const
@@ -211,12 +221,20 @@ public:
 
 	void OnMouseButtonDown(MouseButton::Code code)
 	{
-		m_mouseState.buttonPressed.set(code, true);
+		m_mouseState.buttonPressed[code] = true;
+
+		m_mouseState.buttonHeld[code] = true;
 	}
 
 	void OnMouseButtonUp(MouseButton::Code code)
 	{
-		m_mouseState.buttonPressed.set(code, false);
+		// If we used to be pressed but now we're not, we'll mark as clicked (for this frame)
+		if (m_mouseState.buttonHeld[code])
+		{
+			m_mouseState.buttonClicked[code] = true;
+		}
+
+		m_mouseState.buttonHeld[code] = false;
 	}
 
 	void OnGamepadButtonDown(uint32_t controllerIndex, GamepadButton::Code code)

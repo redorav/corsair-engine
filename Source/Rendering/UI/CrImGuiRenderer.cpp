@@ -173,9 +173,9 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 		
 	// Update input:
 	const MouseState& mouseState = CrInput.GetMouseState();
-	io.MouseDown[0] = mouseState.buttonPressed[MouseButton::Left];
-	io.MouseDown[1] = mouseState.buttonPressed[MouseButton::Right];
-	io.MouseDown[2] = mouseState.buttonPressed[MouseButton::Middle];
+	io.MouseDown[0] = mouseState.buttonHeld[MouseButton::Left];
+	io.MouseDown[1] = mouseState.buttonHeld[MouseButton::Right];
+	io.MouseDown[2] = mouseState.buttonHeld[MouseButton::Middle];
 	io.MousePos = ImVec2((float)mouseState.position.x, (float)mouseState.position.y);
 	io.MouseWheel = (float)mouseState.mouseWheel.y;
 

@@ -1034,7 +1034,7 @@ void CrFrame::UpdateCamera()
 		//camera.LookAt(float3::zero(), float3(0, 1, 0));
 	}
 
-	if (mouseState.buttonPressed[MouseButton::Right])
+	if (mouseState.buttonHeld[MouseButton::Right])
 	{
 		m_camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
 	}

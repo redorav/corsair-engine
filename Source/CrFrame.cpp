@@ -123,7 +123,7 @@ struct CrRenderPacketBatcher
 				}
 			}
 			transformBuffer.Unlock();
-			m_commandBuffer->BindConstantBuffer(&transformBuffer);
+			m_commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &transformBuffer);
 
 			m_commandBuffer->BindGraphicsPipelineState(m_pipeline);
 
@@ -486,7 +486,7 @@ void CrFrame::Process()
 		colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	colorBuffer.Unlock();
-	drawCommandBuffer->BindConstantBuffer(&colorBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &colorBuffer);
 
 	CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
 	Camera* cameraData = cameraDataBuffer.Lock();
@@ -494,7 +494,8 @@ void CrFrame::Process()
 		*cameraData = m_cameraConstantData;
 	}
 	cameraDataBuffer.Unlock();
-	drawCommandBuffer->BindConstantBuffer(&cameraDataBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &cameraDataBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &cameraDataBuffer);
 
 	CrGPUBufferType<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
 	Instance* identityTransformData = identityConstantBuffer.Lock();
@@ -651,7 +652,8 @@ void CrFrame::Process()
 				debugShaderData->debugProperties = float4(1.0f, 0.0f, 0.0f, 0.0f);
 			}
 			debugShaderBuffer.Unlock();
-			commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &debugShaderBuffer);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &debugShaderBuffer);
 
 			edgeSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 			{
@@ -795,7 +797,7 @@ void CrFrame::Process()
 					debugShaderData->debugProperties = float4(0.0f, instanceId, 0.0f, 0.0f);
 				}
 				debugShaderBuffer.Unlock();
-				commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+				commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &debugShaderBuffer);
 
 				renderPacketBatcher.ProcessRenderPacket(renderPacket);
 				renderPacketBatcher.ExecuteBatch(); // TODO Fix dodgy behavior

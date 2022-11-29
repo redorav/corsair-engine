@@ -240,7 +240,8 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 			uiData->projection = ComputeProjectionMatrix(data);
 		}
 		uiDataBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(&uiDataBuffer);
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &uiDataBuffer);
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &uiDataBuffer);
 
 		// Iterate over each draw list -> draw command: 
 		ImVec2 clipOffset = data->DisplayPos;

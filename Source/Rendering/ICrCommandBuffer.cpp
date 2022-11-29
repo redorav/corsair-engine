@@ -156,33 +156,18 @@ CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::Dat
 	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), sizeBytes), indexCount, indexFormat);
 }
 
-// TODO Delete this function and bind constant buffers to specific stages
-void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer)
-{
-	BindConstantBuffer(constantBuffer, constantBuffer->GetGlobalIndex());
-}
-
-// TODO Delete this function and bind constant buffers to specific stages
-void ICrCommandBuffer::BindConstantBuffer(const CrGPUBuffer* constantBuffer, int32_t globalIndex)
-{
-	for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage <= cr3d::ShaderStage::Compute; ++stage)
-	{
-		BindConstantBuffer(stage, constantBuffer, globalIndex);
-	}
-}
-
 void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer)
 {
-	BindConstantBuffer(shaderStage, constantBuffer, constantBuffer->GetGlobalIndex());
+	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBuffer->GetGlobalIndex(), constantBuffer);
 }
 
-void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer, int32_t globalIndex)
+void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer)
 {
 	CrAssertMsg(constantBuffer != nullptr, "Buffer is null");
 	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
-	CrAssertMsg(globalIndex != -1, "Global index not set");
+	CrAssertMsg(constantBufferIndex != -1, "Global index not set");
 
-	m_currentState.m_constantBuffers[shaderStage][globalIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
+	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
 }
 
 void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)

@@ -59,13 +59,9 @@ public:
 
 	void BindComputePipelineState(const ICrComputePipeline* computePipeline);
 
-	void BindConstantBuffer(const CrGPUBuffer* constantBuffer);
-
-	void BindConstantBuffer(const CrGPUBuffer* constantBuffer, int32_t globalIndex);
-
 	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer);
 
-	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer, int32_t globalIndex);
+	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer);
 
 	void BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler);
 

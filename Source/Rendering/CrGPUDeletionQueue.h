@@ -24,7 +24,7 @@ public:
 
 	~CrGPUDeletionQueue();
 
-	static const uint32_t MaximumDeletionLists = 8;
+	static const uint32_t MaximumDeletionLists = 4;
 
 	void Initialize(ICrRenderDevice* renderDevice);
 

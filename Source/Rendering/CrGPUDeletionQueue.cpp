@@ -26,7 +26,6 @@ void CrGPUDeletionQueue::Initialize(ICrRenderDevice* renderDevice)
 
 	for (uint32_t i = 0; i < m_deletionLists.size(); ++i)
 	{
-		// Create fences
 		m_deletionLists[i].fence = m_renderDevice->CreateGPUFence();
 
 		m_availableDeletionLists.push_back(&m_deletionLists[i]);

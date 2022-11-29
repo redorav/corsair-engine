@@ -209,7 +209,9 @@ protected:
 	
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
 
-	// Synchronization
+	//--------------------
+	// GPU Synchronization
+	//--------------------
 
 	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
 
@@ -221,9 +223,9 @@ protected:
 
 	virtual void WaitIdlePS() = 0;
 
-	//------------------------------
-	// Download and Upload functions
-	//------------------------------
+	//--------------------
+	// Download and Upload
+	//--------------------
 
 	// Begins a texture upload. Prepares a buffer and returns a pointer to the beginning of the memory.
 	// External code then populates the given memory

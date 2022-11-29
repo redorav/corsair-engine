@@ -27,7 +27,14 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
 			initialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
 			break;
-		case cr3d::MemoryAccess::Staging:
+		case cr3d::MemoryAccess::StagingUpload:
+			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+			initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;
+			break;
+		case cr3d::MemoryAccess::StagingDownload:
+			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+			initialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+			break;
 		case cr3d::MemoryAccess::CPUStreamToGPU:
 			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 			initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;

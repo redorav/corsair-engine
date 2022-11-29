@@ -972,8 +972,8 @@ namespace cr3d
 			Data        = 1 << 4, // Will be bound as a data (compressed) buffer
 			Byte        = 1 << 5, // Will be bound as a byte (raw data) buffer
 			Indirect    = 1 << 6, // Will be used as an indirect buffer
-			TransferDst = 1 << 7, // Will be used to transfer data from the GPU to the CPU
-			TransferSrc = 1 << 8, // Will be used to transfer data from the CPU to the GPU
+			TransferDst = 1 << 7, // Will be used to transfer data from the GPU to the CPU via a copy operation
+			TransferSrc = 1 << 8, // Will be used to transfer data from the CPU to the GPU via a copy operation
 
 			// Compound
 			Storage = Structured | Byte,
@@ -992,7 +992,8 @@ namespace cr3d
 			GPUOnlyRead,     // Device-only, non-mappable. No unordered access, only copy operations. Use for loaded resources
 			GPUOnlyWrite,    // Device-only, non-mappable. Unordered access
 			GPUWriteCPURead, // CPU random access, cached. GPU queries, feedback textures
-			Staging,         // CPU random access. Staging buffer for upload or download
+			StagingUpload,   // CPU random access. Staging buffer for upload
+			StagingDownload, // CPU random access. Staging buffer for download
 			CPUStreamToGPU,  // Uncached, write-combined, coherent. Don't read on CPU. Streaming per-frame data like vertex/constant buffers
 		};
 	};

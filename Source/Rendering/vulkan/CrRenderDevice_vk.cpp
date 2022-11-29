@@ -175,9 +175,9 @@ void CrRenderDeviceVulkan::WaitIdlePS()
 
 uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 {
-	uint32_t stagingBufferMemory = texture->GetUsedGPUMemory();
+	uint32_t stagingBufferSizeBytes = texture->GetUsedGPUMemory();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)stagingBufferMemory);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 

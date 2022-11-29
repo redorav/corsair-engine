@@ -338,7 +338,7 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 	UINT64 stagingBufferSizeBytes;
 	m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, d3d12Texture->GetD3D12SubresourceCount(), 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::Staging, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 
 	CrTextureUpload textureUpload;

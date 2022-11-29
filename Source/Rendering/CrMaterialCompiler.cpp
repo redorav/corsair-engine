@@ -163,6 +163,8 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 				materialShaderDescriptor
 			);
 
+			CrAssertMsg(bytecode != nullptr, "Bytecode is null. Compilation failed");
+
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 

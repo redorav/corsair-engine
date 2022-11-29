@@ -29,13 +29,3 @@ private:
 
 	ID3D12Device* m_d3d12Device;
 };
-
-inline const CrHardwareGPUBufferD3D12* D3D12Cast(const ICrHardwareGPUBuffer* buffer)
-{
-	return static_cast<const CrHardwareGPUBufferD3D12*>(buffer);
-}
-
-inline CrHardwareGPUBufferD3D12* D3D12Cast(ICrHardwareGPUBuffer* buffer)
-{
-	return static_cast<CrHardwareGPUBufferD3D12*>(buffer);
-}

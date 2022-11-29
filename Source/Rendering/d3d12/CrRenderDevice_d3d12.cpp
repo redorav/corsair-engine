@@ -416,7 +416,7 @@ uint8_t* CrRenderDeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* de
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = D3D12Cast(stagingBuffer.get());
+	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 
 	CrBufferUpload bufferUpload;
 	bufferUpload.stagingBuffer = stagingBuffer;
@@ -441,12 +441,12 @@ void CrRenderDeviceD3D12::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinat
 	{
 		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
 
-		const CrHardwareGPUBufferD3D12* d3d12DestinationBuffer = D3D12Cast(destinationBuffer);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = D3D12Cast(bufferUpload.stagingBuffer.get());
+		const CrHardwareGPUBufferD3D12* d3d12DestinationBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(destinationBuffer);
+		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get());
 
 		d3d12StagingBuffer->Unlock();
 
-		CrCommandBufferD3D12* d3d12CommandBuffer = D3D12Cast(GetAuxiliaryCommandBuffer().get());
+		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
 			// TODO Consider using CopyResource when copying the entire resource
 
@@ -465,7 +465,7 @@ void CrRenderDeviceD3D12::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinat
 
 CrGPUHardwareBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
 {
-	const CrHardwareGPUBufferD3D12* d3d12SourceBuffer = D3D12Cast(sourceBuffer);
+	const CrHardwareGPUBufferD3D12* d3d12SourceBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(sourceBuffer);
 
 	D3D12_RESOURCE_DESC resourceDescriptor = d3d12SourceBuffer->GetD3D12Resource()->GetDesc();
 
@@ -476,7 +476,7 @@ CrGPUHardwareBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwar
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = D3D12Cast(stagingBuffer.get());
+	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 
 	CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 	{

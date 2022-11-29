@@ -283,7 +283,7 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(stagingBuffer.get());
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrBufferUpload bufferUpload;
 	bufferUpload.stagingBuffer = stagingBuffer;
@@ -308,8 +308,8 @@ void CrRenderDeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destina
 	{
 		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
 
-		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = VulkanCast(destinationBuffer);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(bufferUpload.stagingBuffer.get());
+		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(destinationBuffer);
+		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());
 
 		vulkanStagingBuffer->Unlock();
 
@@ -359,11 +359,11 @@ CrGPUHardwareBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwa
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
 	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(stagingBuffer.get());
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 	{
-		const CrHardwareGPUBufferVulkan* vulkanSourceBuffer = VulkanCast(sourceBuffer);
+		const CrHardwareGPUBufferVulkan* vulkanSourceBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(sourceBuffer);
 
 		VkBufferCopy copyRegions;
 		copyRegions.srcOffset = 0;

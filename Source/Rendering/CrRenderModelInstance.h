@@ -21,8 +21,6 @@ public:
 
 	void SetVisibilityId(uint32_t visibilityId) { m_visibilityId = visibilityId; }
 
-	void RemoveFromWorld();
-
 private:
 
 	CrModelInstanceId m_instanceId;

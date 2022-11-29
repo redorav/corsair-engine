@@ -34,7 +34,34 @@ struct CrHardwareGPUBufferDescriptor
 
 	uint32_t stride;
 
-	CrFixedString128 name;
+	const uint8_t* initialData = nullptr;
+
+	uint32_t initialDataSize = 0;
+
+	const char* name = nullptr;
+};
+
+struct CrGPUBufferDescriptor
+{
+	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access) : usage(usage), access(access) {}
+
+	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
+
+	ICrHardwareGPUBuffer* existingHardwareGPUBuffer = nullptr;
+
+	void* memory = nullptr;
+
+	uint32_t offset = 0;
+
+	cr3d::BufferUsage::T usage;
+
+	cr3d::MemoryAccess::T access;
+
+	const uint8_t* initialData = nullptr;
+
+	uint32_t initialDataSize = 0;
+
+	const char* name = nullptr;
 };
 
 // A ICrHardwareGPUBuffer represents a real buffer on the GPU, with allocated memory and
@@ -62,7 +89,11 @@ public:
 
 	uint32_t GetStrideBytes() const { return strideBytes; }
 
+	cr3d::BufferUsage::T GetUsage() const { return usage; }
+
 	cr3d::DataFormat::T GetDataFormat() const { return dataFormat; }
+
+protected:
 
 	ICrRenderDevice* m_renderDevice;
 
@@ -93,23 +124,6 @@ inline void ICrHardwareGPUBuffer::Unlock()
 
 	return UnlockPS();
 }
-
-struct CrGPUBufferDescriptor
-{
-	CrGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access) : usage(usage), access(access) {}
-
-	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
-
-	ICrHardwareGPUBuffer* existingHardwareGPUBuffer = nullptr;
-
-	void* memory = nullptr;
-
-	uint32_t offset = 0;
-
-	cr3d::BufferUsage::T usage;
-
-	cr3d::MemoryAccess::T access;
-};
 
 // A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
 // than the actual buffer it points to. It can also own a buffer and dispose of it suitably.

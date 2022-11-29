@@ -137,6 +137,8 @@ using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>
 class CrDataBuffer;
 using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
 
+typedef CrFixedFunction<4, void(const CrGPUHardwareBufferHandle&)> CrGPUTransferCallbackType;
+
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;
 

@@ -61,7 +61,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 	vkResult = vmaCreateBuffer(vulkanRenderDevice->GetVmaAllocator(), &bufferCreateInfo, &vmaAllocationCreateInfo, &m_vkBuffer, &m_vmaAllocation, &vmaAllocationInfo);
 	CrAssert(vkResult == VK_SUCCESS);
 
-	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_OBJECT_TYPE_BUFFER, descriptor.name.c_str());
+	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_OBJECT_TYPE_BUFFER, descriptor.name);
 
 	if (descriptor.usage & cr3d::BufferUsage::Data)
 	{
@@ -78,6 +78,28 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 		vkResult = vkCreateBufferView(vkDevice, &vkBufferViewCreateInfo, nullptr, &m_vkBufferView);
 		CrAssert(vkResult == VK_SUCCESS);
+	}
+
+	if (descriptor.initialData)
+	{
+		CrAssertMsg(descriptor.initialDataSize <= vmaAllocationInfo.size, "Not enough memory in buffer");
+
+		if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+		{
+			uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
+			{
+				memcpy(bufferData, descriptor.initialData, descriptor.initialDataSize);
+			}
+			m_renderDevice->EndBufferUpload(this);
+		}
+		else
+		{
+			void* data;
+			vkResult = vmaMapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation, &data);
+			CrAssert(vkResult == VK_SUCCESS);
+			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
+			vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
+		}
 	}
 }
 

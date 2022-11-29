@@ -86,7 +86,17 @@ struct CrTextureUpload
 	uint32_t sliceCount;
 };
 
+struct CrBufferUpload
+{
+	CrGPUHardwareBufferHandle stagingBuffer;
+	const ICrHardwareGPUBuffer* destinationBuffer;
+	uint32_t sizeBytes;
+	uint32_t sourceOffsetBytes;
+	uint32_t destinationOffsetBytes;
+};
+
 class CrGPUDeletionQueue;
+class CrGPUTransferCallbackQueue;
 class CrGPUDeletable;
 typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
 
@@ -170,6 +180,12 @@ public:
 
 	void EndTextureUpload(const ICrTexture* texture);
 
+	uint8_t* BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+
+	void EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+
+	void DownloadBuffer(const ICrHardwareGPUBuffer* buffer, const CrGPUTransferCallbackType& callback);
+
 	//-------------------------------
 	// Properties and feature support
 	//-------------------------------
@@ -235,6 +251,12 @@ protected:
 	// schedule an upload that is guaranteed to be visible on the next texture usage
 	virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
 
+	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) { (destinationBuffer); return nullptr; }
+
+	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) { (destinationBuffer); }
+
+	virtual CrGPUHardwareBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
+
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
 
 	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
@@ -245,12 +267,17 @@ protected:
 
 	CrUniquePtr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
+	CrUniquePtr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
+
 	const ICrRenderSystem* m_renderSystem;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 
-	// Texture uploads that have begun to be populated with data but haven't been committed yet
+	// Texture uploads that have started but haven't been committed yet
 	CrHashMap<CrHash, CrTextureUpload> m_openTextureUploads;
+
+	// Buffer uploads that have started but haven't been committed yet
+	CrHashMap<CrHash, CrBufferUpload> m_openBufferUploads;
 
 	// The platform-specific code is able to determine whether
 	// the pipeline is valid or not

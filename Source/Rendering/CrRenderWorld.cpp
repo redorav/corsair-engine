@@ -23,8 +23,6 @@ CrRenderWorld::CrRenderWorld()
 	m_modelInstanceIdToIndex.resize(1000);
 	m_modelInstanceIndexToId.resize(1000);
 
-	m_modelInstanceEditorProperties.resize(1000);
-
 	m_maxModelInstanceId = CrModelInstanceId(0);
 	m_numModelInstances = CrModelInstanceIndex(0);
 }
@@ -84,7 +82,6 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_modelInstanceTransforms[destroyedInstanceIndex.id]       = m_modelInstanceTransforms[lastInstanceIndex.id];
 	m_renderModels[destroyedInstanceIndex.id]                  = m_renderModels[lastInstanceIndex.id];
 	m_modelInstanceObbs[destroyedInstanceIndex.id]             = m_modelInstanceObbs[lastInstanceIndex.id];
-	m_modelInstanceEditorProperties[destroyedInstanceIndex.id] = m_modelInstanceEditorProperties[lastInstanceIndex.id];
 
 	// Free references (no need to zero out data that doesn't have a smart pointer)
 	m_renderModels[lastInstanceIndex.id]   = nullptr;
@@ -113,24 +110,43 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_numModelInstances.id--;
 }
 
-void CrRenderWorld::SetSelected(CrModelInstanceIndex instanceIndex, bool isSelected)
+void CrRenderWorld::SetSelected(CrModelInstanceId instanceId)
 {
-	m_modelInstanceEditorProperties[instanceIndex.id].isSelected = isSelected;
+	ClearSelection();
+
+	AddSelected(instanceId);
 }
 
-void CrRenderWorld::SetSelected(CrModelInstanceId instanceId, bool isSelected)
+void CrRenderWorld::AddSelected(CrModelInstanceId instanceId)
 {
-	SetSelected(GetModelInstanceIndex(instanceId), isSelected);
+	m_selectedInstances.insert(instanceId.id);
 }
 
-bool CrRenderWorld::GetSelected(CrModelInstanceIndex instanceIndex) const
+void CrRenderWorld::RemoveSelected(CrModelInstanceId instanceId)
 {
-	return m_modelInstanceEditorProperties[instanceIndex.id].isSelected;
+	m_selectedInstances.erase(instanceId.id);
+}
+
+void CrRenderWorld::ToggleSelected(CrModelInstanceId instanceId)
+{
+	if (GetSelected(instanceId))
+	{
+		m_selectedInstances.erase(instanceId.id);
+	}
+	else
+	{
+		m_selectedInstances.insert(instanceId.id);
+	}
 }
 
 bool CrRenderWorld::GetSelected(CrModelInstanceId instanceId) const
 {
-	return GetSelected(GetModelInstanceIndex(instanceId));
+	return m_selectedInstances.find(instanceId.id) != m_selectedInstances.end();
+}
+
+void CrRenderWorld::ClearSelection()
+{
+	m_selectedInstances.clear();
 }
 
 void CrRenderWorld::ComputeVisibilityAndRenderPackets()
@@ -163,17 +179,11 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		m_visibleModelInstances.push_back(instanceIndex);
 
-		bool isEditorSelected = GetSelected(instanceIndex);
+		CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
 
-		uint32_t* instanceIdPtr = nullptr;
+		bool isEditorSelected = GetSelected(instanceId);
+
 		bool computeMouseSelection = GetMouseSelectionEnabled();
-
-		if (computeMouseSelection)
-		{
-			CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
-			instanceIdPtr = m_renderingStream->Allocate<uint32_t>(1).memory;
-			((uint32_t*)instanceIdPtr)[0] = instanceId.id;
-		}
 
 		for (uint32_t meshIndex = 0; meshIndex < meshCount; ++meshIndex)
 		{
@@ -223,7 +233,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 				// TODO Reduce list using bound selection
 				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-				mainPacket.extra = instanceIdPtr;
+				mainPacket.extra = (void*)(uintptr_t)instanceId.id;
 				m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
 			}
 

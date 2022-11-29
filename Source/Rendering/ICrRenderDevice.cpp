@@ -19,6 +19,7 @@
 #include "Core/CrGlobalPaths.h"
 
 #include "Rendering/CrGPUDeletionQueue.h"
+#include "Rendering/CrGPUTransferCallbackQueue.h"
 
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	: m_renderSystem(renderSystem)
@@ -32,6 +33,8 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 
 	m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue->AddToQueue(deletable); };
 	m_gpuDeletionQueue = CrUniquePtr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
+
+	m_gpuTransferCallbackQueue = CrUniquePtr<CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());
 }
 
 ICrRenderDevice::~ICrRenderDevice()
@@ -42,6 +45,8 @@ ICrRenderDevice::~ICrRenderDevice()
 void ICrRenderDevice::Initialize()
 {
 	m_gpuDeletionQueue->Initialize(this);
+
+	m_gpuTransferCallbackQueue->Initialize(this);
 
 	m_auxiliaryCommandBufferCount = 3; // TODO Pass in or make dynamic
 
@@ -83,6 +88,8 @@ void ICrRenderDevice::ProcessQueuedCommands()
 		m_auxiliaryCommandBuffer->Submit();
 		m_auxiliaryCommandBuffer = nullptr;
 	}
+
+	m_gpuTransferCallbackQueue->Process();
 }
 
 void ICrRenderDevice::FinalizeDeletion()
@@ -247,10 +254,36 @@ uint8_t* ICrRenderDevice::BeginTextureUpload(const ICrTexture* texture)
 	return BeginTextureUploadPS(texture);
 }
 
-
 void ICrRenderDevice::EndTextureUpload(const ICrTexture* texture)
 {
 	return EndTextureUploadPS(texture);
+}
+
+uint8_t* ICrRenderDevice::BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+{
+	CrAssertMsg(destinationBuffer->GetUsage() & cr3d::BufferUsage::TransferDst, "Buffer must have transfer destination usage enabled");
+
+	return BeginBufferUploadPS(destinationBuffer);
+}
+
+void ICrRenderDevice::EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+{
+	EndBufferUploadPS(destinationBuffer);
+}
+
+void ICrRenderDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, const CrGPUTransferCallbackType& callback)
+{
+	CrAssertMsg(sourceBuffer->GetUsage() & cr3d::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
+
+	// Queue the download operation and return the buffer that contains the data for the CPU
+	CrGPUHardwareBufferHandle buffer = DownloadBufferPS(sourceBuffer);
+
+	// Create a callback that will be called by the render device during processing once it's done
+	// We store the callback and the buffer as we will most likely want to map it
+	CrGPUDownloadCallback downloadCallback;
+	downloadCallback.callback = callback;
+	downloadCallback.buffer = buffer;
+	m_gpuTransferCallbackQueue->AddToQueue(downloadCallback);
 }
 
 const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const

@@ -4,6 +4,7 @@
 #include "Core/Containers/CrVectorSet.h"
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrArray.h"
+#include "Core/Containers/CrHashSet.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderModel.h"
@@ -109,11 +110,6 @@ private:
 	CrVector<CrRenderPacket> m_renderPackets;
 };
 
-struct CrModelInstanceEditorProperties
-{
-	bool isSelected;
-};
-
 // CrRenderWorld is where all rendering primitives live, e.g. model instances,
 // cameras, lights and other entities that contribute to the way the frame is rendered
 // such as post effects, etc. The render world is able to create and manage the members
@@ -154,10 +150,17 @@ public:
 	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
 
 	// Editor properties
-	void SetSelected(CrModelInstanceIndex instanceIndex, bool isSelected);
-	void SetSelected(CrModelInstanceId instanceId, bool isSelected);
-	bool GetSelected(CrModelInstanceIndex instanceIndex) const;
+	void SetSelected(CrModelInstanceId instanceId);
+
+	void AddSelected(CrModelInstanceId instanceId);
+
+	void RemoveSelected(CrModelInstanceId instanceId);
+
+	void ToggleSelected(CrModelInstanceId instanceId);
+
 	bool GetSelected(CrModelInstanceId instanceId) const;
+
+	void ClearSelection();
 
 	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
 
@@ -216,8 +219,6 @@ private:
 
 	CrVector<CrModelInstanceId>         m_modelInstanceIndexToId;
 
-	
-
 	CrModelInstanceId                   m_maxModelInstanceId;
 
 	CrModelInstanceIndex                m_numModelInstances;
@@ -249,7 +250,7 @@ private:
 
 	// Editor support
 
-	CrVector<CrModelInstanceEditorProperties> m_modelInstanceEditorProperties;
+	CrHashSet<CrModelInstanceId::type> m_selectedInstances;
 
 	bool m_computeMouseSelection = false;
 

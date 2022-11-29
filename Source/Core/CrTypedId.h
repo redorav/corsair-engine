@@ -7,6 +7,8 @@ class CrTypedId
 {
 public:
 
+	using type = U;
+
 	enum : U { DefaultValue = DefaultValueT };
 
 	static const U MaxId = CrNumericLimits<U>::max();

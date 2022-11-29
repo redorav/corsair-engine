@@ -277,6 +277,123 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 	}
 }
 
+uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+{
+	uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
+
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(stagingBuffer.get());
+
+	CrBufferUpload bufferUpload;
+	bufferUpload.stagingBuffer = stagingBuffer;
+	bufferUpload.destinationBuffer = destinationBuffer;
+	bufferUpload.sizeBytes = destinationBuffer->GetSizeBytes();
+	bufferUpload.sourceOffsetBytes = 0;
+	bufferUpload.destinationOffsetBytes = 0; // TODO Add as parameter
+
+	CrHash textureHash(&destinationBuffer, sizeof(destinationBuffer));
+
+	// Add to the open uploads for when we end the texture upload
+	m_openBufferUploads.insert({ textureHash, bufferUpload });
+
+	return (uint8_t*)vulkanStagingBuffer->Lock();
+}
+
+void CrRenderDeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+{
+	CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
+	const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
+	if (bufferUploadIter != m_openBufferUploads.end())
+	{
+		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+
+		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = VulkanCast(destinationBuffer);
+		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(bufferUpload.stagingBuffer.get());
+
+		vulkanStagingBuffer->Unlock();
+
+		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+		{
+			VkBufferMemoryBarrier bufferMemoryBarrier;
+			bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			bufferMemoryBarrier.pNext = nullptr;
+			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_NONE_KHR;
+			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			bufferMemoryBarrier.buffer = vulkanDestinationBuffer->GetVkBuffer();
+			bufferMemoryBarrier.offset = 0;
+			bufferMemoryBarrier.size = vulkanDestinationBuffer->GetSizeBytes();
+
+			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
+			// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+
+			VkBufferCopy bufferCopyRegion;
+			bufferCopyRegion.size = vulkanDestinationBuffer->GetSizeBytes();
+			bufferCopyRegion.srcOffset = bufferUpload.sourceOffsetBytes;
+			bufferCopyRegion.dstOffset = bufferUpload.destinationOffsetBytes;
+
+			vkCmdCopyBuffer(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanDestinationBuffer->GetVkBuffer(), 1, &bufferCopyRegion);
+
+			// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
+			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+			// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+			// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+		}
+
+		// Cast to const_iterator to conform to EASTL's interface
+		m_openBufferUploads.erase((CrHashMap<CrHash, CrBufferUpload>::const_iterator)bufferUploadIter);
+	}
+}
+
+CrGPUHardwareBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
+{
+	uint32_t stagingBufferSizeBytes = sourceBuffer->GetSizeBytes();
+
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
+	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = VulkanCast(stagingBuffer.get());
+
+	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+	{
+		const CrHardwareGPUBufferVulkan* vulkanSourceBuffer = VulkanCast(sourceBuffer);
+
+		VkBufferCopy copyRegions;
+		copyRegions.srcOffset = 0;
+		copyRegions.dstOffset = 0;
+		copyRegions.size = stagingBufferSizeBytes;
+
+		VkBufferMemoryBarrier bufferMemoryBarrier;
+		bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		bufferMemoryBarrier.pNext = nullptr;
+		bufferMemoryBarrier.srcAccessMask = VK_ACCESS_NONE_KHR;
+		bufferMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		bufferMemoryBarrier.buffer = vulkanSourceBuffer->GetVkBuffer();
+		bufferMemoryBarrier.offset = 0;
+		bufferMemoryBarrier.size = stagingBufferSizeBytes;
+
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+
+		vkCmdCopyBuffer(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanSourceBuffer->GetVkBuffer(), vulkanStagingBuffer->GetVkBuffer(), 1, &copyRegions);
+
+		bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		bufferMemoryBarrier.dstAccessMask = VK_ACCESS_NONE_KHR;
+
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+	}
+
+	return stagingBuffer;
+}
+
 void CrRenderDeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 {
 	VkSubmitInfo submitInfo = {};

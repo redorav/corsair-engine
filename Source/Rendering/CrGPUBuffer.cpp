@@ -14,6 +14,7 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 	, strideBytes(descriptor.stride)
 {
 	CrAssertMsg(sizeBytes > 0, "Size must be greater than zero");
+	CrAssertMsg(descriptor.initialData ? descriptor.initialDataSize <= sizeBytes : true, "Size must be less or equal");
 }
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
@@ -42,6 +43,9 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 	{
 		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
 		hardwareGPUBufferDescriptor.dataFormat = dataFormat;
+		hardwareGPUBufferDescriptor.initialData = descriptor.initialData;
+		hardwareGPUBufferDescriptor.initialDataSize = descriptor.initialDataSize;
+		hardwareGPUBufferDescriptor.name = descriptor.name;
 
 		m_buffer = renderDevice->CreateHardwareGPUBufferPointer(hardwareGPUBufferDescriptor);
 		m_memory = nullptr;

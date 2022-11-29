@@ -247,7 +247,7 @@ void CrCommandBufferD3D12::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool,
 	const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
 	const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(d3d12QueryPool->GetResultsBuffer());
 
-	m_d3d12GraphicsCommandList->ResolveQueryData(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, start, count, d3d12GPUBuffer->GetD3D12Buffer(), start * sizeof(uint64_t));
+	m_d3d12GraphicsCommandList->ResolveQueryData(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, start, count, d3d12GPUBuffer->GetD3D12Resource(), start * sizeof(uint64_t));
 }
 
 void CrCommandBufferD3D12::WriteCBV(const ConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle)
@@ -256,7 +256,7 @@ void CrCommandBufferD3D12::WriteCBV(const ConstantBufferBinding& binding, crd3d:
 	const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.buffer);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDescriptor;
-	cbvDescriptor.BufferLocation = d3d12GPUBuffer->GetD3D12Buffer()->GetGPUVirtualAddress() + binding.offsetBytes;
+	cbvDescriptor.BufferLocation = d3d12GPUBuffer->GetD3D12Resource()->GetGPUVirtualAddress() + binding.offsetBytes;
 	cbvDescriptor.SizeInBytes = CrAlignUp256(binding.sizeBytes); // Align to 256 bytes as required by the spec
 
 	d3d12RenderDevice->GetD3D12Device()->CreateConstantBufferView(&cbvDescriptor, cbvHandle.cpuHandle);
@@ -307,7 +307,7 @@ void CrCommandBufferD3D12::WriteStorageBufferSRV(const StorageBufferBinding& bin
 		srvDescriptor.Buffer.StructureByteStride = binding.strideBytes;
 	}
 
-	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(d3d12GPUBuffer->GetD3D12Buffer(), &srvDescriptor, srvHandle.cpuHandle);
+	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(d3d12GPUBuffer->GetD3D12Resource(), &srvDescriptor, srvHandle.cpuHandle);
 }
 
 void CrCommandBufferD3D12::WriteRWStorageBufferUAV(const StorageBufferBinding& binding, crd3d::DescriptorD3D12 uavHandle)
@@ -333,7 +333,7 @@ void CrCommandBufferD3D12::WriteRWStorageBufferUAV(const StorageBufferBinding& b
 
 	uavDescriptor.Buffer.NumElements = binding.numElements;
 
-	d3d12RenderDevice->GetD3D12Device()->CreateUnorderedAccessView(d3d12GPUBuffer->GetD3D12Buffer(), nullptr, &uavDescriptor, uavHandle.cpuHandle);
+	d3d12RenderDevice->GetD3D12Device()->CreateUnorderedAccessView(d3d12GPUBuffer->GetD3D12Resource(), nullptr, &uavDescriptor, uavHandle.cpuHandle);
 }
 
 void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
@@ -344,11 +344,11 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	if (m_currentState.m_indexBufferDirty)
 	{
 		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(m_currentState.m_indexBuffer);
-		ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Buffer();
+		ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Resource();
 
 		D3D12_INDEX_BUFFER_VIEW d3d12IndexBufferView;
 		d3d12IndexBufferView.BufferLocation = d3d12Resource->GetGPUVirtualAddress() + m_currentState.m_indexBufferOffset;
-		d3d12IndexBufferView.SizeInBytes = d3d12GPUBuffer->sizeBytes;
+		d3d12IndexBufferView.SizeInBytes = d3d12GPUBuffer->GetSizeBytes();
 		d3d12IndexBufferView.Format = crd3d::GetDXGIFormat(m_currentState.m_indexBufferFormat);
 
 		m_d3d12GraphicsCommandList->IASetIndexBuffer(&d3d12IndexBufferView);
@@ -367,7 +367,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 			{
 				const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
 				const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.vertexBuffer);
-				ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Buffer();
+				ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Resource();
 				d3d12Views[streamId].BufferLocation = d3d12Resource->GetGPUVirtualAddress() + binding.offset;
 				d3d12Views[streamId].SizeInBytes = binding.size;
 				d3d12Views[streamId].StrideInBytes = binding.stride;
@@ -680,21 +680,21 @@ void CrCommandBufferD3D12::ClearRenderTargetPS(const ICrTexture* renderTarget, c
 void CrCommandBufferD3D12::DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 {
 	ID3D12CommandSignature* commandSignature = static_cast<const CrRenderDeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndirectCommandSignature();
-	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Buffer();
+	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 	m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 }
 
 void CrCommandBufferD3D12::DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 {
 	ID3D12CommandSignature* commandSignature = static_cast<const CrRenderDeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndexedIndirectCommandSignature();
-	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Buffer();
+	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 	m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 }
 
 void CrCommandBufferD3D12::DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 {
 	ID3D12CommandSignature* commandSignature = static_cast<const CrRenderDeviceD3D12*>(m_renderDevice)->GetD3D12DispatchIndirectCommandSignature();
-	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Buffer();
+	ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 	m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, 1, resource, offset, nullptr, 0);
 }
 

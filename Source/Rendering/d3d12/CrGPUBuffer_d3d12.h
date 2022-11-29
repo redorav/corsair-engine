@@ -13,7 +13,9 @@ public:
 
 	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
-	ID3D12Resource* GetD3D12Buffer() const { return m_d3dBufferResource; }
+	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
+
+	D3D12_RESOURCE_STATES GetDefaultResourceState() const { return m_d3d12InitialState; }
 
 	virtual void* LockPS() override;
 
@@ -21,7 +23,19 @@ public:
 
 private:
 
-	ID3D12Resource* m_d3dBufferResource;
+	ID3D12Resource* m_d3d12Resource;
+
+	D3D12_RESOURCE_STATES m_d3d12InitialState;
 
 	ID3D12Device* m_d3d12Device;
 };
+
+inline const CrHardwareGPUBufferD3D12* D3D12Cast(const ICrHardwareGPUBuffer* buffer)
+{
+	return static_cast<const CrHardwareGPUBufferD3D12*>(buffer);
+}
+
+inline CrHardwareGPUBufferD3D12* D3D12Cast(ICrHardwareGPUBuffer* buffer)
+{
+	return static_cast<CrHardwareGPUBufferD3D12*>(buffer);
+}

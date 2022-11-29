@@ -100,6 +100,12 @@ private:
 
 	virtual void EndTextureUploadPS(const ICrTexture* texture) override;
 
+	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer);
+
+	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer);
+
+	virtual CrGPUHardwareBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
+
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
 	// Heap for Render Target Views

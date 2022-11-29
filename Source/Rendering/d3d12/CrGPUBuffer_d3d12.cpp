@@ -43,6 +43,8 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 			break;
 	}
 
+	m_d3d12InitialState = initialResourceState;
+
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 	heapProperties.CreationNodeMask = 1;
 	heapProperties.VisibleNodeMask = 1;
@@ -68,20 +70,44 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	HRESULT hResult = S_OK;
 
-	hResult = m_d3d12Device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialResourceState, nullptr, IID_PPV_ARGS(&m_d3dBufferResource));
+	hResult = m_d3d12Device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialResourceState, nullptr, IID_PPV_ARGS(&m_d3d12Resource));
 
 	CrAssertMsg(hResult == S_OK, "Failed to create buffer");
+
+	if (descriptor.initialData)
+	{
+		CrAssertMsg(descriptor.initialDataSize <= sizeBytes, "Not enough memory in buffer");
+
+		if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+		{
+			uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
+			{
+				memcpy(bufferData, descriptor.initialData, descriptor.initialDataSize);
+			}
+			m_renderDevice->EndBufferUpload(this);
+		}
+		else
+		{
+			void* data;
+			hResult = m_d3d12Resource->Map(0, nullptr, &data);
+			CrAssertMsg(hResult == S_OK, "Failed to map buffer");
+			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
+			m_d3d12Resource->Unmap(0, nullptr);
+		}
+	}
+
+	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
 }
 
 void* CrHardwareGPUBufferD3D12::LockPS()
 {
 	void* data = nullptr;
-	HRESULT hResult = m_d3dBufferResource->Map(0, nullptr, &data);
+	HRESULT hResult = m_d3d12Resource->Map(0, nullptr, &data);
 	CrAssertMsg(hResult == S_OK, "Failed to map buffer");
 	return data;
 }
 
 void CrHardwareGPUBufferD3D12::UnlockPS()
 {
-	m_d3dBufferResource->Unmap(0, nullptr);
+	m_d3d12Resource->Unmap(0, nullptr);
 }

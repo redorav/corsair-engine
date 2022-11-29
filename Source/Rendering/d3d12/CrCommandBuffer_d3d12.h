@@ -139,3 +139,13 @@ inline void CrCommandBufferD3D12::EndTimestampQueryPS(const ICrGPUQueryPool* que
 {
 	BeginTimestampQueryPS(queryPool, query);
 }
+
+inline const CrCommandBufferD3D12* D3D12Cast(const ICrCommandBuffer* buffer)
+{
+	return static_cast<const CrCommandBufferD3D12*>(buffer);
+}
+
+inline CrCommandBufferD3D12* D3D12Cast(ICrCommandBuffer* buffer)
+{
+	return static_cast<CrCommandBufferD3D12*>(buffer);
+}

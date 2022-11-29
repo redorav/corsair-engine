@@ -362,8 +362,12 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	CrGPUBufferDescriptor argumentsDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
 	m_indirectDispatchArguments = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), argumentsDescriptor, 3, 4));
 
-	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
-	m_mouseSelectionBuffer = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 3, 4));
+	uint32_t initialValue = 65535;
+	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte | cr3d::BufferUsage::TransferSrc | cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::GPUOnlyWrite);
+	mouseSelectionBufferDescriptor.initialData = (uint8_t*) & initialValue;
+	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
+	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
+	m_mouseSelectionBuffer = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 1, 4));
 
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
@@ -373,6 +377,14 @@ void CrFrame::Deinitialize()
 {
 	CrImGuiRenderer::Destroy();
 }
+
+struct SelectionPacket
+{
+	uint32_t entityId = 0xffffffff;
+	bool isLeftShiftClicked = false;
+};
+
+SelectionPacket CurrentSelectionData;
 
 void CrFrame::Process()
 {
@@ -401,8 +413,38 @@ void CrFrame::Process()
 	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
 	const MouseState& mouseState = CrInput.GetMouseState();
-	bool isMouseClicked = mouseState.buttonPressed[MouseButton::Left];
-	m_renderWorld->SetSelected(CrModelInstanceId(0), isMouseClicked);
+	bool isMouseClicked = mouseState.buttonClicked[MouseButton::Left];
+	
+	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
+	bool isEscapeClicked = keyboardState.keyPressed[KeyboardKey::Escape];
+	bool isLeftShiftClicked = keyboardState.keyPressed[KeyboardKey::LeftShift];
+
+	if (isEscapeClicked)
+	{
+		m_renderWorld->ClearSelection();
+		CurrentSelectionData.entityId = 0xffffffff;
+	}
+	
+	if (CurrentSelectionData.entityId != 0xffffffff)
+	{
+		if (CurrentSelectionData.entityId == 65535)
+		{
+			m_renderWorld->ClearSelection();
+		}
+		else
+		{
+			if (CurrentSelectionData.isLeftShiftClicked)
+			{
+				m_renderWorld->ToggleSelected(CrModelInstanceId(CurrentSelectionData.entityId));
+			}
+			else
+			{
+				m_renderWorld->SetSelected(CrModelInstanceId(CurrentSelectionData.entityId));
+			}
+		}
+
+		CurrentSelectionData = SelectionPacket();
+	}
 
 	CrRectangle mouseRectangle(mouseState.position.x - 10, mouseState.position.y - 10, 20, 20);
 	m_renderWorld->SetMouseSelectionEnabled(isMouseClicked, mouseRectangle);
@@ -746,18 +788,17 @@ void CrFrame::Process()
 
 			mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 			{
-				if (renderPacket.extra)
+				CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+				DebugShader* debugShaderData = debugShaderBuffer.Lock();
 				{
-					CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-					DebugShader* debugShaderData = debugShaderBuffer.Lock();
-					{
-						debugShaderData->debugProperties = float4(0.0f, ((uint32_t*)renderPacket.extra)[0], 0.0f, 0.0f);
-					}
-					debugShaderBuffer.Unlock();
-					commandBuffer->BindConstantBuffer(&debugShaderBuffer);
-
-					renderPacketBatcher.ProcessRenderPacket(renderPacket);
+					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
+					debugShaderData->debugProperties = float4(0.0f, instanceId, 0.0f, 0.0f);
 				}
+				debugShaderBuffer.Unlock();
+				commandBuffer->BindConstantBuffer(&debugShaderBuffer);
+
+				renderPacketBatcher.ProcessRenderPacket(renderPacket);
+				renderPacketBatcher.ExecuteBatch(); // TODO Fix dodgy behavior
 			});
 
 			renderPacketBatcher.ExecuteBatch(); // Execute last batch
@@ -828,6 +869,24 @@ void CrFrame::Process()
 	// Submit command buffer (should be reworked)
 	drawCommandBuffer->Submit();
 
+	// Download the mouse selection id
+	if(isMouseClicked)
+	{
+		renderDevice->DownloadBuffer
+		(
+			m_mouseSelectionBuffer->GetHardwareBuffer(),
+			[isLeftShiftClicked](const CrGPUHardwareBufferHandle& mouseIdBuffer)
+			{
+				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
+				{
+					CurrentSelectionData.entityId = *mouseIdMemory;
+					CurrentSelectionData.isLeftShiftClicked = isLeftShiftClicked;
+				}
+				mouseIdBuffer->Unlock();
+			}
+		);
+	}
+
 	// Present the swapchain
 	m_swapchain->Present();
 
@@ -892,6 +951,8 @@ void CrFrame::DrawDebugUI()
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
+
+			ImGui::Text("Selected Entity ID: %d", CurrentSelectionData.entityId);
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 

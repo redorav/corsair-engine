@@ -284,7 +284,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 	}
 
-	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name.c_str());
+	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
 
 	// Calculate number of subresources by computing the last subresource in the resource
 	m_d3d12SubresourceCount = crd3d::CalculateSubresource(m_mipmapCount - 1, m_arraySize - 1, 0, m_mipmapCount, m_arraySize) + 1;

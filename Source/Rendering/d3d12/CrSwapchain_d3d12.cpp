@@ -64,8 +64,9 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		swapchainTextureParams.name = swapchainDescriptor.name.c_str();
-		swapchainTextureParams.name.append_sprintf(" Texture %i", i);
+		CrFixedString128 swapchainName = swapchainDescriptor.name;
+		swapchainName.append_sprintf(" Texture %i", i);
+		swapchainTextureParams.name = swapchainName.c_str();
 
 		ID3D12Resource* surfaceResource;
 		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));

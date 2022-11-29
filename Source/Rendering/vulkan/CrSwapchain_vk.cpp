@@ -247,8 +247,9 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		swapchainTextureParams.name = swapchainDescriptor.name.c_str();
-		swapchainTextureParams.name.append_sprintf(" Texture %i", i);
+		CrFixedString128 swapchainTextureName = swapchainDescriptor.name;
+		swapchainTextureName.append_sprintf(" Texture %i", i);
+		swapchainTextureParams.name = swapchainTextureName.c_str();
 		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
 		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
 	}

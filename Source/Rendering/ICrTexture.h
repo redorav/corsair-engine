@@ -31,7 +31,7 @@ struct CrTextureDescriptor
 	uint32_t extraData;
 	void* extraDataPtr;
 	
-	CrFixedString128 name;
+	const char* name;
 };
 
 class ICrTexture : public CrGPUDeletable

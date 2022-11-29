@@ -18,7 +18,7 @@ struct CrSwapchainDescriptor
 {
 	CrSwapchainDescriptor();
 
-	CrFixedString64 name;
+	const char* name;
 	void* platformWindow;
 	void* platformHandle;
 	uint32_t requestedWidth;

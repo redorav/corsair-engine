@@ -26,8 +26,6 @@ public:
 
 	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);
 
-	VkIndexType GetVkIndexType() const;
-
 	VkBuffer GetVkBuffer() const;
 
 	VkBufferView GetVkBufferView() const;
@@ -53,4 +51,14 @@ inline VkBuffer CrHardwareGPUBufferVulkan::GetVkBuffer() const
 inline VkBufferView CrHardwareGPUBufferVulkan::GetVkBufferView() const
 {
 	return m_vkBufferView;
+}
+
+inline const CrHardwareGPUBufferVulkan* VulkanCast(const ICrHardwareGPUBuffer* buffer)
+{
+	return static_cast<const CrHardwareGPUBufferVulkan*>(buffer);
+}
+
+inline CrHardwareGPUBufferVulkan* VulkanCast(ICrHardwareGPUBuffer* buffer)
+{
+	return static_cast<CrHardwareGPUBufferVulkan*>(buffer);
 }

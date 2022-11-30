@@ -419,7 +419,8 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 			attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(colorAttachment.texture)->GetVkImageViewSingleMipSlice(colorAttachment.mipmap, colorAttachment.slice));
 			attachments.push_back(GetVkAttachmentDescription(colorAttachment));
-			hlslpp::store(colorAttachment.clearColor, clearValues.push_back().color.float32);
+			VkClearValue& colorClearValue = clearValues.push_back();
+			hlslpp::store(colorAttachment.clearColor, colorClearValue.color.float32);
 		}
 
 		if (renderPassDescriptor.depth.texture)

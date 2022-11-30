@@ -21,6 +21,7 @@ CrTextureDescriptor::CrTextureDescriptor()
 	, initialDataSize(0)
 	, extraData(0)
 	, extraDataPtr(nullptr)
+	, name(nullptr)
 {
 
 }

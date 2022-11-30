@@ -156,20 +156,6 @@ CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::Dat
 	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), sizeBytes), indexCount, indexFormat);
 }
 
-void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer)
-{
-	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBuffer->GetGlobalIndex(), constantBuffer);
-}
-
-void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer)
-{
-	CrAssertMsg(constantBuffer != nullptr, "Buffer is null");
-	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
-	CrAssertMsg(constantBufferIndex != -1, "Global index not set");
-
-	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
-}
-
 void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
 {
 	CrAssertMsg(!m_currentState.m_renderPassActive, "Render pass already active. Have you forgotten to close a render pass?");

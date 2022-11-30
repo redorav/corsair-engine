@@ -452,6 +452,20 @@ inline void ICrCommandBuffer::InsertDebugMarker(const char* markerName, const fl
 	InsertDebugMarkerPS(markerName, color);
 }
 
+inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer)
+{
+	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBuffer->GetGlobalIndex(), constantBuffer);
+}
+
+inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer)
+{
+	CrAssertMsg(constantBuffer != nullptr, "Buffer is null");
+	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
+	CrAssertMsg(constantBufferIndex != -1, "Global index not set");
+
+	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
+}
+
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
 	CrAssertMsg(sampler != nullptr, "Sampler is null");
@@ -470,7 +484,7 @@ inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, co
 {
 	CrAssertMsg(texture != nullptr, "Texture is null");
 	CrAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag!");
-	CrAssertMsg(texture->GetMipmapCount() > mip, "Texture doesn't have enough mipmaps!");
+	CrAssertMsg(mip < texture->GetMipmapCount(), "Texture doesn't have enough mipmaps!");
 
 	m_currentState.m_rwTextures[shaderStage][textureIndex] = RWTextureBinding(texture, mip);
 }

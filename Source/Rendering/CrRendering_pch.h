@@ -11,6 +11,7 @@
 #if defined(D3D12_API)
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <dxgi1_6.h>
 #endif
 
 #include "Core/PCH/CrEASTLPch.h"

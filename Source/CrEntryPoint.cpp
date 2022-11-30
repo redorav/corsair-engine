@@ -32,11 +32,12 @@ int main(int argc, char* argv[])
 
 	crcore::CommandLine = CrCommandLineParser(argc, argv);
 
-	const CrString& dataPath          = crcore::CommandLine("-root");
-	const CrString& graphicsApiString = crcore::CommandLine("-graphicsapi");
-	bool enableGraphicsValidation     = crcore::CommandLine["-debugGraphics"];
-	bool enableRenderDoc              = crcore::CommandLine["-renderdoc"];
-	bool enablePIX                    = crcore::CommandLine["-pix"];
+	const CrString& dataPath             = crcore::CommandLine("-root");
+	const CrString& graphicsApiString    = crcore::CommandLine("-graphicsApi");
+	const CrString& graphicsVendorString = crcore::CommandLine("-graphicsVendor");
+	bool enableGraphicsValidation        = crcore::CommandLine["-debugGraphics"];
+	bool enableRenderDoc                 = crcore::CommandLine["-renderdoc"];
+	bool enablePIX                       = crcore::CommandLine["-pix"];
 
 	CrString resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())
@@ -75,14 +76,12 @@ int main(int argc, char* argv[])
 	CrPrintProcessMemory("Before Render Device");
 
 	CrRenderSystemDescriptor renderSystemDescriptor;
+	renderSystemDescriptor.graphicsApi      = cr3d::GraphicsApi::FromString(graphicsApiString.c_str());
 
-	if (graphicsApiString == "vulkan")
+	// Default API is Vulkan
+	if (renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::Count)
 	{
 		renderSystemDescriptor.graphicsApi = cr3d::GraphicsApi::Vulkan;
-	}
-	else if (graphicsApiString == "d3d12")
-	{
-		renderSystemDescriptor.graphicsApi = cr3d::GraphicsApi::D3D12;
 	}
 
 	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
@@ -90,7 +89,10 @@ int main(int argc, char* argv[])
 	renderSystemDescriptor.enablePIX        = enablePIX;
 
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
-	ICrRenderSystem::CreateRenderDevice();
+
+	CrRenderDeviceDescriptor renderDeviceDescriptor;
+	renderDeviceDescriptor.preferredVendor = cr3d::GraphicsVendor::FromString(graphicsVendorString.c_str());
+	ICrRenderSystem::CreateRenderDevice(renderDeviceDescriptor);
 
 	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 

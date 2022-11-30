@@ -21,7 +21,7 @@
 #include "Rendering/CrGPUDeletionQueue.h"
 #include "Rendering/CrGPUTransferCallbackQueue.h"
 
-ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
+ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor)
 	: m_renderSystem(renderSystem)
 	, m_isValidPipelineCache(false)
 {
@@ -30,6 +30,7 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem)
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";
 	m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
+	m_renderDeviceProperties.preferredVendor = descriptor.preferredVendor;
 
 	m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue->AddToQueue(deletable); };
 	m_gpuDeletionQueue = CrUniquePtr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());

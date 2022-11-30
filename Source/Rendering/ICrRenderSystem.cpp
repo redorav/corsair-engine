@@ -98,11 +98,11 @@ const CrRenderDeviceSharedHandle& ICrRenderSystem::GetRenderDevice()
 	return RenderSystem->m_mainDevice;
 }
 
-void ICrRenderSystem::CreateRenderDevice()
+void ICrRenderSystem::CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor)
 {
 	// We need a custom deleter for the render device because we cannot call functions that use virtual methods during the destruction
 	// process. It's an unfortunate consequence of the virtual function abstraction
-	RenderSystem->m_mainDevice = CrRenderDeviceSharedHandle(RenderSystem->CreateRenderDevicePS(), [](ICrRenderDevice* renderDevice)
+	RenderSystem->m_mainDevice = CrRenderDeviceSharedHandle(RenderSystem->CreateRenderDevicePS(descriptor), [](ICrRenderDevice* renderDevice)
 	{
 		renderDevice->FinalizeDeletion();
 		delete renderDevice;

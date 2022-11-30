@@ -224,10 +224,10 @@ void CrRenderGraph::Execute()
 			transitionInfo.usageState = textureUsage.state;
 			transitionInfo.finalState = textureUsage.state; // Initialize final state to current state until we have more information
 
-			if (texture->descriptor.texture)
-			{
-				transitionInfo.finalState = texture->descriptor.texture->GetDefaultState();
-			}
+			//if (texture->descriptor.texture)
+			//{
+			//	transitionInfo.finalState = texture->descriptor.texture->GetDefaultState();
+			//}
 
 			transitionInfo.usageShaderStages = textureUsage.shaderStages;
 			transitionInfo.finalShaderStages = textureUsage.shaderStages;
@@ -256,10 +256,10 @@ void CrRenderGraph::Execute()
 			{
 				transitionInfo.initialState = cr3d::TextureState::Undefined;
 
-				if (texture->descriptor.texture)
-				{
-					transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
-				}
+				//if (texture->descriptor.texture)
+				//{
+				//	transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
+				//}
 
 				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
 			}
@@ -484,10 +484,14 @@ void CrRenderGraph::Execute()
 void CrRenderGraph::Begin(const CrRenderGraphFrameParams& frameParams)
 {
 	m_frameParams = frameParams;
+
+	CrRenderGraphLog("Beginning render pass for frame %ld", m_frameParams.frameCount);
 }
 
 void CrRenderGraph::End()
 {
+	CrRenderGraphLog("Ending render pass for frame %ld", m_frameParams.frameCount);
+
 	m_uniquePassId = CrRenderPassId(0);
 	m_uniqueTextureId = CrRenderGraphTextureId(0);
 	m_uniqueBufferId = CrRenderGraphBufferId(0);

@@ -30,8 +30,7 @@ struct VkPipelineCacheHeader
 	uint8_t uuid[VK_UUID_SIZE]; // A pipeline cache ID equal to VkPhysicalDeviceProperties::pipelineCacheUUID
 };
 
-CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem)
-	: ICrRenderDevice(renderSystem)
+CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 	, m_numCommandQueues(0)
 {
 	m_vkInstance = static_cast<const CrRenderSystemVulkan*>(renderSystem)->GetVkInstance();
@@ -433,17 +432,25 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, physicalDevices.data());
 	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
-	// Select from the list of available GPUs which one we want to use. A priority system will automatically select
-	// the best available from the list
-	uint32_t highestPriority = 0;
-	uint32_t highestPriorityIndex = 0;
+	cr3d::GraphicsVendor::T preferredVendor = m_renderDeviceProperties.preferredVendor;
+
+	struct SelectedDevice
+	{
+		cr3d::GraphicsVendor::T vendor = cr3d::GraphicsVendor::Unknown;
+		uint32_t priority = 0;
+		uint32_t index = 0xffffffff;
+	};
+
+	SelectedDevice maxPriorityDevice;
+	SelectedDevice maxPriorityPreferredDevice;
+
+	// Select from the list of available GPUs which one we want to use. A priority system will automatically select the best available from the list
 	for (uint32_t i = 0; i < physicalDevices.size(); ++i)
 	{
 		VkPhysicalDeviceProperties vkPhysicalDeviceProperties;
 		vkGetPhysicalDeviceProperties(physicalDevices[i], &vkPhysicalDeviceProperties);
 
-		VkPhysicalDeviceMemoryProperties vkPhysicalDeviceMemoryProperties;
-		vkGetPhysicalDeviceMemoryProperties(physicalDevices[i], &vkPhysicalDeviceMemoryProperties);
+		cr3d::GraphicsVendor::T graphicsVendor = cr3d::GraphicsVendor::FromVendorID(vkPhysicalDeviceProperties.vendorID);
 
 		uint32_t priority = 0;
 		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU   ? (1 << 31) : 0;
@@ -451,14 +458,32 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU    ? (1 << 29) : 0;
 		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU            ? (1 << 28) : 0;
 
-		if (priority > highestPriority)
+		if (maxPriorityDevice.priority < priority)
 		{
-			highestPriority = priority;
-			highestPriorityIndex = i;
+			maxPriorityDevice.priority = priority;
+			maxPriorityDevice.index = i;
+		}
+
+		if (graphicsVendor == preferredVendor)
+		{
+			if (maxPriorityPreferredDevice.priority < priority)
+			{
+				maxPriorityPreferredDevice.priority = priority;
+				maxPriorityPreferredDevice.index = i;
+			}
 		}
 	}
 
-	m_vkPhysicalDevice = physicalDevices[highestPriorityIndex];
+	// If we've found a device from the vendor we prefer, use that
+	// Otherwise, use the best detected device
+	if (maxPriorityPreferredDevice.index != 0xffffffff)
+	{
+		m_vkPhysicalDevice = physicalDevices[maxPriorityPreferredDevice.index];
+	}
+	else
+	{
+		m_vkPhysicalDevice = physicalDevices[maxPriorityDevice.index];
+	}
 
 	// Query physical device properties
 	vkGetPhysicalDeviceMemoryProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceMemoryProperties);
@@ -475,7 +500,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
 
 	// Populate the render device properties into the platform-independent structure
-	m_renderDeviceProperties.vendor = GetVendorFromVendorID(m_vkPhysicalDeviceProperties.vendorID);
+	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties.vendorID);
 	m_renderDeviceProperties.description = m_vkPhysicalDeviceProperties.deviceName;
 	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties.limits.maxUniformBufferRange;
 	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;

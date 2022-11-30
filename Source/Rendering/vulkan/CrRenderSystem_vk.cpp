@@ -149,7 +149,7 @@ bool CrRenderSystemVulkan::IsVkInstanceLayerSupported(const CrString& layer)
 	return m_supportedInstanceLayers.count(layer) > 0;
 }
 
-ICrRenderDevice* CrRenderSystemVulkan::CreateRenderDevicePS() const
+ICrRenderDevice* CrRenderSystemVulkan::CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const
 {
-	return new CrRenderDeviceVulkan(this);
+	return new CrRenderDeviceVulkan(this, descriptor);
 }

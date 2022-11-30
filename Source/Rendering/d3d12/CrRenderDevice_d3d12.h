@@ -12,7 +12,7 @@ class CrRenderDeviceD3D12 final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem);
+	CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	~CrRenderDeviceD3D12();
 

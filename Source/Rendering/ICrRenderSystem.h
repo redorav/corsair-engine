@@ -14,16 +14,21 @@
 
 struct CrRenderSystemDescriptor 
 {
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Vulkan;
-	bool enableValidation = false; // e.g. Vulkan layers, D3D debug layer
+	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+
+	// e.g. Vulkan layers, D3D debug layer
+	bool enableValidation = false;
 	
 	// On PC we can programmatically load multiple debuggers. They cannot
 	// all be simultaneously loaded or loaded for all platforms
 	bool enableRenderDoc = false;
+
 	bool enablePIX = false;
 };
 
 namespace CrBuiltinShaders { enum T : uint32_t; };
+
+struct CrRenderDeviceDescriptor;
 
 class ICrRenderSystem
 {
@@ -39,7 +44,7 @@ public:
 
 	static const CrRenderDeviceSharedHandle& GetRenderDevice();
 
-	static void CreateRenderDevice();
+	static void CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor);
 
 	static bool GetIsValidationEnabled();
 
@@ -61,5 +66,5 @@ protected:
 
 	CrPIX m_pix;
 
-	virtual ICrRenderDevice* CreateRenderDevicePS() const = 0;
+	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const = 0;
 };

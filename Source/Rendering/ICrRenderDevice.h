@@ -12,17 +12,6 @@
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
 
-namespace CrVendor
-{
-	enum T
-	{
-		Unknown,
-		NVIDIA,
-		AMD,
-		Intel
-	};
-}
-
 namespace CrRenderingFeature
 {
 	enum T
@@ -41,9 +30,16 @@ namespace CrRenderingFeature
 
 struct CrRenderDeviceProperties
 {
-	CrVendor::T vendor = CrVendor::Unknown;
+	// We can choose to search for a vendor. If we don't have it, we choose the best available one
+	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
+
+	// Actual vendor we selected
+	cr3d::GraphicsVendor::T vendor = cr3d::GraphicsVendor::Unknown;
+
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+
 	bool isUMA = false; // Whether a unified memory architecture is used here
+
 	CrFixedString128 description;
 
 	uint32_t maxConstantBufferRange = 0;
@@ -57,21 +53,6 @@ struct CrRenderDeviceProperties
 };
 
 namespace CrCommandQueueType { enum T : uint32_t; }
-
-inline CrVendor::T GetVendorFromVendorID(unsigned int vendorID)
-{
-	switch (vendorID)
-	{
-		case 0x10DE:
-			return CrVendor::NVIDIA;
-		case 0x1002:
-			return CrVendor::AMD;
-		case 0x8086:
-			return CrVendor::Intel;
-		default:
-			return CrVendor::Unknown;
-	}
-}
 
 // Texture uploads encapsulate the idea that platforms have
 // an optimal texture format but for some (PC mainly) we can
@@ -100,11 +81,16 @@ class CrGPUTransferCallbackQueue;
 class CrGPUDeletable;
 typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
 
+struct CrRenderDeviceDescriptor
+{
+	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
+};
+
 class ICrRenderDevice
 {
 public:
 
-	ICrRenderDevice(const ICrRenderSystem* renderSystem);
+	ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	virtual ~ICrRenderDevice();
 

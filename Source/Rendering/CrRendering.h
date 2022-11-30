@@ -371,7 +371,7 @@ namespace cr3d
 			Count
 		};
 
-		inline const char* ToString(cr3d::GraphicsApi::T graphicsApi, bool lowercase = false)
+		constexpr const char* ToString(cr3d::GraphicsApi::T graphicsApi, bool lowercase = false)
 		{
 			switch (graphicsApi)
 			{
@@ -379,6 +379,68 @@ namespace cr3d
 				case cr3d::GraphicsApi::D3D12:  return lowercase ? "d3d12"  : "D3D12";
 				case cr3d::GraphicsApi::Metal:  return lowercase ? "metal"  : "Metal";
 				default: return lowercase ? "invalid" : "Invalid";
+			}
+		}
+
+		inline cr3d::GraphicsApi::T FromString(const char* graphicsApiString)
+		{
+			if (strcmp(graphicsApiString, "vulkan") == 0)
+			{
+				return cr3d::GraphicsApi::Vulkan;
+			}
+			else if (strcmp(graphicsApiString, "d3d12") == 0)
+			{
+				return cr3d::GraphicsApi::D3D12;
+			}
+			else
+			{
+				return cr3d::GraphicsApi::Count;
+			}
+		}
+	}
+
+	namespace GraphicsVendor
+	{
+		enum T
+		{
+			Unknown,
+			NVIDIA,
+			AMD,
+			Intel
+		};
+
+		constexpr GraphicsVendor::T FromVendorID(unsigned int vendorID)
+		{
+			switch (vendorID)
+			{
+			case 0x10DE:
+				return GraphicsVendor::NVIDIA;
+			case 0x1002:
+				return GraphicsVendor::AMD;
+			case 0x8086:
+				return GraphicsVendor::Intel;
+			default:
+				return GraphicsVendor::Unknown;
+			}
+		}
+
+		inline GraphicsVendor::T FromString(const char* s)
+		{
+			if (strcmp(s, "nvidia") == 0)
+			{
+				return GraphicsVendor::NVIDIA;
+			}
+			else if (strcmp(s, "amd") == 0)
+			{
+				return GraphicsVendor::AMD;
+			}
+			else if (strcmp(s, "intel") == 0)
+			{
+				return GraphicsVendor::Intel;
+			}
+			else
+			{
+				return GraphicsVendor::Unknown;
 			}
 		}
 	}

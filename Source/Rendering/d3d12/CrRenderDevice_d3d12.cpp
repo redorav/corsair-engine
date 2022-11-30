@@ -18,32 +18,98 @@
 
 #include "Math/CrMath.h"
 
-CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : ICrRenderDevice(renderSystem)
+CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 {
 	const CrRenderSystemD3D12* d3d12RenderSystem = static_cast<const CrRenderSystemD3D12*>(renderSystem);
-	IDXGIFactory4* dxgiFactory = d3d12RenderSystem->GetDXGIFactory();
+	IDXGIFactory1* dxgiFactory = d3d12RenderSystem->GetDXGIFactory1();
 
-	SIZE_T maxVideoMemory = 0;
-
-	IDXGIAdapter1* dxgiAdapter = nullptr;
-	DXGI_ADAPTER_DESC1 selectedAdapterDescriptor = {};
-
-	for(UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
+	struct PriorityKey
 	{
-		DXGI_ADAPTER_DESC1 adapterDescriptor;
-		dxgiAdapter->GetDesc1(&adapterDescriptor);
+		uint64_t deviceMemory = 0;
+		uint32_t priority = 0;
 
-		if (adapterDescriptor.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		bool operator < (const PriorityKey& other)
 		{
-			continue;
+			return (deviceMemory < other.deviceMemory) ? true : (priority < other.priority) ? true : false;
+		}
+	};
+
+	struct SelectedDevice
+	{
+		PriorityKey priorityKey;
+		IDXGIAdapter1* dxgiAdapter = nullptr;
+		DXGI_ADAPTER_DESC3 descriptor;
+	};
+
+	SelectedDevice maxPriorityDevice;
+	SelectedDevice maxPriorityPreferredDevice;
+
+	cr3d::GraphicsVendor::T preferredVendor = descriptor.preferredVendor;
+
+	IDXGIAdapter1* dxgiAdapter1 = nullptr;
+	IDXGIAdapter2* dxgiAdapter2 = nullptr;
+	IDXGIAdapter4* dxgiAdapter4 = nullptr;
+
+	for(UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
+	{
+		// Provide a union here as they are incremental
+		union
+		{
+			DXGI_ADAPTER_DESC1 adapterDescriptor1;
+			DXGI_ADAPTER_DESC2 adapterDescriptor2;
+			DXGI_ADAPTER_DESC3 adapterDescriptor3 = {};
+		};
+
+		if (dxgiAdapter1->QueryInterface(IID_PPV_ARGS(&dxgiAdapter4)) == S_OK)
+		{
+			dxgiAdapter4->GetDesc3(&adapterDescriptor3);
+		}
+		else if (dxgiAdapter1->QueryInterface(IID_PPV_ARGS(&dxgiAdapter2)) == S_OK)
+		{
+			dxgiAdapter2->GetDesc2(&adapterDescriptor2);
+		}
+		else
+		{
+			dxgiAdapter1->GetDesc1(&adapterDescriptor1);
 		}
 
-		if (adapterDescriptor.DedicatedVideoMemory > maxVideoMemory)
+		cr3d::GraphicsVendor::T graphicsVendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor3.VendorId);
+
+		bool isSoftwareRenderer = adapterDescriptor3.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE;
+
+		PriorityKey priorityKey;
+		priorityKey.priority |= !isSoftwareRenderer ? 1u << 31u : 0u;
+		priorityKey.deviceMemory = adapterDescriptor3.DedicatedVideoMemory;
+
+		if (maxPriorityDevice.priorityKey < priorityKey)
 		{
-			m_dxgiAdapter = dxgiAdapter;
-			selectedAdapterDescriptor = adapterDescriptor;
-			maxVideoMemory = adapterDescriptor.DedicatedVideoMemory;
+			maxPriorityDevice.priorityKey = priorityKey;
+			maxPriorityDevice.dxgiAdapter = dxgiAdapter1;
+			maxPriorityDevice.descriptor = adapterDescriptor3;
 		}
+
+		if (graphicsVendor == preferredVendor)
+		{
+			if (maxPriorityPreferredDevice.priorityKey < priorityKey)
+			{
+				maxPriorityPreferredDevice.priorityKey = priorityKey;
+				maxPriorityPreferredDevice.dxgiAdapter = dxgiAdapter1;
+				maxPriorityPreferredDevice.descriptor = adapterDescriptor3;
+			}
+		}
+	}
+
+	DXGI_ADAPTER_DESC3 adapterDescriptor = {};
+
+	if (maxPriorityPreferredDevice.dxgiAdapter != nullptr)
+	{
+		m_dxgiAdapter = maxPriorityPreferredDevice.dxgiAdapter;
+		adapterDescriptor = maxPriorityPreferredDevice.descriptor;
+	}
+	else
+	{
+		m_dxgiAdapter = maxPriorityDevice.dxgiAdapter;
+		adapterDescriptor = maxPriorityDevice.descriptor;
 	}
 
 	HRESULT hResult = S_OK;
@@ -52,9 +118,9 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating D3D12 device");
 
 	// Parse render device properties
-	m_renderDeviceProperties.vendor = GetVendorFromVendorID(selectedAdapterDescriptor.VendorId);
-	m_renderDeviceProperties.description.append_convert<wchar_t>(selectedAdapterDescriptor.Description);
-	m_renderDeviceProperties.gpuMemoryBytes = selectedAdapterDescriptor.DedicatedVideoMemory;
+	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
+	m_renderDeviceProperties.description.append_convert<wchar_t>(adapterDescriptor.Description);
+	m_renderDeviceProperties.gpuMemoryBytes = adapterDescriptor.DedicatedVideoMemory;
 
 	// Check architecture
 	D3D12_FEATURE_DATA_ARCHITECTURE d3d12Architecture;
@@ -138,12 +204,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
 		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW;
 
-		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
-		descriptor.ByteStride = sizeof(D3D12_DRAW_ARGUMENTS);
-		descriptor.NumArgumentDescs = 1;
-		descriptor.pArgumentDescs = &indirectArgument;
+		D3D12_COMMAND_SIGNATURE_DESC commandSignatureDescriptor = {};
+		commandSignatureDescriptor.ByteStride = sizeof(D3D12_DRAW_ARGUMENTS);
+		commandSignatureDescriptor.NumArgumentDescs = 1;
+		commandSignatureDescriptor.pArgumentDescs = &indirectArgument;
 
-		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndirectCommandSignature);
+		hResult = m_d3d12Device->CreateCommandSignature(&commandSignatureDescriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndirectCommandSignature);
 		CrAssertMsg(hResult == S_OK, "Error creating command signature");
 	}
 
@@ -152,12 +218,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
 		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
 
-		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
-		descriptor.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
-		descriptor.NumArgumentDescs = 1;
-		descriptor.pArgumentDescs = &indirectArgument;
+		D3D12_COMMAND_SIGNATURE_DESC commandSignatureDescriptor = {};
+		commandSignatureDescriptor.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
+		commandSignatureDescriptor.NumArgumentDescs = 1;
+		commandSignatureDescriptor.pArgumentDescs = &indirectArgument;
 
-		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndexedIndirectCommandSignature);
+		hResult = m_d3d12Device->CreateCommandSignature(&commandSignatureDescriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DrawIndexedIndirectCommandSignature);
 		CrAssertMsg(hResult == S_OK, "Error creating command signature");
 	}
 	
@@ -166,12 +232,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem) : 
 		D3D12_INDIRECT_ARGUMENT_DESC indirectArgument;
 		indirectArgument.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH;
 
-		D3D12_COMMAND_SIGNATURE_DESC descriptor = {};
-		descriptor.ByteStride = sizeof(D3D12_DISPATCH_ARGUMENTS);
-		descriptor.NumArgumentDescs = 1;
-		descriptor.pArgumentDescs = &indirectArgument;
+		D3D12_COMMAND_SIGNATURE_DESC commandSignatureDescriptor = {};
+		commandSignatureDescriptor.ByteStride = sizeof(D3D12_DISPATCH_ARGUMENTS);
+		commandSignatureDescriptor.NumArgumentDescs = 1;
+		commandSignatureDescriptor.pArgumentDescs = &indirectArgument;
 
-		hResult = m_d3d12Device->CreateCommandSignature(&descriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DispatchIndirectCommandSignature);
+		hResult = m_d3d12Device->CreateCommandSignature(&commandSignatureDescriptor, nullptr, __uuidof(ID3D12CommandSignature), (void**)&m_d3d12DispatchIndirectCommandSignature);
 		CrAssertMsg(hResult == S_OK, "Error creating command signature");
 	}
 

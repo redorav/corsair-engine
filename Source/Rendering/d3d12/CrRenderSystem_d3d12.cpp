@@ -27,11 +27,26 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderS
 		}
 	}
 
-	hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory));
+	hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory1));
 	CrAssertMsg(SUCCEEDED(hResult), "Failed to create DXGIFactory");
+
+	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory4)) == S_OK)
+	{
+
+	}
+
+	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory6)) == S_OK)
+	{
+
+	}
+
+	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory7)) == S_OK)
+	{
+
+	}
 }
 
-ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS() const
+ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const
 {
-	return new CrRenderDeviceD3D12(this);
+	return new CrRenderDeviceD3D12(this, descriptor);
 }

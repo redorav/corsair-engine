@@ -535,6 +535,7 @@ namespace cr3d
 			Domain   = 1 << ShaderStage::Domain,
 			Geometry = 1 << ShaderStage::Geometry,
 			Compute  = 1 << ShaderStage::Compute,
+			Present, // Only used to help validation
 			Graphics = Vertex | Pixel | Hull | Domain | Geometry
 		};
 
@@ -544,26 +545,26 @@ namespace cr3d
 		}
 	};
 
-	// These resource states encapsulate resource states as a common denominator between APIs. Some platforms don't even
-	// have resource states but instead flush caches, etc. These are ways to clue in each platform of what needs doing.
+	// These resource layouts encapsulate resource states as a common denominator between APIs. Some platforms don't even
+	// have resource layouts but instead flush caches, etc. These are ways to clue in each platform of what needs doing.
 	// It might mean doing the same thing for some of the states.
-	namespace TextureState
+	namespace TextureLayout
 	{
 		enum T : uint32_t
 		{
-			Undefined,         // Never use this as the destination state in a resource transition operation
-			ShaderInput,       // Use as input to a shader (except depth)
-			RenderTarget,      // Use as a render target
-			RWTexture,         // Use as RW texture
-			Present,           // Use as swapchain
-			DepthStencilRead,  // Read depth in shader
-			DepthStencilWrite, // Write to depth
-			CopySource,        // Use as source of copy operation
-			CopyDestination,   // Use as destination of copy operation
+			Undefined          = 0, // Never use this as the destination state in a resource transition operation
+			ShaderInput        = 1, // Use as input to a shader (except depth)
+			RenderTarget       = 2, // Use as a render target
+			RWTexture          = 3, // Use as RW texture
+			Present            = 4, // Use as swapchain
+			DepthStencilRead   = 5, // Read depth in shader
+			DepthStencilWrite  = 6, // Write to depth
+			CopySource         = 7, // Use as source of copy operation
+			CopyDestination    = 8, // Use as destination of copy operation
 			Count
 		};
 
-		inline const char* ToString(cr3d::TextureState::T textureState)
+		inline const char* ToString(cr3d::TextureLayout::T textureState)
 		{
 			switch (textureState)
 			{
@@ -579,6 +580,17 @@ namespace cr3d
 				default: return "";
 			}
 		}
+	};
+
+	struct TextureState
+	{
+		TextureState() = default;
+
+		TextureLayout::T layout = TextureLayout::Undefined;
+		ShaderStageFlags::T stages = ShaderStageFlags::None;
+
+		bool operator == (const TextureState& other) const { return layout == other.layout && stages == other.stages; }
+		bool operator != (const TextureState& other) const { return layout != other.layout || stages != other.stages; }
 	};
 
 	namespace BufferState

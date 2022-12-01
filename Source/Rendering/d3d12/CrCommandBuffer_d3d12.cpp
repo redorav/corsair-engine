@@ -81,15 +81,19 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 		textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-		textureBarrier.Transition.StateBefore = crd3d::GetTextureState(descriptor.sourceState, descriptor.sourceShaderStages);
-		textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(descriptor.destinationState, descriptor.destinationShaderStages);
-		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-		(
-			descriptor.mipmapStart, descriptor.sliceStart, 0,
-			d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
-		);
+		textureBarrier.Transition.StateBefore = crd3d::GetTextureState(descriptor.sourceState);
+		textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(descriptor.destinationState);
 
-		resourceBarriers.push_back(textureBarrier);
+		if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
+		{
+			textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
+			(
+				descriptor.mipmapStart, descriptor.sliceStart, 0,
+				d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
+			);
+
+			resourceBarriers.push_back(textureBarrier);
+		}
 	}
 
 	// TODO Handle buffer transitions
@@ -98,8 +102,8 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 
 void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	const CrRenderTargetDescriptor& renderTargetDescriptor, 
-	cr3d::TextureState::T initialState,
-	cr3d::TextureState::T finalState,
+	const cr3d::TextureState& initialState,
+	const cr3d::TextureState& finalState,
 	CrBarrierVectorD3D12& resourceBarriers)
 {
 	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
@@ -110,21 +114,24 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-	textureBarrier.Transition.StateBefore = crd3d::GetTextureState(initialState, cr3d::ShaderStageFlags::None);
-	textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(finalState, cr3d::ShaderStageFlags::Graphics);
+	textureBarrier.Transition.StateBefore = crd3d::GetTextureState(initialState);
+	textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(finalState);
 
-	if (finalState != cr3d::TextureState::Present)
+	if (finalState.layout != cr3d::TextureLayout::Present)
 	{
 		CrAssertMsg(textureBarrier.Transition.StateAfter != D3D12_RESOURCE_STATE_COMMON, "Invalid transition state");
 	}
 
-	textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-	(
-		renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
-		d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
-	);
+	if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
+	{
+		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
+		(
+			renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
+			d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
+		);
 
-	resourceBarriers.push_back(textureBarrier);
+		resourceBarriers.push_back(textureBarrier);
+	}
 }
 
 void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)

@@ -25,9 +25,6 @@ struct CrRenderTargetDescriptor
 		, storeOp(CrRenderTargetStoreOp::Store)
 		, stencilLoadOp(CrRenderTargetLoadOp::DontCare)
 		, stencilStoreOp(CrRenderTargetStoreOp::DontCare)
-		, initialState(cr3d::TextureState::Undefined)
-		, usageState(cr3d::TextureState::Undefined)
-		, finalState(cr3d::TextureState::Undefined)
 	{}
 
 	const ICrTexture* texture;
@@ -42,9 +39,9 @@ struct CrRenderTargetDescriptor
 	CrRenderTargetStoreOp storeOp;
 	CrRenderTargetLoadOp stencilLoadOp;
 	CrRenderTargetStoreOp stencilStoreOp;
-	cr3d::TextureState::T initialState;
-	cr3d::TextureState::T usageState;
-	cr3d::TextureState::T finalState;
+	cr3d::TextureState initialState;
+	cr3d::TextureState usageState;
+	cr3d::TextureState finalState;
 };
 
 // For buffers and textures that aren't used as render targets, we split them into two parts. Even if some data is duplicated in some cases,
@@ -71,10 +68,9 @@ struct CrRenderPassTextureDescriptor
 {
 	CrRenderPassTextureDescriptor(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
 		uint32_t sliceStart, uint32_t sliceCount, 
-		cr3d::TextureState::T sourceState, cr3d::ShaderStageFlags::T sourceShaderStages, 
-		cr3d::TextureState::T destinationState, cr3d::ShaderStageFlags::T destinationShaderStages)
+		const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
 		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount)
-		, sourceState(sourceState), sourceShaderStages(sourceShaderStages), destinationState(destinationState), destinationShaderStages(destinationShaderStages) {}
+		, sourceState(sourceState), destinationState(destinationState) {}
 
 	const ICrTexture* texture;
 
@@ -84,10 +80,8 @@ struct CrRenderPassTextureDescriptor
 	uint32_t sliceStart;
 	uint32_t sliceCount;
 
-	cr3d::TextureState::T sourceState;
-	cr3d::TextureState::T destinationState;
-	cr3d::ShaderStageFlags::T sourceShaderStages;
-	cr3d::ShaderStageFlags::T destinationShaderStages;
+	cr3d::TextureState sourceState;
+	cr3d::TextureState destinationState;
 };
 
 struct CrRenderPassDescriptor

@@ -33,9 +33,9 @@ public:
 
 	~CrTextureVulkan();
 
-	static const CrVkImageStateInfo& GetVkImageStateInfo(cr3d::TextureState::T textureState);
+	static const CrVkImageStateInfo& GetVkImageStateInfo(cr3d::TextureLayout::T textureState);
 
-	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages);
+	static VkPipelineStageFlags GetVkPipelineStageFlags(const cr3d::TextureState& textureState);
 
 	VkImage GetVkImage() const { return m_vkImage; }
 

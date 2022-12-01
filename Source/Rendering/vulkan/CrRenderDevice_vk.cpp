@@ -208,7 +208,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 
 		vulkanStagingBuffer->Unlock();
 
-		const CrVkImageStateInfo& imageStateInfo = CrTextureVulkan::GetVkImageStateInfo(vulkanTexture->GetDefaultState());
+		const CrVkImageStateInfo& vkImageStateInfo = CrTextureVulkan::GetVkImageStateInfo(vulkanTexture->GetDefaultState().layout);
 
 		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
@@ -229,7 +229,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 			imageMemoryBarrier.subresourceRange = subresourceRange;
 			imageMemoryBarrier.srcAccessMask = 0;
 			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			imageMemoryBarrier.oldLayout = imageStateInfo.imageLayout;
+			imageMemoryBarrier.oldLayout = vkImageStateInfo.imageLayout;
 			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 			imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -265,7 +265,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			imageMemoryBarrier.newLayout = imageStateInfo.imageLayout;
+			imageMemoryBarrier.newLayout = vkImageStateInfo.imageLayout;
 
 			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
 			// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
@@ -807,7 +807,7 @@ VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queue
 }
 
 // Transitions texture to an initial, predictable state
-void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, cr3d::TextureState::T textureState)
+void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState)
 {
 	// Transition all resources to their initial state
 	VkImageSubresourceRange subresourceRange;
@@ -817,7 +817,7 @@ void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVul
 	subresourceRange.baseArrayLayer = 0;
 	subresourceRange.layerCount = vulkanTexture->GetArraySize();
 
-	const CrVkImageStateInfo& imageStateInfo = CrTextureVulkan::GetVkImageStateInfo(textureState);
+	const CrVkImageStateInfo& imageStateInfo = CrTextureVulkan::GetVkImageStateInfo(textureState.layout);
 
 	VkImageMemoryBarrier imageMemoryBarrier;
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

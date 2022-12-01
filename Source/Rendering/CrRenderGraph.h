@@ -66,8 +66,7 @@ struct CrRenderGraphTextureUsage
 	CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare;
 	CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare;
 
-	cr3d::TextureState::T state = cr3d::TextureState::Undefined;
-	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::TextureState state;
 };
 
 struct CrRenderGraphBufferUsage
@@ -101,13 +100,9 @@ struct CrRenderGraphTextureTransition
 	uint32_t sliceStart = 0;
 	uint32_t sliceCount = 1;
 
-	cr3d::TextureState::T initialState = cr3d::TextureState::Undefined; // State it comes in
-	cr3d::TextureState::T usageState = cr3d::TextureState::Undefined; // State I want it to be used in
-	cr3d::TextureState::T finalState = cr3d::TextureState::Undefined; // State it needs to be left in
-
-	cr3d::ShaderStageFlags::T initialShaderStages = cr3d::ShaderStageFlags::None;
-	cr3d::ShaderStageFlags::T usageShaderStages = cr3d::ShaderStageFlags::None;
-	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
+	cr3d::TextureState initialState; // State it comes in
+	cr3d::TextureState usageState; // State I want it to be used in
+	cr3d::TextureState finalState; // State it needs to be left in
 };
 
 struct CrRenderGraphBufferTransition

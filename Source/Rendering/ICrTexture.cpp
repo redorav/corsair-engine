@@ -72,24 +72,24 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	// operations if not explicitly declared
 	if (IsRenderTarget())
 	{
-		m_defaultState = cr3d::TextureState::RenderTarget;
+		m_defaultState = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel };
 	}
 	else if (IsDepthStencil())
 	{
-		m_defaultState = cr3d::TextureState::DepthStencilWrite;
+		m_defaultState = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
 	}
 	else if (IsUnorderedAccess())
 	{
-		m_defaultState = cr3d::TextureState::RWTexture;
+		m_defaultState = { cr3d::TextureLayout::RWTexture, cr3d::ShaderStageFlags::Compute };
 	}
 	else if (IsSwapchain())
 	{
-		m_defaultState = cr3d::TextureState::Present;
+		m_defaultState = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
 	}
 	else
 	{
 		// If none of the states above, assume we want to sample this texture
-		m_defaultState = cr3d::TextureState::ShaderInput;
+		m_defaultState = { cr3d::TextureLayout::ShaderInput, cr3d::ShaderStageFlags::Pixel };
 	}
 
 	m_hardwareMipmapLayouts = {};

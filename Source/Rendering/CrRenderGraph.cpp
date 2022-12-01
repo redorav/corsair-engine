@@ -99,8 +99,7 @@ void CrRenderGraph::AddTexture(CrRenderGraphTextureId textureId, cr3d::ShaderSta
 		textureUsage.mipmapCount = textureResource->descriptor.mipmapCount;
 		textureUsage.sliceStart = 0;
 		textureUsage.sliceCount = textureResource->descriptor.sliceCount;
-		textureUsage.state = cr3d::TextureState::ShaderInput;
-		textureUsage.shaderStages = shaderStages;
+		textureUsage.state = { cr3d::TextureLayout::ShaderInput, shaderStages };
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added Texture %s", textureResource->name.c_str());
 	}
@@ -118,8 +117,7 @@ void CrRenderGraph::AddRWTexture(CrRenderGraphTextureId textureId, cr3d::ShaderS
 		textureUsage.mipmapCount = CrMin(mipmapCount, textureResource->descriptor.mipmapCount);
 		textureUsage.sliceStart = CrMin(sliceStart, textureResource->descriptor.sliceCount);
 		textureUsage.sliceCount = CrMin(sliceCount, textureResource->descriptor.sliceCount);
-		textureUsage.state = cr3d::TextureState::RWTexture;
-		textureUsage.shaderStages = shaderStages;
+		textureUsage.state = { cr3d::TextureLayout::RWTexture, shaderStages };
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added RWTexture %s", textureResource->name.c_str());
 	}
@@ -136,7 +134,7 @@ void CrRenderGraph::AddRenderTarget(CrRenderGraphTextureId textureId, CrRenderTa
 		textureUsage.clearColor = clearColor;
 		textureUsage.loadOp = loadOp;
 		textureUsage.storeOp = storeOp;
-		textureUsage.state = cr3d::TextureState::RenderTarget;
+		textureUsage.state = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel };
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added Render Target %s", m_textureResources[textureId.id].name.c_str());
 	}
@@ -162,7 +160,7 @@ void CrRenderGraph::AddDepthStencilTarget
 		textureUsage.storeOp = storeOp;
 		textureUsage.stencilLoadOp = stencilLoadOp;
 		textureUsage.stencilStoreOp = stencilStoreOp;
-		textureUsage.state = cr3d::TextureState::DepthStencilWrite;
+		textureUsage.state = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added Depth Stencil Target %s", m_textureResources[textureId.id].name.c_str());
 	}
@@ -174,7 +172,7 @@ void CrRenderGraph::AddSwapchain(CrRenderGraphTextureId textureId)
 	{
 		CrRenderGraphTextureUsage textureUsage;
 		textureUsage.textureId = textureId;
-		textureUsage.state = cr3d::TextureState::Present;
+		textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added Swapchain %s", m_textureResources[textureId.id].name.c_str());
 	}
@@ -222,15 +220,8 @@ void CrRenderGraph::Execute()
 			CrRenderGraphTextureTransition transitionInfo;
 			transitionInfo.name = texture->name;
 			transitionInfo.usageState = textureUsage.state;
-			transitionInfo.finalState = textureUsage.state; // Initialize final state to current state until we have more information
 
-			if (texture->descriptor.texture)
-			{
-				transitionInfo.finalState = texture->descriptor.texture->GetDefaultState();
-			}
-
-			transitionInfo.usageShaderStages = textureUsage.shaderStages;
-			transitionInfo.finalShaderStages = textureUsage.shaderStages;
+			transitionInfo.finalState = texture->descriptor.texture->GetDefaultState(); // Initialize final state to default state until we have more information
 
 			CrRenderPassId lastUsedPassId = m_textureLastUsedPass[texture->id.id];
 
@@ -244,24 +235,15 @@ void CrRenderGraph::Execute()
 				// Inject the final and initial states with usage states
 				CrRenderGraphTextureTransition& lastUsedTransitionInfo = lastUsedPass->textureTransitions.find(texture->id.id)->second;
 				lastUsedTransitionInfo.finalState = textureUsage.state;
-				lastUsedTransitionInfo.finalShaderStages = textureUsage.shaderStages;
 
 				transitionInfo.initialState = lastUsedTransitionInfo.finalState;
-				transitionInfo.initialShaderStages = lastUsedTransitionInfo.finalShaderStages;
 			}
 			// If we didn't find the resource it means we're the first to access it
 			// In normal circumstances this could be an error (i.e. we access a
 			// resource nobody has populated)
 			else
 			{
-				transitionInfo.initialState = cr3d::TextureState::Undefined;
-
-				if (texture->descriptor.texture)
-				{
-					transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
-				}
-
-				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
+				transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
 			}
 
 			renderGraphPass->textureTransitions.insert({ texture->id.id, transitionInfo });
@@ -343,9 +325,9 @@ void CrRenderGraph::Execute()
 				const CrRenderGraphTextureId textureId = textureUsage.textureId;
 				const CrRenderGraphTextureTransition& transitionInfo = renderGraphPass.textureTransitions.find(textureId.id)->second;
 
-				switch (textureUsage.state)
+				switch (textureUsage.state.layout)
 				{
-					case cr3d::TextureState::RenderTarget:
+					case cr3d::TextureLayout::RenderTarget:
 					{
 						CrRenderTargetDescriptor renderTargetDescriptor;
 						renderTargetDescriptor.texture      = m_textureResources[textureId.id].descriptor.texture;
@@ -360,14 +342,14 @@ void CrRenderGraph::Execute()
 
 						CrRenderGraphLog("  Render Target %s [%s -> %s -> %s]",
 							m_textureResources[textureId.id].name.c_str(),
-							cr3d::TextureState::ToString(renderTargetDescriptor.initialState),
-							cr3d::TextureState::ToString(renderTargetDescriptor.usageState),
-							cr3d::TextureState::ToString(renderTargetDescriptor.finalState));
+							cr3d::TextureLayout::ToString(renderTargetDescriptor.initialState.layout),
+							cr3d::TextureLayout::ToString(renderTargetDescriptor.usageState.layout),
+							cr3d::TextureLayout::ToString(renderTargetDescriptor.finalState.layout));
 
 						renderPassDescriptor.color.push_back(renderTargetDescriptor);
 						break;
 					}
-					case cr3d::TextureState::DepthStencilWrite:
+					case cr3d::TextureLayout::DepthStencilWrite:
 					{
 						CrRenderTargetDescriptor depthDescriptor;
 						depthDescriptor.texture           = m_textureResources[textureId.id].descriptor.texture;
@@ -384,29 +366,29 @@ void CrRenderGraph::Execute()
 						depthDescriptor.finalState        = transitionInfo.finalState;
 
 						CrRenderGraphLog("  Depth Stencil %s [%s -> %s -> %s]", m_textureResources[textureId.id].name.c_str(),
-							cr3d::TextureState::ToString(depthDescriptor.initialState),
-							cr3d::TextureState::ToString(depthDescriptor.usageState),
-							cr3d::TextureState::ToString(depthDescriptor.finalState));
+							cr3d::TextureLayout::ToString(depthDescriptor.initialState.layout),
+							cr3d::TextureLayout::ToString(depthDescriptor.usageState.layout),
+							cr3d::TextureLayout::ToString(depthDescriptor.finalState.layout));
 
 						renderPassDescriptor.depth        = depthDescriptor;
 						break;
 					}
-					case cr3d::TextureState::RWTexture:
-					case cr3d::TextureState::ShaderInput:
+					case cr3d::TextureLayout::RWTexture:
+					case cr3d::TextureLayout::ShaderInput:
 					{
+						if (transitionInfo.initialState != transitionInfo.usageState)
 						{
 							renderPassDescriptor.beginTextures.emplace_back
 							(
 								m_textureResources[textureId.id].descriptor.texture,
 								textureUsage.mipmapStart, textureUsage.mipmapCount,
 								textureUsage.sliceStart, textureUsage.sliceCount,
-								transitionInfo.initialState, transitionInfo.initialShaderStages,
-								transitionInfo.usageState, transitionInfo.usageShaderStages
+								transitionInfo.initialState, transitionInfo.usageState
 							);
 
 							CrRenderGraphLog("  Texture %s [%s -> %s]", m_textureResources[textureId.id].name.c_str(),
-								cr3d::TextureState::ToString(transitionInfo.initialState),
-								cr3d::TextureState::ToString(transitionInfo.usageState));
+								cr3d::TextureLayout::ToString(transitionInfo.initialState),
+								cr3d::TextureLayout::ToString(transitionInfo.usageState));
 						}
 
 						if (transitionInfo.usageState != transitionInfo.finalState)
@@ -416,13 +398,12 @@ void CrRenderGraph::Execute()
 								m_textureResources[textureId.id].descriptor.texture,
 								textureUsage.mipmapStart, textureUsage.mipmapCount,
 								textureUsage.sliceStart, textureUsage.sliceCount,
-								transitionInfo.usageState, transitionInfo.usageShaderStages,
-								transitionInfo.finalState, transitionInfo.finalShaderStages
+								transitionInfo.usageState, transitionInfo.finalState
 							);
 
 							CrRenderGraphLog("  Texture %s [%s -> %s]", m_textureResources[textureId.id].name.c_str(),
-								cr3d::TextureState::ToString(transitionInfo.usageState),
-								cr3d::TextureState::ToString(transitionInfo.finalState));
+								cr3d::TextureLayout::ToString(transitionInfo.usageState.layout),
+								cr3d::TextureLayout::ToString(transitionInfo.finalState.layout));
 						}
 						break;
 					}

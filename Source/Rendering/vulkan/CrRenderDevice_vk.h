@@ -43,7 +43,7 @@ public:
 
 	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
 
-	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, cr3d::TextureState::T textureState);
+	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState);
 
 	void SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const;
 

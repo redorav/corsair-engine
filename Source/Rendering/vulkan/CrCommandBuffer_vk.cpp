@@ -386,8 +386,8 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 	attachmentDescription.storeOp        = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.storeOp);
 	attachmentDescription.stencilLoadOp  = crvk::GetVkAttachmentLoadOp(renderTargetDescriptor.stencilLoadOp);
 	attachmentDescription.stencilStoreOp = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.stencilStoreOp);
-	attachmentDescription.initialLayout  = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.initialState).imageLayout;
-	attachmentDescription.finalLayout    = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.finalState).imageLayout;
+	attachmentDescription.initialLayout  = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.initialState.layout).imageLayout;
+	attachmentDescription.finalLayout    = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.finalState.layout).imageLayout;
 
 	return attachmentDescription;
 }
@@ -525,7 +525,7 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 
 void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture, 
 	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount, 
-	cr3d::TextureState::T sourceState, cr3d::TextureState::T destinationState)
+	cr3d::TextureLayout::T sourceState, cr3d::TextureLayout::T destinationState)
 {
 	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
 
@@ -577,9 +577,9 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescri
 	{
 		VkImageMemoryBarrier& imageMemoryBarrier = imageMemoryBarriers.push_back();
 		PopulateVkImageBarrier(imageMemoryBarrier, textureDescriptor.texture, textureDescriptor.mipmapStart, textureDescriptor.mipmapCount,
-			textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState, textureDescriptor.destinationState);
-		srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.sourceState, textureDescriptor.sourceShaderStages);
-		destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.destinationState, textureDescriptor.destinationShaderStages);
+			textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState.layout, textureDescriptor.destinationState.layout);
+		srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.sourceState);
+		destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.destinationState);
 	}
 
 	if (!imageMemoryBarriers.empty() || !bufferMemoryBarriers.empty())

@@ -425,36 +425,36 @@ D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(CrRenderTar
 	}
 }
 
-D3D12_RESOURCE_STATES crd3d::GetTextureState(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages)
+D3D12_RESOURCE_STATES crd3d::GetTextureState(const cr3d::TextureState& textureState)
 {
-	switch (textureState)
+	switch (textureState.layout)
 	{
-		case cr3d::TextureState::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
-		case cr3d::TextureState::ShaderInput:
+		case cr3d::TextureLayout::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
+		case cr3d::TextureLayout::ShaderInput:
 		{
 			D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COMMON;
 
 			// If the pixel shader is using the resource
-			if (shaderStages & cr3d::ShaderStageFlags::Pixel)
+			if (textureState.stages & cr3d::ShaderStageFlags::Pixel)
 			{
 				resourceState |= D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 			}
 
 			// If any other stages are using the resource
-			if ((shaderStages & ~cr3d::ShaderStageFlags::Pixel) != 0)
+			if ((textureState.stages & ~cr3d::ShaderStageFlags::Pixel) != 0)
 			{
 				resourceState |= D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 			}
 
 			return resourceState;
 		}
-		case cr3d::TextureState::RenderTarget:      return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case cr3d::TextureState::RWTexture:         return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		case cr3d::TextureState::Present:           return D3D12_RESOURCE_STATE_PRESENT;
-		case cr3d::TextureState::DepthStencilRead:  return D3D12_RESOURCE_STATE_DEPTH_READ;
-		case cr3d::TextureState::DepthStencilWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureState::CopySource:        return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case cr3d::TextureState::CopyDestination:   return D3D12_RESOURCE_STATE_COPY_DEST;
+		case cr3d::TextureLayout::RenderTarget:      return D3D12_RESOURCE_STATE_RENDER_TARGET;
+		case cr3d::TextureLayout::RWTexture:         return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		case cr3d::TextureLayout::Present:           return D3D12_RESOURCE_STATE_PRESENT;
+		case cr3d::TextureLayout::DepthStencilRead:  return D3D12_RESOURCE_STATE_DEPTH_READ;
+		case cr3d::TextureLayout::DepthStencilWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::CopySource:        return D3D12_RESOURCE_STATE_COPY_SOURCE;
+		case cr3d::TextureLayout::CopyDestination:   return D3D12_RESOURCE_STATE_COPY_DEST;
 		default: return D3D12_RESOURCE_STATE_COMMON;
 	}
 }

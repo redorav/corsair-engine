@@ -310,22 +310,22 @@ CrTextureVulkan::~CrTextureVulkan()
 	}
 }
 
-CrArray<CrVkImageStateInfo, cr3d::TextureState::Count> CrVkImageResourceStateTable;
+CrArray<CrVkImageStateInfo, cr3d::TextureLayout::Count> CrVkImageResourceLayoutTable;
 
 static bool PopulateVkImageResourceTable()
 {
-	CrVkImageResourceStateTable[cr3d::TextureState::Undefined]         = { VK_IMAGE_LAYOUT_UNDEFINED,                        VK_ACCESS_NONE_KHR };
-	CrVkImageResourceStateTable[cr3d::TextureState::ShaderInput]       = { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,         VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::RenderTarget]      = { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::RWTexture]         = { VK_IMAGE_LAYOUT_GENERAL,                          VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::Present]           = { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  0 };
-	CrVkImageResourceStateTable[cr3d::TextureState::DepthStencilRead]  = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,  VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::DepthStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::CopySource]        = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkImageResourceStateTable[cr3d::TextureState::CopyDestination]   = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Undefined]         = { VK_IMAGE_LAYOUT_UNDEFINED,                        VK_ACCESS_NONE_KHR };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::ShaderInput]       = { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,         VK_ACCESS_SHADER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RenderTarget]      = { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RWTexture]         = { VK_IMAGE_LAYOUT_GENERAL,                          VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Present]           = { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  0 };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilRead]  = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,  VK_ACCESS_SHADER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopySource]        = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopyDestination]   = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
 
 	// Validate the entries on boot
-	for (const CrVkImageStateInfo& resourceInfo : CrVkImageResourceStateTable)
+	for (const CrVkImageStateInfo& resourceInfo : CrVkImageResourceLayoutTable)
 	{
 		CrAssertMsg((resourceInfo.imageLayout != VK_IMAGE_LAYOUT_MAX_ENUM) && (resourceInfo.accessMask != VK_ACCESS_FLAG_BITS_MAX_ENUM), "Resource info entry is invalid");
 	}
@@ -335,26 +335,26 @@ static bool PopulateVkImageResourceTable()
 
 static const bool DummyPopulateVkImageTable = PopulateVkImageResourceTable();
 
-const CrVkImageStateInfo& CrTextureVulkan::GetVkImageStateInfo(cr3d::TextureState::T textureState)
+const CrVkImageStateInfo& CrTextureVulkan::GetVkImageStateInfo(cr3d::TextureLayout::T textureLayout)
 {
-	return CrVkImageResourceStateTable[textureState];
+	return CrVkImageResourceLayoutTable[textureLayout];
 }
 
-VkPipelineStageFlags CrTextureVulkan::GetVkPipelineStageFlags(cr3d::TextureState::T textureState, cr3d::ShaderStageFlags::T shaderStages)
+VkPipelineStageFlags CrTextureVulkan::GetVkPipelineStageFlags(const cr3d::TextureState& textureState)
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
-	if (textureState == cr3d::TextureState::RenderTarget)
+	if (textureState.layout == cr3d::TextureLayout::RenderTarget)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	}
-	else if (textureState == cr3d::TextureState::DepthStencilWrite)
+	else if (textureState.layout == cr3d::TextureLayout::DepthStencilWrite)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 	}
-	else if (textureState == cr3d::TextureState::ShaderInput || textureState == cr3d::TextureState::RWTexture)
+	else if (textureState.layout == cr3d::TextureLayout::ShaderInput || textureState.layout == cr3d::TextureLayout::RWTexture)
 	{
-		pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(shaderStages);
+		pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(textureState.stages);
 	}
 
 	return pipelineFlags;

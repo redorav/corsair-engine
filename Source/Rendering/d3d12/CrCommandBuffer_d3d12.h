@@ -76,8 +76,8 @@ private:
 	void ProcessRenderTargetBarrier
 	(
 		const CrRenderTargetDescriptor& renderTargetDescriptor, 
-		cr3d::TextureState::T initialState,
-		cr3d::TextureState::T finalState, 
+		const cr3d::TextureState& initialState,
+		const cr3d::TextureState& finalState,
 		CrBarrierVectorD3D12& resourceBarriers
 	);
 

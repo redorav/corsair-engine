@@ -16,7 +16,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
-	m_d3d12InitialState = crd3d::GetTextureState(m_defaultState, cr3d::ShaderStageFlags::Graphics);
+	m_d3d12InitialState = crd3d::GetTextureState(m_defaultState);
 
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 

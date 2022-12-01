@@ -70,7 +70,7 @@ public:
 
 	uint32_t GetArraySize() const { return m_arraySize; }
 
-	cr3d::TextureState::T GetDefaultState() const { return m_defaultState; }
+	cr3d::TextureState GetDefaultState() const { return m_defaultState; }
 
 	static cr3d::MipmapLayout GetGenericMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
@@ -115,7 +115,7 @@ protected:
 	// by the hardware and takes into account padding, etc Used for reporting
 	uint32_t m_usedGPUMemoryBytes;
 
-	cr3d::TextureState::T m_defaultState;
+	cr3d::TextureState m_defaultState;
 
 	cr3d::TextureUsageFlags m_usage;
 

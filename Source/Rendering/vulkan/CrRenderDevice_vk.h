@@ -8,6 +8,8 @@
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 
+class CrTextureVulkan;
+
 class CrRenderDeviceVulkan final : public ICrRenderDevice
 {
 public:
@@ -40,6 +42,8 @@ public:
 	VkQueue GetVkQueue(CrCommandQueueType::T queueType) const;
 
 	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
+
+	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, cr3d::TextureState::T textureState);
 
 	void SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const;
 

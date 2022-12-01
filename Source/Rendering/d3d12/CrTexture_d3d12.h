@@ -48,6 +48,8 @@ public:
 
 	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
 
+	D3D12_RESOURCE_STATES GetDefaultResourceState() const { return m_d3d12InitialState; }
+
 	const D3D12_SHADER_RESOURCE_VIEW_DESC& GetD3D12ShaderResourceView() const { return m_d3d12ShaderResourceView; }
 
 	const D3D12_UNORDERED_ACCESS_VIEW_DESC& GetD3D12UnorderedAccessView(uint32_t mip) const { return m_additionalViews->m_d3d12UAVSingleMipAllSlices[mip]; }
@@ -62,6 +64,8 @@ private:
 	CrUniquePtr<CrD3D12AdditionalTextureViews> m_additionalViews;
 
 	uint32_t m_d3d12SubresourceCount;
+
+	D3D12_RESOURCE_STATES m_d3d12InitialState;
 
 	ID3D12Resource* m_d3d12Resource = nullptr;
 };

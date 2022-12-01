@@ -453,6 +453,7 @@ void CrFrame::Process()
 	CrRenderGraphFrameParams frameRenderGraphParams;
 	frameRenderGraphParams.commandBuffer = drawCommandBuffer;
 	frameRenderGraphParams.timingQueryTracker = m_timingQueryTracker.get();
+	frameRenderGraphParams.frameCount = CrFrameTime::GetFrameCount();
 	m_mainRenderGraph.Begin(frameRenderGraphParams);
 
 	m_renderingStream->Reset();

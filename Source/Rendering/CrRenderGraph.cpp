@@ -224,10 +224,10 @@ void CrRenderGraph::Execute()
 			transitionInfo.usageState = textureUsage.state;
 			transitionInfo.finalState = textureUsage.state; // Initialize final state to current state until we have more information
 
-			//if (texture->descriptor.texture)
-			//{
-			//	transitionInfo.finalState = texture->descriptor.texture->GetDefaultState();
-			//}
+			if (texture->descriptor.texture)
+			{
+				transitionInfo.finalState = texture->descriptor.texture->GetDefaultState();
+			}
 
 			transitionInfo.usageShaderStages = textureUsage.shaderStages;
 			transitionInfo.finalShaderStages = textureUsage.shaderStages;
@@ -246,8 +246,8 @@ void CrRenderGraph::Execute()
 				lastUsedTransitionInfo.finalState = textureUsage.state;
 				lastUsedTransitionInfo.finalShaderStages = textureUsage.shaderStages;
 
-				transitionInfo.initialState = lastUsedTransitionInfo.usageState;
-				transitionInfo.initialShaderStages = lastUsedTransitionInfo.usageShaderStages;
+				transitionInfo.initialState = lastUsedTransitionInfo.finalState;
+				transitionInfo.initialShaderStages = lastUsedTransitionInfo.finalShaderStages;
 			}
 			// If we didn't find the resource it means we're the first to access it
 			// In normal circumstances this could be an error (i.e. we access a
@@ -256,10 +256,10 @@ void CrRenderGraph::Execute()
 			{
 				transitionInfo.initialState = cr3d::TextureState::Undefined;
 
-				//if (texture->descriptor.texture)
-				//{
-				//	transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
-				//}
+				if (texture->descriptor.texture)
+				{
+					transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
+				}
 
 				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
 			}
@@ -296,8 +296,8 @@ void CrRenderGraph::Execute()
 				lastUsedTransitionInfo.finalState = bufferUsage.usageState;
 				lastUsedTransitionInfo.finalShaderStages = bufferUsage.shaderStages;
 
-				transitionInfo.initialState = lastUsedTransitionInfo.usageState;
-				transitionInfo.initialShaderStages = lastUsedTransitionInfo.usageShaderStages;
+				transitionInfo.initialState = lastUsedTransitionInfo.finalState;
+				transitionInfo.initialShaderStages = lastUsedTransitionInfo.finalShaderStages;
 			}
 			// If we didn't find the resource it means we're the first to access it
 			// In normal circumstances this could be an error (i.e. we access a
@@ -392,8 +392,8 @@ void CrRenderGraph::Execute()
 						break;
 					}
 					case cr3d::TextureState::RWTexture:
+					case cr3d::TextureState::ShaderInput:
 					{
-						if (transitionInfo.initialState != transitionInfo.usageState)
 						{
 							renderPassDescriptor.beginTextures.emplace_back
 							(

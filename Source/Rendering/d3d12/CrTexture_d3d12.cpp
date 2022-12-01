@@ -16,6 +16,8 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
+	m_d3d12InitialState = crd3d::GetTextureState(m_defaultState, cr3d::ShaderStageFlags::Graphics);
+
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 
 	D3D12_RESOURCE_DESC d3d12ResourceDescriptor = {};
@@ -77,7 +79,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&d3d12ResourceDescriptor,
-			D3D12_RESOURCE_STATE_COMMON,
+			m_d3d12InitialState,
 			nullptr,
 			IID_PPV_ARGS(&m_d3d12Resource)
 		);

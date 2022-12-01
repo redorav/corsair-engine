@@ -425,22 +425,31 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 	return (uint8_t*)stagingBuffer->Lock();
 }
 
-void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* texture)
+void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTexture)
 {
-	CrHash textureHash(&texture, sizeof(texture));
+	CrHash textureHash(&destinationTexture, sizeof(destinationTexture));
 	const auto textureUploadIter = m_openTextureUploads.find(textureHash);
 	if (textureUploadIter != m_openTextureUploads.end())
 	{
 		const CrTextureUpload& textureUpload = textureUploadIter->second;
 
-		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(texture);
+		const CrTextureD3D12* d3d12DestinationTexture = static_cast<const CrTextureD3D12*>(destinationTexture);
 		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.buffer.get());
 
 		d3d12StagingBuffer->Unlock();
 
 		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
-			cr3d::DataFormat::T format = texture->GetFormat();
+			D3D12_RESOURCE_BARRIER barrier = {};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Transition.pResource = d3d12DestinationTexture->GetD3D12Resource();
+			barrier.Transition.StateBefore = d3d12DestinationTexture->GetDefaultResourceState();
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+
+			cr3d::DataFormat::T format = destinationTexture->GetFormat();
 
 			uint32_t blockWidth = cr3d::DataFormats[format].blockWidth;
 			uint32_t blockHeight = cr3d::DataFormats[format].blockHeight;
@@ -449,26 +458,31 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* texture)
 			{
 				for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapCount; ++mip)
 				{
-					cr3d::MipmapLayout mipmapLayout = texture->GetHardwareMipSliceLayout(mip, slice);
+					cr3d::MipmapLayout mipmapLayout = destinationTexture->GetHardwareMipSliceLayout(mip, slice);
 
 					D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
 					textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Resource();
 					textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 					textureCopySource.PlacedFootprint.Offset = mipmapLayout.offsetBytes;
 					textureCopySource.PlacedFootprint.Footprint.Format   = crd3d::GetDXGIFormat(format);
-					textureCopySource.PlacedFootprint.Footprint.Width    = CrMax(blockWidth, texture->GetWidth() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Height   = CrMax(blockHeight, texture->GetHeight() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Depth    = CrMax(1u, texture->GetDepth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Width    = CrMax(blockWidth, destinationTexture->GetWidth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Height   = CrMax(blockHeight, destinationTexture->GetHeight() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Depth    = CrMax(1u, destinationTexture->GetDepth() >> mip);
 					textureCopySource.PlacedFootprint.Footprint.RowPitch = mipmapLayout.rowPitchBytes;
 
 					D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
-					textureCopyDestination.pResource = d3d12Texture->GetD3D12Resource();
+					textureCopyDestination.pResource = d3d12DestinationTexture->GetD3D12Resource();
 					textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-					textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, texture->GetMipmapCount(), texture->GetArraySize());
+					textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, destinationTexture->GetMipmapCount(), destinationTexture->GetArraySize());
 
 					d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
 				}
 			}
+
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			barrier.Transition.StateAfter = d3d12DestinationTexture->GetDefaultResourceState();
+
+			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 		}
 
 		// Cast to const_iterator to conform to EASTL's interface

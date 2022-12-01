@@ -239,6 +239,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		}
 	}
 
+	vulkanRenderDevice->TransitionVkTextureToInitialLayout(this, m_defaultState);
+
 	for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 	{
 		cr3d::MipmapLayout genericMipLayout = GetGenericMipSliceLayout(mip, 0);

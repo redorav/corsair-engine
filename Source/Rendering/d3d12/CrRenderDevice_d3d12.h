@@ -7,6 +7,7 @@
 #include <d3d12.h>
 
 class CrCommandQueueD3D12;
+class CrTextureD3D12;
 
 class CrRenderDeviceD3D12 final : public ICrRenderDevice
 {

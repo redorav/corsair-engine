@@ -691,6 +691,11 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		enabledDeviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 	}
 
+	if (IsVkDeviceExtensionSupported(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+	{
+		enabledDeviceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+	}
+
 	if (IsVkDeviceExtensionSupported(VK_KHR_MAINTENANCE1_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);

@@ -3,7 +3,6 @@
 	<repository name="github" url="https://github.com/redorav/corsair-dependencies/raw/master/packages/"/>
 
 	<package name="assimp">
-		<version id="80799bd" file="assimp_2017_12_11_80799bd.zip" repository="github"/>
 		<version id="88a9598" file="assimp_2022_04_26_88a9598.zip" repository="github"/>
 	</package>
 	
@@ -61,8 +60,8 @@
 	</package>
 	
 	<package name="vulkan">
-		<version id="1.2.170" file="vulkan_1.2.170.zip" repository="github"/>
 		<version id="1.2.189.2" file="vulkan_1.2.189.2.zip" repository="github"/>
+		<version id="1.3.231.1" file="vulkan_1.3.231.1.zip" repository="github"/>
 	</package>
 	
 	<package name="winpixeventruntime">

@@ -117,10 +117,12 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	textureBarrier.Transition.StateBefore = crd3d::GetTextureState(initialState);
 	textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(finalState);
 
+#if defined(COMMAND_BUFFER_VALIDATION)
 	if (finalState.layout != cr3d::TextureLayout::Present)
 	{
 		CrAssertMsg(textureBarrier.Transition.StateAfter != D3D12_RESOURCE_STATE_COMMON, "Invalid transition state");
 	}
+#endif
 
 	if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
 	{
@@ -746,7 +748,7 @@ void CrCommandBufferD3D12::EndPS()
 	{
 		crd3d::DescriptorD3D12 cbv_SRV_UAV_Heap = m_CBV_SRV_UAV_DescriptorStream.GetDescriptorHeap().GetHeapStart();
 		crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleHeap = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetDescriptorHeap().GetHeapStart();
-		CrAssertMsg(m_CBV_SRV_UAV_DescriptorStream.GetNumDescriptors() == m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
+		CrCommandBufferAssertMsg(m_CBV_SRV_UAV_DescriptorStream.GetNumDescriptors() == m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
 		d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(m_CBV_SRV_UAV_DescriptorStream.GetNumDescriptors(),
 			cbv_SRV_UAV_ShaderVisibleHeap.cpuHandle, cbv_SRV_UAV_Heap.cpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
@@ -755,7 +757,7 @@ void CrCommandBufferD3D12::EndPS()
 	{
 		crd3d::DescriptorD3D12 samplerHeap = m_samplerDescriptorStream.GetDescriptorHeap().GetHeapStart();
 		crd3d::DescriptorD3D12 samplerShaderVisibleHeap = m_samplerShaderVisibleDescriptorStream.GetDescriptorHeap().GetHeapStart();
-		CrAssertMsg(m_samplerDescriptorStream.GetNumDescriptors() == m_samplerShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
+		CrCommandBufferAssertMsg(m_samplerDescriptorStream.GetNumDescriptors() == m_samplerShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
 		d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(m_samplerDescriptorStream.GetNumDescriptors(),
 			samplerShaderVisibleHeap.cpuHandle, samplerHeap.cpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 	}

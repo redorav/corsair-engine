@@ -16,6 +16,14 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
+#define COMMAND_BUFFER_VALIDATION
+
+#if defined(COMMAND_BUFFER_VALIDATION)
+	#define CrCommandBufferAssertMsg(condition, message, ...) CrAssertMsg(condition, message, __VA_ARGS__)
+#else
+	#define CrCommandBufferAssertMsg(condition, message, ...)
+#endif
+
 struct CrCommandBufferDescriptor
 {
 	CrCommandQueueType::T queueType = CrCommandQueueType::Graphics;

@@ -158,8 +158,8 @@ CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::Dat
 
 void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	CrAssertMsg(!m_currentState.m_renderPassActive, "Render pass already active. Have you forgotten to close a render pass?");
-	
+	CrCommandBufferAssertMsg(!m_currentState.m_renderPassActive, "Render pass already active. Have you forgotten to close a render pass?");
+
 	m_currentState.m_currentRenderPass = renderPassDescriptor;
 	m_currentState.m_renderPassActive = true;
 
@@ -168,33 +168,34 @@ void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassD
 		BeginDebugEvent(m_currentState.m_currentRenderPass.debugName.c_str(), m_currentState.m_currentRenderPass.debugColor);
 	}
 
-	// Validation
+#if defined(COMMAND_BUFFER_VALIDATION)
 	for (uint32_t i = 0; i < renderPassDescriptor.color.size(); ++i)
 	{
 		const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
 		if (renderTargetDescriptor.loadOp == CrRenderTargetLoadOp::Load && renderTargetDescriptor.initialState.layout == cr3d::TextureLayout::Undefined)
 		{
-			CrAssertMsg(false, "Invalid combination");
+			CrCommandBufferAssertMsg(false, "Invalid combination");
 		}
 
-		CrAssertMsg(renderTargetDescriptor.initialState.stages != cr3d::ShaderStageFlags::None, "");
-		CrAssertMsg(renderTargetDescriptor.usageState.stages != cr3d::ShaderStageFlags::None, "");
-		CrAssertMsg(renderTargetDescriptor.finalState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderTargetDescriptor.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderTargetDescriptor.usageState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderTargetDescriptor.finalState.stages != cr3d::ShaderStageFlags::None, "");
 	}
 
 	if (renderPassDescriptor.depth.texture)
 	{
-		CrAssertMsg(renderPassDescriptor.depth.initialState.stages != cr3d::ShaderStageFlags::None, "");
-		CrAssertMsg(renderPassDescriptor.depth.usageState.stages != cr3d::ShaderStageFlags::None, "");
-		CrAssertMsg(renderPassDescriptor.depth.finalState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderPassDescriptor.depth.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderPassDescriptor.depth.usageState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderPassDescriptor.depth.finalState.stages != cr3d::ShaderStageFlags::None, "");
 	}
+#endif
 
 	BeginRenderPassPS(renderPassDescriptor);
 }
 
 void ICrCommandBuffer::EndRenderPass()
 {
-	CrAssertMsg(m_currentState.m_renderPassActive, "Render pass not active. Have you forgotten to start a render pass?");
+	CrCommandBufferAssertMsg(m_currentState.m_renderPassActive, "Render pass not active. Have you forgotten to start a render pass?");
 	
 	EndRenderPassPS();
 

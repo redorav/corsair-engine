@@ -28,14 +28,6 @@ CrGlobalPaths constructor;
 
 CrGlobalPaths::CrGlobalPaths()
 {
-}
-
-void CrGlobalPaths::SetupGlobalPaths
-(
-	const char* currentExecutablePath,
-	const char* dataRootDirectory
-)
-{
 	ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
 
 #if defined(_WIN32)
@@ -89,7 +81,14 @@ void CrGlobalPaths::SetupGlobalPaths
 #endif
 
 	TempEngineDirectory = TempDirectory + "Corsair Engine/";
+}
 
+void CrGlobalPaths::SetupGlobalPaths
+(
+	const char* currentExecutablePath,
+	const char* dataRootDirectory
+)
+{
 	CrPath currentExecutableDirectory = CrPath(currentExecutablePath).parent_path();
 
 	CurrentExecutableDirectory = currentExecutableDirectory.c_str();

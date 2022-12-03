@@ -102,8 +102,6 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 	cr3d::GraphicsApi::T graphicsApi = ICrRenderSystem::Get()->GetGraphicsApi();
 	cr::Platform::T platform = cr::Platform::Windows;
 
-	CrPath shaderEntryPointPath = CrPath(CrGlobalPaths::GetShaderSourceDirectory()) / "Ubershader.hlsl";
-
 	// Generate header with defines
 	CrShaderHeaderGenerator shaderHeaderGenerator;
 

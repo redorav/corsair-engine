@@ -173,7 +173,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	{
 		CrArray<char, 2048> processOutput;
 		process.ReadStdOut(processOutput.data(), processOutput.size());
-		CrLog(processOutput.data());
+		CrAssertMsg(false, "%s", processOutput.data());
 
 		return nullptr;
 	}

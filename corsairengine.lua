@@ -3,7 +3,6 @@ require("premake/corsairengine/dependencies")
 -- Directories
 SourceDirectory          = 'Source'
 ToolsDirectory           = 'Tools'
-ShaderCompilerDirectory  = ToolsDirectory..'/Shader Compiler'
 MathDirectory            = SourceDirectory..'/Math'
 SourceUnitTestsDirectory = SourceDirectory..'/UnitTests'
 SourceRenderingDirectory = SourceDirectory..'/Rendering'
@@ -36,8 +35,10 @@ ProjectUnitTests        = 'CrUnitTests'
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
 GeneratedCodeDirectory = WorkspaceDirectory..'/GeneratedCode'
 
-ShaderCompilerAbsoluteDirectory = path.getabsolute(ShaderCompilerDirectory)
-ShaderCompilerAbsolutePath = ShaderCompilerAbsoluteDirectory..'/'..ProjectShaderCompiler..'.exe'
+ShaderCompilerExecutableName = ProjectShaderCompiler..'.exe'
+
+-- Path is resolved during the parsing pass. It's meant to be in the same directory as the main executable
+ShaderCompilerPath = '%{cfg.buildtarget.directory}'..ShaderCompilerExecutableName
 
 -- Utility Functions
 
@@ -195,8 +196,7 @@ workspace 'Corsair Engine'
 	-- Generate the global paths file
 	globalVariableHeader = io.open(path.getabsolute(GeneratedCodeDirectory)..'/GlobalVariables.h', 'wb');
 	globalVariableHeader:write('namespace GlobalPaths\n{\n');
-	globalVariableHeader:write('\tstatic const char* ShaderCompilerDirectory = "'..ShaderCompilerAbsoluteDirectory..'/";\n');
-	globalVariableHeader:write('\tstatic const char* ShaderCompilerPath = "'..ShaderCompilerAbsolutePath..'";\n');
+	globalVariableHeader:write('\tstatic const char* ShaderCompilerExecutableName = "'..ShaderCompilerExecutableName..'";\n');
 	globalVariableHeader:write('\tstatic const char* ShaderSourceDirectory = "'..path.getabsolute(SourceShadersDirectory)..'/";\n');
 	globalVariableHeader:write('};\n');
 	globalVariableHeader:close();
@@ -337,11 +337,11 @@ project(ProjectShaders)
 	kind('StaticLib')
 	files { SourceShadersDirectory..'/**.hlsl', SourceShadersDirectory..'/**.shaders' }
 	dependson { ProjectShaderCompiler }
-	
+
 	local metadataFile = path.getabsolute(SourceShadersDirectory)..'/Metadata.hlsl'
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/'..ShaderMetadataFilename
 	local shaderMetadataCommandLine = 
-	'"'..ShaderCompilerAbsolutePath..'" '..
+	'"'..ShaderCompilerPath..'" '..
 	'-metadata -input "'..metadataFile..'" ' ..
 	'-output "'..outputFile..'" -entrypoint metadata'
 
@@ -352,7 +352,7 @@ project(ProjectShaders)
 		shaderMetadataCommandLine, -- Run
 	}
 	
-	buildinputs { hlslFiles, shadersFiles, ShaderCompilerAbsolutePath }
+	buildinputs { hlslFiles, shadersFiles, ShaderCompilerPath }
 	
 	buildoutputs { outputFile..'.uptodate' }
 	
@@ -375,12 +375,12 @@ project(ProjectBuiltinShaders)
 
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/BuiltinShaders'
 	local builtinShaderCommandLine =
-	'"'..ShaderCompilerAbsolutePath..'" '..
+	'"'..ShaderCompilerPath..'" '..
 	'-builtin '..
 	'-input "'..path.getabsolute(SourceShadersDirectory)..'" '..
 	'-output "'..outputFile..'" '..
 	'-platform '..Platform:lower()
-
+	
 	for i, graphicsApi in ipairs(GraphicsApis) do
 		builtinShaderCommandLine = builtinShaderCommandLine..' -graphicsapi '..graphicsApi:lower()
 	end
@@ -392,7 +392,7 @@ project(ProjectBuiltinShaders)
 		builtinShaderCommandLine,
 	}
 
-	buildinputs { hlslFiles, shadersFiles, ShaderCompilerAbsolutePath }
+	buildinputs { hlslFiles, shadersFiles, ShaderCompilerPath }
 
 	buildoutputs { outputFile..'.uptodate' }
 	
@@ -423,11 +423,9 @@ project(ProjectShaderCompiler)
 	AddLibraryIncludes(RapidYAMLLibrary)
 	LinkLibrary(RapidYAMLLibrary)
 
-	-- Copy the shader compiler into a known directory
 	postbuildcommands
 	{
-		'{mkdir} \"'..path.getabsolute(ShaderCompilerDirectory).."\"",
-		CopyFileCommand('%{cfg.buildtarget.abspath}', path.getabsolute(ShaderCompilerDirectory)),
+		-- Copy DLLs that the shader compiler needs
 		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[1]), '%{cfg.buildtarget.directory}'),
 		CopyFileCommand(path.getabsolute(DxcLibrary.dlls[2]), '%{cfg.buildtarget.directory}')
 	}

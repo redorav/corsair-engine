@@ -17,7 +17,6 @@ CrString CrGlobalPaths::AppDataDirectory;
 CrString CrGlobalPaths::CurrentExecutableDirectory;
 CrString CrGlobalPaths::CurrentWorkingDirectory;
 CrString CrGlobalPaths::DataRootDirectory;
-CrString CrGlobalPaths::ShaderCompilerDirectory;
 CrString CrGlobalPaths::ShaderCompilerPath;
 CrString CrGlobalPaths::ShaderSourceDirectory;
 CrString CrGlobalPaths::TempEngineDirectory;
@@ -29,8 +28,14 @@ CrGlobalPaths constructor;
 
 CrGlobalPaths::CrGlobalPaths()
 {
-	ShaderCompilerDirectory = GlobalPaths::ShaderCompilerDirectory;
-	ShaderCompilerPath = GlobalPaths::ShaderCompilerPath;
+}
+
+void CrGlobalPaths::SetupGlobalPaths
+(
+	const char* currentExecutablePath,
+	const char* dataRootDirectory
+)
+{
 	ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
 
 #if defined(_WIN32)
@@ -84,18 +89,17 @@ CrGlobalPaths::CrGlobalPaths()
 #endif
 
 	TempEngineDirectory = TempDirectory + "Corsair Engine/";
-}
 
-void CrGlobalPaths::SetupGlobalPaths
-(
-	const char* currentExecutablePath,
-	const char* dataRootDirectory
-)
-{
-	CurrentExecutableDirectory = CrPath(currentExecutablePath).parent_path().c_str();
+	CrPath currentExecutableDirectory = CrPath(currentExecutablePath).parent_path();
+
+	CurrentExecutableDirectory = currentExecutableDirectory.c_str();
 	CurrentExecutableDirectory += "/";
+
 	DataRootDirectory = dataRootDirectory;
 	DataRootDirectory += "/";
+
+	// The shader compiler should always live alongside the main executable
+	ShaderCompilerPath = (currentExecutableDirectory / GlobalPaths::ShaderCompilerExecutableName).c_str();
 }
 
 const CrString& CrGlobalPaths::GetTempDirectory()
@@ -116,11 +120,6 @@ const CrString& CrGlobalPaths::GetCurrentWorkingDirectory()
 const CrString& CrGlobalPaths::GetAppDataDirectory()
 {
 	return AppDataDirectory;
-}
-
-const CrString& CrGlobalPaths::GetShaderCompilerDirectory()
-{
-	return ShaderCompilerDirectory;
 }
 
 const CrString& CrGlobalPaths::GetShaderCompilerPath()

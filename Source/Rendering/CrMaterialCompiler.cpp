@@ -83,6 +83,8 @@ CrShaderBytecodeSharedHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderByt
 		// Compile bytecode
 		shaderBytecode = CrShaderManager::Get().CompileShaderBytecode(compilationDescriptor, defines);
 
+		CrAssertMsg(shaderBytecode != nullptr, "Bytecode compilation failed.");
+
 		// Save to cache if compilation was successful
 		if (shaderBytecode)
 		{

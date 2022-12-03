@@ -519,7 +519,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	// when determining availability and features.
 
 	VkFormatProperties formatProperties;
-	for (uint32_t dataFormat = 0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
+	for (cr3d::DataFormat::T dataFormat = (cr3d::DataFormat::T)0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
 	{
 		VkFormat format = crvk::GetVkFormat((cr3d::DataFormat::T)dataFormat);
 		vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, (VkFormat)format, &formatProperties);

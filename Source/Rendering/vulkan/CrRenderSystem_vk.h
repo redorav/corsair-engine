@@ -27,6 +27,8 @@ private:
 	// Global per-application state https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkInstance
 	VkInstance m_vkInstance;
 
+	VkDebugUtilsMessengerEXT m_vkDebugMessenger;
+
 	CrSet<CrString> m_supportedInstanceExtensions;
 
 	CrSet<CrString> m_supportedInstanceLayers;

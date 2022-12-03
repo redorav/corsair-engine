@@ -20,6 +20,25 @@ PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessenger  = nullptr;
 PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = nullptr;
 PFN_vkSubmitDebugUtilsMessageEXT    vkSubmitDebugUtilsMessage    = nullptr;
 
+// https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/PFN_vkDebugUtilsMessengerCallbackEXT.html
+static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
+(
+	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	VkDebugUtilsMessageTypeFlagsEXT messageType,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData
+)
+{
+	(messageSeverity);
+	(messageType);
+	(pUserData);
+
+	CrLog(pCallbackData->pMessage);
+
+	// The application should always return VK_FALSE. The VK_TRUE value is reserved for use in layer development.
+	return VK_FALSE;
+}
+
 CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
 	VkApplicationInfo appInfo = {};
@@ -136,6 +155,18 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 		vkCreateDebugUtilsMessenger  = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_vkInstance, "vkCreateDebugUtilsMessengerEXT");
 		vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_vkInstance, "vkDestroyDebugUtilsMessengerEXT");
 		vkSubmitDebugUtilsMessage    = (PFN_vkSubmitDebugUtilsMessageEXT)vkGetInstanceProcAddr(m_vkInstance, "vkSubmitDebugUtilsMessageEXT");
+
+		if (vkCreateDebugUtilsMessenger)
+		{
+			VkDebugUtilsMessengerCreateInfoEXT vkDebugUtilsMessengerCreateInfo = {};
+			vkDebugUtilsMessengerCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+			vkDebugUtilsMessengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+			vkDebugUtilsMessengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+			vkDebugUtilsMessengerCreateInfo.pfnUserCallback = &CrVkDebugCallback;
+			vkDebugUtilsMessengerCreateInfo.pUserData = nullptr; // Optional
+
+			vkCreateDebugUtilsMessenger(m_vkInstance, &vkDebugUtilsMessengerCreateInfo, nullptr, &m_vkDebugMessenger);
+		}
 	}
 }
 

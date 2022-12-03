@@ -197,6 +197,11 @@ namespace cr3d
 			FirstPVRTC = PVRTC1_2BPP_Unorm,
 			LastPVRTC  = PVRTC2_4BPP_SRGB,
 		};
+
+		inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; } // Pre-increment
+		inline T operator++(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return temp; } // Post-increment
+		inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; } // Pre-decrement
+		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; } // Post-decrement
 	};
 
 	// TODO Move to core

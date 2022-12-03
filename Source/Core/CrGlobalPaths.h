@@ -22,8 +22,6 @@ public:
 
 	static const CrString& GetDataRootDirectory();
 
-	static const CrString& GetShaderCompilerDirectory();
-
 	static const CrString& GetShaderCompilerPath();
 
 	static const CrString& GetShaderSourceDirectory();
@@ -45,9 +43,6 @@ private:
 
 	// Path to root of data
 	static CrString DataRootDirectory;
-
-	// Directory of shader compiler
-	static CrString ShaderCompilerDirectory;
 
 	// Path to shader compiler
 	static CrString ShaderCompilerPath;

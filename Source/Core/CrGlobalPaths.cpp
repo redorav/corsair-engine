@@ -6,6 +6,8 @@
 
 #include "Core/FileSystem/CrPath.h"
 
+#include "Core/FileSystem/ICrFile.h"
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <shlobj.h>
@@ -28,8 +30,6 @@ CrGlobalPaths constructor;
 
 CrGlobalPaths::CrGlobalPaths()
 {
-	ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
-
 #if defined(_WIN32)
 
 	const uint32_t MaxPathSize = MAX_PATH + 1;
@@ -99,6 +99,21 @@ void CrGlobalPaths::SetupGlobalPaths
 
 	// The shader compiler should always live alongside the main executable
 	ShaderCompilerPath = (currentExecutableDirectory / GlobalPaths::ShaderCompilerExecutableName).c_str();
+
+	ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
+
+	CrPath overrideShaderSources = currentExecutableDirectory / "Shader Source";
+
+	// If the directory does not exist, try to find a local one instead
+	if (!ICrFile::DirectoryExists(GlobalPaths::ShaderSourceDirectory))
+	{
+		ShaderSourceDirectory = overrideShaderSources.c_str();
+	}
+
+	if (ICrFile::DirectoryExists(overrideShaderSources.c_str()))
+	{
+		ShaderSourceDirectory = overrideShaderSources.c_str();
+	}
 }
 
 const CrString& CrGlobalPaths::GetTempDirectory()

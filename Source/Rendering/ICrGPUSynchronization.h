@@ -2,6 +2,8 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
+#include "Rendering/CrGPUDeletable.h"
+
 // For synchronization primitives we'll use Vulkan nomenclature, as the naming varies between APIs and it's not always
 // clear which is which. If unclear refer to the descriptions here for clarity
 
@@ -23,7 +25,7 @@ public:
 // e.g. Graphics queue signals, graphics queue receives
 // Vulkan: vkSemaphore
 // D3D12: ID3D12Fence
-class ICrGPUSemaphore
+class ICrGPUSemaphore : public CrGPUDeletable
 {
 public:
 

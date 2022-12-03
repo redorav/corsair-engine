@@ -112,7 +112,7 @@ CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
 
 CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
 {
-	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS());
+	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS(), m_gpuDeletionCallback);
 }
 
 CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)

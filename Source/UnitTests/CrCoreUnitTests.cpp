@@ -8,6 +8,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
+#include "Core/String/CrStringUtilities.h"
 
 void CrCoreUnitTests::RunCrPathUnitTests()
 {
@@ -32,6 +33,14 @@ void CrCoreUnitTests::RunCrPathUnitTests()
 
 		std::filesystem::path stdPath = examplePath.c_str();
 		CrPath crPath = examplePath.c_str();
+
+		// Check empty path concatenation
+		{
+			CrString stdPathFilename = (stdPath / "foobar.exe").string().c_str();
+			CrString crPathFilename = (crPath / "foobar.exe").c_str();
+			CrStringUtilities::ReplaceAll(stdPathFilename, '\\', '/');
+			CrAssert(stdPathFilename == crPathFilename);
+		}
 
 		// Check filename
 		{

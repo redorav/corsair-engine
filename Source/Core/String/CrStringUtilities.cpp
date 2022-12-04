@@ -26,6 +26,16 @@ void CrStringUtilities::EraseAll(CrString& input, const CrString& needle)
 	}
 }
 
+void CrStringUtilities::ReplaceAll(CrString& input, char needle, char replace)
+{
+	size_t position = input.find(needle);
+	while (position != input.npos)
+	{
+		input.replace(position, 1, 1, replace);
+		position = input.find(needle);
+	}
+}
+
 void CrStringUtilities::SplitLines(CrVector<CrString>& lines, const CrString& input)
 {
 	size_t lineStartPosition = 0;

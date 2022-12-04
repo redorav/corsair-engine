@@ -252,9 +252,14 @@ private:
 	void AddTrailingSeparator()
 	{
 		// Need to check for empty or back will return invalid memory
-		if (m_pathString.empty() || m_pathString.back() != '/')
+		if (!m_pathString.empty())
 		{
-			m_pathString += "/";
+			char lastCharacter = m_pathString.back();
+
+			if (lastCharacter != '/' || lastCharacter == '.')
+			{
+				m_pathString += "/";
+			}
 		}
 	}
 

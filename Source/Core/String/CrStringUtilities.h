@@ -16,6 +16,8 @@ struct CrStringUtilities
 	// Erase all instances of string needle, in place
 	static void EraseAll(CrString& input, const CrString& needle);
 
+	static void ReplaceAll(CrString& input, char needle, char replace);
+
 	// Split input string into lines
 	static void SplitLines(CrVector<CrString>& lines, const CrString& input);
 };

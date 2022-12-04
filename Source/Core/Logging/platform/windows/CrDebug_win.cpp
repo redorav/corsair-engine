@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <windows.h>
 #include <psapi.h>
+#include <cstdlib>
 
 // For documentation on Visual Studio friendly output see the following
 // https://windowscecleaner.blogspot.com/2013/04/debug-output-tricks-for-visual-studio.html
@@ -27,6 +28,19 @@ void CrDebugWindows::Log(const char* file, unsigned long line, const char* func,
 	sprintf(finalString, "%s (%ld): %s : %s\n", file, line, func, buffer);
 
 	OutputDebugStringA(finalString);
+}
+
+void CrDebugWindows::WaitForDebugger() const
+{
+	while (!IsDebuggerPresent())
+	{
+		int mbResult = MessageBoxA(nullptr, "Waiting For Debugger...", "Waiting For Debugger", MB_RETRYCANCEL | MB_ICONEXCLAMATION);
+
+		if (mbResult == IDCANCEL)
+		{
+			_exit(0);
+		}
+	}
 }
 
 void CrDebugWindows::AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const

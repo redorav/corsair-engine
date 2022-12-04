@@ -12,5 +12,7 @@ public:
 
 	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const override;
 
+	virtual void WaitForDebugger() const override;
+
 	virtual void PrintCurrentProcessMemory(const char* file, unsigned long line, const char* func, const char* format...) const override;
 };

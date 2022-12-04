@@ -12,6 +12,8 @@ public:
 
 	virtual void AssertMsg(bool condition, const char* file, unsigned long line, const char* func, const char* format...) const = 0;
 
+	virtual void WaitForDebugger() const = 0;
+
 	// TODO Make this a Getter somewhere more appropriate like a memory header
 	virtual void PrintCurrentProcessMemory(const char* file, unsigned long line, const char* func, const char* format...) const = 0;
 

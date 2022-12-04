@@ -38,6 +38,12 @@ int main(int argc, char* argv[])
 	bool enableGraphicsValidation        = crcore::CommandLine["-debugGraphics"];
 	bool enableRenderDoc                 = crcore::CommandLine["-renderdoc"];
 	bool enablePIX                       = crcore::CommandLine["-pix"];
+	bool waitForDebugger                 = crcore::CommandLine["-waitForDebugger"];
+
+	if (waitForDebugger)
+	{
+		GetDebug()->WaitForDebugger();
+	}
 
 	CrString resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())

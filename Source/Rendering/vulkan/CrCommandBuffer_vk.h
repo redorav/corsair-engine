@@ -71,7 +71,12 @@ private:
 
 	virtual void EndRenderPassPS() override;
 
-	void FlushImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
+	void GatherImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
+
+	void QueueVkImageBarrier(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount, 
+		const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState);
+
+	void FlushImageAndBufferBarriers();
 
 	void UpdateResourceTableVulkan(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout);
 
@@ -86,6 +91,16 @@ private:
 	VkCommandBuffer m_vkCommandBuffer;
 
 	VkDescriptorPool m_vkDescriptorPool;
+
+	// Barrier processing
+
+	VkPipelineStageFlags m_srcStageMask = VK_PIPELINE_STAGE_NONE; // srcStageMask is an OR of all pipeline barrier stage masks
+
+	VkPipelineStageFlags m_destStageMask = VK_PIPELINE_STAGE_NONE; // destStageMask is an OR of all pipeline barrier stage masks
+
+	CrFixedVector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_bufferMemoryBarriers;
+
+	CrFixedVector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_imageMemoryBarriers;
 };
 
 inline const VkCommandBuffer& CrCommandBufferVulkan::GetVkCommandBuffer() const

@@ -386,10 +386,60 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 	attachmentDescription.storeOp        = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.storeOp);
 	attachmentDescription.stencilLoadOp  = crvk::GetVkAttachmentLoadOp(renderTargetDescriptor.stencilLoadOp);
 	attachmentDescription.stencilStoreOp = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.stencilStoreOp);
+
+	// We don't let the Vulkan render pass try to do transitions as it will do them incorrectly unless there's some subpass
+	// magic going on. Instead, we take care of transitions manually and ignore the layouts here. For more information read
+	// https://themaister.net/blog/2019/08/14/yet-another-blog-explaining-vulkan-synchronization/
 	attachmentDescription.initialLayout  = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.initialState.layout).imageLayout;
-	attachmentDescription.finalLayout    = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.finalState.layout).imageLayout;
+	attachmentDescription.finalLayout    = attachmentDescription.initialLayout;
 
 	return attachmentDescription;
+}
+
+void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
+	const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
+{
+	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(buffer->GetHardwareBuffer());
+
+	bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	bufferMemoryBarrier.pNext = nullptr;
+
+	bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+	bufferMemoryBarrier.srcAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(sourceState).accessMask;
+	bufferMemoryBarrier.dstAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
+
+	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
+	bufferMemoryBarrier.offset = buffer->GetByteOffset();
+	bufferMemoryBarrier.size = buffer->GetSize();
+}
+
+void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture,
+	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
+	cr3d::TextureLayout::T sourceLayout, cr3d::TextureLayout::T destinationLayout)
+{
+	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
+
+	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	imageMemoryBarrier.pNext = nullptr;
+
+	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+	const CrVkImageStateInfo& resourceStateInfoSource = CrTextureVulkan::GetVkImageStateInfo(sourceLayout);
+	const CrVkImageStateInfo& resourceStateInfoDestination = CrTextureVulkan::GetVkImageStateInfo(destinationLayout);
+
+	imageMemoryBarrier.oldLayout = resourceStateInfoSource.imageLayout;
+	imageMemoryBarrier.newLayout = resourceStateInfoDestination.imageLayout;
+	imageMemoryBarrier.image = vulkanTexture->GetVkImage();
+	imageMemoryBarrier.subresourceRange.aspectMask = vulkanTexture->GetVkImageAspectMask();
+	imageMemoryBarrier.subresourceRange.baseMipLevel = mipmapStart;
+	imageMemoryBarrier.subresourceRange.levelCount = mipmapCount;
+	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;
+	imageMemoryBarrier.subresourceRange.layerCount = sliceCount;
+	imageMemoryBarrier.srcAccessMask = resourceStateInfoSource.accessMask;
+	imageMemoryBarrier.dstAccessMask = resourceStateInfoDestination.accessMask;
 }
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
@@ -397,7 +447,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	// Always process buffers and textures
-	FlushImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
+	GatherImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
 
 	if(renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
 	{
@@ -419,6 +469,12 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 			attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(colorAttachment.texture)->GetVkImageViewSingleMipSlice(colorAttachment.mipmap, colorAttachment.slice));
 			attachments.push_back(GetVkAttachmentDescription(colorAttachment));
+
+			if (colorAttachment.initialState.layout != colorAttachment.usageState.layout)
+			{
+				QueueVkImageBarrier(colorAttachment.texture, colorAttachment.mipmap, 1, colorAttachment.slice, 1, colorAttachment.initialState, colorAttachment.usageState);
+			}
+
 			VkClearValue& colorClearValue = clearValues.push_back();
 			hlslpp::store(colorAttachment.clearColor, colorClearValue.color.float32);
 		}
@@ -429,6 +485,12 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 			attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(depthAttachment.texture)->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice));
 			attachments.push_back(GetVkAttachmentDescription(depthAttachment));
+
+			if (depthAttachment.initialState.layout != depthAttachment.usageState.layout)
+			{
+				QueueVkImageBarrier(depthAttachment.texture, depthAttachment.mipmap, 1, depthAttachment.slice, 1, depthAttachment.initialState, depthAttachment.usageState);
+			}
+
 			VkClearValue& depthClearValue = clearValues.push_back();
 			depthClearValue.depthStencil.depth = depthAttachment.depthClearValue;
 			depthClearValue.depthStencil.stencil = depthAttachment.stencilClearValue;
@@ -492,101 +554,85 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 		renderPassBeginInfo.pClearValues = clearValues.data();
 		vkCmdBeginRenderPass(m_vkCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
+	else
+	{
+		FlushImageAndBufferBarriers();
+	}
 }
 
 void CrCommandBufferVulkan::EndRenderPassPS()
 {
 	if (m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics)
 	{
+		uint32_t numColorAttachments = (uint32_t)m_currentState.m_currentRenderPass.color.size();
+
+		for (uint32_t i = 0; i < numColorAttachments; ++i)
+		{
+			const CrRenderTargetDescriptor& colorAttachment = m_currentState.m_currentRenderPass.color[i];
+
+			if (colorAttachment.usageState.layout != colorAttachment.finalState.layout)
+			{
+				QueueVkImageBarrier(colorAttachment.texture, colorAttachment.mipmap, 1, colorAttachment.slice, 1, colorAttachment.usageState, colorAttachment.finalState);
+			}
+		}
+
+		if (m_currentState.m_currentRenderPass.depth.texture)
+		{
+			const CrRenderTargetDescriptor& depthAttachment = m_currentState.m_currentRenderPass.depth;
+
+			if (depthAttachment.usageState.layout != depthAttachment.finalState.layout)
+			{
+				QueueVkImageBarrier(depthAttachment.texture, depthAttachment.mipmap, 1, depthAttachment.slice, 1, depthAttachment.usageState, depthAttachment.finalState);
+			}
+		}
+
 		vkCmdEndRenderPass(m_vkCommandBuffer);
 	}
 
-	FlushImageAndBufferBarriers(m_currentState.m_currentRenderPass.endBuffers, m_currentState.m_currentRenderPass.endTextures);
-}
-
-void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
-	const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
-{
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(buffer->GetHardwareBuffer());
-
-	bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-	bufferMemoryBarrier.pNext = nullptr;
-
-	bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-	bufferMemoryBarrier.srcAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(sourceState).accessMask;
-	bufferMemoryBarrier.dstAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
-
-	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
-	bufferMemoryBarrier.offset = buffer->GetByteOffset();
-	bufferMemoryBarrier.size   = buffer->GetSize();
-}
-
-void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture, 
-	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount, 
-	cr3d::TextureLayout::T sourceState, cr3d::TextureLayout::T destinationState)
-{
-	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
-
-	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	imageMemoryBarrier.pNext = nullptr;
-
-	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-	const CrVkImageStateInfo& resourceStateInfoSource = CrTextureVulkan::GetVkImageStateInfo(sourceState);
-	const CrVkImageStateInfo& resourceStateInfoDestination = CrTextureVulkan::GetVkImageStateInfo(destinationState);
-
-	imageMemoryBarrier.oldLayout                       = resourceStateInfoSource.imageLayout;
-	imageMemoryBarrier.newLayout                       = resourceStateInfoDestination.imageLayout;
-	imageMemoryBarrier.image                           = vulkanTexture->GetVkImage();
-	imageMemoryBarrier.subresourceRange.aspectMask     = vulkanTexture->GetVkImageAspectMask();
-	imageMemoryBarrier.subresourceRange.baseMipLevel   = mipmapStart;
-	imageMemoryBarrier.subresourceRange.levelCount     = mipmapCount;
-	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;
-	imageMemoryBarrier.subresourceRange.layerCount     = sliceCount;
-	imageMemoryBarrier.srcAccessMask                   = resourceStateInfoSource.accessMask;
-	imageMemoryBarrier.dstAccessMask                   = resourceStateInfoDestination.accessMask;
+	GatherImageAndBufferBarriers(m_currentState.m_currentRenderPass.endBuffers, m_currentState.m_currentRenderPass.endTextures);
+	FlushImageAndBufferBarriers();
 }
 
 // Create the image and buffer barriers for the buffer and texture transitions specified in the arrays
 // They're all calculated and batched together for efficiency
-void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures)
+void CrCommandBufferVulkan::GatherImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures)
 {
-	// VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT specifies no stage of execution when specified in the first scope
-	// VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT specifies no stage of execution when specified in the second scope
-	VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-	VkPipelineStageFlags destStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
-	// Buffer barriers
-	CrFixedVector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> bufferMemoryBarriers;
-
 	for (const CrRenderPassBufferDescriptor& bufferDescriptor : buffers)
 	{
-		VkBufferMemoryBarrier& bufferMemoryBarrier = bufferMemoryBarriers.push_back();
+		VkBufferMemoryBarrier& bufferMemoryBarrier = m_bufferMemoryBarriers.push_back();
 		PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor.buffer, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
-		srcStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
-		destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
+		m_srcStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
+		m_destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
 	}
-
-	// Image barriers
-	CrFixedVector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> imageMemoryBarriers;
 
 	for (const CrRenderPassTextureDescriptor& textureDescriptor : textures)
 	{
-		VkImageMemoryBarrier& imageMemoryBarrier = imageMemoryBarriers.push_back();
-		PopulateVkImageBarrier(imageMemoryBarrier, textureDescriptor.texture, textureDescriptor.mipmapStart, textureDescriptor.mipmapCount,
-			textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState.layout, textureDescriptor.destinationState.layout);
-		srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.sourceState);
-		destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(textureDescriptor.destinationState);
+		QueueVkImageBarrier(textureDescriptor.texture, textureDescriptor.mipmapStart, textureDescriptor.mipmapCount,
+			textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState, textureDescriptor.destinationState);
 	}
+}
 
-	if (!imageMemoryBarriers.empty() || !bufferMemoryBarriers.empty())
+void CrCommandBufferVulkan::QueueVkImageBarrier(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
+	const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
+{
+	VkImageMemoryBarrier& imageMemoryBarrier = m_imageMemoryBarriers.push_back();
+	PopulateVkImageBarrier(imageMemoryBarrier, texture, mipmapStart, mipmapCount, sliceStart, sliceCount, sourceState.layout, destinationState.layout);
+	m_srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(sourceState);
+	m_destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(destinationState);
+}
+
+void CrCommandBufferVulkan::FlushImageAndBufferBarriers()
+{
+	if (!m_imageMemoryBarriers.empty() || !m_bufferMemoryBarriers.empty())
 	{
 		VkDependencyFlags dependencyFlags = 0;
 		uint32_t memoryBarrierCount = 0;
 		const VkMemoryBarrier* memoryBarriers = nullptr;
+
+		// VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT specifies no stage of execution when specified in the first scope
+		// VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT specifies no stage of execution when specified in the second scope
+		VkPipelineStageFlags srcStageMask = m_srcStageMask != 0 ? m_srcStageMask : VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		VkPipelineStageFlags destStageMask = m_destStageMask != 0 ? m_destStageMask : VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
 		vkCmdPipelineBarrier(
 			m_vkCommandBuffer,
@@ -595,10 +641,16 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers(const CrRenderPassDescri
 			dependencyFlags,
 			memoryBarrierCount,
 			memoryBarriers,
-			(uint32_t)bufferMemoryBarriers.size(),
-			bufferMemoryBarriers.data(),
-			(uint32_t)imageMemoryBarriers.size(),
-			imageMemoryBarriers.data());
+			(uint32_t)m_bufferMemoryBarriers.size(),
+			m_bufferMemoryBarriers.data(),
+			(uint32_t)m_imageMemoryBarriers.size(),
+			m_imageMemoryBarriers.data());
+
+		// Reset state
+		m_srcStageMask = VK_PIPELINE_STAGE_NONE;
+		m_destStageMask = VK_PIPELINE_STAGE_NONE;
+		m_imageMemoryBarriers.clear();
+		m_bufferMemoryBarriers.clear();
 	}
 }
 

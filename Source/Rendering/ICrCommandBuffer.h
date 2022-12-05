@@ -184,7 +184,7 @@ protected:
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
 	{
-		ConstantBufferBinding() {}
+		ConstantBufferBinding() = default;
 
 		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
 
@@ -195,7 +195,7 @@ protected:
 
 	struct StorageBufferBinding
 	{
-		StorageBufferBinding() {}
+		StorageBufferBinding() = default;
 
 		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, cr3d::BufferUsage::T usage, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
 			: buffer(buffer), usage(usage), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
@@ -204,7 +204,7 @@ protected:
 		}
 
 		const ICrHardwareGPUBuffer* buffer = nullptr;
-		cr3d::BufferUsage::T usage;
+		cr3d::BufferUsage::T usage = cr3d::BufferUsage::None;
 		uint32_t numElements = 0;
 		uint32_t offsetBytes = 0;
 		uint32_t sizeBytes = 0;
@@ -223,7 +223,7 @@ protected:
 
 	struct VertexBufferBinding
 	{
-		VertexBufferBinding() {}
+		VertexBufferBinding() = default;
 		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t size, uint32_t offset, uint32_t stride)
 			: vertexBuffer(vertexBuffer), size(size), offset(offset), stride(stride) {}
 
@@ -333,6 +333,9 @@ inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 {
+	CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer require index buffer flag");
+
 	if (m_currentState.m_indexBuffer != indexBuffer->GetHardwareBuffer() ||
 		m_currentState.m_indexBufferOffset != indexBuffer->GetByteOffset())
 	{
@@ -345,7 +348,9 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 
 inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId)
 {
-	CrAssertMsg(vertexBuffer->GetStride() < 2048, "Stride is too large");
+	CrCommandBufferAssertMsg(vertexBuffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & cr3d::BufferUsage::Vertex, "Buffer require vertex buffer flag");
+	CrCommandBufferAssertMsg(vertexBuffer->GetStride() < 2048, "Stride is too large");
 
 	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
 		m_currentState.m_vertexBuffers[streamId].offset != vertexBuffer->GetByteOffset())
@@ -467,39 +472,40 @@ inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStag
 
 inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer)
 {
-	CrAssertMsg(constantBuffer != nullptr, "Buffer is null");
-	CrAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must be set to Constant");
-	CrAssertMsg(constantBufferIndex != -1, "Global index not set");
+	CrCommandBufferAssertMsg(constantBuffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must have constant buffer flag");
+	CrCommandBufferAssertMsg(constantBufferIndex != -1, "Global index not set");
 
 	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
-	CrAssertMsg(sampler != nullptr, "Sampler is null");
+	CrCommandBufferAssertMsg(sampler != nullptr, "Sampler is null");
 
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
 }
 
 inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture)
 {
-	CrAssertMsg(texture != nullptr, "Texture is null");
+	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 
 	m_currentState.m_textures[shaderStage][textureIndex] = texture;
 }
 
 inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T textureIndex, const ICrTexture* texture, uint32_t mip)
 {
-	CrAssertMsg(texture != nullptr, "Texture is null");
-	CrAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag!");
-	CrAssertMsg(mip < texture->GetMipmapCount(), "Texture doesn't have enough mipmaps!");
+	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
+	CrCommandBufferAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag");
+	CrCommandBufferAssertMsg(mip < texture->GetMipmapCount(), "Texture doesn't have enough mipmaps!");
 
 	m_currentState.m_rwTextures[shaderStage][textureIndex] = RWTextureBinding(texture, mip);
 }
 
 inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, const StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 
 	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = 
 		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
@@ -507,7 +513,8 @@ inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage
 
 inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 
 	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = 
 		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
@@ -515,7 +522,8 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, const RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
 {
-	CrAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
+	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");
 
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
 }

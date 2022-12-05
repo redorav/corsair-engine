@@ -1044,6 +1044,7 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
+			None        = 0,
 			Constant    = 1 << 0, // Will be used as constant buffer
 			Vertex      = 1 << 1, // Will be used as vertex buffer
 			Index       = 1 << 2, // Will be used as index buffer

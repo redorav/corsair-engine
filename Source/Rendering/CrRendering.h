@@ -655,6 +655,19 @@ namespace cr3d
 		};
 	};
 
+	namespace CubemapFace
+	{
+		enum T
+		{
+			PositiveX = 0,
+			NegativeX = 1,
+			PositiveY = 2,
+			NegativeY = 3,
+			PositiveZ = 4,
+			NegativeZ = 5
+		};
+	};
+
 	namespace ShaderInterfaceBuiltinType
 	{
 		enum T : uint32_t

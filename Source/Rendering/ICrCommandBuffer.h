@@ -334,7 +334,7 @@ inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
 inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 {
 	CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer require index buffer flag");
+	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer must have index buffer flag");
 
 	if (m_currentState.m_indexBuffer != indexBuffer->GetHardwareBuffer() ||
 		m_currentState.m_indexBufferOffset != indexBuffer->GetByteOffset())
@@ -349,7 +349,7 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
 inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId)
 {
 	CrCommandBufferAssertMsg(vertexBuffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & cr3d::BufferUsage::Vertex, "Buffer require vertex buffer flag");
+	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & cr3d::BufferUsage::Vertex, "Buffer must have vertex buffer flag");
 	CrCommandBufferAssertMsg(vertexBuffer->GetStride() < 2048, "Stride is too large");
 
 	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer->GetHardwareBuffer() ||

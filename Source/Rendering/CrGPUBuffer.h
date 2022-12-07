@@ -85,43 +85,47 @@ public:
 
 	virtual void UnlockPS() = 0;
 
-	uint32_t GetSizeBytes() const { return sizeBytes; }
+	uint32_t GetSizeBytes() const { return m_sizeBytes; }
 
-	uint32_t GetStrideBytes() const { return strideBytes; }
+	uint32_t GetStrideBytes() const { return m_strideBytes; }
 
-	cr3d::BufferUsage::T GetUsage() const { return usage; }
+	cr3d::BufferUsage::T GetUsage() const { return m_usage; }
 
-	cr3d::MemoryAccess::T GetAccess() const { return access; }
+	cr3d::MemoryAccess::T GetAccess() const { return m_access; }
 
-	cr3d::DataFormat::T GetDataFormat() const { return dataFormat; }
+	cr3d::DataFormat::T GetDataFormat() const { return m_dataFormat; }
+
+	bool HasUsage(cr3d::BufferUsage::T usage) const { return (m_usage & usage) != 0; }
+
+	bool HasAccess(cr3d::MemoryAccess::T access) const { return (m_access & access) != 0; }
 
 protected:
 
 	ICrRenderDevice* m_renderDevice;
 
-	cr3d::BufferUsage::T usage;
+	cr3d::BufferUsage::T m_usage;
 
-	cr3d::MemoryAccess::T access;
+	cr3d::MemoryAccess::T m_access;
 
-	cr3d::DataFormat::T dataFormat;
+	cr3d::DataFormat::T m_dataFormat;
 
-	bool mapped;
+	bool m_mapped;
 
-	uint32_t sizeBytes;
+	uint32_t m_sizeBytes;
 
-	uint32_t strideBytes;
+	uint32_t m_strideBytes;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()
 {
-	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnlyWrite && access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot map a buffer with no CPU access");
+	CrAssertMsg(m_access != cr3d::MemoryAccess::GPUOnlyWrite && m_access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot map a buffer with no CPU access");
 
 	return LockPS();
 }
 
 inline void ICrHardwareGPUBuffer::Unlock()
 {
-	CrAssertMsg(access != cr3d::MemoryAccess::GPUOnlyWrite && access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot unmap a buffer with no CPU access");
+	CrAssertMsg(m_access != cr3d::MemoryAccess::GPUOnlyWrite && m_access != cr3d::MemoryAccess::GPUOnlyRead, "Cannot unmap a buffer with no CPU access");
 
 	return UnlockPS();
 }

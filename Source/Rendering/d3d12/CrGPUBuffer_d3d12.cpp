@@ -59,7 +59,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.SampleDesc = { 1, 0 };
-	resourceDesc.Width = sizeBytes;
+	resourceDesc.Width = m_sizeBytes;
 
 	if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
 	{
@@ -76,7 +76,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	if (descriptor.initialData)
 	{
-		CrAssertMsg(descriptor.initialDataSize <= sizeBytes, "Not enough memory in buffer");
+		CrAssertMsg(descriptor.initialDataSize <= m_sizeBytes, "Not enough memory in buffer");
 
 		if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
 		{

@@ -6,15 +6,15 @@
 
 ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
 	: m_renderDevice(renderDevice)
-	, access(descriptor.access)
-	, usage(descriptor.usage)
-	, mapped(false)
-	, dataFormat(descriptor.dataFormat)
-	, sizeBytes(descriptor.numElements * descriptor.stride)
-	, strideBytes(descriptor.stride)
+	, m_access(descriptor.access)
+	, m_usage(descriptor.usage)
+	, m_mapped(false)
+	, m_dataFormat(descriptor.dataFormat)
+	, m_sizeBytes(descriptor.numElements * descriptor.stride)
+	, m_strideBytes(descriptor.stride)
 {
-	CrAssertMsg(sizeBytes > 0, "Size must be greater than zero");
-	CrAssertMsg(descriptor.initialData ? descriptor.initialDataSize <= sizeBytes : true, "Size must be less or equal");
+	CrAssertMsg(m_sizeBytes > 0, "Size must be greater than zero");
+	CrAssertMsg(descriptor.initialData ? descriptor.initialDataSize <= m_sizeBytes : true, "Size must be less or equal");
 }
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor

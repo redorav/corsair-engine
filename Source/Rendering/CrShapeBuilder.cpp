@@ -49,6 +49,8 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 	CrVertexBufferSharedHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
 	CrVertexBufferSharedHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 
+	float4 colorAsByte = descriptor.color * 255.0f;
+
 	ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
 	{
@@ -71,11 +73,13 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 
 				additionalBufferData[currentVertex].tangent = { 255, 0, 0 };
 
-				additionalBufferData[currentVertex].color = { 255, 255, 255, 255 };
+				additionalBufferData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
 
 				currentVertex++;
 			}
 		}
+
+		CrAssertMsg(vertexCount == currentVertex, "Mismatch in number of vertices");
 	}
 	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
@@ -98,6 +102,8 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 				indexData[currentIndex++] = (uint16_t)(x + 1 + vertexCountX);
 			}
 		}
+
+		CrAssertMsg(indexCount == currentIndex, "Mismatch in number of indices");
 	}
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 

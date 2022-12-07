@@ -276,7 +276,7 @@ protected:
 
 		StorageBufferBinding			m_rwStorageBuffers[cr3d::ShaderStage::Count][RWStorageBuffers::Count];
 
-		const CrGPUBuffer*				m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
+		StorageBufferBinding			m_rwDataBuffers[cr3d::ShaderStage::Count][RWDataBuffers::Count];
 
 		uint32_t						m_stencilRef;
 		bool							m_stencilRefDirty;
@@ -525,7 +525,7 @@ inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage,
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");
 
-	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex] = buffer;
+	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex].buffer = buffer->GetHardwareBuffer();
 }
 
 template<typename MetaType>

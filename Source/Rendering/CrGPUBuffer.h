@@ -91,6 +91,8 @@ public:
 
 	cr3d::BufferUsage::T GetUsage() const { return usage; }
 
+	cr3d::MemoryAccess::T GetAccess() const { return access; }
+
 	cr3d::DataFormat::T GetDataFormat() const { return dataFormat; }
 
 protected:

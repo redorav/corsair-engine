@@ -249,15 +249,24 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
+	// Basic shaders
 	{
 		CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
 		lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
 		lineGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
 		lineGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-		m_line3DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, SimpleVertexDescriptor, CrBuiltinShaders::BasicNoTransformVS, CrBuiltinShaders::BasicPS);
+		m_line3DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
 
 		lineGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_line2DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, SimpleVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
+		m_line2DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicNoTransformVS, CrBuiltinShaders::BasicPS);
+
+		CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
+		basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
+		basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+		m_basic3DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), basicGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
+
+		basicGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
+		m_basic2DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), basicGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicNoTransformVS, CrBuiltinShaders::BasicPS);
 	}
 
 	{

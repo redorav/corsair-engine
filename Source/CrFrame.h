@@ -44,7 +44,11 @@ private:
 
 	uint32_t m_height = 0;
 
-	// TODO Temporary
+	// Basic Shaders
+
+	CrBuiltinGraphicsPipeline m_basic2DPipeline;
+	CrBuiltinGraphicsPipeline m_basic3DPipeline;
+
 	CrBuiltinGraphicsPipeline m_line2DPipeline;
 	CrBuiltinGraphicsPipeline m_line3DPipeline;
 

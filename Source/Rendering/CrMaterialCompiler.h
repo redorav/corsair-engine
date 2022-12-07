@@ -58,7 +58,7 @@ public:
 	CrMaterialSharedHandle CompileMaterial(const CrMaterialDescriptor& descriptor);
 
 	// Gets a material shader through the internal cache, or if not available, sends it off for compilation
-	CrShaderBytecodeSharedHandle GetDiskCachedOrCompileShaderBytecode
+	CrShaderBytecodeHandle GetDiskCachedOrCompileShaderBytecode
 	(const CrPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor);
 
 private:

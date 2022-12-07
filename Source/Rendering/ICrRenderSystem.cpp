@@ -53,7 +53,7 @@ ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDes
 		if (metadata.shaderCode)
 		{
 			CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
-			const CrShaderBytecodeSharedHandle& bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
+			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
 			shaderBytecodeStream << *bytecode.get();
 			m_builtinShaderBytecodes[i] = bytecode;
 		}
@@ -126,7 +126,7 @@ cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()
 	return RenderSystem->m_descriptor.graphicsApi;
 }
 
-const CrShaderBytecodeSharedHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
+const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
 {
 	return RenderSystem->m_builtinShaderBytecodes[builtinShader];
 }

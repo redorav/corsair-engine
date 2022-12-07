@@ -121,7 +121,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = graphicsShader->GetBytecodes();
+	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 	d3d12PipelineStateDescriptor.VS = {};
 	d3d12PipelineStateDescriptor.PS = {};
@@ -131,7 +131,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 
 	for (uint32_t i = 0; i < bytecodes.size(); ++i)
 	{
-		const CrShaderBytecodeSharedHandle& bytecode = bytecodes[i];
+		const CrShaderBytecodeHandle& bytecode = bytecodes[i];
 
 		switch (bytecode->GetShaderStage())
 		{
@@ -197,7 +197,7 @@ CrComputePipelineD3D12::CrComputePipelineD3D12(const CrRenderDeviceD3D12* d3d12R
 	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const CrShaderBytecodeSharedHandle& bytecode = computeShader->GetBytecode();
+	const CrShaderBytecodeHandle& bytecode = computeShader->GetBytecode();
 	d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size()};
 
 	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12ComputeRootSignature();

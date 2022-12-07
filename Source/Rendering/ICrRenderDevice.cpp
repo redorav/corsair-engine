@@ -132,7 +132,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
 	// Print out a message that includes meaningful information
-	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = graphicsShader->GetBytecodes();
+	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 	
 	// Add entry point names
 	CrFixedString128 entryPoints("(");

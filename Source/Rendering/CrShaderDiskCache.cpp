@@ -72,7 +72,7 @@ CrPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::Graphic
 	return cachedBytecodePath;
 }
 
-CrShaderBytecodeSharedHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
+CrShaderBytecodeHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
 {
 	CrPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
 	
@@ -80,7 +80,7 @@ CrShaderBytecodeSharedHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash
 	
 	if (cachedBytecodeFile.GetFile())
 	{
-		CrShaderBytecodeSharedHandle shaderBytecode(new CrShaderBytecode());
+		CrShaderBytecodeHandle shaderBytecode(new CrShaderBytecode());
 		cachedBytecodeFile << *shaderBytecode.get();
 		return shaderBytecode;
 	}
@@ -90,7 +90,7 @@ CrShaderBytecodeSharedHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash
 	}
 }
 
-void CrShaderDiskCache::SaveToCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi, const CrShaderBytecodeSharedHandle& bytecode) const
+void CrShaderDiskCache::SaveToCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi, const CrShaderBytecodeHandle& bytecode) const
 {
 	if (bytecode)
 	{

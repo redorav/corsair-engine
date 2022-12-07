@@ -156,13 +156,13 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 
 	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
-	const CrVector<CrShaderBytecodeSharedHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
+	const CrVector<CrShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
 
 	uint32_t usedShaderStages = 0;
 
 	for (uint32_t i = 0; i < bytecodes.size(); ++i)
 	{
-		const CrShaderBytecodeSharedHandle& bytecode = bytecodes[i];
+		const CrShaderBytecodeHandle& bytecode = bytecodes[i];
 		const VkShaderModule vkShaderModule = vkShaderModules[i];
 
 		shaderStageCreateInfo.module = vkShaderModule;

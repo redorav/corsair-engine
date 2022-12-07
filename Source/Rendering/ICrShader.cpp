@@ -48,7 +48,7 @@ ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResour
 
 ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
-	for (const CrShaderBytecodeSharedHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
+	for (const CrShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		m_bytecodes.push_back(bytecode);
 		m_hash <<= bytecode->GetHash();

@@ -28,7 +28,7 @@ public:
 
 	virtual ~ICrShaderReflection() {}
 
-	virtual void AddBytecode(const CrShaderBytecodeSharedHandle& bytecode) = 0;
+	virtual void AddBytecode(const CrShaderBytecodeHandle& bytecode) = 0;
 
 	virtual void ForEachResource(const ShaderReflectionFunction& function) const = 0;
 };

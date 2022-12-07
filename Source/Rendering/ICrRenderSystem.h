@@ -52,11 +52,11 @@ public:
 
 	static cr3d::GraphicsApi::T GetGraphicsApi();
 
-	static const CrShaderBytecodeSharedHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
+	static const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
 
 protected:
 
-	CrVector<CrShaderBytecodeSharedHandle> m_builtinShaderBytecodes;
+	CrVector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
 
 	CrRenderDeviceSharedHandle m_mainDevice;
 

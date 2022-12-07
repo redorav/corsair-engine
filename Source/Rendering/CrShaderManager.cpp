@@ -45,7 +45,7 @@ CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderComp
 	// Load all the relevant shader bytecodes
 	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : shaderCompilationDescriptor.GetBytecodeDescriptors())
 	{
-		CrShaderBytecodeSharedHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
+		CrShaderBytecodeHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
@@ -79,12 +79,12 @@ void CrShaderManager::Initialize(ICrRenderDevice* renderDevice)
 	m_renderDevice = renderDevice;
 }
 
-CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
+CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
 {
 	return CompileShaderBytecode(bytecodeDescriptor, CrShaderCompilerDefines::Dummy);
 }
 
-CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
+CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 (
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor,
 	const CrShaderCompilerDefines& defines
@@ -157,7 +157,7 @@ CrShaderBytecodeSharedHandle CrShaderManager::CompileShaderBytecode
 	{
 		// Serialize in bytecode
 		CrReadFileStream compilationOutput(outputPath.c_str());
-		CrShaderBytecodeSharedHandle bytecode = CrShaderBytecodeSharedHandle(new CrShaderBytecode());
+		CrShaderBytecodeHandle bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
 		compilationOutput << *bytecode.get();
 
 		CrLog("Compiled %s [%s] for %s %s (%f ms)",

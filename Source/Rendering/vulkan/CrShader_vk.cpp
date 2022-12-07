@@ -50,7 +50,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 	CrShaderBindingLayoutResources resources;
 
 	// Create the shader modules and parse reflection information
-	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
+	for (const CrShaderBytecodeHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		// Modify the reflection and the bytecode itself. We need to do this to get consecutive
 		// binding points once different shader stages are brought together

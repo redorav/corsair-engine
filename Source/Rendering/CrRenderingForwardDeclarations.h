@@ -105,7 +105,7 @@ struct CrComputePipelineDescriptor;
 
 // Shader Bytecode
 class CrShaderBytecode;
-using CrShaderBytecodeSharedHandle = CrSharedPtr<CrShaderBytecode>;
+using CrShaderBytecodeHandle = CrSharedPtr<CrShaderBytecode>;
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderCompilerDefines;

@@ -324,7 +324,7 @@ struct CrGraphicsShaderDescriptor
 {
 	CrShaderDebugString m_debugName;
 
-	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
+	CrVector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
 class ICrShader
@@ -368,7 +368,7 @@ public:
 
 	virtual ~ICrGraphicsShader() {}
 
-	const CrVector<CrShaderBytecodeSharedHandle>& GetBytecodes() const
+	const CrVector<CrShaderBytecodeHandle>& GetBytecodes() const
 	{
 		return m_bytecodes;
 	}
@@ -382,14 +382,14 @@ protected:
 
 	CrInputSignature m_inputSignature;
 
-	CrVector<CrShaderBytecodeSharedHandle> m_bytecodes;
+	CrVector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
 struct CrComputeShaderDescriptor
 {
 	CrShaderDebugString m_debugName;
 
-	CrShaderBytecodeSharedHandle m_bytecode;
+	CrShaderBytecodeHandle m_bytecode;
 };
 
 class ICrComputeShader : public ICrShader
@@ -403,7 +403,7 @@ public:
 		m_debugName = computeShaderDescriptor.m_debugName;
 	}
 
-	const CrShaderBytecodeSharedHandle& GetBytecode() const
+	const CrShaderBytecodeHandle& GetBytecode() const
 	{
 		return m_bytecode;
 	}
@@ -412,7 +412,7 @@ public:
 
 private:
 
-	CrShaderBytecodeSharedHandle m_bytecode;
+	CrShaderBytecodeHandle m_bytecode;
 };
 
 struct CrShaderBytecodeCompilationDescriptor

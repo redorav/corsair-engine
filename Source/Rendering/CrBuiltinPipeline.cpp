@@ -18,8 +18,8 @@ CrBuiltinGraphicsPipeline::CrBuiltinGraphicsPipeline
 	: m_graphicsPipelineDescriptor(graphicsPipelineDescriptor)
 	, m_vertexDescriptor(vertexDescriptor)
 {
-	CrShaderBytecodeSharedHandle vertexShaderBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(vertexShader);
-	CrShaderBytecodeSharedHandle pixelShaderBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(pixelShader);
+	CrShaderBytecodeHandle vertexShaderBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(vertexShader);
+	CrShaderBytecodeHandle pixelShaderBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(pixelShader);
 
 	const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 

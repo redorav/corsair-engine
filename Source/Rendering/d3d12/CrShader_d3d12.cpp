@@ -14,7 +14,7 @@ CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(ICrRenderDevice* renderDevice, cons
 	CrShaderBindingLayoutResources resources;
 
 	// Create the shader modules and parse reflection information
-	for (const CrShaderBytecodeSharedHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
+	for (const CrShaderBytecodeHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [](cr3d::ShaderStage::T, const CrShaderReflectionResource&){});

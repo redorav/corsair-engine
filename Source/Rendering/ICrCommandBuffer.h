@@ -515,6 +515,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 
 	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = 
 		StorageBufferBinding(buffer->GetHardwareBuffer(), buffer->GetUsage(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
@@ -524,6 +525,7 @@ inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage,
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex].buffer = buffer->GetHardwareBuffer();
 }

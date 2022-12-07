@@ -157,6 +157,8 @@ public:
 
 	bool HasUsage(cr3d::BufferUsage::T usage) const;
 
+	bool HasAccess(cr3d::MemoryAccess::T access) const;
+
 	void* Lock();
 
 	void Unlock();
@@ -208,6 +210,11 @@ inline cr3d::BufferUsage::T CrGPUBuffer::GetUsage() const
 inline bool CrGPUBuffer::HasUsage(cr3d::BufferUsage::T usage) const
 {
 	return (m_usage & usage) != 0;
+}
+
+inline bool CrGPUBuffer::HasAccess(cr3d::MemoryAccess::T access) const
+{
+	return (m_access & access) != 0;
 }
 
 inline uint32_t CrGPUBuffer::GetStride() const

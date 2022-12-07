@@ -97,7 +97,6 @@ protected:
 
 	ICrRenderDevice* m_renderDevice;
 
-	// TODO Make const. Once we've constructed this buffer we cannot change access or usage
 	cr3d::BufferUsage::T usage;
 
 	cr3d::MemoryAccess::T access;
@@ -127,7 +126,6 @@ inline void ICrHardwareGPUBuffer::Unlock()
 
 // A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
 // than the actual buffer it points to. It can also own a buffer and dispose of it suitably.
-// TODO One interesting feature we should add is a way to deallocate memory from a buffer we don't own
 class CrGPUBuffer
 {
 public:
@@ -268,7 +266,9 @@ class CrVertexBufferCommon : public CrGPUBuffer
 public:
 
 	CrVertexBufferCommon(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Vertex, access), numVertices, vertexDescriptor.GetDataSize())
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(
+			cr3d::BufferUsage::Vertex | (access == cr3d::MemoryAccess::GPUOnlyRead ? cr3d::BufferUsage::TransferDst : cr3d::BufferUsage::None),
+			access), numVertices, vertexDescriptor.GetDataSize())
 		, m_vertexDescriptor(vertexDescriptor)
 	{}
 
@@ -288,7 +288,9 @@ class CrIndexBufferCommon : public CrGPUBuffer
 public:
 
 	CrIndexBufferCommon(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
-		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Index, access), numIndices, dataFormat) {}
+		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(
+			cr3d::BufferUsage::Index | (access == cr3d::MemoryAccess::GPUOnlyRead ? cr3d::BufferUsage::TransferDst : cr3d::BufferUsage::None),
+			access), numIndices, dataFormat) {}
 };
 
 using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;

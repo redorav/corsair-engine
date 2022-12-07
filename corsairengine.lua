@@ -38,7 +38,7 @@ GeneratedCodeDirectory = WorkspaceDirectory..'/GeneratedCode'
 ShaderCompilerExecutableName = ProjectShaderCompiler..'.exe'
 
 -- Path is resolved during the parsing pass. It's meant to be in the same directory as the main executable
-ShaderCompilerPath = '%{cfg.buildtarget.directory}'..ShaderCompilerExecutableName
+ShaderCompilerPath = '%{cfg.buildtarget.directory}/'..ShaderCompilerExecutableName
 
 -- Utility Functions
 

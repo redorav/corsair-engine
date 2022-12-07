@@ -47,6 +47,26 @@ static Textures::T GetTextureSemantic(aiTextureType textureType)
 	}
 }
 
+static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const aiMatrix4x4& cumulativeTransform, CrRenderModelDescriptor& modelDescriptor)
+{
+	for (uint32_t c = 0; c < parentNode->mNumChildren; ++c)
+	{
+		const aiNode* childNode = parentNode->mChildren[c];
+		aiMatrix4x4 childTransform = cumulativeTransform * childNode->mTransformation;
+		//CrLog("Child %s with %i meshes", childNode->mName.C_Str(), childNode->mNumMeshes);
+
+		for (uint32_t m = 0; m < childNode->mNumMeshes; ++m)
+		{
+			const aiMesh* mesh = scene->mMeshes[childNode->mMeshes[m]];
+			CrRenderMeshSharedHandle renderMesh = CrModelDecoderASSIMP::LoadMesh(scene, mesh, childTransform);
+			modelDescriptor.meshes.push_back(renderMesh);
+			modelDescriptor.materialIndices.push_back((uint8_t)mesh->mMaterialIndex);
+		}
+
+		ProcessNode(scene, childNode, childTransform, modelDescriptor);
+	}
+}
+
 CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle& file)
 {
 	// Read the raw data:
@@ -57,6 +77,8 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 		free(fileRawData);
 		return nullptr;
 	}
+
+	//bool bakeTransforms = true;
 
 	// Import it:
 	Assimp::Importer importer;
@@ -70,46 +92,55 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 
 	CrRenderModelDescriptor modelDescriptor;
 
-	for (uint32_t m = 0; m < scene->mNumMeshes; ++m)
-	{
-		CrRenderMeshSharedHandle renderMesh = LoadMesh(scene->mMeshes[m]);
-		modelDescriptor.meshes.push_back(renderMesh);
-		modelDescriptor.materialIndices.push_back((uint8_t)scene->mMeshes[m]->mMaterialIndex);
-	}
+	ProcessNode(scene, scene->mRootNode, scene->mRootNode->mTransformation, modelDescriptor);
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
 	const CrPath filePath = file->GetFilePath();
+
+	modelDescriptor.materials.resize(scene->mNumMaterials);
+
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
 		CrMaterialSharedHandle material = LoadMaterial(scene->mMaterials[m], filePath);
-		modelDescriptor.materials.push_back(material);
+		modelDescriptor.materials[m] = material;
 	}
+
+	importer.FreeScene();
 
 	return CrMakeShared<CrRenderModel>(modelDescriptor);
 }
 
-CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
+CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform)
 {
 	CrRenderMeshSharedHandle renderMesh = CrMakeShared<CrRenderMesh>();
 
 	bool hasTextureCoords      = mesh->HasTextureCoords(0);
 	bool hasNormals            = mesh->HasNormals();
 	bool hasTangentsBitangents = mesh->HasTangentsAndBitangents();
-	bool hasColor              = mesh->HasVertexColors(0);
+	bool hasVertexColors       = mesh->HasVertexColors(0);
+	const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-	CrVertexBufferSharedHandle positionBuffer   = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
-	CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	aiColor4D materialColor(1.0f, 1.0f, 1.0f, 1.0f);
+	aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &materialColor);
+
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+
+	CrVertexBufferSharedHandle positionBuffer   = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	CrVertexBufferSharedHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
 
-	ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
-	ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();
+	aiMatrix4x4 inverseTransform = transform;
+	inverseTransform.Inverse().Transpose();
+
+	ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
+	ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
 	{
-		for (size_t j = 0; j < mesh->mNumVertices; ++j)
+		for (size_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
 		{
-			const aiVector3D& vertex = mesh->mVertices[j];
-			positionBufferData[j].position = { (half)vertex.x, (half)vertex.y, (half)vertex.z };
+			const aiVector3D& vertex = transform * mesh->mVertices[vertexIndex];
+			positionBufferData[vertexIndex].position = { (half)vertex.x, (half)vertex.y, (half)vertex.z };
 
 			minVertex = min(minVertex, float3(vertex.x, vertex.y, vertex.z));
 			maxVertex = max(maxVertex, float3(vertex.x, vertex.y, vertex.z));
@@ -117,8 +148,9 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			// Normals
 			if (hasNormals)
 			{
-				const aiVector3D& normal = mesh->mNormals[j];
-				additionalBufferData[j].normal = 
+				aiVector3D normal = ((aiMatrix3x3)inverseTransform) * mesh->mNormals[vertexIndex];
+				normal.Normalize();
+				additionalBufferData[vertexIndex].normal = 
 				{
 					(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), 
 					(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), 
@@ -128,13 +160,14 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			}
 			else
 			{
-				additionalBufferData[j].normal = { 0, 255, 0, 0 };
+				additionalBufferData[vertexIndex].normal = { 0, 255, 0, 0 };
 			}
 
 			if (hasTangentsBitangents)
 			{
-				const aiVector3D& tangent = mesh->mTangents[j];
-				additionalBufferData[j].tangent = 
+				aiVector3D tangent = ((aiMatrix3x3)inverseTransform) * mesh->mTangents[vertexIndex];
+				tangent.Normalize();
+				additionalBufferData[vertexIndex].tangent = 
 				{ 
 					(uint8_t)((tangent.x * 0.5f + 0.5f) * 255.0f), 
 					(uint8_t)((tangent.y * 0.5f + 0.5f) * 255.0f), 
@@ -144,24 +177,36 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			}
 			else
 			{
-				additionalBufferData[j].tangent = { 255, 0, 0, 0 };
+				additionalBufferData[vertexIndex].tangent = { 255, 0, 0, 0 };
 			}
 
 			// UV coordinates
 			if (hasTextureCoords)
 			{
-				const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
-				additionalBufferData[j].uv = { (half)texCoord.x, (half)texCoord.y };
+				const aiVector3D& texCoord = mesh->mTextureCoords[0][vertexIndex];
+				additionalBufferData[vertexIndex].uv = { (half)texCoord.x, (half)texCoord.y };
 			}
 			else
 			{
-				additionalBufferData[j].uv = { 0.0_h, 0.0_h };
+				additionalBufferData[vertexIndex].uv = { 0.0_h, 0.0_h };
 			}
 
-			if (hasColor)
+			// Vertex colors
+			if (hasVertexColors)
 			{
-				const aiColor4D& color = mesh->mColors[0][j];
-				additionalBufferData[j].color =
+				const aiColor4D& vertexColor = mesh->mColors[0][vertexIndex] * 255.0f;
+				additionalBufferData[vertexIndex].color = { (uint8_t)vertexColor.r, (uint8_t)vertexColor.g, (uint8_t)vertexColor.b, (uint8_t)vertexColor.a };
+			}
+			else
+			{
+				const aiColor4D& vertexColor = materialColor * 255.0f;
+				additionalBufferData[vertexIndex].color = { (uint8_t)vertexColor.r, (uint8_t)vertexColor.g, (uint8_t)vertexColor.b, (uint8_t)vertexColor.a }; // Default to white
+			}
+
+			if (hasVertexColors)
+			{
+				const aiColor4D& color = mesh->mColors[0][vertexIndex];
+				additionalBufferData[vertexIndex].color =
 				{
 					(uint8_t)(color.r * 255), 
 					(uint8_t)(color.g * 255), 
@@ -171,22 +216,22 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			}
 			else
 			{
-				additionalBufferData[j].color = { 255, 255, 255, 255 };
+				additionalBufferData[vertexIndex].color = { 255, 255, 255, 255 };
 			}
 		}
 	}
-	positionBuffer->Unlock();
-	additionalBuffer->Unlock();
+	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 
 	renderMesh->AddVertexBuffer(positionBuffer);
 	renderMesh->AddVertexBuffer(additionalBuffer);
 
 	renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-	CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	CrIndexBufferSharedHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
-	uint16_t* indexData = (uint16_t*)indexBuffer->Lock();
+	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
 	{
 		for (size_t j = 0; j < mesh->mNumFaces; ++j)
 		{
@@ -198,7 +243,7 @@ CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiMesh* mesh)
 			}
 		}
 	}
-	indexBuffer->Unlock();
+	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
 	renderMesh->SetIndexBuffer(indexBuffer);
 

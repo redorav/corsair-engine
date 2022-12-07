@@ -59,7 +59,7 @@ namespace CrCommandQueueType { enum T : uint32_t; }
 // only provide the data in a linear format
 struct CrTextureUpload
 {
-	CrGPUHardwareBufferHandle buffer;
+	CrHardwareGPUBufferHandle buffer;
 	ICrTexture* texture;
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;
@@ -69,7 +69,7 @@ struct CrTextureUpload
 
 struct CrBufferUpload
 {
-	CrGPUHardwareBufferHandle stagingBuffer;
+	CrHardwareGPUBufferHandle stagingBuffer;
 	const ICrHardwareGPUBuffer* destinationBuffer;
 	uint32_t sizeBytes;
 	uint32_t sourceOffsetBytes;
@@ -135,7 +135,7 @@ public:
 
 	CrGPUQueryPoolHandle CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
 
-	CrGPUHardwareBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+	CrHardwareGPUBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
 	ICrHardwareGPUBuffer* CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor);
 
@@ -241,7 +241,7 @@ protected:
 
 	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) { (destinationBuffer); }
 
-	virtual CrGPUHardwareBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
+	virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
 
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
 

@@ -887,7 +887,7 @@ void CrFrame::Process()
 		renderDevice->DownloadBuffer
 		(
 			m_mouseSelectionBuffer->GetHardwareBuffer(),
-			[isLeftShiftClicked](const CrGPUHardwareBufferHandle& mouseIdBuffer)
+			[isLeftShiftClicked](const CrHardwareGPUBufferHandle& mouseIdBuffer)
 			{
 				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
 				{

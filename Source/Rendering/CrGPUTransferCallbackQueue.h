@@ -11,7 +11,7 @@
 struct CrGPUDownloadCallback
 {
 	CrGPUTransferCallbackType callback;
-	CrGPUHardwareBufferHandle buffer;
+	CrHardwareGPUBufferHandle buffer;
 };
 
 struct CrDownloadCallbackList

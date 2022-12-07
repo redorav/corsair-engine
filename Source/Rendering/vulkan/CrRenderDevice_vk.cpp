@@ -177,7 +177,7 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 	uint32_t stagingBufferSizeBytes = texture->GetUsedGPUMemory();
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
-	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrTextureUpload textureUpload;
@@ -283,7 +283,7 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 	uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
-	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrBufferUpload bufferUpload;
@@ -354,12 +354,12 @@ void CrRenderDeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destina
 	}
 }
 
-CrGPUHardwareBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
+CrHardwareGPUBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
 {
 	uint32_t stagingBufferSizeBytes = sourceBuffer->GetSizeBytes();
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
-	CrGPUHardwareBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());

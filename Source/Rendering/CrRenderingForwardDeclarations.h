@@ -113,7 +113,7 @@ struct CrShaderReflectionHeader;
 
 // GPU Buffers
 class ICrHardwareGPUBuffer;
-using CrGPUHardwareBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
+using CrHardwareGPUBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
 struct CrHardwareGPUBufferDescriptor;
 
 class CrGPUBuffer;
@@ -137,7 +137,7 @@ using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>
 class CrDataBuffer;
 using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
 
-typedef CrFixedFunction<4, void(const CrGPUHardwareBufferHandle&)> CrGPUTransferCallbackType;
+typedef CrFixedFunction<4, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;

@@ -174,9 +174,9 @@ CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDes
 	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor), m_gpuDeletionCallback);
 }
 
-CrGPUHardwareBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+CrHardwareGPUBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
-	return CrGPUHardwareBufferHandle(CreateHardwareGPUBufferPS(descriptor), m_gpuDeletionCallback);
+	return CrHardwareGPUBufferHandle(CreateHardwareGPUBufferPS(descriptor), m_gpuDeletionCallback);
 }
 
 ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor)
@@ -277,7 +277,7 @@ void ICrRenderDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, c
 	CrAssertMsg(sourceBuffer->GetUsage() & cr3d::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
 
 	// Queue the download operation and return the buffer that contains the data for the CPU
-	CrGPUHardwareBufferHandle buffer = DownloadBufferPS(sourceBuffer);
+	CrHardwareGPUBufferHandle buffer = DownloadBufferPS(sourceBuffer);
 
 	// Create a callback that will be called by the render device during processing once it's done
 	// We store the callback and the buffer as we will most likely want to map it

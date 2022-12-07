@@ -133,9 +133,9 @@ struct CrRenderPacketBatcher
 				m_commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, binding.semantic, binding.texture.get());
 			}
 
-			for (uint32_t vbIndex = 0; vbIndex < m_renderMesh->GetVertexBufferCount(); ++vbIndex)
+			for (uint32_t streamIndex = 0; streamIndex < m_renderMesh->GetVertexBufferCount(); ++streamIndex)
 			{
-				m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(vbIndex).get(), vbIndex);
+				m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(streamIndex).get(), streamIndex);
 			}
 
 			m_commandBuffer->BindIndexBuffer(m_renderMesh->GetIndexBuffer().get());

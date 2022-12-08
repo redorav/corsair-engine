@@ -18,4 +18,14 @@ public:
 	};
 
 	static CrRenderMeshSharedHandle CreateQuad(const CrQuadDescriptor& descriptor);
+
+	struct CrCubeDescriptor
+	{
+		uint32_t subdivisionX = 0;
+		uint32_t subdivisionY = 0;
+		uint32_t subdivisionZ = 0;
+		float4 color = float4(1.0f);
+	};
+	
+	static CrRenderMeshSharedHandle CreateCube(const CrCubeDescriptor& descriptor);
 };

@@ -309,7 +309,7 @@ void CrCommandBufferD3D12::WriteStorageBufferSRV(const StorageBufferBinding& bin
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescriptor = {};
 	srvDescriptor.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 
-	if (binding.usage & cr3d::BufferUsage::Byte)
+	if (d3d12GPUBuffer->HasUsage(cr3d::BufferUsage::Byte))
 	{
 		srvDescriptor.Format = DXGI_FORMAT_R32_TYPELESS;
 		srvDescriptor.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
@@ -333,7 +333,7 @@ void CrCommandBufferD3D12::WriteRWStorageBufferUAV(const StorageBufferBinding& b
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDescriptor = {};
 	uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 
-	if (binding.usage & cr3d::BufferUsage::Byte)
+	if (d3d12GPUBuffer->HasUsage(cr3d::BufferUsage::Byte))
 	{
 		uavDescriptor.Format = DXGI_FORMAT_R32_TYPELESS;
 		uavDescriptor.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;

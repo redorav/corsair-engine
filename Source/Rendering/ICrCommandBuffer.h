@@ -476,7 +476,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStag
 {
 	CrCommandBufferAssertMsg(constantBuffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must have constant buffer flag");
-	CrCommandBufferAssertMsg(constantBufferIndex != -1, "Global index not set");
+	CrCommandBufferAssertMsg(constantBufferIndex < ConstantBuffers::Count, "Invalid binding index");
 
 	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer, size, offset);
 }
@@ -494,6 +494,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStag
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
 {
 	CrCommandBufferAssertMsg(sampler != nullptr, "Sampler is null");
+	CrCommandBufferAssertMsg(samplerIndex < Samplers::Count, "Invalid binding index");
 
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
 }
@@ -501,23 +502,26 @@ inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, cons
 inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
+	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
 
 	m_currentState.m_textures[shaderStage][textureIndex] = texture;
 }
 
-inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T textureIndex, const ICrTexture* texture, uint32_t mip)
+inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag");
 	CrCommandBufferAssertMsg(mip < texture->GetMipmapCount(), "Texture doesn't have enough mipmaps!");
+	CrCommandBufferAssertMsg(rwTextureIndex < RWTextures::Count, "Invalid binding index");
 
-	m_currentState.m_rwTextures[shaderStage][textureIndex] = RWTextureBinding(texture, mip);
+	m_currentState.m_rwTextures[shaderStage][rwTextureIndex] = RWTextureBinding(texture, mip);
 }
 
 inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
+	CrCommandBufferAssertMsg(storageBufferIndex < StorageBuffers::Count, "Invalid binding index");
 
 	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 }
@@ -532,6 +536,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
+	CrCommandBufferAssertMsg(rwStorageBufferIndex < RWStorageBuffers::Count, "Invalid binding index");
 
 	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 }
@@ -548,6 +553,7 @@ inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage,
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
+	CrCommandBufferAssertMsg(rwBufferIndex < RWDataBuffers::Count, "Invalid binding index");
 
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex].buffer = buffer;
 }

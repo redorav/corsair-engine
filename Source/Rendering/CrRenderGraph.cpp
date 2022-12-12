@@ -5,6 +5,7 @@
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/ICrGPUQueryPool.h"
 #include "Rendering/CrGPUTimingQueryTracker.h"
+#include "Rendering/CrGPUBuffer.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -16,6 +17,18 @@
 #else
 	#define CrRenderGraphLog(format, ...)
 #endif
+
+CrRenderGraphBufferDescriptor::CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t size, uint32_t offset)
+	: hardwareBuffer(hardwareBuffer)
+	, size(size)
+	, offset(offset)
+{}
+
+CrRenderGraphBufferDescriptor::CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer)
+	: hardwareBuffer(hardwareBuffer)
+	, size(hardwareBuffer->GetSizeBytes())
+	, offset(0)
+{}
 
 CrRenderGraph::CrRenderGraph()
 {
@@ -413,27 +426,29 @@ void CrRenderGraph::Execute()
 			for (uint32_t i = 0; i < renderGraphPass.bufferUsages.size(); ++i)
 			{
 				const CrRenderGraphBufferUsage& bufferUsage = renderGraphPass.bufferUsages[i];
-				CrRenderGraphBufferId bufferId = bufferUsage.bufferId;
+				const CrRenderGraphBufferId bufferId = bufferUsage.bufferId;
 				const CrRenderGraphBufferTransition& transitionInfo = renderGraphPass.bufferTransitions.find(bufferId.id)->second;
+				const CrRenderGraphBufferResource& bufferResource = m_bufferResources[bufferId.id];
+				const CrRenderGraphBufferDescriptor& bufferDescriptor = bufferResource.descriptor;
 
 				if (transitionInfo.initialState != transitionInfo.usageState)
 				{
-					renderPassDescriptor.beginBuffers.emplace_back(m_bufferResources[bufferId.id].descriptor.buffer, 
+					renderPassDescriptor.beginBuffers.emplace_back(bufferDescriptor.hardwareBuffer, bufferDescriptor.size, bufferDescriptor.offset,
 						transitionInfo.initialState, transitionInfo.initialShaderStages,
 						transitionInfo.usageState, transitionInfo.usageShaderStages);
 
-					CrRenderGraphLog("  Buffer %s [%s -> %s]", m_bufferResources[bufferId.id].name.c_str(),
+					CrRenderGraphLog("  Buffer %s [%s -> %s]", bufferResource.name.c_str(),
 						cr3d::BufferState::ToString(transitionInfo.initialState),
 						cr3d::BufferState::ToString(transitionInfo.usageState));
 				}
 
 				if (transitionInfo.usageState != transitionInfo.finalState)
 				{
-					renderPassDescriptor.endBuffers.emplace_back(m_bufferResources[bufferId.id].descriptor.buffer, 
+					renderPassDescriptor.endBuffers.emplace_back(bufferDescriptor.hardwareBuffer, bufferDescriptor.size, bufferDescriptor.offset,
 						transitionInfo.usageState, transitionInfo.usageShaderStages,
 						transitionInfo.finalState, transitionInfo.finalShaderStages);
 
-					CrRenderGraphLog("  Buffer %s [%s -> %s]", m_bufferResources[bufferId.id].name.c_str(),
+					CrRenderGraphLog("  Buffer %s [%s -> %s]", bufferResource.name.c_str(),
 						cr3d::BufferState::ToString(transitionInfo.usageState),
 						cr3d::BufferState::ToString(transitionInfo.finalState));
 				}

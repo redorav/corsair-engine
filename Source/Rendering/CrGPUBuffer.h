@@ -47,12 +47,6 @@ struct CrGPUBufferDescriptor
 
 	CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
 
-	ICrHardwareGPUBuffer* existingHardwareGPUBuffer = nullptr;
-
-	void* memory = nullptr;
-
-	uint32_t offset = 0;
-
 	cr3d::BufferUsage::T usage;
 
 	cr3d::MemoryAccess::T access;
@@ -134,8 +128,98 @@ inline void ICrHardwareGPUBuffer::Unlock()
 	return UnlockPS();
 }
 
-// A CrGPUBuffer is a view into an actual hardware buffer. It contains an offset and a size that can be smaller
-// than the actual buffer it points to. It can also own a buffer and dispose of it suitably.
+// This is a view of the buffer, which mainly means a size, an offset and a couple of other properties
+// such as stride, data format, etc which help us tell the API how to interpret the data. Views never
+// own the hardware buffer they point to, and they should be short lived. Keeping hold of or storing
+// a GPU buffer is not a recommended usage. The memory field is there for the common usage of getting
+// a view from a mapped buffer
+class CrGPUBufferView
+{
+public:
+
+	CrGPUBufferView() = default;
+
+	CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
+		: m_hardwareBuffer(hardwareBuffer)
+		, m_numElements(numElements)
+		, m_stride(stride)
+		, m_byteOffset(byteOffset)
+		, m_memory(memory)
+	{}
+
+	CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, cr3d::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
+		: m_hardwareBuffer(hardwareBuffer)
+		, m_numElements(numElements)
+		, m_stride(cr3d::DataFormats[dataFormat].dataOrBlockSize)
+		, m_byteOffset(byteOffset)
+		, m_dataFormat(dataFormat)
+		, m_memory(memory)
+	{}
+
+	const ICrHardwareGPUBuffer* GetHardwareBuffer() const { return m_hardwareBuffer; }
+
+	uint32_t GetNumElements() const { return m_numElements; }
+
+	uint32_t GetStride() const { return m_stride; }
+
+	uint32_t GetSize() const { return m_stride * m_numElements; }
+
+	uint32_t GetByteOffset() const { return m_byteOffset; }
+
+	cr3d::DataFormat::T GetFormat() const { return m_dataFormat; }
+
+	void* GetData() const { return m_memory; }
+
+	int32_t GetBindingIndex() const { return m_bindingIndex; }
+
+protected:
+
+	const ICrHardwareGPUBuffer* m_hardwareBuffer = nullptr;
+
+	void* m_memory = nullptr;
+
+	uint32_t m_byteOffset = 0;
+
+	uint32_t m_numElements = 0;
+
+	uint32_t m_stride = 0;
+
+	cr3d::DataFormat::T m_dataFormat = cr3d::DataFormat::Invalid;
+
+	int32_t m_bindingIndex = -1;
+};
+
+template<typename MetaType>
+class CrGPUBufferViewT : public CrGPUBufferView
+{
+public:
+
+	CrGPUBufferViewT()
+	{
+		m_bindingIndex = MetaType::index;
+	}
+
+	CrGPUBufferViewT(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
+		: CrGPUBufferView(hardwareBuffer, numElements, stride, byteOffset, memory)
+	{
+		m_bindingIndex = MetaType::index;
+	}
+
+	CrGPUBufferViewT(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, cr3d::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
+		: CrGPUBufferView(hardwareBuffer, numElements, dataFormat, byteOffset, memory)
+	{
+		m_bindingIndex = MetaType::index;
+	}
+
+	MetaType* GetData()
+	{
+		return static_cast<MetaType*>(CrGPUBufferView::GetData());
+	}
+};
+
+// A CrGPUBuffer holds an actual hardware buffer. It can have other convenient data in the derived classes,
+// such as vertex descriptors, index sizes, binding indices, etc. It exists so we don't burden the hardware
+// buffer with metadata that varies depending on usage
 class CrGPUBuffer
 {
 public:
@@ -147,108 +231,30 @@ public:
 	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, cr3d::DataFormat::T dataFormat)
 		: CrGPUBuffer(renderDevice, descriptor, numElements, cr3d::DataFormats[dataFormat].dataOrBlockSize, dataFormat) {}
 
-	~CrGPUBuffer();
+	const ICrHardwareGPUBuffer* GetHardwareBuffer() const { return m_buffer.get(); }
 
-	const ICrHardwareGPUBuffer* GetHardwareBuffer() const;
+	uint32_t GetNumElements() const { return m_buffer->GetNumElements(); }
 
-	uint32_t GetNumElements() const;
+	uint32_t GetStride() const { return m_buffer->GetStrideBytes(); }
 
-	uint32_t GetStride() const;
-
-	uint32_t GetSize() const;
-
-	uint32_t GetByteOffset() const;
-
-	cr3d::DataFormat::T GetFormat() const;
-
-	cr3d::BufferUsage::T GetUsage() const;
-
-	bool HasUsage(cr3d::BufferUsage::T usage) const;
-
-	bool HasAccess(cr3d::MemoryAccess::T access) const;
+	cr3d::DataFormat::T GetFormat() const { return m_buffer->GetDataFormat(); }
 
 	void* Lock();
 
 	void Unlock();
 
-	int32_t GetGlobalIndex() const;
-
 protected:
 
-	ICrHardwareGPUBuffer* m_buffer;
-
-	void* m_memory;
-
-	uint32_t m_byteOffset;
-
-	uint32_t m_numElements;
-
-	uint32_t m_stride;
-
-	int32_t m_globalIndex = -1; // Global index for binding resource as input to shader
+	CrHardwareGPUBufferHandle m_buffer;
 
 	cr3d::BufferUsage::T m_usage;
 
 	cr3d::MemoryAccess::T m_access;
 
-	cr3d::BufferOwnership::T m_ownership;
-	
-	cr3d::DataFormat::T m_dataFormat;
-
 private:
 
 	CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat);
 };
-
-inline const ICrHardwareGPUBuffer* CrGPUBuffer::GetHardwareBuffer() const
-{
-	return m_buffer;
-}
-
-inline uint32_t CrGPUBuffer::GetNumElements() const
-{
-	return m_numElements;
-}
-
-inline cr3d::BufferUsage::T CrGPUBuffer::GetUsage() const
-{
-	return m_usage;
-}
-
-inline bool CrGPUBuffer::HasUsage(cr3d::BufferUsage::T usage) const
-{
-	return (m_usage & usage) != 0;
-}
-
-inline bool CrGPUBuffer::HasAccess(cr3d::MemoryAccess::T access) const
-{
-	return (m_access & access) != 0;
-}
-
-inline uint32_t CrGPUBuffer::GetStride() const
-{
-	return m_stride;
-}
-
-inline uint32_t CrGPUBuffer::GetSize() const
-{
-	return m_stride * m_numElements;
-}
-
-inline uint32_t CrGPUBuffer::GetByteOffset() const
-{
-	return m_byteOffset;
-}
-
-inline int32_t CrGPUBuffer::GetGlobalIndex() const
-{
-	return m_globalIndex;
-}
-
-inline cr3d::DataFormat::T CrGPUBuffer::GetFormat() const
-{
-	return m_dataFormat;
-}
 
 template<typename MetaType>
 class CrGPUBufferType : public CrGPUBuffer
@@ -258,7 +264,7 @@ public:
 	CrGPUBufferType(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements)
 		: CrGPUBuffer(renderDevice, descriptor, numElements, sizeof(MetaType))
 	{
-		m_globalIndex = MetaType::index;
+		//m_globalIndex = MetaType::index;
 	}
 
 	MetaType* Lock()

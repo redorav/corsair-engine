@@ -114,16 +114,15 @@ struct CrRenderPacketBatcher
 		if (m_numInstances > 0)
 		{
 			// Allocate constant buffer with all transforms and copy them across
-			CrGPUBufferType<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
-			cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.Lock();
+			CrGPUBufferViewT<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
+			cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.GetData();
 			{
 				for (uint32_t i = 0; i < m_numInstances; ++i)
 				{
 					transforms[i] = *m_matrices[i];
 				}
 			}
-			transformBuffer.Unlock();
-			m_commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &transformBuffer);
+			m_commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, transformBuffer);
 
 			m_commandBuffer->BindGraphicsPipelineState(m_pipeline);
 
@@ -489,30 +488,27 @@ void CrFrame::Process()
 
 	// Set up default values for common constant buffers
 
-	CrGPUBufferType<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
-	Color* colorData2 = colorBuffer.Lock();
+	CrGPUBufferViewT<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
+	Color* colorData2 = colorBuffer.GetData();
 	{
 		colorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	colorBuffer.Unlock();
-	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &colorBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, colorBuffer);
 
-	CrGPUBufferType<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
-	Camera* cameraData = cameraDataBuffer.Lock();
+	CrGPUBufferViewT<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
+	Camera* cameraData = cameraDataBuffer.GetData();
 	{
 		*cameraData = m_cameraConstantData;
 	}
-	cameraDataBuffer.Unlock();
-	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &cameraDataBuffer);
-	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &cameraDataBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, cameraDataBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, cameraDataBuffer);
 
-	CrGPUBufferType<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
-	Instance* identityTransformData = identityConstantBuffer.Lock();
+	CrGPUBufferViewT<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
+	Instance* identityTransformData = identityConstantBuffer.GetData();
 	{
 		identityTransformData->local2World[0] = float4x4::identity();
 	}
-	identityConstantBuffer.Unlock();
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
 
@@ -525,32 +521,25 @@ void CrFrame::Process()
 	CrRenderGraphTextureId lightingTexture;
 
 	{
-		CrRenderGraphTextureDescriptor depthDescriptor;
-		depthDescriptor.texture = m_depthStencilTexture.get();
+		CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
 		depthTexture = m_mainRenderGraph.CreateTexture("Depth", depthDescriptor);
 
-		CrRenderGraphTextureDescriptor swapchainDescriptor;
-		swapchainDescriptor.texture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get();
+		CrRenderGraphTextureDescriptor swapchainDescriptor(m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
 		swapchainTexture = m_mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
 
-		CrRenderGraphTextureDescriptor preSwapchainDescriptor;
-		preSwapchainDescriptor.texture = m_preSwapchainTexture.get();
+		CrRenderGraphTextureDescriptor preSwapchainDescriptor(m_preSwapchainTexture.get());
 		preSwapchainTexture = m_mainRenderGraph.CreateTexture("Pre Swapchain", preSwapchainDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor;
-		gBufferAlbedoDescriptor.texture = m_gbufferAlbedoAOTexture.get();
+		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor(m_gbufferAlbedoAOTexture.get());
 		gBufferAlbedoAO = m_mainRenderGraph.CreateTexture("GBuffer Albedo AO", gBufferAlbedoDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor;
-		gBufferNormalsDescriptor.texture = m_gbufferNormalsTexture.get();
+		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor(m_gbufferNormalsTexture.get());
 		gBufferNormals = m_mainRenderGraph.CreateTexture("GBuffer Normals", gBufferNormalsDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor;
-		gBufferMaterialDescriptor.texture = m_gbufferMaterialTexture.get();
+		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor(m_gbufferMaterialTexture.get());
 		gBufferMaterial = m_mainRenderGraph.CreateTexture("GBuffer Material", gBufferMaterialDescriptor);
 
-		CrRenderGraphTextureDescriptor lightingDescriptor;
-		lightingDescriptor.texture = m_lightingTexture.get();
+		CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
 		lightingTexture = m_mainRenderGraph.CreateTexture("Lighting HDR", lightingDescriptor);
 	}
 
@@ -564,7 +553,7 @@ void CrFrame::Process()
 	},
 	[this, gBufferAlbedoAO](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		ICrTexture* gBufferAlbedoAOTexture = renderGraph.GetPhysicalTexture(gBufferAlbedoAO);
+		const ICrTexture* gBufferAlbedoAOTexture = renderGraph.GetPhysicalTexture(gBufferAlbedoAO);
 
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)gBufferAlbedoAOTexture->GetWidth(), (float)gBufferAlbedoAOTexture->GetHeight()));
 		commandBuffer->SetScissor(CrRectangle(0, 0, gBufferAlbedoAOTexture->GetWidth(), gBufferAlbedoAOTexture->GetHeight()));
@@ -592,15 +581,14 @@ void CrFrame::Process()
 	[this, gBufferAlbedoAO, gBufferNormals, gBufferMaterial]
 	(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		CrGPUBufferType<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
-		DynamicLightCB* lightData = lightConstantBuffer.Lock();
+		CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
+		DynamicLightCB* lightData = lightConstantBuffer.GetData();
 		{
 			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
 			lightData->radiance = float4(1.0f, 1.0f, 1.0f, 0.0f);
 		}
-		lightConstantBuffer.Unlock();
 
-		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &lightConstantBuffer);
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, lightConstantBuffer);
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
@@ -614,7 +602,7 @@ void CrFrame::Process()
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
 		renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this, &identityConstantBuffer](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 		commandBuffer->SetScissor(CrRectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
@@ -631,12 +619,10 @@ void CrFrame::Process()
 		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
 	});
 
-	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor;
-	debugShaderTextureDescriptor.texture = m_debugShaderTexture.get();
+	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor(m_debugShaderTexture.get());
 	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
 
-	CrRenderGraphBufferDescriptor mouseSelectionBufferDescriptor;
-	mouseSelectionBufferDescriptor.buffer = m_mouseSelectionBuffer.get();
+	CrRenderGraphBufferDescriptor mouseSelectionBufferDescriptor(m_mouseSelectionBuffer->GetHardwareBuffer());
 	CrRenderGraphBufferId mouseSelectionBufferId = m_mainRenderGraph.CreateBuffer("Mouse Selection Buffer", mouseSelectionBufferDescriptor);
 
 	const CrRenderList& edgeSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::EdgeSelection);
@@ -656,14 +642,13 @@ void CrFrame::Process()
 
 			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
 
-			CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-			DebugShader* debugShaderData = debugShaderBuffer.Lock();
+			CrGPUBufferViewT<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+			DebugShader* debugShaderData = debugShaderBuffer.GetData();
 			{
 				debugShaderData->debugProperties = float4(1.0f, 0.0f, 0.0f, 0.0f);
 			}
-			debugShaderBuffer.Unlock();
-			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &debugShaderBuffer);
-			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &debugShaderBuffer);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, debugShaderBuffer);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, debugShaderBuffer);
 
 			edgeSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 			{
@@ -701,20 +686,16 @@ void CrFrame::Process()
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
-	CrRenderGraphBufferDescriptor structuredBufferDescriptor;
-	structuredBufferDescriptor.buffer = m_structuredBuffer.get();
+	CrRenderGraphBufferDescriptor structuredBufferDescriptor(m_structuredBuffer->GetHardwareBuffer());
 	CrRenderGraphBufferId structuredBuffer = m_mainRenderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
 
-	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor;
-	rwStructuredBufferDescriptor.buffer = m_rwStructuredBuffer.get();
+	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor(m_rwStructuredBuffer->GetHardwareBuffer());
 	CrRenderGraphBufferId rwStructuredBuffer = m_mainRenderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
 
-	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor;
-	colorsRWDataBufferDescriptor.buffer = m_colorsRWDataBuffer.get();
+	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor(m_colorsRWDataBuffer->GetHardwareBuffer());
 	CrRenderGraphBufferId colorsRWDataBuffer = m_mainRenderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
 
-	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor;
-	colorsRWTextureDescriptor.texture = m_colorsRWTexture.get();
+	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor(m_colorsRWTexture.get());
 	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
 
 	const ICrComputePipeline* exampleComputePipeline = m_exampleComputePipeline.get();
@@ -739,8 +720,7 @@ void CrFrame::Process()
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 
-	CrRenderGraphBufferDescriptor indirectArgumentsBufferDescriptor;
-	indirectArgumentsBufferDescriptor.buffer = m_indirectDispatchArguments.get();
+	CrRenderGraphBufferDescriptor indirectArgumentsBufferDescriptor(m_indirectDispatchArguments->GetHardwareBuffer());
 	CrRenderGraphBufferId indirectArgumentsBuffer = m_mainRenderGraph.CreateBuffer("Indirect Arguments", indirectArgumentsBufferDescriptor);
 
 	m_mainRenderGraph.AddRenderPass("Indirect Arguments Create", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
@@ -773,8 +753,8 @@ void CrFrame::Process()
 		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTexture3DCompute, m_colorfulVolumeTexture.get());
 		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::ExampleTextureArrayCompute, m_colorfulTextureArray.get());
 	
-		const CrGPUBuffer* gpuBuffer = renderGraph.GetPhysicalBuffer(indirectArgumentsBuffer);
-		commandBuffer->DispatchIndirect(gpuBuffer->GetHardwareBuffer(), 0);
+		const ICrHardwareGPUBuffer* indirectBuffer = renderGraph.GetPhysicalBuffer(indirectArgumentsBuffer);
+		commandBuffer->DispatchIndirect(indirectBuffer, 0);
 	});
 
 	if (m_renderWorld->GetMouseSelectionEnabled())
@@ -800,14 +780,13 @@ void CrFrame::Process()
 
 			mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 			{
-				CrGPUBufferType<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-				DebugShader* debugShaderData = debugShaderBuffer.Lock();
+				CrGPUBufferViewT<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
+				DebugShader* debugShaderData = debugShaderBuffer.GetData();
 				{
 					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
 					debugShaderData->debugProperties = float4(0.0f, instanceId, 0.0f, 0.0f);
 				}
-				debugShaderBuffer.Unlock();
-				commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &debugShaderBuffer);
+				commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, debugShaderBuffer);
 
 				renderPacketBatcher.ProcessRenderPacket(renderPacket);
 				renderPacketBatcher.ExecuteBatch(); // TODO Fix dodgy behavior
@@ -828,16 +807,15 @@ void CrFrame::Process()
 		},
 		[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 		{
-			CrGPUBufferType<MouseSelection> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelection>(1);
-			MouseSelection* mouseSelectionData = mouseSelectionBuffer.Lock();
+			CrGPUBufferViewT<MouseSelection> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelection>(1);
+			MouseSelection* mouseSelectionData = mouseSelectionBuffer.GetData();
 			{
 				mouseSelectionData->mouseCoordinates.x = mouseX;
 				mouseSelectionData->mouseCoordinates.y = mouseY;
 			}
-			mouseSelectionBuffer.Unlock();
 
 			commandBuffer->BindComputePipelineState(mouseSelectionResolvePipeline);
-			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Compute, &mouseSelectionBuffer);
+			commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Compute, mouseSelectionBuffer);
 			commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::EditorInstanceIDTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
 			commandBuffer->BindRWStorageBuffer(cr3d::ShaderStage::Compute, RWStorageBuffers::EditorSelectedInstanceID, renderGraph.GetPhysicalBuffer(mouseSelectionBufferId));
 			commandBuffer->Dispatch(1, 1, 1);

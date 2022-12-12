@@ -21,7 +21,7 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
 // is not public, and lives here to cater for the two public-facing constructors
 CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat)
-	: m_usage(descriptor.usage), m_access(descriptor.access), m_numElements(numElements), m_stride(stride), m_dataFormat(dataFormat)
+	: m_usage(descriptor.usage), m_access(descriptor.access)
 {
 	if (descriptor.usage & cr3d::BufferUsage::Index)
 	{
@@ -33,53 +33,20 @@ CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescrip
 		CrAssertMsg(descriptor.usage & (cr3d::BufferUsage::Structured | cr3d::BufferUsage::Byte), "Must specify structured or byte buffer to write to an indirect buffer");
 	}
 
-	if (descriptor.existingHardwareGPUBuffer)
-	{
-		m_buffer = descriptor.existingHardwareGPUBuffer;
-		m_memory = descriptor.memory;
-		m_byteOffset = descriptor.offset;
-		m_ownership = cr3d::BufferOwnership::NonOwning;
-	}
-	else
-	{
-		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
-		hardwareGPUBufferDescriptor.dataFormat = dataFormat;
-		hardwareGPUBufferDescriptor.initialData = descriptor.initialData;
-		hardwareGPUBufferDescriptor.initialDataSize = descriptor.initialDataSize;
-		hardwareGPUBufferDescriptor.name = descriptor.name;
-
-		m_buffer = renderDevice->CreateHardwareGPUBufferPointer(hardwareGPUBufferDescriptor);
-		m_memory = nullptr;
-		m_byteOffset = 0;
-		m_ownership = cr3d::BufferOwnership::Owning;
-	}
-}
-
-CrGPUBuffer::~CrGPUBuffer()
-{
-	// We only dispose of the memory if we actually own it
-	if (m_ownership == cr3d::BufferOwnership::Owning)
-	{
-		delete m_buffer;
-	}
+	CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
+	hardwareGPUBufferDescriptor.dataFormat = dataFormat;
+	hardwareGPUBufferDescriptor.initialData = descriptor.initialData;
+	hardwareGPUBufferDescriptor.initialDataSize = descriptor.initialDataSize;
+	hardwareGPUBufferDescriptor.name = descriptor.name;
+	m_buffer = renderDevice->CreateHardwareGPUBuffer(hardwareGPUBufferDescriptor);
 }
 
 void* CrGPUBuffer::Lock()
 {
-	if (m_ownership == cr3d::BufferOwnership::Owning)
-	{
-		return m_buffer->Lock();
-	}
-	else
-	{
-		return m_memory;
-	}
+	return m_buffer->Lock();
 }
 
 void CrGPUBuffer::Unlock()
 {
-	if (m_ownership == cr3d::BufferOwnership::Owning)
-	{
-		m_buffer->Unlock();
-	}
+	m_buffer->Unlock();
 }

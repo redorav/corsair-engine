@@ -208,12 +208,12 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		}
 
 		// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-		CrGPUBuffer indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
-		CrGPUBuffer vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
+		CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
+		CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
 
 		// Update contents:
-		ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.Lock();
-		ImDrawVert* pVtx = (ImDrawVert*)vertexBuffer.Lock();
+		ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.GetData();
+		ImDrawVert* pVtx = (ImDrawVert*)vertexBuffer.GetData();
 		for (int i = 0; i < data->CmdListsCount; ++i)
 		{
 			ImDrawList* drawList = data->CmdLists[i];
@@ -224,24 +224,21 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 			pIdx += drawList->IdxBuffer.Size;
 			pVtx += drawList->VtxBuffer.Size;
 		}
-		indexBuffer.Unlock();
-		vertexBuffer.Unlock();
 
 		// Setup global config:
 		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
-		commandBuffer->BindIndexBuffer(&indexBuffer);
-		commandBuffer->BindVertexBuffer(&vertexBuffer, 0);
+		commandBuffer->BindIndexBuffer(indexBuffer);
+		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());
 
 		// Projection matrix. TODO: this could be cached.
-		CrGPUBufferType<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
-		UIDataData* uiData = uiDataBuffer.Lock();
+		CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
+		UIData* uiData = uiDataBuffer.GetData();
 		{
 			uiData->projection = ComputeProjectionMatrix(data);
 		}
-		uiDataBuffer.Unlock();
-		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, &uiDataBuffer);
-		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, &uiDataBuffer);
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, uiDataBuffer);
+		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, uiDataBuffer);
 
 		// Iterate over each draw list -> draw command: 
 		ImVec2 clipOffset = data->DisplayPos;

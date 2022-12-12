@@ -12,6 +12,8 @@
 
 #include "Rendering/CrRenderPassDescriptor.h"
 
+#include "Rendering/CrGPUStackAllocator.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "CrRenderingForwardDeclarations.h"
@@ -57,21 +59,33 @@ public:
 
 	void SetStencilRef(uint32_t stencilRef);
 
-	// Binding functions
+	//--------
+	// Binding
+	//--------
 
-	void BindIndexBuffer(const CrGPUBuffer* indexBuffer);
+	// Index Buffer
+
+	void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, cr3d::DataFormat::T indexFormat);
+
+	void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
+
+	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer, uint32_t elementOffset = 0);
+
+	// Vertex Buffer
+
+	void BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride);
 	
-	void BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId);
+	void BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId);
 
-	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
+	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
 
-	void BindComputePipelineState(const ICrComputePipeline* computePipeline);
+	// Constant Buffer
 
 	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const ICrHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset);
 
-	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer);
+	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBufferView& constantBufferView);
 
-	void BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer);
+	// Textures and Samplers
 
 	void BindSampler(cr3d::ShaderStage::T shaderStage, Samplers::T samplerIndex, const ICrSampler* sampler);
 
@@ -79,19 +93,31 @@ public:
 
 	void BindRWTexture(cr3d::ShaderStage::T shaderStage, RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip);
 
+	// Storage Buffers
+
 	void BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer);
+	void BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer);
+
+	// RW Storage Buffers
 
 	void BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer);
+	void BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer);
+
+	// RW Data Buffers
 
 	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwDataBufferIndex, const CrGPUBuffer* buffer);
+	void BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer);
 
-	// Command functions
+	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
+
+	void BindComputePipelineState(const ICrComputePipeline* computePipeline);
+
+	//---------
+	// Commands
+	//---------
 
 	void ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount);
 
@@ -131,19 +157,19 @@ public:
 	void FlushComputeRenderState();
 
 	template<typename MetaType>
-	CrGPUBufferType<MetaType> AllocateConstantBuffer();
+	CrGPUBufferViewT<MetaType> AllocateConstantBuffer();
 
 	// This function is to be used when you know exactly what the constant buffer contains, as it will
 	// treat the memory as the MetaType, even though there are fewer entries than declared in HLSL.
 	// However this is useful when you know the constant buffer is an array of entries in HLSL
 	template<typename MetaType>
-	CrGPUBufferType<MetaType> AllocateConstantBuffer(uint32_t size);
+	CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t sizeBytes);
 
-	CrGPUBuffer AllocateConstantBuffer(uint32_t size);
+	CrGPUBufferView AllocateConstantBuffer(uint32_t sizeBytes);
 
-	CrGPUBuffer AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
+	CrGPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
-	CrGPUBuffer AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat);
+	CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat);
 
 protected:
 
@@ -187,8 +213,6 @@ protected:
 
 	virtual void FlushComputeRenderStatePS() = 0;
 
-	CrGPUBufferDescriptor AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t size);
-
 	// TODO Do all platforms support binding a buffer and an offset inside?
 	struct ConstantBufferBinding
 	{
@@ -231,11 +255,11 @@ protected:
 	struct VertexBufferBinding
 	{
 		VertexBufferBinding() = default;
-		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t size, uint32_t offset, uint32_t stride)
-			: vertexBuffer(vertexBuffer), size(size), offset(offset), stride(stride) {}
+		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
+			: vertexBuffer(vertexBuffer), vertexCount(vertexCount), offset(offset), stride(stride) {}
 
 		const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
-		uint32_t size = 0;
+		uint32_t vertexCount = 0;
 		uint32_t offset = 0;
 		uint32_t stride = 0;
 	};
@@ -338,36 +362,58 @@ inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
 	}
 }
 
-inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBuffer* indexBuffer)
+inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, cr3d::DataFormat::T indexFormat)
 {
 	CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer must have index buffer flag");
+	CrCommandBufferAssertMsg(indexFormat == cr3d::DataFormat::R16_Uint || indexFormat == cr3d::DataFormat::R32_Uint, "Only these formats are allowed");
 
-	if (m_currentState.m_indexBuffer != indexBuffer->GetHardwareBuffer() ||
-		m_currentState.m_indexBufferOffset != indexBuffer->GetByteOffset())
+	if (m_currentState.m_indexBuffer != indexBuffer ||
+		m_currentState.m_indexBufferOffset != byteOffset ||
+		m_currentState.m_indexBufferFormat != indexFormat)
 	{
-		m_currentState.m_indexBuffer = indexBuffer->GetHardwareBuffer();
-		m_currentState.m_indexBufferOffset = indexBuffer->GetByteOffset();
-		m_currentState.m_indexBufferFormat = indexBuffer->GetFormat();
+		m_currentState.m_indexBuffer = indexBuffer;
+		m_currentState.m_indexBufferOffset = byteOffset;
+		m_currentState.m_indexBufferFormat = indexFormat;
 		m_currentState.m_indexBufferDirty = true;
 	}
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBuffer* vertexBuffer, uint32_t streamId)
+inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBufferView& indexBufferView)
+{
+	BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetFormat());
+}
+
+inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBuffer, uint32_t elementOffset)
+{
+	BindIndexBuffer(indexBuffer->GetHardwareBuffer(), elementOffset * indexBuffer->GetStride(), indexBuffer->GetFormat());
+}
+
+inline void ICrCommandBuffer::BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride)
 {
 	CrCommandBufferAssertMsg(vertexBuffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & cr3d::BufferUsage::Vertex, "Buffer must have vertex buffer flag");
-	CrCommandBufferAssertMsg(vertexBuffer->GetStride() < 2048, "Stride is too large");
+	CrCommandBufferAssertMsg(stride < 2048, "Stride is too large");
 
-	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer->GetHardwareBuffer() ||
-		m_currentState.m_vertexBuffers[streamId].offset != vertexBuffer->GetByteOffset())
+	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer || m_currentState.m_vertexBuffers[streamId].offset != byteOffset ||
+		m_currentState.m_vertexBuffers[streamId].vertexCount != vertexCount || m_currentState.m_vertexBuffers[streamId].stride != stride)
 	{
-		m_currentState.m_vertexBuffers[streamId].vertexBuffer = vertexBuffer->GetHardwareBuffer();
-		m_currentState.m_vertexBuffers[streamId].size = vertexBuffer->GetSize();
-		m_currentState.m_vertexBuffers[streamId].offset = vertexBuffer->GetByteOffset();
-		m_currentState.m_vertexBuffers[streamId].stride = vertexBuffer->GetStride();
+		m_currentState.m_vertexBuffers[streamId].vertexBuffer = vertexBuffer;
+		m_currentState.m_vertexBuffers[streamId].vertexCount = vertexCount;
+		m_currentState.m_vertexBuffers[streamId].offset = byteOffset;
+		m_currentState.m_vertexBuffers[streamId].stride = stride;
 		m_currentState.m_vertexBufferDirty = true;
 	}
+}
+
+inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId)
+{
+	BindVertexBuffer(vertexBufferView.GetHardwareBuffer(), streamId, vertexBufferView.GetByteOffset(), vertexBufferView.GetNumElements(), vertexBufferView.GetStride());
+}
+
+inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t streamId, uint32_t elementOffset)
+{
+	BindVertexBuffer(vertexBuffer->GetHardwareBuffer(), streamId, elementOffset * vertexBuffer->GetStride(), vertexBuffer->GetNumElements(), vertexBuffer->GetStride());
 }
 
 inline void ICrCommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
@@ -481,14 +527,9 @@ inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStag
 	m_currentState.m_constantBuffers[shaderStage][constantBufferIndex] = ConstantBufferBinding(constantBuffer, size, offset);
 }
 
-inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, ConstantBuffers::T constantBufferIndex, const CrGPUBuffer* constantBuffer)
+inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBufferView& constantBufferView)
 {
-	BindConstantBuffer(shaderStage, constantBufferIndex, constantBuffer->GetHardwareBuffer(), constantBuffer->GetSize(), constantBuffer->GetByteOffset());
-}
-
-inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStage, const CrGPUBuffer* constantBuffer)
-{
-	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBuffer->GetGlobalIndex(), constantBuffer);
+	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSize(), constantBufferView.GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
@@ -526,9 +567,9 @@ inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage
 	m_currentState.m_storageBuffers[shaderStage][storageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 }
 
-inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const CrGPUBuffer* buffer)
+inline void ICrCommandBuffer::BindStorageBuffer(cr3d::ShaderStage::T shaderStage, StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer)
 {
-	BindStorageBuffer(shaderStage, storageBufferIndex, buffer->GetHardwareBuffer(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
+	BindStorageBuffer(shaderStage, storageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
 inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
@@ -541,9 +582,9 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 	m_currentState.m_rwStorageBuffers[shaderStage][rwStorageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 }
 
-inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T rwStorageBufferIndex, const CrGPUBuffer* buffer)
+inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderStage, RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer)
 {
-	BindRWStorageBuffer(shaderStage, rwStorageBufferIndex, buffer->GetHardwareBuffer(), buffer->GetNumElements(), buffer->GetStride(), buffer->GetByteOffset());
+	BindRWStorageBuffer(shaderStage, rwStorageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
@@ -558,19 +599,30 @@ inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage,
 	m_currentState.m_rwDataBuffers[shaderStage][rwBufferIndex].buffer = buffer;
 }
 
-inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwBufferIndex, const CrGPUBuffer* buffer)
+inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer)
 {
-	BindRWDataBuffer(shaderStage, rwBufferIndex, buffer->GetHardwareBuffer(), 1, 1, 0);
+	BindRWDataBuffer(shaderStage, rwDataBufferIndex, buffer, 1, 1, 0);
 }
 
 template<typename MetaType>
-inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
+inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 {
-	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), sizeof(MetaType)), 1);
+	CrStackAllocation<void> allocation = m_constantBufferGPUStack->AllocateAligned(sizeBytes, 256);
+
+	CrGPUBufferViewT<MetaType> constantBufferView
+	(
+		m_constantBufferGPUStack->GetHardwareGPUBuffer(),
+		1,
+		sizeBytes,
+		allocation.offset,
+		allocation.memory
+	);
+
+	return constantBufferView;
 }
 
 template<typename MetaType>
-inline CrGPUBufferType<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t size)
+inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
-	return CrGPUBufferType<MetaType>(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), size), 1);
+	return AllocateConstantBuffer<MetaType>(sizeof(MetaType));
 }

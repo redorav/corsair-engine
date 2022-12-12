@@ -384,7 +384,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 				const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.vertexBuffer);
 				ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Resource();
 				d3d12Views[streamId].BufferLocation = d3d12Resource->GetGPUVirtualAddress() + binding.offset;
-				d3d12Views[streamId].SizeInBytes = binding.size;
+				d3d12Views[streamId].SizeInBytes = binding.vertexCount * binding.stride;
 				d3d12Views[streamId].StrideInBytes = binding.stride;
 			}
 

@@ -107,18 +107,6 @@ void ICrCommandBuffer::Submit()
 	m_renderDevice->SubmitCommandBuffer(this, nullptr, nullptr, m_completionFence.get());
 }
 
-CrGPUBufferDescriptor ICrCommandBuffer::AllocateFromGPUStack(CrGPUStackAllocator* stackAllocator, uint32_t sizeBytes)
-{
-	// TODO Fix alignment
-	CrStackAllocation<void> allocation = stackAllocator->AllocateAligned(sizeBytes, 256);
-
-	CrGPUBufferDescriptor descriptor(stackAllocator->GetUsage(), stackAllocator->GetAccess());
-	descriptor.existingHardwareGPUBuffer = stackAllocator->GetHardwareGPUBuffer();
-	descriptor.memory = allocation.memory;
-	descriptor.offset = allocation.offset;
-	return descriptor;
-}
-
 void ICrCommandBuffer::BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
 {
 	BeginTimestampQueryPS(queryPool, query);
@@ -139,21 +127,58 @@ void ICrCommandBuffer::ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint3
 	ResolveGPUQueriesPS(queryPool, start, count);
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
+CrGPUBufferView ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 {
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_constantBufferGPUStack.get(), sizeBytes), 1, sizeBytes);
+	CrStackAllocation<void> allocation = m_constantBufferGPUStack->AllocateAligned(sizeBytes, 256);
+
+	CrGPUBufferView constantBufferView
+	(
+		m_constantBufferGPUStack->GetHardwareGPUBuffer(),
+		1,
+		sizeBytes,
+		allocation.offset,
+		allocation.memory
+	);
+
+	return constantBufferView;
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride)
+CrGPUBufferView ICrCommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride)
 {
 	uint32_t sizeBytes = vertexCount * stride;
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_vertexBufferGPUStack.get(), sizeBytes), vertexCount, stride);
+
+	// TODO Fix alignment
+	CrStackAllocation<void> allocation = m_vertexBufferGPUStack->AllocateAligned(sizeBytes, 256);
+
+	CrGPUBufferView vertexBufferView
+	(
+		m_vertexBufferGPUStack->GetHardwareGPUBuffer(),
+		vertexCount,
+		stride,
+		allocation.offset,
+		allocation.memory
+	);
+
+	return vertexBufferView;
 }
 
-CrGPUBuffer ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat)
+CrGPUBufferView ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat)
 {
 	uint32_t sizeBytes = indexCount * cr3d::DataFormats[indexFormat].dataOrBlockSize;
-	return CrGPUBuffer(m_renderDevice, AllocateFromGPUStack(m_indexBufferGPUStack.get(), sizeBytes), indexCount, indexFormat);
+
+	// TODO Fix alignment
+	CrStackAllocation<void> allocation = m_indexBufferGPUStack->AllocateAligned(sizeBytes, 256);
+	
+	CrGPUBufferView indexBufferView
+	(
+		m_indexBufferGPUStack->GetHardwareGPUBuffer(),
+		indexCount,
+		indexFormat,
+		allocation.offset,
+		allocation.memory
+	);
+
+	return indexBufferView;
 }
 
 void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)

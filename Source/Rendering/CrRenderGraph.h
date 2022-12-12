@@ -28,6 +28,8 @@ namespace CrRenderGraphPassType
 
 struct CrRenderGraphTextureDescriptor
 {
+	CrRenderGraphTextureDescriptor(const ICrTexture* texture) : texture(texture) {}
+
 	cr3d::DataFormat::T format = cr3d::DataFormat::RGBA8_Unorm;
 	int usage = 0;
 	uint32_t width = 1;
@@ -36,14 +38,20 @@ struct CrRenderGraphTextureDescriptor
 	uint32_t sliceCount = 1;
 
 	// Physical texture. Can be assigned manually or pulled from a pool
-	ICrTexture* texture = nullptr;
+	const ICrTexture* texture = nullptr;
 };
 
 struct CrRenderGraphBufferDescriptor
 {
-	// TODO Add more properties when the buffer is dynamically allocated
+	CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t size, uint32_t offset);
 
-	CrGPUBuffer* buffer = nullptr;
+	CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer);
+
+	const ICrHardwareGPUBuffer* hardwareBuffer = nullptr;
+
+	uint32_t size = 0;
+
+	uint32_t offset = 0;
 };
 
 // How the texture is used by a given pass
@@ -245,14 +253,14 @@ public:
 
 	void AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages);
 
-	ICrTexture* GetPhysicalTexture(CrRenderGraphTextureId textureId) const
+	const ICrTexture* GetPhysicalTexture(CrRenderGraphTextureId textureId) const
 	{
 		return m_textureResources[textureId.id].descriptor.texture;
 	}
 
-	CrGPUBuffer* GetPhysicalBuffer(CrRenderGraphBufferId bufferId) const
+	const ICrHardwareGPUBuffer* GetPhysicalBuffer(CrRenderGraphBufferId bufferId) const
 	{
-		return m_bufferResources[bufferId.id].descriptor.buffer;
+		return m_bufferResources[bufferId.id].descriptor.hardwareBuffer;
 	}
 
 	void Execute();

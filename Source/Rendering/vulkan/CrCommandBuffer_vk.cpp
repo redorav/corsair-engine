@@ -152,7 +152,8 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		dynamicOffsets[dynamicOffsetCount] = binding.offsetBytes;
 		dynamicOffsetCount++;
 
-		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
 		descriptorCount++;
 		bufferCount++;
@@ -213,11 +214,11 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 		bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-		bufferInfo.offset = 0;
+		bufferInfo.offset = binding.offsetBytes;
 		bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
-		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
-		(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
+		writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1, 
+			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
 
 		descriptorCount++;
 		bufferCount++;
@@ -397,9 +398,9 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 }
 
 void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
-	const CrGPUBuffer* buffer, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
+	const CrRenderPassBufferDescriptor& bufferDescriptor, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
 {
-	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(buffer->GetHardwareBuffer());
+	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(bufferDescriptor.hardwareBuffer);
 
 	bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 	bufferMemoryBarrier.pNext = nullptr;
@@ -411,8 +412,8 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	bufferMemoryBarrier.dstAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
 
 	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
-	bufferMemoryBarrier.offset = buffer->GetByteOffset();
-	bufferMemoryBarrier.size = buffer->GetSize();
+	bufferMemoryBarrier.offset = bufferDescriptor.offset;
+	bufferMemoryBarrier.size = bufferDescriptor.size;
 }
 
 void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture,
@@ -600,7 +601,7 @@ void CrCommandBufferVulkan::GatherImageAndBufferBarriers(const CrRenderPassDescr
 	for (const CrRenderPassBufferDescriptor& bufferDescriptor : buffers)
 	{
 		VkBufferMemoryBarrier& bufferMemoryBarrier = m_bufferMemoryBarriers.push_back();
-		PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor.buffer, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
+		PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
 		m_srcStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
 		m_destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
 	}

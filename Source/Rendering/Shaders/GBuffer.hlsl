@@ -32,7 +32,7 @@ Surface DecodeGBufferSurface(uint2 pixelCoords)
 	Surface surface = (Surface)0;
 	
 	surface.albedoSRGB       = gBuffer.albedoAO.rgb;
-	surface.albedoLinear     = surface.albedoSRGB * surface.albedoSRGB;	
+	surface.albedoLinear     = surface.albedoSRGB * surface.albedoSRGB;
 	surface.pixelNormalWorld = gBuffer.worldNormalRoughness.xyz * 2.0 - 1.0;
 	surface.roughness        = gBuffer.worldNormalRoughness.a;
 	

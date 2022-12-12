@@ -184,9 +184,9 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBufferPointer(const CrHa
 	return CreateHardwareGPUBufferPS(descriptor);
 }
 
-CrIndexBufferSharedHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
+CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
-	return CrIndexBufferSharedHandle(new CrIndexBufferCommon(this, access, dataFormat, numIndices));
+	return CrIndexBufferHandle(new CrIndexBuffer(this, access, dataFormat, numIndices));
 }
 
 CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
@@ -215,9 +215,9 @@ CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& 
 	return CrTextureSharedHandle(CreateTexturePS(descriptor), m_gpuDeletionCallback);
 }
 
-CrVertexBufferSharedHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 {
-	return CrVertexBufferSharedHandle(new CrVertexBufferCommon(this, access, vertexDescriptor, numVertices));
+	return CrVertexBufferHandle(new CrVertexBuffer(this, access, vertexDescriptor, numVertices));
 }
 
 CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)

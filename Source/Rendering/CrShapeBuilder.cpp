@@ -46,8 +46,8 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 	// Compute number of indices (number of quads * 2 triangles per quad * 3 vertices per triangle)
 	uint32_t indexCount = quadCountX * quadCountY * 2 * 3;
 
-	CrVertexBufferSharedHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferSharedHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
@@ -84,7 +84,7 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 
-	CrIndexBufferSharedHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
 	{
 		uint32_t currentIndex = 0;
@@ -155,9 +155,9 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& desc
 	// Number of quads per face, times 2 faces (positive and negative) * 2 triangles per quad * 3 vertices per triangle
 	uint32_t indexCount = (quadCountY * quadCountZ + quadCountX * quadCountZ + quadCountX * quadCountY) * 2 * 2 * 3;
 
-	CrVertexBufferSharedHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferSharedHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
-	CrIndexBufferSharedHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
+	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 

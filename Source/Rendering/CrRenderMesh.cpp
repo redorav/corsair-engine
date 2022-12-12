@@ -3,7 +3,7 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "CrRenderMesh.h"
 
-void CrRenderMesh::AddVertexBuffer(const CrVertexBufferSharedHandle& vertexBuffer)
+void CrRenderMesh::AddVertexBuffer(const CrVertexBufferHandle& vertexBuffer)
 {
 	m_vertexBuffers.push_back(vertexBuffer);
 

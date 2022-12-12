@@ -69,7 +69,7 @@ public:
 
 	void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
 
-	void BindIndexBuffer(const CrIndexBufferCommon* indexBuffer, uint32_t elementOffset = 0);
+	void BindIndexBuffer(const CrIndexBuffer* indexBuffer, uint32_t elementOffset = 0);
 
 	// Vertex Buffer
 
@@ -77,7 +77,7 @@ public:
 	
 	void BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId);
 
-	void BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
+	void BindVertexBuffer(const CrVertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
 
 	// Constant Buffer
 
@@ -384,7 +384,7 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBufferView& indexBuffer
 	BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetFormat());
 }
 
-inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBufferCommon* indexBuffer, uint32_t elementOffset)
+inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBuffer* indexBuffer, uint32_t elementOffset)
 {
 	BindIndexBuffer(indexBuffer->GetHardwareBuffer(), elementOffset * indexBuffer->GetStride(), indexBuffer->GetFormat());
 }
@@ -411,7 +411,7 @@ inline void ICrCommandBuffer::BindVertexBuffer(const CrGPUBufferView& vertexBuff
 	BindVertexBuffer(vertexBufferView.GetHardwareBuffer(), streamId, vertexBufferView.GetByteOffset(), vertexBufferView.GetNumElements(), vertexBufferView.GetStride());
 }
 
-inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBufferCommon* vertexBuffer, uint32_t streamId, uint32_t elementOffset)
+inline void ICrCommandBuffer::BindVertexBuffer(const CrVertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset)
 {
 	BindVertexBuffer(vertexBuffer->GetHardwareBuffer(), streamId, elementOffset * vertexBuffer->GetStride(), vertexBuffer->GetNumElements(), vertexBuffer->GetStride());
 }

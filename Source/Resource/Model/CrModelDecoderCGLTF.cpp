@@ -71,7 +71,7 @@ CrRenderMeshSharedHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 	
 		// Create the buffer
 		cr3d::DataFormat::T format = ToDataFormat(gltfIndexAccessor->component_type);
-		CrIndexBufferSharedHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
+		CrIndexBufferHandle indexBuffer = ICrRenderSystem::GetRenderDevice()->CreateIndexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
 
 		// Use the buffer view to copy the data
 		const cgltf_buffer_view* gltfBufferView = gltfIndexAccessor->buffer_view;
@@ -148,8 +148,8 @@ CrRenderMeshSharedHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 		float3 maxVertex = float3(-FLT_MAX);
 
 		// Create the vertex buffer
-		CrVertexBufferSharedHandle positionBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
-		CrVertexBufferSharedHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle positionBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle additionalBuffer = ICrRenderSystem::GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
 
 		ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
 		ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();

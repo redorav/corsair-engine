@@ -122,11 +122,11 @@ using CrGPUBufferSharedHandle = CrSharedPtr<CrGPUBuffer>;
 struct CrGPUBufferDescriptor;
 class CrGPUStackAllocator;
 
-class CrIndexBufferCommon;
-using CrIndexBufferSharedHandle = CrSharedPtr<CrIndexBufferCommon>;
+class CrIndexBuffer;
+using CrIndexBufferHandle = CrSharedPtr<CrIndexBuffer>;
 
-class CrVertexBufferCommon;
-using CrVertexBufferSharedHandle = CrSharedPtr<CrVertexBufferCommon>;
+class CrVertexBuffer;
+using CrVertexBufferHandle = CrSharedPtr<CrVertexBuffer>;
 
 template<typename Metadata>
 class CrStructuredBuffer;

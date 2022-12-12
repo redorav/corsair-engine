@@ -9,9 +9,6 @@
 
 #include "Core/CrMacros.h"
 
-class CrVertexBufferCommon;
-class CrIndexBufferCommon;
-class ICrGraphicsPipeline;
 class CrTextureD3D12;
 
 typedef CrFixedVector<D3D12_RESOURCE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrBarrierVectorD3D12;

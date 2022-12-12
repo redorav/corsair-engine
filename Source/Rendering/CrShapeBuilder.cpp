@@ -33,8 +33,6 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 
 	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	CrRenderMeshHandle quadMesh = CrRenderMeshHandle(new CrRenderMesh());
-
 	// Compute number of vertices
 	uint32_t vertexCountX = 2 + descriptor.subdivisionX;
 	uint32_t vertexCountY = 2 + descriptor.subdivisionY;
@@ -107,9 +105,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 	}
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrRenderMeshHandle quadMesh = CrRenderMeshHandle(new CrRenderMesh());
 	quadMesh->AddVertexBuffer(positionBuffer);
 	quadMesh->AddVertexBuffer(additionalBuffer);
-
 	quadMesh->SetIndexBuffer(indexBuffer);
 
 	return quadMesh;
@@ -137,11 +135,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	// G: xyz (-1, -1, -1)
 	// H: xyz ( 1, -1, -1)
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
-
-	CrRenderMeshHandle sphereMesh = CrRenderMeshHandle(new CrRenderMesh());
-
-	// Compute number of vertices
+	// Compute number of vertices per row
 	uint32_t vertexCountX = 2 + descriptor.subdivisionX;
 	uint32_t vertexCountY = 2 + descriptor.subdivisionY;
 	uint32_t vertexCountZ = 2 + descriptor.subdivisionZ;
@@ -155,6 +149,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	// Number of quads per face, times 2 faces (positive and negative) * 2 triangles per quad * 3 vertices per triangle
 	uint32_t indexCount = (quadCountY * quadCountZ + quadCountX * quadCountZ + quadCountX * quadCountY) * 2 * 2 * 3;
 
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
@@ -204,20 +199,23 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 				float fw = 0.0f;
 				for (uint32_t w = 0; w < vertexCountW; ++w, fw += dw)
 				{
-					float invfw = 1.0f - fw;
-					float invfh = 1.0f - fh;
+					float3 cubePosition;
 
 					switch (face)
 					{
-						case cr3d::CubemapFace::PositiveX: positionData[currentVertex].position = {  1.0_h, (half)(invfh * 2.0f - 1.0f), (half)(fw * 2.0f - 1.0f) }; break;
-						case cr3d::CubemapFace::NegativeX: positionData[currentVertex].position = { -1.0_h, (half)(invfh * 2.0f - 1.0f), (half)(invfw * 2.0f - 1.0f) }; break;
+						case cr3d::CubemapFace::PositiveX: cubePosition = { 1.0f, 1.0f - fh, fw }; break;
+						case cr3d::CubemapFace::NegativeX: cubePosition = { 0.0f, 1.0f - fh, 1.0f - fw }; break;
 
-						case cr3d::CubemapFace::PositiveY: positionData[currentVertex].position = { (half)(fw * 2.0f - 1.0f),  1.0_h, (half)(invfh * 2.0f - 1.0f) }; break;
-						case cr3d::CubemapFace::NegativeY: positionData[currentVertex].position = { (half)(fw * 2.0f - 1.0f), -1.0_h, (half)(fh * 2.0f - 1.0f) }; break;
+						case cr3d::CubemapFace::PositiveY: cubePosition = { fw, 1.0f, 1.0f - fh }; break;
+						case cr3d::CubemapFace::NegativeY: cubePosition = { fw, 0.0f, fh }; break;
 
-						case cr3d::CubemapFace::PositiveZ: positionData[currentVertex].position = { (half)(invfw * 2.0f - 1.0f), (half)(invfh * 2.0f - 1.0f),  1.0_h }; break;
-						case cr3d::CubemapFace::NegativeZ: positionData[currentVertex].position = { (half)(fw * 2.0f - 1.0f), (half)(invfh * 2.0f - 1.0f), -1.0_h }; break;
+						case cr3d::CubemapFace::PositiveZ: cubePosition = { 1.0f - fw, 1.0f - fh, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
 					}
+
+					cubePosition = cubePosition * 2.0f - 1.0f;
+
+					positionData[currentVertex].position = { (half)cubePosition.x, (half)cubePosition.y, (half)cubePosition.z };
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
@@ -234,15 +232,17 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 
 			for (uint32_t h = 0; h < quadCountH; ++h)
 			{
+				uint32_t baseVertex = currentFaceVertexCount + h * vertexCountW;
+
 				for (uint32_t w = 0; w < quadCountW; ++w)
 				{
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w);
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w + 1);
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
 
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w + vertexCountW);
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w + 1);
-					indexData[currentIndex++] = (uint16_t)(currentFaceVertexCount + w + 1 + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1 + vertexCountW);
 				}
 			}
 
@@ -256,9 +256,118 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrRenderMeshHandle cubeMesh = CrRenderMeshHandle(new CrRenderMesh());
+	cubeMesh->AddVertexBuffer(positionBuffer);
+	cubeMesh->AddVertexBuffer(additionalBuffer);
+	cubeMesh->SetIndexBuffer(indexBuffer);
+
+	return cubeMesh;
+}
+
+CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descriptor)
+{
+	uint32_t vertexCountFace = 2 + descriptor.subdivision;
+
+	uint32_t quadCountFace = vertexCountFace - 1;
+
+	uint32_t vertexCount = 2 * 3 * (vertexCountFace * vertexCountFace);
+
+	// Number of quads per face, times 2 faces (positive and negative) * 2 triangles per quad * 3 vertices per triangle
+	uint32_t indexCount = (quadCountFace * quadCountFace) * 3 * 2 * 2 * 3;
+
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
+
+	float4 colorAsByte = descriptor.color * 255.0f;
+
+	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
+	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
+	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
+	{
+		uint32_t currentVertex = 0;
+		uint32_t currentIndex = 0;
+		uint32_t currentFaceVertexCount = 0;
+
+		for (cr3d::CubemapFace::T face = cr3d::CubemapFace::PositiveX; face < cr3d::CubemapFace::Count; ++face)
+		{
+			uint32_t quadCountW = quadCountFace, quadCountH = quadCountFace;
+			uint32_t vertexCountW = vertexCountFace, vertexCountH = vertexCountFace;
+
+			uint32_t faceVertexCount = 0;
+
+			float dw = 1.0f / quadCountW;
+			float dh = 1.0f / quadCountH;
+
+			float fh = 0.0f;
+			for (uint32_t h = 0; h < vertexCountH; ++h, fh += dh)
+			{
+				float fw = 0.0f;
+				for (uint32_t w = 0; w < vertexCountW; ++w, fw += dw)
+				{
+					float3 cubePosition;
+
+					switch (face)
+					{
+						case cr3d::CubemapFace::PositiveX: cubePosition = { 1.0f, 1.0f - fh, fw }; break;
+						case cr3d::CubemapFace::NegativeX: cubePosition = { 0.0f, 1.0f - fh, 1.0f - fw }; break;
+
+						case cr3d::CubemapFace::PositiveY: cubePosition = { fw, 1.0f, 1.0f - fh }; break;
+						case cr3d::CubemapFace::NegativeY: cubePosition = { fw, 0.0f, fh }; break;
+
+						case cr3d::CubemapFace::PositiveZ: cubePosition = { 1.0f - fw, 1.0f - fh, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
+					}
+
+					float3 spherePosition = normalize(cubePosition * 2.0f - 1.0f);
+
+					spherePosition *= descriptor.radius;
+
+					positionData[currentVertex].position = { (half)spherePosition.x, (half)spherePosition.y, (half)spherePosition.z };
+
+					additionalData[currentVertex].uv = { (half)fw, (half)fh };
+
+					additionalData[currentVertex].normal = { 0, 255, 0 };
+
+					additionalData[currentVertex].tangent = { 255, 0, 0 };
+
+					additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+
+					currentVertex++;
+					faceVertexCount++;
+				}
+			}
+
+			for (uint32_t h = 0; h < quadCountH; ++h)
+			{
+				uint32_t baseVertex = currentFaceVertexCount + h * vertexCountW;
+
+				for (uint32_t w = 0; w < quadCountW; ++w)
+				{
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
+
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1 + vertexCountW);
+				}
+			}
+
+			currentFaceVertexCount += faceVertexCount;
+		}
+
+		CrAssertMsg(vertexCount == currentVertex, "Mismatch in number of vertices");
+		CrAssertMsg(indexCount == currentIndex, "Mismatch in number of indices");
+	}
+	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
+
+	CrRenderMeshHandle sphereMesh = CrRenderMeshHandle(new CrRenderMesh());
 	sphereMesh->AddVertexBuffer(positionBuffer);
 	sphereMesh->AddVertexBuffer(additionalBuffer);
-
 	sphereMesh->SetIndexBuffer(indexBuffer);
 
 	return sphereMesh;

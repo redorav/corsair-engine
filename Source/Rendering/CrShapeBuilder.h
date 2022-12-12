@@ -26,6 +26,15 @@ public:
 		uint32_t subdivisionZ = 0;
 		float4 color = float4(1.0f);
 	};
-	
+
 	static CrRenderMeshHandle CreateCube(const CrCubeDescriptor& descriptor);
+
+	struct CrSphereDescriptor
+	{
+		uint32_t subdivision = 0;
+		float radius = 1.0f;
+		float4 color = float4(1.0f);
+	};
+
+	static CrRenderMeshHandle CreateSphere(const CrSphereDescriptor& descriptor);
 };

@@ -671,7 +671,6 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				resource.name = resourceDescriptor.Name;
 				resource.type = GetShaderResourceType(resourceDescriptor);
 				resource.bindPoint = (uint8_t)resourceDescriptor.BindPoint;
-				resource.bytecodeOffset = 0;
 
 				InsertResourceIntoHeader(reflectionHeader, resource);
 			}

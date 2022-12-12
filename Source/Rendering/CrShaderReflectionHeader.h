@@ -16,7 +16,6 @@ struct CrShaderReflectionResource
 {
 	uint8_t bindPoint;
 	cr3d::ShaderResourceType::T type;
-	uint32_t bytecodeOffset; // Offset into the bytecode to mangle the bind point (needed for Vulkan)
 	CrString name;
 };
 

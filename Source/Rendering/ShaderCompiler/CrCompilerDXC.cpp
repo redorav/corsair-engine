@@ -27,6 +27,8 @@
 
 #include "CrShaderCompilerUtilities.h"
 
+#include <atomic>
+
 // DXC Argument handling
 static const wchar_t* DXCArgumentWarningsAsErrors  = L"-WX";
 static const wchar_t* DXCArgumentOptimization0     = L"-O0";

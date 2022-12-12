@@ -2,6 +2,7 @@
 
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrStackAllocator.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 class ICrRenderDevice;
 class ICrHardwareGPUBuffer;
@@ -36,7 +37,7 @@ protected:
 
 	ICrRenderDevice* m_renderDevice = nullptr;
 
-	CrUniquePtr<ICrHardwareGPUBuffer> m_hardwareBuffer;
+	CrHardwareGPUBufferHandle m_hardwareBuffer;
 
 	cr3d::BufferUsage::T m_bufferUsage;
 

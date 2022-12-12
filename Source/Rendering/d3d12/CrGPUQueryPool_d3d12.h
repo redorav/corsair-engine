@@ -23,7 +23,7 @@ protected:
 	virtual void GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t count) override;
 
 	// Use the platform-independent code so we don't have to rewrite it
-	CrUniquePtr<ICrHardwareGPUBuffer> m_queryBuffer;
+	CrHardwareGPUBufferHandle m_queryBuffer;
 
 	ID3D12QueryHeap* m_d3d12QueryHeap;
 };

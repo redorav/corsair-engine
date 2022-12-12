@@ -137,8 +137,6 @@ public:
 
 	CrHardwareGPUBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-	ICrHardwareGPUBuffer* CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor);
-
 	CrGPUFenceSharedHandle CreateGPUFence();
 
 	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();

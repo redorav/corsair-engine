@@ -179,11 +179,6 @@ CrHardwareGPUBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardw
 	return CrHardwareGPUBufferHandle(CreateHardwareGPUBufferPS(descriptor), m_gpuDeletionCallback);
 }
 
-ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBufferPointer(const CrHardwareGPUBufferDescriptor& descriptor)
-{
-	return CreateHardwareGPUBufferPS(descriptor);
-}
-
 CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
 	return CrIndexBufferHandle(new CrIndexBuffer(this, access, dataFormat, numIndices));

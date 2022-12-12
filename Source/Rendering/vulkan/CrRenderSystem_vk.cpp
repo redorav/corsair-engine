@@ -33,7 +33,13 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 	(messageType);
 	(pUserData);
 
-	CrLog(pCallbackData->pMessage);
+	switch (messageSeverity)
+	{
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: CrLog(pCallbackData->pMessage); break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: CrLogWarning(pCallbackData->pMessage); break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: CrLogError(pCallbackData->pMessage); break;
+	}
 
 	// The application should always return VK_FALSE. The VK_TRUE value is reserved for use in layer development.
 	return VK_FALSE;

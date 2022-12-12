@@ -7,7 +7,7 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 
-CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor)
+CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor)
 {
 	// XZ Plane: Quad faces up
 	// 
@@ -33,7 +33,7 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 
 	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	CrRenderMeshSharedHandle quadMesh = CrRenderMeshSharedHandle(new CrRenderMesh());
+	CrRenderMeshHandle quadMesh = CrRenderMeshHandle(new CrRenderMesh());
 
 	// Compute number of vertices
 	uint32_t vertexCountX = 2 + descriptor.subdivisionX;
@@ -115,7 +115,7 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& desc
 	return quadMesh;
 }
 
-CrRenderMeshSharedHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor)
+CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor)
 {
 	//     A +--------+  B
 	//      /        /|
@@ -139,7 +139,7 @@ CrRenderMeshSharedHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& desc
 
 	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	CrRenderMeshSharedHandle sphereMesh = CrRenderMeshSharedHandle(new CrRenderMesh());
+	CrRenderMeshHandle sphereMesh = CrRenderMeshHandle(new CrRenderMesh());
 
 	// Compute number of vertices
 	uint32_t vertexCountX = 2 + descriptor.subdivisionX;

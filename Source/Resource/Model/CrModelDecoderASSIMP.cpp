@@ -58,7 +58,7 @@ static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const ai
 		for (uint32_t m = 0; m < childNode->mNumMeshes; ++m)
 		{
 			const aiMesh* mesh = scene->mMeshes[childNode->mMeshes[m]];
-			CrRenderMeshSharedHandle renderMesh = CrModelDecoderASSIMP::LoadMesh(scene, mesh, childTransform);
+			CrRenderMeshHandle renderMesh = CrModelDecoderASSIMP::LoadMesh(scene, mesh, childTransform);
 			modelDescriptor.meshes.push_back(renderMesh);
 			modelDescriptor.materialIndices.push_back((uint8_t)mesh->mMaterialIndex);
 		}
@@ -110,9 +110,9 @@ CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle&
 	return CrMakeShared<CrRenderModel>(modelDescriptor);
 }
 
-CrRenderMeshSharedHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform)
+CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform)
 {
-	CrRenderMeshSharedHandle renderMesh = CrMakeShared<CrRenderMesh>();
+	CrRenderMeshHandle renderMesh = CrMakeShared<CrRenderMesh>();
 
 	bool hasTextureCoords      = mesh->HasTextureCoords(0);
 	bool hasNormals            = mesh->HasNormals();

@@ -40,4 +40,4 @@ private:
 	CrBoundingBox m_boundingBox;
 };
 
-using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
+using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;

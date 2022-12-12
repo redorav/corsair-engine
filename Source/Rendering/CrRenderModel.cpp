@@ -22,7 +22,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	// For every mesh-material combination, create the necessary pipeline objects
 	for (uint32_t meshIndex = 0; meshIndex < descriptor.meshes.size(); ++meshIndex)
 	{
-		const CrRenderMeshSharedHandle& mesh = descriptor.meshes[meshIndex];
+		const CrRenderMeshHandle& mesh = descriptor.meshes[meshIndex];
 		const CrMaterialSharedHandle& material = descriptor.materials[descriptor.materialIndices[meshIndex]];
 
 		m_renderMeshes.push_back(mesh);
@@ -49,7 +49,7 @@ void CrRenderModel::ComputeBoundingBoxFromMeshes()
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
 
-	for (const CrRenderMeshSharedHandle& renderMesh : m_renderMeshes)
+	for (const CrRenderMeshHandle& renderMesh : m_renderMeshes)
 	{
 		const CrBoundingBox& meshBox = renderMesh->GetBoundingBox();
 		minVertex = min(minVertex, meshBox.center - meshBox.extents);

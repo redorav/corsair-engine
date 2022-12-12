@@ -17,7 +17,7 @@ public:
 		float4 color = float4(1.0f);
 	};
 
-	static CrRenderMeshSharedHandle CreateQuad(const CrQuadDescriptor& descriptor);
+	static CrRenderMeshHandle CreateQuad(const CrQuadDescriptor& descriptor);
 
 	struct CrCubeDescriptor
 	{
@@ -27,5 +27,5 @@ public:
 		float4 color = float4(1.0f);
 	};
 	
-	static CrRenderMeshSharedHandle CreateCube(const CrCubeDescriptor& descriptor);
+	static CrRenderMeshHandle CreateCube(const CrCubeDescriptor& descriptor);
 };

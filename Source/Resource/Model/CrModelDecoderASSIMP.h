@@ -3,7 +3,7 @@
 #include "ICrModelDecoder.h"
 
 class CrRenderMesh;
-using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
+using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
@@ -20,7 +20,7 @@ public:
 
 	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) override;
 
-	static CrRenderMeshSharedHandle LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform);
+	static CrRenderMeshHandle LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform);
 
 	static CrMaterialSharedHandle LoadMaterial(const aiMaterial* material, const CrPath& relativePath);
 };

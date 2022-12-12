@@ -23,7 +23,7 @@
 #include "cgltf.h"
 
 class CrRenderMesh;
-using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
+using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
@@ -60,9 +60,9 @@ void LoadAttribute(CrVector<T>& targetBuffer, const unsigned char* sourceBuffer,
 	}
 }
 
-CrRenderMeshSharedHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
+CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 {
-	CrRenderMeshSharedHandle mesh = CrMakeShared<CrRenderMesh>();
+	CrRenderMeshHandle mesh = CrMakeShared<CrRenderMesh>();
 
 	// Index data
 	if (gltfPrimitive.indices != nullptr)
@@ -375,7 +375,7 @@ CrRenderModelSharedHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& 
 			for (uint32_t p = 0; p < gltfMesh.primitives_count; ++p)
 			{
 				const cgltf_primitive& cgltfPrimitive = gltfMesh.primitives[p];
-				CrRenderMeshSharedHandle renderMesh = LoadMesh(cgltfPrimitive);
+				CrRenderMeshHandle renderMesh = LoadMesh(cgltfPrimitive);
 				modelDescriptor.meshes.push_back(renderMesh);
 
 				// Find material

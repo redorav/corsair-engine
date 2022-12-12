@@ -18,11 +18,11 @@ class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
 
 class CrRenderMesh;
-using CrRenderMeshSharedHandle = CrSharedPtr<CrRenderMesh>;
+using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 struct CrRenderModelDescriptor
 {
-	CrFixedVector<CrRenderMeshSharedHandle, 256> meshes;
+	CrFixedVector<CrRenderMeshHandle, 256> meshes;
 
 	CrFixedVector<uint8_t, 256> materialIndices;
 
@@ -39,13 +39,13 @@ public:
 
 	const CrBoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
-	const CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
+	const CrPair<const CrRenderMeshHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
 	{
-		const CrRenderMeshSharedHandle& renderMesh = m_renderMeshes[meshIndex];
+		const CrRenderMeshHandle& renderMesh = m_renderMeshes[meshIndex];
 		uint32_t materialIndex = m_renderMeshMaterialIndex[meshIndex];
 		const CrMaterialSharedHandle& material = m_materials[materialIndex];
 
-		return CrPair<const CrRenderMeshSharedHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
+		return CrPair<const CrRenderMeshHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
 	}
 
 	const CrMaterialSharedHandle& GetMaterial(uint32_t meshIndex) const
@@ -76,7 +76,7 @@ private:
 	// be. A merging of a material + a render mesh produces a pipeline state. The pipeline
 	// state knows everything about where it's going to be rendered (it needs to)
 
-	CrVector<CrRenderMeshSharedHandle> m_renderMeshes;
+	CrVector<CrRenderMeshHandle> m_renderMeshes;
 
 	CrVector<uint8_t> m_renderMeshMaterialIndex;
 

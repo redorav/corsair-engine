@@ -89,6 +89,8 @@ public:
 
 	uint32_t GetStrideBytes() const { return m_strideBytes; }
 
+	uint32_t GetNumElements() const { return m_numElements; }
+
 	cr3d::BufferUsage::T GetUsage() const { return m_usage; }
 
 	cr3d::MemoryAccess::T GetAccess() const { return m_access; }
@@ -114,6 +116,8 @@ protected:
 	uint32_t m_sizeBytes;
 
 	uint32_t m_strideBytes;
+
+	uint32_t m_numElements;
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()

@@ -107,7 +107,7 @@ private:
 
 struct CrVertexAttribute
 {
-	CrVertexAttribute() {}
+	CrVertexAttribute() : semantic(0), format(0), streamId(0) {}
 
 	CrVertexAttribute(CrVertexSemantic::T semantic, cr3d::DataFormat::T format, uint32_t streamId)
 		: semantic((uint16_t)semantic), format((uint16_t)format), streamId((uint16_t)streamId) {}

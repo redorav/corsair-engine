@@ -2,6 +2,7 @@
 #define EDITOR_HLSL
 
 #include "Common.hlsl"
+#include "ComputeCommon.hlsl"
 #include "GBuffer.hlsl"
 
 Texture2D EditorSelectionTexture;

@@ -2,6 +2,7 @@
 #define COMPUTE_HLSL
 
 #include "Common.hlsl"
+#include "ComputeCommon.hlsl"
 #include "Utilities.hlsl"
 
 Buffer<float4> ExampleDataBufferCompute;

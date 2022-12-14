@@ -591,6 +591,8 @@ namespace cr3d
 	{
 		TextureState() = default;
 
+		TextureState(TextureLayout::T layout, ShaderStageFlags::T stages) : layout(layout), stages(stages) {}
+
 		TextureLayout::T layout = TextureLayout::Undefined;
 		ShaderStageFlags::T stages = ShaderStageFlags::None;
 

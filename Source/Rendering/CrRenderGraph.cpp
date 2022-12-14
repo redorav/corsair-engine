@@ -112,7 +112,7 @@ void CrRenderGraph::AddTexture(CrRenderGraphTextureId textureId, cr3d::ShaderSta
 		textureUsage.mipmapCount = textureResource->descriptor.mipmapCount;
 		textureUsage.sliceStart = 0;
 		textureUsage.sliceCount = textureResource->descriptor.sliceCount;
-		textureUsage.state = { cr3d::TextureLayout::ShaderInput, shaderStages };
+		textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::ShaderInput, shaderStages);
 		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
 		CrRenderGraphLog("Added Texture %s", textureResource->name.c_str());
 	}

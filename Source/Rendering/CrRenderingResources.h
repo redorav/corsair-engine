@@ -15,18 +15,18 @@ public:
 
 	// Global samplers
 
-	CrSamplerSharedHandle AllLinearClampSampler;
+	CrSamplerHandle AllLinearClampSampler;
 
-	CrSamplerSharedHandle AllLinearWrapSampler;
+	CrSamplerHandle AllLinearWrapSampler;
 
-	CrSamplerSharedHandle AllPointClampSampler;
+	CrSamplerHandle AllPointClampSampler;
 
-	CrSamplerSharedHandle AllPointWrapSampler;
+	CrSamplerHandle AllPointWrapSampler;
 
-	CrTextureSharedHandle WhiteSmallTexture;
+	CrTextureHandle WhiteSmallTexture;
 
-	CrTextureSharedHandle BlackSmallTexture;
+	CrTextureHandle BlackSmallTexture;
 
 	// Points up in tangent space
-	CrTextureSharedHandle NormalsSmallTexture;
+	CrTextureHandle NormalsSmallTexture;
 };

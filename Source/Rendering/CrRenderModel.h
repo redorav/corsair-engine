@@ -15,7 +15,7 @@ class CrRenderModel;
 using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrMaterial;
-using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
+using CrMaterialHandle = CrSharedPtr<CrMaterial>;
 
 class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
@@ -26,7 +26,7 @@ struct CrRenderModelDescriptor
 
 	CrFixedVector<uint8_t, 256> materialIndices;
 
-	CrFixedVector<CrMaterialSharedHandle, 256> materials;
+	CrFixedVector<CrMaterialHandle, 256> materials;
 };
 
 class CrRenderModel
@@ -39,16 +39,16 @@ public:
 
 	const CrBoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
-	const CrPair<const CrRenderMeshHandle&, const CrMaterialSharedHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
+	const CrPair<const CrRenderMeshHandle&, const CrMaterialHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
 	{
 		const CrRenderMeshHandle& renderMesh = m_renderMeshes[meshIndex];
 		uint32_t materialIndex = m_renderMeshMaterialIndex[meshIndex];
-		const CrMaterialSharedHandle& material = m_materials[materialIndex];
+		const CrMaterialHandle& material = m_materials[materialIndex];
 
-		return CrPair<const CrRenderMeshHandle&, const CrMaterialSharedHandle&>(renderMesh, material);
+		return CrPair<const CrRenderMeshHandle&, const CrMaterialHandle&>(renderMesh, material);
 	}
 
-	const CrMaterialSharedHandle& GetMaterial(uint32_t meshIndex) const
+	const CrMaterialHandle& GetMaterial(uint32_t meshIndex) const
 	{
 		return m_materials[meshIndex];
 	}
@@ -80,7 +80,7 @@ private:
 
 	CrVector<uint8_t> m_renderMeshMaterialIndex;
 
-	CrVector<CrMaterialSharedHandle> m_materials;
+	CrVector<CrMaterialHandle> m_materials;
 
 	CrVector<CrArray<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
 };

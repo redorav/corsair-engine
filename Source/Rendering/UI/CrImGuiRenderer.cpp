@@ -93,7 +93,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 	ImGuiIO& io = ImGui::GetIO();
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Pipeline description:
 	{

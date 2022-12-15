@@ -146,7 +146,7 @@ public:
 		CrPath includerDirectory = includerPath.parent_path();
 		CrPath headerPath = includerDirectory / headerName;
 
-		CrFileSharedHandle file = ICrFile::OpenFile(headerPath.c_str(), FileOpenFlags::Read);
+		CrFileHandle file = ICrFile::OpenFile(headerPath.c_str(), FileOpenFlags::Read);
 
 		if (file)
 		{
@@ -181,7 +181,7 @@ public:
 
 bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescriptor, const glslang::TIntermediate*& intermediate, CrString& compilationStatus)
 {
-	CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
+	CrFileHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
 
 	if (!file)
 	{

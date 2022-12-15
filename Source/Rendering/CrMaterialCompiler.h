@@ -7,7 +7,7 @@
 #include "Core/String/CrString.h"
 
 class CrMaterial;
-using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
+using CrMaterialHandle = CrSharedPtr<CrMaterial>;
 
 struct CrMaterialDescriptor;
 struct CrMaterialShaderDescriptor;
@@ -55,7 +55,7 @@ public:
 	void CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines);
 
 	// Compiles a material through its material descriptor
-	CrMaterialSharedHandle CompileMaterial(const CrMaterialDescriptor& descriptor);
+	CrMaterialHandle CompileMaterial(const CrMaterialDescriptor& descriptor);
 
 	// Gets a material shader through the internal cache, or if not available, sends it off for compilation
 	CrShaderBytecodeHandle GetDiskCachedOrCompileShaderBytecode

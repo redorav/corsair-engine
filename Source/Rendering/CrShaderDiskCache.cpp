@@ -21,7 +21,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFi
 
 	// If we have a hash, check whether we've produced the same hash. If so, the cache is valid
 	// If not, create the hash file and store it
-	if (CrFileSharedHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::Read))
+	if (CrFileHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::Read))
 	{
 		hashFile->Read((void*)&storedHash, sizeof(storedHash));
 
@@ -58,7 +58,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFi
 
 	if (clearCache)
 	{
-		CrFileSharedHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+		CrFileHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 		hashFile->Write((void*)&currentHash, sizeof(currentHash));
 	}
 }

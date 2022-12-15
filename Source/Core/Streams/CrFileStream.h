@@ -31,7 +31,7 @@ public:
 
 	// Initialize file stream from an opened file. We need to make sure the required
 	// flags are set on the file
-	CrFileStream(const CrFileSharedHandle& file)
+	CrFileStream(const CrFileHandle& file)
 	{
 		if (IsWriting())
 		{
@@ -130,7 +130,7 @@ public:
 
 private:
 
-	CrFileSharedHandle m_file;
+	CrFileHandle m_file;
 };
 
 typedef CrFileStream<CrStreamType::Read> CrReadFileStream;

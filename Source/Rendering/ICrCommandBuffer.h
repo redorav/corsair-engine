@@ -328,7 +328,7 @@ protected:
 	CrUniquePtr<CrGPUStackAllocator> m_indexBufferGPUStack;
 
 	// Signal fence when execution completes
-	CrGPUFenceSharedHandle			m_completionFence;
+	CrGPUFenceHandle			m_completionFence;
 
 	CrCommandQueueType::T			m_queueType;
 

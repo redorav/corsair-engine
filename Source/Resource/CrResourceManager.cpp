@@ -21,7 +21,7 @@
 
 CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {
-	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
+	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	if (file)
 	{
@@ -58,7 +58,7 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 {
 	CrPath extension = fullPath.extension();
 
-	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
+	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	CrSharedPtr<ICrImageDecoder> imageDecoder;
 
@@ -88,7 +88,7 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath
 {
 	CrPath extension = fullPath.extension();
 
-	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 
 	if (file)
 	{

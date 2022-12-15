@@ -9,5 +9,5 @@ public:
 
 	virtual ~ICrModelDecoder() {}
 
-	virtual CrRenderModelHandle Decode(const CrFileSharedHandle& file) = 0;
+	virtual CrRenderModelHandle Decode(const CrFileHandle& file) = 0;
 };

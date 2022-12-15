@@ -22,7 +22,7 @@ public:
 	virtual ~ICrImageDecoder() {}
 
 	// Decode image in file
-	virtual CrImageHandle Decode(const CrFileSharedHandle& file) const = 0;
+	virtual CrImageHandle Decode(const CrFileHandle& file) const = 0;
 
 	// Decode image in provided data
 	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const = 0;
@@ -35,7 +35,7 @@ public:
 	virtual ~ICrImageEncoder() {}
 
 	// Encode image to file
-	virtual void Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const = 0;
+	virtual void Encode(const CrImageHandle& image, const CrFileHandle& file) const = 0;
 
 	// Encode image in raw data
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const = 0;

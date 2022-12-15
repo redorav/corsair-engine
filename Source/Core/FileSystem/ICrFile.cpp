@@ -15,9 +15,9 @@ CrFileUniqueHandle ICrFile::OpenUnique(const char* filePath, FileOpenFlags::T op
 	return CrFileUniqueHandle(OpenRaw(filePath, openFlags));
 }
 
-CrFileSharedHandle ICrFile::OpenFile(const char* filePath, FileOpenFlags::T openFlags)
+CrFileHandle ICrFile::OpenFile(const char* filePath, FileOpenFlags::T openFlags)
 {
-	return CrFileSharedHandle(OpenRaw(filePath, openFlags));
+	return CrFileHandle(OpenRaw(filePath, openFlags));
 }
 
 bool ICrFile::CreateDirectories(const char* directoryPath)

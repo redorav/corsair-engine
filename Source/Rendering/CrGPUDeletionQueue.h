@@ -12,7 +12,7 @@
 
 struct CrDeletionList
 {
-	CrGPUFenceSharedHandle fence;
+	CrGPUFenceHandle fence;
 	CrVector<CrGPUDeletable*> deletables;
 };
 

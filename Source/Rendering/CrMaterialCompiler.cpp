@@ -95,7 +95,7 @@ CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 	return shaderBytecode;
 }
 
-CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor& descriptor)
+CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor& descriptor)
 {
 	unused_parameter(descriptor); // TODO
 
@@ -123,11 +123,11 @@ CrMaterialSharedHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescr
 	patchedShaderSourcePath /= "ShaderTemp.hlsl";
 
 	// Save patched code. We overwrite any existing file (hence ForceCreate)
-	CrFileSharedHandle patchedSourceFile = ICrFile::OpenFile(patchedShaderSourcePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+	CrFileHandle patchedSourceFile = ICrFile::OpenFile(patchedShaderSourcePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 	patchedSourceFile->Write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
 	patchedSourceFile = nullptr;
 
-	CrMaterialSharedHandle material = CrMakeShared<CrMaterial>();
+	CrMaterialHandle material = CrMakeShared<CrMaterial>();
 
 	CrMaterialShaderDescriptor baseShaderDescriptor;
 	baseShaderDescriptor.blendMode = CrMaterialBlendMode::Opaque;

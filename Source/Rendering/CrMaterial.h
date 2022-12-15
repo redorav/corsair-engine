@@ -9,7 +9,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrMaterial;
-using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
+using CrMaterialHandle = CrSharedPtr<CrMaterial>;
 
 namespace CrMaterialBlendMode
 {
@@ -137,13 +137,13 @@ public:
 
 	const CrGraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
 
-	void AddTexture(const CrTextureSharedHandle& texture, Textures::T semantic);
+	void AddTexture(const CrTextureHandle& texture, Textures::T semantic);
 
 //private: TODO Fix
 
 	struct TextureBinding
 	{
-		CrTextureSharedHandle texture;
+		CrTextureHandle texture;
 		Textures::T semantic;
 	};
 

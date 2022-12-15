@@ -16,7 +16,7 @@ struct CrGPUDownloadCallback
 
 struct CrDownloadCallbackList
 {
-	CrGPUFenceSharedHandle fence;
+	CrGPUFenceHandle fence;
 	CrVector<CrGPUDownloadCallback> callbacks;
 };
 

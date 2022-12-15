@@ -12,7 +12,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	m_materials.reserve(descriptor.materials.size());
 	for (uint32_t i = 0; i < descriptor.materials.size(); ++i)
 	{
-		const CrMaterialSharedHandle& material = descriptor.materials[i];
+		const CrMaterialHandle& material = descriptor.materials[i];
 		m_materials.push_back(material);
 	}
 
@@ -23,7 +23,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 	for (uint32_t meshIndex = 0; meshIndex < descriptor.meshes.size(); ++meshIndex)
 	{
 		const CrRenderMeshHandle& mesh = descriptor.meshes[meshIndex];
-		const CrMaterialSharedHandle& material = descriptor.materials[descriptor.materialIndices[meshIndex]];
+		const CrMaterialHandle& material = descriptor.materials[descriptor.materialIndices[meshIndex]];
 
 		m_renderMeshes.push_back(mesh);
 		m_renderMeshMaterialIndex.push_back((uint8_t)descriptor.materialIndices[meshIndex]);

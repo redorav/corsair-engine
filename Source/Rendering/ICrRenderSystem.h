@@ -42,7 +42,7 @@ public:
 
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
-	static const CrRenderDeviceSharedHandle& GetRenderDevice();
+	static const CrRenderDeviceHandle& GetRenderDevice();
 
 	static void CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor);
 
@@ -58,7 +58,7 @@ protected:
 
 	CrVector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
 
-	CrRenderDeviceSharedHandle m_mainDevice;
+	CrRenderDeviceHandle m_mainDevice;
 
 	CrRenderSystemDescriptor m_descriptor;
 

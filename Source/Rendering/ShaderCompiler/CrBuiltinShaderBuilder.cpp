@@ -31,7 +31,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 			CrPath shadersFilePath = CrPath(entry.directory) / entry.filename;
 
 			// Load .shaders file
-			CrFileSharedHandle file = ICrFile::OpenFile(shadersFilePath.c_str(), FileOpenFlags::Read);
+			CrFileHandle file = ICrFile::OpenFile(shadersFilePath.c_str(), FileOpenFlags::Read);
 
 			// Read in data
 			CrString shadersFile;
@@ -258,7 +258,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			const CompilationDescriptor& compilationDescriptor = shaderJob.compilationDescriptor;
 
 			// Load binary file
-			CrFileSharedHandle file = ICrFile::OpenFile(compilationDescriptor.outputPath.c_str(), FileOpenFlags::Read);
+			CrFileHandle file = ICrFile::OpenFile(compilationDescriptor.outputPath.c_str(), FileOpenFlags::Read);
 
 			if (file)
 			{

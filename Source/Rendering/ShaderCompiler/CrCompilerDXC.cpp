@@ -115,7 +115,7 @@ public:
 			CrString filename;
 			filename.append_convert<wchar_t>(pFilename);
 
-			CrFileSharedHandle file = ICrFile::OpenFile(filename.c_str(), FileOpenFlags::Read);
+			CrFileHandle file = ICrFile::OpenFile(filename.c_str(), FileOpenFlags::Read);
 
 			if (file)
 			{
@@ -508,7 +508,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			CrPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 			pdbFilePath /= eastl::to_string(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
-			CrFileSharedHandle file = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+			CrFileHandle file = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 			file->Write(bytecode.data(), bytecode.size());
 		}
 	
@@ -640,7 +640,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				const CrPath& pdbDirectory = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 				CrPath pdbFilePath = pdbDirectory / pdbNameAsUtf8->GetStringPointer();
 
-				CrFileSharedHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+				CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 				if (pdbFile)
 				{
 					pdbFile->Write(pdbBlob->GetBufferPointer(), pdbBlob->GetBufferSize());

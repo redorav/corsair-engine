@@ -237,7 +237,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
-	m_textures = CrVector<CrTextureSharedHandle>(m_imageCount);
+	m_textures = CrVector<CrTextureHandle>(m_imageCount);
 
 	CrTextureDescriptor swapchainTextureParams;
 	swapchainTextureParams.width = m_width;
@@ -256,7 +256,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 
 	m_presentCompleteSemaphores.resize(m_imageCount);
 
-	for (CrGPUSemaphoreSharedHandle& waitSemaphore : m_presentCompleteSemaphores)
+	for (CrGPUSemaphoreHandle& waitSemaphore : m_presentCompleteSemaphores)
 	{
 		waitSemaphore = m_renderDevice->CreateGPUSemaphore();
 	}

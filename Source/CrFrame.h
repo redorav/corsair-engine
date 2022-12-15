@@ -15,7 +15,7 @@ class CrRenderModel;
 using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrRenderWorld;
-using CrRenderWorldSharedHandle = CrSharedPtr<CrRenderWorld>;
+using CrRenderWorldHandle = CrSharedPtr<CrRenderWorld>;
 
 class CrFrame
 {
@@ -63,37 +63,37 @@ private:
 
 	CrBuiltinComputePipeline m_createIndirectArguments;
 
-	CrTextureSharedHandle m_colorfulVolumeTexture;
+	CrTextureHandle m_colorfulVolumeTexture;
 
-	CrTextureSharedHandle m_colorfulTextureArray;
+	CrTextureHandle m_colorfulTextureArray;
 
 	// Editor Shaders
 	CrBuiltinGraphicsPipeline m_editorEdgeSelectionPipeline;
 
-	CrSwapchainSharedHandle m_swapchain;
+	CrSwapchainHandle m_swapchain;
 
-	CrTextureSharedHandle m_depthStencilTexture;
-	CrTextureSharedHandle m_preSwapchainTexture;
+	CrTextureHandle m_depthStencilTexture;
+	CrTextureHandle m_preSwapchainTexture;
 
-	CrTextureSharedHandle m_gbufferAlbedoAOTexture;
-	CrTextureSharedHandle m_gbufferNormalsTexture;
-	CrTextureSharedHandle m_gbufferMaterialTexture;
+	CrTextureHandle m_gbufferAlbedoAOTexture;
+	CrTextureHandle m_gbufferNormalsTexture;
+	CrTextureHandle m_gbufferMaterialTexture;
 
-	CrTextureSharedHandle m_lightingTexture;
+	CrTextureHandle m_lightingTexture;
 
-	CrTextureSharedHandle m_debugShaderTexture;
+	CrTextureHandle m_debugShaderTexture;
 
-	CrGPUBufferSharedHandle m_mouseSelectionBuffer;
+	CrGPUBufferHandle m_mouseSelectionBuffer;
 
-	CrTextureSharedHandle m_colorsRWTexture;
+	CrTextureHandle m_colorsRWTexture;
 
-	CrStructuredBufferSharedHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
+	CrStructuredBufferHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
 
-	CrStructuredBufferSharedHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
+	CrStructuredBufferHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
 
-	CrDataBufferSharedHandle m_colorsRWDataBuffer;
+	CrDataBufferHandle m_colorsRWDataBuffer;
 
-	CrGPUBufferSharedHandle m_indirectDispatchArguments;
+	CrGPUBufferHandle m_indirectDispatchArguments;
 
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;
@@ -101,7 +101,7 @@ private:
 	CrSharedPtr<CrCamera> m_camera;
 	Camera m_cameraConstantData;
 
-	CrRenderWorldSharedHandle m_renderWorld;
+	CrRenderWorldHandle m_renderWorld;
 
 	CrRenderGraph m_mainRenderGraph;
 

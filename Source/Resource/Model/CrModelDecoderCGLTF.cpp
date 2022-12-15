@@ -26,7 +26,7 @@ class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
-using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;
+using CrMaterialHandle = CrSharedPtr<CrMaterial>;
 
 cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 {
@@ -236,7 +236,7 @@ static cgltf_result cgltfFileRead(const struct cgltf_memory_options* memory_opti
 	void* (*memory_alloc)(void*, cgltf_size) = memory_options->alloc ? memory_options->alloc : &cgltf_default_alloc;
 	void (*memory_free)(void*, void*) = memory_options->free ? memory_options->free : &cgltf_default_free;
 
-	CrFileSharedHandle file = ICrFile::OpenFile(resourcePath.c_str(), FileOpenFlags::Read);
+	CrFileHandle file = ICrFile::OpenFile(resourcePath.c_str(), FileOpenFlags::Read);
 
 	if (!file)
 	{
@@ -283,7 +283,7 @@ static void cgltfFileRelease(const struct cgltf_memory_options* memory_options, 
 	memfree(memory_options->user_data, data);
 }
 
-CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
+CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 {
 	uint64_t fileSize = file->GetSize();
 	CrUniquePtr<uint8_t[]> fileData = CrUniquePtr<uint8_t[]>(new uint8_t[fileSize]);
@@ -305,7 +305,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
 
 		CrRenderModelDescriptor modelDescriptor;
 
-		CrHashMap<void*, CrTextureSharedHandle> textureMap;
+		CrHashMap<void*, CrTextureHandle> textureMap;
 
 		for (uint32_t t = 0; t < gltfData->textures_count; ++t)
 		{
@@ -324,7 +324,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
-			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{
@@ -334,12 +334,12 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
 			textureMap.insert({ &gltfData->textures[t], texture });
 		}
 
-		const auto ProcessMaterialTexture = [&](const CrMaterialSharedHandle& material, void* cgltfKey, Textures::T semantic)
+		const auto ProcessMaterialTexture = [&](const CrMaterialHandle& material, void* cgltfKey, Textures::T semantic)
 		{
 			const auto textureIter = textureMap.find(cgltfKey);
 			if (textureIter != textureMap.end())
 			{
-				const CrTextureSharedHandle& texture = textureIter->second;
+				const CrTextureHandle& texture = textureIter->second;
 				material->AddTexture(texture, semantic);
 			}
 		};
@@ -353,7 +353,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
 		{
 			const cgltf_material& cgltfMaterial = gltfData->materials[m];
 			CrMaterialDescriptor materialDescriptor;
-			CrMaterialSharedHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
+			CrMaterialHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
 
 			ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.base_color_texture.texture, Textures::DiffuseTexture0);
 			ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.metallic_roughness_texture.texture, Textures::SpecularTexture0);

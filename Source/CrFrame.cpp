@@ -168,7 +168,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	m_width = width;
 	m_height = height;
 
-	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	RecreateSwapchainAndRenderTargets();
 
@@ -368,14 +368,14 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	m_structuredBuffer = renderDevice->CreateStructuredBuffer<ExampleStructuredBufferCompute>(cr3d::MemoryAccess::GPUOnlyRead, 32);
 
 	CrGPUBufferDescriptor argumentsDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte, cr3d::MemoryAccess::GPUOnlyWrite);
-	m_indirectDispatchArguments = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), argumentsDescriptor, 3, 4));
+	m_indirectDispatchArguments = CrGPUBufferHandle(new CrGPUBuffer(renderDevice.get(), argumentsDescriptor, 3, 4));
 
 	uint32_t initialValue = 65535;
 	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte | cr3d::BufferUsage::TransferSrc | cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::GPUOnlyWrite);
 	mouseSelectionBufferDescriptor.initialData = (uint8_t*) & initialValue;
 	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
 	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
-	m_mouseSelectionBuffer = CrGPUBufferSharedHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 1, 4));
+	m_mouseSelectionBuffer = CrGPUBufferHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 1, 4));
 
 	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
@@ -402,7 +402,7 @@ void CrFrame::Process()
 
 	// 2. Rendering
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
@@ -1098,7 +1098,7 @@ void CrFrame::UpdateCamera()
 
 void CrFrame::RecreateSwapchainAndRenderTargets()
 {
-	CrRenderDeviceSharedHandle renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();

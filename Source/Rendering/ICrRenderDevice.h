@@ -112,18 +112,18 @@ public:
 
 	CrIndexBufferHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
-	CrSamplerSharedHandle CreateSampler(const CrSamplerDescriptor& descriptor);
+	CrSamplerHandle CreateSampler(const CrSamplerDescriptor& descriptor);
 
-	CrSwapchainSharedHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
+	CrSwapchainHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
-	CrTextureSharedHandle CreateTexture(const CrTextureDescriptor& descriptor);
+	CrTextureHandle CreateTexture(const CrTextureDescriptor& descriptor);
 
 	CrVertexBufferHandle CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 	template<typename Metadata>
-	CrStructuredBufferSharedHandle<Metadata> CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
+	CrStructuredBufferHandle<Metadata> CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
 
-	CrDataBufferSharedHandle CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
+	CrDataBufferHandle CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
 
 	CrGraphicsShaderHandle CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
@@ -137,9 +137,9 @@ public:
 
 	CrHardwareGPUBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-	CrGPUFenceSharedHandle CreateGPUFence();
+	CrGPUFenceHandle CreateGPUFence();
 
-	CrGPUSemaphoreSharedHandle CreateGPUSemaphore();
+	CrGPUSemaphoreHandle CreateGPUSemaphore();
 
 	//--------------------
 	// GPU Synchronization
@@ -285,7 +285,7 @@ private:
 };
 
 template<typename Metadata>
-CrStructuredBufferSharedHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
+CrStructuredBufferHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
 {
-	return CrStructuredBufferSharedHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
+	return CrStructuredBufferHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
 }

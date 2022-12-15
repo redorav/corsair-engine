@@ -67,7 +67,7 @@ static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const ai
 	}
 }
 
-CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle& file)
+CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 {
 	// Read the raw data:
 	uint64_t fileSize = file->GetSize();
@@ -101,7 +101,7 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle& file)
 
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
-		CrMaterialSharedHandle material = LoadMaterial(scene->mMaterials[m], filePath);
+		CrMaterialHandle material = LoadMaterial(scene->mMaterials[m], filePath);
 		modelDescriptor.materials[m] = material;
 	}
 
@@ -123,7 +123,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 	aiColor4D materialColor(1.0f, 1.0f, 1.0f, 1.0f);
 	aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &materialColor);
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
@@ -250,10 +250,10 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 	return renderMesh;
 }
 
-CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& materialPath)
+CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& materialPath)
 {
 	CrMaterialDescriptor materialDescriptor;
-	CrMaterialSharedHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
+	CrMaterialHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
 
 	aiString name;
 	aiMaterial->Get(AI_MATKEY_NAME, name);
@@ -287,7 +287,7 @@ CrMaterialSharedHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMa
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
-			CrTextureSharedHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{

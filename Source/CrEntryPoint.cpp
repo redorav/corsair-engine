@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	renderDeviceDescriptor.preferredVendor = cr3d::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	ICrRenderSystem::CreateRenderDevice(renderDeviceDescriptor);
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	CrPrintProcessMemory("After Render Device");
 

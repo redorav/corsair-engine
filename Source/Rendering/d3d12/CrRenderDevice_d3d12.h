@@ -118,7 +118,7 @@ private:
 	// Heap for Samplers
 	CrDescriptorPoolD3D12 m_samplerPool;
 
-	CrGPUFenceSharedHandle m_waitIdleFence;
+	CrGPUFenceHandle m_waitIdleFence;
 
 	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue;
 

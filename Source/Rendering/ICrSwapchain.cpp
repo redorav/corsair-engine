@@ -64,7 +64,7 @@ void ICrSwapchain::Present()
 	PresentPS();
 }
 
-const CrTextureSharedHandle& ICrSwapchain::GetTexture(uint32_t index)
+const CrTextureHandle& ICrSwapchain::GetTexture(uint32_t index)
 {
 	CrAssert(index < m_textures.size());
 	return m_textures[index];

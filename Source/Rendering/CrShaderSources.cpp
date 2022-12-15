@@ -47,7 +47,7 @@ void CrShaderSources::Initialize()
 			CrPath shaderPath = entry.directory;
 			shaderPath /= entry.filename.c_str();
 
-			CrFileSharedHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
+			CrFileHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
 
 			if (shaderSourceFile)
 			{

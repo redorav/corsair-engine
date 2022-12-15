@@ -33,7 +33,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 	// C: xyz (-1, 0, -1) uv (0, 1)
 	// D: xyz ( 1, 0, -1) uv (1, 1)
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Compute number of vertices
 	uint32_t vertexCountX = 2 + descriptor.subdivisionX;
@@ -155,7 +155,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	// Number of quads per face, times 2 faces (positive and negative) * 2 triangles per quad * 3 vertices per triangle
 	uint32_t indexCount = (quadCountY * quadCountZ + quadCountX * quadCountZ + quadCountX * quadCountY) * 2 * 2 * 3;
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
@@ -280,7 +280,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 	// Number of quads per face, times 2 faces (positive and negative) * 2 triangles per quad * 3 vertices per triangle
 	uint32_t indexCount = (quadCountFace * quadCountFace) * 3 * 2 * 2 * 3;
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
@@ -401,7 +401,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 	uint32_t indexCount = triangleCount * 3;
 
-	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);

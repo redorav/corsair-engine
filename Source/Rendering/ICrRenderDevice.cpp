@@ -105,14 +105,14 @@ CrCommandBufferHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBuffer
 	return CrCommandBufferHandle(CreateCommandBufferPS(descriptor));
 }
 
-CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()
+CrGPUFenceHandle ICrRenderDevice::CreateGPUFence()
 {
-	return CrGPUFenceSharedHandle(CreateGPUFencePS());
+	return CrGPUFenceHandle(CreateGPUFencePS());
 }
 
-CrGPUSemaphoreSharedHandle ICrRenderDevice::CreateGPUSemaphore()
+CrGPUSemaphoreHandle ICrRenderDevice::CreateGPUSemaphore()
 {
-	return CrGPUSemaphoreSharedHandle(CreateGPUSemaphorePS(), m_gpuDeletionCallback);
+	return CrGPUSemaphoreHandle(CreateGPUSemaphorePS(), m_gpuDeletionCallback);
 }
 
 CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
@@ -184,18 +184,18 @@ CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T acc
 	return CrIndexBufferHandle(new CrIndexBuffer(this, access, dataFormat, numIndices));
 }
 
-CrSamplerSharedHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
+CrSamplerHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 {
-	return CrSamplerSharedHandle(CreateSamplerPS(descriptor), m_gpuDeletionCallback);
+	return CrSamplerHandle(CreateSamplerPS(descriptor), m_gpuDeletionCallback);
 }
 
-CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
+CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
 	CrAssertMsg(swapchainDescriptor.platformWindow, "Platform window cannot be null");
 	CrAssertMsg(swapchainDescriptor.platformHandle, "Platform handle cannot be null");
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
-	CrSwapchainSharedHandle swapchain = CrSwapchainSharedHandle(CreateSwapchainPS(swapchainDescriptor));
+	CrSwapchainHandle swapchain = CrSwapchainHandle(CreateSwapchainPS(swapchainDescriptor));
 
 	CrAssertMsg(swapchain->GetWidth() > 0, "Swapchain must have a width");
 	CrAssertMsg(swapchain->GetHeight() > 0, "Swapchain must have a height");
@@ -205,9 +205,9 @@ CrSwapchainSharedHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescri
 	return swapchain;
 }
 
-CrTextureSharedHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
+CrTextureHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 {
-	return CrTextureSharedHandle(CreateTexturePS(descriptor), m_gpuDeletionCallback);
+	return CrTextureHandle(CreateTexturePS(descriptor), m_gpuDeletionCallback);
 }
 
 CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
@@ -215,9 +215,9 @@ CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T a
 	return CrVertexBufferHandle(new CrVertexBuffer(this, access, vertexDescriptor, numVertices));
 }
 
-CrDataBufferSharedHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+CrDataBufferHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 {
-	return CrDataBufferSharedHandle(new CrDataBuffer(this, access, dataFormat, numElements));
+	return CrDataBufferHandle(new CrDataBuffer(this, access, dataFormat, numElements));
 }
 
 cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
@@ -301,7 +301,7 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 		// We assume the directory has been created by now
 		if (ICrFile::CreateDirectories(m_pipelineCacheDirectory.c_str()))
 		{
-			CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
+			CrFileHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
 			file->Write(pipelineCacheData, pipelineCacheSize);
 		}
 		else
@@ -316,7 +316,7 @@ void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
 	if (m_isValidPipelineCache)
 	{
 		CrPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
-		CrFileSharedHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
+		CrFileHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
 
 		if (file)
 		{

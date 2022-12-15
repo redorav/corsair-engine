@@ -20,7 +20,7 @@ public:
 private:
 
 	// Semaphores are signaled when present completes
-	CrVector<CrGPUSemaphoreSharedHandle> m_presentCompleteSemaphores;
+	CrVector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
 
 	// We need to have another index for the semaphore because we don't really know
 	// the buffer index until we have acquired the image, but we need to signal the

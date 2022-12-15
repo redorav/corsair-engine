@@ -172,7 +172,7 @@ CrImageDecoderDDS::CrImageDecoderDDS()
 	m_containerFormat = CrImageContainerFormat::DDS;
 }
 
-CrImageHandle CrImageDecoderDDS::Decode(const CrFileSharedHandle& file) const
+CrImageHandle CrImageDecoderDDS::Decode(const CrFileHandle& file) const
 {
 	// Read in the header
 	unsigned char ddsHeaderData[ddspp::MAX_HEADER_SIZE];
@@ -267,7 +267,7 @@ void CrImageEncoderDDS::Encode(const CrImageHandle& image, StreamT& stream) cons
 	stream.Write(image->GetData(), image->GetDataSize());
 }
 
-void CrImageEncoderDDS::Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const
+void CrImageEncoderDDS::Encode(const CrImageHandle& image, const CrFileHandle& file) const
 {
 	CrWriteFileStream fileStream(file);
 	Encode(image, fileStream);

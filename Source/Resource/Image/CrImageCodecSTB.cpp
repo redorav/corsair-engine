@@ -16,7 +16,7 @@
 #include <stb_image_write.h>
 #pragma warning(pop)
 
-CrImageHandle CrImageDecoderSTB::Decode(const CrFileSharedHandle& file) const
+CrImageHandle CrImageDecoderSTB::Decode(const CrFileHandle& file) const
 {
 	// Read file into memory
 	CrVector<unsigned char> fileData;
@@ -83,7 +83,7 @@ static void WriteToFileSTB(void* context, void* data, int size)
 	file->Write(data, size);
 }
 
-void CrImageEncoderSTB::Encode(const CrImageHandle& image, const CrFileSharedHandle& file) const
+void CrImageEncoderSTB::Encode(const CrImageHandle& image, const CrFileHandle& file) const
 {
 	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
 

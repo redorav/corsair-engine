@@ -9,7 +9,7 @@
 #include <cstdint>
 
 class ICrFile;
-using CrFileSharedHandle = CrSharedPtr<ICrFile>;
+using CrFileHandle = CrSharedPtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 struct CrDirectoryEntry
@@ -81,7 +81,7 @@ public:
 	// TODO Move this elsewhere when we have a FileDevice
 	// We need to be able to create different files for different platforms, functionality, etc
 	// Functions like FileExists also would want to be part of the file device
-	static CrFileSharedHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
+	static CrFileHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
 	// Copy a file to a different locatioin
 	static bool FileCopy(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);

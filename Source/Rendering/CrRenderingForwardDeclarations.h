@@ -42,30 +42,27 @@ struct RWDataBufferMetadata;
 class ICrRenderSystem;
 
 class ICrRenderDevice;
-using CrRenderDeviceSharedHandle = CrSharedPtr<ICrRenderDevice>;
+using CrRenderDeviceHandle = CrSharedPtr<ICrRenderDevice>;
 
 namespace CrCommandQueueType { enum T : uint32_t; }
 
 class ICrTexture;
-using CrTextureSharedHandle = CrSharedPtr<ICrTexture>;
+using CrTextureHandle = CrSharedPtr<ICrTexture>;
 struct CrTextureDescriptor;
 
 class ICrSampler;
-using CrSamplerSharedHandle = CrSharedPtr<ICrSampler>;
+using CrSamplerHandle = CrSharedPtr<ICrSampler>;
 struct CrSamplerDescriptor;
 
-class ICrCommandQueue;
-using CrCommandQueueSharedHandle = CrSharedPtr<ICrCommandQueue>;
-
 class ICrSwapchain;
-using CrSwapchainSharedHandle = CrSharedPtr<ICrSwapchain>;
+using CrSwapchainHandle = CrSharedPtr<ICrSwapchain>;
 struct CrSwapchainDescriptor;
 
 class ICrGPUFence;
-using CrGPUFenceSharedHandle = CrSharedPtr<ICrGPUFence>;
+using CrGPUFenceHandle = CrSharedPtr<ICrGPUFence>;
 
 class ICrGPUSemaphore;
-using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
+using CrGPUSemaphoreHandle = CrSharedPtr<ICrGPUSemaphore>;
 
 class ICrCommandBuffer;
 using CrCommandBufferHandle = CrSharedPtr<ICrCommandBuffer>;
@@ -117,7 +114,7 @@ using CrHardwareGPUBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
 struct CrHardwareGPUBufferDescriptor;
 
 class CrGPUBuffer;
-using CrGPUBufferSharedHandle = CrSharedPtr<CrGPUBuffer>;
+using CrGPUBufferHandle = CrSharedPtr<CrGPUBuffer>;
 
 struct CrGPUBufferDescriptor;
 class CrGPUStackAllocator;
@@ -132,10 +129,10 @@ template<typename Metadata>
 class CrStructuredBuffer;
 
 template<typename Metadata>
-using CrStructuredBufferSharedHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
+using CrStructuredBufferHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
 
 class CrDataBuffer;
-using CrDataBufferSharedHandle = CrSharedPtr<CrDataBuffer>;
+using CrDataBufferHandle = CrSharedPtr<CrDataBuffer>;
 
 typedef CrFixedFunction<4, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 

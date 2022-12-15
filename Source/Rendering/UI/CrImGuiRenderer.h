@@ -40,7 +40,7 @@ private:
 
 	CrBuiltinGraphicsPipeline m_imguiGraphicsPipeline;
 
-	CrTextureSharedHandle m_fontAtlas;
+	CrTextureHandle m_fontAtlas;
 
 	// Imgui's vertex and index buffers grow if more vertices
 	// are needed, but never shrink

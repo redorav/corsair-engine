@@ -54,7 +54,7 @@ CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(CrM
 	return materialPassProperties;
 }
 
-void CrMaterial::AddTexture(const CrTextureSharedHandle& texture, Textures::T semantic)
+void CrMaterial::AddTexture(const CrTextureHandle& texture, Textures::T semantic)
 {
 	TextureBinding binding;
 	binding.texture = texture;

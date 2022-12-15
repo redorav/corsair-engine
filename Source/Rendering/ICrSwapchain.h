@@ -49,7 +49,7 @@ public:
 
 	void Present();
 
-	const CrTextureSharedHandle& GetTexture(uint32_t index);
+	const CrTextureHandle& GetTexture(uint32_t index);
 
 protected:
 
@@ -59,7 +59,7 @@ protected:
 
 	ICrRenderDevice*						m_renderDevice = nullptr;
 
-	CrVector<CrTextureSharedHandle>			m_textures;
+	CrVector<CrTextureHandle>			m_textures;
 
 	uint32_t								m_imageCount;
 

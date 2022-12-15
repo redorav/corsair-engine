@@ -283,7 +283,7 @@ static void cgltfFileRelease(const struct cgltf_memory_options* memory_options, 
 	memfree(memory_options->user_data, data);
 }
 
-CrRenderModelSharedHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
+CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileSharedHandle& file)
 {
 	uint64_t fileSize = file->GetSize();
 	CrUniquePtr<uint8_t[]> fileData = CrUniquePtr<uint8_t[]>(new uint8_t[fileSize]);

@@ -4,14 +4,15 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrRenderWorld.h"
 #include "Rendering/CrRenderGraph.h"
 #include "Rendering/CrBuiltinPipeline.h"
+
+#include "Rendering/RenderWorld/CrRenderWorld.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
 class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
+using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrRenderWorld;
 using CrRenderWorldSharedHandle = CrSharedPtr<CrRenderWorld>;

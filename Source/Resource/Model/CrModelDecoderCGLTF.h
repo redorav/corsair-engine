@@ -6,5 +6,5 @@
 class CrModelDecoderCGLTF final : public ICrModelDecoder
 {
 public:
-	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) override;
+	virtual CrRenderModelHandle Decode(const CrFileSharedHandle& file) override;
 };

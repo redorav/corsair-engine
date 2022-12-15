@@ -12,7 +12,7 @@
 #include "Core/Containers/CrArray.h"
 
 class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
+using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrMaterial;
 using CrMaterialSharedHandle = CrSharedPtr<CrMaterial>;

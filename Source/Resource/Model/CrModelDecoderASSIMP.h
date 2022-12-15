@@ -18,7 +18,7 @@ class CrModelDecoderASSIMP final : public ICrModelDecoder
 {
 public:
 
-	virtual CrRenderModelSharedHandle Decode(const CrFileSharedHandle& file) override;
+	virtual CrRenderModelHandle Decode(const CrFileSharedHandle& file) override;
 
 	static CrRenderMeshHandle LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform);
 

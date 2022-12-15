@@ -19,7 +19,7 @@
 #include "Resource/Model/CrModelDecoderASSIMP.h"
 #include "Resource/Model/CrModelDecoderCGLTF.h"
 
-CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
+CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 {
 	CrFileSharedHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
@@ -36,7 +36,7 @@ CrRenderModelSharedHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 			modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
 		}
 
-		CrRenderModelSharedHandle model = modelDecoder->Decode(file);
+		CrRenderModelHandle model = modelDecoder->Decode(file);
 
 		model->ComputeBoundingBoxFromMeshes();
 

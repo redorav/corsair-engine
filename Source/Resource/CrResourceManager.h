@@ -5,19 +5,16 @@
 class CrShader;
 
 class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
+using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrImage;
 using CrImageHandle = CrSharedPtr<CrImage>;
-
-class CrRenderModel;
-using CrRenderModelSharedHandle = CrSharedPtr<CrRenderModel>;
 
 class CrResourceManager
 {
 public:
 
-	static CrRenderModelSharedHandle LoadModel(const CrPath& filePath);
+	static CrRenderModelHandle LoadModel(const CrPath& filePath);
 
 	static CrPath GetFullResourcePath(const CrPath& relativePath);
 

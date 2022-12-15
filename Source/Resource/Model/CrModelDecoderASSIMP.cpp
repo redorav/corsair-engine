@@ -67,7 +67,7 @@ static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const ai
 	}
 }
 
-CrRenderModelSharedHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle& file)
+CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileSharedHandle& file)
 {
 	// Read the raw data:
 	uint64_t fileSize = file->GetSize();

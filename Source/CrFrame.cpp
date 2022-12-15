@@ -22,10 +22,10 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrShaderSources.h"
 #include "Rendering/CrVisibility.h"
-
-#include "Rendering/CrRenderWorld.h"
-#include "Rendering/CrRenderModelInstance.h"
 #include "Rendering/CrCPUStackAllocator.h"
+
+#include "Rendering/RenderWorld/CrRenderWorld.h"
+#include "Rendering/RenderWorld/CrRenderModelInstance.h"
 
 #include "Rendering/CrRenderGraph.h"
 
@@ -196,9 +196,9 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	if (loadData)
 	{
-		CrRenderModelSharedHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
-		CrRenderModelSharedHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
-		CrRenderModelSharedHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
+		CrRenderModelHandle nyraModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("nyra/nyra_pose_mod.fbx"));
+		CrRenderModelHandle jainaModel = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("jaina/storm_hero_jaina.fbx"));
+		CrRenderModelHandle damagedHelmet = CrResourceManager::LoadModel(CrResourceManager::GetFullResourcePath("gltf-helmet/DamagedHelmet.gltf"));
 
 		const uint32_t numModels = 100;
 
@@ -217,7 +217,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 			m_renderWorld->SetTransform(modelInstance.GetId(), transformMatrix);
 
 			int r = rand();
-			CrRenderModelSharedHandle renderModel;
+			CrRenderModelHandle renderModel;
 
 			if (r < RAND_MAX / 3)
 			{

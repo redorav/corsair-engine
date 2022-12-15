@@ -40,6 +40,12 @@ ShaderCompilerExecutableName = ProjectShaderCompiler..'.exe'
 -- Path is resolved during the parsing pass. It's meant to be in the same directory as the main executable
 ShaderCompilerPath = '%{cfg.buildtarget.directory}/'..ShaderCompilerExecutableName
 
+IsVisualStudio = string.sub(_ACTION, 1, string.len('vs')) == 'vs'
+VisualStudioVersion = ''
+if IsVisualStudio then
+	VisualStudioVersion = string.sub(_ACTION, string.len('vs') + 1)
+end
+
 -- Utility Functions
 
 function ExcludePlatformSpecificCode(rootPath)
@@ -498,7 +504,7 @@ project(ProjectUnitTests)
 		SourceUnitTestsDirectory..'/**'
 	}
 
---[[group('.Solution Generation')
+group('.Solution Generation')
 
 project('Generate Solution')
 	kind('StaticLib')
@@ -507,8 +513,13 @@ project('Generate Solution')
 	local rootPathAbsolute = path.getabsolute('')
 	local generateSolutionCommandLine = '{chdir} "'..rootPathAbsolute..'"'
 
+	if IsVisualStudio then
+		rebuildProjectCommand = '"Visual Studio '..VisualStudioVersion..'.bat"'
+		print(rebuildProjectCommand)
+	end
+
 	postbuildcommands
 	{
-		generateSolutionCommandLine,						-- Run
-		'"Visual Studio 2017.bat"',
-	}]]--
+		generateSolutionCommandLine, -- Run
+		rebuildProjectCommand,
+	}

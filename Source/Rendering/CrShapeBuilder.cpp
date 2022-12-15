@@ -7,6 +7,8 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 
+#include "Math/CrMath.h"
+
 CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor)
 {
 	// XZ Plane: Quad faces up
@@ -115,15 +117,15 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 
 CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor)
 {
-	//     A +--------+  B
-	//      /        /|
-	//     /        / |
-	//  C +--------+ D|
-	//    |        |  |
-	//    |   E    |  +  F
-	//    |        | /
-	//    |        |/
-	//    +--------+
+	//     A +----------+  B
+	//      /|         /|
+	//     / |        / |
+	//  C +----------+ D|
+	//    |  | E     |  | F
+	//    |  +- - - -|- +
+	//    | /        | /
+	//    |/         |/
+	//    +----------+
 	//  G            H
 	//
 	// A: xyz (-1,  1,  1) uv (0, 0)
@@ -163,41 +165,40 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 		uint32_t currentVertex = 0;
 		uint32_t currentIndex = 0;
 		uint32_t currentFaceVertexCount = 0;
+		
+		struct FaceProperties
+		{
+			uint32_t quadCountW, quadCountH, vertexCountW, vertexCountH;
+			float3 normal;
+			float3 tangent;
+		};
+
+		const FaceProperties FacePropertyArray[cr3d::CubemapFace::Count] =
+		{
+			{ quadCountZ, quadCountY, vertexCountZ, vertexCountY, float3( 1.0f,  0.0f,  0.0f) },
+			{ quadCountZ, quadCountY, vertexCountZ, vertexCountY, float3(-1.0f,  0.0f,  0.0f) },
+			{ quadCountX, quadCountZ, vertexCountX, vertexCountZ, float3( 0.0f,  1.0f,  0.0f) },
+			{ quadCountX, quadCountZ, vertexCountX, vertexCountZ, float3( 0.0f, -1.0f,  0.0f) },
+			{ quadCountX, quadCountY, vertexCountX, vertexCountY, float3( 0.0f,  0.0f,  1.0f) },
+			{ quadCountX, quadCountY, vertexCountX, vertexCountY, float3( 0.0f,  0.0f, -1.0f) }
+		};
 
 		for (cr3d::CubemapFace::T face = cr3d::CubemapFace::PositiveX; face < cr3d::CubemapFace::Count; ++face)
 		{
-			uint32_t quadCountW = 1, quadCountH = 1;
-			uint32_t vertexCountW = 1, vertexCountH = 1;
+			const FaceProperties& faceProperties = FacePropertyArray[face];
 
-			switch (face)
-			{
-				case cr3d::CubemapFace::PositiveX: 
-				case cr3d::CubemapFace::NegativeX:
-					quadCountW = quadCountZ; vertexCountW = vertexCountZ;
-					quadCountH = quadCountY; vertexCountH = vertexCountY;
-					break;
-				case cr3d::CubemapFace::PositiveY:
-				case cr3d::CubemapFace::NegativeY:
-					quadCountW = quadCountX; vertexCountW = vertexCountX;
-					quadCountH = quadCountZ; vertexCountH = vertexCountZ;
-					break;
-				case cr3d::CubemapFace::PositiveZ:
-				case cr3d::CubemapFace::NegativeZ:
-					quadCountW = quadCountX; vertexCountW = vertexCountX;
-					quadCountH = quadCountY; vertexCountH = vertexCountY;
-					break;
-			}
+			float3 normalAsByte = (faceProperties.normal * 0.5f + 0.5f) * 255.0f;
 
 			uint32_t faceVertexCount = 0;
 
-			float dw = 1.0f / quadCountW;
-			float dh = 1.0f / quadCountH;
+			float dw = 1.0f / faceProperties.quadCountW;
+			float dh = 1.0f / faceProperties.quadCountH;
 
 			float fh = 0.0f;
-			for (uint32_t h = 0; h < vertexCountH; ++h, fh += dh)
+			for (uint32_t h = 0; h < faceProperties.vertexCountH; ++h, fh += dh)
 			{
 				float fw = 0.0f;
-				for (uint32_t w = 0; w < vertexCountW; ++w, fw += dw)
+				for (uint32_t w = 0; w < faceProperties.vertexCountW; ++w, fw += dw)
 				{
 					float3 cubePosition;
 
@@ -219,7 +220,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
-					additionalData[currentVertex].normal = { 0, 255, 0 };
+					additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
 
 					additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -230,19 +231,19 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 				}
 			}
 
-			for (uint32_t h = 0; h < quadCountH; ++h)
+			for (uint32_t h = 0; h < faceProperties.quadCountH; ++h)
 			{
-				uint32_t baseVertex = currentFaceVertexCount + h * vertexCountW;
+				uint32_t baseVertex = currentFaceVertexCount + h * faceProperties.vertexCountW;
 
-				for (uint32_t w = 0; w < quadCountW; ++w)
+				for (uint32_t w = 0; w < faceProperties.quadCountW; ++w)
 				{
 					indexData[currentIndex++] = (uint16_t)(baseVertex + w);
 					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
-					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + faceProperties.vertexCountW);
 
-					indexData[currentIndex++] = (uint16_t)(baseVertex + w + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + faceProperties.vertexCountW);
 					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1);
-					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1 + vertexCountW);
+					indexData[currentIndex++] = (uint16_t)(baseVertex + w + 1 + faceProperties.vertexCountW);
 				}
 			}
 
@@ -320,15 +321,17 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
 					}
 
-					float3 spherePosition = normalize(cubePosition * 2.0f - 1.0f);
+					float3 normal = normalize(cubePosition * 2.0f - 1.0f);
 
-					spherePosition *= descriptor.radius;
+					float3 spherePosition = normal * descriptor.radius;
 
 					positionData[currentVertex].position = { (half)spherePosition.x, (half)spherePosition.y, (half)spherePosition.z };
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
-					additionalData[currentVertex].normal = { 0, 255, 0 };
+					float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+
+					additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
 
 					additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -371,4 +374,145 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 	sphereMesh->SetIndexBuffer(indexBuffer);
 
 	return sphereMesh;
+}
+
+CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& descriptor)
+{
+	// Number of vertices in ring (not counting the duplicated one)
+	uint32_t vertexCountRingLogical = descriptor.subdivisionAxis + 3;
+
+	// Vertices at each ring (minimum of 3) + 1 for when we wrap around (needs different UV)
+	uint32_t vertexCountRingPhysical = vertexCountRingLogical + 1;
+
+	// Number of rings * vertex count of each ring + two extra vertices at the bottom and the top
+	uint32_t vertexCount = vertexCountRingPhysical * (2 + descriptor.subdivisionLength) + 2;
+
+	// Side quads follow the number of vertices
+	uint32_t quadCountSides = vertexCountRingLogical;
+
+	// Triangles for the base follow the number of vertices
+	uint32_t triangleCountBase = vertexCountRingLogical;
+
+	uint32_t triangleCount = quadCountSides * 2 + triangleCountBase * 2;
+
+	uint32_t indexCount = triangleCount * 3;
+
+	const CrRenderDeviceSharedHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
+
+	float4 colorAsByte = descriptor.color * 255.0f;
+
+	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
+	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
+	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
+	{
+		uint32_t currentVertex = 0;
+		uint32_t currentIndex = 0;
+
+		// Add top tip vertex
+		{
+			positionData[currentVertex].position = { 0.0_h, 1.0_h, 0.0_h };
+			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
+			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].tangent = { 255, 0, 0 };
+			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+			currentVertex++;
+		}
+
+		// Indices for top cap
+		for (uint32_t v = 0; v < vertexCountRingLogical; ++v)
+		{
+			indexData[currentIndex++] = 0;
+			indexData[currentIndex++] = (uint16_t)(v + 2);
+			indexData[currentIndex++] = (uint16_t)(v + 1);
+		}
+
+		// Go from the top cap to the bottom
+		for (uint32_t l = 0; l <= 1; ++l)
+		{
+			float fh = 1.0f - 2.0f * l;
+
+			for (uint32_t v = 0; v <= vertexCountRingLogical; ++v)
+			{
+				float theta = (2.0f * CrMath::Pi * v) / vertexCountRingLogical;
+				float fw = (float)v / vertexCountRingLogical;
+
+				float x = cosf(theta);
+				float z = sinf(theta);
+
+				float3 position = { descriptor.radius * x, fh, descriptor.radius * z };
+
+				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
+
+				additionalData[currentVertex].uv = { (half)fw, (half)fh };
+
+				float3 normal = float3(x, 0.0f, z);
+
+				float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+
+				additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+
+				additionalData[currentVertex].tangent = { 255, 0, 0 };
+
+				additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+
+				currentVertex++;
+			}
+		}
+
+		uint32_t currentRingVertexCount = 1; // Account for the top vertex
+
+		for (uint32_t l = 0; l < 1; ++l)
+		{
+			// Skip the last vertex to add indices
+			for (uint32_t v = 0; v < vertexCountRingLogical; ++v)
+			{
+				uint32_t baseVertex = currentRingVertexCount + v;
+
+				indexData[currentIndex++] = (uint16_t)(baseVertex);
+				indexData[currentIndex++] = (uint16_t)(baseVertex + 1);
+				indexData[currentIndex++] = (uint16_t)(baseVertex + vertexCountRingPhysical);
+
+				indexData[currentIndex++] = (uint16_t)(baseVertex + vertexCountRingPhysical);
+				indexData[currentIndex++] = (uint16_t)(baseVertex + 1);
+				indexData[currentIndex++] = (uint16_t)(baseVertex + vertexCountRingPhysical + 1);
+			}
+
+			currentRingVertexCount += vertexCountRingPhysical;
+		}
+
+		// Indices for bottom cap
+		for (uint32_t v = 0; v < vertexCountRingLogical; ++v)
+		{
+			uint32_t baseVertex = currentVertex - vertexCountRingPhysical;
+			indexData[currentIndex++] = (uint16_t)currentVertex;
+			indexData[currentIndex++] = (uint16_t)(baseVertex + v + 0);
+			indexData[currentIndex++] = (uint16_t)(baseVertex + v + 1);
+		}
+
+		// Add bottom tip vertex
+		{
+			positionData[currentVertex].position = { 0.0_h, -1.0_h, 0.0_h };
+			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
+			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].tangent = { 255, 0, 0 };
+			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+			currentVertex++;
+		}
+
+		CrAssertMsg(vertexCount == currentVertex, "Mismatch in number of vertices");
+		CrAssertMsg(indexCount == currentIndex, "Mismatch in number of indices");
+	}
+	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
+
+	CrRenderMeshHandle cylinderMesh = CrRenderMeshHandle(new CrRenderMesh());
+	cylinderMesh->AddVertexBuffer(positionBuffer);
+	cylinderMesh->AddVertexBuffer(additionalBuffer);
+	cylinderMesh->SetIndexBuffer(indexBuffer);
+
+	return cylinderMesh;
 }

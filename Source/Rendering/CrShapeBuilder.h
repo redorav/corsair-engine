@@ -37,4 +37,14 @@ public:
 	};
 
 	static CrRenderMeshHandle CreateSphere(const CrSphereDescriptor& descriptor);
+
+	struct CrCylinderDescriptor
+	{
+		uint32_t subdivisionAxis = 0;
+		uint32_t subdivisionLength = 0;
+		float radius = 1.0f;
+		float4 color = float4(1.0f);
+	};
+
+	static CrRenderMeshHandle CreateCylinder(const CrCylinderDescriptor& descriptor);
 };

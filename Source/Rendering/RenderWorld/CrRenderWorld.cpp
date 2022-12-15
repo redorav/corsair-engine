@@ -230,6 +230,9 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 			if (computeMouseSelection)
 			{
+				// m_mouseSelectionBoundingRectangle
+				bool intersectingRactangles = false; (intersectingRactangles);
+
 				// TODO Reduce list using bound selection
 				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);

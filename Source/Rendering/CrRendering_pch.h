@@ -4,8 +4,8 @@
 // Vulkan on Windows includes windows.h which defines things like min and max, aside from being very big.
 // To counter it we define NOMINMAX, etc. globally
 #include <vulkan/vulkan.h>
-#include "vulkan/CrVulkan.h"
-#include "vulkan/CrVMA.h"
+#include "Vulkan/CrVulkan.h"
+#include "Vulkan/CrVMA.h"
 #endif
 
 #if defined(D3D12_API)

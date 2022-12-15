@@ -65,7 +65,11 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 			float fx = 0.0f;
 			for (uint32_t x = 0; x < vertexCountX; ++x, fx += dx)
 			{
-				positionData[currentVertex].position = { (half)(fx * 2.0f - 1.0f), 0.0_h, (half)((1.0f - fy) * 2.0f - 1.0f) };
+				float3 position = float3(fx, 0.5f, 1.0f - fy) * 2.0f - 1.0f;
+
+				position *= descriptor.scale;
+
+				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
 				additionalData[currentVertex].uv = { (half)fx, (half)fy };
 
@@ -214,7 +218,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
 					}
 
-					cubePosition = cubePosition * 2.0f - 1.0f;
+					cubePosition = (cubePosition * 2.0f - 1.0f) * descriptor.scale;
 
 					positionData[currentVertex].position = { (half)cubePosition.x, (half)cubePosition.y, (half)cubePosition.z };
 
@@ -323,7 +327,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 
 					float3 normal = normalize(cubePosition * 2.0f - 1.0f);
 
-					float3 spherePosition = normal * descriptor.radius;
+					float3 spherePosition = normal * descriptor.scale;
 
 					positionData[currentVertex].position = { (half)spherePosition.x, (half)spherePosition.y, (half)spherePosition.z };
 
@@ -413,7 +417,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add top tip vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, 1.0_h, 0.0_h };
+			positionData[currentVertex].position = { 0.0_h, (half)descriptor.scale.y, 0.0_h };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
 			additionalData[currentVertex].normal = { 0, 255, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -442,7 +446,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 				float x = cosf(theta);
 				float z = sinf(theta);
 
-				float3 position = { descriptor.radius * x, fh, descriptor.radius * z };
+				float3 position = float3(x, fh, z) * descriptor.scale;
 
 				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
@@ -494,9 +498,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add bottom tip vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, -1.0_h, 0.0_h };
+			positionData[currentVertex].position = { 0.0_h, (half)-descriptor.scale.y, 0.0_h};
 			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
-			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].normal = { 0, 0, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
 			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
 			currentVertex++;

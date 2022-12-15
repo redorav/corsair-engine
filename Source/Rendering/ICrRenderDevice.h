@@ -102,13 +102,13 @@ public:
 
 	void ProcessQueuedCommands();
 
-	const CrCommandBufferSharedHandle& GetAuxiliaryCommandBuffer();
+	const CrCommandBufferHandle& GetAuxiliaryCommandBuffer();
 
 	//------------------
 	// Resource Creation
 	//------------------
 
-	CrCommandBufferSharedHandle CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
+	CrCommandBufferHandle CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
 	CrIndexBufferHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -275,9 +275,9 @@ private:
 
 	// Auxiliary command buffers. Subclasses don't need to know about the implementation details,
 	// they queue work onto the auxiliary command buffer (via the getter)
-	CrCommandBufferSharedHandle m_auxiliaryCommandBuffer;
+	CrCommandBufferHandle m_auxiliaryCommandBuffer;
 
-	CrVector<CrCommandBufferSharedHandle> m_auxiliaryCommandBuffers;
+	CrVector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
 
 	uint32_t m_auxiliaryCommandBufferIndex = 0;
 

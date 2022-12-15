@@ -68,7 +68,7 @@ class ICrGPUSemaphore;
 using CrGPUSemaphoreSharedHandle = CrSharedPtr<ICrGPUSemaphore>;
 
 class ICrCommandBuffer;
-using CrCommandBufferSharedHandle = CrSharedPtr<ICrCommandBuffer>;
+using CrCommandBufferHandle = CrSharedPtr<ICrCommandBuffer>;
 struct CrCommandBufferDescriptor;
 
 struct CrRenderPassDescriptor;

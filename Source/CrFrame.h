@@ -39,7 +39,7 @@ public:
 
 private:
 
-	CrVector<CrCommandBufferSharedHandle> m_drawCmdBuffers; // Command buffers used for rendering
+	CrVector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	
 	uint32_t m_width = 0;
 

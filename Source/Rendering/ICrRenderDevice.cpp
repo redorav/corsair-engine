@@ -59,7 +59,7 @@ void ICrRenderDevice::Initialize()
 	}
 }
 
-const CrCommandBufferSharedHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer()
+const CrCommandBufferHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer()
 {
 	// If we don't have an auxiliary command buffer, get one from the pool
 	if (!m_auxiliaryCommandBuffer)
@@ -100,9 +100,9 @@ void ICrRenderDevice::FinalizeDeletion()
 	m_gpuDeletionQueue->Finalize();
 }
 
-CrCommandBufferSharedHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
+CrCommandBufferHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
 {
-	return CrCommandBufferSharedHandle(CreateCommandBufferPS(descriptor));
+	return CrCommandBufferHandle(CreateCommandBufferPS(descriptor));
 }
 
 CrGPUFenceSharedHandle ICrRenderDevice::CreateGPUFence()

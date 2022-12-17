@@ -50,8 +50,6 @@ VS_OUT UbershaderVS(VS_IN IN)
 	return output;
 }
 
-const float3 lightDirection = float3(0.0, -1.0, 0.0);
-
 UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 {
 	UbershaderPixelOutput pixelOutput = (UbershaderPixelOutput)0;
@@ -85,9 +83,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	surface.albedoSRGB   = diffuse0.rgb;
 	surface.albedoLinear = surface.albedoSRGB * surface.albedoSRGB;
 
-    float NdotL = dot(normalize(surface.pixelNormalWorld.xyz), -lightDirection);
-	
-    float3 litSurface = surface.albedoSRGB.xyz; // * NdotL; // +surface.F0 * pow(;
+    float3 litSurface = surface.albedoSRGB.xyz * IN.color.rgb; // +surface.F0 * pow(;
 
 #if (EMaterialShaderVariant == EMaterialShaderVariant_Debug)
 

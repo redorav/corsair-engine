@@ -49,4 +49,14 @@ public:
 	};
 
 	static CrRenderMeshHandle CreateCylinder(const CrCylinderDescriptor& descriptor);
+
+	struct CrConeDescriptor
+	{
+		uint32_t subdivisionAxis = 0;
+		uint32_t subdivisionLength = 0;
+		float3 scale = 1.0f;
+		float4 color = 1.0f;
+	};
+
+	static CrRenderMeshHandle CreateCone(const CrConeDescriptor& descriptor);
 };

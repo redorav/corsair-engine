@@ -520,3 +520,118 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 	return cylinderMesh;
 }
+
+CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor)
+{
+	// Minimum of 3 vertices
+	uint32_t vertexCountRingLogical = descriptor.subdivisionAxis + 3;
+
+	// Vertices at each ring (minimum of 3) + 1 for when we wrap around (needs different UV)
+	uint32_t vertexCountRingPhysical = vertexCountRingLogical + 1;
+
+	// Number of rings * vertex count of each ring + two extra vertices at the bottom and the top
+	uint32_t vertexCount = vertexCountRingPhysical * (descriptor.subdivisionLength + 1) + 2;
+
+	// Side triangles follow the number of vertices
+	uint32_t triangleCountSides = vertexCountRingLogical;
+
+	// Triangles for the base follow the number of vertices
+	uint32_t triangleCountBase = vertexCountRingLogical;
+
+	uint32_t triangleCount = triangleCountSides + triangleCountBase;
+
+	uint32_t indexCount = triangleCount * 3;
+
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
+
+	float4 colorAsByte = descriptor.color * 255.0f;
+
+	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
+	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
+	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
+	{
+		uint32_t currentVertex = 0;
+		uint32_t currentIndex = 0;
+
+		// Add top tip vertex
+		{
+			positionData[currentVertex].position = { 0.0_h, (half)descriptor.scale.y, 0.0_h };
+			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
+			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].tangent = { 255, 0, 0 };
+			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+			currentVertex++;
+		}
+
+		float fh = 0.0f;
+
+		for (uint32_t v = 0; v <= vertexCountRingLogical; ++v)
+		{
+			float theta = (2.0f * CrMath::Pi * v) / vertexCountRingLogical;
+			float fw = (float)v / vertexCountRingLogical;
+
+			float x = cosf(theta);
+			float z = sinf(theta);
+
+			float3 position = float3(x, fh, z) * descriptor.scale;
+
+			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
+
+			additionalData[currentVertex].uv = { (half)fw, (half)fh };
+
+			float3 normal = float3(x, 0.0f, z);
+
+			float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+
+			additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+
+			additionalData[currentVertex].tangent = { 255, 0, 0 };
+
+			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+
+			currentVertex++;
+		}
+
+		// Triangles for the top
+		for (uint32_t v = 0; v < vertexCountRingLogical; ++v)
+		{
+			indexData[currentIndex++] = (uint16_t)0;
+			indexData[currentIndex++] = (uint16_t)(v + 2);
+			indexData[currentIndex++] = (uint16_t)(v + 1);
+		}
+
+		// Triangles for the base
+		for (uint32_t v = 0; v < vertexCountRingLogical; ++v)
+		{
+			indexData[currentIndex++] = (uint16_t)(currentVertex);
+			indexData[currentIndex++] = (uint16_t)(v + 1);
+			indexData[currentIndex++] = (uint16_t)(v + 2);
+		}
+
+		// Add bottom vertex
+		{
+			positionData[currentVertex].position = { 0.0_h, 0.0_h, 0.0_h };
+			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
+			additionalData[currentVertex].normal = { 0, 0, 0 };
+			additionalData[currentVertex].tangent = { 255, 0, 0 };
+			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
+			currentVertex++;
+		}
+
+		CrAssertMsg(vertexCount == currentVertex, "Mismatch in number of vertices");
+		CrAssertMsg(indexCount == currentIndex, "Mismatch in number of indices");
+	}
+	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
+	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
+
+	CrRenderMeshHandle coneMesh = CrRenderMeshHandle(new CrRenderMesh());
+	coneMesh->AddVertexBuffer(positionBuffer);
+	coneMesh->AddVertexBuffer(additionalBuffer);
+	coneMesh->SetIndexBuffer(indexBuffer);
+
+	return coneMesh;
+}

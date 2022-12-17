@@ -346,8 +346,6 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 
 		CrHashMap<void*, uint32_t> materialMap;
 
-		modelDescriptor.materials.resize(gltfData->materials_count);
-
 		// Load materials. Store materials in table to meshes can index into them
 		for (uint32_t m = 0; m < gltfData->materials_count; ++m)
 		{
@@ -361,7 +359,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 			//ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.base_color_texture.texture, Textures::DiffuseTexture0);
 			//ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.base_color_texture.texture, Textures::DiffuseTexture0);
 
-			modelDescriptor.materials[m] = material;
+			modelDescriptor.AddMaterial(material);
 
 			materialMap.insert({ &gltfData->materials[m], m });
 		}
@@ -376,15 +374,17 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 			{
 				const cgltf_primitive& cgltfPrimitive = gltfMesh.primitives[p];
 				CrRenderMeshHandle renderMesh = LoadMesh(cgltfPrimitive);
-				modelDescriptor.meshes.push_back(renderMesh);
 
 				// Find material
 				const auto materialIndexIter = materialMap.find(cgltfPrimitive.material);
+				uint8_t materialIndex = 0;
 
 				if (materialIndexIter != materialMap.end())
 				{
-					modelDescriptor.materialIndices.push_back((uint8_t)materialIndexIter->second);
+					materialIndex = (uint8_t)materialIndexIter->second;
 				}
+
+				modelDescriptor.AddRenderMesh(renderMesh, materialIndex);
 			}
 		}
 

@@ -59,8 +59,7 @@ static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const ai
 		{
 			const aiMesh* mesh = scene->mMeshes[childNode->mMeshes[m]];
 			CrRenderMeshHandle renderMesh = CrModelDecoderASSIMP::LoadMesh(scene, mesh, childTransform);
-			modelDescriptor.meshes.push_back(renderMesh);
-			modelDescriptor.materialIndices.push_back((uint8_t)mesh->mMaterialIndex);
+			modelDescriptor.AddRenderMesh(renderMesh, (uint8_t)mesh->mMaterialIndex);
 		}
 
 		ProcessNode(scene, childNode, childTransform, modelDescriptor);
@@ -97,12 +96,10 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
 	const CrPath filePath = file->GetFilePath();
 
-	modelDescriptor.materials.resize(scene->mNumMaterials);
-
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
 		CrMaterialHandle material = LoadMaterial(scene->mMaterials[m], filePath);
-		modelDescriptor.materials[m] = material;
+		modelDescriptor.AddMaterial(material);
 	}
 
 	importer.FreeScene();

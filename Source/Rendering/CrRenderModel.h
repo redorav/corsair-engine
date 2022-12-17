@@ -22,11 +22,27 @@ using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 struct CrRenderModelDescriptor
 {
-	CrFixedVector<CrRenderMeshHandle, 256> meshes;
+	uint32_t AddMaterial(const CrMaterialHandle& material);
 
-	CrFixedVector<uint8_t, 256> materialIndices;
+	void AddRenderMesh(const CrRenderMeshHandle& renderMesh, uint8_t materialIndex);
 
-	CrFixedVector<CrMaterialHandle, 256> materials;
+	uint32_t GetMaterialCount() const { return (uint32_t)m_materials.size(); }
+
+	uint32_t GetRenderMeshCount() const { return (uint32_t)m_meshes.size(); }
+
+	const CrMaterialHandle& GetMaterial(uint32_t materialIndex) const { return m_materials[materialIndex]; }
+
+	const CrRenderMeshHandle& GetRenderMesh(uint32_t renderMeshIndex) const { return m_meshes[renderMeshIndex]; }
+
+	const uint32_t GetRenderMeshMaterial(uint32_t renderMeshIndex) const { return m_materialIndices[renderMeshIndex]; }
+
+private:
+
+	CrFixedVector<CrRenderMeshHandle, 256> m_meshes;
+
+	CrFixedVector<uint8_t, 256> m_materialIndices;
+
+	CrFixedVector<CrMaterialHandle, 256> m_materials;
 };
 
 class CrRenderModel

@@ -14,7 +14,7 @@ public:
 	{
 		uint32_t subdivisionX = 0;
 		uint32_t subdivisionY = 0;
-		float3 scale = 1.0f;
+		float4x4 transform = float4x4::identity();
 		float4 color = 1.0f;
 	};
 
@@ -25,7 +25,7 @@ public:
 		uint32_t subdivisionX = 0;
 		uint32_t subdivisionY = 0;
 		uint32_t subdivisionZ = 0;
-		float3 scale = 1.0f;
+		float4x4 transform = float4x4::identity();
 		float4 color = 1.0f;
 	};
 
@@ -34,7 +34,7 @@ public:
 	struct CrSphereDescriptor
 	{
 		uint32_t subdivision = 0;
-		float3 scale = 1.0f;
+		float4x4 transform = float4x4::identity();
 		float4 color = 1.0f;
 	};
 
@@ -44,7 +44,7 @@ public:
 	{
 		uint32_t subdivisionAxis = 0;
 		uint32_t subdivisionLength = 0;
-		float3 scale = 1.0f;
+		float4x4 transform = float4x4::identity();
 		float4 color = 1.0f;
 	};
 
@@ -54,7 +54,7 @@ public:
 	{
 		uint32_t subdivisionAxis = 0;
 		uint32_t subdivisionLength = 0;
-		float3 scale = 1.0f;
+		float4x4 transform = float4x4::identity();
 		float4 color = 1.0f;
 	};
 

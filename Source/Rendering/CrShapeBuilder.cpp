@@ -65,9 +65,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 			float fx = 0.0f;
 			for (uint32_t x = 0; x < vertexCountX; ++x, fx += dx)
 			{
-				float3 position = float3(fx, 0.5f, 1.0f - fy) * 2.0f - 1.0f;
+				float4 position = float4(fx, 0.5f, 1.0f - fy, 1.0f) * 2.0f - 1.0f;
 
-				position *= descriptor.scale;
+				position = mul(position, descriptor.transform);
 
 				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
@@ -204,21 +204,21 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 				float fw = 0.0f;
 				for (uint32_t w = 0; w < faceProperties.vertexCountW; ++w, fw += dw)
 				{
-					float3 cubePosition;
+					float4 cubePosition;
 
 					switch (face)
 					{
-						case cr3d::CubemapFace::PositiveX: cubePosition = { 1.0f, 1.0f - fh, fw }; break;
-						case cr3d::CubemapFace::NegativeX: cubePosition = { 0.0f, 1.0f - fh, 1.0f - fw }; break;
+						case cr3d::CubemapFace::PositiveX: cubePosition = { 1.0f, 1.0f - fh, fw, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeX: cubePosition = { 0.0f, 1.0f - fh, 1.0f - fw, 1.0f }; break;
 
-						case cr3d::CubemapFace::PositiveY: cubePosition = { fw, 1.0f, 1.0f - fh }; break;
-						case cr3d::CubemapFace::NegativeY: cubePosition = { fw, 0.0f, fh }; break;
+						case cr3d::CubemapFace::PositiveY: cubePosition = { fw, 1.0f, 1.0f - fh, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeY: cubePosition = { fw, 0.0f, fh, 1.0f }; break;
 
-						case cr3d::CubemapFace::PositiveZ: cubePosition = { 1.0f - fw, 1.0f - fh, 1.0f }; break;
-						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
+						case cr3d::CubemapFace::PositiveZ: cubePosition = { 1.0f - fw, 1.0f - fh, 1.0f, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f, 1.0f }; break;
 					}
 
-					cubePosition = (cubePosition * 2.0f - 1.0f) * descriptor.scale;
+					cubePosition = mul(cubePosition * 2.0f - 1.0f, descriptor.transform);
 
 					positionData[currentVertex].position = { (half)cubePosition.x, (half)cubePosition.y, (half)cubePosition.z };
 
@@ -325,9 +325,13 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f }; break;
 					}
 
-					float3 normal = normalize(cubePosition * 2.0f - 1.0f);
+					cubePosition = cubePosition * 2.0f - 1.0f;
 
-					float3 spherePosition = normal * descriptor.scale;
+					float4 spherePosition = float4(normalize(cubePosition), 1.0f);
+
+					spherePosition = mul(spherePosition, descriptor.transform);
+
+					float3 normal = normalize(spherePosition.xyz);
 
 					positionData[currentVertex].position = { (half)spherePosition.x, (half)spherePosition.y, (half)spherePosition.z };
 
@@ -417,7 +421,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add top tip vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, (half)descriptor.scale.y, 0.0_h };
+			float4 topTipPosition = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
+			positionData[currentVertex].position = { (half)topTipPosition.x, (half)topTipPosition.y, (half)topTipPosition.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
 			additionalData[currentVertex].normal = { 0, 255, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -446,7 +451,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 				float x = cosf(theta);
 				float z = sinf(theta);
 
-				float3 position = float3(x, fh, z) * descriptor.scale;
+				float4 position = mul(float4(x, fh, z, 1.0f), descriptor.transform);
 
 				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
@@ -498,7 +503,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add bottom tip vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, (half)-descriptor.scale.y, 0.0_h};
+			float4 bottomTipPosition = mul(float4(0.0f, -1.0f, 0.0f, 1.0f), descriptor.transform);
+			positionData[currentVertex].position = { (half)bottomTipPosition.x, (half)bottomTipPosition.y, (half)bottomTipPosition.z };
 			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
 			additionalData[currentVertex].normal = { 0, 0, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -558,7 +564,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 		// Add top tip vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, (half)descriptor.scale.y, 0.0_h };
+			float4 topTipPosition = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
+			positionData[currentVertex].position = { (half)topTipPosition.x, (half)topTipPosition.y, (half)topTipPosition.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
 			additionalData[currentVertex].normal = { 0, 255, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -576,7 +583,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 			float x = cosf(theta);
 			float z = sinf(theta);
 
-			float3 position = float3(x, fh, z) * descriptor.scale;
+			float4 position = mul(float4(x, fh, z, 1.0f), descriptor.transform);
 
 			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 

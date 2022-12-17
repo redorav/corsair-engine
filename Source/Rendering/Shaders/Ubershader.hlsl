@@ -106,9 +106,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 		litSurface = float3(1.0, 0.0, 0.0);
 	}
 
-#endif
-
-#if (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
+#elif (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);

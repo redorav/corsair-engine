@@ -620,7 +620,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 		// Add bottom vertex
 		{
-			positionData[currentVertex].position = { 0.0_h, 0.0_h, 0.0_h };
+			float4 position = mul(float4(0.0f, 0.0f, 0.0f, 1.0f), descriptor.transform);
+			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
 			additionalData[currentVertex].normal = { 0, 0, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };

@@ -22,13 +22,13 @@ GraphicsApis = {}
 
 -- Project Names
 ProjectCorsairEngine    = 'Corsair Engine'
-ProjectCrMath           = 'CrMath'
-ProjectCrRendering      = 'CrRendering'
+ProjectMath             = 'CrMath'
+ProjectRendering        = 'CrRendering'
 ProjectShaderCompiler   = 'CrShaderCompiler'
 ProjectShaders          = 'CrShaders'
 ProjectBuiltinShaders   = 'CrBuiltinShaders'
-ProjectCrResource       = 'CrResource'
-ProjectCrCore           = 'CrCore'
+ProjectResource         = 'CrResource'
+ProjectCore             = 'CrCore'
 ProjectUnitTests        = 'CrUnitTests'
 
 -- Generated Code Directories
@@ -244,9 +244,9 @@ project (ProjectCorsairEngine)
 	-- Libraries from other projects
 	links
 	{
-		ProjectCrCore,
-		ProjectCrRendering,
-		ProjectCrResource,
+		ProjectCore,
+		ProjectRendering,
+		ProjectResource,
 		ProjectUnitTests
 	}
 	
@@ -283,7 +283,7 @@ SourceShaderCompilerDirectory = SourceRenderingDirectory..'/ShaderCompiler'
 ShaderMetadataFilename = "ShaderMetadata"
 BuiltinShadersFilename = "BuiltinShaders"
 
-project(ProjectCrRendering)
+project(ProjectRendering)
 	kind('StaticLib')
 	pchheader('CrRendering_pch.h')
 	pchsource(SourceRenderingDirectory..'/CrRendering_pch.cpp')
@@ -414,7 +414,7 @@ project(ProjectShaderCompiler)
 	pchheader('CrShaderCompiler_pch.h')
 	pchsource(SourceShaderCompilerDirectory..'/CrShaderCompiler_pch.cpp')
 	
-	links { ProjectCrCore }
+	links { ProjectCore }
 
 	AddLibraryIncludes(SPIRVReflectLibrary)
 	LinkLibrary(SPIRVReflectLibrary)
@@ -443,7 +443,7 @@ SourceResourceDirectory = SourceDirectory..'/Resource'
 SourceImageDirectory = SourceResourceDirectory..'/Image'
 SourceModelDirectory = SourceResourceDirectory..'/Model'
 
-project(ProjectCrResource)
+project(ProjectResource)
 	kind('StaticLib')
 	pchheader('CrResource_pch.h')
 	pchsource(SourceResourceDirectory..'/CrResource_pch.cpp')
@@ -461,7 +461,7 @@ group('Core')
 
 SourceCoreDirectory = SourceDirectory..'/Core'
 
-project(ProjectCrCore)
+project(ProjectCore)
 	kind('StaticLib')
 	
 	pchheader('CrCore_pch.h')
@@ -486,7 +486,7 @@ project(ProjectCrCore)
 
 	filter {}
 
-project(ProjectCrMath)
+project(ProjectMath)
 	kind('StaticLib')
 	files { MathDirectory..'/**' }
 	includedirs { MathDirectory }

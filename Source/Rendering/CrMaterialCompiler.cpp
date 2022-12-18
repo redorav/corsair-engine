@@ -105,11 +105,6 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	// Generate header with defines
 	CrShaderHeaderGenerator shaderHeaderGenerator;
 
-	for (CrMaterialShaderVariant::T i = (CrMaterialShaderVariant::T)0; i < CrMaterialShaderVariant::Count; ++i)
-	{
-		shaderHeaderGenerator.DefineInt(GetMaterialShaderEnum(i), i);
-	}
-
 	CrString patchedShaderSource;
 	patchedShaderSource += shaderHeaderGenerator.GetString();
 	patchedShaderSource += CrShaderSources::Get().GetUbershaderSource();

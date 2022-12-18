@@ -60,7 +60,7 @@ void CrMaterialCompiler::Initialize()
 
 void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines)
 {
-	CrString materialShaderVariantDefine = "EMaterialShaderVariant="; materialShaderVariantDefine += GetMaterialShaderEnum(materialShaderDescriptor.shaderVariant);
+	CrString materialShaderVariantDefine = GetMaterialShaderEnum(materialShaderDescriptor.shaderVariant);
 	defines.AddDefine(materialShaderVariantDefine);
 }
 

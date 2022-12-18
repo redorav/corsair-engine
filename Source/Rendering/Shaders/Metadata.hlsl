@@ -1,4 +1,3 @@
-#include "Basic.hlsl"
 #include "Brdf.hlsl"
 #include "Common.hlsl"
 #include "Compute.hlsl"

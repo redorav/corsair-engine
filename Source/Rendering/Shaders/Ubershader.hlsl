@@ -7,12 +7,12 @@
 
 struct UbershaderPixelOutput
 {
-#if (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
+#if defined(EMaterialShaderVariant_GBuffer)
 	float4 albedoTarget   : SV_Target0;
 	float4 normalsTarget  : SV_Target1;
 	float4 materialTarget : SV_Target2;
 #else
-    float4 finalTarget : SV_Target0;
+  float4 finalTarget : SV_Target0;
 #endif
 };
 
@@ -68,7 +68,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	float3x3 tbn = float3x3(surface.vertexTangentWorld, surface.vertexBitangentWorld, surface.vertexNormalWorld);
 	
 	// Texture reads
-	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy) * IN.color;
+	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	
@@ -85,7 +85,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 
     float3 litSurface = surface.albedoSRGB.xyz * IN.color.rgb; // +surface.F0 * pow(;
 
-#if (EMaterialShaderVariant == EMaterialShaderVariant_Debug)
+#if defined(EMaterialShaderVariant_Debug)
 
 	float debugShaderMode = cb_DebugShader.debugProperties.x;
 
@@ -102,7 +102,9 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 		litSurface = float3(1.0, 0.0, 0.0);
 	}
 
-#elif (EMaterialShaderVariant == EMaterialShaderVariant_GBuffer)
+	pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint.a);
+
+#elif defined(EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);

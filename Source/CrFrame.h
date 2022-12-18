@@ -45,13 +45,12 @@ private:
 
 	uint32_t m_height = 0;
 
-	// Basic Shaders
+	// Ubershader Built-in shaders
 
-	CrBuiltinGraphicsPipeline m_basic2DPipeline;
-	CrBuiltinGraphicsPipeline m_basic3DPipeline;
+	CrBuiltinGraphicsPipeline m_basicUbershaderForward;
+	CrBuiltinGraphicsPipeline m_basicUbershaderGBuffer;
+	CrBuiltinGraphicsPipeline m_basicUbershaderDebug;
 
-	CrBuiltinGraphicsPipeline m_line2DPipeline;
-	CrBuiltinGraphicsPipeline m_line3DPipeline;
 
 	CrBuiltinComputePipeline m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;

@@ -1,0 +1,17 @@
+BasicUbershaderVS:
+  entrypoint: UbershaderVS
+  stage: Vertex
+
+BasicForwardUbershaderPS:
+  entrypoint: UbershaderPS
+  stage: Pixel
+
+BasicGBufferUbershaderPS:
+  entrypoint: UbershaderPS
+  stage: Pixel
+  defines: "EMaterialShaderVariant_GBuffer"
+
+BasicDebugUbershaderPS:
+  entrypoint: UbershaderPS
+  stage: Pixel
+  defines: "EMaterialShaderVariant_Debug"

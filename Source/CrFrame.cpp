@@ -248,33 +248,28 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	// Basic shaders
+	// Builtin ubershaders
 	{
-		CrGraphicsPipelineDescriptor lineGraphicsPipelineDescriptor;
-		lineGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
-		lineGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
-		lineGraphicsPipelineDescriptor.primitiveTopology = cr3d::PrimitiveTopology::LineList;
-		m_line3DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
+		CrGraphicsPipelineDescriptor forwardUbershaderDescriptor;
+		forwardUbershaderDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
+		forwardUbershaderDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+		m_basicUbershaderForward = CrBuiltinGraphicsPipeline(renderDevice.get(), forwardUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicForwardUbershaderPS);
 
-		lineGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_line2DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), lineGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicNoTransformVS, CrBuiltinShaders::BasicPS);
+		CrGraphicsPipelineDescriptor gbufferUbershaderDescriptor;
+		gbufferUbershaderDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::GBufferAlbedoAOFormat;
+		gbufferUbershaderDescriptor.renderTargets.colorFormats[1] = CrRendererConfig::GBufferNormalsFormat;
+		gbufferUbershaderDescriptor.renderTargets.colorFormats[2] = CrRendererConfig::GBufferMaterialFormat;
+		gbufferUbershaderDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+		m_basicUbershaderGBuffer = CrBuiltinGraphicsPipeline(renderDevice.get(), gbufferUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicGBufferUbershaderPS);
 
-		CrGraphicsPipelineDescriptor basicGraphicsPipelineDescriptor;
-		basicGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = m_swapchain->GetFormat();
-		basicGraphicsPipelineDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
-		m_basic3DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), basicGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicVS, CrBuiltinShaders::BasicPS);
-
-		basicGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_basic2DPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), basicGraphicsPipelineDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicNoTransformVS, CrBuiltinShaders::BasicPS);
+		CrGraphicsPipelineDescriptor debugUbershaderDescriptor;
+		debugUbershaderDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::DebugShaderFormat;
+		debugUbershaderDescriptor.renderTargets.depthFormat = m_depthStencilTexture->GetFormat();
+		m_basicUbershaderDebug = CrBuiltinGraphicsPipeline(renderDevice.get(), debugUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicDebugUbershaderPS);
 	}
 
-	{
-		m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::ExampleCompute);
-	}
-
-	{
-		m_mouseSelectionResolvePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::EditorMouseSelectionResolveCS);
-	}
+	m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::ExampleCompute);
+	m_mouseSelectionResolvePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::EditorMouseSelectionResolveCS);
 
 	{
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;

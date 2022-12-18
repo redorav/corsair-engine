@@ -8,8 +8,6 @@
 
 #include "CrVulkan.h"
 
-#include "Rendering/CrRendering.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Rendering/CrCPUStackAllocator.h"

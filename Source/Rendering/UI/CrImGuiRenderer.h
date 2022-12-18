@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/SmartPointers/CrSharedPtr.h"
-#include "Rendering/CrRendering.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrBuiltinPipeline.h"
@@ -35,8 +34,6 @@ private:
 	CrImGuiRenderer();
 
 	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
-
-	void UpdateBuffers(ImDrawData* data);
 
 	CrBuiltinGraphicsPipeline m_imguiGraphicsPipeline;
 

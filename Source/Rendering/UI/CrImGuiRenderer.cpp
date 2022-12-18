@@ -18,6 +18,7 @@
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/CrRenderGraph.h"
 #include "Rendering/CrRenderingResources.h"
+#include "Rendering/CrRendering.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

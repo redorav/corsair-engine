@@ -7,6 +7,7 @@
 
 #include "Rendering/CrImage.h"
 #include "Rendering/CrRendering.h"
+#include "Rendering/CrDataFormats.h"
 
 #define STBI_NO_STDIO
 #pragma warning(push, 0)

@@ -4,7 +4,10 @@
 #include "CrVMA.h"
 
 #include "CrVulkan.h"
+
 #include "Core/Logging/ICrDebug.h"
+
+#include "Rendering/CrRendering.h"
 
 VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 {

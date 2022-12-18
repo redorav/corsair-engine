@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrRendering.h"
+#include "Rendering/CrDataFormats.h"
 
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Containers/CrVector.h"

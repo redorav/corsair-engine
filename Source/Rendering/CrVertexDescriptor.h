@@ -7,6 +7,8 @@
 #include "Core/String/CrString.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrRendering.h"
+#include "Rendering/CrDataFormats.h"
 
 #include "Math/CrVectorT.h"
 

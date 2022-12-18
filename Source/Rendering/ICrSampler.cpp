@@ -2,8 +2,9 @@
 #include "ICrSampler.h"
 
 #include "Core/CrMacros.h"
-
 #include "Core/SmartPointers/CrSharedPtr.h"
+
+#include "Rendering/CrRendering.h"
 
 CrSamplerDescriptor::CrSamplerDescriptor() 
 	: minFilter(cr3d::Filter::Linear)

@@ -3,6 +3,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+#include "Rendering/CrRendering.h"
+
 DXGI_FORMAT crd3d::GetDXGIFormat(cr3d::DataFormat::T format)
 {
 	switch (format)

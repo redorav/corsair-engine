@@ -8,6 +8,7 @@
 #include "CrGPUBuffer_vk.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/CrShaderResourceMetadata.h"
+#include "Rendering/CrRendering.h"
 
 #include "Core/Containers/CrArray.h"
 #include "Core/Logging/ICrDebug.h"

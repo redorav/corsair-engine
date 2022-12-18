@@ -13,12 +13,40 @@ namespace cr3d
 	enum class TextureType : uint32_t;
 	using TextureUsageFlags = uint32_t;
 
-	enum class SampleCount : uint32_t;
-	
 	namespace ShaderStage { enum T : uint32_t; }
 
+	namespace ShaderStageFlags { enum T : uint32_t; }
+
 	namespace GraphicsApi { enum T : uint32_t; }
-}
+
+	namespace BufferUsage { enum T : uint32_t; }
+
+	namespace MemoryAccess { enum T : uint32_t; }
+
+	namespace ShaderResourceType { enum T : uint32_t; }
+
+	enum class AddressMode : uint32_t;
+	enum class BorderColor : uint32_t;
+	enum class BlendFactor : uint32_t;
+	enum class BlendOp : uint32_t;
+	enum class CompareOp : uint32_t;
+	enum class Filter : uint32_t;
+	enum class FrontFace : uint32_t;
+	enum class PrimitiveTopology : uint32_t;
+	enum class PolygonCullMode : uint32_t;
+	enum class PolygonFillMode : uint32_t;
+	enum class SampleCount : uint32_t;
+	enum class StencilOp : uint32_t;
+	enum class VertexInputRate : uint32_t;
+
+	enum class QueryType : uint32_t;
+	enum class CameraProjection : uint32_t;
+
+	struct TextureState;
+};
+
+enum class CrRenderTargetLoadOp : uint32_t;
+enum class CrRenderTargetStoreOp : uint32_t;
 
 // Forward declare shader resources
 namespace ConstantBuffers { enum T : uint8_t; }

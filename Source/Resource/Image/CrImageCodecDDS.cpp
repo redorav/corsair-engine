@@ -10,6 +10,7 @@
 
 #include "Rendering/CrImage.h"
 #include "Rendering/CrRendering.h"
+#include "Rendering/CrDataFormats.h"
 
 #include "ddspp.h"
 

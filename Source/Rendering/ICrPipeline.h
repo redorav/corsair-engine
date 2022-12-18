@@ -142,8 +142,7 @@ struct CrGraphicsPipelineDescriptor
 		
 		padding                   = 0;
 		
-		// Don't put a loop here to initialize the color write masks. It helps the compiler
-		// hoist the code outside of loops
+		// Don't put a loop here to initialize the color write masks
 		blendState.renderTargetBlends[0].colorWriteMask = cr3d::ColorWriteComponent::All;
 		blendState.renderTargetBlends[1].colorWriteMask = cr3d::ColorWriteComponent::All;
 		blendState.renderTargetBlends[2].colorWriteMask = cr3d::ColorWriteComponent::All;

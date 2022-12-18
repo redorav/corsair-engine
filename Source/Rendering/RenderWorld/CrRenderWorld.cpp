@@ -1,6 +1,6 @@
 #include "CrRendering_pch.h"
 
-#include "Rendering/CrRenderWorld.h"
+#include "Rendering/RenderWorld/CrRenderWorld.h"
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrCamera.h"
@@ -155,7 +155,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 	for (CrModelInstanceIndex instanceIndex(0); instanceIndex < m_numModelInstances; ++instanceIndex)
 	{
-		const CrRenderModelSharedHandle& renderModel = GetRenderModel(instanceIndex);
+		const CrRenderModelHandle& renderModel = GetRenderModel(instanceIndex);
 		const CrBoundingBox& modelBoundingBox = renderModel->GetBoundingBox();
 		float4x4 transform = GetTransform(instanceIndex);
 

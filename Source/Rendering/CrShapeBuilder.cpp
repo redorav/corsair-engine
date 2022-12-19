@@ -50,6 +50,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
+	
+	float4 minVertex = float4(FLT_MAX);
+	float4 maxVertex = float4(-FLT_MAX);
 
 	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
@@ -66,6 +69,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 			for (uint32_t x = 0; x < vertexCountX; ++x, fx += dx)
 			{
 				float4 position = float4(fx, 0.5f, 1.0f - fy, 1.0f) * 2.0f - 1.0f;
+
+				minVertex = min(minVertex, position);
+				maxVertex = max(maxVertex, position);
 
 				position = mul(position, descriptor.transform);
 
@@ -110,11 +116,14 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 		CrAssertMsg(indexCount == currentIndex, "Mismatch in number of indices");
 	}
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
+	
+	CrBoundingBox boundingBox((maxVertex + minVertex).xyz * 0.5f, (maxVertex - minVertex).xyz * 0.5f);
 
 	CrRenderMeshHandle quadMesh = CrRenderMeshHandle(new CrRenderMesh());
 	quadMesh->AddVertexBuffer(positionBuffer);
 	quadMesh->AddVertexBuffer(additionalBuffer);
 	quadMesh->SetIndexBuffer(indexBuffer);
+	quadMesh->SetBoundingBox(boundingBox);
 
 	return quadMesh;
 }
@@ -162,6 +171,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
+	float4 minVertex = float4(FLT_MAX);
+	float4 maxVertex = float4(-FLT_MAX);
+
 	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
@@ -204,23 +216,26 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 				float fw = 0.0f;
 				for (uint32_t w = 0; w < faceProperties.vertexCountW; ++w, fw += dw)
 				{
-					float4 cubePosition;
+					float4 position;
 
 					switch (face)
 					{
-						case cr3d::CubemapFace::PositiveX: cubePosition = { 1.0f, 1.0f - fh, fw, 1.0f }; break;
-						case cr3d::CubemapFace::NegativeX: cubePosition = { 0.0f, 1.0f - fh, 1.0f - fw, 1.0f }; break;
+						case cr3d::CubemapFace::PositiveX: position = { 1.0f, 1.0f - fh, fw, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeX: position = { 0.0f, 1.0f - fh, 1.0f - fw, 1.0f }; break;
 
-						case cr3d::CubemapFace::PositiveY: cubePosition = { fw, 1.0f, 1.0f - fh, 1.0f }; break;
-						case cr3d::CubemapFace::NegativeY: cubePosition = { fw, 0.0f, fh, 1.0f }; break;
+						case cr3d::CubemapFace::PositiveY: position = { fw, 1.0f, 1.0f - fh, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeY: position = { fw, 0.0f, fh, 1.0f }; break;
 
-						case cr3d::CubemapFace::PositiveZ: cubePosition = { 1.0f - fw, 1.0f - fh, 1.0f, 1.0f }; break;
-						case cr3d::CubemapFace::NegativeZ: cubePosition = { fw, 1.0f - fh, 0.0f, 1.0f }; break;
+						case cr3d::CubemapFace::PositiveZ: position = { 1.0f - fw, 1.0f - fh, 1.0f, 1.0f }; break;
+						case cr3d::CubemapFace::NegativeZ: position = { fw, 1.0f - fh, 0.0f, 1.0f }; break;
 					}
 
-					cubePosition = mul(cubePosition * 2.0f - 1.0f, descriptor.transform);
+					position = mul(position * 2.0f - 1.0f, descriptor.transform);
 
-					positionData[currentVertex].position = { (half)cubePosition.x, (half)cubePosition.y, (half)cubePosition.z };
+					minVertex = min(minVertex, position);
+					maxVertex = max(maxVertex, position);
+
+					positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
@@ -261,10 +276,13 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrBoundingBox boundingBox((maxVertex + minVertex).xyz * 0.5f, (maxVertex - minVertex).xyz * 0.5f);
+
 	CrRenderMeshHandle cubeMesh = CrRenderMeshHandle(new CrRenderMesh());
 	cubeMesh->AddVertexBuffer(positionBuffer);
 	cubeMesh->AddVertexBuffer(additionalBuffer);
 	cubeMesh->SetIndexBuffer(indexBuffer);
+	cubeMesh->SetBoundingBox(boundingBox);
 
 	return cubeMesh;
 }
@@ -286,6 +304,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
+
+	float4 minVertex = float4(FLT_MAX);
+	float4 maxVertex = float4(-FLT_MAX);
 
 	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
@@ -330,6 +351,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 					float4 spherePosition = float4(normalize(cubePosition), 1.0f);
 
 					spherePosition = mul(spherePosition, descriptor.transform);
+
+					minVertex = min(minVertex, spherePosition);
+					maxVertex = max(maxVertex, spherePosition);
 
 					float3 normal = normalize(spherePosition.xyz);
 
@@ -376,10 +400,13 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrBoundingBox boundingBox((maxVertex + minVertex).xyz * 0.5f, (maxVertex - minVertex).xyz * 0.5f);
+
 	CrRenderMeshHandle sphereMesh = CrRenderMeshHandle(new CrRenderMesh());
 	sphereMesh->AddVertexBuffer(positionBuffer);
 	sphereMesh->AddVertexBuffer(additionalBuffer);
 	sphereMesh->SetIndexBuffer(indexBuffer);
+	sphereMesh->SetBoundingBox(boundingBox);
 
 	return sphereMesh;
 }
@@ -412,6 +439,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
+	float4 minVertex = float4(FLT_MAX);
+	float4 maxVertex = float4(-FLT_MAX);
+
 	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
@@ -421,8 +451,10 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add top tip vertex
 		{
-			float4 topTipPosition = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
-			positionData[currentVertex].position = { (half)topTipPosition.x, (half)topTipPosition.y, (half)topTipPosition.z };
+			float4 position = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
+			minVertex = min(minVertex, position);
+			maxVertex = max(maxVertex, position);
+			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
 			additionalData[currentVertex].normal = { 0, 255, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -452,6 +484,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 				float z = sinf(theta);
 
 				float4 position = mul(float4(x, fh, z, 1.0f), descriptor.transform);
+
+				minVertex = min(minVertex, position);
+				maxVertex = max(maxVertex, position);
 
 				positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
@@ -503,8 +538,10 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 		// Add bottom tip vertex
 		{
-			float4 bottomTipPosition = mul(float4(0.0f, -1.0f, 0.0f, 1.0f), descriptor.transform);
-			positionData[currentVertex].position = { (half)bottomTipPosition.x, (half)bottomTipPosition.y, (half)bottomTipPosition.z };
+			float4 position = mul(float4(0.0f, -1.0f, 0.0f, 1.0f), descriptor.transform);
+			minVertex = min(minVertex, position);
+			maxVertex = max(maxVertex, position);
+			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
 			additionalData[currentVertex].normal = { 0, 0, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -519,10 +556,13 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrBoundingBox boundingBox((maxVertex + minVertex).xyz * 0.5f, (maxVertex - minVertex).xyz * 0.5f);
+
 	CrRenderMeshHandle cylinderMesh = CrRenderMeshHandle(new CrRenderMesh());
 	cylinderMesh->AddVertexBuffer(positionBuffer);
 	cylinderMesh->AddVertexBuffer(additionalBuffer);
 	cylinderMesh->SetIndexBuffer(indexBuffer);
+	cylinderMesh->SetBoundingBox(boundingBox);
 
 	return cylinderMesh;
 }
@@ -555,6 +595,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
+	float4 minVertex = float4(FLT_MAX);
+	float4 maxVertex = float4(-FLT_MAX);
+
 	ComplexVertexPosition* positionData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 	ComplexVertexAdditional* additionalData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
@@ -564,8 +607,10 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 		// Add top tip vertex
 		{
-			float4 topTipPosition = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
-			positionData[currentVertex].position = { (half)topTipPosition.x, (half)topTipPosition.y, (half)topTipPosition.z };
+			float4 position = mul(float4(0.0f, 1.0f, 0.0f, 1.0f), descriptor.transform);
+			minVertex = min(minVertex, position);
+			maxVertex = max(maxVertex, position);
+			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
 			additionalData[currentVertex].normal = { 0, 255, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
@@ -584,6 +629,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 			float z = sinf(theta);
 
 			float4 position = mul(float4(x, fh, z, 1.0f), descriptor.transform);
+
+			minVertex = min(minVertex, position);
+			maxVertex = max(maxVertex, position);
 
 			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 
@@ -621,6 +669,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 		// Add bottom vertex
 		{
 			float4 position = mul(float4(0.0f, 0.0f, 0.0f, 1.0f), descriptor.transform);
+			minVertex = min(minVertex, position);
+			maxVertex = max(maxVertex, position);
 			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 1.0_h };
 			additionalData[currentVertex].normal = { 0, 0, 0 };
@@ -636,10 +686,13 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(indexBuffer->GetHardwareBuffer());
 
+	CrBoundingBox boundingBox((maxVertex + minVertex).xyz * 0.5f, (maxVertex - minVertex).xyz * 0.5f);
+
 	CrRenderMeshHandle coneMesh = CrRenderMeshHandle(new CrRenderMesh());
 	coneMesh->AddVertexBuffer(positionBuffer);
 	coneMesh->AddVertexBuffer(additionalBuffer);
 	coneMesh->SetIndexBuffer(indexBuffer);
+	coneMesh->SetBoundingBox(boundingBox);
 
 	return coneMesh;
 }

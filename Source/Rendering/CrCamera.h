@@ -27,10 +27,11 @@ public:
 
 	void Update();
 
-	// TODO Remove all these in favor of putting things in the transform
-	// Basically Translate, Rotate, etc all go in the transform
 	void Translate(const float3& t);
+
 	void Rotate(const float3& r);
+
+	void SetPosition(const float3& p);
 
 	void SetFilmWidth(float filmWidth);
 

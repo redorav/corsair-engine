@@ -76,6 +76,11 @@ void CrCamera::Rotate(const float3& r)
 	m_rightWorldSpace  = mul(m_rightWorldSpace,  rotationXY);
 }
 
+void CrCamera::SetPosition(const float3& p)
+{
+	m_position = p;
+}
+
 void CrCamera::SetFilmWidth(float filmWidth)
 {
 	m_filmWidthMm = filmWidth;

@@ -55,6 +55,8 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 			m_pipelines[meshIndex][pipelineVariant] = pipeline;
 		}
 	}
+
+	ComputeBoundingBoxFromMeshes();
 }
 
 void CrRenderModel::ComputeBoundingBoxFromMeshes()

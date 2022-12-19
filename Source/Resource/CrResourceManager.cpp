@@ -38,8 +38,6 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 
 		CrRenderModelHandle model = modelDecoder->Decode(file);
 
-		model->ComputeBoundingBoxFromMeshes();
-
 		return model;
 	}
 	else

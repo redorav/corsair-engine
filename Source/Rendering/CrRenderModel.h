@@ -79,9 +79,9 @@ public:
 		return (uint32_t)m_renderMeshes.size();
 	}
 
-	void ComputeBoundingBoxFromMeshes();
-
 private:
+
+	void ComputeBoundingBoxFromMeshes();
 
 	CrBoundingBox m_boundingBox;
 

@@ -285,7 +285,7 @@ BuiltinShadersFilename = "BuiltinShaders"
 
 project(ProjectRendering)
 	kind('StaticLib')
-	pchheader('CrRendering_pch.h')
+	pchheader('Rendering/CrRendering_pch.h')
 	pchsource(SourceRenderingDirectory..'/CrRendering_pch.cpp')
 	dependson { ProjectShaders } -- This depends on the shaders. Shaders in turn depends on the shader compiler
 	dependson { ProjectBuiltinShaders }

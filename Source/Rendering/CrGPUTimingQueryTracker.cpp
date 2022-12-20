@@ -1,6 +1,6 @@
-#include "CrRendering_pch.h"
+#include "Rendering/CrRendering_pch.h"
 
-#include "CrGPUTimingQueryTracker.h"
+#include "Rendering/CrGPUTimingQueryTracker.h"
 #include "Rendering/ICrGPUQueryPool.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrCommandBuffer.h"

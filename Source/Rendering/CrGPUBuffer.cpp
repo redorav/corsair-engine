@@ -1,6 +1,7 @@
-#include "CrRendering_pch.h"
-#include "CrGPUBuffer.h"
-#include "ICrRenderDevice.h"
+#include "Rendering/CrRendering_pch.h"
+
+#include "Rendering/CrGPUBuffer.h"
+#include "Rendering/ICrRenderDevice.h"
 
 #include "Core/Logging/ICrDebug.h"
 

@@ -1,6 +1,7 @@
-#include "CrRendering_pch.h"
+#include "Rendering/CrRendering_pch.h"
 
-#include "CrCamera.h"
+#include "Rendering/CrCamera.h"
+
 #include "Math/CrMath.h"
 #include "Math/CrHlslppVectorFloat.h"
 #include "Math/CrHlslppQuaternion.h"

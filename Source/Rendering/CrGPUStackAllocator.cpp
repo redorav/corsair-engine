@@ -1,12 +1,8 @@
-#pragma once
+#include "Rendering/CrRendering_pch.h"
 
-#include "CrRendering_pch.h"
-
-#include "CrGPUStackAllocator.h"
-
-#include "ICrRenderDevice.h"
-
-#include "CrGPUBuffer.h"
+#include "Rendering/CrGPUStackAllocator.h"
+#include "Rendering/ICrRenderDevice.h"
+#include "Rendering/CrGPUBuffer.h"
 
 #include "Core/CrAlignment.h"
 

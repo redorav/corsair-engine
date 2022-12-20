@@ -50,9 +50,12 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 			const CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
 
-			CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+			if (graphicsShader)
+			{
+				CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
-			m_pipelines[meshIndex][pipelineVariant] = pipeline;
+				m_pipelines[meshIndex][pipelineVariant] = pipeline;
+			}
 		}
 	}
 

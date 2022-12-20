@@ -1,9 +1,9 @@
-#include "CrRendering_pch.h"
+#include "Rendering/CrRendering_pch.h"
 
-#include "CrPipelineStateManager.h"
-#include "ICrShader.h"
-#include "ICrPipeline.h"
-#include "ICrRenderDevice.h"
+#include "Rendering/CrPipelineStateManager.h"
+#include "Rendering/ICrShader.h"
+#include "Rendering/ICrPipeline.h"
+#include "Rendering/ICrRenderDevice.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"

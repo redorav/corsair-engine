@@ -1,8 +1,6 @@
-#pragma once
+#include "Rendering/CrRendering_pch.h"
 
-#include "CrRendering_pch.h"
-
-#include "CrCPUStackAllocator.h"
+#include "Rendering/CrCPUStackAllocator.h"
 
 CrCPUStackAllocator::~CrCPUStackAllocator()
 {

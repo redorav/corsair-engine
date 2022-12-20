@@ -1,6 +1,6 @@
-#include "CrRendering_pch.h"
-#include "CrImage.h"
+#include "Rendering/CrRendering_pch.h"
 
+#include "Rendering/CrImage.h"
 #include "Rendering/CrRendering.h"
 
 CrImageDescriptor::CrImageDescriptor()

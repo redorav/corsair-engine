@@ -38,8 +38,8 @@ void CrCamera::SetupPerspective(float filmWidth, float filmHeight, float nearPla
 void CrCamera::LookAt(const float3& target, const float3& up)
 {
 	float3 vz = normalize(target - m_position);
-	float3 vx = normalize(cross(vz, up));
-	float3 vy = cross(vx, vz);
+	float3 vx = normalize(cross(up, vz));
+	float3 vy = cross(vz, vx);
 
 	m_lookAtWorldSpace = vz;
 	m_rightWorldSpace = vx;
@@ -49,9 +49,9 @@ void CrCamera::LookAt(const float3& target, const float3& up)
 void CrCamera::RotateAround(const float3& pivot, const float3& axis, float angle)
 {
 	quaternion rotation = quaternion::rotation_axis(axis, angle * CrMath::Deg2Rad);
-	float3 currentDirection = m_position - pivot; // Get current direction
+	float3 currentDirection = m_position - pivot;       // Get current direction
 	float3 direction = mul(currentDirection, rotation); // Rotate with quaternion
-	m_position = pivot + direction; // Get position
+	m_position = pivot + direction;                     // Get position
 }
 
 void CrCamera::Translate(const float3& t)

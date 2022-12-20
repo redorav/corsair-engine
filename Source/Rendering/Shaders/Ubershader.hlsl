@@ -54,7 +54,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 {
 	UbershaderPixelOutput pixelOutput = (UbershaderPixelOutput)0;
 
-	Surface surface;
+	Surface surface = CreateDefaultSurface();
 	
 	// Interpolants
 	surface.vertexNormalWorld = IN.normal.xyz;
@@ -67,23 +67,24 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	
 	float3x3 tbn = float3x3(surface.vertexTangentWorld, surface.vertexBitangentWorld, surface.vertexNormalWorld);
 	
-	// Texture reads
+#if defined(TEXTURED)
+
 	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
 	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
-	
+
 	surface.roughness = 1.0 - spec0.a;
 	surface.F0 = spec0.rgb;
-	
+
 	surface.pixelNormalTangent = normal0.xyz * 2.0 - 1.0;
-	
-	// Space transformation
 	surface.pixelNormalWorld = mul(surface.pixelNormalTangent, tbn);
-	
-	surface.albedoSRGB   = diffuse0.rgb;
+
+	surface.albedoSRGB = diffuse0.rgb;
 	surface.albedoLinear = surface.albedoSRGB * surface.albedoSRGB;
 
-    float3 litSurface = surface.albedoSRGB.xyz * IN.color.rgb; // +surface.F0 * pow(;
+#endif
+
+    float3 litSurface = surface.albedoSRGB.xyz * IN.color.rgb;
 
 #if defined(EMaterialShaderVariant_Debug)
 
@@ -102,14 +103,14 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 		litSurface = float3(1.0, 0.0, 0.0);
 	}
 
-	pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint.a);
+	pixelOutput.finalTarget = float4(litSurface, cb_Color.tint.a);
 
 #elif defined(EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 #else
-    pixelOutput.finalTarget = float4(litSurface, 1.0 * cb_Color.tint.a);
+    pixelOutput.finalTarget = float4(litSurface, cb_Color.tint.a);
 #endif
 	
 	return pixelOutput;

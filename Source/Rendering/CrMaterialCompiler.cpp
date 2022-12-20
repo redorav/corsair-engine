@@ -104,6 +104,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 	// Generate header with defines
 	CrShaderHeaderGenerator shaderHeaderGenerator;
+	shaderHeaderGenerator.Define("TEXTURED");
 
 	CrString patchedShaderSource;
 	patchedShaderSource += shaderHeaderGenerator.GetString();

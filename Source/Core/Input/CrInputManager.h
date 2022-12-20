@@ -135,7 +135,14 @@ struct MouseState
 
 struct KeyboardState
 {
+	// Whether key was 'clicked' (held and raised)
+	CrBitset<KeyboardKey::Count> keyClicked;
+
+	// Whether key was pressed this tick (started to hold)
 	CrBitset<KeyboardKey::Count> keyPressed;
+
+	// Whether key is held down
+	CrBitset<KeyboardKey::Count> keyHeld;
 };
 
 struct GamepadState
@@ -164,6 +171,9 @@ public:
 
 		m_mouseState.buttonClicked = 0;
 		m_mouseState.buttonPressed = 0;
+
+		m_keyboardState.keyClicked = 0;
+		m_keyboardState.keyPressed = 0;
 	}
 
 	const MouseState& GetMouseState() const
@@ -193,12 +203,20 @@ public:
 
 	void OnKeyboardDown(KeyboardKey::Code code)
 	{
-		m_keyboardState.keyPressed.set(code, true);
+		m_keyboardState.keyPressed[code] = true;
+
+		m_keyboardState.keyHeld[code] = true;
 	}
 
 	void OnKeyboardUp(KeyboardKey::Code code)
 	{
-		m_keyboardState.keyPressed.set(code, false);
+		// If we used to be pressed but now we're not, we'll mark as clicked (for this frame)
+		if (m_keyboardState.keyHeld[code])
+		{
+			m_keyboardState.keyClicked[code] = true;
+		}
+
+		m_keyboardState.keyHeld[code] = false;
 	}
 
 	void OnMouseMove(int32_t x, int32_t y)

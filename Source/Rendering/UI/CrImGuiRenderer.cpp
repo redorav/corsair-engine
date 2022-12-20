@@ -184,7 +184,7 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 
 	for (uint32_t k = 0; k < KeyboardKey::Count; ++k)
 	{
-		io.KeysDown[k] = keyboardState.keyPressed[k];
+		io.KeysDown[k] = keyboardState.keyHeld[k];
 	}
 
 	ImGui::NewFrame();

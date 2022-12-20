@@ -419,8 +419,8 @@ void CrFrame::Process()
 	bool isMouseClicked = mouseState.buttonClicked[MouseButton::Left];
 	
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
-	bool isEscapeClicked = keyboardState.keyPressed[KeyboardKey::Escape];
-	bool isLeftShiftClicked = keyboardState.keyPressed[KeyboardKey::LeftShift];
+	bool isEscapeClicked = keyboardState.keyHeld[KeyboardKey::Escape];
+	bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
 
 	if (isEscapeClicked)
 	{
@@ -1028,38 +1028,38 @@ void CrFrame::UpdateCamera()
 
 	float translationSpeed = 5.0f;
 
-	if (keyboard.keyPressed[KeyboardKey::LeftShift])
+	if (keyboard.keyHeld[KeyboardKey::LeftShift])
 	{
 		translationSpeed *= 10.0f;
 	}
 
 	// TODO Hack to get a bit of movement on the camera
-	if (keyboard.keyPressed[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
 		m_camera->Translate(currentRight * -translationSpeed * frameDelta);
 	}
 	
-	if (keyboard.keyPressed[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
 		m_camera->Translate(currentRight * translationSpeed * frameDelta);
 	}
 	
-	if (keyboard.keyPressed[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
 		m_camera->Translate(currentLookAt * translationSpeed * frameDelta);
 	}
 	
-	if (keyboard.keyPressed[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
 		m_camera->Translate(currentLookAt * -translationSpeed * frameDelta);
 	}
 	
-	if (keyboard.keyPressed[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
 	{
 		m_camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
 	}
 	
-	if (keyboard.keyPressed[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
+	if (keyboard.keyHeld[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
 	{
 		m_camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
 	}

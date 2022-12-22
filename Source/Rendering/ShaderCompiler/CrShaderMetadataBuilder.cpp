@@ -228,7 +228,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
 	
 	// Maybe there is a better way of not writing these headers directly. They depend on the physical
 	// structure of the code which can change
-	metadataCpp += "#include \"CrRendering_pch.h\"\n";
+	metadataCpp += "#include \"Rendering/CrRendering_pch.h\"\n";
 	metadataCpp += "#include \"ShaderMetadata.h\"\n\n";
 	metadataCpp += "\n";
 

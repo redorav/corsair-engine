@@ -8,8 +8,6 @@ class ICrOSWindow
 {
 public:
 
-	static void Initialize();
-
 	ICrOSWindow(uint32_t width, uint32_t height);
 
 	~ICrOSWindow();

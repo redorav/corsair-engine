@@ -2,7 +2,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppVectorFloatType.h"
 
 struct CrBoundingBox
 {

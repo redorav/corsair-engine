@@ -4,6 +4,7 @@
 
 #include "Core/Containers/CrArray.h"
 
+#include "Math/CrHlslppVectorFloat.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
 // These projected corners are before the division by w

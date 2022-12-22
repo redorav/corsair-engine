@@ -3,7 +3,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderMesh.h"
 
-#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppVectorFloatType.h"
 
 class CrShapeBuilder
 {

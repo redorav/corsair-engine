@@ -8,7 +8,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/CrRenderModelInstance.h"
+#include "Rendering/RenderWorld/CrRenderModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloat.h"
 

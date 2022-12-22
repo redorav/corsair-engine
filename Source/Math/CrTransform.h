@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Math/CrHlslppVectorFloat.h"
-#include "Math/CrHlslppQuaternion.h"
+#include "Math/CrHlslppVectorFloatType.h"
+#include "Math/CrHlslppQuaternionType.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
 class CrTransform

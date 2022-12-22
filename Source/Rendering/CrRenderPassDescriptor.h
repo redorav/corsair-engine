@@ -4,7 +4,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppVectorFloatType.h"
 
 using CrRenderPassNameString = CrFixedString32;
 

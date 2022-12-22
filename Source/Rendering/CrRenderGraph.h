@@ -11,7 +11,7 @@
 #include "Core/CrTypedId.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Math/CrHlslppVectorFloat.h"
+#include "Math/CrHlslppVectorFloatType.h"
 
 using CrRenderGraphSetupFunction = CrFixedFunction<32, void(CrRenderGraph& renderGraph)>;
 using CrRenderGraphExecutionFunction = CrFixedFunction<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;

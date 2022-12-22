@@ -447,6 +447,7 @@ inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount,
 
 	CrRenderingStatistics::AddDrawcall();
 	CrRenderingStatistics::AddVertices(vertexCount);
+	CrRenderingStatistics::AddInstances(instanceCount);
 }
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
@@ -457,6 +458,7 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 
 	CrRenderingStatistics::AddDrawcall();
 	CrRenderingStatistics::AddVertices(indexCount * instanceCount);
+	CrRenderingStatistics::AddInstances(instanceCount);
 }
 
 inline void ICrCommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)

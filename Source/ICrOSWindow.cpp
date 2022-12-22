@@ -21,7 +21,7 @@ ICrOSWindow::~ICrOSWindow()
 
 bool ICrOSWindow::GetIsMinimized() const
 {
-	return (SDL_GetWindowFlags(m_window) & SDL_WINDOW_MINIMIZED) == SDL_WINDOW_MINIMIZED;
+	return (SDL_GetWindowFlags(m_window) & SDL_WINDOW_MINIMIZED);
 }
 
 void* ICrOSWindow::GetNativeWindowHandle() const

@@ -170,9 +170,13 @@ struct CrVertexDescriptor;
 // Visibility
 struct CrBoundingBox;
 
-// Render World objects
+// Render World
+
 class CrCamera;
 using CrCameraHandle = CrSharedPtr<CrCamera>;
+
+class CrRenderWorld;
+using CrRenderWorldHandle = CrSharedPtr<CrRenderWorld>;
 
 // RenderGraph
 class CrRenderGraph;

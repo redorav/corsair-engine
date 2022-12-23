@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EASTL/array.h>
+#include "Core/CRSTL/array.h"
 #include <EASTL/bitset.h>
 #include <EASTL/deque.h>
 #include <EASTL/fixed_vector.h>

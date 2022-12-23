@@ -8,14 +8,9 @@
 #include "Math/CrHlslppMatrixFloat.h"
 
 // These projected corners are before the division by w
-void CrVisibility::ComputeObbProjection
-(
-	const CrBoundingBox& obb,
-	const float4x4& worldTransform,
-	const float4x4& viewProjectionMatrix,
-	CrArray<float4, 8>& projectedCorners)
+void CrVisibility::ComputeObbProjection(const CrBoundingBox& obb, const float4x4& worldTransform, const float4x4& view2ProjectionMatrix, CrBoxVertices& projectedCorners)
 {
-	float4x4 worldViewProjectionMatrix = mul(worldTransform, viewProjectionMatrix);
+	float4x4 worldViewProjectionMatrix = mul(worldTransform, view2ProjectionMatrix);
 
 	float4 cornerMin = float4(obb.center, 1.0f) - float4(obb.extents, 0.0f);
 	float4 cornerMax = float4(obb.center, 1.0f) + float4(obb.extents, 0.0f);

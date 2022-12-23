@@ -16,10 +16,8 @@ namespace eastl
 	template <typename T> struct equal_to;
 
 	template <bool bCondition, class ConditionIsTrueType, class ConditionIsFalseType> struct type_select;
-	
-	// Containers
-	template<typename T, size_t N> struct array;
 
+	// Containers
 	template <size_t N, typename WordType> class bitset;
 
 	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
@@ -77,11 +75,16 @@ namespace eastl
 	// Functional
 	template<int N, typename R>
 	class fixed_function;
-}
+};
+
+namespace crstl
+{
+	template<typename T, size_t N> struct array;
+};
 
 // Containers
 template<typename T, size_t N>
-using CrArray = eastl::array<T, N>;
+using CrArray = crstl::array<T, N>;
 
 template<size_t N, typename WordType = size_t>
 using CrBitset = eastl::bitset<N, WordType>;

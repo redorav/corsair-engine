@@ -915,9 +915,7 @@ void CrFrame::DrawDebugUI()
 			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
-			ImGui::Text("Drawcalls: %i Vertices: %i", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetVertexCount());
-
-			ImGui::Text("Selected Entity ID: %d", CurrentSelectionData.entityId);
+			ImGui::Text("Drawcalls: %d Instances: %d Vertices: %d", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetInstanceCount(), CrRenderingStatistics::GetVertexCount());
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 

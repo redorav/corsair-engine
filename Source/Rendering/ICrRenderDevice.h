@@ -28,6 +28,17 @@ namespace CrRenderingFeature
 	};
 }
 
+struct CrDriverVersion
+{
+	CrDriverVersion() = default;
+
+	uint32_t major = 0;
+
+	uint32_t minor = 0;
+
+	uint32_t patch = 0;
+};
+
 struct CrRenderDeviceProperties
 {
 	// We can choose to search for a vendor. If we don't have it, we choose the best available one
@@ -36,7 +47,14 @@ struct CrRenderDeviceProperties
 	// Actual vendor we selected
 	cr3d::GraphicsVendor::T vendor = cr3d::GraphicsVendor::Unknown;
 
+	// Graphics API
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+
+	// Just for display
+	CrFixedString16 graphicsApiDisplay;
+
+	// Version of the driver
+	CrDriverVersion driverVersion;
 
 	bool isUMA = false; // Whether a unified memory architecture is used here
 

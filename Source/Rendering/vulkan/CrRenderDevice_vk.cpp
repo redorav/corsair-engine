@@ -91,7 +91,7 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, 
 	if (!pipelineCacheData.empty())
 	{
 		const VkPipelineCacheHeader& pipelineCacheHeader = reinterpret_cast<VkPipelineCacheHeader&>(*pipelineCacheData.data());
-		bool matchesUUID = memcmp(pipelineCacheHeader.uuid, m_vkPhysicalDeviceProperties.pipelineCacheUUID, VK_UUID_SIZE) == 0;
+		bool matchesUUID = memcmp(pipelineCacheHeader.uuid, m_vkPhysicalDeviceProperties2.properties.pipelineCacheUUID, VK_UUID_SIZE) == 0;
 
 		if (matchesUUID)
 		{
@@ -457,10 +457,10 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		cr3d::GraphicsVendor::T graphicsVendor = cr3d::GraphicsVendor::FromVendorID(vkPhysicalDeviceProperties.vendorID);
 
 		uint32_t priority = 0;
-		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU   ? (1 << 31) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? (1 << 31) : 0;
 		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ? (1 << 30) : 0;
-		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU    ? (1 << 29) : 0;
-		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU            ? (1 << 28) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU ? (1 << 29) : 0;
+		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU ? (1 << 28) : 0;
 
 		if (maxPriorityDevice.priority < priority)
 		{
@@ -501,20 +501,103 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		}
 	}
 
-	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties);
+	// Enumerate device extensions
+	{
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, nullptr);
+		CrVector<VkExtensionProperties> extensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, extensions.data());
+
+		for (const VkExtensionProperties& extension : extensions)
+		{
+			m_supportedDeviceExtensions.insert(extension.extensionName);
+		}
+	}
+
+	// Get initial properties from a function we know is supported in version 1.0
+	// This is here only to get the Vulkan version supported by this physical device
+	uint32_t vulkanVersion = 0;
+	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2.properties);
+	vulkanVersion = m_vkPhysicalDeviceProperties2.properties.apiVersion;
 
 	// Populate the render device properties into the platform-independent structure
-	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties.vendorID);
-	m_renderDeviceProperties.description = m_vkPhysicalDeviceProperties.deviceName;
-	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties.limits.maxUniformBufferRange;
-	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties.limits.maxImageDimension1D;
-	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties.limits.maxImageDimension2D;
-	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties.limits.maxImageDimension3D;
-	m_renderDeviceProperties.isUMA = m_vkPhysicalDeviceProperties.deviceType & VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
+	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);
+
+	VkPhysicalDeviceVulkan11Properties vulkan11Properties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES };
+	VkPhysicalDeviceVulkan12Properties vulkan12Properties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES };
+
+	VkDriverId driverId = VK_DRIVER_ID_MAX_ENUM;
+
+	if (m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::NVIDIA)
+	{
+		driverId = VK_DRIVER_ID_NVIDIA_PROPRIETARY;
+	}
+	else if (m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::Intel)
+	{
+		driverId = VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS;
+	}
+	else if(m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::AMD)
+	{
+		driverId = VK_DRIVER_ID_AMD_PROPRIETARY;
+	}
+
+	bool isVulkan11 = vulkanVersion >= VK_VERSION_1_1;
+	bool isVulkan12 = vulkanVersion >= VK_VERSION_1_2;
+
+	// Starting from Vulkan 1.1 we have this alternative available. There is also an extension that basically no one supports
+	if (isVulkan11)
+	{
+		m_vkPhysicalDeviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+		m_vkPhysicalDeviceProperties2.pNext = &vulkan11Properties;
+
+		// Starting from 1.2 we get even more properties
+		if (isVulkan12)
+		{
+			vulkan11Properties.pNext = &vulkan12Properties;
+		}
+
+		vkGetPhysicalDeviceProperties2(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2);
+
+		if (isVulkan12)
+		{
+			driverId = vulkan12Properties.driverID;
+		}
+	}
+
+	uint32_t driverVersionEncoded = m_vkPhysicalDeviceProperties2.properties.driverVersion;
+
+	m_renderDeviceProperties.driverVersion.major = VK_API_VERSION_MAJOR(driverVersionEncoded);
+	m_renderDeviceProperties.driverVersion.minor = VK_API_VERSION_MINOR(driverVersionEncoded);
+	m_renderDeviceProperties.driverVersion.patch = VK_API_VERSION_PATCH(driverVersionEncoded);
+
+	// https://github.com/baldurk/renderdoc/blob/v1.x/renderdoc/driver/vulkan/vk_common.cpp
+	if (driverId == VK_DRIVER_ID_NVIDIA_PROPRIETARY)
+	{
+		m_renderDeviceProperties.driverVersion.major = ((uint32_t)(driverVersionEncoded) >> (8 + 8 + 6)) & 0x3ff;
+		m_renderDeviceProperties.driverVersion.minor = ((uint32_t)(driverVersionEncoded) >> (8 + 6)) & 0xff;
+
+		uint32_t secondary = ((uint32_t)(driverVersionEncoded) >> 6) & 0x0ff;
+		uint32_t tertiary = driverVersionEncoded & 0x03f;
+
+		m_renderDeviceProperties.driverVersion.patch = (secondary << 8) | tertiary;
+	}
+	else if (driverId == VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS)
+	{
+		m_renderDeviceProperties.driverVersion.major = ((uint32_t)(driverVersionEncoded) >> 14) & 0x3fff;
+		m_renderDeviceProperties.driverVersion.minor = (uint32_t)(driverVersionEncoded) & 0x3fff;
+		m_renderDeviceProperties.driverVersion.patch = 0;
+	}
+
+	m_renderDeviceProperties.description = m_vkPhysicalDeviceProperties2.properties.deviceName;
+	m_renderDeviceProperties.maxConstantBufferRange = m_vkPhysicalDeviceProperties2.properties.limits.maxUniformBufferRange;
+	m_renderDeviceProperties.maxTextureDimension1D = m_vkPhysicalDeviceProperties2.properties.limits.maxImageDimension1D;
+	m_renderDeviceProperties.maxTextureDimension2D = m_vkPhysicalDeviceProperties2.properties.limits.maxImageDimension2D;
+	m_renderDeviceProperties.maxTextureDimension3D = m_vkPhysicalDeviceProperties2.properties.limits.maxImageDimension3D;
+	m_renderDeviceProperties.isUMA = m_vkPhysicalDeviceProperties2.properties.deviceType & VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
 
 	// A pipeline cache belonging to renderdoc is invalid (it never has the same hash), so we don't want to 
 	// store it or even delete a previous cache just because renderdoc can't use or create one.
-	uint8_t* cacheUUID = m_vkPhysicalDeviceProperties.pipelineCacheUUID;
+	uint8_t* cacheUUID = m_vkPhysicalDeviceProperties2.properties.pipelineCacheUUID;
 	m_isValidPipelineCache = !(cacheUUID[0] == 'r' && cacheUUID[1] == 'd' && cacheUUID[2] == 'o' && cacheUUID[3] == 'c');
 
 	// Loop through all available formats and add to supported lists. These will be useful later 
@@ -545,19 +628,6 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT)
 		{
 			m_supportedRenderTargetFormats.insert(format);
-		}
-	}
-
-	// Enumerate device extensions
-	{
-		uint32_t extensionCount;
-		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, nullptr);
-		CrVector<VkExtensionProperties> extensions(extensionCount);
-		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, extensions.data());
-
-		for (const VkExtensionProperties& extension : extensions)
-		{
-			m_supportedDeviceExtensions.insert(extension.extensionName);
 		}
 	}
 

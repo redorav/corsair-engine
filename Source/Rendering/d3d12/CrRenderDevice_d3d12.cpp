@@ -114,11 +114,35 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	HRESULT hResult = S_OK;
 
-	hResult = D3D12CreateDevice(m_dxgiAdapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_d3d12Device));
-	CrAssertMsg(SUCCEEDED(hResult), "Error creating D3D12 device");
+	struct FeatureLevelString
+	{
+		D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_1_0_CORE;
+		const char* version = nullptr;
+	};
+
+	// We'll try the higher first, then go down the list
+	FeatureLevelString featureLevels[] =
+	{
+		{ D3D_FEATURE_LEVEL_12_2, "12.2" },
+		{ D3D_FEATURE_LEVEL_12_1, "12.1" },
+		{ D3D_FEATURE_LEVEL_12_0, "12.0" }
+	};
+
+	uint32_t currentFeatureLevel = 0;
+	FeatureLevelString selectedFeatureLevel;
+	
+	while (D3D12CreateDevice(m_dxgiAdapter, featureLevels[currentFeatureLevel].level, IID_PPV_ARGS(&m_d3d12Device)) != S_OK && currentFeatureLevel < sizeof_array(featureLevels))
+	{
+		currentFeatureLevel++;
+	}
+
+	selectedFeatureLevel = featureLevels[currentFeatureLevel];
+
+	CrAssertMsg(m_d3d12Device != nullptr, "Error creating D3D12 device");
 
 	// Parse render device properties
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
+	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", cr3d::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), selectedFeatureLevel.version);
 	m_renderDeviceProperties.description.append_convert<wchar_t>(adapterDescriptor.Description);
 	m_renderDeviceProperties.gpuMemoryBytes = adapterDescriptor.DedicatedVideoMemory;
 

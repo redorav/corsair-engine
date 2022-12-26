@@ -14,7 +14,7 @@ public:
 
 	CrRenderSystemVulkan(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
-	VkInstance GetVkInstance() const;
+	VkInstance GetVkInstance() const { return m_vkInstance; }
 
 	bool IsVkInstanceExtensionSupported(const CrString& extension);
 
@@ -35,8 +35,3 @@ private:
 
 	CrVector<const char*> m_instanceLayers;
 };
-
-inline VkInstance CrRenderSystemVulkan::GetVkInstance() const
-{
-	return m_vkInstance;
-}

@@ -26,7 +26,7 @@ public:
 
 	VkPipelineCache GetVkPipelineCache() const { return m_vkPipelineCache; }
 
-	VkPhysicalDeviceProperties GetVkPhysicalDeviceProperties() const { return m_vkPhysicalDeviceProperties; }
+	VkPhysicalDeviceProperties GetVkPhysicalDeviceProperties() const { return m_vkPhysicalDeviceProperties2.properties; }
 
 	VmaAllocator GetVmaAllocator() const { return m_vmaAllocator; }
 
@@ -141,7 +141,7 @@ private:
 	VkPhysicalDeviceMemoryProperties m_vkPhysicalDeviceMemoryProperties;
 
 	// Stores the different hardware limits reported by this device, e.g. maximum buffer or texture sizes, queue priorities, etc
-	VkPhysicalDeviceProperties m_vkPhysicalDeviceProperties;
+	VkPhysicalDeviceProperties2 m_vkPhysicalDeviceProperties2;
 
 	VmaAllocator m_vmaAllocator;
 

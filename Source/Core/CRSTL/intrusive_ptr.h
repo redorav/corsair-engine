@@ -94,10 +94,11 @@ namespace crstl
 		T* m_ptr = nullptr;
 	};
 
-	template<typename T>
-	class intrusive_interface
+	class intrusive_ptr_interface
 	{
 	public:
+
+		virtual ~intrusive_ptr_interface() {}
 
 		virtual int32_t add_ref()
 		{

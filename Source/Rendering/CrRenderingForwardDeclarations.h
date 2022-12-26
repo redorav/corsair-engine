@@ -173,7 +173,7 @@ struct CrBoundingBox;
 // Render World
 
 class CrCamera;
-using CrCameraHandle = CrSharedPtr<CrCamera>;
+using CrCameraHandle = CrIntrusivePtr<CrCamera>;
 
 class CrRenderWorld;
 using CrRenderWorldHandle = CrSharedPtr<CrRenderWorld>;

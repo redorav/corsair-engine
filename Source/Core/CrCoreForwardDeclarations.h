@@ -80,6 +80,8 @@ namespace eastl
 namespace crstl
 {
 	template<typename T, size_t N> struct array;
+
+	template<typename T> class intrusive_ptr;
 };
 
 // Containers
@@ -138,6 +140,9 @@ using CrSharedPtr = eastl::shared_ptr<T>;
 
 template <typename T, typename D = eastl::default_delete<T>>
 using CrUniquePtr = eastl::unique_ptr<T, D>;
+
+template<typename T>
+using CrIntrusivePtr = crstl::intrusive_ptr<T>;
 
 // Strings
 using CrString = eastl::string;

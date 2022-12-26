@@ -36,6 +36,19 @@ namespace crstl
 			}
 		}
 
+		intrusive_ptr(const intrusive_ptr<T>& ptr) : m_ptr(ptr.m_ptr)
+		{
+			if (m_ptr != nullptr)
+			{
+				intrusive_ptr_add_ref(m_ptr);
+			}
+		}
+
+		intrusive_ptr(intrusive_ptr<T>&& ptr) : m_ptr(ptr.m_ptr)
+		{
+			ptr.m_ptr = nullptr;
+		}
+
 		~intrusive_ptr()
 		{
 			if (m_ptr)
@@ -64,6 +77,52 @@ namespace crstl
 				{
 					intrusive_ptr_release(ptr_temp);
 				}
+			}
+
+			return *this;
+		}
+
+		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr)
+		{
+			if (m_ptr != ptr.m_ptr)
+			{
+				T* const ptr_temp = m_ptr;
+
+				// Add a reference to the new pointer
+				if (ptr.m_ptr)
+				{
+					intrusive_ptr_add_ref(ptr.m_ptr);
+				}
+
+				// Assign to member pointer
+				m_ptr = ptr.m_ptr;
+
+				// Release reference from the old pointer we used to hold on to
+				if (ptr_temp)
+				{
+					intrusive_ptr_release(ptr_temp);
+				}
+			}
+
+			return *this;
+		}
+
+		intrusive_ptr& operator = (intrusive_ptr<T>&& ptr)
+		{
+			if (m_ptr != ptr.m_ptr)
+			{
+				T* const ptr_temp = m_ptr;
+
+				// Assign to member pointer
+				m_ptr = ptr.m_ptr;
+
+				// Release reference from the old pointer we used to hold on to
+				if (ptr_temp)
+				{
+					intrusive_ptr_release(ptr_temp);
+				}
+
+				ptr.m_ptr = nullptr;
 			}
 
 			return *this;
@@ -109,12 +168,6 @@ namespace crstl
 		virtual int32_t release_ref()
 		{
 			m_refcount--;
-
-			if (m_refcount == 0)
-			{
-				// Delete the thing
-			}
-
 			return m_refcount;
 		}
 

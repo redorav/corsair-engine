@@ -176,7 +176,7 @@ class CrCamera;
 using CrCameraHandle = CrIntrusivePtr<CrCamera>;
 
 class CrRenderWorld;
-using CrRenderWorldHandle = CrSharedPtr<CrRenderWorld>;
+using CrRenderWorldHandle = CrIntrusivePtr<CrRenderWorld>;
 
 // RenderGraph
 class CrRenderGraph;

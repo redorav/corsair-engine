@@ -516,9 +516,14 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 
 	// Get initial properties from a function we know is supported in version 1.0
 	// This is here only to get the Vulkan version supported by this physical device
-	uint32_t vulkanVersion = 0;
+
 	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2.properties);
-	vulkanVersion = m_vkPhysicalDeviceProperties2.properties.apiVersion;
+	uint32_t vulkanVersion = m_vkPhysicalDeviceProperties2.properties.apiVersion;
+	uint32_t vulkanVersionMajor = VK_API_VERSION_MAJOR(vulkanVersion);
+	uint32_t vulkanVersionMinor = VK_API_VERSION_MINOR(vulkanVersion);
+	uint32_t vulkanVersionPatch = VK_API_VERSION_PATCH(vulkanVersion);
+
+	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %d.%d.%d", cr3d::GraphicsApi::ToString(cr3d::GraphicsApi::Vulkan), vulkanVersionMajor, vulkanVersionMinor, vulkanVersionPatch);
 
 	// Populate the render device properties into the platform-independent structure
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);

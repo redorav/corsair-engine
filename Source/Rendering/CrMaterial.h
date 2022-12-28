@@ -4,12 +4,10 @@
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/ICrPipeline.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
-
-class CrMaterial;
-using CrMaterialHandle = CrSharedPtr<CrMaterial>;
 
 namespace CrMaterialBlendMode
 {
@@ -131,7 +129,7 @@ struct CrMaterialShaderDescriptor
 
 static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescriptor size mismatch");
 
-class CrMaterial
+class CrMaterial final : public CrIntrusivePtrInterface
 {
 public:
 

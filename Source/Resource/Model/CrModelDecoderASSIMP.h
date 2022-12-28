@@ -6,7 +6,7 @@ class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 class CrMaterial;
-using CrMaterialHandle = CrSharedPtr<CrMaterial>;
+using CrMaterialHandle = CrIntrusivePtr<CrMaterial>;
 
 struct aiScene;
 struct aiMesh;

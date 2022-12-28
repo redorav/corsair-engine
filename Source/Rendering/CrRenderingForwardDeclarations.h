@@ -136,6 +136,9 @@ struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderCompilerDefines;
 struct CrShaderReflectionHeader;
 
+class CrMaterial;
+using CrMaterialHandle = CrIntrusivePtr<CrMaterial>;
+
 // GPU Buffers
 class ICrHardwareGPUBuffer;
 using CrHardwareGPUBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;

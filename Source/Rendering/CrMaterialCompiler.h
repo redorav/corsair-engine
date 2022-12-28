@@ -6,9 +6,6 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/String/CrString.h"
 
-class CrMaterial;
-using CrMaterialHandle = CrSharedPtr<CrMaterial>;
-
 struct CrMaterialDescriptor;
 struct CrMaterialShaderDescriptor;
 

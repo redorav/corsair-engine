@@ -14,9 +14,6 @@
 class CrRenderModel;
 using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
-class CrMaterial;
-using CrMaterialHandle = CrSharedPtr<CrMaterial>;
-
 class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 

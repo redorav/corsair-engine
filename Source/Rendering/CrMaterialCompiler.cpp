@@ -123,7 +123,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	patchedSourceFile->Write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
 	patchedSourceFile = nullptr;
 
-	CrMaterialHandle material = CrMakeShared<CrMaterial>();
+	CrMaterialHandle material = CrMaterialHandle(new CrMaterial());
 
 	CrMaterialShaderDescriptor baseShaderDescriptor;
 	baseShaderDescriptor.blendMode = CrMaterialBlendMode::Opaque;

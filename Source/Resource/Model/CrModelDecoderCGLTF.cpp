@@ -25,9 +25,6 @@
 class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
-class CrMaterial;
-using CrMaterialHandle = CrSharedPtr<CrMaterial>;
-
 cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 {
 	switch (componentType)

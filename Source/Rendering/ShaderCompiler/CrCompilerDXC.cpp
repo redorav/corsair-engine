@@ -508,8 +508,11 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			CrPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 			pdbFilePath /= eastl::to_string(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
-			CrFileHandle file = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-			file->Write(bytecode.data(), bytecode.size());
+			CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+			if (pdbFile)
+			{
+				pdbFile->Write(bytecode.data(), bytecode.size());
+			}
 		}
 	
 		// This doesn't strip the reflection data we need to create the reflection header

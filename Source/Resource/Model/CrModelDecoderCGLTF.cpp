@@ -16,14 +16,12 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
-
-class CrRenderMesh;
-using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
 
 cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 {
@@ -59,7 +57,7 @@ void LoadAttribute(CrVector<T>& targetBuffer, const unsigned char* sourceBuffer,
 
 CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 {
-	CrRenderMeshHandle mesh = CrMakeShared<CrRenderMesh>();
+	CrRenderMeshHandle mesh = CrRenderMeshHandle(new CrRenderMesh());
 
 	// Index data
 	if (gltfPrimitive.indices != nullptr)

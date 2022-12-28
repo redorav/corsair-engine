@@ -12,9 +12,6 @@
 #include "Core/Containers/CrPair.h"
 #include "Core/Containers/CrArray.h"
 
-class CrRenderMesh;
-using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
-
 struct CrRenderModelDescriptor
 {
 	uint32_t AddMaterial(const CrMaterialHandle& material);

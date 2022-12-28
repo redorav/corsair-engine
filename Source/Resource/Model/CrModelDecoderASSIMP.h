@@ -2,11 +2,7 @@
 
 #include "ICrModelDecoder.h"
 
-class CrRenderMesh;
-using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
-
-class CrMaterial;
-using CrMaterialHandle = CrIntrusivePtr<CrMaterial>;
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 struct aiScene;
 struct aiMesh;

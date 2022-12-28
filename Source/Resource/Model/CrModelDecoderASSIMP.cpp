@@ -109,7 +109,7 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 
 CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform)
 {
-	CrRenderMeshHandle renderMesh = CrMakeShared<CrRenderMesh>();
+	CrRenderMeshHandle renderMesh = CrRenderMeshHandle(new CrRenderMesh());
 
 	bool hasTextureCoords      = mesh->HasTextureCoords(0);
 	bool hasNormals            = mesh->HasNormals();

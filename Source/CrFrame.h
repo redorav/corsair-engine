@@ -11,9 +11,6 @@
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
-class CrRenderModel;
-using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
-
 class CrFrame
 {
 public:

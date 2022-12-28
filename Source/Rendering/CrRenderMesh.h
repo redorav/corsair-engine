@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrVector.h"
 
 #include "Rendering/CrVisibility.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-class CrRenderMesh
+class CrRenderMesh final : public CrIntrusivePtrInterface
 {
 public:
 
@@ -39,5 +40,3 @@ private:
 
 	CrBoundingBox m_boundingBox;
 };
-
-using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;

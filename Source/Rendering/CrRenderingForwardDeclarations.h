@@ -195,3 +195,6 @@ using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint16_t>;
 
 class CrRenderModel;
 using CrRenderModelHandle = CrIntrusivePtr<CrRenderModel>;
+
+class CrRenderMesh;
+using CrRenderMeshHandle = CrIntrusivePtr<CrRenderMesh>;

@@ -26,6 +26,7 @@
 	
 	<package name="half">
 		<version id="1.12.0" file="half_1.12.0.zip" repository="github"/>
+		<version id="2.2.0_modified" file="half_2.2.0_modified.zip" repository="github"/>
 	</package>
 	
 	<package name="imgui">

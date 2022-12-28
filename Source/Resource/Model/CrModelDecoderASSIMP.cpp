@@ -104,7 +104,7 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 
 	importer.FreeScene();
 
-	return CrMakeShared<CrRenderModel>(modelDescriptor);
+	return CrRenderModelHandle(new CrRenderModel(modelDescriptor));
 }
 
 CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform)

@@ -192,3 +192,6 @@ using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint16_t>
 
 struct CrRenderGraphBufferResource;
 using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint16_t>;
+
+class CrRenderModel;
+using CrRenderModelHandle = CrIntrusivePtr<CrRenderModel>;

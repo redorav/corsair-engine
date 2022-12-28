@@ -387,7 +387,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 
 		cgltf_free(gltfData);
 
-		return CrMakeShared<CrRenderModel>(modelDescriptor);
+		return CrRenderModelHandle(new CrRenderModel(modelDescriptor));
 	}
 	else
 	{

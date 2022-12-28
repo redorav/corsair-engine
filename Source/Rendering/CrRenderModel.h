@@ -5,14 +5,12 @@
 #include "Rendering/CrMaterial.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/Containers/CrArray.h"
-
-class CrRenderModel;
-using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrRenderMesh;
 using CrRenderMeshHandle = CrSharedPtr<CrRenderMesh>;
@@ -42,7 +40,7 @@ private:
 	CrFixedVector<CrMaterialHandle, 256> m_materials;
 };
 
-class CrRenderModel
+class CrRenderModel final : public CrIntrusivePtrInterface
 {
 public:
 

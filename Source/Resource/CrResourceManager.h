@@ -1,11 +1,9 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 class CrShader;
-
-class CrRenderModel;
-using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
 class CrImage;
 using CrImageHandle = CrSharedPtr<CrImage>;

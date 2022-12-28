@@ -2,10 +2,12 @@
 
 #include "ICrFile.h"
 
-ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags)
+ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags, void* fileHandle, uint64_t fileSize)
 {
 	m_filePath = filePath;
 	m_openFlags = openFlags;
+	m_fileHandle = fileHandle;
+	m_fileSize = fileSize;
 }
 
 CrFileUniqueHandle ICrFile::OpenUnique(const char* filePath, FileOpenFlags::T openFlags)

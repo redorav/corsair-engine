@@ -55,19 +55,19 @@ class ICrFile final : public CrIntrusivePtrInterface
 {
 public:
 
-	ICrFile(const char* filePath, FileOpenFlags::T openFlags);
+	ICrFile(const char* filePath, FileOpenFlags::T openFlags, void* fileHandle, uint64_t fileSize);
 
-	virtual ~ICrFile() {}
+	~ICrFile();
 
 	size_t Read(void* memory, size_t bytes) const;
 
 	size_t Write(const void* memory, size_t bytes) const;
 
-	virtual void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset) = 0;
+	void Seek(SeekOrigin::T seekOrigin, int64_t byteOffset);
 
-	virtual void Rewind() = 0;
+	void Rewind();
 
-	virtual uint64_t GetSize() const = 0;
+	uint64_t GetSize() const;
 
 	FileOpenFlags::T GetFlags() const { return m_openFlags; }
 
@@ -80,7 +80,7 @@ public:
 	// Functions like FileExists also would want to be part of the file device
 	static CrFileHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
 
-	// Copy a file to a different locatioin
+	// Copy a file to a different location
 	static bool FileCopy(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);
 
 	// Unconditionally delete a file. If successfully deleted or file didn't exist, return true
@@ -108,15 +108,19 @@ public:
 
 private:
 
-	virtual size_t ReadPS(void* memory, size_t bytes) const = 0;
+	size_t ReadPS(void* memory, size_t bytes) const;
 
-	virtual size_t WritePS(const void* memory, size_t bytes) const = 0;
+	size_t WritePS(const void* memory, size_t bytes) const;
 
 	static ICrFile* OpenRaw(const char* filePath, FileOpenFlags::T openFlags);
 
 	CrPath m_filePath;
 
 	FileOpenFlags::T m_openFlags;
+
+	void* m_fileHandle = nullptr;
+
+	uint64_t m_fileSize = 0;
 };
 
 inline const char* ICrFile::GetFilePath() const

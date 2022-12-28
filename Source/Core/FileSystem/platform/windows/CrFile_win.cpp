@@ -1,6 +1,6 @@
 #include "CrCore_pch.h"
 
-#include "CrFile_win.h"
+#include "Core/FileSystem/ICrFile.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Function/CrFixedFunction.h"
@@ -72,7 +72,7 @@ ICrFile* ICrFile::OpenRaw(const char* filePath, FileOpenFlags::T openFlags)
 
 	uint64_t fileSize = liFileSize.QuadPart;
 
-	ICrFile* file = new CrFileWindows(filePath, openFlags, fileHandle, fileSize);
+	ICrFile* file = new ICrFile(filePath, openFlags, fileHandle, fileSize);
 
 	if (!(openFlags & FileOpenFlags::Append))
 	{
@@ -82,35 +82,27 @@ ICrFile* ICrFile::OpenRaw(const char* filePath, FileOpenFlags::T openFlags)
 	return file;
 }
 
-CrFileWindows::CrFileWindows(const char* filePath, FileOpenFlags::T openFlags, HANDLE fileHandle, uint64_t fileSize) 
-	: ICrFile(filePath, openFlags)
-	, m_fileHandle(fileHandle)
-	, m_fileSize (fileSize)
-{
-
-}
-
-CrFileWindows::~CrFileWindows()
+ICrFile::~ICrFile()
 {
 	CloseHandle(m_fileHandle);
 	// Handle error
 }
 
-size_t CrFileWindows::ReadPS(void* memory, size_t bytes) const
+size_t ICrFile::ReadPS(void* memory, size_t bytes) const
 {
 	DWORD numberOfBytesRead;
 	ReadFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesRead, nullptr);
 	return (size_t)numberOfBytesRead;
 }
 
-size_t CrFileWindows::WritePS(const void* memory, size_t bytes) const
+size_t ICrFile::WritePS(const void* memory, size_t bytes) const
 {
 	DWORD numberOfBytesWritten;
 	WriteFile(m_fileHandle, memory, (DWORD)bytes, &numberOfBytesWritten, nullptr);
 	return (size_t)numberOfBytesWritten;
 }
 
-void CrFileWindows::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)
+void ICrFile::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)
 {
 	LARGE_INTEGER liByteOffset;
 	liByteOffset.QuadPart = byteOffset;
@@ -144,12 +136,12 @@ void CrFileWindows::Seek(SeekOrigin::T seekOrigin, int64_t byteOffset)
 	}
 }
 
-void CrFileWindows::Rewind()
+void ICrFile::Rewind()
 {
 	SetFilePointer(m_fileHandle, 0, nullptr, FILE_BEGIN);
 }
 
-uint64_t CrFileWindows::GetSize() const
+uint64_t ICrFile::GetSize() const
 {
 	return m_fileSize;
 }

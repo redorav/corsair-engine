@@ -186,7 +186,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	// Create the rendering scratch. Start with 10MB
-	m_renderingStream = CrSharedPtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
+	m_renderingStream = CrIntrusivePtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
 	m_renderingStream->Initialize(10 * 1024 * 1024);
 
 	// Create a render world

@@ -1,10 +1,12 @@
 #pragma once
 
+#include "Core/SmartPointers/CrIntrusivePtr.h"
+
 #include "Math/CrMath.h"
 
 struct SDL_Window;
 
-class ICrOSWindow
+class ICrOSWindow : public CrIntrusivePtrInterface
 {
 public:
 

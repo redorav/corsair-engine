@@ -191,11 +191,13 @@ public:
 		}
 	}
 
-	void BeginRendering(const CrSharedPtr<CrCPUStackAllocator>& renderingStream);
+	void BeginRendering(const CrIntrusivePtr<CrCPUStackAllocator>& renderingStream);
 
 	void EndRendering();
 
+	//-------
 	// Editor
+	//-------
 
 	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
 
@@ -234,7 +236,7 @@ private:
 
 	// TODO light ids
 
-	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;
+	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;
 
 	// Camera data. We aren't doing data driven design for cameras as there won't be many
 	// and it's easier to manage this way

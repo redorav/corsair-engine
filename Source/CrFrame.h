@@ -14,9 +14,6 @@
 class CrRenderModel;
 using CrRenderModelHandle = CrSharedPtr<CrRenderModel>;
 
-class CrRenderWorld;
-using CrRenderWorldHandle = CrSharedPtr<CrRenderWorld>;
-
 class CrFrame
 {
 public:
@@ -90,7 +87,8 @@ private:
 	void* m_platformWindow = nullptr;
 	void* m_platformHandle = nullptr;
 
-	CrSharedPtr<CrCamera> m_camera;
+	CrCameraHandle m_camera;
+
 	Camera m_cameraConstantData;
 
 	CrRenderWorldHandle m_renderWorld;
@@ -100,5 +98,5 @@ private:
 	CrUniquePtr<CrGPUTimingQueryTracker> m_timingQueryTracker;
 
 	// This would need to be buffered to account for multiple threads
-	CrSharedPtr<CrCPUStackAllocator> m_renderingStream;
+	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;
 };

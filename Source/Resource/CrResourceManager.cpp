@@ -25,15 +25,15 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 
 	if (file)
 	{
-		CrSharedPtr<ICrModelDecoder> modelDecoder;
+		CrUniquePtr<ICrModelDecoder> modelDecoder;
 		CrPath extension = fullPath.extension();
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
-			modelDecoder = CrMakeShared<CrModelDecoderCGLTF>();
+			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderCGLTF());
 		}
 		else
 		{
-			modelDecoder = CrMakeShared<CrModelDecoderASSIMP>();
+			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderASSIMP());
 		}
 
 		CrRenderModelHandle model = modelDecoder->Decode(file);

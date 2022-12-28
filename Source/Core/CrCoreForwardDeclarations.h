@@ -186,7 +186,7 @@ using CrFixedFunction = eastl::fixed_function<SIZE_IN_BYTES, R>;
 class CrHash;
 
 class ICrFile;
-using CrFileHandle = CrSharedPtr<ICrFile>;
+using CrFileHandle = CrIntrusivePtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 class CrPath;

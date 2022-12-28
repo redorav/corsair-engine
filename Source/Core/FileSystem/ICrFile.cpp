@@ -2,8 +2,6 @@
 
 #include "ICrFile.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
-
 ICrFile::ICrFile(const char* filePath, FileOpenFlags::T openFlags)
 {
 	m_filePath = filePath;

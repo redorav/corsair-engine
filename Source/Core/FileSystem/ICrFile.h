@@ -5,12 +5,9 @@
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/String/CrFixedString.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include <cstdint>
-
-class ICrFile;
-using CrFileHandle = CrSharedPtr<ICrFile>;
-using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 struct CrDirectoryEntry
 {
@@ -54,7 +51,7 @@ namespace SeekOrigin
 	};
 }
 
-class ICrFile
+class ICrFile final : public CrIntrusivePtrInterface
 {
 public:
 

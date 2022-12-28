@@ -2,11 +2,9 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Image/CrImageForwardDeclarations.h"
 
 class CrShader;
-
-class CrImage;
-using CrImageHandle = CrSharedPtr<CrImage>;
 
 class CrResourceManager
 {

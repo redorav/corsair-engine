@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Containers/CrVector.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
@@ -35,7 +36,7 @@ struct CrImageDescriptor
 	cr3d::TextureType type;
 };
 
-class CrImage
+class CrImage final : public CrIntrusivePtrInterface
 {
 public:
 

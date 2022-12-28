@@ -58,17 +58,17 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 
 	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
-	CrSharedPtr<ICrImageDecoder> imageDecoder;
+	CrUniquePtr<ICrImageDecoder> imageDecoder;
 
 	if (file)
 	{
 		if (extension.comparei(".dds") == 0)
 		{
-			imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderDDS());
+			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderDDS());
 		}
 		else
 		{
-			imageDecoder = CrSharedPtr<ICrImageDecoder>(new CrImageDecoderSTB());
+			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderSTB());
 		}
 	}
 
@@ -90,31 +90,31 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath
 
 	if (file)
 	{
-		CrSharedPtr<ICrImageEncoder> imageEncoder;
+		CrUniquePtr<ICrImageEncoder> imageEncoder;
 
 		if (extension.comparei(".dds") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderDDS());
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderDDS());
 		}
 		else if(extension.comparei(".png") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::PNG));
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::PNG));
 		}
 		else if (extension.comparei(".jpg") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::JPG));
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::JPG));
 		}
 		else if (extension.comparei(".hdr") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::HDR));
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::HDR));
 		}
 		else if (extension.comparei(".tga") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::TGA));
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::TGA));
 		}
 		else if (extension.comparei(".bmp") == 0)
 		{
-			imageEncoder = CrSharedPtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::BMP));
+			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::BMP));
 		}
 
 		if (imageEncoder && imageEncoder->IsImageFormatSupported(image->GetFormat()))

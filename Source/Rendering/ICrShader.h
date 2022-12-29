@@ -4,9 +4,9 @@
 #include "Core/String/CrFixedString.h"
 #include "Core/FileSystem/CrPath.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
+#include "Core/SmartPointers/CrUniquePtr.h"
 
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrShaderReflectionHeader.h"
@@ -260,7 +260,7 @@ struct CrInputSignature
 };
 
 // Bytecode represents a shader code, e.g. vertex, pixel, etc
-class CrShaderBytecode
+class CrShaderBytecode : public CrIntrusivePtrInterface<CrShaderBytecode>
 {
 public:
 
@@ -327,7 +327,7 @@ struct CrGraphicsShaderDescriptor
 	CrVector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
-class ICrShader
+class ICrShader : public CrIntrusivePtrInterface<ICrShader>
 {
 public:
 

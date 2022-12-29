@@ -5,7 +5,6 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderMesh.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrFixedVector.h"

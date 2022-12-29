@@ -70,30 +70,30 @@ struct RWDataBufferMetadata;
 class ICrRenderSystem;
 
 class ICrRenderDevice;
-using CrRenderDeviceHandle = CrSharedPtr<ICrRenderDevice>;
+using CrRenderDeviceHandle = CrIntrusivePtr<ICrRenderDevice>;
 
 namespace CrCommandQueueType { enum T : uint32_t; }
 
 class ICrTexture;
-using CrTextureHandle = CrSharedPtr<ICrTexture>;
+using CrTextureHandle = CrIntrusivePtr<ICrTexture>;
 struct CrTextureDescriptor;
 
 class ICrSampler;
-using CrSamplerHandle = CrSharedPtr<ICrSampler>;
+using CrSamplerHandle = CrIntrusivePtr<ICrSampler>;
 struct CrSamplerDescriptor;
 
 class ICrSwapchain;
-using CrSwapchainHandle = CrSharedPtr<ICrSwapchain>;
+using CrSwapchainHandle = CrIntrusivePtr<ICrSwapchain>;
 struct CrSwapchainDescriptor;
 
 class ICrGPUFence;
-using CrGPUFenceHandle = CrSharedPtr<ICrGPUFence>;
+using CrGPUFenceHandle = CrIntrusivePtr<ICrGPUFence>;
 
 class ICrGPUSemaphore;
-using CrGPUSemaphoreHandle = CrSharedPtr<ICrGPUSemaphore>;
+using CrGPUSemaphoreHandle = CrIntrusivePtr<ICrGPUSemaphore>;
 
 class ICrCommandBuffer;
-using CrCommandBufferHandle = CrSharedPtr<ICrCommandBuffer>;
+using CrCommandBufferHandle = CrIntrusivePtr<ICrCommandBuffer>;
 struct CrCommandBufferDescriptor;
 
 struct CrRenderPassDescriptor;
@@ -102,7 +102,7 @@ struct CrComputePassDescriptor;
 // GPU Queries
 class ICrGPUQueryPool;
 struct CrGPUQueryPoolDescriptor;
-using CrGPUQueryPoolHandle = CrSharedPtr<ICrGPUQueryPool>;
+using CrGPUQueryPoolHandle = CrIntrusivePtr<ICrGPUQueryPool>;
 
 class CrGPUQueryDummy;
 using CrGPUQueryId = CrTypedId<CrGPUQueryDummy, uint32_t>;
@@ -113,24 +113,24 @@ class CrGPUTimingQueryTracker;
 
 // Shaders & Pipeline Objects
 class ICrGraphicsShader;
-using CrGraphicsShaderHandle = CrSharedPtr<ICrGraphicsShader>;
+using CrGraphicsShaderHandle = CrIntrusivePtr<ICrGraphicsShader>;
 struct CrGraphicsShaderDescriptor;
 
 class ICrComputeShader;
-using CrComputeShaderHandle = CrSharedPtr<ICrComputeShader>;
+using CrComputeShaderHandle = CrIntrusivePtr<ICrComputeShader>;
 struct CrComputeShaderDescriptor;
 
 class ICrGraphicsPipeline;
-using CrGraphicsPipelineHandle = CrSharedPtr<ICrGraphicsPipeline>;
+using CrGraphicsPipelineHandle = CrIntrusivePtr<ICrGraphicsPipeline>;
 struct CrGraphicsPipelineDescriptor;
 
 class ICrComputePipeline;
-using CrComputePipelineHandle = CrSharedPtr<ICrComputePipeline>;
+using CrComputePipelineHandle = CrIntrusivePtr<ICrComputePipeline>;
 struct CrComputePipelineDescriptor;
 
 // Shader Bytecode
 class CrShaderBytecode;
-using CrShaderBytecodeHandle = CrSharedPtr<CrShaderBytecode>;
+using CrShaderBytecodeHandle = CrIntrusivePtr<CrShaderBytecode>;
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
 struct CrShaderCompilerDefines;
@@ -141,29 +141,29 @@ using CrMaterialHandle = CrIntrusivePtr<CrMaterial>;
 
 // GPU Buffers
 class ICrHardwareGPUBuffer;
-using CrHardwareGPUBufferHandle = CrSharedPtr<ICrHardwareGPUBuffer>;
+using CrHardwareGPUBufferHandle = CrIntrusivePtr<ICrHardwareGPUBuffer>;
 struct CrHardwareGPUBufferDescriptor;
 
 class CrGPUBuffer;
-using CrGPUBufferHandle = CrSharedPtr<CrGPUBuffer>;
+using CrGPUBufferHandle = CrIntrusivePtr<CrGPUBuffer>;
 
 struct CrGPUBufferDescriptor;
 class CrGPUStackAllocator;
 
 class CrIndexBuffer;
-using CrIndexBufferHandle = CrSharedPtr<CrIndexBuffer>;
+using CrIndexBufferHandle = CrIntrusivePtr<CrIndexBuffer>;
 
 class CrVertexBuffer;
-using CrVertexBufferHandle = CrSharedPtr<CrVertexBuffer>;
+using CrVertexBufferHandle = CrIntrusivePtr<CrVertexBuffer>;
 
 template<typename Metadata>
 class CrStructuredBuffer;
 
 template<typename Metadata>
-using CrStructuredBufferHandle = CrSharedPtr<CrStructuredBuffer<Metadata>>;
+using CrStructuredBufferHandle = CrIntrusivePtr<CrStructuredBuffer<Metadata>>;
 
 class CrDataBuffer;
-using CrDataBufferHandle = CrSharedPtr<CrDataBuffer>;
+using CrDataBufferHandle = CrIntrusivePtr<CrDataBuffer>;
 
 typedef CrFixedFunction<4, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 

@@ -4,7 +4,7 @@
 
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 template<CrStreamType::T StreamTypeT>
 class CrFileStream final : public ICrStream

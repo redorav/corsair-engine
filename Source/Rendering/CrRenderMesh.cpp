@@ -3,11 +3,21 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "CrRenderMesh.h"
 
+CrRenderMesh::~CrRenderMesh()
+{
+
+}
+
 void CrRenderMesh::AddVertexBuffer(const CrVertexBufferHandle& vertexBuffer)
 {
 	m_vertexBuffers.push_back(vertexBuffer);
 
 	MergeVertexDescriptors();
+}
+
+void CrRenderMesh::SetIndexBuffer(const CrIndexBufferHandle& indexBuffer)
+{
+	m_indexBuffer = indexBuffer;
 }
 
 // TODO Figure out best way of passing multiple references

@@ -15,6 +15,14 @@ CrGPUStackAllocator::CrGPUStackAllocator(ICrRenderDevice* renderDevice, const Cr
 	m_hardwareBuffer = m_renderDevice->CreateHardwareGPUBuffer(gpuBufferDescriptor);
 }
 
+CrGPUStackAllocator::~CrGPUStackAllocator()
+{
+	if (m_currentPointer)
+	{
+		End();
+	}
+}
+
 void CrGPUStackAllocator::Begin()
 {
 	CrAssertMsg(m_currentPointer == nullptr, "Did you call end?");

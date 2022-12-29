@@ -9,7 +9,6 @@
 
 #include "Core/CrSort.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Logging/ICrDebug.h"
 
 CrRenderWorld::CrRenderWorld()

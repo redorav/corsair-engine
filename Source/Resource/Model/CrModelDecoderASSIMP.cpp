@@ -2,7 +2,6 @@
 
 #include "CrModelDecoderASSIMP.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/FileSystem/CrPath.h"

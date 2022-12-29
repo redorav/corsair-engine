@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Rendering/CrStackAllocator.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
@@ -15,13 +14,7 @@ public:
 
 	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
-	~CrGPUStackAllocator()
-	{
-		if (m_currentPointer)
-		{
-			End();
-		}
-	}
+	~CrGPUStackAllocator();
 
 	void Begin();
 

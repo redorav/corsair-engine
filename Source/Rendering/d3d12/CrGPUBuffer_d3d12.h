@@ -13,6 +13,8 @@ public:
 
 	CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
+	virtual ~CrHardwareGPUBufferD3D12() override;
+
 	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
 
 	D3D12_RESOURCE_STATES GetDefaultResourceState() const { return m_d3d12InitialState; }
@@ -26,6 +28,4 @@ private:
 	ID3D12Resource* m_d3d12Resource;
 
 	D3D12_RESOURCE_STATES m_d3d12InitialState;
-
-	ID3D12Device* m_d3d12Device;
 };

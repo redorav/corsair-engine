@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrBuiltinPipeline.h"
+#include "Rendering/ICrTexture.h"
 
 struct ImDrawData;
 

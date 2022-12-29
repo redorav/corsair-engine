@@ -4,7 +4,7 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrDataFormats.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/CrHash.h"
 #include "Core/Containers/CrArray.h"
 
@@ -175,13 +175,13 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-class ICrGraphicsPipeline
+class ICrGraphicsPipeline : public CrIntrusivePtrInterface<ICrGraphicsPipeline>
 {
 public:
 
 	ICrGraphicsPipeline(const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
-	virtual ~ICrGraphicsPipeline() {}
+	virtual ~ICrGraphicsPipeline();
 
 	const CrGraphicsShaderHandle& GetShader() const { return m_shader; }
 
@@ -202,13 +202,13 @@ struct CrComputePipelineDescriptor
 	}
 };
 
-class ICrComputePipeline
+class ICrComputePipeline : public CrIntrusivePtrInterface<ICrComputePipeline>
 {
 public:
 
-	ICrComputePipeline(const CrComputeShaderHandle& computeShader) : m_shader(computeShader) {}
+	ICrComputePipeline(const CrComputeShaderHandle& computeShader);
 
-	virtual ~ICrComputePipeline() {}
+	virtual ~ICrComputePipeline();
 
 	const CrComputeShaderHandle& GetShader() const { return m_shader; }
 

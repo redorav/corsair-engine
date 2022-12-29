@@ -3,7 +3,6 @@
 
 #include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashSet.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/FileSystem/ICrFile.h"

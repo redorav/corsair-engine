@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Containers/CrVector.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderGraph.h"

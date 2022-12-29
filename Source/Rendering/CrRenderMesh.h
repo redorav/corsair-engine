@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrVector.h"
 
@@ -11,6 +10,8 @@
 class CrRenderMesh final : public CrIntrusivePtrInterface<CrRenderMesh>
 {
 public:
+
+	~CrRenderMesh();
 
 	const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
 
@@ -26,7 +27,7 @@ public:
 	
 	const CrIndexBufferHandle& GetIndexBuffer() const { return m_indexBuffer; }
 
-	void SetIndexBuffer(const CrIndexBufferHandle& indexBuffer) { m_indexBuffer = indexBuffer; }
+	void SetIndexBuffer(const CrIndexBufferHandle& indexBuffer);
 
 private:
 

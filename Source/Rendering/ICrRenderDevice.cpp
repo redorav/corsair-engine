@@ -21,6 +21,10 @@
 #include "Rendering/CrGPUDeletionQueue.h"
 #include "Rendering/CrGPUTransferCallbackQueue.h"
 
+CrTextureUpload::~CrTextureUpload() {}
+
+CrBufferUpload::~CrBufferUpload() {}
+
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor)
 	: m_renderSystem(renderSystem)
 	, m_isValidPipelineCache(false)
@@ -93,10 +97,27 @@ void ICrRenderDevice::ProcessQueuedCommands()
 	m_gpuTransferCallbackQueue->Process();
 }
 
+// We need a custom deleter for the render device because we cannot call functions that use virtual methods during the destruction
+// process. It's an unfortunate consequence of the virtual function abstraction. We need to make sure all render device GPU resources
+// are manually destroyed here, as well as giving an opportunity to the platform-specific render devices to do so
 void ICrRenderDevice::FinalizeDeletion()
 {
+	// Finalize any resources that are platform-specific, such as custom fences
+	FinalizeDeletionPS();
+
+	// Process any pending transfers
+	m_gpuTransferCallbackQueue->Process();
+	m_gpuTransferCallbackQueue = nullptr;
+
+	// Delete all resources that belong to the device. This puts them into the deletion queues
+	for (uint32_t i = 0; i < m_auxiliaryCommandBuffers.size(); ++i)
+	{
+		m_auxiliaryCommandBuffers[i] = nullptr;
+	}
+
 	m_auxiliaryCommandBuffer = nullptr;
 
+	// The last thing we do is process the deletion queue. It will take care of its own resources too
 	m_gpuDeletionQueue->Finalize();
 }
 
@@ -112,7 +133,12 @@ CrGPUFenceHandle ICrRenderDevice::CreateGPUFence()
 
 CrGPUSemaphoreHandle ICrRenderDevice::CreateGPUSemaphore()
 {
-	return CrGPUSemaphoreHandle(CreateGPUSemaphorePS(), m_gpuDeletionCallback);
+	return CrGPUSemaphoreHandle(CreateGPUSemaphorePS());
+}
+
+void ICrRenderDevice::AddToDeletionQueue(CrGPUDeletable* resource)
+{
+	m_gpuDeletionQueue->AddToQueue(resource);
 }
 
 CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
@@ -171,12 +197,12 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePi
 
 CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
 {
-	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor), m_gpuDeletionCallback);
+	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor));
 }
 
 CrHardwareGPUBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
-	return CrHardwareGPUBufferHandle(CreateHardwareGPUBufferPS(descriptor), m_gpuDeletionCallback);
+	return CrHardwareGPUBufferHandle(CreateHardwareGPUBufferPS(descriptor));
 }
 
 CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
@@ -186,7 +212,7 @@ CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T acc
 
 CrSamplerHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 {
-	return CrSamplerHandle(CreateSamplerPS(descriptor), m_gpuDeletionCallback);
+	return CrSamplerHandle(CreateSamplerPS(descriptor));
 }
 
 CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
@@ -207,7 +233,7 @@ CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& 
 
 CrTextureHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 {
-	return CrTextureHandle(CreateTexturePS(descriptor), m_gpuDeletionCallback);
+	return CrTextureHandle(CreateTexturePS(descriptor));
 }
 
 CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)

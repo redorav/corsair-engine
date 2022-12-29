@@ -10,8 +10,7 @@
 
 #include "Core/CrMacros.h"
 
-ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
-	: m_renderDevice(renderDevice)
+ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUDeletable(renderDevice)
 	, m_queueType(descriptor.queueType)
 	, m_submitted(false)
 {

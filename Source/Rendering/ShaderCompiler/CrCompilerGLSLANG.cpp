@@ -7,7 +7,6 @@
 #include "Rendering/CrRendering.h"
 
 #include "Core/FileSystem/CrPath.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/CrMacros.h"
 

@@ -19,7 +19,7 @@ namespace crstl
 
 		if (currentRef == 0)
 		{
-			ptr->delete_callback();
+			ptr->template delete_callback<T>();
 		}
 	}
 
@@ -182,9 +182,10 @@ namespace crstl
 	{
 	public:
 
+		template<typename Q = T>
 		void delete_callback()
 		{
-			delete (T*)this;
+			delete (Q*)this;
 		}
 	};
 };

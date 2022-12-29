@@ -2,13 +2,13 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "Rendering/CrGPUDeletable.h"
+#include "Rendering/ICrGPUSynchronization.h"
 
 #include "Core/Containers/CrFixedVector.h"
 
 #include "Core/Containers/CrDeque.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
+class CrGPUDeletable;
 
 struct CrDeletionList
 {

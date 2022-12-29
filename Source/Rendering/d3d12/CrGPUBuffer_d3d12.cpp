@@ -9,7 +9,7 @@
 CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
 	: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 {
-	m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
+	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
 	D3D12_RESOURCE_STATES initialResourceState = D3D12_RESOURCE_STATE_COMMON;
 
@@ -70,7 +70,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	HRESULT hResult = S_OK;
 
-	hResult = m_d3d12Device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialResourceState, nullptr, IID_PPV_ARGS(&m_d3d12Resource));
+	hResult = d3d12Device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialResourceState, nullptr, IID_PPV_ARGS(&m_d3d12Resource));
 
 	CrAssertMsg(hResult == S_OK, "Failed to create buffer");
 
@@ -97,6 +97,11 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	}
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
+}
+
+CrHardwareGPUBufferD3D12::~CrHardwareGPUBufferD3D12()
+{
+	m_d3d12Resource->Release();
 }
 
 void* CrHardwareGPUBufferD3D12::LockPS()

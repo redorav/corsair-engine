@@ -2,6 +2,8 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Core/SmartPointers/CrIntrusivePtr.h"
+
 // Rendering resources that are used as default
 class CrRenderingResources
 {

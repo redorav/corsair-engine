@@ -8,7 +8,6 @@
 #include "Resource/CrResourceManager.h"
 
 #include "Core/CrMacros.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Process/CrProcess.h"

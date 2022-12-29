@@ -6,16 +6,18 @@
 
 #include "Core/Containers/CrDeque.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
-
 struct CrGPUDownloadCallback
 {
+	~CrGPUDownloadCallback();
+
 	CrGPUTransferCallbackType callback;
 	CrHardwareGPUBufferHandle buffer;
 };
 
 struct CrDownloadCallbackList
 {
+	~CrDownloadCallbackList();
+
 	CrGPUFenceHandle fence;
 	CrVector<CrGPUDownloadCallback> callbacks;
 };

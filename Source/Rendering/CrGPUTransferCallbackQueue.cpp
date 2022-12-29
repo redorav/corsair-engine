@@ -2,16 +2,21 @@
 
 #include "Rendering/ICrRenderDevice.h"
 
+#include "Rendering/ICrGPUSynchronization.h"
+
+#include "Rendering/CrGPUBuffer.h"
+
 #include "Rendering/CrGPUTransferCallbackQueue.h"
 
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/CrFrameTime.h"
 
-CrGPUTransferCallbackQueue::~CrGPUTransferCallbackQueue()
-{
+CrGPUDownloadCallback::~CrGPUDownloadCallback() {}
 
-}
+CrDownloadCallbackList::~CrDownloadCallbackList() {}
+
+CrGPUTransferCallbackQueue::~CrGPUTransferCallbackQueue() {}
 
 void CrGPUTransferCallbackQueue::Initialize(ICrRenderDevice* renderDevice)
 {

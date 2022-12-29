@@ -17,8 +17,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/)
-	: m_renderDevice(renderDevice)
+ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/) : CrGPUDeletable(renderDevice)
 	, m_imageCount(0)
 	, m_width(0)
 	, m_height(0)

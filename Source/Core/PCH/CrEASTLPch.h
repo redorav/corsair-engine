@@ -11,8 +11,8 @@
 #include <EASTL/fixed_string.h>
 #include <EASTL/string.h>
 
-#include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
+#include <Core/CRSTL/intrusive_ptr.h>
 
 // Explicit instantiations of commonly used templates
 template class eastl::fixed_string<char, 32, false, eastl::allocator>;

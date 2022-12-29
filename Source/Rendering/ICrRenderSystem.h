@@ -4,13 +4,11 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
-
-#include "Core/Containers/CrVector.h"
-
 #include "Rendering/FrameCapture/CrRenderDoc.h"
-
 #include "Rendering/FrameCapture/CrPIX.h"
+
+#include "Core/SmartPointers/CrIntrusivePtr.h"
+#include "Core/Containers/CrVector.h"
 
 struct CrRenderSystemDescriptor 
 {

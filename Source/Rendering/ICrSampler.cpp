@@ -2,7 +2,6 @@
 #include "ICrSampler.h"
 
 #include "Core/CrMacros.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 
 #include "Rendering/CrRendering.h"
 
@@ -25,7 +24,7 @@ CrSamplerDescriptor::CrSamplerDescriptor()
 
 }
 
-ICrSampler::ICrSampler(ICrRenderDevice* renderDevice)
+ICrSampler::ICrSampler(ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

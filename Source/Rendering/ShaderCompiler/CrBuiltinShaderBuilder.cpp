@@ -7,7 +7,6 @@
 #include "Core/Containers/CrHashMap.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Function/CrFixedFunction.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/Containers/CrArray.h"

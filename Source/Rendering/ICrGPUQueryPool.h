@@ -34,14 +34,7 @@ class ICrGPUQueryPool : public CrGPUDeletable
 {
 public:
 
-	ICrGPUQueryPool(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor)
-		: m_renderDevice(renderDevice)
-		, m_descriptor(descriptor)
-		, m_currentQuery(0)
-		, m_resolved(false)
-		, m_querySize(0) // Gets calculated by each platform
-		, m_timestampPeriod(1.0) // Gets calculated per platform
-	{}
+	ICrGPUQueryPool(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	virtual ~ICrGPUQueryPool() {}
 
@@ -105,6 +98,4 @@ protected:
 	// Not all platforms work the same way, so this is just a multiplier that takes from
 	// raw ticks to nanoseconds. In many common cases it will just be 1.0
 	double m_timestampPeriod;
-
-	ICrRenderDevice* m_renderDevice;
 };

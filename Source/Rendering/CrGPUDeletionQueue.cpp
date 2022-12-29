@@ -3,6 +3,7 @@
 #include "Rendering/ICrRenderDevice.h"
 
 #include "Rendering/CrGPUDeletionQueue.h"
+#include "Rendering/CrGPUDeletable.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -117,6 +118,14 @@ void CrGPUDeletionQueue::Process()
 
 void CrGPUDeletionQueue::Finalize()
 {
+	// Delete all the fence that aren't currently in an available deletion list. It won't matter
+	// who waits for them. We cannot do this with the deletion lists that are currently active
+	// as we need to wait for the fences to finish
+	for (CrDeletionList* deletionList : m_availableDeletionLists)
+	{
+		deletionList->fence = nullptr;
+	}
+
 	// Push current list to the main queue and signal it. These are the last remaining resources in flight
 	m_activeDeletionLists.push_back(m_currentDeletionList);
 	m_renderDevice->SignalFence(CrCommandQueueType::Graphics, m_currentDeletionList->fence.get());
@@ -128,6 +137,9 @@ void CrGPUDeletionQueue::Finalize()
 	{
 		if (m_renderDevice->WaitForFence(deletionList->fence.get(), UINT64_MAX) == cr3d::GPUFenceResult::Success)
 		{
+			// Add current fence to the deletion list. We can now guarantee this it the last usage of this list
+			deletionList->fence = nullptr;
+
 			for (CrGPUDeletable* deletable : deletionList->deletables)
 			{
 				delete deletable;

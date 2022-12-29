@@ -17,8 +17,6 @@ public:
 
 private:
 
-	VkDevice m_vkDevice;
-
 	VkFence m_vkFence;
 };
 
@@ -38,8 +36,6 @@ public:
 	const VkSemaphore& GetVkSemaphore() const;
 
 private:
-
-	VkDevice m_vkDevice;
 
 	VkSemaphore m_vkSemaphore;
 };

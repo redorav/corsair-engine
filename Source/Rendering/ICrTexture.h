@@ -93,8 +93,6 @@ protected:
 	// We don't allow the constructor externally
 	ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
-	ICrRenderDevice* m_renderDevice;
-
 	cr3d::DataFormat::T m_format;
 
 	cr3d::SampleCount m_sampleCount;

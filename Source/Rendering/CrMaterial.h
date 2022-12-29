@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Core/Containers/CrVector.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/ICrPipeline.h"
+#include "Rendering/ICrShader.h"
+#include "Rendering/ICrTexture.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 namespace CrMaterialBlendMode

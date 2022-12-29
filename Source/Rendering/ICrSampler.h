@@ -38,6 +38,4 @@ public:
 protected:
 
 	ICrSampler(ICrRenderDevice* renderDevice);
-
-	ICrRenderDevice* m_renderDevice = nullptr;
 };

@@ -14,9 +14,6 @@
 
 #include "Math/CrHlslppMatrixFloat.h"
 
-class CrRenderModelInstance;
-using CrRenderModelInstanceHandle = CrSharedPtr<CrRenderModelInstance>;
-
 class CrModelInstanceIndexDummy;
 using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
 
@@ -125,7 +122,7 @@ private:
 // The render world also computes visibility and creates rendering packets that encapsulate
 // everything that is needed to render an object. After visibility, there is a list of
 // visible packets with their state all ready to be translated into drawcalls.
-class CrRenderWorld final : public CrIntrusivePtrInterface
+class CrRenderWorld final : public CrIntrusivePtrInterface<CrRenderWorld>
 {
 public:
 
@@ -215,7 +212,7 @@ private:
 
 	CrVector<float4x4>                  m_modelInstanceTransforms;
 
-	CrVector<CrRenderModelSharedHandle> m_renderModels;
+	CrVector<CrRenderModelHandle>       m_renderModels;
 
 	CrVector<CrBoundingBox>             m_modelInstanceObbs;
 

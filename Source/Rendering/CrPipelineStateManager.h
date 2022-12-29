@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Core/Containers/CrHashMap.h"
-
-#include "Core/SmartPointers/CrSharedPtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 

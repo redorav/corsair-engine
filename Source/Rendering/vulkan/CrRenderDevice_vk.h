@@ -6,8 +6,6 @@
 #include "Core/String/CrString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
-
 class CrTextureVulkan;
 
 class CrRenderDeviceVulkan final : public ICrRenderDevice

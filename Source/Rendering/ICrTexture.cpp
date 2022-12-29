@@ -2,7 +2,6 @@
 #include "ICrTexture.h"
 
 #include "Core/CrMacros.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Math/CrMath.h"
@@ -26,10 +25,9 @@ CrTextureDescriptor::CrTextureDescriptor()
 
 }
 
-ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : m_usedGPUMemoryBytes(0)
+ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : CrGPUDeletable(renderDevice)
+	, m_usedGPUMemoryBytes(0)
 {
-	m_renderDevice = renderDevice;
-
 	m_width = descriptor.width;
 	m_height = descriptor.height;
 	m_depth = CrMax(descriptor.depth, 1u);

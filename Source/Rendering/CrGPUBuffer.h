@@ -7,7 +7,6 @@
 
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrUniquePtr.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
@@ -96,8 +95,6 @@ public:
 	bool HasAccess(cr3d::MemoryAccess::T access) const { return (m_access & access) != 0; }
 
 protected:
-
-	ICrRenderDevice* m_renderDevice;
 
 	cr3d::BufferUsage::T m_usage;
 
@@ -220,7 +217,7 @@ public:
 // A CrGPUBuffer holds an actual hardware buffer. It can have other convenient data in the derived classes,
 // such as vertex descriptors, index sizes, binding indices, etc. It exists so we don't burden the hardware
 // buffer with metadata that varies depending on usage
-class CrGPUBuffer
+class CrGPUBuffer : public CrIntrusivePtrInterface<CrGPUBuffer>
 {
 public:
 

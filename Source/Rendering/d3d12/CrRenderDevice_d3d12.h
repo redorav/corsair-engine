@@ -2,6 +2,8 @@
 
 #include "Rendering/ICrRenderDevice.h"
 
+#include "Rendering/ICrGPUSynchronization.h"
+
 #include "CrDescriptorHeap_d3d12.h"
 
 #include <d3d12.h>
@@ -78,6 +80,8 @@ private:
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader) override;
 
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) override;
+
+	virtual void FinalizeDeletionPS() override;
 
 	//--------------------
 	// GPU Synchronization

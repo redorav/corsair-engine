@@ -3,10 +3,10 @@
 #include "ICrGPUSynchronization.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/String/CrFixedString.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/ICrTexture.h"
 
 enum class CrSwapchainResult : uint32_t
 {
@@ -27,7 +27,7 @@ struct CrSwapchainDescriptor
 	cr3d::DataFormat::T format;
 };
 
-class ICrSwapchain
+class ICrSwapchain : public CrGPUDeletable
 {
 public:
 
@@ -56,8 +56,6 @@ protected:
 	virtual void PresentPS() = 0;
 
 	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
-
-	ICrRenderDevice*						m_renderDevice = nullptr;
 
 	CrVector<CrTextureHandle>			m_textures;
 

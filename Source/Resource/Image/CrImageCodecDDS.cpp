@@ -2,7 +2,6 @@
 
 #include "CrImageCodecDDS.h"
 
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Streams/CrMemoryStream.h"
 #include "Core/Streams/CrFileStream.h"

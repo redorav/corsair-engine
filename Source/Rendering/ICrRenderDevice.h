@@ -5,12 +5,13 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/String/CrString.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
+#include "Core/SmartPointers/CrUniquePtr.h"
+#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 namespace CrRenderingFeature
 {
@@ -77,6 +78,8 @@ namespace CrCommandQueueType { enum T : uint32_t; }
 // only provide the data in a linear format
 struct CrTextureUpload
 {
+	~CrTextureUpload();
+
 	CrHardwareGPUBufferHandle buffer;
 	ICrTexture* texture;
 	uint32_t mipmapStart;
@@ -87,6 +90,8 @@ struct CrTextureUpload
 
 struct CrBufferUpload
 {
+	~CrBufferUpload();
+
 	CrHardwareGPUBufferHandle stagingBuffer;
 	const ICrHardwareGPUBuffer* destinationBuffer;
 	uint32_t sizeBytes;
@@ -104,13 +109,20 @@ struct CrRenderDeviceDescriptor
 	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
 };
 
-class ICrRenderDevice
+class ICrRenderDevice : public CrIntrusivePtrInterfaceBase
 {
 public:
 
 	ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	virtual ~ICrRenderDevice();
+
+	template<typename T>
+	void delete_callback()
+	{
+		FinalizeDeletion();
+		delete this;
+	}
 
 	void Initialize();
 
@@ -159,6 +171,8 @@ public:
 
 	CrGPUSemaphoreHandle CreateGPUSemaphore();
 
+	void AddToDeletionQueue(CrGPUDeletable* resource);
+
 	//--------------------
 	// GPU Synchronization
 	//--------------------
@@ -196,11 +210,6 @@ public:
 
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
-	const CrGPUDeletionCallbackType& GetGPUDeletionCallback() const
-	{
-		return m_gpuDeletionCallback;
-	}
-
 protected:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
@@ -226,6 +235,8 @@ protected:
 	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader) = 0;
 	
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
+
+	virtual void FinalizeDeletionPS() {}
 
 	//--------------------
 	// GPU Synchronization

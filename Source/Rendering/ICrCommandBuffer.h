@@ -14,9 +14,11 @@
 
 #include "Rendering/CrGPUStackAllocator.h"
 
+#include "Rendering/ICrGPUSynchronization.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
-#include "CrRenderingForwardDeclarations.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
 
 #define COMMAND_BUFFER_VALIDATION
 
@@ -318,8 +320,6 @@ protected:
 	};
 
 	CurrentState					m_currentState;
-
-	ICrRenderDevice*				m_renderDevice = nullptr;
 
 	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
 

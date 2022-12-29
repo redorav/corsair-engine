@@ -347,6 +347,11 @@ ICrGPUQueryPool* CrRenderDeviceD3D12::CreateGPUQueryPoolPS(const CrGPUQueryPoolD
 	return new CrGPUQueryPoolD3D12(this, queryPoolDescriptor);
 }
 
+void CrRenderDeviceD3D12::FinalizeDeletionPS()
+{
+	m_waitIdleFence = nullptr;
+}
+
 cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);

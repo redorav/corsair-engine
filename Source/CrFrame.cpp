@@ -12,7 +12,6 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/UI/CrImGuiRenderer.h"
-#include "Rendering/ICrGPUQueryPool.h"
 #include "Rendering/CrGPUTimingQueryTracker.h"
 
 #include "Rendering/CrCamera.h"

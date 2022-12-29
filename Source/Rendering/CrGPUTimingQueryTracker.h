@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/ICrGPUQueryPool.h"
 
 #include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"

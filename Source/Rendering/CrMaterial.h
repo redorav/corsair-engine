@@ -130,7 +130,7 @@ struct CrMaterialShaderDescriptor
 
 static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescriptor size mismatch");
 
-class CrMaterial final : public CrIntrusivePtrInterface<CrMaterial>
+class CrMaterial final : public CrIntrusivePtrInterface
 {
 public:
 

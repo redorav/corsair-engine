@@ -6,7 +6,7 @@
 #include "Rendering/CrStackAllocator.h"
 
 // Manages transient memory allocated per frame for CPU resources
-class CrCPUStackAllocator final : public CrStackAllocator, public CrIntrusivePtrInterface<CrCPUStackAllocator>
+class CrCPUStackAllocator final : public CrStackAllocator, public CrIntrusivePtrInterface
 {
 public:
 

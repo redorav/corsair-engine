@@ -6,7 +6,7 @@
 
 struct SDL_Window;
 
-class ICrOSWindow : public CrIntrusivePtrInterface<ICrOSWindow>
+class ICrOSWindow : public CrIntrusivePtrInterface
 {
 public:
 

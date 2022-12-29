@@ -37,7 +37,7 @@ private:
 	CrFixedVector<CrMaterialHandle, 256> m_materials;
 };
 
-class CrRenderModel final : public CrIntrusivePtrInterface<CrRenderModel>
+class CrRenderModel final : public CrIntrusivePtrInterface
 {
 public:
 

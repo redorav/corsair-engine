@@ -217,7 +217,7 @@ public:
 // A CrGPUBuffer holds an actual hardware buffer. It can have other convenient data in the derived classes,
 // such as vertex descriptors, index sizes, binding indices, etc. It exists so we don't burden the hardware
 // buffer with metadata that varies depending on usage
-class CrGPUBuffer : public CrIntrusivePtrInterface<CrGPUBuffer>
+class CrGPUBuffer : public CrIntrusivePtrInterface
 {
 public:
 

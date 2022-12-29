@@ -5,7 +5,6 @@
 template<typename T>
 using CrIntrusivePtr = crstl::intrusive_ptr<T>;
 
-template<typename T>
-using CrIntrusivePtrInterface = crstl::intrusive_ptr_interface_delete<T>;
+using CrIntrusivePtrInterface = crstl::intrusive_ptr_interface_delete;
 
 using CrIntrusivePtrInterfaceBase = crstl::intrusive_ptr_interface_base;

@@ -177,12 +177,11 @@ namespace crstl
 		crstl::atomic<int32_t> m_refcount;
 	};
 
-	template<typename T>
 	class intrusive_ptr_interface_delete : public intrusive_ptr_interface_base
 	{
 	public:
 
-		template<typename Q = T>
+		template<typename Q>
 		void delete_callback()
 		{
 			delete (Q*)this;

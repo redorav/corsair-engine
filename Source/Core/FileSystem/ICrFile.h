@@ -51,7 +51,7 @@ namespace SeekOrigin
 	};
 }
 
-class ICrFile final : public CrIntrusivePtrInterface<ICrFile>
+class ICrFile final : public CrIntrusivePtrInterface
 {
 public:
 

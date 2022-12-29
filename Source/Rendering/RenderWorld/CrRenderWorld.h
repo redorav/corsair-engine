@@ -122,7 +122,7 @@ private:
 // The render world also computes visibility and creates rendering packets that encapsulate
 // everything that is needed to render an object. After visibility, there is a list of
 // visible packets with their state all ready to be translated into drawcalls.
-class CrRenderWorld final : public CrIntrusivePtrInterface<CrRenderWorld>
+class CrRenderWorld final : public CrIntrusivePtrInterface
 {
 public:
 

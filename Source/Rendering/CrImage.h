@@ -36,7 +36,7 @@ struct CrImageDescriptor
 	cr3d::TextureType type;
 };
 
-class CrImage final : public CrIntrusivePtrInterface<CrImage>
+class CrImage final : public CrIntrusivePtrInterface
 {
 public:
 

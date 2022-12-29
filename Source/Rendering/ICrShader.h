@@ -260,7 +260,7 @@ struct CrInputSignature
 };
 
 // Bytecode represents a shader code, e.g. vertex, pixel, etc
-class CrShaderBytecode : public CrIntrusivePtrInterface<CrShaderBytecode>
+class CrShaderBytecode : public CrIntrusivePtrInterface
 {
 public:
 
@@ -327,7 +327,7 @@ struct CrGraphicsShaderDescriptor
 	CrVector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
-class ICrShader : public CrIntrusivePtrInterface<ICrShader>
+class ICrShader : public CrIntrusivePtrInterface
 {
 public:
 

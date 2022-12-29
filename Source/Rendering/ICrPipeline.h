@@ -175,7 +175,7 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-class ICrGraphicsPipeline : public CrIntrusivePtrInterface<ICrGraphicsPipeline>
+class ICrGraphicsPipeline : public CrIntrusivePtrInterface
 {
 public:
 
@@ -202,7 +202,7 @@ struct CrComputePipelineDescriptor
 	}
 };
 
-class ICrComputePipeline : public CrIntrusivePtrInterface<ICrComputePipeline>
+class ICrComputePipeline : public CrIntrusivePtrInterface
 {
 public:
 

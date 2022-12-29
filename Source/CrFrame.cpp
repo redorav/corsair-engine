@@ -2,7 +2,6 @@
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrSampler.h"
 #include "Rendering/ICrSwapchain.h"
 #include "Rendering/CrShaderManager.h"
 #include "Rendering/ICrShader.h"
@@ -10,7 +9,6 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/CrGPUBuffer.h"
-#include "Rendering/CrRenderPassDescriptor.h"
 #include "Rendering/UI/CrImGuiRenderer.h"
 #include "Rendering/CrGPUTimingQueryTracker.h"
 
@@ -31,7 +29,6 @@
 #include "Rendering/CrRendererConfig.h"
 #include "Rendering/CrRenderingResources.h"
 
-#include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 
 #include "Core/Input/CrInputManager.h"

@@ -8,7 +8,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-class CrRenderMesh final : public CrIntrusivePtrInterface
+class CrRenderMesh final : public CrIntrusivePtrInterface<CrRenderMesh>
 {
 public:
 

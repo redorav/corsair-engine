@@ -7,7 +7,7 @@
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
 // TODO Remove the CrEntity hierarchy. This is the engine object
-class CrCamera final : public CrEntity, public CrIntrusivePtrInterface
+class CrCamera final : public CrEntity, public CrIntrusivePtrInterface<CrCamera>
 {
 public:
 

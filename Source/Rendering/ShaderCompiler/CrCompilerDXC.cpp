@@ -517,7 +517,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	
 		// This doesn't strip the reflection data we need to create the reflection header
 		SpvStripDebugData(bytecode);
-	
+
 		// Write reflection header and shader bytecode
 		CrWriteFileStream writeFileStream(compilationDescriptor.outputPath.c_str());
 		writeFileStream << reflectionHeader;

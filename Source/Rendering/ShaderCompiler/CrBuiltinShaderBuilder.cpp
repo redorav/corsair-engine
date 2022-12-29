@@ -96,6 +96,8 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 					else { continue; }
 
 					compilationDescriptor.shaderStage = shaderStage;
+
+					stageName = cr3d::ShaderStage::ToString(shaderStage);
 				}
 				else
 				{

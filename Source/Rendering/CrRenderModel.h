@@ -3,6 +3,7 @@
 #include "Rendering/CrVisibility.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrMaterial.h"
+#include "Rendering/CrRenderMesh.h"
 
 #include "Core/SmartPointers/CrSharedPtr.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
@@ -37,7 +38,7 @@ private:
 	CrFixedVector<CrMaterialHandle, 256> m_materials;
 };
 
-class CrRenderModel final : public CrIntrusivePtrInterface
+class CrRenderModel final : public CrIntrusivePtrInterface<CrRenderModel>
 {
 public:
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.h"
+
 #include "atomic.h"
 
 namespace crstl
@@ -28,7 +30,7 @@ namespace crstl
 
 		intrusive_ptr() = default;
 
-		intrusive_ptr(T* ptr) : m_ptr(ptr)
+		intrusive_ptr(T* ptr) crstl_noexcept : m_ptr(ptr)
 		{
 			if (ptr)
 			{
@@ -36,7 +38,7 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr(const intrusive_ptr<T>& ptr) : m_ptr(ptr.m_ptr)
+		intrusive_ptr(const intrusive_ptr<T>& ptr) crstl_noexcept : m_ptr(ptr.m_ptr)
 		{
 			if (m_ptr != nullptr)
 			{
@@ -44,12 +46,12 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr(intrusive_ptr<T>&& ptr) : m_ptr(ptr.m_ptr)
+		intrusive_ptr(intrusive_ptr<T>&& ptr) crstl_noexcept : m_ptr(ptr.m_ptr)
 		{
 			ptr.m_ptr = nullptr;
 		}
 
-		~intrusive_ptr()
+		~intrusive_ptr() crstl_noexcept
 		{
 			if (m_ptr)
 			{
@@ -57,7 +59,7 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr& operator = (T* ptr)
+		intrusive_ptr& operator = (T* ptr) crstl_noexcept
 		{
 			if (m_ptr != ptr)
 			{
@@ -82,7 +84,7 @@ namespace crstl
 			return *this;
 		}
 
-		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr)
+		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr) crstl_noexcept
 		{
 			if (m_ptr != ptr.m_ptr)
 			{
@@ -107,7 +109,7 @@ namespace crstl
 			return *this;
 		}
 
-		intrusive_ptr& operator = (intrusive_ptr<T>&& ptr)
+		intrusive_ptr& operator = (intrusive_ptr<T>&& ptr) crstl_noexcept
 		{
 			if (m_ptr != ptr.m_ptr)
 			{
@@ -128,22 +130,22 @@ namespace crstl
 			return *this;
 		}
 
-		T* get() const { return m_ptr; }
+		T* get() const crstl_noexcept { return m_ptr; }
 
-		T* operator ->() const
+		T* operator ->() const crstl_noexcept
 		{
 			return m_ptr;
 		}
 
 		typedef T* (intrusive_ptr<T>::*boolean)() const;
 
-		operator boolean() const
+		operator boolean() const crstl_noexcept
 		{
 			// Return anything that isn't easily castable but is guaranteed to be non-null, such as the get function pointer
 			return m_ptr ? &intrusive_ptr<T>::get : nullptr;
 		}
 
-		bool operator!() const
+		bool operator!() const crstl_noexcept
 		{
 			return (m_ptr == nullptr);
 		}
@@ -153,29 +155,36 @@ namespace crstl
 		T* m_ptr = nullptr;
 	};
 
-	class intrusive_ptr_interface
+	// Simple interface for intrusive_ptr. If there is need for more advanced behavior,
+	// create a new class that conforms to this interface. Intentionally removing virtual
+	// to ensure there is no virtual dispatching
+	class intrusive_ptr_interface_base
 	{
 	public:
 
-		virtual ~intrusive_ptr_interface() {}
-
-		virtual int32_t add_ref()
+		int32_t add_ref()
 		{
 			m_refcount++;
 			return m_refcount;
 		}
 
-		virtual int32_t release_ref()
+		int32_t release_ref()
 		{
 			m_refcount--;
 			return m_refcount;
 		}
 
-		virtual void delete_callback()
-		{
-			delete this;
-		}
-
 		crstl::atomic<int32_t> m_refcount;
+	};
+
+	template<typename T>
+	class intrusive_ptr_interface_delete : public intrusive_ptr_interface_base
+	{
+	public:
+
+		void delete_callback()
+		{
+			delete (T*)this;
+		}
 	};
 };

@@ -2,6 +2,8 @@
 
 #include "Rendering/CrRendererConfig.h"
 
+#include "Rendering/CrDataFormats.h"
+
 cr3d::DataFormat::T CrRendererConfig::DepthBufferFormat = cr3d::DataFormat::D32_Float_S8_Uint;
 
 // GBuffer

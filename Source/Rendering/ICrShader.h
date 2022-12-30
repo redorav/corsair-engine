@@ -41,9 +41,9 @@ struct CrShaderBinding
 	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWDataBuffers::T rwDataBufferID)
 		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWDataBuffer), rwDataBufferID(rwDataBufferID) {}
 
+	bindpoint_t bindPoint;
 	uint8_t stage : 4; // cr3d::ShaderStage::T
 	uint8_t type : 4; // cr3d::ShaderResourceType::T
-	bindpoint_t bindPoint;
 	union
 	{
 		ConstantBuffers::T constantBufferID;

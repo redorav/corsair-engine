@@ -264,9 +264,9 @@ protected:
 	// schedule an upload that is guaranteed to be visible on the next texture usage
 	virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
 
-	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) { (destinationBuffer); return nullptr; }
+	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
 
-	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) { (destinationBuffer); }
+	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
 
 	virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
 

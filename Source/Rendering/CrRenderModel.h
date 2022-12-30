@@ -26,7 +26,7 @@ struct CrRenderModelDescriptor
 
 	const CrRenderMeshHandle& GetRenderMesh(uint32_t renderMeshIndex) const { return m_meshes[renderMeshIndex]; }
 
-	const uint32_t GetRenderMeshMaterial(uint32_t renderMeshIndex) const { return m_materialIndices[renderMeshIndex]; }
+	uint32_t GetRenderMeshMaterial(uint32_t renderMeshIndex) const { return m_materialIndices[renderMeshIndex]; }
 
 private:
 

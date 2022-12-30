@@ -15,7 +15,7 @@ namespace CrStreamType
 struct CrStreamDataBlob
 {
 	CrStreamDataBlob() {}
-	CrStreamDataBlob(void* data, size_t size) : data(data), size((uint32_t)size) {}
+	CrStreamDataBlob(void* data, uint64_t size) : data(data), size((uint32_t)size) {}
 	CrStreamDataBlob(void* data, uint32_t size) : data(data), size(size) {}
 	void* data = nullptr;
 	uint32_t size = 0;

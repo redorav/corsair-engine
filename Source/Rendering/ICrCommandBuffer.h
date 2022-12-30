@@ -223,8 +223,8 @@ protected:
 		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
 
 		const ICrHardwareGPUBuffer* buffer = nullptr;
-		uint32_t offsetBytes = 0;
 		uint32_t sizeBytes = 0;
+		uint32_t offsetBytes = 0;
 	};
 
 	struct StorageBufferBinding
@@ -591,7 +591,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(cr3d::ShaderStage::T shaderSta
 
 inline void ICrCommandBuffer::BindRWDataBuffer(cr3d::ShaderStage::T shaderStage, RWDataBuffers::T rwBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
-	(numElements); (stride); (offset);
+	unused_parameter(numElements); unused_parameter(stride); unused_parameter(offset);
 
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");

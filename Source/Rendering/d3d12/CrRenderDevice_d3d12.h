@@ -105,9 +105,9 @@ private:
 
 	virtual void EndTextureUploadPS(const ICrTexture* texture) override;
 
-	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer);
+	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
 
-	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer);
+	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
 
 	virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
 

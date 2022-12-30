@@ -104,8 +104,6 @@ private:
 
 	ID3D12DescriptorHeap* m_samplerDescriptorHeap;
 
-	ID3D12Device* m_d3d12Device;
-
 	ID3D12CommandAllocator* m_d3d12CommandAllocator;
 
 	ID3D12GraphicsCommandList4* m_d3d12GraphicsCommandList;

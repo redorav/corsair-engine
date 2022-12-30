@@ -97,7 +97,7 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 	}
 
 	// TODO Handle buffer transitions
-	(buffers);
+	unused_parameter(buffers);
 }
 
 void CrCommandBufferD3D12::ProcessRenderTargetBarrier(

@@ -186,7 +186,6 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 		{
 			uint32_t quadCountW, quadCountH, vertexCountW, vertexCountH;
 			float3 normal;
-			float3 tangent;
 		};
 
 		const FaceProperties FacePropertyArray[cr3d::CubemapFace::Count] =

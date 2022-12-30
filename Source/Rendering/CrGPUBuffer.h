@@ -138,19 +138,19 @@ public:
 
 	CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
 		: m_hardwareBuffer(hardwareBuffer)
+		, m_memory(memory)
+		, m_byteOffset(byteOffset)
 		, m_numElements(numElements)
 		, m_stride(stride)
-		, m_byteOffset(byteOffset)
-		, m_memory(memory)
 	{}
 
 	CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, cr3d::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
 		: m_hardwareBuffer(hardwareBuffer)
+		, m_memory(memory)
+		, m_byteOffset(byteOffset)
 		, m_numElements(numElements)
 		, m_stride(cr3d::DataFormats[dataFormat].dataOrBlockSize)
-		, m_byteOffset(byteOffset)
 		, m_dataFormat(dataFormat)
-		, m_memory(memory)
 	{}
 
 	const ICrHardwareGPUBuffer* GetHardwareBuffer() const { return m_hardwareBuffer; }

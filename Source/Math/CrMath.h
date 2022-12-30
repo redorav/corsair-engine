@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 namespace CrMath
 {
 	constexpr static float Pi = 3.14159265359f;

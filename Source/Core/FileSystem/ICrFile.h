@@ -7,7 +7,7 @@
 #include "Core/String/CrFixedString.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
-#include <cstdint>
+#include "stdint.h"
 
 struct CrDirectoryEntry
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include "stdint.h"
 
 #include "Core/Time/CrTime.h"
 #include "Core/Containers/CrArray.h"

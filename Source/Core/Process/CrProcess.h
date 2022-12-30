@@ -2,7 +2,7 @@
 
 #include "Core/String/CrFixedString.h"
 
-#include <cstdint>
+#include "stdint.h"
 
 struct CrProcessDescriptor
 {

@@ -3,7 +3,7 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/CrTypedId.h"
 
-#include <cstdint>
+#include "stdint.h"
 
 namespace cr3d
 {

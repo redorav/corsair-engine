@@ -48,16 +48,13 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	return graphicsPipeline;
 }
 
-CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
+CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrComputeShaderHandle& computeShader)
 {
 	CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
 
-	const CrHash pipelineHash = pipelineDescriptor.ComputeHash();
 	const CrHash computeShaderHash = computeShader->GetHash();
 
-	const CrHash combinedHash = pipelineHash << computeShaderHash;
-
-	const auto& it = m_computePipelines.find(combinedHash.GetHash());
+	const auto& it = m_computePipelines.find(computeShaderHash.GetHash());
 	CrComputePipelineHandle computePipeline;
 
 	if (it != m_computePipelines.end())
@@ -66,7 +63,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	}
 	else
 	{
-		computePipeline = m_renderDevice->CreateComputePipeline(pipelineDescriptor, computeShader);
+		computePipeline = m_renderDevice->CreateComputePipeline(computeShader);
 
 		m_computePipelines.insert({ combinedHash.GetHash(), computePipeline }); // Insert in the hashmap
 	}

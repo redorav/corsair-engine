@@ -180,11 +180,11 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	return pipeline;
 }
 
-CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader)
+CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeShaderHandle& computeShader)
 {
 	CrTimer pipelineCreationTime;
 
-	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(pipelineDescriptor, computeShader));
+	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
 
 	CrFixedString128 entryPoint("(");
 	entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());

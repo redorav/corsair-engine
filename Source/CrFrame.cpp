@@ -244,8 +244,8 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
-	m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::ExampleCompute);
-	m_mouseSelectionResolvePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrComputePipelineDescriptor(), CrBuiltinShaders::EditorMouseSelectionResolveCS);
+	m_exampleComputePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrBuiltinShaders::ExampleCompute);
+	m_mouseSelectionResolvePipeline = CrBuiltinComputePipeline(renderDevice.get(), CrBuiltinShaders::EditorMouseSelectionResolveCS);
 
 	{
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
@@ -255,8 +255,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	}
 
 	{
-		CrComputePipelineDescriptor computePipelineDescriptor;
-		m_createIndirectArguments = CrBuiltinComputePipeline(renderDevice.get(), computePipelineDescriptor, CrBuiltinShaders::CreateIndirectArguments);
+		m_createIndirectArguments = CrBuiltinComputePipeline(renderDevice.get(), CrBuiltinShaders::CreateIndirectArguments);
 	}
 
 	{

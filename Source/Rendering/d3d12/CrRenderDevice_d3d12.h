@@ -77,7 +77,7 @@ private:
 
 	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
-	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader) override;
+	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) override;
 
 	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) override;
 

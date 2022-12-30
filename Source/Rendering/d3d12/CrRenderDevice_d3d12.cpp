@@ -337,7 +337,7 @@ ICrGraphicsPipeline* CrRenderDeviceD3D12::CreateGraphicsPipelinePS
 	return new CrGraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const CrComputeShaderHandle& computeShader)
+ICrComputePipeline* CrRenderDeviceD3D12::CreateComputePipelinePS(const CrComputeShaderHandle& computeShader)
 {
 	return new CrComputePipelineD3D12(this, computeShader);
 }

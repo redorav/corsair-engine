@@ -694,7 +694,7 @@ ICrGraphicsPipeline* CrRenderDeviceVulkan::CreateGraphicsPipelinePS
 	return new CrGraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS(const CrComputePipelineDescriptor& /*pipelineDescriptor*/, const CrComputeShaderHandle& computeShader)
+ICrComputePipeline* CrRenderDeviceVulkan::CreateComputePipelinePS(const CrComputeShaderHandle& computeShader)
 {
 	return new CrComputePipelineVulkan(this, computeShader);
 }

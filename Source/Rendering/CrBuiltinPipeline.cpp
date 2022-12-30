@@ -35,8 +35,7 @@ CrBuiltinGraphicsPipeline::CrBuiltinGraphicsPipeline
 	m_graphicsPipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 }
 
-CrBuiltinComputePipeline::CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, const CrComputePipelineDescriptor& computePipelineDescriptor, CrBuiltinShaders::T computeShader)
-	: m_computePipelineDescriptor(computePipelineDescriptor)
+CrBuiltinComputePipeline::CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, CrBuiltinShaders::T computeShader)
 {
 	const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 
@@ -46,5 +45,5 @@ CrBuiltinComputePipeline::CrBuiltinComputePipeline(ICrRenderDevice* renderDevice
 
 	CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
 
-	m_computePipeline = CrPipelineStateManager::Get().GetComputePipeline(computePipelineDescriptor, shader);
+	m_computePipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
 }

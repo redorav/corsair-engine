@@ -6,10 +6,10 @@
 #include "Core/Logging/ICrDebug.h"
 
 ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUDeletable(renderDevice)
-	, m_access(descriptor.access)
 	, m_usage(descriptor.usage)
-	, m_mapped(false)
+	, m_access(descriptor.access)
 	, m_dataFormat(descriptor.dataFormat)
+	, m_mapped(false)
 	, m_sizeBytes(descriptor.numElements * descriptor.stride)
 	, m_strideBytes(descriptor.stride)
 	, m_numElements(descriptor.numElements)

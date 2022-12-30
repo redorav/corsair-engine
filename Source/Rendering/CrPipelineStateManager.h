@@ -20,7 +20,7 @@ public:
 		const CrVertexDescriptor& vertexDescriptor
 	);
 
-	CrComputePipelineHandle GetComputePipeline(const CrComputePipelineDescriptor& pipelineDescriptor, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineHandle GetComputePipeline(const CrComputeShaderHandle& computeShader);
 
 	static CrPipelineStateManager& Get();
 

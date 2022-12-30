@@ -42,7 +42,7 @@ public:
 
 	CrBuiltinComputePipeline() {}
 
-	CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, const CrComputePipelineDescriptor& computePipelineDescriptor, CrBuiltinShaders::T computeShader);
+	CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, CrBuiltinShaders::T computeShader);
 
 	const ICrComputePipeline* get() { return m_computePipeline.get(); }
 

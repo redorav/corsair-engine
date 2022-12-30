@@ -411,7 +411,7 @@ project(ProjectShaderCompiler)
 	kind('ConsoleApp')
 	files { SourceShaderCompilerDirectory..'/**' }
 	
-	pchheader('CrShaderCompiler_pch.h')
+	pchheader('Rendering/ShaderCompiler/CrShaderCompiler_pch.h')
 	pchsource(SourceShaderCompilerDirectory..'/CrShaderCompiler_pch.cpp')
 	
 	links { ProjectCore }
@@ -464,7 +464,7 @@ SourceCoreDirectory = SourceDirectory..'/Core'
 project(ProjectCore)
 	kind('StaticLib')
 	
-	pchheader('CrCore_pch.h')
+	pchheader('Core/CrCore_pch.h')
 	pchsource(SourceCoreDirectory..'/CrCore_pch.cpp')
 	
 	files

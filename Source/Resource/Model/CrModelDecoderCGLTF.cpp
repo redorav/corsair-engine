@@ -1,4 +1,4 @@
-#include "CrResource_pch.h"
+#include "Resource/CrResource_pch.h"
 
 #include "CrModelDecoderCGLTF.h"
 

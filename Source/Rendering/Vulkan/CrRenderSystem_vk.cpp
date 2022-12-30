@@ -29,9 +29,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 	void* pUserData
 )
 {
-	(messageSeverity);
-	(messageType);
-	(pUserData);
+	unused_parameter(messageType);
+	unused_parameter(pUserData);
 
 	switch (messageSeverity)
 	{
@@ -39,6 +38,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: CrLog(pCallbackData->pMessage); break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: CrLogWarning(pCallbackData->pMessage); break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: CrLogError(pCallbackData->pMessage); break;
+		default: break;
 	}
 
 	// The application should always return VK_FALSE. The VK_TRUE value is reserved for use in layer development.
@@ -54,7 +54,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 
 	uint32_t vulkanApiVersion = VK_VERSION_1_0;
 
-	if(vkEnumerateInstanceVersion != nullptr)
+	if(&vkEnumerateInstanceVersion != nullptr)
 	{
 		vkEnumerateInstanceVersion(&vulkanApiVersion);
 	}

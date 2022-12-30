@@ -61,8 +61,6 @@ float4x4 ComputeProjectionMatrix(ImDrawData* data)
 CrImGuiRenderer* ImGuiRenderer = nullptr;
 
 CrImGuiRenderer::CrImGuiRenderer()
-	: m_currentMaxIndexCount(0)
-	, m_currentMaxVertexCount(0)
 {
 }
 

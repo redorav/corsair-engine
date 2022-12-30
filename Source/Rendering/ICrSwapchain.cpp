@@ -19,10 +19,10 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/) : CrGPUDeletable(renderDevice)
 	, m_imageCount(0)
+	, m_format(cr3d::DataFormat::Invalid)
 	, m_width(0)
 	, m_height(0)
 	, m_currentBufferIndex(0)
-	, m_format(cr3d::DataFormat::Invalid)
 	, m_imageAcquired(false)
 {
 

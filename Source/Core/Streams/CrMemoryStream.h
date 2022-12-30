@@ -8,8 +8,8 @@ class CrMemoryStream final : public ICrStream
 {
 public:
 
-	static const bool IsReading() { return StreamTypeT == CrStreamType::Read; }
-	static const bool IsWriting() { return StreamTypeT == CrStreamType::Write; }
+	static bool IsReading() { return StreamTypeT == CrStreamType::Read; }
+	static bool IsWriting() { return StreamTypeT == CrStreamType::Write; }
 
 	CrMemoryStream(uint8_t* memory)
 		: m_baseDataPointer(memory)
@@ -47,7 +47,7 @@ public:
 	virtual CrMemoryStream& operator << (const float& value) override { CrAssert(IsWriting()); Write(value); return *this; }
 	virtual CrMemoryStream& operator << (const double& value) override { CrAssert(IsWriting()); Write(value); return *this; }
 
-	virtual CrMemoryStream& operator << (CrStreamDataBlob& dataBlob)
+	virtual CrMemoryStream& operator << (CrStreamDataBlob& dataBlob) override
 	{
 		*this << dataBlob.size;
 
@@ -113,8 +113,8 @@ private:
 		m_currentPointer += sizeof(value);
 	}
 
-	uint8_t* m_currentPointer;
 	uint8_t* m_baseDataPointer;
+	uint8_t* m_currentPointer;
 };
 
 typedef CrMemoryStream<CrStreamType::Read> CrReadMemoryStream;

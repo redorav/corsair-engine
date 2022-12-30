@@ -40,11 +40,5 @@ private:
 
 	CrTextureHandle m_fontAtlas;
 
-	// Imgui's vertex and index buffers grow if more vertices
-	// are needed, but never shrink
-	uint32_t m_currentMaxIndexCount;
-
-	uint32_t m_currentMaxVertexCount;
-
 	CrImGuiRendererInitParams m_initParams;
 };

@@ -528,8 +528,10 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	// Populate the render device properties into the platform-independent structure
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);
 
-	VkPhysicalDeviceVulkan11Properties vulkan11Properties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES };
-	VkPhysicalDeviceVulkan12Properties vulkan12Properties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES };
+	VkPhysicalDeviceVulkan11Properties vulkan11Properties = {};
+	vulkan11Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+	VkPhysicalDeviceVulkan12Properties vulkan12Properties = {};
+	vulkan12Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
 
 	VkDriverId driverId = VK_DRIVER_ID_MAX_ENUM;
 

@@ -27,7 +27,8 @@ static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, c
 {
 	if (vkSetDebugUtilsObjectTag)
 	{
-		VkDebugUtilsObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT };
+		VkDebugUtilsObjectTagInfoEXT tagInfo = {};
+		tagInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT;
 		tagInfo.objectType = VK_OBJECT_TYPE_SHADER_MODULE;
 		tagInfo.objectHandle = (uint64_t)vkShaderModule;
 		tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;

@@ -65,7 +65,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	{
 		computePipeline = m_renderDevice->CreateComputePipeline(computeShader);
 
-		m_computePipelines.insert({ combinedHash.GetHash(), computePipeline }); // Insert in the hashmap
+		m_computePipelines.insert({ computeShaderHash.GetHash(), computePipeline }); // Insert in the hashmap
 	}
 
 	return computePipeline;

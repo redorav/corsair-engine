@@ -18,8 +18,6 @@ namespace eastl
 	template <bool bCondition, class ConditionIsTrueType, class ConditionIsFalseType> struct type_select;
 
 	// Containers
-	template <size_t N, typename WordType> class bitset;
-
 	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
 
 	template <typename Key, typename T, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_map;
@@ -79,9 +77,11 @@ namespace eastl
 
 namespace crstl
 {
-	template<typename T, size_t N> struct array;
+	template<typename T, size_t N> class array;
 
 	template<typename T> class intrusive_ptr;
+
+	template<size_t N, typename WordType> class bitset;
 };
 
 // Containers
@@ -89,7 +89,7 @@ template<typename T, size_t N>
 using CrArray = crstl::array<T, N>;
 
 template<size_t N, typename WordType = size_t>
-using CrBitset = eastl::bitset<N, WordType>;
+using CrBitset = crstl::bitset<N, WordType>;
 
 // Copied from EASTL
 #if !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x can't handle the declaration below.

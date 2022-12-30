@@ -3,8 +3,10 @@
 namespace crstl
 {
 	template<typename T, size_t N = 1>
-	struct array
+	class array
 	{
+	public:
+
 		constexpr T* begin() { return m_contents; }
 		constexpr const T* begin() const { return m_contents; }
 		constexpr const T* cbegin() const { return m_contents; }

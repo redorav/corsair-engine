@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/CRSTL/array.h"
-#include <EASTL/bitset.h>
+#include <Core/CRSTL/bitset.h>
 #include <EASTL/deque.h>
 #include <EASTL/fixed_vector.h>
 #include <EASTL/hash_map.h>

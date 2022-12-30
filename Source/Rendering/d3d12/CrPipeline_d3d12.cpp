@@ -140,6 +140,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 			case cr3d::ShaderStage::Hull: d3d12PipelineStateDescriptor.HS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
 			case cr3d::ShaderStage::Domain: d3d12PipelineStateDescriptor.DS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
 			case cr3d::ShaderStage::Geometry: d3d12PipelineStateDescriptor.GS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			default: break;
 		}
 	}
 

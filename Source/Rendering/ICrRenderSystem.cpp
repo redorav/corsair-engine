@@ -7,11 +7,11 @@
 // Include all the necessary platforms here
 
 #if defined(VULKAN_API)
-#include "vulkan/CrRenderSystem_vk.h"
+#include "Vulkan/CrRenderSystem_vk.h"
 #endif
 
 #if defined(D3D12_API)
-#include "d3d12/CrRenderSystem_d3d12.h"
+#include "D3D12/CrRenderSystem_d3d12.h"
 #endif
 
 #include "Core/Streams/CrMemoryStream.h"

@@ -227,6 +227,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 
 						case cr3d::CubemapFace::PositiveZ: position = { 1.0f - fw, 1.0f - fh, 1.0f, 1.0f }; break;
 						case cr3d::CubemapFace::NegativeZ: position = { fw, 1.0f - fh, 0.0f, 1.0f }; break;
+						default: break;
 					}
 
 					position = mul(position * 2.0f - 1.0f, descriptor.transform);

@@ -7,9 +7,9 @@
 
 ICrGPUQueryPool::ICrGPUQueryPool(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : CrGPUDeletable(renderDevice)
 , m_descriptor(descriptor)
-, m_currentQuery(0)
 , m_resolved(false)
 , m_querySize(0) // Gets calculated by each platform
+, m_currentQuery(0)
 , m_timestampPeriod(1.0) // Gets calculated per platform
 {}
 

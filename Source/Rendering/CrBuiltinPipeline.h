@@ -48,7 +48,5 @@ public:
 
 private:
 
-	CrComputePipelineDescriptor m_computePipelineDescriptor;
-
 	CrComputePipelineHandle m_computePipeline;
 };

@@ -62,8 +62,8 @@ struct CrRenderPassBufferDescriptor
 	uint32_t offset;
 
 	cr3d::BufferState::T sourceState;
-	cr3d::BufferState::T destinationState;
 	cr3d::ShaderStageFlags::T sourceShaderStages;
+	cr3d::BufferState::T destinationState;
 	cr3d::ShaderStageFlags::T destinationShaderStages;
 };
 

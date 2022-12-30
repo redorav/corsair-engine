@@ -419,6 +419,7 @@ void CrRenderGraph::Execute()
 						}
 						break;
 					}
+					default: break;
 				}
 			}
 

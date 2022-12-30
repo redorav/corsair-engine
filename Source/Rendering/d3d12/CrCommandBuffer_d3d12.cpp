@@ -9,8 +9,10 @@
 
 #include "Core/CrAlignment.h"
 
+warnings_off
 #define USE_PIX
 #include "WinPixEventRuntime/pix3.h"
+warnings_on
 
 #include "Core/Logging/ICrDebug.h"
 

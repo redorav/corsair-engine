@@ -36,7 +36,7 @@ public:
 
 	~CrComputeShaderVulkan();
 
-	const VkShaderModule GetVkShaderModule() const { return m_vkShaderModule; }
+	VkShaderModule GetVkShaderModule() const { return m_vkShaderModule; }
 
 	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 

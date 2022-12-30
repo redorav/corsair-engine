@@ -10,7 +10,8 @@ SourceShadersDirectory   = SourceRenderingDirectory..'/Shaders'
 WorkspaceDirectory       = 'Workspace/'.._ACTION
 
 -- IDE Platform Names
-DesktopWin64 = 'Desktop Win64'
+MSVCWin64    = 'MSVC Win64'
+ClangWin64   = 'Clang Win64'
 VulkanOSX    = 'Vulkan OSX'
 
 PlatformWindows = "Windows"
@@ -19,6 +20,8 @@ GraphicsApiD3D12 = "D3D12"
 
 Platform = nil
 GraphicsApis = {}
+
+Win64PlatformFilter = "platforms:"..MSVCWin64..' or '..ClangWin64
 
 -- Project Names
 ProjectCorsairEngine    = 'Corsair Engine'
@@ -89,12 +92,9 @@ end
 
 workspace 'Corsair Engine'
 	configurations { 'Debug', 'Release' }
-	platforms { DesktopWin64 }
+	platforms { MSVCWin64, ClangWin64 }
 	location (WorkspaceDirectory)
 	preferredtoolarchitecture('x86_64') -- Prefer this toolset on MSVC as it can handle more memory for multiprocessor compiles
-	toolset('msc') -- Use default VS toolset TODO do this platform specific
-	--toolset('msc-llvm') -- Use for Clang on VS
-	--toolset('msc-clangcl') -- Use for Clang on VS
 	warnings('extra')
 	startproject(ProjectCorsairEngine)
 	language('C++')
@@ -109,6 +109,13 @@ workspace 'Corsair Engine'
 	flags { 'fatalcompilewarnings' }
 	vectorextensions('sse4.1')
 	
+	filter('platforms:'..MSVCWin64)
+		toolset('msc')
+
+	filter('platforms:'..ClangWin64)
+		toolset('msc-clangcl')
+		--toolset('msc-llvm') -- Older versions of Clang in VS
+
 	filter('toolset:msc*')
 		flags
 		{
@@ -117,7 +124,6 @@ workspace 'Corsair Engine'
 		
 		buildoptions
 		{
-			'/experimental:module',
 			'/permissive-'
 		}
 		
@@ -139,7 +145,7 @@ workspace 'Corsair Engine'
 	
 	includedirs	{ SourceDirectory }
 
-	filter { 'platforms:'..DesktopWin64 }
+	filter { Win64PlatformFilter }
 		system('windows')
 		architecture('x64')
 		Platform = PlatformWindows
@@ -315,7 +321,7 @@ project(ProjectRendering)
 	AddLibraryIncludes(SPIRVReflectLibrary)
 	AddLibraryIncludes(RenderDocLibrary)
 	
-	filter { 'platforms:'..DesktopWin64 }
+	filter { Win64PlatformFilter }
 		files { SourceRenderingDirectory..'/Vulkan/*' }
 		files { SourceRenderingDirectory..'/D3D12/*' }
 		AddLibraryIncludes(VulkanLibrary)
@@ -445,7 +451,7 @@ SourceModelDirectory = SourceResourceDirectory..'/Model'
 
 project(ProjectResource)
 	kind('StaticLib')
-	pchheader('CrResource_pch.h')
+	pchheader('Resource/CrResource_pch.h')
 	pchsource(SourceResourceDirectory..'/CrResource_pch.cpp')
 	dependson { ProjectShaders }
 	files

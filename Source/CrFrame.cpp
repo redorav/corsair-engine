@@ -51,7 +51,7 @@ bool HashingAssert()
 {
 	CrGraphicsPipelineDescriptor defaultDescriptor;
 	CrHash defaultDescriptorHash = CrHash(defaultDescriptor);
-	CrAssertMsg(defaultDescriptorHash == CrHash(14802820647099604725), "Failed to hash known pipeline descriptor!");
+	CrAssertMsg(defaultDescriptorHash == CrHash(14802820647099604725u), "Failed to hash known pipeline descriptor!");
 	return true;
 }
 
@@ -572,7 +572,7 @@ void CrFrame::Process()
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
 		renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f));
 	},
-	[this, &identityConstantBuffer](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->SetViewport(CrViewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 		commandBuffer->SetScissor(CrRectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
@@ -906,8 +906,8 @@ void CrFrame::DrawDebugUI()
 			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
-			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, cr3d::GraphicsApi::ToString(properties.graphicsApi));
-			ImGui::Text("Frame: %i", CrFrameTime::GetFrameCount());
+			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, properties.graphicsApiDisplay.c_str());
+			ImGui::Text("Frame: %llu", CrFrameTime::GetFrameCount());
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %d Instances: %d Vertices: %d", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetInstanceCount(), CrRenderingStatistics::GetVertexCount());
@@ -949,7 +949,7 @@ void CrFrame::DrawDebugUI()
 					if (pass.type != CrRenderGraphPassType::Behavior)
 					{
 						ImGui::TableSetColumnIndex(0);
-						ImGui::Text(pass.name.c_str());
+						ImGui::Text("%s", pass.name.c_str());
 
 						ImGui::TableSetColumnIndex(1);
 						ImGui::Text("%lfms", interval.durationNanoseconds / 1e6);

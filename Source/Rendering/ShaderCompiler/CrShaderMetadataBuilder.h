@@ -2,6 +2,8 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
+#include <vector>
+
 struct SpvReflectDescriptorBinding;
 struct SpvReflectTypeDescription;
 

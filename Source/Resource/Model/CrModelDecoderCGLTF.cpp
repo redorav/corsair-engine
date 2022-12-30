@@ -32,6 +32,7 @@ cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 		case cgltf_component_type_r_16u:	return cr3d::DataFormat::R16_Uint;
 		case cgltf_component_type_r_32u:	return cr3d::DataFormat::R32_Uint;
 		case cgltf_component_type_r_32f:	return cr3d::DataFormat::R32_Float;
+		default: break;
 	}
 	CrAssertMsg(false, "Failed to convert data format: %i", componentType);
 	return cr3d::DataFormat::R32_Float;

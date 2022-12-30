@@ -1,4 +1,4 @@
-#include "CrShaderCompiler_pch.h"
+#include "Rendering/ShaderCompiler/CrShaderCompiler_pch.h"
 
 #include "CrCompilerDXC.h"
 
@@ -31,14 +31,14 @@
 
 // DXC Argument handling
 static const wchar_t* DXCArgumentWarningsAsErrors  = L"-WX";
-static const wchar_t* DXCArgumentOptimization0     = L"-O0";
-static const wchar_t* DXCArgumentOptimization1     = L"-O1";
-static const wchar_t* DXCArgumentOptimization2     = L"-O2";
+//static const wchar_t* DXCArgumentOptimization0     = L"-O0";
+//static const wchar_t* DXCArgumentOptimization1     = L"-O1";
+//static const wchar_t* DXCArgumentOptimization2     = L"-O2";
 static const wchar_t* DXCArgumentOptimization3     = L"-O3";
 static const wchar_t* DXCArgumentEnableDebug       = L"-Zi";
 
-static const wchar_t* DXCArgumentSkipValidation    = L"-Vd";
-static const wchar_t* DXCArgumentSkipOptimizations = L"-Od";
+//static const wchar_t* DXCArgumentSkipValidation    = L"-Vd";
+//static const wchar_t* DXCArgumentSkipOptimizations = L"-Od";
 
 static const wchar_t* DXCArgumentEntryPoint        = L"-E";
 static const wchar_t* DXCArgumentShaderProfile     = L"-T";
@@ -389,6 +389,8 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 			break;
 		case cr3d::ShaderResourceType::RWDataBuffer:
 			reflectionHeader.rwDataBuffers.push_back(resource);
+			break;
+		default: // TODO Handle Data Buffers
 			break;
 	}
 }

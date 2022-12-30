@@ -15,13 +15,13 @@
 struct CrHardwareGPUBufferDescriptor
 {
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t size)
-		: usage(usage), access(access), numElements(1), stride(size), dataFormat(cr3d::DataFormat::Invalid) {}
+		: usage(usage), access(access), dataFormat(cr3d::DataFormat::Invalid), numElements(1), stride(size) {}
 
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, uint32_t stride)
-		: usage(usage), access(access), numElements(numElements), stride(stride), dataFormat(cr3d::DataFormat::Invalid) {}
+		: usage(usage), access(access), dataFormat(cr3d::DataFormat::Invalid), numElements(numElements), stride(stride) {}
 
 	CrHardwareGPUBufferDescriptor(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access, uint32_t numElements, cr3d::DataFormat::T dataFormat)
-		: usage(usage), access(access), numElements(numElements), dataFormat(dataFormat), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
+		: usage(usage), access(access), dataFormat(dataFormat), numElements(numElements), stride(cr3d::DataFormats[dataFormat].dataOrBlockSize) {}
 
 	cr3d::BufferUsage::T usage;
 

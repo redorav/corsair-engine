@@ -2,7 +2,14 @@
 
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRendererConfig.h"
+#include "Rendering/ICrShader.h"
+
 #include "Core/Logging/ICrDebug.h"
+
+CrMaterial::~CrMaterial()
+{
+
+}
 
 CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(CrMaterialPipelineVariant::T pipelineVariant)
 {

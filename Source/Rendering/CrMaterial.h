@@ -6,7 +6,6 @@
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/ICrPipeline.h"
-#include "Rendering/ICrShader.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
@@ -133,6 +132,8 @@ static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescrip
 class CrMaterial final : public CrIntrusivePtrInterface
 {
 public:
+
+	~CrMaterial();
 
 	const CrGraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
 

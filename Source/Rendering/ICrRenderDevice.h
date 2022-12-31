@@ -7,7 +7,6 @@
 #include "Core/Containers/CrVector.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/String/CrString.h"
-#include "Core/Function/CrFixedFunction.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrUniquePtr.h"
@@ -275,8 +274,6 @@ protected:
 	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 
 	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
-
-	CrGPUDeletionCallbackType m_gpuDeletionCallback;
 
 	CrUniquePtr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 

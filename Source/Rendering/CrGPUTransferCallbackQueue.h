@@ -3,6 +3,7 @@
 #include "CrRenderingForwardDeclarations.h"
 
 #include "Core/Containers/CrFixedVector.h"
+#include "Core/Function/CrFixedFunction.h"
 
 #include "Core/Containers/CrDeque.h"
 

@@ -36,7 +36,6 @@ ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRe
 	m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
 	m_renderDeviceProperties.preferredVendor = descriptor.preferredVendor;
 
-	m_gpuDeletionCallback = [this](CrGPUDeletable* deletable) { m_gpuDeletionQueue->AddToQueue(deletable); };
 	m_gpuDeletionQueue = CrUniquePtr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
 
 	m_gpuTransferCallbackQueue = CrUniquePtr<CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());

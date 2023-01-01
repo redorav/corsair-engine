@@ -24,8 +24,6 @@ namespace eastl
 
 	template <typename Key, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_set;
 
-	template<typename T, size_t nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_vector;
-
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_map;
 
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
@@ -79,6 +77,8 @@ namespace crstl
 {
 	template<typename T, size_t N> class array;
 
+	template<typename T, size_t N> class fixed_vector;
+
 	template<typename T> class intrusive_ptr;
 
 	template<size_t N, typename WordType> class bitset;
@@ -108,7 +108,7 @@ template<typename Key, size_t N>
 using CrFixedSet = eastl::fixed_set<Key, N, false, eastl::less<Key>, eastl::dummy_allocator>;
 
 template<typename T, size_t N>
-using CrFixedVector = eastl::fixed_vector<T, N, false, eastl::dummy_allocator>;
+using CrFixedVector = crstl::fixed_vector<T, N>;
 
 template<typename Key, typename S>
 using CrHashMap = eastl::hash_map<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;

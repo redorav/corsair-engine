@@ -17,14 +17,16 @@ namespace crstl
 		return c;
 	}
 
-	template<size_t num_bits, typename word_type>
+	template<size_t NumBits, typename WordType>
 	class bitset
 	{
 	public:
 
+		typedef WordType word_type;
+
 		enum : word_type
 		{
-			kNumBits = num_bits,
+			kNumBits = NumBits,
 			kBitsPerWord = sizeof(word_type) * 8,
 			kBitsPerWordMask = kBitsPerWord - 1, // Used as modulo for words
 			kBitsPerWordShift =                  // How many bits to shift for this word type
@@ -33,7 +35,7 @@ namespace crstl
 			(kBitsPerWord == 32) ? 5 :
 			(kBitsPerWord == 64) ? 6 : 7,
 			kMaxWordValue = word_type(~word_type(0)),                          // Maximum value of this word type
-			kNumWords = (num_bits + kBitsPerWord - 1) / kBitsPerWord,          // How many words we need to store the number of bits
+			kNumWords = (NumBits + kBitsPerWord - 1) / kBitsPerWord,          // How many words we need to store the number of bits
 			kLastWordBits = kNumBits - (kNumWords - 1) * kBitsPerWord,         // How many bits in the last word
 			kLastWordBitMask = kMaxWordValue >> (kBitsPerWord - kLastWordBits) // Mask for those "leftover" bits in the last word
 		};

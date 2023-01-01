@@ -4,16 +4,16 @@
 
 #include "Core/CRSTL/array.h"
 #include <Core/CRSTL/bitset.h>
+#include <Core/CRSTL/fixed_vector.h>
 
 warnings_off
-#include <EASTL/deque.h>
-#include <EASTL/fixed_vector.h>
+#include <EASTL/fixed_string.h>
+#include <EASTL/vector.h>
+#include <EASTL/string.h>
 #include <EASTL/hash_map.h>
 #include <EASTL/set.h>
-#include <EASTL/vector.h>
+#include <EASTL/deque.h>
 
-#include <EASTL/fixed_string.h>
-#include <EASTL/string.h>
 #include <EASTL/unique_ptr.h>
 warnings_on
 

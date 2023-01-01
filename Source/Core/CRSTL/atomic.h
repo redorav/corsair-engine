@@ -118,8 +118,7 @@ namespace crstl
 		return crstl_atomic_xor64(target, value);
 	}
 
-	template<size_t N>
-	struct atomic_type {};
+	template<size_t N> struct atomic_type {};
 
 	template<> struct atomic_type<1> { using type = int8_t; };
 	template<> struct atomic_type<2> { using type = int16_t; };

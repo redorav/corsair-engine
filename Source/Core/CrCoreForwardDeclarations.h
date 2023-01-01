@@ -20,10 +20,6 @@ namespace eastl
 	// Containers
 	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
 
-	template <typename Key, typename T, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_map;
-
-	template <typename Key, size_t nodeCount, bool bEnableOverflow, typename Compare, typename OverflowAllocator> class fixed_set;
-
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_map;
 
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
@@ -101,12 +97,6 @@ using CrBitset = crstl::bitset<N, WordType>;
 template<typename T>
 using CrDeque = eastl::deque<T, eastl::allocator, DEQUE_DEFAULT_SUBARRAY_SIZE(T)>;
 
-template<typename Key, typename U, size_t N>
-using CrFixedMap = eastl::fixed_map<Key, U, N, false, eastl::less<Key>, eastl::dummy_allocator>;
-
-template<typename Key, size_t N>
-using CrFixedSet = eastl::fixed_set<Key, N, false, eastl::less<Key>, eastl::dummy_allocator>;
-
 template<typename T, size_t N>
 using CrFixedVector = crstl::fixed_vector<T, N>;
 
@@ -127,12 +117,6 @@ using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
 template<typename T>
 using CrVector = eastl::vector<T, eastl::allocator>;
-
-template<typename Key, typename T>
-using CrVectorMap = eastl::vector_map<Key, T, eastl::less<Key>, eastl::allocator, eastl::vector<eastl::pair<Key, T>, eastl::allocator>>;
-
-template<typename Key>
-using CrVectorSet = eastl::vector_set<Key, eastl::less<Key>, eastl::allocator, eastl::vector<Key, eastl::allocator>>;
 
 // Smart Pointers
 template<typename T>

@@ -31,9 +31,9 @@
 
 #endif
 
-#define CRSTL_ASSERT
+#define CRSTL_ENABLE_ASSERT
 
-#if defined(CRSTL_ASSERT)
+#if defined(CRSTL_ENABLE_ASSERT)
 
 inline void crstl_assert_impl(bool condition)
 {

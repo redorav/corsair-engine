@@ -31,8 +31,23 @@
 
 #endif
 
-#if defined(_MSC_VER)
+#define CRSTL_ASSERT
+
+#if defined(CRSTL_ASSERT)
+
+inline void crstl_assert_impl(bool condition)
+{
+	if (!condition)
+	{
+		int* p = nullptr;
+		*p = 0;
+	}
+}
+
+#define crstl_assert(x) crstl_assert_impl((x))
 
 #else
+
+#define crstl_assert(x)
 
 #endif

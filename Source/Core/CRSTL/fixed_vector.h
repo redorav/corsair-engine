@@ -53,8 +53,8 @@ namespace crstl
 		reference at(size_t i) { crstl_assert(i < m_currentSize); return m_data[i]; }
 		const_reference at(size_t i) const { crstl_assert(i < m_currentSize); return m_data[i]; }
 
-		reference back() { return m_data[m_currentSize - 1]; }
-		const_reference back() const { return m_data[m_currentSize - 1]; }
+		reference back() { crstl_assert(m_currentSize > 0); return m_data[m_currentSize - 1]; }
+		const_reference back() const { crstl_assert(m_currentSize > 0); return m_data[m_currentSize - 1]; }
 
 		iterator begin() { return &m_data[0]; }
 		const_iterator begin() const { return &m_data[0]; }

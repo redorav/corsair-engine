@@ -4,6 +4,3 @@
 [submodule "Dependencies/ddspp/Include"]
 	path = Dependencies/ddspp/Include
 	url = https://github.com/redorav/ddspp/
-[submodule "Dependencies/crstl"]
-	path = Dependencies/crstl
-	url = https://github.com/redorav/crstl

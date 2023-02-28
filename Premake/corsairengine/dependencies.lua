@@ -7,6 +7,7 @@ IncludeDirectory = '/Include/'
 -- Library Directories
 LibAssimp       = DependenciesDirectory..'/assimp'
 LibCGLTF        = DependenciesDirectory..'/cgltf'
+LibCRSTL        = DependenciesDirectory..'/crstl'
 LibDdspp        = DependenciesDirectory..'/ddspp'
 LibDxc          = DependenciesDirectory..'/dxc'
 LibEASTL        = DependenciesDirectory..'/eastl'
@@ -34,6 +35,12 @@ AssimpLibrary =
 CGLTFLibrary =
 {
 	includeDirs = LibCGLTF..IncludeDirectory
+}
+
+CRSTLLibrary =
+{
+	includeDirs = LibCRSTL..IncludeDirectory,
+	natvis      = LibCRSTL..IncludeDirectory..'*.natvis',
 }
 
 D3D12Library =

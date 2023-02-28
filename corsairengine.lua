@@ -187,6 +187,7 @@ workspace 'Corsair Engine'
 	-- Global library includes. Very few things should go here, basically things
 	-- that are used in every possible project like math and containers
 	
+	AddLibraryIncludes(CRSTLLibrary)
 	AddLibraryIncludes(DdsppLibrary)
 	AddLibraryIncludes(EASTLLibrary)
 	AddLibraryIncludes(HalfLibrary)
@@ -479,6 +480,7 @@ project(ProjectCore)
 		xxHashLibrary.includeDirs..'/xxhash.h'
 	}
 
+	AddLibraryNatvis(CRSTLLibrary)
 	AddLibraryNatvis(EASTLLibrary)
 	AddLibraryIncludes(SDL2Library)
 

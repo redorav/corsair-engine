@@ -39,7 +39,7 @@ CGLTFLibrary =
 
 CRSTLLibrary =
 {
-	includeDirs = LibCRSTL..IncludeDirectory,
+	includeDirs = LibCRSTL..IncludeDirectory..'include',
 	natvis      = LibCRSTL..IncludeDirectory..'*.natvis',
 }
 

@@ -1,4 +1,4 @@
 #pragma once
 
-#include <Core/CRSTL/bitset.h>
+#include <crstl/bitset.h>
 #include "Core/CrCoreForwardDeclarations.h"

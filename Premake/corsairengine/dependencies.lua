@@ -40,7 +40,7 @@ CGLTFLibrary =
 CRSTLLibrary =
 {
 	includeDirs = LibCRSTL..IncludeDirectory..'include',
-	natvis      = LibCRSTL..IncludeDirectory..'*.natvis',
+	natvis      = LibCRSTL..IncludeDirectory..'include/*.natvis',
 }
 
 D3D12Library =

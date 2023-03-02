@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/CRSTL/intrusive_ptr.h>
+#include <crstl/intrusive_ptr.h>
 
 template<typename T>
 using CrIntrusivePtr = crstl::intrusive_ptr<T>;

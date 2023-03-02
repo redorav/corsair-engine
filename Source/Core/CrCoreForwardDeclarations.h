@@ -78,6 +78,8 @@ namespace crstl
 	template<typename T> class intrusive_ptr;
 
 	template<size_t N, typename WordType> class bitset;
+
+	template<typename T, int N> class basic_fixed_string;
 };
 
 // Containers
@@ -136,7 +138,7 @@ using CrWString = eastl::wstring;
 // of 16 has 15 usable characters
 
 template<int N>
-using CrFixedString = eastl::fixed_string<char, N, false, eastl::allocator>;
+using CrFixedString = crstl::basic_fixed_string<char, N>;
 
 using CrFixedString8     = CrFixedString<8>;
 using CrFixedString16    = CrFixedString<16>;

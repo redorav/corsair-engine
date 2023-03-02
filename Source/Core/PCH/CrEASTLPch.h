@@ -2,9 +2,10 @@
 
 #include "Core/CrMacros.h"
 
-#include "Core/CRSTL/array.h"
-#include <Core/CRSTL/bitset.h>
-#include <Core/CRSTL/fixed_vector.h>
+#include <crstl/array.h>
+#include <crstl/bitset.h>
+#include <crstl/fixed_vector.h>
+#include <crstl/fixed_string.h>
 
 warnings_off
 #include <EASTL/fixed_string.h>
@@ -17,10 +18,15 @@ warnings_off
 #include <EASTL/unique_ptr.h>
 warnings_on
 
-#include <Core/CRSTL/intrusive_ptr.h>
+#include <crstl/intrusive_ptr.h>
 
 // Explicit instantiations of commonly used templates
 template class eastl::fixed_string<char, 32, false, eastl::allocator>;
 template class eastl::fixed_string<char, 64, false, eastl::allocator>;
 template class eastl::fixed_string<char, 128, false, eastl::allocator>;
 template class eastl::fixed_string<char, 512, false, eastl::allocator>;
+
+template class crstl::basic_fixed_string<char, 32>;
+template class crstl::basic_fixed_string<char, 64>;
+template class crstl::basic_fixed_string<char, 128>;
+template class crstl::basic_fixed_string<char, 512>;

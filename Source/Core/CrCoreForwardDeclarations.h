@@ -2,6 +2,21 @@
 
 #include "stdint.h"
 
+// CRSTL
+
+namespace crstl
+{
+	template<typename T, size_t N> class array;
+
+	template<typename T, size_t N> class fixed_vector;
+
+	template<typename T> class intrusive_ptr;
+
+	template<size_t N, typename WordType> class bitset;
+
+	template<typename T, int N> class basic_fixed_string;
+};
+
 // EASTL
 
 namespace eastl
@@ -64,22 +79,22 @@ namespace eastl
 		}
 	};
 
+	template <typename T, int nodeCount>
+	struct hash<crstl::basic_fixed_string<T, nodeCount>>
+	{
+		size_t operator()(const crstl::basic_fixed_string<T, nodeCount>& x) const
+		{
+			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
+			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
+			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
+				result = (result * 16777619) ^ c;
+			return (size_t)result;
+		}
+	};
+
 	// Functional
 	template<int N, typename R>
 	class fixed_function;
-};
-
-namespace crstl
-{
-	template<typename T, size_t N> class array;
-
-	template<typename T, size_t N> class fixed_vector;
-
-	template<typename T> class intrusive_ptr;
-
-	template<size_t N, typename WordType> class bitset;
-
-	template<typename T, int N> class basic_fixed_string;
 };
 
 // Containers
@@ -152,7 +167,7 @@ using CrFixedString2048  = CrFixedString<2048>;
 using CrFixedString4096  = CrFixedString<4096>;
 
 template<int N>
-using CrFixedWString     = eastl::fixed_string<wchar_t, N, false, eastl::allocator>;
+using CrFixedWString     = crstl::basic_fixed_string<wchar_t, N>;
 
 using CrFixedWString8    = CrFixedWString<8>;
 using CrFixedWString16   = CrFixedWString<16>;

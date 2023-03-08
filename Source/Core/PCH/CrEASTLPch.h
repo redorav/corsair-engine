@@ -6,6 +6,8 @@
 #include <crstl/bitset.h>
 #include <crstl/fixed_vector.h>
 #include <crstl/fixed_string.h>
+#include <crstl/unique_ptr.h>
+#include <crstl/intrusive_ptr.h>
 
 warnings_off
 #include <EASTL/vector.h>
@@ -13,11 +15,7 @@ warnings_off
 #include <EASTL/hash_map.h>
 #include <EASTL/set.h>
 #include <EASTL/deque.h>
-
-#include <EASTL/unique_ptr.h>
 warnings_on
-
-#include <crstl/intrusive_ptr.h>
 
 // Explicit instantiations of commonly used templates
 template class crstl::basic_fixed_string<char, 32>;

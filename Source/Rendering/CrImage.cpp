@@ -16,7 +16,7 @@ CrImageDescriptor::CrImageDescriptor()
 
 }
 
-CrImage::CrImage() : m_width(1), m_height(1), m_depth(1), m_data(nullptr), m_format(cr3d::DataFormat::RGBA8_Unorm)
+CrImage::CrImage() : m_width(1), m_height(1), m_depth(1), m_format(cr3d::DataFormat::RGBA8_Unorm)
 {
 
 }

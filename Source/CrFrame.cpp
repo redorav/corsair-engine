@@ -492,28 +492,28 @@ void CrFrame::Process()
 
 	{
 		CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
-		depthTexture = m_mainRenderGraph.CreateTexture("Depth", depthDescriptor);
+		depthTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Depth"), depthDescriptor);
 
 		CrRenderGraphTextureDescriptor swapchainDescriptor(m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
-		swapchainTexture = m_mainRenderGraph.CreateTexture("Swapchain", swapchainDescriptor);
+		swapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Swapchain"), swapchainDescriptor);
 
 		CrRenderGraphTextureDescriptor preSwapchainDescriptor(m_preSwapchainTexture.get());
-		preSwapchainTexture = m_mainRenderGraph.CreateTexture("Pre Swapchain", preSwapchainDescriptor);
+		preSwapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Pre Swapchain"), preSwapchainDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor(m_gbufferAlbedoAOTexture.get());
-		gBufferAlbedoAO = m_mainRenderGraph.CreateTexture("GBuffer Albedo AO", gBufferAlbedoDescriptor);
+		gBufferAlbedoAO = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Albedo AO"), gBufferAlbedoDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor(m_gbufferNormalsTexture.get());
-		gBufferNormals = m_mainRenderGraph.CreateTexture("GBuffer Normals", gBufferNormalsDescriptor);
+		gBufferNormals = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Normals"), gBufferNormalsDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor(m_gbufferMaterialTexture.get());
-		gBufferMaterial = m_mainRenderGraph.CreateTexture("GBuffer Material", gBufferMaterialDescriptor);
+		gBufferMaterial = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Material"), gBufferMaterialDescriptor);
 
 		CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
-		lightingTexture = m_mainRenderGraph.CreateTexture("Lighting HDR", lightingDescriptor);
+		lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
 	}
 
-	m_mainRenderGraph.AddRenderPass("GBuffer Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -540,7 +540,7 @@ void CrFrame::Process()
 		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
 	});
 
-	m_mainRenderGraph.AddRenderPass("GBuffer Lighting Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Lighting Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddRenderTarget(lightingTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f));
@@ -566,7 +566,7 @@ void CrFrame::Process()
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
-	m_mainRenderGraph.AddRenderPass("Main Render Pass", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Main Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -590,17 +590,17 @@ void CrFrame::Process()
 	});
 
 	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor(m_debugShaderTexture.get());
-	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture("Debug Shader Texture", debugShaderTextureDescriptor);
+	CrRenderGraphTextureId debugShaderTextureId = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Debug Shader Texture"), debugShaderTextureDescriptor);
 
 	CrRenderGraphBufferDescriptor mouseSelectionBufferDescriptor(m_mouseSelectionBuffer->GetHardwareBuffer());
-	CrRenderGraphBufferId mouseSelectionBufferId = m_mainRenderGraph.CreateBuffer("Mouse Selection Buffer", mouseSelectionBufferDescriptor);
+	CrRenderGraphBufferId mouseSelectionBufferId = m_mainRenderGraph.CreateBuffer(CrRenderGraphString("Mouse Selection Buffer"), mouseSelectionBufferDescriptor);
 
 	const CrRenderList& edgeSelectionRenderList = m_renderWorld->GetRenderList(CrRenderListUsage::EdgeSelection);
 
 	if (edgeSelectionRenderList.Size() > 0)
 	{
-		m_mainRenderGraph.AddRenderPass("Edge Selection Render", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
-		[=](CrRenderGraph& renderGraph)
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Render"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		[depthTexture, debugShaderTextureId](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
 			renderGraph.AddRenderTarget(debugShaderTextureId, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -628,7 +628,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ExecuteBatch(); // Execute the last batch
 		});
 
-		m_mainRenderGraph.AddRenderPass("Edge Selection Resolve", float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Resolve"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 		[=](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store, float4(0.0f));
@@ -643,7 +643,7 @@ void CrFrame::Process()
 		});
 	}
 
-	m_mainRenderGraph.AddRenderPass("Copy Pass", float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Copy Pass"), float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddTexture(preSwapchainTexture, cr3d::ShaderStageFlags::Pixel);
@@ -657,20 +657,20 @@ void CrFrame::Process()
 	});
 
 	CrRenderGraphBufferDescriptor structuredBufferDescriptor(m_structuredBuffer->GetHardwareBuffer());
-	CrRenderGraphBufferId structuredBuffer = m_mainRenderGraph.CreateBuffer("Structured Buffer", structuredBufferDescriptor);
+	CrRenderGraphBufferId structuredBuffer = m_mainRenderGraph.CreateBuffer(CrRenderGraphString("Structured Buffer"), structuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor rwStructuredBufferDescriptor(m_rwStructuredBuffer->GetHardwareBuffer());
-	CrRenderGraphBufferId rwStructuredBuffer = m_mainRenderGraph.CreateBuffer("RW Structured Buffer", rwStructuredBufferDescriptor);
+	CrRenderGraphBufferId rwStructuredBuffer = m_mainRenderGraph.CreateBuffer(CrRenderGraphString("RW Structured Buffer"), rwStructuredBufferDescriptor);
 
 	CrRenderGraphBufferDescriptor colorsRWDataBufferDescriptor(m_colorsRWDataBuffer->GetHardwareBuffer());
-	CrRenderGraphBufferId colorsRWDataBuffer = m_mainRenderGraph.CreateBuffer("Colors RW Data Buffer", colorsRWDataBufferDescriptor);
+	CrRenderGraphBufferId colorsRWDataBuffer = m_mainRenderGraph.CreateBuffer(CrRenderGraphString("Colors RW Data Buffer"), colorsRWDataBufferDescriptor);
 
 	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor(m_colorsRWTexture.get());
-	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture("Colors RW Texture", colorsRWTextureDescriptor);
+	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Colors RW Texture"), colorsRWTextureDescriptor);
 
 	const ICrComputePipeline* exampleComputePipeline = m_exampleComputePipeline.get();
 
-	m_mainRenderGraph.AddRenderPass("Compute 1", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Compute 1"), float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
@@ -691,9 +691,9 @@ void CrFrame::Process()
 	});
 
 	CrRenderGraphBufferDescriptor indirectArgumentsBufferDescriptor(m_indirectDispatchArguments->GetHardwareBuffer());
-	CrRenderGraphBufferId indirectArgumentsBuffer = m_mainRenderGraph.CreateBuffer("Indirect Arguments", indirectArgumentsBufferDescriptor);
+	CrRenderGraphBufferId indirectArgumentsBuffer = m_mainRenderGraph.CreateBuffer(CrRenderGraphString("Indirect Arguments"), indirectArgumentsBufferDescriptor);
 
-	m_mainRenderGraph.AddRenderPass("Indirect Arguments Create", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Indirect Arguments Create"), float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddRWBuffer(indirectArgumentsBuffer, cr3d::ShaderStageFlags::Compute);
@@ -705,7 +705,7 @@ void CrFrame::Process()
 		commandBuffer->Dispatch(1, 1, 1);
 	});
 	
-	m_mainRenderGraph.AddRenderPass("Indirect Arguments Consume", float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Indirect Arguments Consume"), float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddBuffer(structuredBuffer, cr3d::ShaderStageFlags::Compute);
@@ -729,7 +729,7 @@ void CrFrame::Process()
 
 	if (m_renderWorld->GetMouseSelectionEnabled())
 	{
-		m_mainRenderGraph.AddRenderPass("Mouse Instance ID", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Mouse Instance ID"), float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
 		[&](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -769,7 +769,7 @@ void CrFrame::Process()
 		int32_t mouseX = mouseState.position.x;
 		int32_t mouseY = mouseState.position.y;
 
-		m_mainRenderGraph.AddRenderPass("Resolve Selected Instance", float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Compute,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Resolve Selected Instance"), float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Compute,
 		[&](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddRWBuffer(mouseSelectionBufferId, cr3d::ShaderStageFlags::Compute);
@@ -792,7 +792,7 @@ void CrFrame::Process()
 		});
 	}
 
-	m_mainRenderGraph.AddRenderPass("Draw Debug UI", float4(), CrRenderGraphPassType::Behavior,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Draw Debug UI"), float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)
 	{},
 	[this](const CrRenderGraph&, ICrCommandBuffer*)
@@ -807,7 +807,7 @@ void CrFrame::Process()
 	// visibility over what's going to happen with the texture, but not necessarily
 	// execute the behavior inside as we may want to do further work before we end the 
 	// command buffer
-	m_mainRenderGraph.AddRenderPass("Present", float4(), CrRenderGraphPassType::Behavior,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Present"), float4(), CrRenderGraphPassType::Behavior,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddSwapchain(swapchainTexture);

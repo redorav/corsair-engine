@@ -6,6 +6,9 @@
 
 namespace crstl
 {
+	template<typename T>
+	class allocator;
+
 	template<typename T, size_t N> class array;
 
 	template<typename T, int N> class basic_fixed_string;
@@ -17,6 +20,8 @@ namespace crstl
 	template<typename T> class intrusive_ptr;
 
 	template<typename T> class unique_ptr;
+
+	template<typename T, typename Allocator> class vector;
 };
 
 // EASTL
@@ -135,7 +140,7 @@ template<typename Key>
 using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
 template<typename T>
-using CrVector = eastl::vector<T, eastl::allocator>;
+using CrVector = crstl::vector<T, crstl::allocator<T>>;
 
 // Smart Pointers
 template<typename T>

@@ -8,9 +8,9 @@
 #include <crstl/fixed_string.h>
 #include <crstl/unique_ptr.h>
 #include <crstl/intrusive_ptr.h>
+#include <crstl/vector.h>
 
 warnings_off
-#include <EASTL/vector.h>
 #include <EASTL/string.h>
 #include <EASTL/hash_map.h>
 #include <EASTL/set.h>

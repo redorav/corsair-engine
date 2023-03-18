@@ -93,7 +93,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 
 	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
 
-	CrFixedString512 outputPath = ShaderCacheDirectory.c_str();
+	CrFixedString512 outputPath(ShaderCacheDirectory.c_str());
 
 	CrProcessDescriptor processDescriptor;
 

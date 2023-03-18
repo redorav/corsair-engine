@@ -77,7 +77,7 @@ CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 		CrShaderCompilerDefines defines;
 		CreateMaterialShaderDefines(materialShaderDescriptor, defines);
 
-		CrShaderBytecodeCompilationDescriptor compilationDescriptor(shaderSourcePath, entryPoint.c_str(),
+		CrShaderBytecodeCompilationDescriptor compilationDescriptor(shaderSourcePath, CrFixedString128(entryPoint.c_str()),
 		materialShaderDescriptor.shaderStage, materialShaderDescriptor.graphicsApi, materialShaderDescriptor.platform);
 
 		// Compile bytecode

@@ -64,7 +64,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		CrFixedString128 swapchainName = swapchainDescriptor.name;
+		CrFixedString128 swapchainName(swapchainDescriptor.name);
 		swapchainName.append_sprintf(" Texture %i", i);
 		swapchainTextureParams.name = swapchainName.c_str();
 

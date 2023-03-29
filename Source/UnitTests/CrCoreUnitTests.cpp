@@ -36,30 +36,30 @@ void CrCoreUnitTests::RunCrPathUnitTests()
 
 		// Check empty path concatenation
 		{
-			CrString stdPathFilename = (stdPath / "foobar.exe").string().c_str();
-			CrString crPathFilename = (crPath / "foobar.exe").c_str();
+			CrString stdPathFilename((stdPath / "foobar.exe").string().c_str());
+			CrString crPathFilename((crPath / "foobar.exe").c_str());
 			CrStringUtilities::ReplaceAll(stdPathFilename, '\\', '/');
 			CrAssert(stdPathFilename == crPathFilename);
 		}
 
 		// Check filename
 		{
-			CrString stdPathFilename = stdPath.filename().string().c_str();
-			CrString crPathFilename = crPath.filename().c_str();
+			CrString stdPathFilename(stdPath.filename().string().c_str());
+			CrString crPathFilename(crPath.filename().c_str());
 			CrAssert(stdPathFilename == crPathFilename);
 		}
 
 		// Check parent path
 		{
-			CrString stdPathParentPath = stdPath.parent_path().string().c_str();
-			CrString crPathParentPath = crPath.parent_path().c_str();
+			CrString stdPathParentPath(stdPath.parent_path().string().c_str());
+			CrString crPathParentPath(crPath.parent_path().c_str());
 			CrAssert(stdPathParentPath == crPathParentPath);
 		}
 
 		// Check extension
 		{
-			CrString stdPathExtension = stdPath.extension().string().c_str();
-			CrString crPathExtension = crPath.extension().c_str();
+			CrString stdPathExtension(stdPath.extension().string().c_str());
+			CrString crPathExtension(crPath.extension().c_str());
 			CrAssert(crPathExtension == stdPathExtension);
 		}
 

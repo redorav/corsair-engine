@@ -61,6 +61,13 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				const c4::csubstr& shaderKey = shader.key();
 				CrString shaderName(shaderKey.str, shaderKey.len);
 
+				if (shaderName.find(" ") != shaderName.npos)
+				{
+					CrString errorMessage;
+					errorMessage.append_sprintf("Invalid shader name %s. Did you miss a ':'? Make sure YAML syntax is followed", shaderName.c_str());
+					CrShaderCompilerUtilities::QuitWithMessage(errorMessage.c_str());
+				}
+
 				CrString stageName;
 
 				CrShaderCompilationJob compilationJob;
@@ -248,7 +255,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
 		builtinShadersGenericHeaderGetFunction += "::GetBuiltinShaderMetadata(builtinShader);\n\t}\n\n";
 
-		CrString builtinShadersMetadataTable = "CrArray<CrBuiltinShaderMetadata, " + eastl::to_string(graphicsApiCompilationJobs.size()) + "> BuiltinShaderMetadataTable =\n{\n";
+		CrString builtinShadersMetadataTable = "CrArray<CrBuiltinShaderMetadata, " + CrString(graphicsApiCompilationJobs.size()) + "> BuiltinShaderMetadataTable =\n{\n";
 
 		CrString builtinShaderDataCpp;
 
@@ -270,9 +277,9 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 				shaderBinaryData.resize(codeSize);
 				file->Read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
 
-				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + eastl::to_string(codeSize) + "]";
+				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + CrString(codeSize) + "]";
 				builtinShaderDataCpp += shaderBinaryName + " =\n{";
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderName + "ShaderCode, " + eastl::to_string(codeSize) + "),\n";
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderName + "ShaderCode, " + CrString(codeSize) + "),\n";
 
 				for (uint32_t i = 0; i < codeSize; ++i)
 				{
@@ -283,7 +290,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 					}
 
 					// Convert byte to text. Don't add spaces or convert to hex, it just bloats the file
-					builtinShaderDataCpp += eastl::to_string(shaderBinaryData[i]) + ",";
+					builtinShaderDataCpp += CrString(shaderBinaryData[i]) + ",";
 				}
 
 				builtinShaderDataCpp += "\n};\n\n";
@@ -294,7 +301,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			}
 			else
 			{
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", nullptr, " + eastl::to_string(0) + "),\n";
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", nullptr, " + CrString(0) + "),\n";
 			}
 		}
 

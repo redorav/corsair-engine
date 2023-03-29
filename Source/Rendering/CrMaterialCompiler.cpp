@@ -49,7 +49,7 @@ void CrShaderHeaderGenerator::DefineString(const char* define, const char* strin
 
 void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 {
-	m_header += HashDefine + define + " " + eastl::to_string(value) + "\n";
+	m_header += HashDefine + define + " " + CrString(value) + "\n";
 }
 
 void CrMaterialCompiler::Initialize()

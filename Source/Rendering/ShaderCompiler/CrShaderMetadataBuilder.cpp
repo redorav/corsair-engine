@@ -286,7 +286,7 @@ CrString CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLSLRe
 
 	result += "extern CrHashMap<CrString, ConstantBufferMetadata&> ConstantBufferTable;\n\n";
 
-	result += "extern CrArray<ConstantBufferMetadata, " + eastl::to_string(resources.constantBuffers.size()) + CrString("> ConstantBufferMetaTable;\n\n");
+	result += "extern CrArray<ConstantBufferMetadata, " + CrString(resources.constantBuffers.size()) + CrString("> ConstantBufferMetaTable;\n\n");
 
 	return result;
 }
@@ -313,7 +313,7 @@ CrString CrShaderMetadataBuilder::PrintResourceEnum(const CrString& resourceType
 	{
 		const SpvReflectDescriptorBinding& resource = resources[i];
 		CrString resourceName = CrString(resource.name) == "" ? resource.type_description->type_name : resource.name;
-		result += "\n\t\t" + resourceName + " = " + eastl::to_string(i) + ",";
+		result += "\n\t\t" + resourceName + " = " + CrString(i) + ",";
 	}
 
 	result += "\n\t\tCount\n\t};\n};\n\n";
@@ -332,7 +332,7 @@ CrString CrShaderMetadataBuilder::PrintResourceHashmap(const CrString& resourceT
 	}
 	result += "\n};\n\n";
 
-	result += "CrArray<" + resourceTypeName + "Metadata, " + eastl::to_string(resources.size()) + "> " + resourceTypeName + "MetaTable =\n{";
+	result += "CrArray<" + resourceTypeName + "Metadata, " + CrString(resources.size()) + "> " + resourceTypeName + "MetaTable =\n{";
 
 	for (const auto& resource : resources)
 	{
@@ -390,11 +390,11 @@ CrString GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 		// There are good explanations here as to why this is the case
 		// https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst#vectors-and-matrices
 		// https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst#appendix-a-matrix-representation
-		result += eastl::to_string(type.traits.numeric.matrix.column_count) + "x" + eastl::to_string(type.traits.numeric.matrix.row_count);
+		result += CrString(type.traits.numeric.matrix.column_count) + "x" + CrString(type.traits.numeric.matrix.row_count);
 	}
 	else if (type.type_flags & SPV_REFLECT_TYPE_FLAG_VECTOR)
 	{
-		result += eastl::to_string(type.traits.numeric.vector.component_count);
+		result += CrString(type.traits.numeric.vector.component_count);
 	}
 
 	return result;
@@ -413,7 +413,7 @@ CrString CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDescrip
 	// Add array dimensions
 	for(uint32_t i = 0; i < type.traits.array.dims_count; ++i)
 	{
-		result += "[" + eastl::to_string(type.traits.array.dims[i]) + "]";
+		result += "[" + CrString(type.traits.array.dims[i]) + "]";
 	}
 
 	result += ";\n";
@@ -482,7 +482,7 @@ CrString CrShaderMetadataBuilder::PrintConstantBufferStructMetadata(const CrStri
 	result += "struct " + name + " : public " + name + "Data\n{\n";
 	result += "\tusing Data = " + name + "Data;\n";
 	result += "\tenum { size = sizeof(" + name + "Data) };\n";
-	result += "\tenum { index = " + eastl::to_string(index) + " };\n";
+	result += "\tenum { index = " + CrString(index) + " };\n";
 	result += "};\n\n";
 	return result;
 }
@@ -525,7 +525,7 @@ CrString CrShaderMetadataBuilder::BuildTextureMetadataHeader(const HLSLResources
 
 	result += "extern CrHashMap<CrString, TextureMetadata&> TextureTable;\n\n";
 
-	result += "extern CrArray<TextureMetadata, " + eastl::to_string(resources.textures.size()) + "> TextureMetaTable;\n\n";
+	result += "extern CrArray<TextureMetadata, " + CrString(resources.textures.size()) + "> TextureMetaTable;\n\n";
 
 	return result;
 }
@@ -578,7 +578,7 @@ CrString CrShaderMetadataBuilder::BuildSamplerMetadataHeader(const HLSLResources
 
 	result += "extern CrHashMap<CrString, SamplerMetadata&> SamplerTable;\n\n";
 
-	result += "extern CrArray<SamplerMetadata, " + eastl::to_string(resources.samplers.size()) + "> SamplerMetaTable;\n\n";
+	result += "extern CrArray<SamplerMetadata, " + CrString(resources.samplers.size()) + "> SamplerMetaTable;\n\n";
 
 	return result;
 }
@@ -628,7 +628,7 @@ CrString CrShaderMetadataBuilder::BuildRWTextureMetadataHeader(const HLSLResourc
 
 	result += "extern CrHashMap<CrString, RWTextureMetadata&> RWTextureTable;\n\n";
 
-	result += "extern CrArray<RWTextureMetadata, " + eastl::to_string(resources.rwTextures.size()) + "> RWTextureMetaTable;\n\n";
+	result += "extern CrArray<RWTextureMetadata, " + CrString(resources.rwTextures.size()) + "> RWTextureMetaTable;\n\n";
 
 	return result;
 }
@@ -700,7 +700,7 @@ CrString CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const CrStrin
 		result += "\tenum { stride = sizeof(" + typeString + ") };\n";
 	}
 
-	result += "\tenum { index = " + eastl::to_string(index) + " };\n";
+	result += "\tenum { index = " + CrString(index) + " };\n";
 	result += "}; typedef " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + "> " + bufferName + ";\n\n";
 
 	return result;
@@ -729,7 +729,7 @@ CrString CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSLRes
 
 	result += "extern CrHashMap<CrString, StorageBufferMetadata&> StorageBufferTable;\n\n";
 
-	result += "extern CrArray<StorageBufferMetadata, " + eastl::to_string(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
+	result += "extern CrArray<StorageBufferMetadata, " + CrString(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -794,7 +794,7 @@ CrString CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const HLSLR
 
 	result += "extern CrHashMap<CrString, RWStorageBufferMetadata&> RWStorageBufferTable;\n\n";
 
-	result += "extern CrArray<RWStorageBufferMetadata, " + eastl::to_string(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
+	result += "extern CrArray<RWStorageBufferMetadata, " + CrString(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -850,7 +850,7 @@ CrString CrShaderMetadataBuilder::BuildDataBufferMetadataHeader(const HLSLResour
 
 	result += "extern CrHashMap<CrString, DataBufferMetadata&> DataBufferTable;\n\n";
 
-	result += "extern CrArray<DataBufferMetadata, " + eastl::to_string(resources.dataBuffers.size()) + "> DataBufferMetaTable;\n\n";
+	result += "extern CrArray<DataBufferMetadata, " + CrString(resources.dataBuffers.size()) + "> DataBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -903,7 +903,7 @@ CrString CrShaderMetadataBuilder::BuildRWDataBufferMetadataHeader(const HLSLReso
 
 	result += "extern CrHashMap<CrString, RWDataBufferMetadata&> RWDataBufferTable;\n\n";
 
-	result += "extern CrArray<RWDataBufferMetadata, " + eastl::to_string(resources.rwDataBuffers.size()) + "> RWDataBufferMetaTable;\n\n";
+	result += "extern CrArray<RWDataBufferMetadata, " + CrString(resources.rwDataBuffers.size()) + "> RWDataBufferMetaTable;\n\n";
 
 	return result;
 }

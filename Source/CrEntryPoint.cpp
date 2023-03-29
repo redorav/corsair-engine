@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 	CrString resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())
 	{
-		CrString::size_type pos = resolution.find('x');
+		size_t pos = resolution.find('x');
 		if(pos != CrString::npos)
 		{
 			screenWidth = atoi(resolution.substr(0, pos).c_str());

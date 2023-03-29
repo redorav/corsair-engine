@@ -33,7 +33,7 @@ static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, c
 		tagInfo.objectHandle = (uint64_t)vkShaderModule;
 		tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;
 
-		CrString tagName = eastl::to_string(reflectionHeader.bytecodeHash) + ".pdb";
+		CrString tagName = CrString(reflectionHeader.bytecodeHash) + ".pdb";
 
 		tagInfo.pTag = tagName.c_str();
 		tagInfo.tagSize = tagName.length();

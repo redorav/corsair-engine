@@ -65,7 +65,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFi
 
 CrPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
 {
-	CrString hashString = eastl::to_string(hash.GetHash());
+	CrString hashString = CrString(hash.GetHash());
 	CrPath cachedBytecodePath = m_cachePath;
 	cachedBytecodePath /= hashString.c_str();
 	cachedBytecodePath.replace_extension(CrShaderManager::Get().GetShaderBytecodeExtension(graphicsApi));

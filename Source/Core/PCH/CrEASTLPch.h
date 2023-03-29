@@ -2,16 +2,16 @@
 
 #include "Core/CrMacros.h"
 
-#include <crstl/array.h>
-#include <crstl/bitset.h>
-#include <crstl/fixed_vector.h>
-#include <crstl/fixed_string.h>
-#include <crstl/unique_ptr.h>
-#include <crstl/intrusive_ptr.h>
-#include <crstl/vector.h>
+#include "crstl/array.h"
+#include "crstl/bitset.h"
+#include "crstl/fixed_vector.h"
+#include "crstl/fixed_string.h"
+#include "crstl/unique_ptr.h"
+#include "crstl/intrusive_ptr.h"
+#include "crstl/string.h"
+#include "crstl/vector.h"
 
 warnings_off
-#include <EASTL/string.h>
 #include <EASTL/hash_map.h>
 #include <EASTL/set.h>
 #include <EASTL/deque.h>

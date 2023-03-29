@@ -508,7 +508,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		// association at module load time
 		{
 			CrPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
-			pdbFilePath /= eastl::to_string(shaderHash.GetHash()).c_str();
+			pdbFilePath /= CrString(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
 			CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 			if (pdbFile)

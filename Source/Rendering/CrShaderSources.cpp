@@ -51,7 +51,7 @@ void CrShaderSources::Initialize()
 			if (shaderSourceFile)
 			{
 				CrString shaderSource(CrStringNoInitialize(), shaderSourceFile->GetSize());
-				shaderSource.force_size(shaderSourceFile->GetSize());
+				shaderSource.force_length(shaderSourceFile->GetSize());
 				shaderSourceFile->Read(shaderSource.data(), shaderSource.size());
 
 				// Preprocess the shader source to remove anything that cannot

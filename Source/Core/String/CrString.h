@@ -2,10 +2,8 @@
 
 #include "Core/CrMacros.h"
 
-warnings_off
-#include <EASTL/string.h>
-warnings_on
+#include "crstl/string.h"
 
-using CrString = eastl::string;
-using CrWString = eastl::wstring;
-using CrStringNoInitialize = eastl::string::CtorDoNotInitialize;
+using CrString = crstl::string;
+using CrWString = crstl::wstring;
+using CrStringNoInitialize = crstl::ctor_no_initialize;

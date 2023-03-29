@@ -6,8 +6,7 @@
 
 namespace crstl
 {
-	template<typename T>
-	class allocator;
+	template<typename T> class allocator;
 
 	template<typename T, size_t N> class array;
 
@@ -18,6 +17,10 @@ namespace crstl
 	template<typename T, size_t N> class fixed_vector;
 
 	template<typename T> class intrusive_ptr;
+
+	template <typename T, typename Allocator> class basic_string;
+	typedef basic_string<char, allocator<char>> string;
+	typedef basic_string<wchar_t, allocator<wchar_t>> wstring;
 
 	template<typename T> class unique_ptr;
 
@@ -52,31 +55,15 @@ namespace eastl
 
 	template <typename Key, typename Compare, typename Allocator> class set;
 
-	template<typename T, typename Allocator> class vector;
-
 	template <typename Key, typename T, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_map;
 
 	template <typename Key, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_set;
 
-	// Smart Pointers
-	template <typename T> class shared_ptr;
-
-	template <typename T> struct default_delete;
-
-	template <typename T, typename Deleter> class unique_ptr;
-
-	// Strings
-	template <typename T, typename Allocator> class basic_string;
-	typedef basic_string<char, allocator> string;
-	typedef basic_string<wchar_t, allocator> wstring;
-
-	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator> class fixed_string;
-
-	// Keep here until EASTL natively provides this functionality. Copied from <EASTL/string>
-	template <typename T, int nodeCount, bool bEnableOverflow, typename OverflowAllocator>
-	struct hash<fixed_string<T, nodeCount, bEnableOverflow, OverflowAllocator>>
+	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
+	template <typename T, typename Allocator>
+	struct hash<crstl::basic_string<T, Allocator>>
 	{
-		size_t operator()(const fixed_string<T, nodeCount, bEnableOverflow, OverflowAllocator>& x) const
+		size_t operator()(const crstl::basic_string<T, Allocator>& x) const
 		{
 			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
 			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
@@ -86,10 +73,10 @@ namespace eastl
 		}
 	};
 
-	template <typename T, int nodeCount>
-	struct hash<crstl::basic_fixed_string<T, nodeCount>>
+	template <typename T, int N>
+	struct hash<crstl::basic_fixed_string<T, N>>
 	{
-		size_t operator()(const crstl::basic_fixed_string<T, nodeCount>& x) const
+		size_t operator()(const crstl::basic_fixed_string<T, N>& x) const
 		{
 			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
 			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
@@ -143,11 +130,6 @@ template<typename T>
 using CrVector = crstl::vector<T, crstl::allocator<T>>;
 
 // Smart Pointers
-template<typename T>
-using CrSharedPtr = eastl::shared_ptr<T>;
-
-//template <typename T, typename D = eastl::default_delete<T>>
-//using CrUniquePtr = eastl::unique_ptr<T, D>;
 
 template <typename T>
 using CrUniquePtr = crstl::unique_ptr<T>;
@@ -156,8 +138,8 @@ template<typename T>
 using CrIntrusivePtr = crstl::intrusive_ptr<T>;
 
 // Strings
-using CrString = eastl::string;
-using CrWString = eastl::wstring;
+using CrString = crstl::string;
+using CrWString = crstl::wstring;
 
 // Take care to take the null terminator into account, i.e. a fixed string 
 // of 16 has 15 usable characters

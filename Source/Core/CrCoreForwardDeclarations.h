@@ -6,7 +6,7 @@
 
 namespace crstl
 {
-	template<typename T> class allocator;
+	class allocator;
 
 	template<typename T, size_t N> class array;
 
@@ -18,13 +18,15 @@ namespace crstl
 
 	template<typename T> class intrusive_ptr;
 
-	template <typename T, typename Allocator> class basic_string;
-	typedef basic_string<char, allocator<char>> string;
-	typedef basic_string<wchar_t, allocator<wchar_t>> wstring;
+	template <typename CharT, typename Allocator> class basic_string;
+	typedef basic_string<char, allocator> string;
+	typedef basic_string<wchar_t, allocator> wstring;
 
 	template<typename T> class unique_ptr;
 
 	template<typename T, typename Allocator> class vector;
+
+	template<int SizeBytes, typename Return> class fixed_function;
 };
 
 // EASTL
@@ -55,10 +57,6 @@ namespace eastl
 
 	template <typename Key, typename Compare, typename Allocator> class set;
 
-	template <typename Key, typename T, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_map;
-
-	template <typename Key, typename Compare, typename Allocator, typename RandomAccessContainer> class vector_set;
-
 	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
 	template <typename T, typename Allocator>
 	struct hash<crstl::basic_string<T, Allocator>>
@@ -85,10 +83,6 @@ namespace eastl
 			return (size_t)result;
 		}
 	};
-
-	// Functional
-	template<int N, typename R>
-	class fixed_function;
 };
 
 // Containers
@@ -127,7 +121,7 @@ template<typename Key>
 using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
 template<typename T>
-using CrVector = crstl::vector<T, crstl::allocator<T>>;
+using CrVector = crstl::vector<T, crstl::allocator>;
 
 // Smart Pointers
 
@@ -174,7 +168,7 @@ using CrFixedWString4096 = CrFixedWString<4096>;
 
 // Functional
 template<int SIZE_IN_BYTES, typename R>
-using CrFixedFunction = eastl::fixed_function<SIZE_IN_BYTES, R>;
+using CrFixedFunction = crstl::fixed_function<SIZE_IN_BYTES, R>;
 
 class CrHash;
 

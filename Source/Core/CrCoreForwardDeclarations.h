@@ -14,6 +14,8 @@ namespace crstl
 
 	template<size_t N, typename WordType> class bitset;
 
+	template<typename T, size_t N> class fixed_deque;
+
 	template<typename T, size_t N> class fixed_vector;
 
 	template<typename T> class intrusive_ptr;
@@ -41,8 +43,6 @@ namespace eastl
 	template <typename T> struct hash;
 
 	template <typename T> struct equal_to;
-
-	template <bool bCondition, class ConditionIsTrueType, class ConditionIsFalseType> struct type_select;
 
 	// Containers
 	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
@@ -101,6 +101,9 @@ using CrBitset = crstl::bitset<N, WordType>;
 
 template<typename T>
 using CrDeque = eastl::deque<T, eastl::allocator, DEQUE_DEFAULT_SUBARRAY_SIZE(T)>;
+
+template<typename T, size_t N>
+using CrFixedDeque = crstl::fixed_deque<T, N>;
 
 template<typename T, size_t N>
 using CrFixedVector = crstl::fixed_vector<T, N>;

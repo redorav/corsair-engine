@@ -14,6 +14,8 @@ namespace crstl
 
 	template<size_t N, typename WordType> class bitset;
 
+	template<typename T, typename Allocator, size_t ChunkSize> class deque;
+
 	template<typename T, size_t N> class fixed_deque;
 
 	template<typename T, size_t N> class fixed_vector;
@@ -43,9 +45,6 @@ namespace eastl
 	template <typename T> struct hash;
 
 	template <typename T> struct equal_to;
-
-	// Containers
-	template <typename T, typename Allocator, unsigned kDequeSubarraySize> class deque;
 
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_map;
 
@@ -92,15 +91,8 @@ using CrArray = crstl::array<T, N>;
 template<size_t N, typename WordType = size_t>
 using CrBitset = crstl::bitset<N, WordType>;
 
-// Copied from EASTL
-#if !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x can't handle the declaration below.
-#define DEQUE_DEFAULT_SUBARRAY_SIZE(T) ((sizeof(T) <= 4) ? 64 : ((sizeof(T) <= 8) ? 32 : ((sizeof(T) <= 16) ? 16 : ((sizeof(T) <= 32) ? 8 : 4))))
-#else
-#define DEQUE_DEFAULT_SUBARRAY_SIZE(T) 16
-#endif
-
 template<typename T>
-using CrDeque = eastl::deque<T, eastl::allocator, DEQUE_DEFAULT_SUBARRAY_SIZE(T)>;
+using CrDeque = crstl::deque<T, crstl::allocator, 16>;
 
 template<typename T, size_t N>
 using CrFixedDeque = crstl::fixed_deque<T, N>;

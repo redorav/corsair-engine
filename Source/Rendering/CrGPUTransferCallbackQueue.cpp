@@ -90,5 +90,5 @@ void CrGPUTransferCallbackQueue::Process()
 		m_availableCallbackLists.pop_back();
 	}
 
-	CrAssertMsg(m_currentCallbackList, "Current deletion list cannot be null");
+	CrAssertMsg(m_currentCallbackList, "Current callback list cannot be null");
 }

@@ -2,6 +2,10 @@
 
 	<repository name="github" url="https://github.com/redorav/corsair-dependencies/raw/master/packages/"/>
 
+	<package name="agility">
+		<version id="1.610.4" file="agility_1_610_4.zip" repository="github"/>
+	</package>
+
 	<package name="assimp">
 		<version id="88a9598" file="assimp_2022_04_26_88a9598.zip" repository="github"/>
 	</package>

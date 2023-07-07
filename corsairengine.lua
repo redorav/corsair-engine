@@ -59,6 +59,10 @@ function CopyFileCommand(filePath, destinationPath)
 	return '{copyfile} "'..filePath..'" "'..destinationPath..'"'
 end
 
+function MakeDirCommand(directoryPath)
+	return '{mkdir} "'..directoryPath..'"'
+end
+
 -- Add warnings globally to fix serious issues that could cause incorrect
 -- runtime behavior or crashes.
 -- Remove warnings globally only if it makes sense to do so. For example,
@@ -317,6 +321,7 @@ project(ProjectRendering)
 		BuiltinShaderCpp
 	}
 	
+	AddLibraryIncludes(AgilityLibrary)
 	AddLibraryIncludes(AssimpLibrary)
 	AddLibraryIncludes(ImguiLibrary)
 	AddLibraryIncludes(SPIRVReflectLibrary)
@@ -331,6 +336,9 @@ project(ProjectRendering)
 		postbuildcommands
 		{
 			CopyFileCommand(path.getabsolute(WinPixEventRuntimeLibrary.dlls), '%{cfg.buildtarget.directory}'),
+			MakeDirCommand('%{cfg.buildtarget.directory}/D3D12/'),
+			CopyFileCommand(path.getabsolute(AgilityLibrary.dlls[1]), '%{cfg.buildtarget.directory}/D3D12/'),
+			CopyFileCommand(path.getabsolute(AgilityLibrary.dlls[2]), '%{cfg.buildtarget.directory}/D3D12/'),
 		}
 		
 	filter { 'platforms:'..VulkanOSX }

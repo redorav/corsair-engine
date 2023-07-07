@@ -18,6 +18,20 @@
 
 #include "Math/CrMath.h"
 
+#if defined(WINDOWS_PLATFORM)
+#define USE_AGILITY_SDK
+#endif
+
+#if defined(USE_AGILITY_SDK)
+
+// Let the application know we want to look for the Agility SDK
+// https://devblogs.microsoft.com/directx/gettingstarted-dx12agility/#parametersa
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 610; }
+
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
+
+#endif
+
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 {
 	const CrRenderSystemD3D12* d3d12RenderSystem = static_cast<const CrRenderSystemD3D12*>(renderSystem);
@@ -140,9 +154,35 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	CrAssertMsg(m_d3d12Device != nullptr, "Error creating D3D12 device");
 
+#if defined(USE_AGILITY_SDK)
+
+	bool usingAgility = false;
+
+	CrPath agilityPath;
+
+	HMODULE hModule = GetModuleHandle(L"D3D12Core.dll");
+	if (hModule)
+	{
+		TCHAR dllPath[260];
+		GetModuleFileName(hModule, dllPath, 260);
+		agilityPath.append_convert(dllPath);
+	}
+
+	usingAgility = agilityPath != "D3D12Core.dll";
+
+#endif
+
 	// Parse render device properties
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
 	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", cr3d::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), selectedFeatureLevel.version);
+
+#if defined(USE_AGILITY_SDK)
+	if (usingAgility)
+	{
+		m_renderDeviceProperties.graphicsApiDisplay.append_sprintf(", Agility SDK %i", D3D12SDKVersion);
+	}
+#endif
+
 	m_renderDeviceProperties.description.append_convert<wchar_t>(adapterDescriptor.Description);
 	m_renderDeviceProperties.gpuMemoryBytes = adapterDescriptor.DedicatedVideoMemory;
 

@@ -5,6 +5,7 @@ BinaryDirectory = '/Libraries/'
 IncludeDirectory = '/Include/'
 
 -- Library Directories
+LibAgility      = DependenciesDirectory..'/agility'
 LibAssimp       = DependenciesDirectory..'/assimp'
 LibCGLTF        = DependenciesDirectory..'/cgltf'
 LibCRSTL        = DependenciesDirectory..'/crstl'
@@ -24,6 +25,17 @@ LibVMA          = DependenciesDirectory..'/vma'
 LibVulkan       = DependenciesDirectory..'/vulkan'
 LibWinPixEventRuntime = DependenciesDirectory..'/winpixeventruntime'
 LibxxHash       = DependenciesDirectory..'/xxHash'
+
+AgilityLibrary =
+{
+	includeDirs = LibAgility..IncludeDirectory..'include',
+	libDirs     = LibAgility..BinaryDirectory,
+	dlls        =
+	{
+		LibAgility..BinaryDirectory..'x64/D3D12Core.dll',
+		LibAgility..BinaryDirectory..'x64/d3d12SDKLayers.dll'
+	}
+}
 
 AssimpLibrary =
 {

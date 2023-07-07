@@ -15,7 +15,7 @@ public:
 	virtual ~CrGPUDeletable() {}
 
 	template<typename T>
-	void delete_callback()
+	void intrusive_delete_callback()
 	{
 		CrRenderDeviceDeletionFunction(m_renderDevice, this);
 	}

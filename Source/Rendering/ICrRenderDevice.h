@@ -51,7 +51,7 @@ struct CrRenderDeviceProperties
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
 
 	// Just for display
-	CrFixedString16 graphicsApiDisplay;
+	CrFixedString32 graphicsApiDisplay;
 
 	// Version of the driver
 	CrDriverVersion driverVersion;

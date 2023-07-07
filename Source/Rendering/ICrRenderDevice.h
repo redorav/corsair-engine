@@ -117,7 +117,7 @@ public:
 	virtual ~ICrRenderDevice();
 
 	template<typename T>
-	void intrusive_delete_callback()
+	void intrusive_ptr_delete_callback()
 	{
 		FinalizeDeletion();
 		delete this;

@@ -38,15 +38,15 @@ private:
 
 	uint32_t m_height = 0;
 
-	CrBuiltinComputePipeline m_exampleComputePipeline;
+	CrBuiltinComputePipelineHandle m_exampleComputePipeline;
 	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer
-	CrBuiltinComputePipeline m_mouseSelectionResolvePipeline;
+	CrBuiltinComputePipelineHandle m_mouseSelectionResolvePipeline;
 
 	CrBuiltinGraphicsPipeline m_directionalLightPipeline;
 
-	CrBuiltinComputePipeline m_createIndirectArguments;
+	CrBuiltinComputePipelineHandle m_createIndirectArguments;
 
 	CrTextureHandle m_colorfulVolumeTexture;
 

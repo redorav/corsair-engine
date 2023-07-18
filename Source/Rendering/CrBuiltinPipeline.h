@@ -8,7 +8,7 @@ namespace CrBuiltinShaders { enum T : uint32_t; }
 
 // This class handles builtin shader building. They get registered in a global database
 // and are able to rebuild their contents live
-class CrBuiltinGraphicsPipeline
+class CrBuiltinGraphicsPipeline : CrIntrusivePtrInterface
 {
 public:
 
@@ -23,9 +23,7 @@ public:
 		CrBuiltinShaders::T pixelShader
 	);
 
-	const ICrGraphicsPipeline* get() { return m_graphicsPipeline.get(); }
-
-	void RecompileGraphicsPipeline();
+	const ICrGraphicsPipeline* GetPipeline() { return m_graphicsPipeline.get(); }
 
 private:
 
@@ -36,7 +34,7 @@ private:
 	CrGraphicsPipelineHandle m_graphicsPipeline;
 };
 
-class CrBuiltinComputePipeline
+class CrBuiltinComputePipeline : public CrIntrusivePtrInterface
 {
 public:
 
@@ -44,9 +42,31 @@ public:
 
 	CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, CrBuiltinShaders::T computeShader);
 
-	const ICrComputePipeline* get() { return m_computePipeline.get(); }
+	const ICrComputePipeline* GetPipeline() { return m_computePipeline.get(); }
 
 private:
 
 	CrComputePipelineHandle m_computePipeline;
+};
+
+using CrBuiltinComputePipelineHandle = CrIntrusivePtr<CrBuiltinComputePipeline>;
+
+// A collection of all builtin pipelines compiled on boot. They are available to any program that wants them
+class CrBuiltinPipelines
+{
+public:
+
+	static void Initialize(ICrRenderDevice* renderDevice);
+
+	static CrBuiltinComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
+
+	// Ubershader builtin pipelines
+
+	static CrBuiltinGraphicsPipeline BasicUbershaderForward;
+
+	static CrBuiltinGraphicsPipeline BasicUbershaderGBuffer;
+
+	static CrBuiltinGraphicsPipeline BasicUbershaderDebug;
+
+	static CrArray<CrBuiltinComputePipelineHandle, 256> m_builtinComputePipelines;
 };

@@ -225,7 +225,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		}
 
 		// Setup global config:
-		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
+		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.GetPipeline());
 		commandBuffer->BindIndexBuffer(indexBuffer);
 		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
 		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());

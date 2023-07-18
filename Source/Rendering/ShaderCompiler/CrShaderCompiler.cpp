@@ -185,6 +185,7 @@ static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 // 
 // -metadata metadataPath : Where C++ metadata is stored
 // -builtin               : Build builtin shaders
+// -builtin-headers       : Build metadata headers for the build to consume. Don't pass in when live recompiling
 // -pdb pdbPath           : Create a PDB for this shader and store in pdbPath
 //                          The PDB is uniquely identified with a hash stored in the reflection data
 
@@ -201,6 +202,7 @@ int main(int argc, char* argv[])
 	CrPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
 	bool buildBuiltinShaders          = commandLine["-builtin"];
+	bool buildBuiltinHeaders          = commandLine["-builtin-headers"];
 	const CrString& entryPoint        = commandLine("-entrypoint");
 	const CrString& shaderStageString = commandLine("-stage");
 	const CrString& platformString    = commandLine("-platform");
@@ -292,6 +294,7 @@ int main(int argc, char* argv[])
 		CrBuiltinShadersDescriptor builtinShadersDescriptor;
 		builtinShadersDescriptor.inputPath = inputFilePath;
 		builtinShadersDescriptor.outputPath = outputFilePath;
+		builtinShadersDescriptor.buildBuiltinHeaders = buildBuiltinHeaders;
 
 		ICrFile::CreateDirectories(outputFilePath.c_str());
 

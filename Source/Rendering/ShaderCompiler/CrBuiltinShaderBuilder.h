@@ -16,6 +16,10 @@ struct CrBuiltinShadersDescriptor
 	CrVector<cr3d::GraphicsApi::T> graphicsApis;
 
 	cr::Platform::T platform;
+
+	// Whether to build the headers from the binaries by creating headers and cpp files
+	// This is useful as part of the main build, but not when live recompiling
+	bool buildBuiltinHeaders;
 };
 
 struct CompilationDescriptor;

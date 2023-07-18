@@ -398,7 +398,7 @@ project(ProjectBuiltinShaders)
 	local outputFile = GeneratedShadersDirectoryAbsolute..'/BuiltinShaders'
 	local builtinShaderCommandLine =
 	'"'..ShaderCompilerPath..'" '..
-	'-builtin '..
+	'-builtin -builtin-headers '..
 	'-input "'..path.getabsolute(SourceShadersDirectory)..'" '..
 	'-output "'..outputFile..'" '..
 	'-platform '..Platform:lower()

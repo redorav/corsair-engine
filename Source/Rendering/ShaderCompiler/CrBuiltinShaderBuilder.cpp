@@ -191,8 +191,11 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 		}
 	}
 	
-	// Once all compilation jobs are finished and successful, build binary and metadata from them
-	BuildBuiltinShaderMetadataAndHeaderFiles(builtinShadersDescriptor, shaderInfos, compilationJobs);
+	if (builtinShadersDescriptor.buildBuiltinHeaders)
+	{
+		// Once all compilation jobs are finished and successful, build binary and metadata from them
+		BuildBuiltinShaderMetadataAndHeaderFiles(builtinShadersDescriptor, shaderInfos, compilationJobs);
+	}
 }
 
 void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles

@@ -144,11 +144,11 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 						stageName + "_" + 
 						cr3d::GraphicsApi::ToString(graphicsApi);
 
-					CrPath binaryFilePath = builtinShadersDescriptor.outputPath.parent_path();
+					CrPath binaryFilePath = builtinShadersDescriptor.outputPath;
 					binaryFilePath /= uniqueShaderName.c_str();
 					binaryFilePath.replace_extension(".bin");
 
-					CrPath tempPath = builtinShadersDescriptor.outputPath.parent_path();
+					CrPath tempPath = builtinShadersDescriptor.outputPath;
 					tempPath /= uniqueShaderName.c_str();
 					tempPath.replace_extension(".temp");
 
@@ -297,7 +297,6 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 
 				// Close file and delete original binary
 				file = nullptr;
-				ICrFile::FileDelete(compilationDescriptor.outputPath.c_str());
 			}
 			else
 			{

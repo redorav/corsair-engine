@@ -293,6 +293,8 @@ int main(int argc, char* argv[])
 		builtinShadersDescriptor.inputPath = inputFilePath;
 		builtinShadersDescriptor.outputPath = outputFilePath;
 
+		ICrFile::CreateDirectories(outputFilePath.c_str());
+
 		for (const CrString& graphicsApiString : graphicsApiStrings)
 		{
 			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);

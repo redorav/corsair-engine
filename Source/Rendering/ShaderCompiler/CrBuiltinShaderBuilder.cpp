@@ -228,11 +228,12 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "\n\n";
 	builtinShadersGenericHeader += "struct CrBuiltinShaderMetadata\n"
 	"{\n"
-		"\tCrBuiltinShaderMetadata(const CrString& name, const CrString& entryPoint, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
-			"\t: name(name), entryPoint(entryPoint), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
-		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", nullptr, 0) {}\n\n"
+		"\tCrBuiltinShaderMetadata(const CrString& name, const CrString& entryPoint, cr3d::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
+			"\t: name(name), entryPoint(entryPoint), shaderStage(shaderStage), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
+		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", cr3d::ShaderStage::Count, nullptr, 0) {}\n\n"
 		"\tCrString name;\n"
 		"\tCrString entryPoint;\n"
+		"\tcr3d::ShaderStage::T shaderStage;\n"
 		"\tuint8_t* shaderCode;\n"
 		"\tuint32_t shaderCodeSize;\n"
 	"};\n\n";
@@ -272,6 +273,9 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			// Load binary file
 			CrFileHandle file = ICrFile::OpenFile(compilationDescriptor.outputPath.c_str(), FileOpenFlags::Read);
 
+			CrString shaderStageString = "cr3d::ShaderStage::";
+			shaderStageString += cr3d::ShaderStage::ToString(compilationDescriptor.shaderStage);
+
 			if (file)
 			{
 				uint64_t codeSize = file->GetSize();
@@ -282,7 +286,9 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 
 				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + CrString(codeSize) + "]";
 				builtinShaderDataCpp += shaderBinaryName + " =\n{";
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", " + shaderName + "ShaderCode, " + CrString(codeSize) + "),\n";
+				builtinShadersMetadataTable += 
+					"\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", " + 
+					shaderStageString.c_str() + ", " + shaderName + "ShaderCode, " + CrString(codeSize) + "),\n";
 
 				for (uint32_t i = 0; i < codeSize; ++i)
 				{
@@ -303,7 +309,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			}
 			else
 			{
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", nullptr, " + CrString(0) + "),\n";
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderStageString.c_str() + ", nullptr, " + CrString(0) + "), \n";
 			}
 		}
 

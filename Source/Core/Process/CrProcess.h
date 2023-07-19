@@ -20,8 +20,6 @@ class CrProcess
 {
 public:
 	
-	static CrProcessResult RunExecutable(const CrProcessDescriptor& processDescriptor);
-
 	CrProcess(const CrProcessDescriptor& processDescriptor);
 
 	~CrProcess();

@@ -137,6 +137,8 @@ namespace cr3d
 				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
+
+		cr3d::ShaderStage::T FromString(const char* shaderStageString);
 	};
 
 	// This enum exists so we can OR stages together

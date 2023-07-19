@@ -19,22 +19,58 @@ cr3d::GraphicsApi::T cr3d::GraphicsApi::FromString(const char* graphicsApiString
 	}
 }
 
-cr3d::GraphicsVendor::T cr3d::GraphicsVendor::FromString(const char* s)
+cr3d::GraphicsVendor::T cr3d::GraphicsVendor::FromString(const char* graphicsVendorString)
 {
-	if (strcmp(s, "nvidia") == 0)
+	if (strcmp(graphicsVendorString, "nvidia") == 0)
 	{
 		return GraphicsVendor::NVIDIA;
 	}
-	else if (strcmp(s, "amd") == 0)
+	else if (strcmp(graphicsVendorString, "amd") == 0)
 	{
 		return GraphicsVendor::AMD;
 	}
-	else if (strcmp(s, "intel") == 0)
+	else if (strcmp(graphicsVendorString, "intel") == 0)
 	{
 		return GraphicsVendor::Intel;
 	}
 	else
 	{
 		return GraphicsVendor::Unknown;
+	}
+}
+
+cr3d::ShaderStage::T cr3d::ShaderStage::FromString(const char* shaderStageString)
+{
+	if (strcmp(shaderStageString, "vertex") == 0)
+	{
+		return ShaderStage::Vertex;
+	}
+	else if (strcmp(shaderStageString, "pixel") == 0)
+	{
+		return ShaderStage::Pixel;
+	}
+	else if (strcmp(shaderStageString, "hull") == 0)
+	{
+		return ShaderStage::Hull;
+	}
+	else if (strcmp(shaderStageString, "domain") == 0)
+	{
+		return ShaderStage::Domain;
+	}
+	else if (strcmp(shaderStageString, "geometry") == 0)
+	{
+		return ShaderStage::Geometry;
+	}
+	else if (strcmp(shaderStageString, "compute") == 0)
+	{
+		return ShaderStage::Compute;
+	}
+	else if (strcmp(shaderStageString, "rootsignature") == 0)
+	{
+		return ShaderStage::RootSignature;
+	}
+	else
+	{
+		return ShaderStage::Count;
 	}
 }

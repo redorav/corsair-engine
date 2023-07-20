@@ -95,7 +95,7 @@ end
 -- However, the pchsource file has to be the exact path.
 
 workspace 'Corsair Engine'
-	configurations { 'Debug', 'Release' }
+	configurations { 'Debug', 'Profiling', 'Final' }
 	platforms { MSVCWin64, ClangWin64 }
 	location (WorkspaceDirectory)
 	preferredtoolarchitecture('x86_64') -- Prefer this toolset on MSVC as it can handle more memory for multiprocessor compiles
@@ -231,7 +231,7 @@ workspace 'Corsair Engine'
 		-- release external libraries to speed up this config
 		runtime('release')
 
-	filter { 'configurations:Release' }
+	filter { 'configurations:Profiling or Final' }
 		defines
 		{
 			'RELEASE_CONFIG',

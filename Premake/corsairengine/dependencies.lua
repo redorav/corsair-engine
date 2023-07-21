@@ -13,7 +13,6 @@ LibDdspp        = DependenciesDirectory..'/ddspp'
 LibDxc          = DependenciesDirectory..'/dxc'
 LibEASTL        = DependenciesDirectory..'/eastl'
 LibGlslang      = DependenciesDirectory..'/glslang'
-LibHalf         = DependenciesDirectory..'/half'
 LibHlslpp       = DependenciesDirectory..'/hlslpp'
 LibImGui        = DependenciesDirectory..'/imgui'
 LibRapidYAML    = DependenciesDirectory..'/rapidyaml'
@@ -97,23 +96,6 @@ GlslangLibrary =
 	includeDirs = LibGlslang..IncludeDirectory,
 	libDirs     = LibGlslang..BinaryDirectory,
 	libNames    = 'Glslang.vs2019.release'
-}
-
-HalfLibrary =
-{
-	includeDirs = LibHalf..IncludeDirectory,
-	defines     = 
-	{
-		'HALF_ENABLE_CPP11_NOEXCEPT=1',
-		'HALF_ENABLE_CPP11_CONSTEXPR=1',
-		'HALF_ENABLE_CPP11_CSTDINT=1',
-		'HALF_ENABLE_CPP11_USER_LITERALS=1',
-		'HALF_ENABLE_CPP11_STATIC_ASSERT=1',
-		'HALF_ENABLE_CPP11_HASH=0',
-		'HALF_ENABLE_CPP11_TYPE_TRAITS=0',
-		'HALF_ENABLE_CPP11_CMATH=0',
-		'HALF_ENABLE_CPP11_CFENV=0'
-	}
 }
 
 HlslppLibrary =

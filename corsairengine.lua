@@ -194,7 +194,6 @@ workspace 'Corsair Engine'
 	AddLibraryIncludes(CRSTLLibrary)
 	AddLibraryIncludes(DdsppLibrary)
 	AddLibraryIncludes(EASTLLibrary)
-	AddLibraryIncludes(HalfLibrary)
 	AddLibraryIncludes(HlslppLibrary)
 	AddLibraryIncludes(xxHashLibrary)
 

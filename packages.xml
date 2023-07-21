@@ -28,11 +28,6 @@
 		<version id="6624e13" file="glslang_2022_01_17_6624e13.zip" repository="github"/>
 	</package>
 	
-	<package name="half">
-		<version id="1.12.0" file="half_1.12.0.zip" repository="github"/>
-		<version id="2.2.0_modified" file="half_2.2.0_modified.zip" repository="github"/>
-	</package>
-	
 	<package name="imgui">
 		<version id="ec48681" file="imgui_docking_2022_04_24_ec48681.zip" repository="github"/>
 		<version id="58075c4" file="imgui_2021_01_21_58075c4.zip" repository="github"/>

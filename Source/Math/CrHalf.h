@@ -1,5 +1,5 @@
 #pragma once
 
-#include <half.hpp>
-using half_float::half;
-using namespace half_float::literal;
+#include "crstl/half.h"
+using crstl::half;
+using namespace crstl::half_literal;

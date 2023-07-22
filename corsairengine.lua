@@ -220,7 +220,7 @@ workspace 'Corsair Engine'
 	filter{}
 	
 	filter { 'configurations:Debug' }
-		defines { 'DEBUG_CONFIG' }
+		defines { 'CR_CONFIG_DEBUG' }
 		optimize('off')
 		--symbols('on')
 		symbols('fastlink')
@@ -233,14 +233,21 @@ workspace 'Corsair Engine'
 	filter { 'configurations:Profiling or Final' }
 		defines
 		{
-			'RELEASE_CONFIG',
-			'NDEBUG' -- Disables assert
+			'NDEBUG', -- Disables assert
+			'EASTL_ASSERT_ENABLED=0'
 		}
 		optimize('speed')
 		symbols('on')
 		inlining('auto')
 		flags { 'linktimeoptimization' }
 		runtime('release')
+
+	filter { 'configurations:Profiling' }
+		defines { 'CR_CONFIG_PROFILING', }
+
+	filter { 'configurations:Final' }
+		defines { 'CR_CONFIG_FINAL', }
+		
 	
 -- Project definitions
 

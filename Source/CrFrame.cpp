@@ -176,7 +176,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrMaterialCompiler::Get().Initialize();
 		CrPipelineStateManager::Get().Initialize(renderDevice.get());
 
-		CrBuiltinPipelines::Initialize(renderDevice.get());
+		CrBuiltinPipelines::Initialize();
 
 		// Initialize ImGui renderer
 		CrImGuiRendererInitParams imguiInitParams = {};
@@ -254,7 +254,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
 		copyTextureGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_copyTexturePipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
+		m_copyTexturePipeline = CrBuiltinPipelines::GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 
 	{
@@ -265,8 +265,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
 		directionalLightPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
 		directionalLightPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_directionalLightPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), 
-			directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
+		m_directionalLightPipeline = CrBuiltinPipelines::GetGraphicsPipeline(directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
 	}
 
 	{
@@ -275,8 +274,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		editorEdgeSelectionPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
-		m_editorEdgeSelectionPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(),
-			editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
+		m_editorEdgeSelectionPipeline = CrBuiltinPipelines::GetGraphicsPipeline(editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
 	}
 
 	{
@@ -572,7 +570,7 @@ void CrFrame::Process()
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
-		commandBuffer->BindGraphicsPipelineState(m_directionalLightPipeline.GetPipeline());
+		commandBuffer->BindGraphicsPipelineState(m_directionalLightPipeline->GetPipeline());
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
@@ -648,7 +646,7 @@ void CrFrame::Process()
 		(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 		{
 			commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::EditorSelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
-			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline.GetPipeline());
+			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline->GetPipeline());
 			commandBuffer->Draw(3, 1, 0, 0);
 		});
 	}
@@ -662,7 +660,7 @@ void CrFrame::Process()
 	[this, preSwapchainTexture](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::CopyTexture, renderGraph.GetPhysicalTexture(preSwapchainTexture));
-		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline.GetPipeline());
+		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline->GetPipeline());
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 

@@ -13,11 +13,11 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-CrBuiltinGraphicsPipeline CrBuiltinPipelines::BasicUbershaderForward;
+CrBuiltinGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderForward;
 
-CrBuiltinGraphicsPipeline CrBuiltinPipelines::BasicUbershaderGBuffer;
+CrBuiltinGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderGBuffer;
 
-CrBuiltinGraphicsPipeline CrBuiltinPipelines::BasicUbershaderDebug;
+CrBuiltinGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderDebug;
 
 CrHashMap<uint64_t, CrBuiltinGraphicsPipelineHandle> CrBuiltinPipelines::m_builtinGraphicsPipelines;
 
@@ -69,26 +69,26 @@ CrBuiltinComputePipeline::CrBuiltinComputePipeline(ICrRenderDevice* renderDevice
 	m_computePipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
 }
 
-void CrBuiltinPipelines::Initialize(ICrRenderDevice* renderDevice)
+void CrBuiltinPipelines::Initialize()
 {
 	// Builtin ubershaders
 	{
 		CrGraphicsPipelineDescriptor forwardUbershaderDescriptor;
 		forwardUbershaderDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
 		forwardUbershaderDescriptor.renderTargets.depthFormat = CrRendererConfig::DepthBufferFormat;
-		BasicUbershaderForward = CrBuiltinGraphicsPipeline(renderDevice, forwardUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicForwardUbershaderPS);
+		BasicUbershaderForward = CrBuiltinPipelines::GetGraphicsPipeline(forwardUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicForwardUbershaderPS);
 
 		CrGraphicsPipelineDescriptor gbufferUbershaderDescriptor;
 		gbufferUbershaderDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::GBufferAlbedoAOFormat;
 		gbufferUbershaderDescriptor.renderTargets.colorFormats[1] = CrRendererConfig::GBufferNormalsFormat;
 		gbufferUbershaderDescriptor.renderTargets.colorFormats[2] = CrRendererConfig::GBufferMaterialFormat;
 		gbufferUbershaderDescriptor.renderTargets.depthFormat = CrRendererConfig::DepthBufferFormat;
-		BasicUbershaderGBuffer = CrBuiltinGraphicsPipeline(renderDevice, gbufferUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicGBufferUbershaderPS);
+		BasicUbershaderGBuffer = CrBuiltinPipelines::GetGraphicsPipeline(gbufferUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicGBufferUbershaderPS);
 
 		CrGraphicsPipelineDescriptor debugUbershaderDescriptor;
 		debugUbershaderDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::DebugShaderFormat;
 		debugUbershaderDescriptor.renderTargets.depthFormat = CrRendererConfig::DepthBufferFormat;
-		BasicUbershaderDebug = CrBuiltinGraphicsPipeline(renderDevice, debugUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicDebugUbershaderPS);
+		BasicUbershaderDebug = CrBuiltinPipelines::GetGraphicsPipeline(debugUbershaderDescriptor, ComplexVertexDescriptor, CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicDebugUbershaderPS);
 	}
 }
 

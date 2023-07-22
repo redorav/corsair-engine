@@ -77,7 +77,7 @@ class CrBuiltinPipelines
 {
 public:
 
-	static void Initialize(ICrRenderDevice* renderDevice);
+	static void Initialize();
 
 	static CrBuiltinGraphicsPipelineHandle GetGraphicsPipeline
 	(
@@ -93,11 +93,11 @@ public:
 
 	// Ubershader builtin pipelines
 
-	static CrBuiltinGraphicsPipeline BasicUbershaderForward;
+	static CrBuiltinGraphicsPipelineHandle BasicUbershaderForward;
 
-	static CrBuiltinGraphicsPipeline BasicUbershaderGBuffer;
+	static CrBuiltinGraphicsPipelineHandle BasicUbershaderGBuffer;
 
-	static CrBuiltinGraphicsPipeline BasicUbershaderDebug;
+	static CrBuiltinGraphicsPipelineHandle BasicUbershaderDebug;
 
 	static CrHashMap<uint64_t, CrBuiltinGraphicsPipelineHandle> m_builtinGraphicsPipelines;
 

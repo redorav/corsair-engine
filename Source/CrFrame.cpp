@@ -400,6 +400,13 @@ void CrFrame::Process()
 	bool isEscapeClicked = keyboardState.keyHeld[KeyboardKey::Escape];
 	bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
 
+	if (keyboardState.keyHeld[KeyboardKey::LeftCtrl] &&
+		keyboardState.keyHeld[KeyboardKey::LeftShift] &&
+		keyboardState.keyPressed[KeyboardKey::F5])
+	{
+		CrBuiltinPipelines::RecompileComputePipelines();
+	}
+
 	if (isEscapeClicked)
 	{
 		m_renderWorld->ClearSelection();

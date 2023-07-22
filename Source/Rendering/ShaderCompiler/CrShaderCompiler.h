@@ -22,6 +22,7 @@ struct CompilationDescriptor
 	CrPath outputPath;
 	CrPath tempPath; // Filename compiler can use to dump intermediate data
 	CrString entryPoint;
+	CrString uniqueBinaryName;
 	mutable CrVector<CrString> defines;
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;

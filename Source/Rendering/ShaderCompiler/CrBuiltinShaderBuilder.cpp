@@ -137,6 +137,8 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				for(uint32_t i = 0; i < builtinShadersDescriptor.graphicsApis.size(); ++i)
 				{
 					cr3d::GraphicsApi::T graphicsApi = builtinShadersDescriptor.graphicsApis[i];
+					
+					const char* shaderBinaryExtension = ".bin";
 
 					CrString uniqueShaderName = 
 						shaderName + "_" + 
@@ -146,12 +148,13 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 					CrPath binaryFilePath = builtinShadersDescriptor.outputPath;
 					binaryFilePath /= uniqueShaderName.c_str();
-					binaryFilePath.replace_extension(".bin");
+					binaryFilePath.replace_extension(shaderBinaryExtension);
 
 					CrPath tempPath = builtinShadersDescriptor.outputPath;
 					tempPath /= uniqueShaderName.c_str();
 					tempPath.replace_extension(".temp");
 
+					compilationDescriptor.uniqueBinaryName = uniqueShaderName + shaderBinaryExtension;
 					compilationDescriptor.outputPath = binaryFilePath;
 					compilationDescriptor.tempPath = tempPath;
 					compilationDescriptor.graphicsApi = graphicsApi;
@@ -228,11 +231,12 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "\n\n";
 	builtinShadersGenericHeader += "struct CrBuiltinShaderMetadata\n"
 	"{\n"
-		"\tCrBuiltinShaderMetadata(const CrString& name, const CrString& entryPoint, cr3d::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
-			"\t: name(name), entryPoint(entryPoint), shaderStage(shaderStage), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
-		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", cr3d::ShaderStage::Count, nullptr, 0) {}\n\n"
+		"\tCrBuiltinShaderMetadata(const CrString& name, const CrString& entryPoint, const CrString& uniqueBinaryName, cr3d::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
+		"\t: name(name), entryPoint(entryPoint), uniqueBinaryName(uniqueBinaryName), shaderStage(shaderStage), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
+		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", \"\", cr3d::ShaderStage::Count, nullptr, 0) {}\n\n"
 		"\tCrString name;\n"
 		"\tCrString entryPoint;\n"
+		"\tCrString uniqueBinaryName;\n"
 		"\tcr3d::ShaderStage::T shaderStage;\n"
 		"\tuint8_t* shaderCode;\n"
 		"\tuint32_t shaderCodeSize;\n"
@@ -287,7 +291,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + CrString(codeSize) + "]";
 				builtinShaderDataCpp += shaderBinaryName + " =\n{";
 				builtinShadersMetadataTable += 
-					"\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", " + 
+					"\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", \"" + compilationDescriptor.uniqueBinaryName + "\", " + 
 					shaderStageString.c_str() + ", " + shaderName + "ShaderCode, " + CrString(codeSize) + "),\n";
 
 				for (uint32_t i = 0; i < codeSize; ++i)
@@ -309,7 +313,8 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			}
 			else
 			{
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", " + shaderStageString.c_str() + ", nullptr, " + CrString(0) + "), \n";
+				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", \"" + compilationDescriptor.uniqueBinaryName + "\", " + 
+					shaderStageString.c_str() + ", nullptr, " + CrString(0) + "), \n";
 			}
 		}
 

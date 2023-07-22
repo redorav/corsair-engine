@@ -158,11 +158,11 @@ static cr::Platform::T ParsePlatform(const CrString& platformString)
 
 static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
 {
-	if (graphicsApiString == "vulkan")
+	if (graphicsApiString.comparei("vulkan") == 0)
 	{
 		return cr3d::GraphicsApi::Vulkan;
 	}
-	else if (graphicsApiString == "d3d12")
+	else if (graphicsApiString.comparei("d3d12") == 0)
 	{
 		return cr3d::GraphicsApi::D3D12;
 	}

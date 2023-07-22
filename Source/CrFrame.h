@@ -39,12 +39,12 @@ private:
 	uint32_t m_height = 0;
 
 	CrBuiltinComputePipelineHandle m_exampleComputePipeline;
-	CrBuiltinGraphicsPipeline m_copyTexturePipeline;
+	CrBuiltinGraphicsPipelineHandle m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer
 	CrBuiltinComputePipelineHandle m_mouseSelectionResolvePipeline;
 
-	CrBuiltinGraphicsPipeline m_directionalLightPipeline;
+	CrBuiltinGraphicsPipelineHandle m_directionalLightPipeline;
 
 	CrBuiltinComputePipelineHandle m_createIndirectArguments;
 
@@ -53,7 +53,7 @@ private:
 	CrTextureHandle m_colorfulTextureArray;
 
 	// Editor Shaders
-	CrBuiltinGraphicsPipeline m_editorEdgeSelectionPipeline;
+	CrBuiltinGraphicsPipelineHandle m_editorEdgeSelectionPipeline;
 
 	CrSwapchainHandle m_swapchain;
 

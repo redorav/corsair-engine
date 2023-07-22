@@ -8,23 +8,33 @@ namespace CrBuiltinShaders { enum T : uint32_t; }
 
 // This class handles builtin shader building. They get registered in a global database
 // and are able to rebuild their contents live
-class CrBuiltinGraphicsPipeline : CrIntrusivePtrInterface
+class CrBuiltinGraphicsPipeline : public CrIntrusivePtrInterface
 {
 public:
 
-	CrBuiltinGraphicsPipeline() {}
+	CrBuiltinGraphicsPipeline();
 
 	CrBuiltinGraphicsPipeline
 	(
 		ICrRenderDevice* renderDevice,
 		const CrGraphicsPipelineDescriptor& graphicsPipelineDescriptor,
 		const CrVertexDescriptor& vertexDescriptor,
-		CrBuiltinShaders::T vertexShader,
-		CrBuiltinShaders::T pixelShader
+		CrBuiltinShaders::T vertexShaderIndex,
+		CrBuiltinShaders::T pixelShaderIndex
 	);
 
 	const ICrGraphicsPipeline* GetPipeline() { return m_graphicsPipeline.get(); }
 
+	void SetPipeline(const CrGraphicsPipelineHandle& graphicsPipeline) { m_graphicsPipeline = graphicsPipeline; }
+
+	const CrGraphicsPipelineDescriptor& GetPipelineDescriptor() const { return m_graphicsPipelineDescriptor; }
+
+	const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
+
+	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
+
+	CrBuiltinShaders::T GetPixelShaderIndex() const { return m_pixelShaderIndex; }
+	
 private:
 
 	CrGraphicsPipelineDescriptor m_graphicsPipelineDescriptor;
@@ -32,6 +42,10 @@ private:
 	CrVertexDescriptor m_vertexDescriptor;
 
 	CrGraphicsPipelineHandle m_graphicsPipeline;
+
+	CrBuiltinShaders::T m_vertexShaderIndex;
+
+	CrBuiltinShaders::T m_pixelShaderIndex;
 };
 
 class CrBuiltinComputePipeline : public CrIntrusivePtrInterface
@@ -40,15 +54,22 @@ public:
 
 	CrBuiltinComputePipeline() {}
 
-	CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, CrBuiltinShaders::T computeShader);
+	CrBuiltinComputePipeline(ICrRenderDevice* renderDevice, CrBuiltinShaders::T computeShaderIndex);
 
 	const ICrComputePipeline* GetPipeline() { return m_computePipeline.get(); }
 
+	void SetPipeline(const CrComputePipelineHandle& pipeline) { m_computePipeline = pipeline; }
+
+	CrBuiltinShaders::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
+
 private:
+
+	CrBuiltinShaders::T m_computeShaderIndex;
 
 	CrComputePipelineHandle m_computePipeline;
 };
 
+using CrBuiltinGraphicsPipelineHandle = CrIntrusivePtr<CrBuiltinGraphicsPipeline>;
 using CrBuiltinComputePipelineHandle = CrIntrusivePtr<CrBuiltinComputePipeline>;
 
 // A collection of all builtin pipelines compiled on boot. They are available to any program that wants them
@@ -58,7 +79,17 @@ public:
 
 	static void Initialize(ICrRenderDevice* renderDevice);
 
+	static CrBuiltinGraphicsPipelineHandle GetGraphicsPipeline
+	(
+		const CrGraphicsPipelineDescriptor& graphicsPipelineDescriptor,
+		const CrVertexDescriptor& vertexDescriptor,
+		CrBuiltinShaders::T vertexShader,
+		CrBuiltinShaders::T pixelShader
+	);
+
 	static CrBuiltinComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
+
+	static void RecompileComputePipelines();
 
 	// Ubershader builtin pipelines
 
@@ -68,5 +99,7 @@ public:
 
 	static CrBuiltinGraphicsPipeline BasicUbershaderDebug;
 
-	static CrArray<CrBuiltinComputePipelineHandle, 256> m_builtinComputePipelines;
+	static CrHashMap<uint64_t, CrBuiltinGraphicsPipelineHandle> m_builtinGraphicsPipelines;
+
+	static CrHashMap<uint64_t, CrBuiltinComputePipelineHandle> m_builtinComputePipelines;
 };

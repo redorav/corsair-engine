@@ -99,7 +99,13 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 					else if (stageValue == "Domain")   { shaderStage = cr3d::ShaderStage::Domain; }
 					else if (stageValue == "Compute")  { shaderStage = cr3d::ShaderStage::Compute; }
 					else if (stageValue == "RootSignature") { shaderStage = cr3d::ShaderStage::RootSignature; }
-					else { continue; }
+					else
+					{
+						CrString errorMessage;
+						CrString invalidStageString(stageValue.str, stageValue.len);
+						errorMessage.append_sprintf("Invalid shader stage '%s' in shader %s. Remember that stage must be upper case", invalidStageString.c_str(), shaderName.c_str());
+						CrShaderCompilerUtilities::QuitWithMessage(errorMessage.c_str());
+					}
 
 					compilationDescriptor.shaderStage = shaderStage;
 

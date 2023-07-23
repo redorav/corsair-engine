@@ -48,6 +48,7 @@ void CrRenderGraph::AddRenderPass
 	{
 		m_logicalPasses.emplace_back(name, color, type, executionFunction);
 		m_workingPassId = m_uniquePassId;
+		m_workingPassType = type;
 		setupFunction(*this);
 		m_workingPassId = CrRenderPassId(0xffffffff);
 		m_nameToLogicalPassId.insert({ name, m_uniquePassId });
@@ -101,55 +102,52 @@ CrRenderGraphBufferId CrRenderGraph::CreateBuffer(const CrRenderGraphString& nam
 
 void CrRenderGraph::AddTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages)
 {
-	if (textureId != CrRenderGraphTextureId())
-	{
-		CrRenderGraphTextureResource* textureResource = &m_textureResources[textureId.id];
+	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
 
-		CrRenderGraphTextureUsage textureUsage;
-		textureUsage.textureId = textureId;
-		textureUsage.mipmapStart = 0;
-		textureUsage.mipmapCount = textureResource->descriptor.mipmapCount;
-		textureUsage.sliceStart = 0;
-		textureUsage.sliceCount = textureResource->descriptor.sliceCount;
-		textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::ShaderInput, shaderStages);
-		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
-		CrRenderGraphLog("Added Texture %s", textureResource->name.c_str());
-	}
+	CrRenderGraphTextureResource* textureResource = &m_textureResources[textureId.id];
+
+	CrRenderGraphTextureUsage textureUsage;
+	textureUsage.textureId = textureId;
+	textureUsage.mipmapStart = 0;
+	textureUsage.mipmapCount = textureResource->descriptor.mipmapCount;
+	textureUsage.sliceStart = 0;
+	textureUsage.sliceCount = textureResource->descriptor.sliceCount;
+	textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::ShaderInput, shaderStages);
+	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	CrRenderGraphLog("Added Texture %s", textureResource->name.c_str());
 }
 
 void CrRenderGraph::AddRWTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount)
 {
-	if (textureId != CrRenderGraphTextureId())
-	{
-		CrRenderGraphTextureResource* textureResource = &m_textureResources[textureId.id];
+	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
 
-		CrRenderGraphTextureUsage textureUsage;
-		textureUsage.textureId = textureId;
-		textureUsage.mipmapStart = CrMin(mipmapStart, textureResource->descriptor.mipmapCount);
-		textureUsage.mipmapCount = CrMin(mipmapCount, textureResource->descriptor.mipmapCount);
-		textureUsage.sliceStart = CrMin(sliceStart, textureResource->descriptor.sliceCount);
-		textureUsage.sliceCount = CrMin(sliceCount, textureResource->descriptor.sliceCount);
-		textureUsage.state = { cr3d::TextureLayout::RWTexture, shaderStages };
-		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
-		CrRenderGraphLog("Added RWTexture %s", textureResource->name.c_str());
-	}
+	CrRenderGraphTextureResource* textureResource = &m_textureResources[textureId.id];
+
+	CrRenderGraphTextureUsage textureUsage;
+	textureUsage.textureId = textureId;
+	textureUsage.mipmapStart = CrMin(mipmapStart, textureResource->descriptor.mipmapCount);
+	textureUsage.mipmapCount = CrMin(mipmapCount, textureResource->descriptor.mipmapCount);
+	textureUsage.sliceStart = CrMin(sliceStart, textureResource->descriptor.sliceCount);
+	textureUsage.sliceCount = CrMin(sliceCount, textureResource->descriptor.sliceCount);
+	textureUsage.state = { cr3d::TextureLayout::RWTexture, shaderStages };
+	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	CrRenderGraphLog("Added RWTexture %s", textureResource->name.c_str());
 }
 
 void CrRenderGraph::AddRenderTarget(CrRenderGraphTextureId textureId, CrRenderTargetLoadOp loadOp, CrRenderTargetStoreOp storeOp, float4 clearColor, uint32_t mipmap, uint32_t slice)
 {
-	if (textureId != CrRenderGraphTextureId())
-	{
-		CrRenderGraphTextureUsage textureUsage;
-		textureUsage.textureId = textureId;
-		textureUsage.mipmapStart = mipmap;
-		textureUsage.sliceStart = slice;
-		textureUsage.clearColor = clearColor;
-		textureUsage.loadOp = loadOp;
-		textureUsage.storeOp = storeOp;
-		textureUsage.state = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel };
-		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
-		CrRenderGraphLog("Added Render Target %s", m_textureResources[textureId.id].name.c_str());
-	}
+	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
+
+	CrRenderGraphTextureUsage textureUsage;
+	textureUsage.textureId = textureId;
+	textureUsage.mipmapStart = mipmap;
+	textureUsage.sliceStart = slice;
+	textureUsage.clearColor = clearColor;
+	textureUsage.loadOp = loadOp;
+	textureUsage.storeOp = storeOp;
+	textureUsage.state = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel };
+	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	CrRenderGraphLog("Added Render Target %s", m_textureResources[textureId.id].name.c_str());
 }
 
 void CrRenderGraph::AddDepthStencilTarget
@@ -160,60 +158,56 @@ void CrRenderGraph::AddDepthStencilTarget
 	uint32_t mipmap, uint32_t slice
 )
 {
-	if (textureId != CrRenderGraphTextureId())
-	{
-		CrRenderGraphTextureUsage textureUsage;
-		textureUsage.textureId = textureId;
-		textureUsage.mipmapStart = mipmap;
-		textureUsage.sliceStart = slice;
-		textureUsage.depthClearValue = depthClearValue;
-		textureUsage.stencilClearValue = stencilClearValue;
-		textureUsage.loadOp = loadOp;
-		textureUsage.storeOp = storeOp;
-		textureUsage.stencilLoadOp = stencilLoadOp;
-		textureUsage.stencilStoreOp = stencilStoreOp;
-		textureUsage.state = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
-		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
-		CrRenderGraphLog("Added Depth Stencil Target %s", m_textureResources[textureId.id].name.c_str());
-	}
+	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
+
+	CrRenderGraphTextureUsage textureUsage;
+	textureUsage.textureId = textureId;
+	textureUsage.mipmapStart = mipmap;
+	textureUsage.sliceStart = slice;
+	textureUsage.depthClearValue = depthClearValue;
+	textureUsage.stencilClearValue = stencilClearValue;
+	textureUsage.loadOp = loadOp;
+	textureUsage.storeOp = storeOp;
+	textureUsage.stencilLoadOp = stencilLoadOp;
+	textureUsage.stencilStoreOp = stencilStoreOp;
+	textureUsage.state = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
+	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	CrRenderGraphLog("Added Depth Stencil Target %s", m_textureResources[textureId.id].name.c_str());
 }
 
 void CrRenderGraph::AddSwapchain(CrRenderGraphTextureId textureId)
 {
-	if (textureId != CrRenderGraphTextureId())
-	{
-		CrRenderGraphTextureUsage textureUsage;
-		textureUsage.textureId = textureId;
-		textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
-		m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
-		CrRenderGraphLog("Added Swapchain %s", m_textureResources[textureId.id].name.c_str());
-	}
+	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
+
+	CrRenderGraphTextureUsage textureUsage;
+	textureUsage.textureId = textureId;
+	textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
+	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	CrRenderGraphLog("Added Swapchain %s", m_textureResources[textureId.id].name.c_str());
 }
 
 void CrRenderGraph::AddBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages)
 {
-	if (bufferId != CrRenderGraphBufferId())
-	{
-		CrRenderGraphBufferUsage bufferUsage;
-		bufferUsage.bufferId = bufferId;
-		bufferUsage.usageState = cr3d::BufferState::ShaderInput;
-		bufferUsage.shaderStages = shaderStages;
-		m_logicalPasses[m_workingPassId.id].bufferUsages.push_back(bufferUsage);
-		CrRenderGraphLog("Added Buffer %s", m_bufferResources[bufferId.id].name.c_str());
-	}
+	CrAssertMsg(bufferId != CrRenderGraphBufferId(), "Invalid bufferId");
+
+	CrRenderGraphBufferUsage bufferUsage;
+	bufferUsage.bufferId = bufferId;
+	bufferUsage.usageState = cr3d::BufferState::ShaderInput;
+	bufferUsage.shaderStages = shaderStages;
+	m_logicalPasses[m_workingPassId.id].bufferUsages.push_back(bufferUsage);
+	CrRenderGraphLog("Added Buffer %s", m_bufferResources[bufferId.id].name.c_str());
 }
 
 void CrRenderGraph::AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages)
 {
-	if (bufferId != CrRenderGraphBufferId())
-	{
-		CrRenderGraphBufferUsage bufferUsage;
-		bufferUsage.bufferId = bufferId;
-		bufferUsage.usageState = cr3d::BufferState::ReadWrite;
-		bufferUsage.shaderStages = shaderStages;
-		m_logicalPasses[m_workingPassId.id].bufferUsages.push_back(bufferUsage);
-		CrRenderGraphLog("Added RWBuffer %s", m_bufferResources[bufferId.id].name.c_str());
-	}
+	CrAssertMsg(bufferId != CrRenderGraphBufferId(), "Invalid bufferId");
+
+	CrRenderGraphBufferUsage bufferUsage;
+	bufferUsage.bufferId = bufferId;
+	bufferUsage.usageState = cr3d::BufferState::ReadWrite;
+	bufferUsage.shaderStages = shaderStages;
+	m_logicalPasses[m_workingPassId.id].bufferUsages.push_back(bufferUsage);
+	CrRenderGraphLog("Added RWBuffer %s", m_bufferResources[bufferId.id].name.c_str());
 }
 
 void CrRenderGraph::Execute()

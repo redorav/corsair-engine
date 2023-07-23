@@ -282,7 +282,11 @@ public:
 private:
 
 	CrRenderPassId m_uniquePassId;
-	CrRenderPassId m_workingPassId; // This id is set during the setup lambda and invalid outside of it
+
+	// Values available during the setup pass and invalid outside of its
+	CrRenderPassId m_workingPassId;
+
+	CrRenderGraphPassType::T m_workingPassType;
 
 	CrRenderGraphTextureId m_uniqueTextureId;
 	CrRenderGraphBufferId m_uniqueBufferId;

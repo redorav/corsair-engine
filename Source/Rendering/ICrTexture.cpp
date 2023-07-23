@@ -74,6 +74,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	}
 	else if (IsDepthStencil())
 	{
+		CrAssertMsg(cr3d::IsDepthFormat(descriptor.format), "Format not compatible with depth stencil capabilities");
 		m_defaultState = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
 	}
 	else if (IsUnorderedAccess())

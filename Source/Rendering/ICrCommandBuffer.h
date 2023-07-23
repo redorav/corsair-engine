@@ -244,6 +244,18 @@ protected:
 		uint32_t strideBytes = 0;
 	};
 
+	struct TextureBinding
+	{
+		TextureBinding() = default;
+
+		TextureBinding(const ICrTexture* texture) : texture(texture)
+		{
+			
+		}
+
+		const ICrTexture* texture = nullptr;
+	};
+
 	struct RWTextureBinding
 	{
 		RWTextureBinding() {}
@@ -301,7 +313,7 @@ protected:
 
 		const ICrSampler*				m_samplers[cr3d::ShaderStage::Count][Samplers::Count];
 
-		const ICrTexture*				m_textures[cr3d::ShaderStage::Count][Textures::Count];
+		TextureBinding					m_textures[cr3d::ShaderStage::Count][Textures::Count];
 
 		RWTextureBinding				m_rwTextures[cr3d::ShaderStage::Count][RWTextures::Count];
 
@@ -547,7 +559,7 @@ inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, cons
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
 
-	m_currentState.m_textures[shaderStage][textureIndex] = texture;
+	m_currentState.m_textures[shaderStage][textureIndex] = TextureBinding(texture);
 }
 
 inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)

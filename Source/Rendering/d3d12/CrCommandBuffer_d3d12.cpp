@@ -506,7 +506,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	bindingLayout.ForEachTexture([=](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[stage][id].texture, srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([=](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
@@ -621,7 +621,7 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[stage][id].texture, srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)

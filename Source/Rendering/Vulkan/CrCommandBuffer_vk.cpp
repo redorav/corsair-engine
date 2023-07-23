@@ -177,7 +177,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id]);
+		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id].texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 		imageInfo.imageView = vulkanTexture->GetVkImageViewAllMipsSlices();

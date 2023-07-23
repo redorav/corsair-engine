@@ -2,15 +2,21 @@
 
 #include "Rendering/CrCamera.h"
 
+#include "Rendering/CrRendering.h"
+
 #include "Math/CrMath.h"
 #include "Math/CrHlslppVectorFloat.h"
 #include "Math/CrHlslppQuaternion.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
 CrCamera::CrCamera() : CrEntity()
-, m_view2WorldMatrix(float4x4::identity())
-, m_world2ViewMatrix(float4x4::identity())
-, m_view2ProjectionMatrix(float4x4::identity())
+	, m_projection(cr3d::CameraProjection::Perspective)
+	, m_nearPlane(0.1f)
+	, m_farPlane(100.0f)
+	, m_view2WorldMatrix(float4x4::identity())
+	, m_world2ViewMatrix(float4x4::identity())
+	, m_view2ProjectionMatrix(float4x4::identity())
+	, m_reverseDepth(true)
 {
 	m_lookAtWorldSpace = float3(0, 0, 1);
 	m_upWorldSpace     = float3(0, 1, 0);
@@ -33,6 +39,8 @@ void CrCamera::SetupPerspective(float filmWidth, float filmHeight, float nearPla
 
 	static float fovY = 60.0f;
 
+	m_projection = cr3d::CameraProjection::Perspective;
+
 	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, aspectRatio, 100000.0f, nearPlane), zclip::zero));
 }
 
@@ -53,6 +61,28 @@ void CrCamera::RotateAround(const float3& pivot, const float3& axis, float angle
 	float3 currentDirection = m_position - pivot;       // Get current direction
 	float3 direction = mul(currentDirection, rotation); // Rotate with quaternion
 	m_position = pivot + direction;                     // Get position
+}
+
+float4 CrCamera::ComputeProjectionParams() const
+{
+	float projectionParamsX = 1.0f;
+	float projectionParamsY = 1.0f;
+
+	if (m_reverseDepth)
+	{
+		projectionParamsX = m_farPlane;
+		projectionParamsY = (m_nearPlane - m_farPlane) / m_nearPlane;
+	}
+	else
+	{
+		projectionParamsX = m_nearPlane;
+		projectionParamsY = (m_farPlane - m_nearPlane) / m_farPlane;
+	}
+
+	float projectionParamsZ = (m_nearPlane - m_farPlane) * (m_projection == cr3d::CameraProjection::Orthographic ? 1.0f : 0.0f); // Orthographic camera
+	float projectionParamsW = 0.0f; // Stereo rendering offset
+
+	return float4(projectionParamsX, projectionParamsY, projectionParamsZ, projectionParamsW);
 }
 
 void CrCamera::Translate(const float3& t)

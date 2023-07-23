@@ -15,9 +15,11 @@ public:
 	{
 		cr3d::CameraProjection projection;
 		float nearPlane;
+
 		float farPlane;
 
 		bool reverseDepth;
+		
 		bool infiniteDepth;
 	};
 
@@ -45,6 +47,12 @@ public:
 
 	void RotateAround(const float3& point, const float3& axis, float angle);
 
+	float4 ComputeProjectionParams() const;
+
+	float GetNearPlane() const { return m_nearPlane; }
+
+	float GetFarPlane() const { return m_farPlane; }
+
 	const float3& GetLookatVector() const { return m_lookAtWorldSpace; }
 
 	const float3& GetRightVector() const { return m_rightWorldSpace; }
@@ -60,11 +68,18 @@ public:
 private:
 
 	float m_filmWidthMm;
+
 	float m_filmHeightMm;
 
 	float m_fovY;
-	//float m_nearPlane;
-	//float m_farPlane;
+
+	float m_nearPlane;
+
+	float m_farPlane;
+
+	cr3d::CameraProjection m_projection;
+
+	bool m_reverseDepth;
 
 	// Camera vectors in world space
 	float3 m_lookAtWorldSpace;

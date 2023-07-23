@@ -490,36 +490,26 @@ void CrFrame::Process()
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
 
-	CrRenderGraphTextureId depthTexture;
-	CrRenderGraphTextureId gBufferAlbedoAO;
-	CrRenderGraphTextureId gBufferNormals;
-	CrRenderGraphTextureId gBufferMaterial;
-	CrRenderGraphTextureId swapchainTexture;
-	CrRenderGraphTextureId preSwapchainTexture;
-	CrRenderGraphTextureId lightingTexture;
-
-	{
 		CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
-		depthTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Depth"), depthDescriptor);
+	CrRenderGraphTextureId depthTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Depth"), depthDescriptor);
 
 		CrRenderGraphTextureDescriptor swapchainDescriptor(m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
-		swapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Swapchain"), swapchainDescriptor);
+	CrRenderGraphTextureId swapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Swapchain"), swapchainDescriptor);
 
 		CrRenderGraphTextureDescriptor preSwapchainDescriptor(m_preSwapchainTexture.get());
-		preSwapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Pre Swapchain"), preSwapchainDescriptor);
+	CrRenderGraphTextureId preSwapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Pre Swapchain"), preSwapchainDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor(m_gbufferAlbedoAOTexture.get());
-		gBufferAlbedoAO = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Albedo AO"), gBufferAlbedoDescriptor);
+	CrRenderGraphTextureId gBufferAlbedoAO = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Albedo AO"), gBufferAlbedoDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor(m_gbufferNormalsTexture.get());
-		gBufferNormals = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Normals"), gBufferNormalsDescriptor);
+	CrRenderGraphTextureId gBufferNormals = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Normals"), gBufferNormalsDescriptor);
 
 		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor(m_gbufferMaterialTexture.get());
-		gBufferMaterial = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Material"), gBufferMaterialDescriptor);
+	CrRenderGraphTextureId gBufferMaterial = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Material"), gBufferMaterialDescriptor);
 
 		CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
-		lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
-	}
+	CrRenderGraphTextureId lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)

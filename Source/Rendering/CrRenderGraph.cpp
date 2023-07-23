@@ -413,7 +413,9 @@ void CrRenderGraph::Execute()
 						}
 						break;
 					}
-					default: break;
+					default:
+						CrAssertMsg(false, "Unhandled texture layout");
+						break;
 				}
 			}
 

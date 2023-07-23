@@ -570,4 +570,17 @@ namespace cr3d
 				return false;
 		}
 	}
+
+	constexpr bool IsStencilFormat(DataFormat::T format)
+	{
+		switch (format)
+		{
+			case cr3d::DataFormat::D24_Unorm_S8_Uint:
+			case cr3d::DataFormat::D24_Unorm_X8:
+			case cr3d::DataFormat::D32_Float_S8_Uint:
+				return true;
+			default:
+				return false;
+		}
+	}
 };

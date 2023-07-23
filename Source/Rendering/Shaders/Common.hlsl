@@ -38,6 +38,7 @@ struct Camera
 {
 	row_major float4x4 view2Projection;
 	row_major float4x4 world2View;
+	float4 projectionParams; // Use to linearize depth
 };
 
 cbuffer Camera
@@ -121,5 +122,11 @@ cbuffer DynamicLightCB
 {
 	DynamicLightCB cb_DynamicLight;
 };
+
+float min3(float a, float b, float c) { return min(min(a, b), c); }
+float min4(float a, float b, float c, float d) { return min(min3(a, b, c), d); }
+
+float max3(float a, float b, float c) { return max(a, max(b, c)); }
+float max4(float a, float b, float c, float d) { return max(max3(a, b, c), d); }
 
 #endif

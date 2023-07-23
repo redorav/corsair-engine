@@ -2,6 +2,7 @@
 #include "Common.hlsl"
 #include "Compute.hlsl"
 #include "CopyTexture.hlsl"
+#include "Depth.hlsl"
 #include "Imgui.hlsl"
 #include "GBuffer.hlsl"
 #include "Editor.hlsl"

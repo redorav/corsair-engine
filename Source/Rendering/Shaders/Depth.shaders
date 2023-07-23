@@ -1,0 +1,3 @@
+DepthDownsampleLinearizeMinMax:
+  entrypoint: DepthDownsampleLinearizeMinMaxCS
+  stage: Compute

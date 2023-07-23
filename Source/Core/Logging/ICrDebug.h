@@ -59,8 +59,20 @@ const ICrDebug* GetDebug();
 #define CrLogInfo(s) CrLog("[Info] %s", s)
 #endif
 
+#if defined(CR_CONFIG_FINAL)
+
+#define CrAssertMsg(condition, message, ...)
+
+#define CrAssert(condition)
+
+#define CrPrintProcessMemory(message, ...)
+
+#else
+
 #define CrAssertMsg(condition, message, ...) GetDebug()->AssertMsg((condition), __FILE__, __LINE__, __func__, (message), __VA_ARGS__)
 
 #define CrAssert(condition)	CrAssertMsg((condition), "")
 
 #define CrPrintProcessMemory(message, ...) GetDebug()->PrintCurrentProcessMemory(__FILE__, __LINE__, __func__, (message), __VA_ARGS__)
+
+#endif

@@ -20,6 +20,7 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 	: ICrCommandBuffer(renderDevice, descriptor)
 	, m_CBV_SRV_UAV_DescriptorHeap(nullptr)
 	, m_samplerDescriptorHeap(nullptr)
+	, m_primitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 

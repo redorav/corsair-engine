@@ -122,8 +122,6 @@ private:
 	VkDevice m_vkDevice;					// Logical device
 	
 	VkPhysicalDevice m_vkPhysicalDevice;	// Physical device
-	
-	VkPhysicalDeviceFeatures m_vkDeviceSupportedFeatures;
 
 	VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
@@ -140,6 +138,9 @@ private:
 
 	// Stores the different hardware limits reported by this device, e.g. maximum buffer or texture sizes, queue priorities, etc
 	VkPhysicalDeviceProperties2 m_vkPhysicalDeviceProperties2;
+
+	// Stores device features such as supported compression, geometry shaders, etc
+	VkPhysicalDeviceFeatures2 m_vkDeviceSupportedFeatures2;
 
 	VmaAllocator m_vmaAllocator;
 

@@ -570,6 +570,10 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 			driverId = vulkan12Properties.driverID;
 		}
 	}
+	else
+	{
+		vkGetPhysicalDeviceFeatures(m_vkPhysicalDevice, &m_vkDeviceSupportedFeatures2.features);
+	}
 
 	uint32_t driverVersionEncoded = m_vkPhysicalDeviceProperties2.properties.driverVersion;
 
@@ -785,14 +789,11 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	queueCreateInfo.queueCount = m_maxCommandQueues;
 	queueCreateInfo.pQueuePriorities = queuePriorities.data();
 
-	// Store the physical features as we can query them
-	vkGetPhysicalDeviceFeatures(m_vkPhysicalDevice, &m_vkDeviceSupportedFeatures);
-
 	VkDeviceCreateInfo deviceCreateInfo = {};
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	deviceCreateInfo.queueCreateInfoCount = 1; // TODO Potentially create other types of queues
 	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-	deviceCreateInfo.pEnabledFeatures = &m_vkDeviceSupportedFeatures; // Enable all available features
+	deviceCreateInfo.pEnabledFeatures = &m_vkDeviceSupportedFeatures2.features; // Enable all available features
 
 	if (enabledDeviceExtensions.size() > 0)
 	{
@@ -803,11 +804,11 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	VkResult vkResult = vkCreateDevice(m_vkPhysicalDevice, &deviceCreateInfo, nullptr, &m_vkDevice);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not create vkDevice");
 
-	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::Tessellation]           = m_vkDeviceSupportedFeatures.tessellationShader;
-	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::GeometryShaders]        = m_vkDeviceSupportedFeatures.geometryShader;
-	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionBC]   = m_vkDeviceSupportedFeatures.textureCompressionBC;
-	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionETC]  = m_vkDeviceSupportedFeatures.textureCompressionETC2;
-	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionASTC] = m_vkDeviceSupportedFeatures.textureCompressionASTC_LDR;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::Tessellation]           = m_vkDeviceSupportedFeatures2.features.tessellationShader;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::GeometryShaders]        = m_vkDeviceSupportedFeatures2.features.geometryShader;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionBC]   = m_vkDeviceSupportedFeatures2.features.textureCompressionBC;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionETC]  = m_vkDeviceSupportedFeatures2.features.textureCompressionETC2;
+	m_renderDeviceProperties.supportedFeatures[CrRenderingFeature::TextureCompressionASTC] = m_vkDeviceSupportedFeatures2.features.textureCompressionASTC_LDR;
 
 	return vkResult;
 }

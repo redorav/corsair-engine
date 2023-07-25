@@ -139,7 +139,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		const ConstantBufferBinding& binding = m_currentState.GetConstantBufferBinding(stage, id);
+		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent

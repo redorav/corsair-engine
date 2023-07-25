@@ -283,11 +283,6 @@ protected:
 
 	struct CurrentState
 	{
-		const ConstantBufferBinding& GetConstantBufferBinding(cr3d::ShaderStage::T stage, ConstantBuffers::T id)
-		{
-			return m_constantBuffers[stage][id];
-		}
-
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
 		cr3d::DataFormat::T             m_indexBufferFormat;

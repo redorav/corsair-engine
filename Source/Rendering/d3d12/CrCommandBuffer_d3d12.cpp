@@ -685,13 +685,13 @@ void CrCommandBufferD3D12::BeginPS()
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }
 
-void CrCommandBufferD3D12::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)
+void CrCommandBufferD3D12::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	unused_parameter(renderTarget);
 	unused_parameter(color);
-	unused_parameter(level);
+	unused_parameter(mip);
 	unused_parameter(slice);
-	unused_parameter(levelCount);
+	unused_parameter(mipCount);
 	unused_parameter(sliceCount);
 }
 

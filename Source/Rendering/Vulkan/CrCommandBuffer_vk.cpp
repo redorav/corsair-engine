@@ -693,15 +693,15 @@ void CrCommandBufferVulkan::BeginPS()
 	CrAssert(result == VK_SUCCESS);
 }
 
-void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t level, uint32_t slice, uint32_t levelCount, uint32_t sliceCount)
+void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	VkClearColorValue clearColor;
 	store(color, clearColor.float32);
 
 	VkImageSubresourceRange imageSubResourceRange = {};
 	imageSubResourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	imageSubResourceRange.baseMipLevel = level;
-	imageSubResourceRange.levelCount = levelCount;
+	imageSubResourceRange.baseMipLevel = mip;
+	imageSubResourceRange.levelCount = mipCount;
 
 	imageSubResourceRange.baseArrayLayer = slice;
 	imageSubResourceRange.layerCount = sliceCount;

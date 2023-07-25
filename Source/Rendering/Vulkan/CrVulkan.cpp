@@ -645,6 +645,28 @@ VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderS
 	return pipelineFlags;
 }
 
+VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::TexturePlane::T texturePlanes)
+{
+	VkImageAspectFlags aspectFlags = 0;
+
+	if (texturePlanes & cr3d::TexturePlane::Color)
+	{
+		aspectFlags |= VK_IMAGE_ASPECT_COLOR_BIT;
+	}
+	
+	if (texturePlanes & cr3d::TexturePlane::Depth)
+	{
+		aspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+	}
+
+	if (texturePlanes & cr3d::TexturePlane::Stencil)
+	{
+		aspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+	}
+
+	return aspectFlags;
+}
+
 VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
 (
 	VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage,

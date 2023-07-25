@@ -67,6 +67,8 @@ public:
 
 private:
 
+	cr3d::CameraProjection m_projection;
+
 	float m_filmWidthMm;
 
 	float m_filmHeightMm;
@@ -76,8 +78,6 @@ private:
 	float m_nearPlane;
 
 	float m_farPlane;
-
-	cr3d::CameraProjection m_projection;
 
 	bool m_reverseDepth;
 

@@ -13,10 +13,10 @@ CrCamera::CrCamera() : CrEntity()
 	, m_projection(cr3d::CameraProjection::Perspective)
 	, m_nearPlane(0.1f)
 	, m_farPlane(100.0f)
+	, m_reverseDepth(true)
 	, m_view2WorldMatrix(float4x4::identity())
 	, m_world2ViewMatrix(float4x4::identity())
 	, m_view2ProjectionMatrix(float4x4::identity())
-	, m_reverseDepth(true)
 {
 	m_lookAtWorldSpace = float3(0, 0, 1);
 	m_upWorldSpace     = float3(0, 1, 0);

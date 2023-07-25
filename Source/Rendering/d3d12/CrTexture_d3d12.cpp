@@ -149,6 +149,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 			case cr3d::DataFormat::D32_Float: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT; break;
 			case cr3d::DataFormat::D24_Unorm_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
 			case cr3d::DataFormat::D32_Float_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT; break;
+			default: break;
 		}
 
 		// Set the view dimensions depending on the texture type
@@ -232,6 +233,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		case cr3d::DataFormat::D32_Float: srvFormat = DXGI_FORMAT_R32_FLOAT; break;
 		case cr3d::DataFormat::D24_Unorm_S8_Uint: srvFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
 		case cr3d::DataFormat::D32_Float_S8_Uint: srvFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS; break;
+		default: break;
 	}
 
 	m_d3d12ShaderResourceView = {};

@@ -546,7 +546,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(cr3d::ShaderStage::T shaderStag
 	BindConstantBuffer(shaderStage, (ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSize(), constantBufferView.GetByteOffset());
 }
 
-inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, const Samplers::T samplerIndex, const ICrSampler* sampler)
+inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, Samplers::T samplerIndex, const ICrSampler* sampler)
 {
 	CrCommandBufferAssertMsg(sampler != nullptr, "Sampler is null");
 	CrCommandBufferAssertMsg(samplerIndex < Samplers::Count, "Invalid binding index");
@@ -554,7 +554,7 @@ inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, cons
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
 }
 
-inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, const Textures::T textureIndex, const ICrTexture* texture)
+inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, Textures::T textureIndex, const ICrTexture* texture)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
@@ -562,7 +562,7 @@ inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, cons
 	m_currentState.m_textures[shaderStage][textureIndex] = TextureBinding(texture);
 }
 
-inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, const RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)
+inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag");

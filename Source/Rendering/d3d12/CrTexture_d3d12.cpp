@@ -135,20 +135,20 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	}
 
 	// Create depth stencil views
+	// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ns-d3d11-d3d11_depth_stencil_view_desc
 	if (IsDepthStencil())
 	{
 		// Map texture formats to depth stencil formats
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDescriptor = {};
 		dsvDescriptor.Flags = D3D12_DSV_FLAG_NONE;
-		dsvDescriptor.Format = dxgiFormat;
+		dsvDescriptor.Format = DXGI_FORMAT_UNKNOWN;
 
-		if (dxgiFormat == DXGI_FORMAT_R32G8X24_TYPELESS)
+		switch (descriptor.format)
 		{
-			dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-		}
-		else if (dxgiFormat == DXGI_FORMAT_R32_TYPELESS)
-		{
-			dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT;
+			case cr3d::DataFormat::D16_Unorm: dsvDescriptor.Format = DXGI_FORMAT_D16_UNORM; break;
+			case cr3d::DataFormat::D32_Float: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT; break;
+			case cr3d::DataFormat::D24_Unorm_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
+			case cr3d::DataFormat::D32_Float_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT; break;
 		}
 
 		// Set the view dimensions depending on the texture type
@@ -223,66 +223,75 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	}
 
 	// Create shader resource views
+
+	DXGI_FORMAT srvFormat = dxgiFormat;
+
+	switch (descriptor.format)
 	{
-		m_d3d12ShaderResourceView = {};
-		m_d3d12ShaderResourceView.Format = dxgiFormat;
-		m_d3d12ShaderResourceView.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		case cr3d::DataFormat::D16_Unorm: srvFormat = DXGI_FORMAT_R16_UNORM; break;
+		case cr3d::DataFormat::D32_Float: srvFormat = DXGI_FORMAT_R32_FLOAT; break;
+		case cr3d::DataFormat::D24_Unorm_S8_Uint: srvFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
+		case cr3d::DataFormat::D32_Float_S8_Uint: srvFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS; break;
+	}
 
-		if (IsCubemap())
-		{
-			m_d3d12ShaderResourceView.TextureCube.MostDetailedMip = 0;
-			m_d3d12ShaderResourceView.TextureCube.MipLevels = m_mipmapCount;
+	m_d3d12ShaderResourceView = {};
+	m_d3d12ShaderResourceView.Format = srvFormat;
+	m_d3d12ShaderResourceView.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-			if (m_arraySize > 1)
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
-				m_d3d12ShaderResourceView.TextureCubeArray.First2DArrayFace = 0;
-				m_d3d12ShaderResourceView.TextureCubeArray.NumCubes = m_arraySize;
-			}
-			else
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-			}
-		}
-		else if (IsVolumeTexture())
-		{
-			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
-			m_d3d12ShaderResourceView.Texture3D.MostDetailedMip = 0;
-			m_d3d12ShaderResourceView.Texture3D.MipLevels = m_mipmapCount;
-		}
-		else if (Is1DTexture())
-		{
-			m_d3d12ShaderResourceView.Texture1D.MostDetailedMip = 0;
-			m_d3d12ShaderResourceView.Texture1D.MipLevels = m_mipmapCount;
+	if (IsCubemap())
+	{
+		m_d3d12ShaderResourceView.TextureCube.MostDetailedMip = 0;
+		m_d3d12ShaderResourceView.TextureCube.MipLevels = m_mipmapCount;
 
-			if (m_arraySize > 1)
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
-				m_d3d12ShaderResourceView.Texture1DArray.FirstArraySlice = 0;
-				m_d3d12ShaderResourceView.Texture1DArray.ArraySize = m_arraySize;
-			}
-			else
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
-			}
+		if (m_arraySize > 1)
+		{
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+			m_d3d12ShaderResourceView.TextureCubeArray.First2DArrayFace = 0;
+			m_d3d12ShaderResourceView.TextureCubeArray.NumCubes = m_arraySize;
 		}
 		else
 		{
-			m_d3d12ShaderResourceView.Texture2D.MostDetailedMip = 0;
-			m_d3d12ShaderResourceView.Texture2D.MipLevels = m_mipmapCount;
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		}
+	}
+	else if (IsVolumeTexture())
+	{
+		m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+		m_d3d12ShaderResourceView.Texture3D.MostDetailedMip = 0;
+		m_d3d12ShaderResourceView.Texture3D.MipLevels = m_mipmapCount;
+	}
+	else if (Is1DTexture())
+	{
+		m_d3d12ShaderResourceView.Texture1D.MostDetailedMip = 0;
+		m_d3d12ShaderResourceView.Texture1D.MipLevels = m_mipmapCount;
 
-			if (m_arraySize > 1)
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-				m_d3d12ShaderResourceView.Texture2DArray.FirstArraySlice = 0;
-				m_d3d12ShaderResourceView.Texture2DArray.ArraySize = m_arraySize;
-				m_d3d12ShaderResourceView.Texture2DArray.PlaneSlice = 0;
-			}
-			else
-			{
-				m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-				m_d3d12ShaderResourceView.Texture2D.PlaneSlice = 0;
-			}
+		if (m_arraySize > 1)
+		{
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
+			m_d3d12ShaderResourceView.Texture1DArray.FirstArraySlice = 0;
+			m_d3d12ShaderResourceView.Texture1DArray.ArraySize = m_arraySize;
+		}
+		else
+		{
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+		}
+	}
+	else
+	{
+		m_d3d12ShaderResourceView.Texture2D.MostDetailedMip = 0;
+		m_d3d12ShaderResourceView.Texture2D.MipLevels = m_mipmapCount;
+
+		if (m_arraySize > 1)
+		{
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+			m_d3d12ShaderResourceView.Texture2DArray.FirstArraySlice = 0;
+			m_d3d12ShaderResourceView.Texture2DArray.ArraySize = m_arraySize;
+			m_d3d12ShaderResourceView.Texture2DArray.PlaneSlice = 0;
+		}
+		else
+		{
+			m_d3d12ShaderResourceView.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			m_d3d12ShaderResourceView.Texture2D.PlaneSlice = 0;
 		}
 	}
 

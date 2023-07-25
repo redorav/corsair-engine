@@ -612,7 +612,7 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 
 	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteCBV(m_currentState.GetConstantBufferBinding(stage, id), cbvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteCBV(m_currentState.m_constantBuffers[stage][id], cbvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)

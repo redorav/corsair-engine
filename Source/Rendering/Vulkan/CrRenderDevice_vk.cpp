@@ -518,20 +518,27 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	// This is here only to get the Vulkan version supported by this physical device
 
 	vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2.properties);
-	uint32_t vulkanVersion = m_vkPhysicalDeviceProperties2.properties.apiVersion;
-	uint32_t vulkanVersionMajor = VK_API_VERSION_MAJOR(vulkanVersion);
-	uint32_t vulkanVersionMinor = VK_API_VERSION_MINOR(vulkanVersion);
-	uint32_t vulkanVersionPatch = VK_API_VERSION_PATCH(vulkanVersion);
+	m_vkVersion = m_vkPhysicalDeviceProperties2.properties.apiVersion;
+	uint32_t vulkanVersionMajor = VK_API_VERSION_MAJOR(m_vkVersion);
+	uint32_t vulkanVersionMinor = VK_API_VERSION_MINOR(m_vkVersion);
+	uint32_t vulkanVersionPatch = VK_API_VERSION_PATCH(m_vkVersion);
 
 	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %d.%d.%d", cr3d::GraphicsApi::ToString(cr3d::GraphicsApi::Vulkan), vulkanVersionMajor, vulkanVersionMinor, vulkanVersionPatch);
 
 	// Populate the render device properties into the platform-independent structure
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);
 
-	VkPhysicalDeviceVulkan11Properties vulkan11Properties = {};
-	vulkan11Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
-	VkPhysicalDeviceVulkan12Properties vulkan12Properties = {};
-	vulkan12Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+	m_vk11PhysicalDeviceProperties = {};
+	m_vk11PhysicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+
+	m_vk12PhysicalDeviceProperties = {};
+	m_vk12PhysicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+
+	m_vk11DeviceSupportedFeatures = {};
+	m_vk11DeviceSupportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+
+	m_vk12DeviceSupportedFeatures = {};
+	m_vk12DeviceSupportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
 
 	VkDriverId driverId = VK_DRIVER_ID_MAX_ENUM;
 
@@ -548,26 +555,30 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		driverId = VK_DRIVER_ID_AMD_PROPRIETARY;
 	}
 
-	bool isVulkan11 = vulkanVersion >= VK_VERSION_1_1;
-	bool isVulkan12 = vulkanVersion >= VK_VERSION_1_2;
-
 	// Starting from Vulkan 1.1 we have this alternative available. There is also an extension that basically no one supports
-	if (isVulkan11)
+	if (m_vkVersion >= VK_VERSION_1_1)
 	{
 		m_vkPhysicalDeviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-		m_vkPhysicalDeviceProperties2.pNext = &vulkan11Properties;
+		m_vkPhysicalDeviceProperties2.pNext = &m_vk11PhysicalDeviceProperties;
+
+		m_vkDeviceSupportedFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		m_vkDeviceSupportedFeatures2.pNext = &m_vk11DeviceSupportedFeatures;
 
 		// Starting from 1.2 we get even more properties
-		if (isVulkan12)
+		if (m_vkVersion >= VK_VERSION_1_2)
 		{
-			vulkan11Properties.pNext = &vulkan12Properties;
+			m_vk11PhysicalDeviceProperties.pNext = &m_vk12PhysicalDeviceProperties;
+			m_vk11DeviceSupportedFeatures.pNext = &m_vk12DeviceSupportedFeatures;
 		}
 
 		vkGetPhysicalDeviceProperties2(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2);
 
-		if (isVulkan12)
+		vkGetPhysicalDeviceFeatures2(m_vkPhysicalDevice, &m_vkDeviceSupportedFeatures2);
+
+		// We check for the Vulkan version to avoid overriding the previously derived driverId
+		if (m_vkVersion >= VK_VERSION_1_2)
 		{
-			driverId = vulkan12Properties.driverID;
+			driverId = m_vk12PhysicalDeviceProperties.driverID;
 		}
 	}
 	else
@@ -793,7 +804,16 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	deviceCreateInfo.queueCreateInfoCount = 1; // TODO Potentially create other types of queues
 	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-	deviceCreateInfo.pEnabledFeatures = &m_vkDeviceSupportedFeatures2.features; // Enable all available features
+
+	// Enable all available features
+	if (m_vkVersion >= VK_VERSION_1_1)
+	{
+		deviceCreateInfo.pNext = &m_vkDeviceSupportedFeatures2;
+	}
+	else
+	{
+		deviceCreateInfo.pEnabledFeatures = &m_vkDeviceSupportedFeatures2.features;
+	}
 
 	if (enabledDeviceExtensions.size() > 0)
 	{

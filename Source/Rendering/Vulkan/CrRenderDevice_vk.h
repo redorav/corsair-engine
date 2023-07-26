@@ -134,13 +134,26 @@ private:
 	CrSet<VkFormat> m_supportedVertexBufferFormats;
 
 	// Stores all available memory (type) properties for the physical device
+
 	VkPhysicalDeviceMemoryProperties m_vkPhysicalDeviceMemoryProperties;
 
 	// Stores the different hardware limits reported by this device, e.g. maximum buffer or texture sizes, queue priorities, etc
+
+	VkPhysicalDeviceVulkan11Properties m_vk11PhysicalDeviceProperties;
+
+	VkPhysicalDeviceVulkan12Properties m_vk12PhysicalDeviceProperties;
+
 	VkPhysicalDeviceProperties2 m_vkPhysicalDeviceProperties2;
 
 	// Stores device features such as supported compression, geometry shaders, etc
+
+	VkPhysicalDeviceVulkan11Features m_vk11DeviceSupportedFeatures;
+
+	VkPhysicalDeviceVulkan12Features m_vk12DeviceSupportedFeatures;
+
 	VkPhysicalDeviceFeatures2 m_vkDeviceSupportedFeatures2;
+
+	uint32_t m_vkVersion = 0;
 
 	VmaAllocator m_vmaAllocator;
 

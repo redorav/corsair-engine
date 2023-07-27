@@ -393,8 +393,8 @@ void CrRenderGraph::Execute()
 							);
 
 							CrRenderGraphLog("  Texture %s [%s -> %s]", m_textureResources[textureId.id].name.c_str(),
-								cr3d::TextureLayout::ToString(transitionInfo.initialState),
-								cr3d::TextureLayout::ToString(transitionInfo.usageState));
+								cr3d::TextureLayout::ToString(transitionInfo.initialState.layout),
+								cr3d::TextureLayout::ToString(transitionInfo.usageState.layout));
 						}
 
 						if (transitionInfo.usageState != transitionInfo.finalState)

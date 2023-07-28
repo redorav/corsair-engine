@@ -39,6 +39,9 @@ private:
 	uint32_t m_height = 0;
 
 	CrBuiltinComputePipelineHandle m_exampleComputePipeline;
+
+	CrBuiltinComputePipelineHandle m_depthDownsampleLinearize;
+
 	CrBuiltinGraphicsPipelineHandle m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer
@@ -58,6 +61,10 @@ private:
 	CrSwapchainHandle m_swapchain;
 
 	CrTextureHandle m_depthStencilTexture;
+
+	// 16-bit linear depth with a min max mip chain
+	CrTextureHandle m_linearDepth16MinMaxMipChain;
+
 	CrTextureHandle m_preSwapchainTexture;
 
 	CrTextureHandle m_gbufferAlbedoAOTexture;

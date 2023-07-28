@@ -213,7 +213,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 
 		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
-			VkImageAspectFlags vkImageAspectMask = vulkanTexture->GetVkImageAspectMask();
+			VkImageAspectFlags vkImageAspectMask = crvk::GetVkImageAspectFlags(vulkanTexture->GetFormat());
 
 			// Transition the texture image layout to transfer target, so we can safely copy our buffer data into it
 			VkImageSubresourceRange subresourceRange;
@@ -906,7 +906,7 @@ void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVul
 {
 	// Transition all resources to their initial state
 	VkImageSubresourceRange subresourceRange;
-	subresourceRange.aspectMask = vulkanTexture->GetVkImageAspectMask();
+	subresourceRange.aspectMask = crvk::GetVkImageAspectFlags(vulkanTexture->GetFormat());
 	subresourceRange.baseMipLevel = 0;
 	subresourceRange.levelCount = vulkanTexture->GetMipmapCount();
 	subresourceRange.baseArrayLayer = 0;

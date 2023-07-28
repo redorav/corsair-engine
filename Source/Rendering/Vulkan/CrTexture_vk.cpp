@@ -10,7 +10,7 @@
 CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)
 	, m_vkImage(nullptr)
-	, m_vkImageView(nullptr)
+	, m_vkImageViewAllMipsAllSlices(nullptr)
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
@@ -172,13 +172,25 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		m_additionalViews = CrUniquePtr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
 	}
 
-	if (IsDepthStencil()) // TODO sparse textures
+	// There are two parts to the aspect mask it seems:
+	// 
+	// 1) Transitions and barriers will make use of them and express how many aspects a texture refers to and transition
+	// the entirety of the aspects of the resource to a single state, as far as I can tell. For example, setting only
+	// the depth aspect of a depth stencil texture when doing a transition to depth only will not transition it properly
+	// 
+	// 2) The view aspect mask, on the other hand, captures the idea that the shader can only see one part of the texture.
+	// For example, the depth texture uses the standard view to be viewed in a shader as depth, and an additional view to 
+	// be viewed as stencil (when applicable). The rest of the textures use the color mask
+
+	VkImageAspectFlags viewAspectMask;
+
+	if (cr3d::IsDepthFormat(m_format))
 	{
-		m_vkAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+		viewAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 	}
 	else
 	{
-		m_vkAspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		viewAspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	}
 
 	// Shader input image view
@@ -196,9 +208,9 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.subresourceRange.layerCount = arrayLayers;
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
-		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
+		imageViewInfo.subresourceRange.aspectMask = viewAspectMask;
 
-		vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_vkImageView);
+		vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_vkImageViewAllMipsAllSlices);
 		CrAssert(vkResult == VK_SUCCESS);
 	}
 
@@ -214,7 +226,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.components = {};
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
-		imageViewInfo.subresourceRange.aspectMask = m_vkAspectMask;
+		imageViewInfo.subresourceRange.aspectMask = viewAspectMask;
 
 		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
@@ -236,6 +248,27 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 				vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageSingleMipSlice[mip][slice]);
 				CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 			}
+		}
+
+		m_additionalViews->m_vkImageViewStencil = nullptr;
+
+		if (IsDepthStencil() && cr3d::IsDepthStencilFormat(m_format))
+		{
+			VkImageViewCreateInfo stencilImageViewInfo;
+			stencilImageViewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			stencilImageViewInfo.pNext                           = nullptr;
+			stencilImageViewInfo.format                          = vkFormat;
+			stencilImageViewInfo.flags                           = vkCreateFlags;
+			stencilImageViewInfo.components = {};
+			stencilImageViewInfo.subresourceRange.baseMipLevel   = 0;
+			stencilImageViewInfo.subresourceRange.levelCount     = m_mipmapCount;
+			stencilImageViewInfo.subresourceRange.baseArrayLayer = 0;
+			stencilImageViewInfo.subresourceRange.layerCount     = arrayLayers;
+			stencilImageViewInfo.viewType                        = vkImageViewType;
+			stencilImageViewInfo.image                           = m_vkImage;
+			stencilImageViewInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_STENCIL_BIT;
+			vkResult = vkCreateImageView(vkDevice, &stencilImageViewInfo, nullptr, &m_additionalViews->m_vkImageViewStencil);
+			CrAssert(vkResult == VK_SUCCESS);
 		}
 	}
 
@@ -282,7 +315,7 @@ CrTextureVulkan::~CrTextureVulkan()
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
-	CrAssert(m_vkImageView);
+	CrAssert(m_vkImageViewAllMipsAllSlices);
 	CrAssert(m_vkImage);
 
 	// Don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
@@ -291,7 +324,7 @@ CrTextureVulkan::~CrTextureVulkan()
 		vmaDestroyImage(vulkanRenderDevice->GetVmaAllocator(), m_vkImage, m_vmaAllocation);
 	}
 
-	vkDestroyImageView(vkDevice, m_vkImageView, nullptr);
+	vkDestroyImageView(vkDevice, m_vkImageViewAllMipsAllSlices, nullptr);
 
 	if (m_additionalViews)
 	{
@@ -314,15 +347,32 @@ CrArray<CrVkImageStateInfo, cr3d::TextureLayout::Count> CrVkImageResourceLayoutT
 
 static bool PopulateVkImageResourceTable()
 {
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Undefined]         = { VK_IMAGE_LAYOUT_UNDEFINED,                        VK_ACCESS_NONE_KHR };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::ShaderInput]       = { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,         VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RenderTarget]      = { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RWTexture]         = { VK_IMAGE_LAYOUT_GENERAL,                          VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Present]           = { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  0 };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilRead]  = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,  VK_ACCESS_SHADER_READ_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopySource]        = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopyDestination]   = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Undefined]             = { VK_IMAGE_LAYOUT_UNDEFINED,                        VK_ACCESS_NONE_KHR };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::ShaderInput]           = { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,         VK_ACCESS_SHADER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RenderTarget]          = { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::RWTexture]             = { VK_IMAGE_LAYOUT_GENERAL,                          VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::Present]               = { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  0 };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopySource]            = { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,             VK_ACCESS_TRANSFER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::CopyDestination]       = { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,             VK_ACCESS_TRANSFER_WRITE_BIT };
+
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilReadWrite] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilWrite]     = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthReadStencilWrite] = { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthWriteStencilRead] = { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthReadWrite]        = { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::StencilReadWrite]      = { VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthWrite]            = { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::StencilWrite]          = { VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilRead]      = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthRead]             = { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL,          VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::StencilRead]           = { VK_IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL,        VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthStencilReadAndShader] = { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::DepthReadAndShader]    = { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT };
+	CrVkImageResourceLayoutTable[cr3d::TextureLayout::StencilReadAndShader]  = { VK_IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT };
 
 	// Validate the entries on boot
 	for (const CrVkImageStateInfo& resourceInfo : CrVkImageResourceLayoutTable)
@@ -344,17 +394,38 @@ VkPipelineStageFlags CrTextureVulkan::GetVkPipelineStageFlags(const cr3d::Textur
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
-	if (textureState.layout == cr3d::TextureLayout::RenderTarget)
+	switch (textureState.layout)
 	{
-		pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	}
-	else if (textureState.layout == cr3d::TextureLayout::DepthStencilWrite)
-	{
-		pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-	}
-	else if (textureState.layout == cr3d::TextureLayout::ShaderInput || textureState.layout == cr3d::TextureLayout::RWTexture)
-	{
-		pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(textureState.stages);
+		case cr3d::TextureLayout::RenderTarget:
+		{
+			pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			break;
+		}
+		case cr3d::TextureLayout::DepthStencilReadWrite:
+		case cr3d::TextureLayout::DepthStencilWrite:
+		case cr3d::TextureLayout::DepthReadStencilWrite:
+		case cr3d::TextureLayout::DepthWriteStencilRead:
+		case cr3d::TextureLayout::DepthReadWrite:
+		case cr3d::TextureLayout::StencilReadWrite:
+		case cr3d::TextureLayout::DepthWrite:
+		case cr3d::TextureLayout::StencilWrite:
+		case cr3d::TextureLayout::DepthStencilRead:
+		case cr3d::TextureLayout::DepthRead:
+		case cr3d::TextureLayout::StencilRead:
+		{
+			pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+			break;
+		}
+		case cr3d::TextureLayout::ShaderInput:
+		case cr3d::TextureLayout::RWTexture:
+		{
+			pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(textureState.stages);
+			break;
+		}
+		case cr3d::TextureLayout::Present:
+			break;
+		default:
+			CrAssertMsg(false, "Unhandled case");
 	}
 
 	return pipelineFlags;

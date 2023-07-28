@@ -80,7 +80,7 @@ private:
 
 	void WriteCBV(const ConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
 
-	void WriteTextureSRV(const ICrTexture* texture, crd3d::DescriptorD3D12 srvHandle);
+	void WriteTextureSRV(const TextureBinding& textureBinding, crd3d::DescriptorD3D12 srvHandle);
 
 	void WriteSamplerView(const ICrSampler* sampler, crd3d::DescriptorD3D12 samplerHandle);
 

@@ -450,13 +450,23 @@ D3D12_RESOURCE_STATES crd3d::GetTextureState(const cr3d::TextureState& textureSt
 
 			return resourceState;
 		}
-		case cr3d::TextureLayout::RenderTarget:      return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case cr3d::TextureLayout::RWTexture:         return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		case cr3d::TextureLayout::Present:           return D3D12_RESOURCE_STATE_PRESENT;
-		case cr3d::TextureLayout::DepthStencilRead:  return D3D12_RESOURCE_STATE_DEPTH_READ;
-		case cr3d::TextureLayout::DepthStencilWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureLayout::CopySource:        return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case cr3d::TextureLayout::CopyDestination:   return D3D12_RESOURCE_STATE_COPY_DEST;
+		case cr3d::TextureLayout::RenderTarget:          return D3D12_RESOURCE_STATE_RENDER_TARGET;
+		case cr3d::TextureLayout::RWTexture:             return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		case cr3d::TextureLayout::Present:               return D3D12_RESOURCE_STATE_PRESENT;
+		case cr3d::TextureLayout::CopySource:            return D3D12_RESOURCE_STATE_COPY_SOURCE;
+		case cr3d::TextureLayout::CopyDestination:       return D3D12_RESOURCE_STATE_COPY_DEST;
+
+		case cr3d::TextureLayout::DepthStencilReadWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthStencilWrite:     return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthReadStencilWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthWriteStencilRead: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthReadWrite:        return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::StencilReadWrite:      return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthWrite:            return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::StencilWrite:          return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case cr3d::TextureLayout::DepthStencilRead:      return D3D12_RESOURCE_STATE_DEPTH_READ;
+		case cr3d::TextureLayout::DepthRead:             return D3D12_RESOURCE_STATE_DEPTH_READ;
+		case cr3d::TextureLayout::StencilRead:           return D3D12_RESOURCE_STATE_DEPTH_READ;
 		default: return D3D12_RESOURCE_STATE_COMMON;
 	}
 }

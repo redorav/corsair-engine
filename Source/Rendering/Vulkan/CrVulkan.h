@@ -72,7 +72,7 @@ namespace crvk
 
 	VkPipelineStageFlags GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderStageFlags::T shaderStages);
 
-	VkImageAspectFlags GetVkImageAspectFlags(cr3d::TexturePlane::T texturePlane);
+	VkImageAspectFlags GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat);
 
 	VkBufferCreateInfo CreateVkBufferCreateInfo(VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage, VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices);
 

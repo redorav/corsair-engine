@@ -248,6 +248,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	m_colorsRWDataBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
 	m_exampleComputePipeline = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::ExampleCompute);
+	m_depthDownsampleLinearize = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::DepthDownsampleLinearizeMinMax);
 	m_mouseSelectionResolvePipeline = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::EditorMouseSelectionResolveCS);
 
 	{
@@ -474,6 +475,10 @@ void CrFrame::Process()
 	}
 	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, colorBuffer);
 
+	m_cameraConstantData.world2View = m_camera->GetWorld2ViewMatrix();
+	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
+	m_cameraConstantData.projectionParams = m_camera->ComputeProjectionParams();
+
 	CrGPUBufferViewT<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
 	Camera* cameraData = cameraDataBuffer.GetData();
 	{
@@ -481,6 +486,7 @@ void CrFrame::Process()
 	}
 	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, cameraDataBuffer);
 	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, cameraDataBuffer);
+	drawCommandBuffer->BindConstantBuffer(cr3d::ShaderStage::Compute, cameraDataBuffer);
 
 	CrGPUBufferViewT<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
 	Instance* identityTransformData = identityConstantBuffer.GetData();
@@ -490,25 +496,25 @@ void CrFrame::Process()
 
 	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
 
-		CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
+	CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
 	CrRenderGraphTextureId depthTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Depth"), depthDescriptor);
 
-		CrRenderGraphTextureDescriptor swapchainDescriptor(m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
+	CrRenderGraphTextureDescriptor swapchainDescriptor(m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex()).get());
 	CrRenderGraphTextureId swapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Swapchain"), swapchainDescriptor);
 
-		CrRenderGraphTextureDescriptor preSwapchainDescriptor(m_preSwapchainTexture.get());
+	CrRenderGraphTextureDescriptor preSwapchainDescriptor(m_preSwapchainTexture.get());
 	CrRenderGraphTextureId preSwapchainTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Pre Swapchain"), preSwapchainDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor(m_gbufferAlbedoAOTexture.get());
+	CrRenderGraphTextureDescriptor gBufferAlbedoDescriptor(m_gbufferAlbedoAOTexture.get());
 	CrRenderGraphTextureId gBufferAlbedoAO = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Albedo AO"), gBufferAlbedoDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferNormalsDescriptor(m_gbufferNormalsTexture.get());
+	CrRenderGraphTextureDescriptor gBufferNormalsDescriptor(m_gbufferNormalsTexture.get());
 	CrRenderGraphTextureId gBufferNormals = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Normals"), gBufferNormalsDescriptor);
 
-		CrRenderGraphTextureDescriptor gBufferMaterialDescriptor(m_gbufferMaterialTexture.get());
+	CrRenderGraphTextureDescriptor gBufferMaterialDescriptor(m_gbufferMaterialTexture.get());
 	CrRenderGraphTextureId gBufferMaterial = m_mainRenderGraph.CreateTexture(CrRenderGraphString("GBuffer Material"), gBufferMaterialDescriptor);
 
-		CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
+	CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
 	CrRenderGraphTextureId lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -536,6 +542,35 @@ void CrFrame::Process()
 		});
 
 		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+	});
+
+	CrRenderGraphTextureDescriptor linearDepthMipChainDescriptor(m_linearDepth16MinMaxMipChain.get());
+	CrRenderGraphTextureId linearDepth16MinMaxMipChainId = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Linear Depth 16 Mip Chain"), linearDepthMipChainDescriptor);
+
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Depth Downsample Linearize"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Compute,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddTexture(depthTexture, cr3d::ShaderStageFlags::Compute);
+		renderGraph.AddRWTexture(linearDepth16MinMaxMipChainId, cr3d::ShaderStageFlags::Compute);
+	},
+	[this, depthTexture, linearDepth16MinMaxMipChainId](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+	{
+		const ICrTexture* rawDepthTexture = renderGraph.GetPhysicalTexture(depthTexture);
+		const ICrTexture* linearDepth16MipChainTexture = renderGraph.GetPhysicalTexture(linearDepth16MinMaxMipChainId);
+		
+		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize->GetPipeline());
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::RawDepthTexture, rawDepthTexture, cr3d::TexturePlane::Depth);
+		commandBuffer->BindTexture(cr3d::ShaderStage::Compute, Textures::StencilTexture, rawDepthTexture, cr3d::TexturePlane::Stencil);
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::RWLinearDepthMinMaxMip1, linearDepth16MipChainTexture, 0);
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::RWLinearDepthMinMaxMip2, linearDepth16MipChainTexture, 1);
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::RWLinearDepthMinMaxMip3, linearDepth16MipChainTexture, 2);
+		commandBuffer->BindRWTexture(cr3d::ShaderStage::Compute, RWTextures::RWLinearDepthMinMaxMip4, linearDepth16MipChainTexture, 3);
+		commandBuffer->Dispatch
+		(
+			(linearDepth16MipChainTexture->GetWidth() + 7) / 8,
+			(linearDepth16MipChainTexture->GetHeight() + 7) / 8,
+			1
+		);
 	});
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Lighting Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -1093,6 +1128,16 @@ void CrFrame::RecreateSwapchainAndRenderTargets()
 	depthTextureDescriptor.name = "Depth Texture D32S8";
 
 	m_depthStencilTexture = renderDevice->CreateTexture(depthTextureDescriptor);
+
+	CrTextureDescriptor linearDepth16MinMaxMipChainTextureDescriptor;
+	linearDepth16MinMaxMipChainTextureDescriptor.width = m_swapchain->GetWidth() >> 1;
+	linearDepth16MinMaxMipChainTextureDescriptor.height = m_swapchain->GetHeight() >> 1;
+	linearDepth16MinMaxMipChainTextureDescriptor.format = cr3d::DataFormat::RG16_Float;
+	linearDepth16MinMaxMipChainTextureDescriptor.usage = cr3d::TextureUsage::UnorderedAccess;
+	linearDepth16MinMaxMipChainTextureDescriptor.name = "Linear Depth 16 Min Max Mip Chain";
+	linearDepth16MinMaxMipChainTextureDescriptor.mipmapCount = 4;
+
+	m_linearDepth16MinMaxMipChain = renderDevice->CreateTexture(linearDepth16MinMaxMipChainTextureDescriptor);
 
 	// Recreate render targets
 	{

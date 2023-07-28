@@ -89,9 +89,11 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 
 		if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
 		{
+			unsigned int planeSlice = descriptor.texturePlane == cr3d::TexturePlane::Stencil ? 1 : 0;
+
 			textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
 			(
-				descriptor.mipmapStart, descriptor.sliceStart, 0,
+				descriptor.mipmapStart, descriptor.sliceStart, planeSlice,
 				d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
 			);
 
@@ -280,12 +282,18 @@ void CrCommandBufferD3D12::WriteCBV(const ConstantBufferBinding& binding, crd3d:
 	d3d12RenderDevice->GetD3D12Device()->CreateConstantBufferView(&cbvDescriptor, cbvHandle.cpuHandle);
 }
 
-void CrCommandBufferD3D12::WriteTextureSRV(const ICrTexture* texture, crd3d::DescriptorD3D12 srvHandle)
+void CrCommandBufferD3D12::WriteTextureSRV(const TextureBinding& textureBinding, crd3d::DescriptorD3D12 srvHandle)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
-	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(texture);
-	const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDescriptor = d3d12Texture->GetD3D12ShaderResourceView();
-	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(d3d12Texture->GetD3D12Resource(), &srvDescriptor, srvHandle.cpuHandle);
+	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(textureBinding.texture);
+	const D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescriptor = &d3d12Texture->GetD3D12SRVDescriptor();
+
+	if (textureBinding.plane == cr3d::TexturePlane::Stencil)
+	{
+		srvDescriptor = &d3d12Texture->GetD3D12StencilSRVDescriptor();
+	}
+
+	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(d3d12Texture->GetD3D12Resource(), srvDescriptor, srvHandle.cpuHandle);
 }
 
 void CrCommandBufferD3D12::WriteSamplerView(const ICrSampler* sampler, crd3d::DescriptorD3D12 samplerHandle)
@@ -300,7 +308,7 @@ void CrCommandBufferD3D12::WriteRWTextureUAV(const RWTextureBinding& rwTextureBi
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
 	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(rwTextureBinding.texture);
-	const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDescriptor = d3d12Texture->GetD3D12UnorderedAccessView(rwTextureBinding.mip);
+	const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDescriptor = d3d12Texture->GetD3D12UAVDescriptor(rwTextureBinding.mip);
 	d3d12RenderDevice->GetD3D12Device()->CreateUnorderedAccessView(d3d12Texture->GetD3D12Resource(), nullptr, &uavDescriptor, uavHandle.cpuHandle);
 }
 
@@ -507,7 +515,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	bindingLayout.ForEachTexture([=](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id].texture, srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([=](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
@@ -622,7 +630,7 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id].texture, srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)

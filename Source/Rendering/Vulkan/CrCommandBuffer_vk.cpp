@@ -177,10 +177,21 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(m_currentState.m_textures[stage][id].texture);
+		const TextureBinding& textureBinding = m_currentState.m_textures[stage][id];
+		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(textureBinding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
-		imageInfo.imageView = vulkanTexture->GetVkImageViewAllMipsSlices();
+
+		if (textureBinding.plane == cr3d::TexturePlane::Stencil)
+		{
+			imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
+		}
+		else
+		{
+			imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
+		}
+
+		// TODO Handle when image is bound to depth stencil and also as shader input
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.sampler = nullptr;
 
@@ -435,7 +446,7 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	imageMemoryBarrier.oldLayout = resourceStateInfoSource.imageLayout;
 	imageMemoryBarrier.newLayout = resourceStateInfoDestination.imageLayout;
 	imageMemoryBarrier.image = vulkanTexture->GetVkImage();
-	imageMemoryBarrier.subresourceRange.aspectMask = vulkanTexture->GetVkImageAspectMask();
+	imageMemoryBarrier.subresourceRange.aspectMask = crvk::GetVkImageAspectFlags(texture->GetFormat());
 	imageMemoryBarrier.subresourceRange.baseMipLevel = mipmapStart;
 	imageMemoryBarrier.subresourceRange.levelCount = mipmapCount;
 	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;
@@ -484,9 +495,12 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 		if (renderPassDescriptor.depth.texture)
 		{
 			const CrRenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
-			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
-			attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(depthAttachment.texture)->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice));
-			attachments.push_back(GetVkAttachmentDescription(depthAttachment));
+			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(depthAttachment.texture);
+			VkAttachmentDescription attachmentDescription = GetVkAttachmentDescription(depthAttachment);
+
+			depthReference = { numColorAttachments, attachmentDescription.initialLayout };
+			attachmentImageViews.push_back(vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice));
+			attachments.push_back(attachmentDescription);
 
 			if (depthAttachment.initialState.layout != depthAttachment.usageState.layout)
 			{

@@ -645,24 +645,24 @@ VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderS
 	return pipelineFlags;
 }
 
-VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::TexturePlane::T texturePlanes)
+VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat)
 {
 	VkImageAspectFlags aspectFlags = 0;
 
-	if (texturePlanes & cr3d::TexturePlane::Color)
+	if (cr3d::IsDepthStencilFormat(textureFormat))
 	{
-		aspectFlags |= VK_IMAGE_ASPECT_COLOR_BIT;
+		aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 	}
-	
-	if (texturePlanes & cr3d::TexturePlane::Depth)
+	else if (cr3d::IsDepthOnlyFormat(textureFormat))
 	{
-		aspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+		aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
+	}
+	else
+	{
+		aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	}
 
-	if (texturePlanes & cr3d::TexturePlane::Stencil)
-	{
-		aspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
-	}
+	CrAssertMsg(aspectFlags != 0, "Aspect flags cannot be 0");
 
 	return aspectFlags;
 }

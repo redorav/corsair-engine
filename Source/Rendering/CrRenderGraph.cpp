@@ -49,7 +49,6 @@ void CrRenderGraph::AddRenderPass
 	{
 		m_logicalPasses.emplace_back(name, color, type, executionFunction);
 		m_workingPassId = m_uniquePassId;
-		m_workingPassType = type;
 		setupFunction(*this);
 		m_workingPassId = CrRenderPassId(0xffffffff);
 		m_nameToLogicalPassId.insert({ name, m_uniquePassId });
@@ -153,26 +152,113 @@ void CrRenderGraph::AddRenderTarget(CrRenderGraphTextureId textureId, CrRenderTa
 
 void CrRenderGraph::AddDepthStencilTarget
 (
-	CrRenderGraphTextureId textureId, 
-	CrRenderTargetLoadOp loadOp, CrRenderTargetStoreOp storeOp, float depthClearValue, 
+	CrRenderGraphTextureId textureId,
+	CrRenderTargetLoadOp loadOp, CrRenderTargetStoreOp storeOp, float depthClearValue,
 	CrRenderTargetLoadOp stencilLoadOp, CrRenderTargetStoreOp stencilStoreOp, uint8_t stencilClearValue,
-	uint32_t mipmap, uint32_t slice
+	uint32_t mipmap, uint32_t slice, bool readDepth, bool readStencil
 )
 {
 	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
 
+	CrRenderGraphPass& workingPass = GetWorkingPass();
+
+	CrAssertMsg(workingPass.type == CrRenderGraphPassType::Graphics, "Render pass must be graphics");
+	CrAssertMsg(workingPass.depthBufferTextureId == CrRenderGraphTextureId(), "Cannot add multiple depth targets");
+
 	CrRenderGraphTextureUsage textureUsage;
-	textureUsage.textureId = textureId;
-	textureUsage.mipmapStart = mipmap;
-	textureUsage.sliceStart = slice;
-	textureUsage.depthClearValue = depthClearValue;
+	textureUsage.textureId         = textureId;
+	textureUsage.mipmapStart       = mipmap;
+	textureUsage.sliceStart        = slice;
+	textureUsage.depthClearValue   = depthClearValue;
 	textureUsage.stencilClearValue = stencilClearValue;
-	textureUsage.loadOp = loadOp;
-	textureUsage.storeOp = storeOp;
-	textureUsage.stencilLoadOp = stencilLoadOp;
-	textureUsage.stencilStoreOp = stencilStoreOp;
-	textureUsage.state = { cr3d::TextureLayout::DepthStencilWrite, cr3d::ShaderStageFlags::Pixel };
-	m_logicalPasses[m_workingPassId.id].textureUsages.push_back(textureUsage);
+	textureUsage.loadOp            = loadOp;
+	textureUsage.storeOp           = storeOp;
+	textureUsage.stencilLoadOp     = stencilLoadOp;
+	textureUsage.stencilStoreOp    = stencilStoreOp;
+
+	cr3d::TextureLayout::T layout = cr3d::TextureLayout::DepthStencilReadWrite;
+
+	// If we don't care about either the inputs or the outputs, we can conclude that nothing meaningful is going to be written to it
+	bool writeDepth = loadOp != CrRenderTargetLoadOp::DontCare || storeOp != CrRenderTargetStoreOp::DontCare;
+	bool writeStencil = stencilLoadOp != CrRenderTargetLoadOp::DontCare || stencilStoreOp != CrRenderTargetStoreOp::DontCare;
+
+	if (loadOp == CrRenderTargetLoadOp::DontCare)
+	{
+		readDepth = false;
+	}
+
+	if (stencilLoadOp == CrRenderTargetLoadOp::DontCare)
+	{
+		readStencil = false;
+	}
+
+	if (writeDepth)
+	{
+		if (writeStencil)
+		{
+			if (readDepth || readStencil)
+			{
+				layout = cr3d::TextureLayout::DepthStencilReadWrite;
+			}
+			else
+			{
+				layout = cr3d::TextureLayout::DepthStencilWrite;
+			}
+		}
+		else if(readStencil)
+		{
+			layout = cr3d::TextureLayout::DepthWriteStencilRead;
+		}
+		else if (readDepth)
+		{
+			layout = cr3d::TextureLayout::DepthReadWrite;
+		}
+		else
+		{
+			layout = cr3d::TextureLayout::DepthWrite;
+		}
+	}
+	else if(writeStencil)
+	{
+		if (readDepth)
+		{
+			layout = cr3d::TextureLayout::DepthReadStencilWrite;
+		}
+		else if (readStencil)
+		{
+			layout = cr3d::TextureLayout::DepthStencilReadWrite;
+		}
+		else
+		{
+			layout = cr3d::TextureLayout::StencilWrite;
+		}
+	}
+	else if (readDepth)
+	{
+		if (readStencil)
+		{
+			layout = cr3d::TextureLayout::DepthStencilRead;
+		}
+		else
+		{
+			layout = cr3d::TextureLayout::DepthRead;
+		}
+	}
+	else if (readStencil)
+	{
+		layout = cr3d::TextureLayout::StencilRead;
+	}
+	else
+	{
+		CrAssertMsg(false, "Unhandled case");
+	}
+
+	textureUsage.state = { layout, cr3d::ShaderStageFlags::Pixel };
+
+	workingPass.depthBufferTextureIndex = (int32_t)workingPass.textureUsages.size();
+	workingPass.depthBufferTextureId = textureId;
+
+	workingPass.textureUsages.push_back(textureUsage);
 	CrRenderGraphLog("Added Depth Stencil Target %s", m_textureResources[textureId.id].name.c_str());
 }
 
@@ -213,7 +299,6 @@ void CrRenderGraph::AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStag
 
 void CrRenderGraph::Execute()
 {
-	// Process all passes
 	for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
 	{
 		CrRenderGraphPass* renderGraphPass = &m_logicalPasses[logicalPassId.id];
@@ -227,7 +312,6 @@ void CrRenderGraph::Execute()
 			CrRenderGraphTextureTransition transitionInfo;
 			transitionInfo.name = texture->name;
 			transitionInfo.usageState = textureUsage.state;
-
 			transitionInfo.finalState = texture->descriptor.texture->GetDefaultState(); // Initialize final state to default state until we have more information
 
 			CrRenderPassId lastUsedPassId = m_textureLastUsedPass[texture->id.id];
@@ -356,7 +440,20 @@ void CrRenderGraph::Execute()
 						renderPassDescriptor.color.push_back(renderTargetDescriptor);
 						break;
 					}
+					case cr3d::TextureLayout::DepthStencilReadWrite:
 					case cr3d::TextureLayout::DepthStencilWrite:
+					case cr3d::TextureLayout::DepthReadStencilWrite:
+					case cr3d::TextureLayout::DepthWriteStencilRead:
+					case cr3d::TextureLayout::DepthReadWrite:
+					case cr3d::TextureLayout::StencilReadWrite:
+					case cr3d::TextureLayout::DepthWrite:
+					case cr3d::TextureLayout::StencilWrite:
+					case cr3d::TextureLayout::DepthStencilRead:
+					case cr3d::TextureLayout::DepthRead:
+					case cr3d::TextureLayout::StencilRead:
+					case cr3d::TextureLayout::DepthStencilReadAndShader:
+					case cr3d::TextureLayout::DepthReadAndShader:
+					case cr3d::TextureLayout::StencilReadAndShader:
 					{
 						CrRenderTargetDescriptor depthDescriptor;
 						depthDescriptor.texture           = m_textureResources[textureId.id].descriptor.texture;
@@ -387,9 +484,8 @@ void CrRenderGraph::Execute()
 						{
 							renderPassDescriptor.beginTextures.emplace_back
 							(
-								m_textureResources[textureId.id].descriptor.texture,
-								textureUsage.mipmapStart, textureUsage.mipmapCount,
-								textureUsage.sliceStart, textureUsage.sliceCount,
+								m_textureResources[textureId.id].descriptor.texture, textureUsage.mipmapStart, textureUsage.mipmapCount,
+								textureUsage.sliceStart, textureUsage.sliceCount, textureUsage.texturePlane,
 								transitionInfo.initialState, transitionInfo.usageState
 							);
 
@@ -402,9 +498,8 @@ void CrRenderGraph::Execute()
 						{
 							renderPassDescriptor.endTextures.emplace_back
 							(
-								m_textureResources[textureId.id].descriptor.texture,
-								textureUsage.mipmapStart, textureUsage.mipmapCount,
-								textureUsage.sliceStart, textureUsage.sliceCount,
+								m_textureResources[textureId.id].descriptor.texture, textureUsage.mipmapStart, textureUsage.mipmapCount,
+								textureUsage.sliceStart, textureUsage.sliceCount, textureUsage.texturePlane,
 								transitionInfo.usageState, transitionInfo.finalState
 							);
 

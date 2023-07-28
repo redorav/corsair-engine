@@ -170,15 +170,33 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			Undefined          = 0, // Never use this as the destination state in a resource transition operation
-			ShaderInput        = 1, // Use as input to a shader (except depth)
-			RenderTarget       = 2, // Use as a render target
-			RWTexture          = 3, // Use as RW texture
-			Present            = 4, // Use as swapchain
-			DepthStencilRead   = 5, // Read depth in shader
-			DepthStencilWrite  = 6, // Write to depth
-			CopySource         = 7, // Use as source of copy operation
-			CopyDestination    = 8, // Use as destination of copy operation
+			Undefined             = 0, // Never use this as the destination state in a resource transition operation
+			ShaderInput           = 1, // Use as input to a shader (depth and stencil included when not used as depth-stencil)
+			RenderTarget          = 2, // Use as a render target
+			RWTexture             = 3, // Use as RW texture
+			Present               = 4, // Use as swapchain
+			CopySource            = 5, // Use as source of copy operation
+			CopyDestination       = 6, // Use as destination of copy operation
+
+			DepthStencilReadWrite = 7, // Read and write to and from depth and stencil (regular usage)
+			DepthStencilWrite     = 8, // Write only to depth and stencil (overwrite values)
+			DepthReadStencilWrite = 9, // Read-only depth, write to stencil
+			DepthWriteStencilRead = 10, // Write to depth, read-only stencil
+			DepthReadWrite        = 11, // Read and write only to depth
+			StencilReadWrite      = 12, // Read and write only to stencil
+
+			DepthWrite            = 13, // Write to depth
+			StencilWrite          = 14, // Write to stencil
+			
+			DepthStencilRead      = 15, // Read only from depth and stencil
+			DepthRead             = 16, // Read-only depth for depth test
+			StencilRead           = 17, // Read-only stencil for stencil test
+			
+			// States where we test and read from shader
+			DepthStencilReadAndShader = 18, // Test depth and stencil and read in shader
+			DepthReadAndShader    = 19, // Test depth and read in shader
+			StencilReadAndShader  = 20, // Test stencil and read in shader
+
 			Count
 		};
 
@@ -191,14 +209,27 @@ namespace cr3d
 				case RenderTarget: return "RenderTarget";
 				case RWTexture: return "RWTexture";
 				case Present: return "Present";
-				case DepthStencilRead: return "DepthStencilRead";
+				case DepthStencilReadWrite: return "DepthStencilWrite";
 				case DepthStencilWrite: return "DepthStencilWrite";
+				case DepthReadStencilWrite: return "DepthReadStencilWrite";
+				case DepthWriteStencilRead: return "DepthWriteStencilRead";
+				case DepthReadWrite: return "DepthReadWrite";
+				case StencilReadWrite: return "StencilReadWrite";
+				case DepthWrite: return "DepthWrite";
+				case StencilWrite: return "StencilWrite";
+				case DepthStencilRead: return "DepthStencilRead";
+				case DepthRead: return "DepthRead";
+				case StencilRead: return "StencilRead";
+				case DepthStencilReadAndShader: return "DepthStencilReadAndShader";
+				case DepthReadAndShader: return "DepthReadAndShader";
+				case StencilReadAndShader: return "StencilReadAndShader";
 				case CopySource: return "CopySource";
 				case CopyDestination: return "CopyDestination";
 				default: return "";
 			}
 		}
 	};
+
 
 	struct TextureState
 	{
@@ -395,6 +426,27 @@ namespace cr3d
 		static const ColorWriteMask All = ColorWriteComponent::Red | ColorWriteComponent::Green | ColorWriteComponent::Blue | ColorWriteComponent::Alpha;
 		static const ColorWriteMask ColorOnly = ColorWriteComponent::Red | ColorWriteComponent::Green | ColorWriteComponent::Blue;
 		static const ColorWriteMask AlphaOnly = ColorWriteComponent::Alpha;
+	};
+
+	// A texture can have multiple aspects, which D3D calls planes and Vulkan calls aspects
+	// For example, a depth buffer can have both depth and stencil and certain movie formats have several 'textures' embedded
+	namespace TexturePlane
+	{
+		enum T : uint32_t
+		{
+			None    = 0,
+			Plane0  = 1 << 0,
+			Plane1  = 1 << 1,
+			Plane2  = 1 << 2,
+			Color   = Plane0,
+			Depth   = Plane0,
+			Stencil = Plane1,
+		};
+
+		inline TexturePlane::T operator | (TexturePlane::T flag1, TexturePlane::T flag2)
+		{
+			return (TexturePlane::T)((uint32_t)flag1 | (uint32_t)flag2);
+		}
 	};
 
 	enum class CompareOp : uint32_t

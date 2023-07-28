@@ -556,6 +556,7 @@ namespace cr3d
 		}
 	}
 
+	// Whether format has a depth plane
 	constexpr bool IsDepthFormat(DataFormat::T format)
 	{
 		switch (format)
@@ -571,13 +572,27 @@ namespace cr3d
 		}
 	}
 
-	constexpr bool IsStencilFormat(DataFormat::T format)
+	// Whether format has both depth and stencil planes
+	constexpr bool IsDepthStencilFormat(DataFormat::T format)
 	{
 		switch (format)
 		{
 			case cr3d::DataFormat::D24_Unorm_S8_Uint:
 			case cr3d::DataFormat::D24_Unorm_X8:
 			case cr3d::DataFormat::D32_Float_S8_Uint:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	// Whether depth format does not have stencil (for e.g. shadow maps)
+	constexpr bool IsDepthOnlyFormat(DataFormat::T format)
+	{
+		switch (format)
+		{
+			case cr3d::DataFormat::D16_Unorm:
+			case cr3d::DataFormat::D32_Float:
 				return true;
 			default:
 				return false;

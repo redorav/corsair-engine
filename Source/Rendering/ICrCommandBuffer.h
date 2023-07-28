@@ -91,7 +91,7 @@ public:
 
 	void BindSampler(cr3d::ShaderStage::T shaderStage, Samplers::T samplerIndex, const ICrSampler* sampler);
 
-	void BindTexture(cr3d::ShaderStage::T shaderStage, Textures::T textureIndex, const ICrTexture* texture);
+	void BindTexture(cr3d::ShaderStage::T shaderStage, Textures::T textureIndex, const ICrTexture* texture, cr3d::TexturePlane::T plane = cr3d::TexturePlane::Plane0);
 
 	void BindRWTexture(cr3d::ShaderStage::T shaderStage, RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip);
 
@@ -248,12 +248,11 @@ protected:
 	{
 		TextureBinding() = default;
 
-		TextureBinding(const ICrTexture* texture) : texture(texture)
-		{
-			
-		}
+		TextureBinding(const ICrTexture* texture, cr3d::TexturePlane::T plane) : texture(texture), plane(plane) {}
 
 		const ICrTexture* texture = nullptr;
+
+		cr3d::TexturePlane::T plane = cr3d::TexturePlane::Color;
 	};
 
 	struct RWTextureBinding
@@ -549,12 +548,13 @@ inline void ICrCommandBuffer::BindSampler(cr3d::ShaderStage::T shaderStage, Samp
 	m_currentState.m_samplers[shaderStage][samplerIndex] = sampler;
 }
 
-inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, Textures::T textureIndex, const ICrTexture* texture)
+inline void ICrCommandBuffer::BindTexture(cr3d::ShaderStage::T shaderStage, Textures::T textureIndex, const ICrTexture* texture, cr3d::TexturePlane::T plane)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
+	CrCommandBufferAssertMsg((plane == cr3d::TexturePlane::Plane0) ? true : cr3d::IsDepthStencilFormat(texture->GetFormat()), "Invalid plane specified");
 
-	m_currentState.m_textures[shaderStage][textureIndex] = TextureBinding(texture);
+	m_currentState.m_textures[shaderStage][textureIndex] = TextureBinding(texture, plane);
 }
 
 inline void ICrCommandBuffer::BindRWTexture(cr3d::ShaderStage::T shaderStage, RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)

@@ -66,6 +66,8 @@ struct CrRenderGraphTextureUsage
 	uint32_t sliceStart = 0;
 	uint32_t sliceCount = 1;
 
+	cr3d::TexturePlane::T texturePlane = cr3d::TexturePlane::Color;
+
 	float4 clearColor;
 	float depthClearValue = 0.0f;
 	uint8_t stencilClearValue = 0;
@@ -163,6 +165,13 @@ struct CrRenderGraphPass
 	CrVector<CrRenderGraphBufferUsage> bufferUsages;
 
 	CrHashMap<uint32_t, CrRenderGraphBufferTransition> bufferTransitions;
+
+	// Texture used as depth buffer for this render pass. The reason we want this is that the depth buffer
+	// can take a multitude of states depending on whether we're also trying to sample it, stencil, etc.
+
+	int32_t depthBufferTextureIndex = -1;
+
+	CrRenderGraphTextureId depthBufferTextureId;
 };
 
 // Objectives
@@ -245,7 +254,8 @@ public:
 		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare, 
 		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare, 
 		uint8_t stencilClearValue = 0,
-		uint32_t mipmap = 0, uint32_t slice = 0
+		uint32_t mipmap = 0, uint32_t slice = 0,
+		bool readDepth = true, bool readStencil = true
 	);
 
 	void AddSwapchain(CrRenderGraphTextureId textureId);
@@ -281,12 +291,12 @@ public:
 
 private:
 
+	CrRenderGraphPass& GetWorkingPass() { return m_logicalPasses[m_workingPassId.id]; }
+
 	CrRenderPassId m_uniquePassId;
 
-	// Values available during the setup pass and invalid outside of its
+	// Values available during the setup pass and invalid outside of its scope
 	CrRenderPassId m_workingPassId;
-
-	CrRenderGraphPassType::T m_workingPassType;
 
 	CrRenderGraphTextureId m_uniqueTextureId;
 	CrRenderGraphBufferId m_uniqueBufferId;

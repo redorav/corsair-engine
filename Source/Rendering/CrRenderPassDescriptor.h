@@ -70,9 +70,8 @@ struct CrRenderPassBufferDescriptor
 struct CrRenderPassTextureDescriptor
 {
 	CrRenderPassTextureDescriptor(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
-		uint32_t sliceStart, uint32_t sliceCount, 
-		const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
-		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount)
+		uint32_t sliceStart, uint32_t sliceCount, cr3d::TexturePlane::T texturePlane, const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
+		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount), texturePlane(texturePlane)
 		, sourceState(sourceState), destinationState(destinationState) {}
 
 	const ICrTexture* texture;
@@ -82,6 +81,8 @@ struct CrRenderPassTextureDescriptor
 
 	uint32_t sliceStart;
 	uint32_t sliceCount;
+
+	cr3d::TexturePlane::T texturePlane;
 
 	cr3d::TextureState sourceState;
 	cr3d::TextureState destinationState;

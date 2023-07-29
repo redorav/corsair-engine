@@ -25,6 +25,8 @@ namespace cr3d
 
 	namespace ShaderResourceType { enum T : uint32_t; }
 
+	namespace TextureLayout { enum T : uint32_t; }
+
 	namespace TexturePlane { enum T : uint32_t; }
 
 	enum class AddressMode : uint32_t;

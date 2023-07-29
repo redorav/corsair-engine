@@ -155,7 +155,7 @@ void CrRenderGraph::AddDepthStencilTarget
 	CrRenderGraphTextureId textureId,
 	CrRenderTargetLoadOp loadOp, CrRenderTargetStoreOp storeOp, float depthClearValue,
 	CrRenderTargetLoadOp stencilLoadOp, CrRenderTargetStoreOp stencilStoreOp, uint8_t stencilClearValue,
-	uint32_t mipmap, uint32_t slice, bool readDepth, bool readStencil
+	uint32_t mipmap, uint32_t slice, bool readOnlyDepth, bool readOnlyStencil
 )
 {
 	CrAssertMsg(textureId != CrRenderGraphTextureId(), "Invalid textureId");
@@ -176,25 +176,38 @@ void CrRenderGraph::AddDepthStencilTarget
 	textureUsage.stencilLoadOp     = stencilLoadOp;
 	textureUsage.stencilStoreOp    = stencilStoreOp;
 
-	cr3d::TextureLayout::T layout = cr3d::TextureLayout::DepthStencilReadWrite;
-
 	// If we don't care about either the inputs or the outputs, we can conclude that nothing meaningful is going to be written to it
 	bool writeDepth = loadOp != CrRenderTargetLoadOp::DontCare || storeOp != CrRenderTargetStoreOp::DontCare;
 	bool writeStencil = stencilLoadOp != CrRenderTargetLoadOp::DontCare || stencilStoreOp != CrRenderTargetStoreOp::DontCare;
 
-	if (loadOp == CrRenderTargetLoadOp::DontCare)
-	{
-		readDepth = false;
-	}
+	CrAssertMsg(!(writeDepth && readOnlyDepth), "Cannot read and write to depth simultaneously");
+	CrAssertMsg(!(writeStencil && readOnlyStencil), "Cannot read and write to stencil simultaneously");
 
-	if (stencilLoadOp == CrRenderTargetLoadOp::DontCare)
-	{
-		readStencil = false;
-	}
+	// Read-only depth specifies that we want to prevent writing to the selected aspect of the render target
+	// If read-only is set to false on both aspects, it just means that we don't want to prevent writing
+	// We can still prevent reading if we detect that 
 
-	if (writeDepth)
+	// If we're not loading or clearing the depth or stencil, we know we won't test it
+	bool readDepth = loadOp != CrRenderTargetLoadOp::DontCare;
+	bool readStencil = stencilLoadOp != CrRenderTargetLoadOp::DontCare;
+
+	cr3d::TextureLayout::T layout = cr3d::TextureLayout::Count;
+
+	if (readOnlyDepth && writeStencil)
 	{
-		if (writeStencil)
+		layout = cr3d::TextureLayout::StencilWriteDepthReadOnly;
+	}
+	else if (readOnlyStencil && writeDepth)
+	{
+		layout = cr3d::TextureLayout::DepthWriteStencilReadOnly;
+	}
+	else if (readOnlyDepth && readOnlyStencil)
+	{
+		layout = cr3d::TextureLayout::DepthStencilReadOnly;
+	}
+	else
+	{
+		if (writeDepth || writeStencil)
 		{
 			if (readDepth || readStencil)
 			{
@@ -205,53 +218,13 @@ void CrRenderGraph::AddDepthStencilTarget
 				layout = cr3d::TextureLayout::DepthStencilWrite;
 			}
 		}
-		else if(readStencil)
-		{
-			layout = cr3d::TextureLayout::DepthWriteStencilRead;
-		}
-		else if (readDepth)
-		{
-			layout = cr3d::TextureLayout::DepthReadWrite;
-		}
 		else
 		{
-			layout = cr3d::TextureLayout::DepthWrite;
+			layout = cr3d::TextureLayout::DepthStencilReadOnly;
 		}
 	}
-	else if(writeStencil)
-	{
-		if (readDepth)
-		{
-			layout = cr3d::TextureLayout::DepthReadStencilWrite;
-		}
-		else if (readStencil)
-		{
-			layout = cr3d::TextureLayout::DepthStencilReadWrite;
-		}
-		else
-		{
-			layout = cr3d::TextureLayout::StencilWrite;
-		}
-	}
-	else if (readDepth)
-	{
-		if (readStencil)
-		{
-			layout = cr3d::TextureLayout::DepthStencilRead;
-		}
-		else
-		{
-			layout = cr3d::TextureLayout::DepthRead;
-		}
-	}
-	else if (readStencil)
-	{
-		layout = cr3d::TextureLayout::StencilRead;
-	}
-	else
-	{
-		CrAssertMsg(false, "Unhandled case");
-	}
+
+	CrAssertMsg(layout != cr3d::TextureLayout::Count, "Invalid layout selected");
 
 	textureUsage.state = { layout, cr3d::ShaderStageFlags::Pixel };
 
@@ -302,6 +275,35 @@ void CrRenderGraph::Execute()
 	for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
 	{
 		CrRenderGraphPass* renderGraphPass = &m_logicalPasses[logicalPassId.id];
+
+		// Process depth-stencil idiosyncrasies
+		// 
+		// If we are trying to bind a texture as ShaderInput that has been identified to be bound as a depth stencil texture, it needs special handling
+		// 1) If we've bound either aspect of a depth stencil as write and the shader wants to read, the state is invalid
+		// 2) If we want to read the depth in the shader and we also want to depth test, we need a special layout
+		// 3) If we want to read an aspect of the depth stencil texture and read the other one in the shader, we need a special layout too
+		if (renderGraphPass->depthBufferTextureId != CrRenderGraphTextureId())
+		{
+			for (uint32_t textureIndex = 0; textureIndex < renderGraphPass->textureUsages.size(); ++textureIndex)
+			{
+				const CrRenderGraphTextureUsage& textureUsage = renderGraphPass->textureUsages[textureIndex];
+
+				if (renderGraphPass->depthBufferTextureId == textureUsage.textureId && textureUsage.state.layout == cr3d::TextureLayout::ShaderInput)
+				{
+					CrRenderGraphTextureUsage& depthStencilTextureUsage = renderGraphPass->textureUsages[renderGraphPass->depthBufferTextureIndex];
+
+					//CrAssertMsg(!(depthStencilTextureUsage.writeDepth && depthStencilTextureUsage.writeStencil), "Cannot read depth or stencil while writing to both");
+					//
+					//if (depthStencilTextureUsage.writeDepth && depthStencilTextureUsage.writeStencil)
+					//{
+					//	
+					//}
+
+					unused_parameter(depthStencilTextureUsage);
+					CrAssert(false);
+				}
+			}
+		}
 
 		// Process textures within a pass
 		for (uint32_t textureIndex = 0; textureIndex < renderGraphPass->textureUsages.size(); ++textureIndex)
@@ -442,18 +444,10 @@ void CrRenderGraph::Execute()
 					}
 					case cr3d::TextureLayout::DepthStencilReadWrite:
 					case cr3d::TextureLayout::DepthStencilWrite:
-					case cr3d::TextureLayout::DepthReadStencilWrite:
-					case cr3d::TextureLayout::DepthWriteStencilRead:
-					case cr3d::TextureLayout::DepthReadWrite:
-					case cr3d::TextureLayout::StencilReadWrite:
-					case cr3d::TextureLayout::DepthWrite:
-					case cr3d::TextureLayout::StencilWrite:
-					case cr3d::TextureLayout::DepthStencilRead:
-					case cr3d::TextureLayout::DepthRead:
-					case cr3d::TextureLayout::StencilRead:
-					case cr3d::TextureLayout::DepthStencilReadAndShader:
-					case cr3d::TextureLayout::DepthReadAndShader:
-					case cr3d::TextureLayout::StencilReadAndShader:
+					case cr3d::TextureLayout::StencilWriteDepthReadOnly:
+					case cr3d::TextureLayout::DepthWriteStencilReadOnly:
+					case cr3d::TextureLayout::DepthStencilReadOnly:
+					case cr3d::TextureLayout::DepthStencilReadOnlyShader:
 					{
 						CrRenderTargetDescriptor depthDescriptor;
 						depthDescriptor.texture           = m_textureResources[textureId.id].descriptor.texture;

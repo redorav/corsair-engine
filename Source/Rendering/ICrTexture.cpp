@@ -74,18 +74,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	}
 	else if (IsDepthStencil())
 	{
-		if (cr3d::IsDepthStencilFormat(descriptor.format))
-		{
-			m_defaultState = { cr3d::TextureLayout::DepthStencilReadWrite, cr3d::ShaderStageFlags::Pixel };
-		}
-		else if (cr3d::IsDepthFormat(descriptor.format))
-		{
-			m_defaultState = { cr3d::TextureLayout::DepthReadWrite, cr3d::ShaderStageFlags::Pixel };
-		}
-		else
-		{
-			CrAssertMsg(false, "Format not compatible with depth stencil capabilities");
-		}
+		m_defaultState = { cr3d::TextureLayout::DepthStencilReadWrite, cr3d::ShaderStageFlags::Pixel };
 	}
 	else if (IsUnorderedAccess())
 	{

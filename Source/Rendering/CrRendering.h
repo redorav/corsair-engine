@@ -170,32 +170,26 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			Undefined             = 0, // Never use this as the destination state in a resource transition operation
-			ShaderInput           = 1, // Use as input to a shader (depth and stencil included when not used as depth-stencil)
-			RenderTarget          = 2, // Use as a render target
-			RWTexture             = 3, // Use as RW texture
-			Present               = 4, // Use as swapchain
-			CopySource            = 5, // Use as source of copy operation
-			CopyDestination       = 6, // Use as destination of copy operation
+			Undefined                       = 0, // Never use this as the destination state in a resource transition operation
+			ShaderInput                     = 1, // Use as input to a shader (depth and stencil included when not used as depth-stencil)
+			RenderTarget                    = 2, // Use as a render target
+			RWTexture                       = 3, // Use as RW texture
+			Present                         = 4, // Use as swapchain
+			CopySource                      = 5, // Use as source of copy operation
+			CopyDestination                 = 6, // Use as destination of copy operation
 
-			DepthStencilReadWrite = 7, // Read and write to and from depth and stencil (regular usage)
-			DepthStencilWrite     = 8, // Write only to depth and stencil (overwrite values)
-			DepthReadStencilWrite = 9, // Read-only depth, write to stencil
-			DepthWriteStencilRead = 10, // Write to depth, read-only stencil
-			DepthReadWrite        = 11, // Read and write only to depth
-			StencilReadWrite      = 12, // Read and write only to stencil
+			// The depth stencil layouts apply to depth-only texture formats as well
+			// Internally we select the most optimal layout depending on the texture format
+			DepthStencilReadWrite           = 7, // Read and write to and from depth and stencil (regular usage)
+			DepthStencilWrite               = 8, // Write only to depth and stencil (overwrite values)
+			StencilWriteDepthReadOnly       = 9, // Read-only depth, write to stencil
+			DepthWriteStencilReadOnly       = 10, // Write to depth, read-only stencil
+			DepthStencilReadOnly            = 11, // Read only from depth and stencil
 
-			DepthWrite            = 13, // Write to depth
-			StencilWrite          = 14, // Write to stencil
-			
-			DepthStencilRead      = 15, // Read only from depth and stencil
-			DepthRead             = 16, // Read-only depth for depth test
-			StencilRead           = 17, // Read-only stencil for stencil test
-			
 			// States where we test and read from shader
-			DepthStencilReadAndShader = 18, // Test depth and stencil and read in shader
-			DepthReadAndShader    = 19, // Test depth and read in shader
-			StencilReadAndShader  = 20, // Test stencil and read in shader
+			DepthStencilReadOnlyShader      = 12, // Test depth and stencil and read in shader
+			DepthWriteStencilReadOnlyShader = 13,
+			StencilWriteDepthReadOnlyShader = 14,
 
 			Count
 		};
@@ -211,18 +205,12 @@ namespace cr3d
 				case Present: return "Present";
 				case DepthStencilReadWrite: return "DepthStencilWrite";
 				case DepthStencilWrite: return "DepthStencilWrite";
-				case DepthReadStencilWrite: return "DepthReadStencilWrite";
-				case DepthWriteStencilRead: return "DepthWriteStencilRead";
-				case DepthReadWrite: return "DepthReadWrite";
-				case StencilReadWrite: return "StencilReadWrite";
-				case DepthWrite: return "DepthWrite";
-				case StencilWrite: return "StencilWrite";
-				case DepthStencilRead: return "DepthStencilRead";
-				case DepthRead: return "DepthRead";
-				case StencilRead: return "StencilRead";
-				case DepthStencilReadAndShader: return "DepthStencilReadAndShader";
-				case DepthReadAndShader: return "DepthReadAndShader";
-				case StencilReadAndShader: return "StencilReadAndShader";
+				case StencilWriteDepthReadOnly: return "StencilWriteDepthRead";
+				case DepthWriteStencilReadOnly: return "DepthWriteStencilRead";
+				case DepthStencilReadOnly: return "DepthStencilRead";
+				case DepthStencilReadOnlyShader: return "DepthStencilReadAndShader";
+				case DepthWriteStencilReadOnlyShader: return "DepthWriteStencilReadAndShader";
+				case StencilWriteDepthReadOnlyShader: return "StencilWriteDepthReadAndShader";
 				case CopySource: return "CopySource";
 				case CopyDestination: return "CopyDestination";
 				default: return "";

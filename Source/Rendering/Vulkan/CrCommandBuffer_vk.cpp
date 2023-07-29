@@ -403,7 +403,7 @@ static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDe
 	// We don't let the Vulkan render pass try to do transitions as it will do them incorrectly unless there's some subpass
 	// magic going on. Instead, we take care of transitions manually and ignore the layouts here. For more information read
 	// https://themaister.net/blog/2019/08/14/yet-another-blog-explaining-vulkan-synchronization/
-	attachmentDescription.initialLayout  = CrTextureVulkan::GetVkImageStateInfo(renderTargetDescriptor.initialState.layout).imageLayout;
+	attachmentDescription.initialLayout  = crvk::GetVkImageStateInfo(renderTargetDescriptor.texture->GetFormat(), renderTargetDescriptor.initialState.layout).imageLayout;
 	attachmentDescription.finalLayout    = attachmentDescription.initialLayout;
 
 	return attachmentDescription;
@@ -440,8 +440,8 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-	const CrVkImageStateInfo& resourceStateInfoSource = CrTextureVulkan::GetVkImageStateInfo(sourceLayout);
-	const CrVkImageStateInfo& resourceStateInfoDestination = CrTextureVulkan::GetVkImageStateInfo(destinationLayout);
+	const CrVkImageStateInfo& resourceStateInfoSource = crvk::GetVkImageStateInfo(texture->GetFormat(), sourceLayout);
+	const CrVkImageStateInfo& resourceStateInfoDestination = crvk::GetVkImageStateInfo(texture->GetFormat(), destinationLayout);
 
 	imageMemoryBarrier.oldLayout = resourceStateInfoSource.imageLayout;
 	imageMemoryBarrier.newLayout = resourceStateInfoDestination.imageLayout;
@@ -633,8 +633,8 @@ void CrCommandBufferVulkan::QueueVkImageBarrier(const ICrTexture* texture, uint3
 {
 	VkImageMemoryBarrier& imageMemoryBarrier = m_imageMemoryBarriers.push_back();
 	PopulateVkImageBarrier(imageMemoryBarrier, texture, mipmapStart, mipmapCount, sliceStart, sliceCount, sourceState.layout, destinationState.layout);
-	m_srcStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(sourceState);
-	m_destStageMask |= CrTextureVulkan::GetVkPipelineStageFlags(destinationState);
+	m_srcStageMask |= crvk::GetVkPipelineStageFlags(sourceState);
+	m_destStageMask |= crvk::GetVkPipelineStageFlags(destinationState);
 }
 
 void CrCommandBufferVulkan::FlushImageAndBufferBarriers()

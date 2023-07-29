@@ -667,6 +667,112 @@ VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat
 	return aspectFlags;
 }
 
+CrVkImageStateInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout)
+{
+	bool depthOnlyFormat = cr3d::IsDepthOnlyFormat(textureFormat);
+
+	switch (textureLayout)
+	{
+		case cr3d::TextureLayout::Undefined:       return { VK_IMAGE_LAYOUT_UNDEFINED,                VK_ACCESS_NONE_KHR };
+		case cr3d::TextureLayout::ShaderInput:     return { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_SHADER_READ_BIT };
+		case cr3d::TextureLayout::RenderTarget:    return { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
+		case cr3d::TextureLayout::RWTexture:       return { VK_IMAGE_LAYOUT_GENERAL,                  VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+		case cr3d::TextureLayout::Present:         return { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,          0 };
+		case cr3d::TextureLayout::CopySource:      return { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,     VK_ACCESS_TRANSFER_READ_BIT };
+		case cr3d::TextureLayout::CopyDestination: return { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,     VK_ACCESS_TRANSFER_WRITE_BIT };
+		case cr3d::TextureLayout::DepthStencilReadWrite:
+		{
+			return { depthOnlyFormat ? VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+		}
+		case cr3d::TextureLayout::DepthStencilWrite:
+		{
+			return { depthOnlyFormat ? VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+		}
+		case cr3d::TextureLayout::StencilWriteDepthReadOnly:
+		{
+			if (depthOnlyFormat)
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+			}
+			else
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+			}
+		}
+		case cr3d::TextureLayout::DepthWriteStencilReadOnly:
+		{
+			if (depthOnlyFormat)
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+			}
+			else
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
+			}
+		}
+		case cr3d::TextureLayout::DepthStencilReadOnly:
+		{
+			if (depthOnlyFormat)
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+			}
+			else
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
+			}
+		}
+		case cr3d::TextureLayout::DepthStencilReadOnlyShader:
+		{
+			if (depthOnlyFormat)
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT };
+			}
+			else
+			{
+				return { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT };
+			}
+		}
+		default:
+			CrAssertMsg(false, "Unhandled layout");
+			return { VK_IMAGE_LAYOUT_MAX_ENUM, VK_ACCESS_NONE };
+	}
+}
+
+VkPipelineStageFlags crvk::GetVkPipelineStageFlags(const cr3d::TextureState& textureState)
+{
+	VkPipelineStageFlags pipelineFlags = 0;
+
+	switch (textureState.layout)
+	{
+		case cr3d::TextureLayout::RenderTarget:
+		{
+			pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			break;
+		}
+		case cr3d::TextureLayout::DepthStencilReadWrite:
+		case cr3d::TextureLayout::DepthStencilWrite:
+		case cr3d::TextureLayout::StencilWriteDepthReadOnly:
+		case cr3d::TextureLayout::DepthWriteStencilReadOnly:
+		case cr3d::TextureLayout::DepthStencilReadOnly:
+		{
+			pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+			break;
+		}
+		case cr3d::TextureLayout::ShaderInput:
+		case cr3d::TextureLayout::RWTexture:
+		{
+			pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(textureState.stages);
+			break;
+		}
+		case cr3d::TextureLayout::Present:
+			break;
+		default:
+			CrAssertMsg(false, "Unhandled case");
+	}
+
+	return pipelineFlags;
+}
+
 VkBufferCreateInfo crvk::CreateVkBufferCreateInfo
 (
 	VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage,

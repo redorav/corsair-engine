@@ -255,7 +255,7 @@ public:
 		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare, 
 		uint8_t stencilClearValue = 0,
 		uint32_t mipmap = 0, uint32_t slice = 0,
-		bool readDepth = true, bool readStencil = true
+		bool readOnlyDepth = false, bool readOnlyStencil = false
 	);
 
 	void AddSwapchain(CrRenderGraphTextureId textureId);

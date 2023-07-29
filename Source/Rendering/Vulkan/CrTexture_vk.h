@@ -10,15 +10,6 @@
 
 class ICrRenderDevice;
 
-// Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
-// This shows how to make the combinations but it tries to tie them with the point in the pipeline at which they
-// are used, whereas we decouple that and get fewer combinations
-struct CrVkImageStateInfo
-{
-	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
-	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
-};
-
 struct CrVkAdditionalTextureViews
 {
 	CrArray<CrVector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
@@ -34,10 +25,6 @@ public:
 	CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureVulkan();
-
-	static const CrVkImageStateInfo& GetVkImageStateInfo(cr3d::TextureLayout::T textureLayout);
-
-	static VkPipelineStageFlags GetVkPipelineStageFlags(const cr3d::TextureState& textureState);
 
 	VkImage GetVkImage() const { return m_vkImage; }
 

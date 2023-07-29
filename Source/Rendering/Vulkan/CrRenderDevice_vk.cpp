@@ -209,7 +209,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 
 		vulkanStagingBuffer->Unlock();
 
-		const CrVkImageStateInfo& vkImageStateInfo = CrTextureVulkan::GetVkImageStateInfo(vulkanTexture->GetDefaultState().layout);
+		const CrVkImageStateInfo& vkImageStateInfo = crvk::GetVkImageStateInfo(texture->GetFormat(), vulkanTexture->GetDefaultState().layout);
 
 		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
@@ -912,7 +912,7 @@ void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVul
 	subresourceRange.baseArrayLayer = 0;
 	subresourceRange.layerCount = vulkanTexture->GetArraySize();
 
-	const CrVkImageStateInfo& imageStateInfo = CrTextureVulkan::GetVkImageStateInfo(textureState.layout);
+	const CrVkImageStateInfo& imageStateInfo = crvk::GetVkImageStateInfo(vulkanTexture->GetFormat(), textureState.layout);
 
 	VkImageMemoryBarrier imageMemoryBarrier;
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

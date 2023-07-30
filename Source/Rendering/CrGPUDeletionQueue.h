@@ -30,6 +30,8 @@ public:
 
 	void AddToQueue(CrGPUDeletable* deletable);
 
+	// Processes pending requests and adds current requests so that they're waited on
+	// This is intended for in-flight resources during the frame
 	void Process();
 
 	void Finalize();

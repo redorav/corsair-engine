@@ -59,7 +59,9 @@ void CrGPUDeletionQueue::Process()
 		// Get the last list we pushed into the active list
 		CrDeletionList* deletionList = m_activeDeletionLists.front();
 
-		if (m_renderDevice->GetFenceStatus(deletionList->fence.get()) == cr3d::GPUFenceResult::Success)
+		cr3d::GPUFenceResult fenceResult = m_renderDevice->GetFenceStatus(deletionList->fence.get());
+
+		if (fenceResult == cr3d::GPUFenceResult::Success)
 		{
 			for (CrGPUDeletable* deletable : deletionList->deletables)
 			{

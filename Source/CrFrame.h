@@ -26,11 +26,17 @@ public:
 
 	void DrawDebugUI();
 
-	void UpdateCamera();
+	void HandleWindowResize(uint32_t width, uint32_t height);
 
-	void RecreateSwapchainAndRenderTargets();
+	void RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height);
 
 private:
+
+	bool m_requestSwapchainResize = false;
+
+	uint32_t m_swapchainResizeRequestWidth;
+
+	uint32_t m_swapchainResizeRequestHeight;
 
 	CrVector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	

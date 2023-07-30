@@ -7,7 +7,8 @@
 class ICrRenderDevice;
 
 CrSwapchainDescriptor::CrSwapchainDescriptor()
-	: platformWindow(nullptr)
+	: name("")
+	, platformWindow(nullptr)
 	, platformHandle(nullptr)
 	, requestedWidth(0)
 	, requestedHeight(0)
@@ -17,7 +18,8 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& /*swapchainDescriptor*/) : CrGPUDeletable(renderDevice)
+ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUDeletable(renderDevice)
+	, m_name(swapchainDescriptor.name)
 	, m_imageCount(0)
 	, m_format(cr3d::DataFormat::Invalid)
 	, m_width(0)
@@ -61,6 +63,13 @@ CrSwapchainResult ICrSwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 void ICrSwapchain::Present()
 {
 	PresentPS();
+}
+
+void ICrSwapchain::Resize(uint32_t width, uint32_t height)
+{
+	ResizePS(width, height);
+	m_width = width;
+	m_height = height;
 }
 
 const CrTextureHandle& ICrSwapchain::GetTexture(uint32_t index)

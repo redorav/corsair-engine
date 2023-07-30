@@ -11,13 +11,17 @@ public:
 
 	~CrSwapchainVulkan();
 
-	virtual void PresentPS() override;
+	VkSwapchainKHR GetVkSwapchain() const;
 
 	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) override;
 
-	VkSwapchainKHR GetVkSwapchain() const;
+	virtual void PresentPS() override;
+
+	virtual void ResizePS(uint32_t width, uint32_t height) override;
 
 private:
+
+	void CreateSwapchainTextures();
 
 	// Semaphores are signaled when present completes
 	CrVector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
@@ -34,6 +38,10 @@ private:
 	VkFormat			m_vkFormat = VK_FORMAT_UNDEFINED;
 
 	VkColorSpaceKHR		m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+
+	// We use this mainly to resize the swapchain. There's a couple of things
+	// we can modify but the rest stays the same
+	VkSwapchainCreateInfoKHR m_vkSwapchainCreateInfo;
 };
 
 inline VkSwapchainKHR CrSwapchainVulkan::GetVkSwapchain() const

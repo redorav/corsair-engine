@@ -319,7 +319,7 @@ CrTextureVulkan::~CrTextureVulkan()
 	CrAssert(m_vkImage);
 
 	// Don't destroy images we don't manage. The swapchain image and memory was handed to us by the OS
-	if (m_usage != cr3d::TextureUsage::SwapChain)
+	if (!IsSwapchain())
 	{
 		vmaDestroyImage(vulkanRenderDevice->GetVmaAllocator(), m_vkImage, m_vmaAllocation);
 	}

@@ -102,15 +102,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 			}
 		}
 
-		if (!foundMatchingFormat)
-		{
-			m_vkFormat = surfaceFormats[0].format;
-			m_format = crvk::GetDataFormat(m_vkFormat);
-			m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-		}
+		CrAssertMsg(foundMatchingFormat, "Could not create swapchain with requested format");
 	}
-
-	VkSwapchainKHR oldSwapchain = m_vkSwapchain;
 
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
@@ -143,8 +136,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		m_height = surfaceCapabilities.currentExtent.height;
 	}
 
-	CrAssertMsg(m_width > 0, "Must have a width greater than 0!");
-	CrAssertMsg(m_height > 0, "Must have a height greater than 0!");
+	CrAssertMsg(m_width > 0, "Must have a width greater than 0");
+	CrAssertMsg(m_height > 0, "Must have a height greater than 0");
 
 	VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_MAX_ENUM_KHR;
 
@@ -200,59 +193,32 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		preTransform = surfaceCapabilities.currentTransform;
 	}
 
-	VkSwapchainCreateInfoKHR swapchainInfo;
-	swapchainInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	swapchainInfo.pNext                 = nullptr;
-	swapchainInfo.flags                 = 0;
-	swapchainInfo.surface               = m_vkSurface;
-	swapchainInfo.minImageCount         = desiredNumberOfSwapchainImages;
-	swapchainInfo.imageFormat           = m_vkFormat;
-	swapchainInfo.imageColorSpace       = m_vkColorSpace;
-	swapchainInfo.imageExtent           = { swapchainExtent.width, swapchainExtent.height };
-	swapchainInfo.imageArrayLayers      = 1;
-	swapchainInfo.imageUsage            = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	swapchainInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
-	swapchainInfo.queueFamilyIndexCount = 0;
-	swapchainInfo.pQueueFamilyIndices   = nullptr;
-	swapchainInfo.preTransform          = (VkSurfaceTransformFlagBitsKHR)preTransform;
-	swapchainInfo.presentMode           = swapchainPresentMode;
-	swapchainInfo.oldSwapchain          = oldSwapchain;
-	swapchainInfo.clipped               = true;
-	swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	m_vkSwapchainCreateInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	m_vkSwapchainCreateInfo.pNext                 = nullptr;
+	m_vkSwapchainCreateInfo.flags                 = 0;
+	m_vkSwapchainCreateInfo.surface               = m_vkSurface;
+	m_vkSwapchainCreateInfo.minImageCount         = desiredNumberOfSwapchainImages;
+	m_vkSwapchainCreateInfo.imageFormat           = m_vkFormat;
+	m_vkSwapchainCreateInfo.imageColorSpace       = m_vkColorSpace;
+	m_vkSwapchainCreateInfo.imageExtent           = { swapchainExtent.width, swapchainExtent.height };
+	m_vkSwapchainCreateInfo.imageArrayLayers      = 1;
+	m_vkSwapchainCreateInfo.imageUsage            = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	m_vkSwapchainCreateInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
+	m_vkSwapchainCreateInfo.queueFamilyIndexCount = 0;
+	m_vkSwapchainCreateInfo.pQueueFamilyIndices   = nullptr;
+	m_vkSwapchainCreateInfo.preTransform          = (VkSurfaceTransformFlagBitsKHR)preTransform;
+	m_vkSwapchainCreateInfo.presentMode           = swapchainPresentMode;
+	m_vkSwapchainCreateInfo.oldSwapchain          = nullptr;
+	m_vkSwapchainCreateInfo.clipped               = true;
+	m_vkSwapchainCreateInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
-	vkResult = vkCreateSwapchainKHR(vkDevice, &swapchainInfo, nullptr, &m_vkSwapchain);
+	vkResult = vkCreateSwapchainKHR(vkDevice, &m_vkSwapchainCreateInfo, nullptr, &m_vkSwapchain);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Swapchain creation failed");
-
-	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
-	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
-	if (oldSwapchain != nullptr)
-	{
-		vkDestroySwapchainKHR(vkDevice, oldSwapchain, nullptr);
-	}
-
+	
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
-	CrVector<VkImage> images(m_imageCount);
-	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
-	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
-
-	m_textures = CrVector<CrTextureHandle>(m_imageCount);
-
-	CrTextureDescriptor swapchainTextureParams;
-	swapchainTextureParams.width = m_width;
-	swapchainTextureParams.height = m_height;
-	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
-
-	for (uint32_t i = 0; i < m_imageCount; i++)
-	{
-		CrFixedString128 swapchainTextureName(swapchainDescriptor.name);
-		swapchainTextureName.append_sprintf(" Texture %i", i);
-		swapchainTextureParams.name = swapchainTextureName.c_str();
-		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
-		m_textures[i] = renderDevice->CreateTexture(swapchainTextureParams);
-	}
+	CreateSwapchainTextures();
 
 	m_presentCompleteSemaphores.resize(m_imageCount);
 
@@ -306,4 +272,65 @@ void CrSwapchainVulkan::PresentPS()
 	presentInfo.pWaitSemaphores = &waitSemaphore->GetVkSemaphore();
 	presentInfo.waitSemaphoreCount = 1;
 	vkQueuePresentKHR(vkQueue, &presentInfo);
+}
+
+void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
+{
+	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	VkDevice vkDevice = vulkanDevice->GetVkDevice();
+	VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
+
+	VkResult vkResult;
+
+	// Call this function again to silence the validation layer about resolution mismatches. I think it has the values cached and
+	// checks against those, which are the old ones. What we can do is assert that the width and height are not larger
+	VkSurfaceCapabilitiesKHR surfaceCapabilities;
+	vkResult = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, m_vkSurface, &surfaceCapabilities);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface capabilities");
+	CrAssertMsg(width <= surfaceCapabilities.maxImageExtent.width && height <= surfaceCapabilities.maxImageExtent.height, "Resolution larger than max extent");
+
+	// Reuse the previously created swapchain create info. This has all the properties we need
+	// distilled into this structure, without needing to go through the entire creation process
+	VkSwapchainKHR oldSwapchain = m_vkSwapchain;
+	m_vkSwapchainCreateInfo.imageExtent = { width, height };
+	m_vkSwapchainCreateInfo.oldSwapchain = m_vkSwapchain;
+
+	vkResult = vkCreateSwapchainKHR(vkDevice, &m_vkSwapchainCreateInfo, nullptr, &m_vkSwapchain);
+	CrAssertMsg(vkResult == VK_SUCCESS, "Swapchain creation failed");
+
+	// If we just re-created an existing swapchain, we should destroy the old swapchain at this point.
+	// Note: destroying the swapchain also cleans up all its associated presentable images once the platform is done with them.
+	// This is unlike D3D12 that needs the images to be explicitly cleared
+	if (oldSwapchain != nullptr)
+	{
+		vkDestroySwapchainKHR(vkDevice, oldSwapchain, nullptr);
+	}
+
+	CreateSwapchainTextures();
+}
+
+void CrSwapchainVulkan::CreateSwapchainTextures()
+{
+	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+
+	CrVector<VkImage> images(m_imageCount);
+	VkResult vkResult = vkGetSwapchainImagesKHR(vulkanDevice->GetVkDevice(), m_vkSwapchain, &m_imageCount, images.data());
+	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
+
+	m_textures = CrVector<CrTextureHandle>(m_imageCount);
+
+	CrTextureDescriptor swapchainTextureParams;
+	swapchainTextureParams.width = m_width;
+	swapchainTextureParams.height = m_height;
+	swapchainTextureParams.format = m_format;
+	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
+
+	for (uint32_t i = 0; i < m_imageCount; i++)
+	{
+		CrFixedString128 swapchainTextureName(m_name);
+		swapchainTextureName.append_sprintf(" Texture %i", i);
+		swapchainTextureParams.name = swapchainTextureName.c_str();
+		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
+		m_textures[i] = vulkanDevice->CreateTexture(swapchainTextureParams);
+	}
 }

@@ -14,6 +14,8 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 
+	m_d3d12SwapchainFlags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
 	DXGI_SWAP_CHAIN_DESC1 d3d12SwapchainDescriptor = {};
 	d3d12SwapchainDescriptor.BufferCount = swapchainDescriptor.requestedBufferCount;
 	d3d12SwapchainDescriptor.Format = crd3d::GetDXGIFormat(swapchainDescriptor.format);
@@ -29,7 +31,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	d3d12SwapchainDescriptor.Scaling = DXGI_SCALING_NONE;
 	d3d12SwapchainDescriptor.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL; // TODO Investigate
 	d3d12SwapchainDescriptor.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	d3d12SwapchainDescriptor.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Let it change modes on fullscreen to windowed
+	d3d12SwapchainDescriptor.Flags = m_d3d12SwapchainFlags; // Let it change modes on fullscreen to windowed
 
 	//DXGI_SWAP_CHAIN_FULLSCREEN_DESC d3d12FullscreenDescriptor = {};
 
@@ -45,6 +47,8 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 		&swapchain
 	);
 
+	CrAssertMsg(SUCCEEDED(hResult) && swapchain != nullptr, "Swapchain creation failed");
+
 	// Cast to an upgraded swapchain with more functionality
 	swapchain->QueryInterface(IID_PPV_ARGS(&m_d3d12Swapchain));
 	swapchain->Release();
@@ -56,25 +60,9 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	m_imageCount = swapchainDescriptor.requestedBufferCount; // In the case of D3D12, requesting too many fails
 	m_format = swapchainDescriptor.format;
 
-	CrTextureDescriptor swapchainTextureParams;
-	swapchainTextureParams.width = m_width;
-	swapchainTextureParams.height = m_height;
-	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
+	CreateSwapchainTextures();
 
-	for (uint32_t i = 0; i < m_imageCount; i++)
-	{
-		CrFixedString128 swapchainName(swapchainDescriptor.name);
-		swapchainName.append_sprintf(" Texture %i", i);
-		swapchainTextureParams.name = swapchainName.c_str();
-
-		ID3D12Resource* surfaceResource;
-		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));
-		swapchainTextureParams.extraDataPtr = surfaceResource; // Swapchain resource
-		m_textures.push_back(renderDevice->CreateTexture(swapchainTextureParams));
-
-		m_fenceValues.push_back();
-	}
+	m_fenceValues.resize(m_imageCount);
 
 	d3d12RenderDevice->GetD3D12Device()->CreateFence(m_fenceValues[m_currentBufferIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
 
@@ -92,7 +80,7 @@ CrSwapchainD3D12::~CrSwapchainD3D12()
 
 CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(ICrRenderSystem::GetRenderDevice().get());
 	ID3D12CommandQueue* commandQueue = d3d12RenderDevice->GetD3D12GraphicsCommandQueue();
 
 	// Signal the fence
@@ -122,4 +110,54 @@ void CrSwapchainD3D12::PresentPS()
 	UINT flags = 0;
 
 	m_d3d12Swapchain->Present(syncInternal, flags);
+}
+
+void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
+{
+	CrAssertMsg(m_d3d12Swapchain != nullptr, "Swapchain must have been previously created");
+
+	// Assert that no one else has a reference to the swapchain texture. We cannot resize a swapchain with outstanding references to it
+	// We also release the swapchain resource manually to avoid depending on the deletion queue to resize the swapchain
+	for (uint32_t i = 0; i < m_imageCount; i++)
+	{
+		CrAssertMsg(m_textures[i]->get_ref() == 1, "Reference to resource being held externally");
+		CrTextureD3D12* d3d12Texture = (CrTextureD3D12*)m_textures[i].get();
+		d3d12Texture->GetD3D12Resource()->Release();
+	}
+
+	m_textures.clear();
+
+	HRESULT hResult = m_d3d12Swapchain->ResizeBuffers(0, width, height, crd3d::GetDXGIFormat(m_format), m_d3d12SwapchainFlags);
+
+	if (hResult == 0x887A0001)
+	{
+		CrAssertMsg(false, "Swapchain resources still in use");
+	}
+
+	CrAssertMsg(SUCCEEDED(hResult), "Failed to recreate swapchain");
+
+	CreateSwapchainTextures();
+}
+
+void CrSwapchainD3D12::CreateSwapchainTextures()
+{
+	CrTextureDescriptor swapchainTextureParams;
+	swapchainTextureParams.width = m_width;
+	swapchainTextureParams.height = m_height;
+	swapchainTextureParams.format = m_format;
+	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
+
+	m_textures.reserve(m_imageCount);
+
+	for (uint32_t i = 0; i < m_imageCount; i++)
+	{
+		CrFixedString128 swapchainName(m_name);
+		swapchainName.append_sprintf(" Texture %i", i);
+		swapchainTextureParams.name = swapchainName.c_str();
+
+		ID3D12Resource* surfaceResource;
+		m_d3d12Swapchain->GetBuffer(i, IID_PPV_ARGS(&surfaceResource));
+		swapchainTextureParams.extraDataPtr = surfaceResource; // Swapchain resource
+		m_textures.push_back(m_renderDevice->CreateTexture(swapchainTextureParams));
+	}
 }

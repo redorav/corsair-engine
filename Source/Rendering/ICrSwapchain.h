@@ -49,19 +49,25 @@ public:
 
 	void Present();
 
+	void Resize(uint32_t width, uint32_t height);
+
 	const CrTextureHandle& GetTexture(uint32_t index);
 
 protected:
 
 	virtual void PresentPS() = 0;
 
+	virtual void ResizePS(uint32_t width, uint32_t height) = 0;
+
 	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 
-	CrVector<CrTextureHandle>			m_textures;
+	CrVector<CrTextureHandle> m_textures;
 
-	uint32_t								m_imageCount;
+	CrFixedString32      m_name;
 
-	cr3d::DataFormat::T						m_format;
+	uint32_t             m_imageCount;
+
+	cr3d::DataFormat::T  m_format;
 
 	uint32_t m_width;
 

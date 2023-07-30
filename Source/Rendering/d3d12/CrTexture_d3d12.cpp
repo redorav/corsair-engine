@@ -168,6 +168,17 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 		m_additionalViews->m_d3d12DSVSingleMipSlice = d3d12RenderDevice->AllocateDSVDescriptor();
 		d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSlice.cpuHandle);
+
+		if (cr3d::IsDepthStencilFormat(descriptor.format))
+		{
+			dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+			m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth = d3d12RenderDevice->AllocateDSVDescriptor();
+			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth.cpuHandle);
+
+			dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+			m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil = d3d12RenderDevice->AllocateDSVDescriptor();
+			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil.cpuHandle);
+		}
 	}
 
 	// Create unordered access views
@@ -363,26 +374,33 @@ CrTextureD3D12::~CrTextureD3D12()
 
 	if (IsRenderTarget())
 	{
-		for (const auto& sliceArray : m_additionalViews->m_d3d12RTVSingleMipSlice)
+		for (size_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
+			const auto& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
+
 			for (const auto& descriptor : sliceArray)
 			{
 				renderDeviceD3D12->FreeRTVDescriptor(descriptor);
 			}
-		}
 
-		for (const auto& descriptor : m_additionalViews->m_d3d12RTVSingleMipAllSlices)
-		{
-			renderDeviceD3D12->FreeRTVDescriptor(descriptor);
+			//const auto& singleMipDescriptor = m_additionalViews->m_d3d12RTVSingleMipAllSlices[mip];
+			//renderDeviceD3D12->FreeRTVDescriptor(singleMipDescriptor);
 		}
 	}
 
 	if (IsDepthStencil())
 	{
 		renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSlice);
+
+		if (cr3d::IsDepthStencilFormat(m_format))
+		{
+			renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
+			renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
+		}
 	}
 
-	// Don't release resources we don't manage. The swapchain resource was handed to us by the OS
+	// Don't release the swapchain texture in the destructor, as we'll destroy it manually in the swapchain class
+	// This simplifies our model greatly as we don't need to go through the deletion queue
 	if (!IsSwapchain())
 	{
 		m_d3d12Resource->Release();

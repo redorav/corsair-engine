@@ -368,21 +368,22 @@ SelectionPacket CurrentSelectionData;
 
 void CrFrame::Process()
 {
-	// 1. Process
+	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	UpdateCamera();
+	// Swapchain resizes are not immediately processed but deferred to the main loop. That way we have control over where it happens
+	if (m_requestSwapchainResize)
+	{
+		RecreateSwapchainAndRenderTargets(m_swapchainResizeRequestWidth, m_swapchainResizeRequestHeight);
+		m_width = m_swapchainResizeRequestWidth;
+		m_height = m_swapchainResizeRequestHeight;
+		m_requestSwapchainResize = false;
+	}
 
 	// 2. Rendering
 
-	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
-
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
-	if (swapchainResult == CrSwapchainResult::Invalid)
-	{
-		RecreateSwapchainAndRenderTargets();
-		swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
-	}
+	CrAssertMsg(swapchainResult != CrSwapchainResult::Invalid, "Was unable to acquire next swapchain image");
 
 	renderDevice->ProcessQueuedCommands();
 

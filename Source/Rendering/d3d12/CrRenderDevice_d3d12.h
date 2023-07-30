@@ -148,6 +148,7 @@ inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()
 
 inline void CrRenderDeviceD3D12::FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
+	CrAssertMsg(descriptor.cpuHandle.ptr != 0 && descriptor.gpuHandle.ptr != 0, "Invalid handle being returned to pool");
 	m_rtvPool.Free(descriptor);
 }
 
@@ -158,6 +159,7 @@ inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateDSVDescriptor()
 
 inline void CrRenderDeviceD3D12::FreeDSVDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
+	CrAssertMsg(descriptor.cpuHandle.ptr != 0 && descriptor.gpuHandle.ptr != 0, "Invalid handle being returned to pool");
 	m_dsvPool.Free(descriptor);
 }
 

@@ -20,6 +20,10 @@ struct CrD3D12AdditionalTextureViews
 	// DSVs
 	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSlice;
 
+	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSliceReadOnlyDepth;
+
+	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSliceReadOnlyStencil;
+
 	// UAVs
 	CrArray<D3D12_UNORDERED_ACCESS_VIEW_DESC, cr3d::MaxMipmaps>	m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 

@@ -135,7 +135,14 @@ int main(int argc, char* argv[])
 						case SDL_WINDOWEVENT_MINIMIZED: CrLog("Window minimized"); break;
 						case SDL_WINDOWEVENT_MAXIMIZED: CrLog("Window maximized"); break;
 						case SDL_WINDOWEVENT_RESTORED: CrLog("Window restored"); break;
-						case SDL_WINDOWEVENT_RESIZED: CrLog("Window resized"); break;
+						case SDL_WINDOWEVENT_RESIZED:
+						{
+							uint32_t width = event.window.data1;
+							uint32_t height = event.window.data2;
+							frame.HandleWindowResize(width, height);
+							CrLog("Window resized");
+							break;
+						}
 						case SDL_WINDOWEVENT_SIZE_CHANGED: CrLog("Window size changed"); break;
 					}
 					break;

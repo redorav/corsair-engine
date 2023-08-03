@@ -11,6 +11,7 @@ namespace crstl
 	template<typename T, size_t N> class array;
 
 	template<typename T, int N> class basic_fixed_string;
+	typedef basic_fixed_string<char, 512> fixed_string512;
 
 	template<size_t N, typename WordType> class bitset;
 
@@ -31,6 +32,9 @@ namespace crstl
 	template<typename T, typename Allocator> class vector;
 
 	template<int SizeBytes, typename Return> class fixed_function;
+
+	template<typename StringInterface> class path_base;
+	typedef path_base<fixed_string512> fixed_path512;
 };
 
 // EASTL
@@ -171,6 +175,6 @@ class ICrFile;
 using CrFileHandle = CrIntrusivePtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
-class CrFixedPath;
+using CrFixedPath = crstl::fixed_path512;
 
 namespace cr { namespace Platform { enum T : uint32_t; } }

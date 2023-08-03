@@ -3,7 +3,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 struct CrMaterialShaderDescriptor;
 
@@ -14,9 +14,9 @@ public:
 	CrShaderDiskCache() {}
 
 	// The current hash is what we want to use this cache with. If the hash doesn't match, we'll delete the cache
-	CrShaderDiskCache(const CrPath& cachePath, const char* hashFilename, CrHash currentHash);
+	CrShaderDiskCache(const CrFixedPath& cachePath, const char* hashFilename, CrHash currentHash);
 
-	CrPath CreateCachedFilePath(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const;
+	CrFixedPath CreateCachedFilePath(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const;
 
 	CrShaderBytecodeHandle LoadFromCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const;
 
@@ -24,5 +24,5 @@ public:
 
 private:
 
-	CrPath m_cachePath;
+	CrFixedPath m_cachePath;
 };

@@ -2,7 +2,7 @@
 
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/String/CrFixedString.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
@@ -418,10 +418,10 @@ private:
 struct CrShaderBytecodeCompilationDescriptor
 {
 	CrShaderBytecodeCompilationDescriptor
-	(const CrPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
+	(const CrFixedPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
 		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
-	const CrPath                    path;
+	const CrFixedPath                    path;
 	const CrFixedString128          entryPoint;
 	const cr3d::ShaderStage::T      stage;
 	const cr3d::GraphicsApi::T      graphicsApi;

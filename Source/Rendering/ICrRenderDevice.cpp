@@ -340,7 +340,7 @@ void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
 {
 	if (m_isValidPipelineCache)
 	{
-		CrPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+		CrFixedPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 		CrFileHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
 
 		if (file)

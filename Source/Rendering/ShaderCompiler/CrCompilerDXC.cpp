@@ -507,7 +507,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		// Renderdoc recommends having two copies, one with debug information, the other without, and creating an
 		// association at module load time
 		{
-			CrPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
+			CrFixedPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 			pdbFilePath /= CrString(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
 			CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
@@ -642,8 +642,8 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				IDxcBlobUtf8* pdbNameAsUtf8 = nullptr;
 				dxcUtils->GetBlobAsUtf8(pdbName, &pdbNameAsUtf8);
 
-				const CrPath& pdbDirectory = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
-				CrPath pdbFilePath = pdbDirectory / pdbNameAsUtf8->GetStringPointer();
+				const CrFixedPath& pdbDirectory = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
+				CrFixedPath pdbFilePath = pdbDirectory / pdbNameAsUtf8->GetStringPointer();
 
 				CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 				if (pdbFile)

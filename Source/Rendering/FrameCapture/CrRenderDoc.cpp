@@ -6,7 +6,7 @@
 #include "Rendering/ICrRenderSystem.h"
 
 #include "Core/Logging/ICrDebug.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #if defined(WINDOWS_PLATFORM)
 #include <shellapi.h>
@@ -22,7 +22,7 @@ void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescrip
 
 	if (!m_renderDocModule)
 	{
-		CrPath renderdocDllPath;
+		CrFixedPath renderdocDllPath;
 
 		// On Vulkan, try to locate the dll that has been registered by the layers. If we don't manually load this
 		// dll and load a different one, when Vulkan initializes it will load both and capture replay will fail.

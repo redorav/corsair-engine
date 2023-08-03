@@ -158,7 +158,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	bool usingAgility = false;
 
-	CrPath agilityPath;
+	CrFixedPath agilityPath;
 
 	HMODULE hModule = GetModuleHandle(L"D3D12Core.dll");
 	if (hModule)

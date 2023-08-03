@@ -171,6 +171,6 @@ class ICrFile;
 using CrFileHandle = CrIntrusivePtr<ICrFile>;
 using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
-class CrPath;
+class CrFixedPath;
 
 namespace cr { namespace Platform { enum T : uint32_t; } }

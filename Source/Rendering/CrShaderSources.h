@@ -2,7 +2,7 @@
 
 #include "Core/Containers/CrHashMap.h"
 #include "Core/String/CrString.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/CrHash.h"
 
 // Stores all the sources for our shaders (on a desktop development build)
@@ -23,20 +23,20 @@ public:
 
 	const CrString& GetUbershaderSource() const;
 
-	const CrPath& GetUbershaderTempDirectory() const;
+	const CrFixedPath& GetUbershaderTempDirectory() const;
 
 	const CrHash GetUbershaderHash() const;
 
 private:
 
-	CrHashMap<CrString, CrPath> m_shaderPaths;
+	CrHashMap<CrString, CrFixedPath> m_shaderPaths;
 
 	CrHashMap<CrString, CrString> m_shaderSources;
 
 	CrHashMap<CrString, CrString> m_ubershaderSources;
 
 	// Path to the temp folder for built ubershaders
-	CrPath m_ubershaderTempDirectory;
+	CrFixedPath m_ubershaderTempDirectory;
 
 	// Ubershader source with resolved includes
 	CrString m_resolvedUbershaderSource;

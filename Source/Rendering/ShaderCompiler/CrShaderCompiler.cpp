@@ -10,7 +10,7 @@
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/ICrFile.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/String/CrStringUtilities.h"
@@ -64,16 +64,16 @@ void CompilationDescriptor::Process() const
 
 CrString CrShaderCompiler::ExecutableDirectory;
 
-CrPath CrShaderCompiler::PDBDirectory;
+CrFixedPath CrShaderCompiler::PDBDirectory;
 
-CrPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
+CrFixedPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
 
 const CrString& CrShaderCompiler::GetExecutableDirectory()
 {
 	return ExecutableDirectory;
 }
 
-const CrPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi)
+const CrFixedPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi)
 {
 	return PDBDirectories[platform][graphicsApi];
 }
@@ -193,13 +193,13 @@ int main(int argc, char* argv[])
 {
 	CrCommandLineParser commandLine(argc, argv);
 	
-	CrPath executablePath = argv[0];
+	CrFixedPath executablePath = argv[0];
 	executablePath.remove_filename();
 
 	CrShaderCompiler::ExecutableDirectory = executablePath.c_str();
 
-	CrPath inputFilePath              = commandLine("-input").c_str();
-	CrPath outputFilePath             = commandLine("-output").c_str();
+	CrFixedPath inputFilePath              = commandLine("-input").c_str();
+	CrFixedPath outputFilePath             = commandLine("-output").c_str();
 	bool buildMetadata                = commandLine["-metadata"];
 	bool buildBuiltinShaders          = commandLine["-builtin"];
 	bool buildBuiltinHeaders          = commandLine["-builtin-headers"];
@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
 		for (const CrString& graphicsApiString : graphicsApiStrings)
 		{
 			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
-			CrPath& pdbPath = CrShaderCompiler::PDBDirectories[platform][graphicsApi];
+			CrFixedPath& pdbPath = CrShaderCompiler::PDBDirectories[platform][graphicsApi];
 			pdbPath = CrShaderCompiler::PDBDirectory;
 			pdbPath /= cr::Platform::ToString(platform);
 			pdbPath += "_";
@@ -340,7 +340,7 @@ int main(int argc, char* argv[])
 			CrShaderCompilerUtilities::QuitWithMessage("No shader stage specified\n");
 		}
 
-		CrPath tempPath = outputFilePath;
+		CrFixedPath tempPath = outputFilePath;
 		tempPath.replace_extension(".temp");
 
 		CompilationDescriptor compilationDescriptor;

@@ -7,28 +7,28 @@
 // This class is a fixe memory replacement for std::filesystem::path. The idea is that it doesn't allocate any memory
 // during all the operations at the cost of more memory at runtime. Extensions on top of this are possible, such as a
 // dynamic CrPath (for storing optimally), shorter CrPaths (for extensions), etc.
-class CrPath
+class CrFixedPath
 {
 public:
 
 	static const size_t npos = (size_t) - 1;
 
-	CrPath() {}
+	CrFixedPath() {}
 
-	CrPath(const char* path) { m_pathString = path; Normalize(); }
+	CrFixedPath(const char* path) { m_pathString = path; Normalize(); }
 
-	CrPath(const char* path, size_t count) { m_pathString = CrFixedString512(path, count); Normalize(); }
+	CrFixedPath(const char* path, size_t count) { m_pathString = CrFixedString512(path, count); Normalize(); }
 
-	CrPath(const char* path, size_t offset, size_t count) { m_pathString = CrFixedString512(path + offset, path + offset + count); Normalize(); }
+	CrFixedPath(const char* path, size_t offset, size_t count) { m_pathString = CrFixedString512(path + offset, path + offset + count); Normalize(); }
 
-	CrPath(const CrString& path) : CrPath(path.c_str()) {}
+	CrFixedPath(const CrString& path) : CrFixedPath(path.c_str()) {}
 
-	CrPath(const CrPath& path, size_t count) : CrPath(path.c_str(), count) {}
+	CrFixedPath(const CrFixedPath& path, size_t count) : CrFixedPath(path.c_str(), count) {}
 
-	CrPath(const CrPath& path, size_t offset, size_t count) : CrPath(path.c_str(), offset, count) {}
+	CrFixedPath(const CrFixedPath& path, size_t offset, size_t count) : CrFixedPath(path.c_str(), offset, count) {}
 
 	template <typename CharType>
-	CrPath& append_convert(const CharType* other)
+	CrFixedPath& append_convert(const CharType* other)
 	{
 		m_pathString.append_convert(other); return *this;
 	}
@@ -50,23 +50,23 @@ public:
 		return m_pathString.empty();
 	}
 
-	CrPath extension() const
+	CrFixedPath extension() const
 	{
 		size_t lastDot;
 		if (has_extension_internal(lastDot))
 		{
-			return CrPath(*this, lastDot, m_pathString.length() - lastDot);
+			return CrFixedPath(*this, lastDot, m_pathString.length() - lastDot);
 		}
 		else
 		{
-			return CrPath();
+			return CrFixedPath();
 		}
 	}
 
-	CrPath filename() const
+	CrFixedPath filename() const
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
-		return CrPath(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
+		return CrFixedPath(*this, lastSeparator + 1, m_pathString.length() - (lastSeparator + 1));
 	}
 
 	size_t find_last_of(char c) const
@@ -85,21 +85,21 @@ public:
 		return has_extension_internal(lastDot);
 	}
 
-	CrPath parent_path() const
+	CrFixedPath parent_path() const
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
 
 		if (lastSeparator != m_pathString.npos)
 		{
-			return CrPath(*this, lastSeparator);
+			return CrFixedPath(*this, lastSeparator);
 		}
 		else
 		{
-			return CrPath();
+			return CrFixedPath();
 		}
 	}
 
-	CrPath& remove_filename()
+	CrFixedPath& remove_filename()
 	{
 		size_t lastSeparator = m_pathString.find_last_of("/");
 		if (lastSeparator != m_pathString.length() - 1)
@@ -115,7 +115,7 @@ public:
 	// Firstly, if this path has an extension(), it is removed from the generic-format view of the pathname.
 	// Then, a dot character is appended to the generic-format view of the pathname, if replacement is not empty and does not begin with a dot character.
 	// Then replacement is appended as if by operator += (replacement).
-	CrPath& replace_extension(const char* extension)
+	CrFixedPath& replace_extension(const char* extension)
 	{
 		size_t lastDot;
 		if (has_extension_internal(lastDot))
@@ -151,7 +151,7 @@ public:
 		return m_pathString == path;
 	}
 
-	bool operator == (const CrPath& path) const
+	bool operator == (const CrFixedPath& path) const
 	{
 		return m_pathString == path.m_pathString;
 	}
@@ -161,55 +161,55 @@ public:
 		return m_pathString != path;
 	}
 
-	bool operator != (const CrPath& path) const
+	bool operator != (const CrFixedPath& path) const
 	{
 		return m_pathString != path.m_pathString;
 	}
 
-	CrPath operator + (const char* str) const
+	CrFixedPath operator + (const char* str) const
 	{
-		CrPath newPath = *this;
+		CrFixedPath newPath = *this;
 		newPath.m_pathString += str;
 		return newPath;
 	}
 
-	CrPath operator + (const CrPath& path) const
+	CrFixedPath operator + (const CrFixedPath& path) const
 	{
-		CrPath newPath = *this;
+		CrFixedPath newPath = *this;
 		newPath.m_pathString += path.m_pathString;
 		return newPath;
 	}
 
-	CrPath& operator += (const char* str)
+	CrFixedPath& operator += (const char* str)
 	{
 		m_pathString += str;
 		return *this;
 	}
 
-	CrPath operator / (const char* str) const
+	CrFixedPath operator / (const char* str) const
 	{
-		CrPath newPath = *this;
+		CrFixedPath newPath = *this;
 		newPath.AddTrailingSeparator();
 		newPath.m_pathString += str;
 		return newPath;
 	}
 
-	CrPath operator / (const CrPath& path) const
+	CrFixedPath operator / (const CrFixedPath& path) const
 	{
-		CrPath newPath = *this;
+		CrFixedPath newPath = *this;
 		newPath.AddTrailingSeparator();
 		newPath.m_pathString += path.m_pathString;
 		return newPath;
 	}
 
-	CrPath& operator /= (const char* str)
+	CrFixedPath& operator /= (const char* str)
 	{
 		AddTrailingSeparator();
 		m_pathString += str;
 		return *this;
 	}
 
-	CrPath& operator /= (const CrPath& path)
+	CrFixedPath& operator /= (const CrFixedPath& path)
 	{
 		AddTrailingSeparator();
 		m_pathString += path.m_pathString;

@@ -18,5 +18,5 @@ public:
 
 	static CrRenderMeshHandle LoadMesh(const aiScene* scene, const aiMesh* mesh, const aiMatrix4x4& transform);
 
-	static CrMaterialHandle LoadMaterial(const aiMaterial* material, const CrPath& relativePath);
+	static CrMaterialHandle LoadMaterial(const aiMaterial* material, const CrFixedPath& relativePath);
 };

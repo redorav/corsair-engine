@@ -6,7 +6,7 @@
 
 #include "Rendering/CrRendering.h"
 
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/CrMacros.h"
 
@@ -141,9 +141,9 @@ public:
 	virtual IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t /*inclusionDepth*/) override
 	{
 		// We assume the file is in the same directory as us. If not, the include should have the required folder
-		CrPath includerPath = includerName;
-		CrPath includerDirectory = includerPath.parent_path();
-		CrPath headerPath = includerDirectory / headerName;
+		CrFixedPath includerPath = includerName;
+		CrFixedPath includerDirectory = includerPath.parent_path();
+		CrFixedPath headerPath = includerDirectory / headerName;
 
 		CrFileHandle file = ICrFile::OpenFile(headerPath.c_str(), FileOpenFlags::Read);
 

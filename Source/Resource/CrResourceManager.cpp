@@ -10,7 +10,7 @@
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #include "Resource/Image/CrImageCodecDDS.h"
 #include "Resource/Image/CrImageCodecSTB.h"
@@ -19,14 +19,14 @@
 #include "Resource/Model/CrModelDecoderASSIMP.h"
 #include "Resource/Model/CrModelDecoderCGLTF.h"
 
-CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
+CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 {
 	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
 	if (file)
 	{
 		CrUniquePtr<ICrModelDecoder> modelDecoder;
-		CrPath extension = fullPath.extension();
+		CrFixedPath extension = fullPath.extension();
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
 			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderCGLTF());
@@ -46,15 +46,15 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrPath& fullPath)
 	}
 }
 
-CrPath CrResourceManager::GetFullResourcePath(const CrPath& relativePath)
+CrFixedPath CrResourceManager::GetFullResourcePath(const CrFixedPath& relativePath)
 {
 	CrString dataPath = crcore::CommandLine("-root").c_str();
-	return CrPath(dataPath.c_str()) / relativePath;
+	return CrFixedPath(dataPath.c_str()) / relativePath;
 }
 
-CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
+CrImageHandle CrResourceManager::LoadImageFromDisk(const CrFixedPath& fullPath)
 {
-	CrPath extension = fullPath.extension();
+	CrFixedPath extension = fullPath.extension();
 
 	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
 
@@ -82,9 +82,9 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrPath& fullPath)
 	}
 }
 
-void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrPath& fullPath)
+void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrFixedPath& fullPath)
 {
-	CrPath extension = fullPath.extension();
+	CrFixedPath extension = fullPath.extension();
 
 	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 

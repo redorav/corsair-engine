@@ -43,7 +43,7 @@ void CrShaderSources::Initialize()
 	{
 		if (!entry.isDirectory)
 		{
-			CrPath shaderPath = entry.directory;
+			CrFixedPath shaderPath = entry.directory;
 			shaderPath /= entry.filename.c_str();
 
 			CrFileHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
@@ -191,7 +191,7 @@ const CrString& CrShaderSources::GetUbershaderSource() const
 	return m_resolvedUbershaderSource;
 }
 
-const CrPath& CrShaderSources::GetUbershaderTempDirectory() const
+const CrFixedPath& CrShaderSources::GetUbershaderTempDirectory() const
 {
 	return m_ubershaderTempDirectory;
 }

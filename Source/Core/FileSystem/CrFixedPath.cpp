@@ -1,8 +1,8 @@
 #include "Core/CrCore_pch.h"
 
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
-void CrPath::Normalize()
+void CrFixedPath::Normalize()
 {
 	size_t separatorPosition = m_pathString.find_first_of('\\');
 

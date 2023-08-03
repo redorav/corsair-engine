@@ -4,7 +4,7 @@
 
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/CrMacros.h"
 
 #include "Rendering/ICrRenderSystem.h"
@@ -93,7 +93,7 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 	ProcessNode(scene, scene->mRootNode, scene->mRootNode->mTransformation, modelDescriptor);
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
-	const CrPath filePath = file->GetFilePath();
+	const CrFixedPath filePath = file->GetFilePath();
 
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{
@@ -246,7 +246,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 	return renderMesh;
 }
 
-CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrPath& materialPath)
+CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrFixedPath& materialPath)
 {
 	CrMaterialDescriptor materialDescriptor;
 	CrMaterialHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
@@ -271,7 +271,7 @@ CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial
 		{
 			aiMaterial->GetTexture(textureType, 0, &aiTexturePath);
 
-			CrPath imagePath = materialPath.parent_path() / aiTexturePath.C_Str();
+			CrFixedPath imagePath = materialPath.parent_path() / aiTexturePath.C_Str();
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(imagePath);
 
 			CrTextureDescriptor textureParams;

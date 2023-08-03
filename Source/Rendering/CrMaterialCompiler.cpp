@@ -65,7 +65,7 @@ void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescr
 }
 
 CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
-(const CrPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
+(const CrFixedPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
 {
 	// Try to load bytecode from cache
 	CrShaderBytecodeHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache(shaderHash, materialShaderDescriptor.graphicsApi);
@@ -111,7 +111,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	patchedShaderSource += CrShaderSources::Get().GetUbershaderSource();
 
 	// Create directory for ubershader shaders
-	CrPath patchedShaderSourcePath = CrShaderSources::Get().GetUbershaderTempDirectory();
+	CrFixedPath patchedShaderSourcePath = CrShaderSources::Get().GetUbershaderTempDirectory();
 
 	// Make sure directory exists
 	ICrFile::CreateDirectories(patchedShaderSourcePath.c_str());

@@ -35,7 +35,6 @@
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 #include "Core/CrGlobalPaths.h"
-#include "Core/FileSystem/CrPath.h"
 
 #include "Resource/CrResourceManager.h"
 

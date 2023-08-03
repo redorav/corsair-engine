@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/String/CrFixedString.h"
@@ -15,7 +15,7 @@ struct CrDirectoryEntry
 	const char* directory = nullptr;
 
 	// Name of the file
-	CrPath filename;
+	CrFixedPath filename;
 
 	// Whether entry is a directory
 	bool isDirectory = false;
@@ -114,7 +114,7 @@ private:
 
 	static ICrFile* OpenRaw(const char* filePath, FileOpenFlags::T openFlags);
 
-	CrPath m_filePath;
+	CrFixedPath m_filePath;
 
 	FileOpenFlags::T m_openFlags;
 

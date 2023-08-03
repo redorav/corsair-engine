@@ -6,7 +6,7 @@
 #include "CrShaderCompiler.h"
 #include "CrCompilerGLSLANG.h"
 
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #include "Rendering/CrRendering.h"
 
@@ -77,14 +77,14 @@ bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compila
 	}
 
 	// Create header and cpp filenames
-	CrPath headerPath = compilationDescriptor.outputPath.c_str();
+	CrFixedPath headerPath = compilationDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFileIfChanged(headerPath.replace_extension("h").c_str(), metadataHeader);
 
-	CrPath cppPath = compilationDescriptor.outputPath.c_str();
+	CrFixedPath cppPath = compilationDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFileIfChanged(cppPath.replace_extension("cpp").c_str(), metadataCpp);
 
 	// Write dummy file that tells the build system dependency tracker that files are up to date
-	CrPath uptodatePath = compilationDescriptor.outputPath.c_str();
+	CrFixedPath uptodatePath = compilationDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFile(uptodatePath.replace_extension("uptodate").c_str(), "");
 
 	return true;

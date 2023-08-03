@@ -3,7 +3,7 @@
 #include "Core/String/CrString.h"
 
 // Include filesystem to compare implementation correctness
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include <filesystem>
 
 #include "Core/Logging/ICrDebug.h"
@@ -32,7 +32,7 @@ void CrCoreUnitTests::RunCrPathUnitTests()
 		const CrString& examplePath = examplePaths[i];
 
 		std::filesystem::path stdPath = examplePath.c_str();
-		CrPath crPath = examplePath.c_str();
+		CrFixedPath crPath = examplePath.c_str();
 
 		// Check empty path concatenation
 		{

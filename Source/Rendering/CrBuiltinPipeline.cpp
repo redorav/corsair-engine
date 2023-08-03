@@ -147,7 +147,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 
 	const CrRenderDeviceProperties& deviceProperties = renderDevice->GetProperties();
 
-	CrPath outputPath = CrPath(CrGlobalPaths::GetTempEngineDirectory()) / "Bultin Shaders Runtime";
+	CrFixedPath outputPath = CrFixedPath(CrGlobalPaths::GetTempEngineDirectory()) / "Bultin Shaders Runtime";
 
 	CrProcessDescriptor processDescriptor;
 
@@ -180,7 +180,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 
 		const CrBuiltinShaderMetadata& builtinShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetComputeShaderIndex(), deviceProperties.graphicsApi);
 
-		CrPath binaryPath = outputPath;
+		CrFixedPath binaryPath = outputPath;
 		binaryPath /= builtinShaderMetadata.uniqueBinaryName;
 
 		CrReadFileStream shaderBytecodeStream(binaryPath.c_str());
@@ -214,7 +214,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 		graphicsShaderDescriptor.m_debugName += "_";
 		graphicsShaderDescriptor.m_debugName += pixelShaderMetadata.name.c_str();
 
-		CrPath vertexBinaryPath = outputPath;
+		CrFixedPath vertexBinaryPath = outputPath;
 		vertexBinaryPath /= vertexShaderMetadata.uniqueBinaryName;
 
 		CrReadFileStream vertexShaderBytecodeStream(vertexBinaryPath.c_str());
@@ -226,7 +226,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 			graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 
-		CrPath pixelBinaryPath = outputPath;
+		CrFixedPath pixelBinaryPath = outputPath;
 		pixelBinaryPath /= pixelShaderMetadata.uniqueBinaryName;
 
 		CrReadFileStream pixelShaderBytecodeStream(pixelBinaryPath.c_str());

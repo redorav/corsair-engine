@@ -27,7 +27,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 	{
 		if (entry.filename.extension() == ".shaders")
 		{
-			CrPath shadersFilePath = CrPath(entry.directory) / entry.filename;
+			CrFixedPath shadersFilePath = CrFixedPath(entry.directory) / entry.filename;
 
 			// Load .shaders file
 			CrFileHandle file = ICrFile::OpenFile(shadersFilePath.c_str(), FileOpenFlags::Read);
@@ -38,7 +38,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 			file->Read(shadersFile.data(), shadersFile.size());
 
 			// Assume we have an hlsl file with the same name where the entry points defined in the .shaders file live
-			CrPath hlslFilePath = shadersFilePath;
+			CrFixedPath hlslFilePath = shadersFilePath;
 			hlslFilePath.replace_extension(".hlsl");
 
 			// Set the error callback to print out 
@@ -152,11 +152,11 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 						stageName + "_" + 
 						cr3d::GraphicsApi::ToString(graphicsApi);
 
-					CrPath binaryFilePath = builtinShadersDescriptor.outputPath;
+					CrFixedPath binaryFilePath = builtinShadersDescriptor.outputPath;
 					binaryFilePath /= uniqueShaderName.c_str();
 					binaryFilePath.replace_extension(shaderBinaryExtension);
 
-					CrPath tempPath = builtinShadersDescriptor.outputPath;
+					CrFixedPath tempPath = builtinShadersDescriptor.outputPath;
 					tempPath /= uniqueShaderName.c_str();
 					tempPath.replace_extension(".temp");
 
@@ -355,7 +355,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersCpp += namespaceDeclarationEnd;
 
 		// Create header and cpp filenames
-		CrPath headerPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
+		CrFixedPath headerPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
 		headerPath.replace_extension("h");
 		CrShaderCompilerUtilities::WriteToFileIfChanged(headerPath.c_str(), builtinShadersHeader);
 
@@ -363,7 +363,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersGenericHeader += headerPath.filename().c_str();
 		builtinShadersGenericHeader += "\"\n";
 
-		CrPath cppPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
+		CrFixedPath cppPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
 		cppPath.replace_extension("cpp");
 		CrShaderCompilerUtilities::WriteToFileIfChanged(cppPath.c_str(), builtinShadersCpp);
 
@@ -378,13 +378,13 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += builtinShadersGenericHeaderGetFunction;
 
 	// Create header and cpp filenames
-	CrPath headerPath = builtinShadersDescriptor.outputPath.c_str();
+	CrFixedPath headerPath = builtinShadersDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFileIfChanged(headerPath.replace_extension("h").c_str(), builtinShadersGenericHeader);
 
-	CrPath cppPath = builtinShadersDescriptor.outputPath.c_str();
+	CrFixedPath cppPath = builtinShadersDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFileIfChanged(cppPath.replace_extension("cpp").c_str(), builtinShadersGenericCpp);
 
 	// Write dummy file that tells the build system dependency tracker that files are up to date
-	CrPath uptodatePath = builtinShadersDescriptor.outputPath.c_str();
+	CrFixedPath uptodatePath = builtinShadersDescriptor.outputPath.c_str();
 	CrShaderCompilerUtilities::WriteToFile(uptodatePath.replace_extension("uptodate").c_str(), "");
 }

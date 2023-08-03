@@ -2,7 +2,7 @@
 
 #include "CrModelDecoderCGLTF.h"
 
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrHashMap.h"
 
@@ -220,13 +220,13 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 
 struct CgltfUserData
 {
-	CrPath parentPath;
+	CrFixedPath parentPath;
 };
 
 static cgltf_result cgltfFileRead(const struct cgltf_memory_options* memory_options, const struct cgltf_file_options* file_options, const char* path, cgltf_size* size, void** data)
 {
 	const CgltfUserData& userData = *(const CgltfUserData*)(file_options->user_data);
-	CrPath resourcePath = userData.parentPath / path;
+	CrFixedPath resourcePath = userData.parentPath / path;
 
 	void* (*memory_alloc)(void*, cgltf_size) = memory_options->alloc ? memory_options->alloc : &cgltf_default_alloc;
 	void (*memory_free)(void*, void*) = memory_options->free ? memory_options->free : &cgltf_default_free;
@@ -285,7 +285,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 	file->Read(fileData.get(), fileSize);
 
 	CgltfUserData userData;
-	userData.parentPath = CrPath(file->GetFilePath()).parent_path();
+	userData.parentPath = CrFixedPath(file->GetFilePath()).parent_path();
 
 	cgltf_options gltfOptions = {};
 	gltfOptions.file.read = cgltfFileRead;
@@ -306,7 +306,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 		{
 			const cgltf_texture& gltfTexture = gltfData->textures[t];
 
-			CrPath imagePath = userData.parentPath / gltfTexture.image->uri;
+			CrFixedPath imagePath = userData.parentPath / gltfTexture.image->uri;
 
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(imagePath);
 

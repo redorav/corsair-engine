@@ -4,7 +4,7 @@
 
 #include "GlobalVariables.h" // TODO Rename to GeneratedPaths.h
 
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #include "Core/FileSystem/ICrFile.h"
 
@@ -89,7 +89,7 @@ void CrGlobalPaths::SetupGlobalPaths
 	const char* dataRootDirectory
 )
 {
-	CrPath currentExecutableDirectory = CrPath(currentExecutablePath).parent_path();
+	CrFixedPath currentExecutableDirectory = CrFixedPath(currentExecutablePath).parent_path();
 
 	CurrentExecutableDirectory = currentExecutableDirectory.c_str();
 	CurrentExecutableDirectory += "/";
@@ -102,7 +102,7 @@ void CrGlobalPaths::SetupGlobalPaths
 
 	ShaderSourceDirectory = GlobalPaths::ShaderSourceDirectory;
 
-	CrPath overrideShaderSources = currentExecutableDirectory / "Shader Source";
+	CrFixedPath overrideShaderSources = currentExecutableDirectory / "Shader Source";
 
 	// If the directory does not exist, try to find a local one instead
 	if (!ICrFile::DirectoryExists(GlobalPaths::ShaderSourceDirectory))

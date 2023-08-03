@@ -10,11 +10,11 @@
 #include "Core/Streams/CrFileStream.h"
 #include "Core/Function/CrFixedFunction.h"
 
-CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFilename, CrHash currentHash)
+CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* hashFilename, CrHash currentHash)
 	: m_cachePath(cachePath)
 {
 	// We store the hash file at the same level as the folder
-	CrPath hashPath = cachePath.parent_path() / hashFilename;
+	CrFixedPath hashPath = cachePath.parent_path() / hashFilename;
 	CrHash storedHash;
 
 	bool clearCache = true;
@@ -41,7 +41,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFi
 			{
 				if (!entry.isDirectory)
 				{
-					CrPath filePath = entry.directory;
+					CrFixedPath filePath = entry.directory;
 					filePath /= entry.filename;
 					ICrFile::FileDelete(filePath.c_str());
 				}
@@ -63,10 +63,10 @@ CrShaderDiskCache::CrShaderDiskCache(const CrPath& cachePath, const char* hashFi
 	}
 }
 
-CrPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
+CrFixedPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
 {
 	CrString hashString = CrString(hash.GetHash());
-	CrPath cachedBytecodePath = m_cachePath;
+	CrFixedPath cachedBytecodePath = m_cachePath;
 	cachedBytecodePath /= hashString.c_str();
 	cachedBytecodePath.replace_extension(CrShaderManager::Get().GetShaderBytecodeExtension(graphicsApi));
 	return cachedBytecodePath;
@@ -74,7 +74,7 @@ CrPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::Graphic
 
 CrShaderBytecodeHandle CrShaderDiskCache::LoadFromCache(const CrHash& hash, cr3d::GraphicsApi::T graphicsApi) const
 {
-	CrPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
+	CrFixedPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
 	
 	CrReadFileStream cachedBytecodeFile(cachedBytecodePath.c_str());
 	
@@ -94,7 +94,7 @@ void CrShaderDiskCache::SaveToCache(const CrHash& hash, cr3d::GraphicsApi::T gra
 {
 	if (bytecode)
 	{
-		CrPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
+		CrFixedPath cachedBytecodePath = CreateCachedFilePath(hash, graphicsApi);
 
 		CrWriteFileStream writeFileStream(cachedBytecodePath.c_str());
 		writeFileStream << *bytecode.get();

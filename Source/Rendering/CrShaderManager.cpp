@@ -65,9 +65,9 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	return computeShader;
 }
 
-CrPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
+CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
 {
-	CrPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "Compiled Shaders/";
+	CrFixedPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "Compiled Shaders/";
 	CrString folderName = CrString(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
 	shaderCachePath /= folderName.c_str();
 	return shaderCachePath;
@@ -89,7 +89,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	const CrShaderCompilerDefines& defines
 ) const
 {
-	CrPath ShaderCacheDirectory = GetCompiledShadersPath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
+	CrFixedPath ShaderCacheDirectory = GetCompiledShadersPath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
 
 	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
 
@@ -116,7 +116,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 
 	processDescriptor.commandLine += "-reflection ";
 
-	CrPath filename = bytecodeDescriptor.path.filename();
+	CrFixedPath filename = bytecodeDescriptor.path.filename();
 	size_t extensionDotPosition = filename.find_last_of(".");
 	if (extensionDotPosition != filename.npos)
 	{

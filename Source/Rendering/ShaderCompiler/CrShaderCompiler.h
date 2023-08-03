@@ -3,7 +3,7 @@
 #include "Rendering/CrRendering.h"
 #include "Core/CrPlatform.h"
 #include "Core/String/CrString.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Containers/CrVector.h"
 
 struct CompilationDescriptor
@@ -18,9 +18,9 @@ struct CompilationDescriptor
 
 	void Process() const;
 
-	CrPath inputPath;
-	CrPath outputPath;
-	CrPath tempPath; // Filename compiler can use to dump intermediate data
+	CrFixedPath inputPath;
+	CrFixedPath outputPath;
+	CrFixedPath tempPath; // Filename compiler can use to dump intermediate data
 	CrString entryPoint;
 	CrString uniqueBinaryName;
 	mutable CrVector<CrString> defines;
@@ -42,11 +42,11 @@ public:
 
 	static CrString ExecutableDirectory;
 
-	static CrPath PDBDirectory;
+	static CrFixedPath PDBDirectory;
 
-	static CrPath PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
+	static CrFixedPath PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
 
-	static const CrPath& GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi);
+	static const CrFixedPath& GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi);
 
 	static void Initialize();
 

@@ -1,15 +1,15 @@
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/FileSystem/CrPath.h"
+#include "Core/FileSystem/CrFixedPath.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 struct CrBuiltinShadersDescriptor
 {
 	// Path where .shaders files live
-	CrPath inputPath;
+	CrFixedPath inputPath;
 
 	// Path where builtin shader binaries are output
-	CrPath outputPath;
+	CrFixedPath outputPath;
 
 	// We can build builtin shaders for multiple APIs for certain platforms such as Windows
 	// which builds Vulkan and D3D12

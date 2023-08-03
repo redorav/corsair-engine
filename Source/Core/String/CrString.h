@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/CrMacros.h"
-
 #include "crstl/string.h"
 
 using CrString = crstl::string;

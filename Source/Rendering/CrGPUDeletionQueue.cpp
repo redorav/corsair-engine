@@ -50,7 +50,7 @@ void CrGPUDeletionQueue::Process()
 
 	if (DebugDeletionQueues)
 	{
-		CrLog("CrGPUDeletionQueue Current Frame %i", CrFrameTime::GetFrameCount());
+		CrLog("CrGPUDeletionQueue Current Frame %i", CrFrameTime::GetFrameIndex());
 		CrLog("%i active deletion lists", m_activeDeletionLists.size());
 	}
 

@@ -19,7 +19,7 @@ public:
 
 	static CrTime GetFrameDeltaMax();
 
-	static uint64_t GetFrameCount();
+	static uint64_t GetFrameIndex();
 
 private:
 

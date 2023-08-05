@@ -567,12 +567,12 @@ void CrRenderGraph::Begin(const CrRenderGraphFrameParams& frameParams)
 {
 	m_frameParams = frameParams;
 
-	CrRenderGraphLog("Beginning render pass for frame %ld", m_frameParams.frameCount);
+	CrRenderGraphLog("Beginning render pass for frame %ld", m_frameParams.frameIndex);
 }
 
 void CrRenderGraph::End()
 {
-	CrRenderGraphLog("Ending render pass for frame %ld", m_frameParams.frameCount);
+	CrRenderGraphLog("Ending render pass for frame %ld", m_frameParams.frameIndex);
 
 	m_uniquePassId = CrRenderPassId(0);
 	m_uniqueTextureId = CrRenderGraphTextureId(0);

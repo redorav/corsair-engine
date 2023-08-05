@@ -27,7 +27,7 @@ public:
 
 	void Initialize(ICrRenderDevice* renderDevice, uint32_t maxFrames);
 
-	void BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t currentFrame);
+	void BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t frameIndex);
 
 	void EndFrame(ICrCommandBuffer* commandBuffer);
 

@@ -19,11 +19,11 @@ void CrGPUTimingQueryTracker::Initialize(ICrRenderDevice* renderDevice, uint32_t
 	m_timingRequests.resize(maxFrames);
 }
 
-void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t currentFrame)
+void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t frameIndex)
 {
-	m_currentFrame = currentFrame;
+	m_currentFrame = frameIndex;
 
-	m_currentPoolIndex = currentFrame % m_maxFrames;
+	m_currentPoolIndex = frameIndex % m_maxFrames;
 
 	// Resolve queries from the oldest frame
 	ICrGPUQueryPool* oldestPool = GetOldestQueryPool();

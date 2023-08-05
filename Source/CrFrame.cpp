@@ -440,7 +440,7 @@ void CrFrame::Process()
 	CrRenderGraphFrameParams frameRenderGraphParams;
 	frameRenderGraphParams.commandBuffer = drawCommandBuffer;
 	frameRenderGraphParams.timingQueryTracker = m_timingQueryTracker.get();
-	frameRenderGraphParams.frameCount = CrFrameTime::GetFrameCount();
+	frameRenderGraphParams.frameIndex = CrFrameTime::GetFrameIndex();
 	m_mainRenderGraph.Begin(frameRenderGraphParams);
 
 	m_renderingStream->Reset();
@@ -494,7 +494,7 @@ void CrFrame::Process()
 		identityTransformData->local2World[0] = float4x4::identity();
 	}
 
-	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameCount());
+	m_timingQueryTracker->BeginFrame(drawCommandBuffer, CrFrameTime::GetFrameIndex());
 
 	CrRenderGraphTextureDescriptor depthDescriptor(m_depthStencilTexture.get());
 	CrRenderGraphTextureId depthTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Depth"), depthDescriptor);
@@ -940,7 +940,7 @@ void CrFrame::DrawDebugUI()
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
 			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, properties.graphicsApiDisplay.c_str());
-			ImGui::Text("Frame: %llu", CrFrameTime::GetFrameCount());
+			ImGui::Text("Frame: %llu", CrFrameTime::GetFrameIndex());
 			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
 			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %d Instances: %d Vertices: %d", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetInstanceCount(), CrRenderingStatistics::GetVertexCount());

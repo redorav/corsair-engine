@@ -79,7 +79,7 @@ CrTime CrFrameTime::GetFrameDeltaMax()
 	return m_frameDeltaMax;
 }
 
-uint64_t CrFrameTime::GetFrameCount()
+uint64_t CrFrameTime::GetFrameIndex()
 {
 	return m_frameCount;
 }

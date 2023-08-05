@@ -217,7 +217,7 @@ struct CrRenderGraphFrameParams
 {
 	ICrCommandBuffer* commandBuffer;
 	CrGPUTimingQueryTracker* timingQueryTracker;
-	uint64_t frameCount;
+	uint64_t frameIndex;
 };
 
 class CrRenderGraph

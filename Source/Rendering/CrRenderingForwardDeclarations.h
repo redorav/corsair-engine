@@ -169,7 +169,7 @@ using CrStructuredBufferHandle = CrIntrusivePtr<CrStructuredBuffer<Metadata>>;
 class CrDataBuffer;
 using CrDataBufferHandle = CrIntrusivePtr<CrDataBuffer>;
 
-typedef CrFixedFunction<4, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
+typedef CrFixedFunction<8, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;

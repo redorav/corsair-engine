@@ -165,7 +165,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	RecreateSwapchainAndRenderTargets();
+	RecreateSwapchainAndRenderTargets(m_width, m_height);
 
 	// TODO Move block to rendering subsystem initialization function
 	{
@@ -1019,6 +1019,13 @@ void CrFrame::DrawDebugUI()
 	}
 }
 
+void CrFrame::HandleWindowResize(uint32_t width, uint32_t height)
+{
+	m_requestSwapchainResize = true;
+	m_swapchainResizeRequestWidth = width;
+	m_swapchainResizeRequestHeight = height;
+}
+
 void CrFrame::UpdateCamera()
 {
 	m_camera->SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
@@ -1097,27 +1104,30 @@ void CrFrame::UpdateCamera()
 	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
 }
 
-void CrFrame::RecreateSwapchainAndRenderTargets()
+void CrFrame::RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height)
 {
 	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
 
-	// Destroy the old swapchain before creating the new one. Otherwise the API will fail trying to create a resource
-	// that becomes available after (once the pointer assignment happens and the resource is destroyed). Right after, create
-	// the new swapchain
-	m_swapchain = nullptr;
-
-	CrSwapchainDescriptor swapchainDescriptor = {};
-	swapchainDescriptor.name = "Main Swapchain";
-	swapchainDescriptor.platformWindow = m_platformWindow;
-	swapchainDescriptor.platformHandle = m_platformHandle;
-	swapchainDescriptor.requestedWidth = m_width;
-	swapchainDescriptor.requestedHeight = m_height;
-	swapchainDescriptor.format = CrRendererConfig::SwapchainFormat;
-	swapchainDescriptor.requestedBufferCount = 3;
-	m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
+	// Resize swapchain if it already exists, create if null
+	if (m_swapchain)
+	{
+		m_swapchain->Resize(width, height);
+	}
+	else
+	{
+		CrSwapchainDescriptor swapchainDescriptor = {};
+		swapchainDescriptor.name = "Main Swapchain";
+		swapchainDescriptor.platformWindow = m_platformWindow;
+		swapchainDescriptor.platformHandle = m_platformHandle;
+		swapchainDescriptor.requestedWidth = width;
+		swapchainDescriptor.requestedHeight = height;
+		swapchainDescriptor.format = CrRendererConfig::SwapchainFormat;
+		swapchainDescriptor.requestedBufferCount = 3;
+		m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
+	}
 
 	// Recreate depth stencil texture
 	CrTextureDescriptor depthTextureDescriptor;

@@ -14,6 +14,8 @@ CrCamera::CrCamera() : CrEntity()
 	, m_nearPlane(0.1f)
 	, m_farPlane(100.0f)
 	, m_reverseDepth(true)
+	, m_resolutionWidth(1)
+	, m_resolutionHeight(1)
 	, m_view2WorldMatrix(float4x4::identity())
 	, m_world2ViewMatrix(float4x4::identity())
 	, m_view2ProjectionMatrix(float4x4::identity())
@@ -23,15 +25,15 @@ CrCamera::CrCamera() : CrEntity()
 	m_rightWorldSpace  = float3(1, 0, 0);
 }
 
-CrCamera::CrCamera(float width, float height, float nearPlane, float farPlane) : CrEntity()
+CrCamera::CrCamera(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane) : CrEntity()
 {
-	SetupPerspective(width, height, nearPlane, farPlane);
+	SetupPerspective(resolutionWidth, resolutionHeight, nearPlane, farPlane);
 }
 
-void CrCamera::SetupPerspective(float filmWidth, float filmHeight, float nearPlane, float /*farPlane*/)
+void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float /*farPlane*/)
 {
 	// Create a new perspective projection matrix. The height will stay the same while the width will vary as per aspect ratio.
-	float aspectRatio = filmWidth / filmHeight;
+	float aspectRatio = (float)resolutionWidth / (float)resolutionHeight;
 	//float left = -aspectRatio;
 	//float right = aspectRatio;
 	//float bottom = -1.0f;
@@ -40,6 +42,10 @@ void CrCamera::SetupPerspective(float filmWidth, float filmHeight, float nearPla
 	static float fovY = 60.0f;
 
 	m_projection = cr3d::CameraProjection::Perspective;
+
+	m_resolutionWidth = resolutionWidth;
+
+	m_resolutionHeight = resolutionHeight;
 
 	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, aspectRatio, 100000.0f, nearPlane), zclip::zero));
 }

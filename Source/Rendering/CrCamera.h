@@ -25,9 +25,9 @@ public:
 
 	CrCamera();
 
-	CrCamera(float width, float height, float nearPlane, float farPlane);
+	CrCamera(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane);
 
-	void SetupPerspective(float filmWidth, float filmHeight, float nearPlane, float farPlane);
+	void SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane);
 
 	void Update();
 
@@ -52,6 +52,10 @@ public:
 	float GetNearPlane() const { return m_nearPlane; }
 
 	float GetFarPlane() const { return m_farPlane; }
+
+	uint32_t GetResolutionWidth() const { return m_resolutionWidth; }
+
+	uint32_t GetResolutionHeight() const { return m_resolutionHeight; }
 
 	const float3& GetLookatVector() const { return m_lookAtWorldSpace; }
 
@@ -80,6 +84,10 @@ private:
 	float m_farPlane;
 
 	bool m_reverseDepth;
+
+	uint32_t m_resolutionWidth;
+
+	uint32_t m_resolutionHeight;
 
 	// Camera vectors in world space
 	float3 m_lookAtWorldSpace;

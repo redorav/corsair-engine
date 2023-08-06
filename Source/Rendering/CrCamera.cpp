@@ -13,6 +13,7 @@ CrCamera::CrCamera() : CrEntity()
 	, m_projection(cr3d::CameraProjection::Perspective)
 	, m_nearPlane(0.1f)
 	, m_farPlane(100.0f)
+	, m_aspectRatio(1.0f)
 	, m_reverseDepth(true)
 	, m_resolutionWidth(1)
 	, m_resolutionHeight(1)
@@ -20,7 +21,7 @@ CrCamera::CrCamera() : CrEntity()
 	, m_world2ViewMatrix(float4x4::identity())
 	, m_view2ProjectionMatrix(float4x4::identity())
 {
-	m_lookAtWorldSpace = float3(0, 0, 1);
+	m_forwardWorldSpace = float3(0, 0, 1);
 	m_upWorldSpace     = float3(0, 1, 0);
 	m_rightWorldSpace  = float3(1, 0, 0);
 }
@@ -33,7 +34,7 @@ CrCamera::CrCamera(uint32_t resolutionWidth, uint32_t resolutionHeight, float ne
 void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float /*farPlane*/)
 {
 	// Create a new perspective projection matrix. The height will stay the same while the width will vary as per aspect ratio.
-	float aspectRatio = (float)resolutionWidth / (float)resolutionHeight;
+	m_aspectRatio = (float)resolutionWidth / (float)resolutionHeight;
 	//float left = -aspectRatio;
 	//float right = aspectRatio;
 	//float bottom = -1.0f;
@@ -47,16 +48,16 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 
 	m_resolutionHeight = resolutionHeight;
 
-	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, aspectRatio, 100000.0f, nearPlane), zclip::zero));
+	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, m_aspectRatio, 100000.0f, nearPlane), zclip::zero));
 }
 
-void CrCamera::LookAt(const float3& target, const float3& up)
+void CrCamera::LookAtPosition(const float3& target, const float3& up)
 {
 	float3 vz = normalize(target - m_position);
 	float3 vx = normalize(cross(up, vz));
 	float3 vy = cross(vz, vx);
 
-	m_lookAtWorldSpace = vz;
+	m_forwardWorldSpace = vz;
 	m_rightWorldSpace = vx;
 	m_upWorldSpace = vy;
 }
@@ -108,7 +109,7 @@ void CrCamera::Rotate(const float3& r)
 	// Combine rotations
 	quaternion rotationXY = mul(rotationX, rotationY);
 
-	m_lookAtWorldSpace = mul(m_lookAtWorldSpace, rotationXY);
+	m_forwardWorldSpace = mul(m_forwardWorldSpace, rotationXY);
 	m_upWorldSpace     = mul(m_upWorldSpace,     rotationXY);
 	m_rightWorldSpace  = mul(m_rightWorldSpace,  rotationXY);
 }
@@ -138,7 +139,7 @@ void CrCamera::Update()
 	m_view2WorldMatrix = float4x4::identity();
 	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
 	m_view2WorldMatrix._m10_m11_m12 = m_upWorldSpace;
-	m_view2WorldMatrix._m20_m21_m22 = m_lookAtWorldSpace;
+	m_view2WorldMatrix._m20_m21_m22 = m_forwardWorldSpace;
 	m_view2WorldMatrix._m30_m31_m32 = m_position;
 
 	m_world2ViewMatrix = inverse(m_view2WorldMatrix);

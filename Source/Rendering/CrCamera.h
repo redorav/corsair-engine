@@ -43,7 +43,7 @@ public:
 
 	void SetVerticalFieldOfView(float fovY);
 
-	void LookAt(const float3& target, const float3& up);
+	void LookAtPosition(const float3& target, const float3& up);
 
 	void RotateAround(const float3& point, const float3& axis, float angle);
 
@@ -53,11 +53,13 @@ public:
 
 	float GetFarPlane() const { return m_farPlane; }
 
+	float GetAspectRatio() const { return m_aspectRatio; }
+
 	uint32_t GetResolutionWidth() const { return m_resolutionWidth; }
 
 	uint32_t GetResolutionHeight() const { return m_resolutionHeight; }
 
-	const float3& GetLookatVector() const { return m_lookAtWorldSpace; }
+	const float3& GetForwardVector() const { return m_forwardWorldSpace; }
 
 	const float3& GetRightVector() const { return m_rightWorldSpace; }
 
@@ -83,6 +85,8 @@ private:
 
 	float m_farPlane;
 
+	float m_aspectRatio;
+
 	bool m_reverseDepth;
 
 	uint32_t m_resolutionWidth;
@@ -90,7 +94,7 @@ private:
 	uint32_t m_resolutionHeight;
 
 	// Camera vectors in world space
-	float3 m_lookAtWorldSpace;
+	float3 m_forwardWorldSpace;
 	float3 m_upWorldSpace;
 	float3 m_rightWorldSpace;
 

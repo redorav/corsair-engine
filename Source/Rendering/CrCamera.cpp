@@ -49,6 +49,21 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 	m_resolutionHeight = resolutionHeight;
 
 	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, m_aspectRatio, 100000.0f, nearPlane), zclip::zero));
+
+	m_projection2ViewMatrix = inverse(m_view2ProjectionMatrix);
+}
+
+void CrCamera::Update()
+{
+	m_view2WorldMatrix = float4x4::identity();
+	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
+	m_view2WorldMatrix._m10_m11_m12 = m_upWorldSpace;
+	m_view2WorldMatrix._m20_m21_m22 = m_forwardWorldSpace;
+	m_view2WorldMatrix._m30_m31_m32 = m_position;
+
+	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
+
+	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
 }
 
 void CrCamera::LookAtPosition(const float3& target, const float3& up)
@@ -134,15 +149,29 @@ void CrCamera::SetVerticalFieldOfView(float fovY)
 	m_fovY = fovY;
 }
 
-void CrCamera::Update()
+float3 CrCamera::ProjectWorldSpacePosition(float3 worldSpacePosition)
 {
-	m_view2WorldMatrix = float4x4::identity();
-	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
-	m_view2WorldMatrix._m10_m11_m12 = m_upWorldSpace;
-	m_view2WorldMatrix._m20_m21_m22 = m_forwardWorldSpace;
-	m_view2WorldMatrix._m30_m31_m32 = m_position;
+	float4 viewSpacePosition = mul(float4(worldSpacePosition, 1.0f), m_world2ViewMatrix);
+	float4 homogeneousSpacePosition = mul(viewSpacePosition, m_view2ProjectionMatrix);
+	float3 ndcSpacePosition = homogeneousSpacePosition.xyz / homogeneousSpacePosition.w;
+	return ndcSpacePosition;
+}
 
-	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
+float3 CrCamera::ProjectViewSpacePosition(float3 viewSpacePosition)
+{
+	float4 homogeneousSpacePosition = mul(float4(viewSpacePosition, 1.0f), m_view2ProjectionMatrix);
+	float3 ndcSpacePosition = homogeneousSpacePosition.xyz / homogeneousSpacePosition.w;
+	return ndcSpacePosition;
+}
 
-	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
+float3 CrCamera::GetViewRay(float2 ndcSpacePosition)
+{
+	// Create a ray whose depth is the near plane
+	float4 ndcPositionExtended(ndcSpacePosition, m_nearPlane, 1.0f);
+
+	// Unproject using the full projection matrix
+	float4 viewSpacePosition = mul(ndcPositionExtended, m_projection2ViewMatrix);
+
+	// Normalize to get a ray
+	return normalize(viewSpacePosition.xyz);
 }

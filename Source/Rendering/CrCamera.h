@@ -71,6 +71,14 @@ public:
 
 	const float4x4& GetWorld2ProjectionMatrix() const { return m_world2ProjectionMatrix; }
 
+	const float4x4& GetProjection2ViewMatrix() const { return m_world2ProjectionMatrix; }
+
+	float3 ProjectWorldSpacePosition(float3 worldSpacePosition);
+
+	float3 ProjectViewSpacePosition(float3 viewSpacePosition);
+
+	float3 GetViewRay(float2 ndcPosition);
+
 private:
 
 	cr3d::CameraProjection m_projection;
@@ -95,11 +103,20 @@ private:
 
 	// Camera vectors in world space
 	float3 m_forwardWorldSpace;
+
 	float3 m_upWorldSpace;
+
 	float3 m_rightWorldSpace;
 
-	float4x4 m_view2WorldMatrix;
+	// Matrices used in forward projection (from world or view space into NDC space)
 	float4x4 m_world2ViewMatrix;
+
 	float4x4 m_view2ProjectionMatrix;
+
 	float4x4 m_world2ProjectionMatrix;
+
+	// Matrices used in back projection (taking from NDC space back to view or world space)
+	float4x4 m_view2WorldMatrix;
+
+	float4x4 m_projection2ViewMatrix;
 };

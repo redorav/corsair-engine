@@ -402,7 +402,8 @@ cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fenc
 
 	if (currentValue < 1)
 	{
-		d3d12Fence->SetEventOnCompletion(1, d3dFence->GetFenceEvent());
+		HRESULT hResult = d3d12Fence->SetEventOnCompletion(1, d3dFence->GetFenceEvent());
+		CrAssertMsg(SUCCEEDED(hResult), "Failed SetEventOnCompletion");
 		waitResult = WaitForSingleObjectEx(d3dFence->GetFenceEvent(), (DWORD)timeoutNanoseconds, FALSE);
 	}
 
@@ -664,11 +665,11 @@ void CrRenderDeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandB
 	unused_parameter(waitSemaphore);
 	unused_parameter(signalSemaphore);
 
-	// Signal fence so we can wait for it on next use
-	SignalFencePS(CrCommandQueueType::Graphics, signalFence);
-
 	const CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<const CrCommandBufferD3D12*>(commandBuffer);
 
 	ID3D12CommandList* d3d12CommandList = { d3d12CommandBuffer->GetD3D12CommandList() };
 	m_d3d12GraphicsCommandQueue->ExecuteCommandLists(1, &d3d12CommandList);
+
+	// Signal fence so we can wait for it on next use
+	SignalFencePS(CrCommandQueueType::Graphics, signalFence);
 }

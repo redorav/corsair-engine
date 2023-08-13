@@ -339,6 +339,9 @@ protected:
 	CrCommandQueueType::T			m_queueType;
 
 	bool							m_submitted;
+
+	// If this command buffer is recording commands. We cannot begin a command list twice
+	bool							m_recording;
 };
 
 inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)

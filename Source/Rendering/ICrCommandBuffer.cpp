@@ -13,6 +13,7 @@
 ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUDeletable(renderDevice)
 	, m_queueType(descriptor.queueType)
 	, m_submitted(false)
+	, m_recording(false)
 {
 	// Initialize GPU buffer stack allocators - for streaming
 	// TODO it is possible to create these lazily on allocation instead
@@ -54,6 +55,10 @@ ICrCommandBuffer::~ICrCommandBuffer()
 
 void ICrCommandBuffer::Begin()
 {
+	CrAssertMsg(!m_recording, "Cannot begin a command buffer while it is recording");
+
+	m_recording = true;
+
 	// Reset current state. When beginning a new command buffer 
 	// any bound state is also reset, and our tracking must match
 	m_currentState = CurrentState();
@@ -73,7 +78,8 @@ void ICrCommandBuffer::Begin()
 	// for the fence to become signaled before we can start recording
 	if (m_submitted)
 	{
-		m_renderDevice->WaitForFence(m_completionFence.get(), UINT64_MAX);
+		cr3d::GPUFenceResult result = m_renderDevice->WaitForFence(m_completionFence.get(), UINT64_MAX);
+		CrAssertMsg(result == cr3d::GPUFenceResult::Success, "Failed waiting for fence");
 		m_renderDevice->ResetFence(m_completionFence.get());
 		m_submitted = false;
 	}
@@ -95,6 +101,8 @@ void ICrCommandBuffer::End()
 	}
 
 	EndPS();
+
+	m_recording = false;
 }
 
 void ICrCommandBuffer::Submit()

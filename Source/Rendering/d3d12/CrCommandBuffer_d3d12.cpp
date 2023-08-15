@@ -196,8 +196,8 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 			// Depth Load Operation
 			d3d12DepthStencil.DepthBeginningAccess.Type = crd3d::GetD3D12BeginningAccessType(depthDescriptor.loadOp);
 			d3d12DepthStencil.DepthBeginningAccess.Clear.ClearValue.Format = crd3d::GetDXGIFormat(d3d12Texture->GetFormat());
-			d3d12DepthStencil.StencilBeginningAccess.Clear.ClearValue.DepthStencil.Depth = depthDescriptor.depthClearValue;
-			d3d12DepthStencil.StencilBeginningAccess.Clear.ClearValue.DepthStencil.Stencil = depthDescriptor.stencilClearValue;
+			d3d12DepthStencil.DepthBeginningAccess.Clear.ClearValue.DepthStencil.Depth = depthDescriptor.depthClearValue;
+			d3d12DepthStencil.DepthBeginningAccess.Clear.ClearValue.DepthStencil.Stencil = depthDescriptor.stencilClearValue;
 
 			// Depth Store Operation
 			d3d12DepthStencil.DepthEndingAccess.Type = crd3d::GetD3D12EndingAccessType(depthDescriptor.storeOp);

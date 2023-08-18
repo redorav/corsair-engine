@@ -178,6 +178,15 @@ public:
 	}
 };
 
+static void GetCompilationStatus(glslang::TShader* shader, CrString& compilationStatus)
+{
+	// Remove the ERROR: prefix so that when it prints out we can double click on the error message and it will take us to the correct line
+	CrString infoLogDebugLog(shader->getInfoLog());
+	infoLogDebugLog.append(shader->getInfoDebugLog());
+	infoLogDebugLog.erase_all("ERROR: ");
+	compilationStatus += infoLogDebugLog;
+}
+
 bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescriptor, const glslang::TIntermediate*& intermediate, CrString& compilationStatus)
 {
 	CrFileHandle file = ICrFile::OpenFile(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
@@ -258,12 +267,7 @@ bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescri
 	bool parsed = shader->parse(&s_resourceLimits, defaultVersion, ENoProfile, false, false, (EShMessages)msg, includer);
 	if (!parsed)
 	{
-		const char* infoLog = shader->getInfoLog();
-		const char* infoDebugLog = shader->getInfoDebugLog();
-		printf("%s", infoLog);
-		printf("%s", infoDebugLog);
-		//CrLogError(infoLog);
-		//CrLogError(infoDebugLog);
+		GetCompilationStatus(shader, compilationStatus);
 		return false;
 	}
 
@@ -274,16 +278,14 @@ bool CrCompilerGLSLANG::HLSLtoAST(const CompilationDescriptor& compilationDescri
 	bool linked = program.link((EShMessages)msg);
 	if (!linked)
 	{
-		compilationStatus += shader->getInfoLog();
-		compilationStatus += shader->getInfoDebugLog();
+		GetCompilationStatus(shader, compilationStatus);
 		return false;
 	}
 
 	bool ioMapped = program.mapIO();
 	if (!ioMapped)
 	{
-		compilationStatus += shader->getInfoLog();
-		compilationStatus += shader->getInfoDebugLog();
+		GetCompilationStatus(shader, compilationStatus);
 		return false;
 	}
 

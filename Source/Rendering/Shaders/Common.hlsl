@@ -3,7 +3,7 @@
 
 // Graphics
 
-struct VS_IN
+struct VSInput
 {
 	float3 pos     : POSITION;
 	float4 color   : COLOR;
@@ -14,7 +14,7 @@ struct VS_IN
 	uint instanceID : SV_InstanceID;
 };
 
-struct VS_OUT
+struct VSOutput
 {
 	float4 hwPosition 	: SV_Position;
 	float4 color 		: TEXCOORD0;
@@ -23,12 +23,12 @@ struct VS_OUT
 	float2 uv			: TEXCOORD3;
 };
 
-struct VS_IN_FULLSCREEN
+struct VSInputFullscreen
 {
     uint vertexId : SV_VertexID;
 };
 
-struct VS_OUT_FULLSCREEN
+struct VSOutputFullscreen
 {
     float4 hwPosition	: SV_Position;
     float2 uv			: TEXCOORD0;

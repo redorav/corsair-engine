@@ -30,13 +30,13 @@ groupshared float2 gs_minMaxDepth[DEPTH_DOWNSAMPLE_GROUP_SIZE][DEPTH_DOWNSAMPLE_
 // It's all good in any case, if we need to process further we can run another really cheap compute pass
 // to do the rest
 [numthreads(DEPTH_DOWNSAMPLE_GROUP_SIZE, DEPTH_DOWNSAMPLE_GROUP_SIZE, 1)]
-void DepthDownsampleLinearizeMinMaxCS(CS_IN In)
+void DepthDownsampleLinearizeMinMaxCS(CSInput csInput)
 {
 	uint2 depthTextureResolution;
 	RawDepthTexture.GetDimensions(depthTextureResolution.x, depthTextureResolution.y);
 
-	uint2 pixelCoordMip1 = In.dispatchThreadId.xy;
-	uint2 groupThreadId = In.groupThreadId.xy;
+	uint2 pixelCoordMip1 = csInput.dispatchThreadId.xy;
+	uint2 groupThreadId = csInput.groupThreadId.xy;
 
 	// We are outputting to mipmap 1 with respect to the full resolution depth buffer
 	float2 centerUV = (2 * pixelCoordMip1.xy + 0.5) / (float2)depthTextureResolution;

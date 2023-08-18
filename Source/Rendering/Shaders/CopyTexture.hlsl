@@ -5,35 +5,35 @@
 
 Texture2D CopyTexture;
 
-VS_OUT_FULLSCREEN CopyTextureVS(VS_IN_FULLSCREEN input)
+VSOutputFullscreen CopyTextureVS(VSInputFullscreen input)
 {
-    VS_OUT_FULLSCREEN vsOut = (VS_OUT_FULLSCREEN) 0;
+    VSOutputFullscreen vsOutput = (VSOutputFullscreen) 0;
     
     if (input.vertexId == 0) // Top left
     {
-        vsOut.hwPosition = float4(-1.0, 1.0, 1.0, 1.0);
-        vsOut.uv = float2(0.0, 0.0);
+        vsOutput.hwPosition = float4(-1.0, 1.0, 1.0, 1.0);
+        vsOutput.uv = float2(0.0, 0.0);
     }
     else if (input.vertexId == 1) // Top right
     {
-        vsOut.hwPosition = float4(3.0, 1.0, 1.0, 1.0);
-        vsOut.uv = float2(2.0, 0.0);
+        vsOutput.hwPosition = float4(3.0, 1.0, 1.0, 1.0);
+        vsOutput.uv = float2(2.0, 0.0);
     }
     else if (input.vertexId == 2) // Bottom left
     {
-        vsOut.hwPosition = float4(-1.0, -3.0, 1.0, 1.0);
-        vsOut.uv = float2(0.0, 2.0);
+        vsOutput.hwPosition = float4(-1.0, -3.0, 1.0, 1.0);
+        vsOutput.uv = float2(0.0, 2.0);
     }
     
-    return vsOut;
+    return vsOutput;
 }
 
-float4 CopyTexturePS(VS_OUT_FULLSCREEN input) : SV_Target0
+float4 CopyTexturePS(VSOutputFullscreen psInput) : SV_Target0
 {
 #if defined(DEPTH)
-    return CopyTexture.Sample(AllPointClampSampler, input.uv);
+    return CopyTexture.Sample(AllPointClampSampler, psInput.uv);
 #else
-    return CopyTexture.Sample(AllLinearClampSampler, input.uv);
+    return CopyTexture.Sample(AllLinearClampSampler, psInput.uv);
 #endif
 }
 

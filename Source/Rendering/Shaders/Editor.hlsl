@@ -7,7 +7,7 @@
 
 Texture2D EditorSelectionTexture;
 
-float4 EditorEdgeSelectionPS(VS_OUT_FULLSCREEN input) : SV_Target0
+float4 EditorEdgeSelectionPS(VSOutputFullscreen psInput) : SV_Target0
 {
 	// Sample in a radius
 	float colorSamples = 0.0;
@@ -17,7 +17,7 @@ float4 EditorEdgeSelectionPS(VS_OUT_FULLSCREEN input) : SV_Target0
 	{
 		for (int j = -1; j <= 1; ++j)
 		{
-			float4 color = EditorSelectionTexture.Load(int3(input.hwPosition.xy + int2(i, j), 0));
+			float4 color = EditorSelectionTexture.Load(int3(psInput.hwPosition.xy + int2(i, j), 0));
 			bool isAnyColor = any(color);
 			colorSamples += isAnyColor;
 			totalSamples++;
@@ -49,7 +49,7 @@ cbuffer MouseSelection
 };
 
 [numthreads(1, 1, 1)]
-void EditorMouseSelectionResolveCS(CS_IN input)
+void EditorMouseSelectionResolveCS(CSInput csInput)
 {
 	int2 mouseCoordinates = cb_MouseSelection.mouseCoordinates.xy;
 

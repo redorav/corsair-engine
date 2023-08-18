@@ -16,17 +16,17 @@ struct UbershaderPixelOutput
 #endif
 };
 
-VS_OUT UbershaderVS(VS_IN IN)
+VSOutput UbershaderVS(VSInput vsInput)
 {
-	VS_OUT output;
+	VSOutput output;
 	
-	float4x4 local2WorldMatrix = cb_Instance.local2World[IN.instanceID];
+	float4x4 local2WorldMatrix = cb_Instance.local2World[vsInput.instanceID];
 	
 	#if defined(NO_TRANSFORM)
-	output.hwPosition = float4(IN.pos.xyz, 1);
+	output.hwPosition = float4(vsInput.pos.xyz, 1);
 	#else
 
-	float4 positionLocal = float4(IN.pos.xyz, 1);
+	float4 positionLocal = float4(vsInput.pos.xyz, 1);
 
 	float4 positionWorld = mul(positionLocal, local2WorldMatrix);
 
@@ -36,29 +36,29 @@ VS_OUT UbershaderVS(VS_IN IN)
 	#endif
 	
 	// Careful with this code and non-uniform scaling
-	float3 vertexNormalLocal = IN.normal.xyz * 2.0 - 1.0;
+	float3 vertexNormalLocal = vsInput.normal.xyz * 2.0 - 1.0;
 	float3 vertexNormalWorld = mul(float4(vertexNormalLocal, 0.0), local2WorldMatrix).xyz;
 	
-	float3 vertexTangentLocal = IN.tangent.xyz * 2.0 - 1.0;
+	float3 vertexTangentLocal = vsInput.tangent.xyz * 2.0 - 1.0;
 	float3 vertexTangentWorld = mul(float4(vertexTangentLocal, 0.0), local2WorldMatrix).xyz;
 
-	output.color   = IN.color;
-	output.uv      = IN.uv;
+	output.color   = vsInput.color;
+	output.uv      = vsInput.uv;
 	output.normal  = vertexNormalWorld.xyz;
 	output.tangent = vertexTangentWorld.xyz;
 	
 	return output;
 }
 
-UbershaderPixelOutput UbershaderPS(VS_OUT IN)
+UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 {
 	UbershaderPixelOutput pixelOutput = (UbershaderPixelOutput)0;
 
 	Surface surface = CreateDefaultSurface();
 	
 	// Interpolants
-	surface.vertexNormalWorld = IN.normal.xyz;
-	surface.vertexTangentWorld = IN.tangent.xyz;
+	surface.vertexNormalWorld = psInput.normal.xyz;
+	surface.vertexTangentWorld = psInput.tangent.xyz;
 	surface.vertexBitangentWorld = cross(surface.vertexNormalWorld, surface.vertexTangentWorld);
 	
 	surface.vertexNormalWorld = normalize(surface.vertexNormalWorld);
@@ -69,9 +69,9 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 	
 #if defined(TEXTURED)
 
-	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
-	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
-	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, IN.uv.xy);
+	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, psInput.uv.xy);
+	float4 normal0 = NormalTexture0.Sample(AllLinearWrapSampler, psInput.uv.xy);
+	float4 spec0 = SpecularTexture0.Sample(AllLinearWrapSampler, psInput.uv.xy);
 
 	surface.roughness = 1.0 - spec0.a;
 	surface.F0 = spec0.rgb;
@@ -84,7 +84,7 @@ UbershaderPixelOutput UbershaderPS(VS_OUT IN)
 
 #endif
 
-    float3 litSurface = surface.albedoSRGB.xyz * IN.color.rgb;
+    float3 litSurface = surface.albedoSRGB.xyz * psInput.color.rgb;
 
 #if defined(EMaterialShaderVariant_Debug)
 

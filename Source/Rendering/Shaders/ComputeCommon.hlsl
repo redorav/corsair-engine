@@ -1,7 +1,7 @@
 #ifndef COMPUTE_COMMON_HLSL
 #define COMPUTE_COMMON_HLSL
 
-struct CS_IN
+struct CSInput
 {
 	uint3 groupId			: SV_GroupID;			// Index of the thread group a compute shader thread is executing in
 	uint3 groupThreadId		: SV_GroupThreadID;		// Index for an individual thread within a thread group (local to the group)

@@ -29,9 +29,9 @@ float3 DirectionalLighting(Surface surface, Light light)
 	return surface.albedoLinear * light.radiance * NdotL;
 }
 
-float4 DeferredLightingPS(VS_OUT_FULLSCREEN In) : SV_Target0
+float4 DeferredLightingPS(VSOutputFullscreen psInput) : SV_Target0
 {
-	uint2 pixelCoords = (uint2) In.hwPosition.xy;
+	uint2 pixelCoords = (uint2)psInput.hwPosition.xy;
 	
 	Surface surface = DecodeGBufferSurface(pixelCoords);
 	

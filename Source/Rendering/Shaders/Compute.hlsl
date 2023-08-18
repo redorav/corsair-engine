@@ -29,13 +29,13 @@ StructuredBuffer<ComputeStruct> ExampleStructuredBufferCompute;
 RWStructuredBuffer<int2> ExampleRWStructuredPerry;
 
 [numthreads(8, 8, 1)]
-void MainCS(CS_IN input)
+void MainCS(CSInput csInput)
 {
 	float4 volumeTextureSample = ExampleTexture3DCompute.SampleLevel(AllLinearClampSampler, float3(0, 0, 0), 0);
 	float4 textureArraySample  = ExampleTextureArrayCompute.SampleLevel(AllLinearClampSampler, float3(0, 0, 0), 0);
 
 	//ExampleDataBufferCompute[0] = float4(0.0, 0.0, 1.0, 0.0);
-	ExampleRWTextureCompute[input.groupThreadId.xy] = float4(input.groupThreadId.xy / 7.0, 0.0, 0.0) + volumeTextureSample + textureArraySample;
+	ExampleRWTextureCompute[csInput.groupThreadId.xy] = float4(csInput.groupThreadId.xy / 7.0, 0.0, 0.0) + volumeTextureSample + textureArraySample;
 
 	ComputeStruct s;
 	s.a = 3.0;
@@ -45,7 +45,7 @@ void MainCS(CS_IN input)
 }
 
 [numthreads(1, 1, 1)]
-void CreateIndirectArgumentsCS(CS_IN input)
+void CreateIndirectArgumentsCS(CSInput csInput)
 {
 	//ExampleDispatchIndirect[0].dispatchX = 2;
 	//ExampleDispatchIndirect[0].dispatchY = 2;

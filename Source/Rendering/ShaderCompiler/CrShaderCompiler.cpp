@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 
 		if (!success)
 		{
-			CrShaderCompilerUtilities::QuitWithMessage(compilationStatus.c_str());
+			CrShaderCompilerUtilities::QuitWithMessage(compilationStatus);
 		}
 	}
 	else if (buildBuiltinShaders)

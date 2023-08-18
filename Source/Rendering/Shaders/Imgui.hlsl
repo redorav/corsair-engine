@@ -1,14 +1,14 @@
 #ifndef IMGUI_HLSL
 #define IMGUI_HLSL
 
-struct VS_IN_UI
+struct VSInputUI
 {
 	float2 position : POSITION;
 	float2 uv       : TEXCOORD0;
 	float4 color    : COLOR;
 };
 
-struct VS_OUT_UI
+struct VSOutputUI
 {
 	float4 hwPosition : SV_Position;
 	float4 color      : COLOR;
@@ -28,18 +28,18 @@ cbuffer UIData
 Texture2D UITexture;
 SamplerState UISampleState;
 
-VS_OUT_UI ImguiVS(VS_IN_UI IN)
+VSOutputUI ImguiVS(VSInputUI vsInput)
 {
-	VS_OUT_UI output = (VS_OUT_UI)0;
-	output.uv = IN.uv;
-	output.color = IN.color;
-	output.hwPosition = mul(cbData.projection, float4(IN.position, 0.0, 1.0));
+	VSOutputUI output = (VSOutputUI)0;
+	output.uv = vsInput.uv;
+	output.color = vsInput.color;
+	output.hwPosition = mul(cbData.projection, float4(vsInput.position, 0.0, 1.0));
 	return output;
 }
 
-float4 ImguiPS(VS_OUT_UI IN) : SV_Target0
+float4 ImguiPS(VSOutputUI psInput) : SV_Target0
 {
-	return UITexture.Sample(UISampleState, IN.uv) * IN.color;
+	return UITexture.Sample(UISampleState, psInput.uv) * psInput.color;
 }
 
 #endif

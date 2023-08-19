@@ -204,8 +204,8 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		{
 			CrRenderModelInstance modelInstance = m_renderWorld->CreateModelInstance();
 
-			float angle = 1.61803f * i;
-			float radius = 300.0f * i / numModels;
+			float angle = 2.39996322f * i;
+			float radius = 30.0f * i / numModels;
 
 			float x = radius * sinf(angle);
 			float z = radius * cosf(angle);
@@ -216,7 +216,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 			int r = rand();
 			CrRenderModelHandle renderModel;
-
 			if (r < RAND_MAX / 3)
 			{
 				renderModel = nyraModel;

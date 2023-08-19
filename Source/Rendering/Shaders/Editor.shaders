@@ -5,3 +5,11 @@ EditorEdgeSelectionPS:
 EditorMouseSelectionResolveCS:
   entrypoint: EditorMouseSelectionResolveCS
   stage: Compute
+
+EditorGridVS:
+  entrypoint: EditorGridVS
+  stage: Vertex
+
+EditorGridPS:
+  entrypoint: EditorGridPS
+  stage: Pixel

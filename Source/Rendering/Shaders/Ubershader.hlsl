@@ -18,7 +18,7 @@ struct UbershaderPixelOutput
 
 VSOutput UbershaderVS(VSInput vsInput)
 {
-	VSOutput output;
+	VSOutput vsOutput;
 	
 	float4x4 local2WorldMatrix = cb_Instance.local2World[vsInput.instanceID];
 	
@@ -32,7 +32,7 @@ VSOutput UbershaderVS(VSInput vsInput)
 
 	float4 positionView = mul(positionWorld, cb_Camera.world2View);
 
-	output.hwPosition = mul(positionView, cb_Camera.view2Projection);
+	vsOutput.hwPosition = mul(positionView, cb_Camera.view2Projection);
 	#endif
 	
 	// Careful with this code and non-uniform scaling
@@ -42,12 +42,12 @@ VSOutput UbershaderVS(VSInput vsInput)
 	float3 vertexTangentLocal = vsInput.tangent.xyz * 2.0 - 1.0;
 	float3 vertexTangentWorld = mul(float4(vertexTangentLocal, 0.0), local2WorldMatrix).xyz;
 
-	output.color   = vsInput.color;
-	output.uv      = vsInput.uv;
-	output.normal  = vertexNormalWorld.xyz;
-	output.tangent = vertexTangentWorld.xyz;
+	vsOutput.color = vsInput.color;
+	vsOutput.uv = vsInput.uv;
+	vsOutput.normal = vertexNormalWorld.xyz;
+	vsOutput.tangent = vertexTangentWorld.xyz;
 	
-	return output;
+	return vsOutput;
 }
 
 UbershaderPixelOutput UbershaderPS(VSOutput psInput)

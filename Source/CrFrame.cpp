@@ -664,11 +664,10 @@ void CrFrame::Process()
 		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Resolve"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 		[=](CrRenderGraph& renderGraph)
 		{
-			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store, float4(0.0f));
+			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store);
 			renderGraph.AddTexture(debugShaderTextureId, cr3d::ShaderStageFlags::Pixel);
 		},
-		[this, debugShaderTextureId]
-		(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+		[this, debugShaderTextureId](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 		{
 			commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::EditorSelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
 			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline->GetPipeline());

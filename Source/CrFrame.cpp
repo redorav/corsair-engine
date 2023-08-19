@@ -922,26 +922,27 @@ CrSizeUnit GetGPUMemorySizeUnit(uint64_t bytes)
 void CrFrame::DrawDebugUI()
 {
 	static bool s_DemoOpen = true;
-	static bool s_ShowStats = true;
+	static bool s_ShowGeneralStatistics = true;
+	static bool s_ShowWorldInfo = true;
 	if (s_DemoOpen)
 	{
 		ImGui::ShowDemoWindow(&s_DemoOpen);
 	}
 
-	if (s_ShowStats)
+	if (s_ShowGeneralStatistics)
 	{
-		if (ImGui::Begin("Statistics", &s_ShowStats))
+		if (ImGui::Begin("Statistics", &s_ShowGeneralStatistics))
 		{
 			CrTime delta = CrFrameTime::GetFrameDelta();
-			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage(); 
+			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage();
 
 			const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
 			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, properties.graphicsApiDisplay.c_str());
 			ImGui::Text("Frame: %llu", CrFrameTime::GetFrameIndex());
-			ImGui::Text("Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
-			ImGui::Text("FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
+			ImGui::Text("CPU Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
+			ImGui::Text("CPU FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
 			ImGui::Text("Drawcalls: %d Instances: %d Vertices: %d", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetInstanceCount(), CrRenderingStatistics::GetVertexCount());
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -1012,6 +1013,20 @@ void CrFrame::DrawDebugUI()
 
 				ImGui::EndTable();
 			}
+
+			ImGui::End();
+		}
+	}
+
+	if (s_ShowWorldInfo)
+	{
+		if (ImGui::Begin("World Information", &s_ShowWorldInfo))
+		{
+			const float3& cameraPosition = m_camera->GetPosition();
+			const float3& cameraForward = m_camera->GetForwardVector();
+
+			ImGui::Text("Camera Position: (%.3f, %.3f, %.3f)", (float)cameraPosition.x, (float)cameraPosition.y, (float)cameraPosition.z);
+			ImGui::Text("Camera Forward: (%.3f, %.3f, %.3f)", (float)cameraForward.x, (float)cameraForward.y, (float)cameraForward.z);
 
 			ImGui::End();
 		}

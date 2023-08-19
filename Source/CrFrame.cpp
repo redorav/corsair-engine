@@ -343,7 +343,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	uint32_t initialValue = 65535;
 	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(cr3d::BufferUsage::Indirect | cr3d::BufferUsage::Byte | cr3d::BufferUsage::TransferSrc | cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::GPUOnlyWrite);
-	mouseSelectionBufferDescriptor.initialData = (uint8_t*) & initialValue;
+	mouseSelectionBufferDescriptor.initialData = (uint8_t*)&initialValue;
 	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
 	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
 	m_mouseSelectionBuffer = CrGPUBufferHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 1, 4));

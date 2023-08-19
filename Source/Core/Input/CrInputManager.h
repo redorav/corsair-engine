@@ -126,8 +126,10 @@ struct MouseState
 	// Whether mouse button is held down
 	CrBitset<MouseButton::Count, uint8_t> buttonHeld;
 
+	// Absolute position of mouse, in screen pixels
 	crinput::int2 position;
 
+	// Number of pixels the mouse has moved since the last time it was updated
 	crinput::int2 relativePosition;
 
 	crinput::int2 mouseWheel;

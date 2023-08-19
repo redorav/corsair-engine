@@ -40,6 +40,4 @@ private:
 	static uint64_t			m_lastUpdatedFrameCount;
 
 	static uint32_t			m_deltaHistoryIndex;
-
-	static CrArray<CrTime, 30> m_frameDeltaHistory;
 };

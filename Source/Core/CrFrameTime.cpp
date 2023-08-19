@@ -15,22 +15,22 @@ CrTime CrFrameTime::m_frameDeltaAverage;
 CrTime CrFrameTime::m_frameDeltaMin;
 CrTime CrFrameTime::m_frameDeltaMax;
 
-uint32_t			CrFrameTime::m_deltaHistoryIndex;
-CrArray<CrTime, 30> CrFrameTime::m_frameDeltaHistory;
-
 void CrFrameTime::IncrementFrameCount()
 {
 	CrTime currentTime = CrTime::Current();
 
 	if ((currentTime - m_lastUpdatedTime).AsSeconds() > 1.0f)
 	{
-		uint64_t frames = m_frameCount - m_lastUpdatedFrameCount;
-
-		CrLog("[FPS] %d [DELTA] %f ms", frames, m_frameDelta.AsMilliseconds());
-		CrPrintProcessMemory("Frame Memory");
+		//CrPrintProcessMemory("Frame Memory");
 
 		m_lastUpdatedTime = currentTime;
 		m_lastUpdatedFrameCount = m_frameCount;
+	}
+
+	// If the previous end time hasn't been initialized yet, set it to the current time
+	if (m_framePreviousEndTime.AsTicks() == 0)
+	{
+		m_framePreviousEndTime = currentTime;
 	}
 
 	m_frameDelta = currentTime - m_framePreviousEndTime;
@@ -45,18 +45,7 @@ void CrFrameTime::IncrementFrameCount()
 	m_frameCount = (m_frameCount + 1) % UINT64_MAX;
 
 	// Update average
-
-	m_frameDeltaHistory[m_deltaHistoryIndex] = m_frameDelta;
-	m_deltaHistoryIndex = (m_deltaHistoryIndex + 1) % (uint32_t)m_frameDeltaHistory.size();
-
-	m_frameDeltaAverage = CrTime();
-
-	for(uint32_t i = 0; i < m_frameDeltaHistory.size(); ++i)
-	{
-		m_frameDeltaAverage += m_frameDeltaHistory[i];
-	}
-
-	m_frameDeltaAverage /= m_frameDeltaHistory.size();
+	m_frameDeltaAverage += (m_frameDelta - m_frameDeltaAverage) / 64;
 }
 
 CrTime CrFrameTime::GetFrameDelta()

@@ -71,6 +71,8 @@ ICrRenderSystem* ICrRenderSystem::Get()
 
 void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
+	CrAssertMsg(renderSystemDescriptor.enablePIX ? renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12 : true, "PIX is only compatible with D3D12");
+
 	ICrRenderSystem* renderSystem = nullptr;
 
 	// Treat this like a factory (on PC) through the API. That way the rest of the code

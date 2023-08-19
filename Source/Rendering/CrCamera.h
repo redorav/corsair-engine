@@ -39,7 +39,11 @@ public:
 
 	void SetFilmWidth(float filmWidth);
 
+	float GetNearPlaneWidth() const;
+
 	void SetFilmHeight(float filmHeight);
+
+	float GetNearPlaneHeight() const;
 
 	void SetVerticalFieldOfView(float fovY);
 
@@ -67,11 +71,19 @@ public:
 
 	const float4x4& GetWorld2ViewMatrix() const { return m_world2ViewMatrix; }
 
+	const float3x3& GetWorld2ViewRotation() const { return reinterpret_cast<const float3x3&>(m_world2ViewMatrix); }
+
+	const float4x4& GetView2WorldMatrix() const { return m_view2WorldMatrix; }
+
+	const float3x3& GetView2WorldRotation() const { return reinterpret_cast<const float3x3&>(m_view2WorldMatrix); }
+
 	const float4x4& GetView2ProjectionMatrix() const { return m_view2ProjectionMatrix; }
 
 	const float4x4& GetWorld2ProjectionMatrix() const { return m_world2ProjectionMatrix; }
 
-	const float4x4& GetProjection2ViewMatrix() const { return m_world2ProjectionMatrix; }
+	const float4x4& GetProjection2ViewMatrix() const { return m_projection2ViewMatrix; }
+
+	const float4x4& GetProjection2WorldMatrix() const { return m_projection2WorldMatrix; }
 
 	float3 ProjectWorldSpacePosition(float3 worldSpacePosition);
 
@@ -83,9 +95,9 @@ private:
 
 	cr3d::CameraProjection m_projection;
 
-	float m_filmWidthMm;
+	float m_nearPlaneWidth;
 
-	float m_filmHeightMm;
+	float m_nearPlaneHeight;
 
 	float m_fovY;
 
@@ -119,4 +131,6 @@ private:
 	float4x4 m_view2WorldMatrix;
 
 	float4x4 m_projection2ViewMatrix;
+
+	float4x4 m_projection2WorldMatrix;
 };

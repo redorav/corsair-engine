@@ -3,6 +3,7 @@
 #include "Rendering/CrCamera.h"
 
 #include "Rendering/CrRendering.h"
+#include "Rendering/CrRendererConfig.h"
 
 #include "Math/CrMath.h"
 #include "Math/CrHlslppVectorFloat.h"
@@ -31,7 +32,7 @@ CrCamera::CrCamera(uint32_t resolutionWidth, uint32_t resolutionHeight, float ne
 	SetupPerspective(resolutionWidth, resolutionHeight, nearPlane, farPlane);
 }
 
-void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float /*farPlane*/)
+void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane)
 {
 	// Create a new perspective projection matrix. The height will stay the same while the width will vary as per aspect ratio.
 	m_aspectRatio = (float)resolutionWidth / (float)resolutionHeight;
@@ -48,7 +49,17 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 
 	m_resolutionHeight = resolutionHeight;
 
-	m_view2ProjectionMatrix = float4x4::perspective(projection(frustum::field_of_view_y(fovY * CrMath::Deg2Rad, m_aspectRatio, 100000.0f, nearPlane), zclip::zero));
+	m_nearPlane = nearPlane;
+
+	m_farPlane = farPlane;
+
+	frustum cameraFrustum = frustum::field_of_view_y(fovY * CrMath::Deg2Rad, m_aspectRatio, nearPlane, farPlane);
+
+	m_nearPlaneWidth = cameraFrustum.width();
+
+	m_nearPlaneHeight = cameraFrustum.height();
+
+	m_view2ProjectionMatrix = float4x4::perspective(projection(cameraFrustum, zclip::zero, zdirection::reverse, zplane::finite));
 
 	m_projection2ViewMatrix = inverse(m_view2ProjectionMatrix);
 }
@@ -64,6 +75,8 @@ void CrCamera::Update()
 	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
 
 	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
+
+	m_projection2WorldMatrix = mul(m_projection2ViewMatrix, m_view2WorldMatrix);
 }
 
 void CrCamera::LookAtPosition(const float3& target, const float3& up)
@@ -136,12 +149,22 @@ void CrCamera::SetPosition(const float3& p)
 
 void CrCamera::SetFilmWidth(float filmWidth)
 {
-	m_filmWidthMm = filmWidth;
+	m_nearPlaneWidth = filmWidth;
+}
+
+float CrCamera::GetNearPlaneWidth() const
+{
+	return m_nearPlaneWidth;
 }
 
 void CrCamera::SetFilmHeight(float filmHeight)
 {
-	m_filmHeightMm = filmHeight;
+	m_nearPlaneHeight = filmHeight;
+}
+
+float CrCamera::GetNearPlaneHeight() const
+{
+	return m_nearPlaneHeight;
 }
 
 void CrCamera::SetVerticalFieldOfView(float fovY)

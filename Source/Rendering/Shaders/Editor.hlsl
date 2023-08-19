@@ -112,6 +112,9 @@ VSOutputEditorGrid EditorGridVS(uint vertexId : SV_VertexID)
 	return vsOutput;
 }
 
+static const float3 WidgetBlue  = float3(100.0, 100.0, 255.0) / 255.0;
+static const float3 WidgetRed   = float3(255.0, 100.0, 100.0) / 255.0;
+
 // Shader used to render the editor grid. We procedurally create the grid via constants
 // and the grid itself will be alpha blended with the rest of the scene
 // A wonderful explanation on how to create a procedural grid: https://madebyevan.com/shaders/grid/
@@ -119,9 +122,33 @@ float4 EditorGridPS(VSOutputEditorGrid psInput) : SV_Target0
 {
 	float2 coord = psInput.worldPosition.xz / cb_EditorGrid.gridParams.y;
 	
-	float horizontalDistanceToCamera = length(cb_Camera.worldPosition.xz - psInput.worldPosition.xz);
+	float3 worldPosition = psInput.worldPosition.xyz;
+	
+	float horizontalDistanceToCamera = length(cb_Camera.worldPosition.xz - worldPosition.xz);
 	
 	float2 grid = abs(frac(coord - 0.5) - 0.5) / fwidth(coord);
+	
+	float3 color = Colors::White;
+	
+	// Tint the X axis red
+	if (abs(worldPosition.z) < 0.5)
+	{
+		if (grid.y <= grid.x)
+		{
+			color = WidgetRed;
+			grid *= 0.5;
+		}
+	}
+	
+	// Tint the Z axis blue
+	if (abs(worldPosition.x) < 0.5)
+	{
+		if (grid.x <= grid.y)
+		{
+			color = WidgetBlue;
+			grid *= 0.5;
+		}
+	}
 	
 	float gridLine = min(grid.x, grid.y);
 
@@ -134,7 +161,7 @@ float4 EditorGridPS(VSOutputEditorGrid psInput) : SV_Target0
 	// Gamma correction
 	alpha = pow(alpha, 1.0 / 2.2);
 	
-	return float4(Colors::White, alpha);
+	return float4(color, alpha);
 }
 
 Texture2D EditorInstanceIDTexture;

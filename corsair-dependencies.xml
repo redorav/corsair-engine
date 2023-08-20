@@ -10,7 +10,7 @@
 	<dependency name="rapidyaml" version="4a8fb19"/>
 	<dependency name="renderdoc" version="1.5.0"/>
 	<dependency name="sdl2" version="2.0.14"/>
-	<dependency name="spirv-reflect" version="4689b33"/>
+	<dependency name="spirv-reflect" version="4f52d7d"/>
 	<dependency name="stb" version="f54acd4"/>
 	<dependency name="vma" version="042e65e"/>
 	<dependency name="vulkan" version="1.3.250.1"/>

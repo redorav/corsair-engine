@@ -228,7 +228,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.GetPipeline());
 		commandBuffer->BindIndexBuffer(indexBuffer);
 		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
-		commandBuffer->BindSampler(cr3d::ShaderStage::Pixel, Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());
+		commandBuffer->BindSampler(Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());
 
 		// Projection matrix. TODO: this could be cached.
 		CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
@@ -236,8 +236,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		{
 			uiData->projection = ComputeProjectionMatrix(data);
 		}
-		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Vertex, uiDataBuffer);
-		commandBuffer->BindConstantBuffer(cr3d::ShaderStage::Pixel, uiDataBuffer);
+		commandBuffer->BindConstantBuffer(uiDataBuffer);
 
 		// Iterate over each draw list -> draw command: 
 		ImVec2 clipOffset = data->DisplayPos;
@@ -259,7 +258,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 				{
 					// Generic rendering.
 					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
-					commandBuffer->BindTexture(cr3d::ShaderStage::Pixel, Textures::UITexture, texture);
+					commandBuffer->BindTexture(Textures::UITexture, texture);
 					commandBuffer->SetScissor(CrRectangle(x, y, width, height));
 					commandBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
 				}

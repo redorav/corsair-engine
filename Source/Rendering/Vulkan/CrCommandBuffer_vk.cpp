@@ -137,9 +137,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	uint32_t imageCount = 0;         // Total number of images
 	uint32_t texelBufferCount = 0;   // Total number of texel buffers
 
-	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[stage][id];
+		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
@@ -160,9 +160,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
 	{
-		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[stage][id]);
+		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[id]);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
@@ -175,9 +175,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
-		const TextureBinding& textureBinding = m_currentState.m_textures[stage][id];
+		const TextureBinding& textureBinding = m_currentState.m_textures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(textureBinding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
@@ -202,9 +202,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		const RWTextureBinding& binding = m_currentState.m_rwTextures[stage][id];
+		const RWTextureBinding& binding = m_currentState.m_rwTextures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
@@ -219,9 +219,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		const StorageBufferBinding& binding = m_currentState.m_storageBuffers[stage][id];
+		const StorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
@@ -236,9 +236,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[stage][id];
+		const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 	
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
@@ -253,9 +253,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachRWDataBuffer([&](cr3d::ShaderStage::T stage, RWDataBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWDataBuffer([&](cr3d::ShaderStage::T, RWDataBuffers::T id, bindpoint_t bindPoint)
 	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[stage][id].buffer);
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[id].buffer);
 
 		bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
 

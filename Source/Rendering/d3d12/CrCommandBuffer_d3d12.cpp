@@ -505,32 +505,32 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	bindingLayout.ForEachConstantBuffer([=](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteCBV(m_currentState.m_constantBuffers[stage][id], cbvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteCBV(m_currentState.m_constantBuffers[id], cbvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachSampler([=](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
 	{
-		WriteSamplerView(m_currentState.m_samplers[stage][id], samplerTables[stage] + bindPoint * samplerDescriptorSize);
+		WriteSamplerView(m_currentState.m_samplers[id], samplerTables[stage] + bindPoint * samplerDescriptorSize);
 	});
 
 	bindingLayout.ForEachTexture([=](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([=](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		WriteRWTextureUAV(m_currentState.m_rwTextures[stage][id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachStorageBuffer([=](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteStorageBufferSRV(m_currentState.m_storageBuffers[stage][id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	bindingLayout.ForEachRWStorageBuffer([=](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[stage][id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	// Bind shader visible heaps to the command buffer
@@ -649,34 +649,34 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 	crd3d::DescriptorD3D12 uavTable     = cbv_SRV_UAV_Offset;
 	crd3d::DescriptorD3D12 samplerTable = samplerTableStart;
 
-	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteCBV(m_currentState.m_constantBuffers[stage][id], cbvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteCBV(m_currentState.m_constantBuffers[id], cbvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
-	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
 	{
-		WriteSamplerView(m_currentState.m_samplers[stage][id], samplerTable + bindPoint * samplerDescriptorSize);
+		WriteSamplerView(m_currentState.m_samplers[id], samplerTable + bindPoint * samplerDescriptorSize);
 	});
 
-	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[stage][id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
-	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		WriteRWTextureUAV(m_currentState.m_rwTextures[stage][id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
-	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteStorageBufferSRV(m_currentState.m_storageBuffers[stage][id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
-	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[stage][id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
 	});
 
 	// Bind shader visible heaps to the command buffer

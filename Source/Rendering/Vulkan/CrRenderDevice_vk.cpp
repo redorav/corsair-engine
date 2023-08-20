@@ -360,7 +360,7 @@ CrHardwareGPUBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwa
 {
 	uint32_t stagingBufferSizeBytes = sourceBuffer->GetSizeBytes();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
 	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 

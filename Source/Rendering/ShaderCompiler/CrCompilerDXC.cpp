@@ -43,6 +43,7 @@ static const wchar_t* DXCArgumentEnableDebug       = L"-Zi";
 static const wchar_t* DXCArgumentEntryPoint        = L"-E";
 static const wchar_t* DXCArgumentShaderProfile     = L"-T";
 static const wchar_t* DXCArgumentDefine            = L"-D";
+static const wchar_t* DXCArgumentAllResourcesBound = L"-all-resources-bound";
 
 const wchar_t* GetDXCShaderProfile(cr3d::ShaderStage::T shaderStage)
 {
@@ -284,6 +285,7 @@ HRESULT CrDXCCompileShader
 		DXCArgumentWarningsAsErrors, // Warnings as errors
 		DXCArgumentOptimization3, // Add full optimizations
 		DXCArgumentEnableDebug, // Add debug data (for PDBs)
+		DXCArgumentAllResourcesBound, // Assume all resources are bound correctly
 		wInputPath.c_str(),
 		DXCArgumentShaderProfile,
 		GetDXCShaderProfile(compilationDescriptor.shaderStage),

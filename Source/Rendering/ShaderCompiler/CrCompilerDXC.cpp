@@ -440,8 +440,14 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	
 		// Create platform-independent reflection data from the platform-specific reflection
 		SpvReflectShaderModule shaderModule;
-		spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &shaderModule);
+		SpvReflectResult reflectResult = spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &shaderModule);
 	
+		if (reflectResult != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			compilationStatus += "Failed shader reflection";
+			return false;
+		}
+
 		CrShaderReflectionHeader reflectionHeader;
 		reflectionHeader.entryPoint = shaderModule.entry_point_name;
 		reflectionHeader.shaderStage = compilationDescriptor.shaderStage;

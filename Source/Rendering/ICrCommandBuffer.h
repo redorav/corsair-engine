@@ -296,7 +296,6 @@ protected:
 		CrViewport                      m_viewport;
 		bool                            m_viewportDirty = true;
 
-		CrGraphicsPipelineDescriptor    m_graphicsPipelineDescriptor;
 		const ICrGraphicsPipeline*      m_graphicsPipeline;
 		bool                            m_graphicsPipelineDirty;
 
@@ -311,7 +310,7 @@ protected:
 
 		RWTextureBinding				m_rwTextures[RWTextures::Count];
 
-		StorageBufferBinding			m_storageBuffers[RWStorageBuffers::Count];
+		StorageBufferBinding			m_storageBuffers[StorageBuffers::Count];
 
 		StorageBufferBinding			m_rwStorageBuffers[RWStorageBuffers::Count];
 

@@ -41,7 +41,7 @@ struct CrCommandBufferDescriptor
 	uint32_t dynamicConstantBufferSizeBytes = 0;
 };
 
-class ICrCommandBuffer : public CrGPUDeletable
+class ICrCommandBuffer : public CrGPUAutoDeletable
 {
 public:
 

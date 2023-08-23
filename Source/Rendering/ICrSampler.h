@@ -29,7 +29,7 @@ struct CrSamplerDescriptor
 	CrFixedString128 name;
 };
 
-class ICrSampler : public CrGPUDeletable
+class ICrSampler : public CrGPUAutoDeletable
 {
 public:
 

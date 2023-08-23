@@ -4,7 +4,7 @@
 
 class ICrRenderDevice;
 
-class CrGPUDeletable : public CrIntrusivePtrInterfaceBase
+class CrGPUDeletable
 {
 public:
 
@@ -14,11 +14,20 @@ public:
 
 	virtual ~CrGPUDeletable() {}
 
+	ICrRenderDevice* m_renderDevice = nullptr;
+};
+
+class CrGPUAutoDeletable : public CrIntrusivePtrInterfaceBase, public CrGPUDeletable
+{
+public:
+
+	CrGPUAutoDeletable(ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
+
+	virtual ~CrGPUAutoDeletable() {}
+
 	template<typename T>
 	void intrusive_ptr_delete_callback()
 	{
 		CrRenderDeviceDeletionFunction(m_renderDevice, this);
 	}
-
-	ICrRenderDevice* m_renderDevice = nullptr;
 };

@@ -18,7 +18,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUDeletable(renderDevice)
+ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_name(swapchainDescriptor.name)
 	, m_imageCount(0)
 	, m_format(cr3d::DataFormat::Invalid)

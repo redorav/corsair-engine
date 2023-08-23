@@ -5,7 +5,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUDeletable(renderDevice)
+ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_usage(descriptor.usage)
 	, m_access(descriptor.access)
 	, m_dataFormat(descriptor.dataFormat)

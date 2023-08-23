@@ -27,7 +27,7 @@ struct CrSwapchainDescriptor
 	cr3d::DataFormat::T format;
 };
 
-class ICrSwapchain : public CrGPUDeletable
+class ICrSwapchain : public CrGPUAutoDeletable
 {
 public:
 

@@ -30,7 +30,7 @@ struct CrGPUQueryPoolDescriptor
 
 // Pool that contains queries of the type passed in as a template
 // The template must be one of the interfaces provided above
-class ICrGPUQueryPool : public CrGPUDeletable
+class ICrGPUQueryPool : public CrGPUAutoDeletable
 {
 public:
 

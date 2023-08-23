@@ -62,7 +62,7 @@ struct CrGPUBufferDescriptor
 // to allocate a relatively big buffer and suballocate from there, it is not intended to
 // be created other than by lower level systems. From there one can reserve an offset and
 // a size, and APIs can bind appropriately
-class ICrHardwareGPUBuffer : public CrGPUDeletable
+class ICrHardwareGPUBuffer : public CrGPUAutoDeletable
 {
 public:
 

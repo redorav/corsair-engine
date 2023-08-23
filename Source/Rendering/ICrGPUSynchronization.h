@@ -12,11 +12,11 @@
 // e.g. GPU signals and CPU waits
 // Vulkan: vkFence
 // D3D12: ID3D12Fence
-class ICrGPUFence : public CrGPUDeletable
+class ICrGPUFence : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGPUFence(ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
+	ICrGPUFence(ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
 
 	virtual ~ICrGPUFence() {}
 };
@@ -27,11 +27,11 @@ public:
 // e.g. Graphics queue signals, graphics queue receives
 // Vulkan: vkSemaphore
 // D3D12: ID3D12Fence
-class ICrGPUSemaphore : public CrGPUDeletable
+class ICrGPUSemaphore : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGPUSemaphore(ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
+	ICrGPUSemaphore(ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
 
 	virtual ~ICrGPUSemaphore() {}
 };

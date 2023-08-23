@@ -176,7 +176,7 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-class ICrGraphicsPipeline : public CrGPUDeletable
+class ICrGraphicsPipeline : public CrGPUAutoDeletable
 {
 public:
 
@@ -195,7 +195,7 @@ private:
 	uint32_t m_usedVertexStreamCount = 0;
 };
 
-class ICrComputePipeline : public CrGPUDeletable
+class ICrComputePipeline : public CrGPUAutoDeletable
 {
 public:
 
@@ -208,7 +208,4 @@ public:
 private:
 
 	CrComputeShaderHandle m_shader;
-
-	// We keep a pointer to the hardware pipeline to allow us to recompile
-	//ICrHardwareComputePipeline* m_hardwarePipeline;
 };

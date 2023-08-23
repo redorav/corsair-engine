@@ -34,7 +34,7 @@ struct CrTextureDescriptor
 	const char* name;
 };
 
-class ICrTexture : public CrGPUDeletable
+class ICrTexture : public CrGPUAutoDeletable
 {
 public:
 

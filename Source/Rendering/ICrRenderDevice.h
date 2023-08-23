@@ -101,7 +101,6 @@ struct CrBufferUpload
 class CrGPUDeletionQueue;
 class CrGPUTransferCallbackQueue;
 class CrGPUDeletable;
-typedef CrFixedFunction<4, void(CrGPUDeletable*)> CrGPUDeletionCallbackType;
 
 struct CrRenderDeviceDescriptor
 {

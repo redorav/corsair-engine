@@ -5,7 +5,7 @@
 
 #include "Math/CrMath.h"
 
-ICrGPUQueryPool::ICrGPUQueryPool(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : CrGPUDeletable(renderDevice)
+ICrGPUQueryPool::ICrGPUQueryPool(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 , m_descriptor(descriptor)
 , m_resolved(false)
 , m_querySize(0) // Gets calculated by each platform

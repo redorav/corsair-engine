@@ -21,6 +21,10 @@
 #include "Rendering/CrGPUDeletionQueue.h"
 #include "Rendering/CrGPUTransferCallbackQueue.h"
 
+#if !defined(CR_CONFIG_FINAL)
+#define RENDER_DEVICE_LOGS
+#endif
+
 CrTextureUpload::~CrTextureUpload() {}
 
 CrBufferUpload::~CrBufferUpload() {}
@@ -159,6 +163,8 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	// Print out a message that includes meaningful information
 	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 	
+#if defined(RENDER_DEVICE_LOGS)
+
 	// Add entry point names
 	CrFixedString128 entryPoints("(");
 	entryPoints.append(bytecodes[0]->GetEntryPoint().c_str());
@@ -176,6 +182,8 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 
 	CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
 
+#endif
+
 	return pipeline;
 }
 
@@ -185,11 +193,15 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeSh
 
 	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
 
+#if defined(RENDER_DEVICE_LOGS)
+
 	CrFixedString128 entryPoint("(");
 	entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
 	entryPoint.append(")");
 
 	CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+
+#endif
 
 	return computePipeline;
 }

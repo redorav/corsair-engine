@@ -582,7 +582,7 @@ void CrFrame::Process()
 		DynamicLightCB* lightData = lightConstantBuffer.GetData();
 		{
 			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
-			lightData->radiance = float4(1.0f, 1.0f, 1.0f, 0.0f);
+			lightData->colorIntensity = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 
 		commandBuffer->BindConstantBuffer(lightConstantBuffer);

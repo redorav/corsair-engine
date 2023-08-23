@@ -5,10 +5,10 @@
 
 CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 (
-	const CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
+	CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
-	: ICrGraphicsPipeline(graphicsShader, vertexDescriptor)
+	: ICrGraphicsPipeline(vulkanRenderDevice, graphicsShader, vertexDescriptor)
 {
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -329,8 +329,8 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
 
-CrComputePipelineVulkan::CrComputePipelineVulkan(const CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
-	: ICrComputePipeline(computeShader)
+CrComputePipelineVulkan::CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
+	: ICrComputePipeline(vulkanRenderDevice, computeShader)
 {
 	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader.get());
 

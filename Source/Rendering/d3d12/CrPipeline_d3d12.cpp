@@ -7,10 +7,10 @@
 
 CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 (
-	const CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
+	CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
-	: ICrGraphicsPipeline(graphicsShader, vertexDescriptor)
+	: ICrGraphicsPipeline(d3d12RenderDevice, graphicsShader, vertexDescriptor)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
@@ -190,8 +190,8 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
 }
 
-CrComputePipelineD3D12::CrComputePipelineD3D12(const CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
-	: ICrComputePipeline(computeShader)
+CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
+	: ICrComputePipeline(d3d12RenderDevice, computeShader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 	d3d12PipelineStateDescriptor.NodeMask = 0;

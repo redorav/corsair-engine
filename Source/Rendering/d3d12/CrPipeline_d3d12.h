@@ -10,7 +10,7 @@ public:
 
 	CrGraphicsPipelineD3D12
 	(
-		const CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
+		CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
@@ -33,7 +33,7 @@ class CrComputePipelineD3D12 final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineD3D12(const CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
 
 	ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState; }
 

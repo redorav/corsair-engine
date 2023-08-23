@@ -3,6 +3,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrDataFormats.h"
+#include "Rendering/CrGPUDeletable.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/CrHash.h"
@@ -175,11 +176,11 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-class ICrGraphicsPipeline : public CrIntrusivePtrInterface
+class ICrGraphicsPipeline : public CrGPUDeletable
 {
 public:
 
-	ICrGraphicsPipeline(const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	virtual ~ICrGraphicsPipeline();
 
@@ -194,11 +195,11 @@ private:
 	uint32_t m_usedVertexStreamCount = 0;
 };
 
-class ICrComputePipeline : public CrIntrusivePtrInterface
+class ICrComputePipeline : public CrGPUDeletable
 {
 public:
 
-	ICrComputePipeline(const CrComputeShaderHandle& computeShader);
+	ICrComputePipeline(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader);
 
 	virtual ~ICrComputePipeline();
 
@@ -207,4 +208,7 @@ public:
 private:
 
 	CrComputeShaderHandle m_shader;
+
+	// We keep a pointer to the hardware pipeline to allow us to recompile
+	//ICrHardwareComputePipeline* m_hardwarePipeline;
 };

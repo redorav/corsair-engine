@@ -10,7 +10,7 @@ public:
 
 	CrGraphicsPipelineVulkan
 	(
-		const CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
+		CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
@@ -31,7 +31,7 @@ class CrComputePipelineVulkan final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineVulkan(const CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
 
 	VkPipeline GetVkPipeline() const { return m_vkPipeline; }
 

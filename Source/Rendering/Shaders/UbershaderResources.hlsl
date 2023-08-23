@@ -1,5 +1,5 @@
-#ifndef UBERSHADER_HLSL
-#define UBERSHADER_HLSL
+#ifndef UBERSHADER_RESOURCES_HLSL
+#define UBERSHADER_RESOURCES_HLSL
 
 Texture2D DiffuseTexture0;
 Texture2D NormalTexture0;

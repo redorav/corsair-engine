@@ -61,9 +61,9 @@ const ICrDebug* GetDebug();
 
 #if defined(CR_CONFIG_FINAL)
 
-#define CrAssertMsg(condition, message, ...)
+#define CrAssertMsg(condition, message, ...) (void)(condition)
 
-#define CrAssert(condition)
+#define CrAssert(condition) (void)(condition)
 
 #define CrPrintProcessMemory(message, ...)
 

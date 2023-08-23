@@ -29,12 +29,13 @@ Surface DecodeGBufferSurface(uint2 pixelCoords)
 {
 	GBuffer gBuffer = ReadGBuffer(pixelCoords);
 
-	Surface surface = (Surface)0;
+	Surface surface = CreateDefaultSurface();
 	
-	surface.albedoSRGB       = gBuffer.albedoAO.rgb;
-	surface.albedoLinear     = surface.albedoSRGB * surface.albedoSRGB;
-	surface.pixelNormalWorld = gBuffer.worldNormalRoughness.xyz * 2.0 - 1.0;
-	surface.roughness        = gBuffer.worldNormalRoughness.a;
+	surface.diffuseAlbedoSRGB   = gBuffer.albedoAO.rgb;
+	surface.diffuseAlbedoLinear = surface.diffuseAlbedoSRGB * surface.diffuseAlbedoSRGB;
+	surface.pixelNormalWorld    = gBuffer.worldNormalRoughness.xyz * 2.0 - 1.0;
+	surface.roughness           = gBuffer.worldNormalRoughness.a;
+	surface.alpha               = surface.roughness * surface.roughness;
 	
 	return surface;
 }

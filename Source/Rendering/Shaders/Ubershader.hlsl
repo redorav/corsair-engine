@@ -3,7 +3,7 @@
 
 #include "UbershaderResources.hlsl"
 #include "Common.hlsl"
-#include "Brdf.hlsl"
+#include "BSDF.hlsl"
 #include "Surface.hlsl"
 
 struct UbershaderPixelOutput
@@ -80,12 +80,12 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	surface.pixelNormalTangent = normal0.xyz * 2.0 - 1.0;
 	surface.pixelNormalWorld = mul(surface.pixelNormalTangent, tbn);
 
-	surface.albedoSRGB = diffuse0.rgb;
-	surface.albedoLinear = surface.albedoSRGB * surface.albedoSRGB;
+	surface.diffuseAlbedoSRGB = diffuse0.rgb;
+	surface.diffuseAlbedoLinear = surface.diffuseAlbedoSRGB * surface.diffuseAlbedoSRGB;
 
 #endif
 
-    float3 litSurface = surface.albedoSRGB.xyz * psInput.color.rgb;
+    float3 litSurface = surface.diffuseAlbedoSRGB.xyz * psInput.color.rgb;
 
 #if defined(EMaterialShaderVariant_Debug)
 
@@ -107,7 +107,7 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	pixelOutput.finalTarget = float4(litSurface, cb_Color.tint.a);
 
 #elif defined(EMaterialShaderVariant_GBuffer)
-	pixelOutput.albedoTarget  = float4(surface.albedoSRGB, 1.0);
+	pixelOutput.albedoTarget  = float4(surface.diffuseAlbedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 #else

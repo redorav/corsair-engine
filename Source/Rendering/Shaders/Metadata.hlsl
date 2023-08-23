@@ -1,4 +1,4 @@
-#include "Brdf.hlsl"
+#include "BSDF.hlsl"
 #include "Common.hlsl"
 #include "Compute.hlsl"
 #include "CopyTexture.hlsl"

@@ -39,6 +39,8 @@ struct Camera
 	row_major float4x4 view2Projection;
 	row_major float4x4 world2View;
 	float4 projectionParams; // Use to linearize depth
+	float4 screenResolution; // Resolution of final screen
+	float4 worldPosition; // Position of the camera in world space
 };
 
 cbuffer Camera
@@ -108,7 +110,7 @@ RWByteAddressBuffer ExampleRWByteBuffer;
 struct DynamicLightCB
 {
 	float4 positionRadius;
-	float4 radiance;
+	float4 colorIntensity;
 };
 
 cbuffer DynamicLightCB
@@ -116,10 +118,19 @@ cbuffer DynamicLightCB
 	DynamicLightCB cb_DynamicLight;
 };
 
+static const float pi = 3.14159265359;
+
 float min3(float a, float b, float c) { return min(min(a, b), c); }
 float min4(float a, float b, float c, float d) { return min(min3(a, b, c), d); }
 
 float max3(float a, float b, float c) { return max(a, max(b, c)); }
 float max4(float a, float b, float c, float d) { return max(max3(a, b, c), d); }
+
+float pow3(float x) { return x * x * x; }
+float pow4(float x) { return x * x * x * x; }
+float pow5(float x) { return x * x * x * x * x; }
+float pow6(float x) { return x * x * x * x * x * x; }
+float pow7(float x) { return x * x * x * x * x * x * x; }
+float pow8(float x) { return x * x * x * x * x * x * x * x; }
 
 #endif

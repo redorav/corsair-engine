@@ -11,12 +11,18 @@ struct Surface
 	float3 pixelNormalTangent;
 
 	float3 pixelNormalWorld;
+	
+	float rawDepth;
+	float linearDepth;
+	
+	float3 viewWorld;
 
 	// Material Properties
-	float3 albedoSRGB;
-	float3 albedoLinear;
+	float3 diffuseAlbedoSRGB;
+	float3 diffuseAlbedoLinear;
 
 	float roughness;
+	float alpha;
 	float3 F0;
 };
 
@@ -30,10 +36,13 @@ Surface CreateDefaultSurface()
 	surface.pixelNormalTangent   = float3(0, 0, 1);
 	surface.pixelNormalWorld     = float3(0, 1, 0);
 
-	surface.albedoSRGB = surface.albedoLinear = 1.0;
+	surface.diffuseAlbedoSRGB = surface.diffuseAlbedoLinear = 1.0;
 
 	surface.roughness = 1.0;
 	surface.F0 = 0.02;
+
+	surface.rawDepth = 0.0;
+	surface.linearDepth = 0.0;
 
 	return surface;
 }

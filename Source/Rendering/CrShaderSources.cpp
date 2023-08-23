@@ -30,7 +30,7 @@ void CrShaderSources::Initialize()
 	// Perhaps more flexible in a text file
 	static const CrHashSet<CrString> UbershaderFiles =
 	{
-		"Brdf.hlsl",
+		"BSDF.hlsl",
 		"Common.hlsl",
 		"Surface.hlsl",
 		UbershaderEntryFile,

@@ -170,7 +170,8 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	}
 	else
 	{
-		CrArray<char, 2048> processOutput;
+		CrString processOutput;
+		processOutput.resize_uninitialized(2048);
 		process.ReadStdOut(processOutput.data(), processOutput.size());
 		CrAssertMsg(false, "%s", processOutput.data());
 

@@ -10,6 +10,11 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 )
 	: ICrGraphicsPipeline(vulkanRenderDevice, graphicsShader, vertexDescriptor)
 {
+	Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
+}
+
+void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+{
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.pNext = nullptr;
@@ -18,12 +23,12 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	inputAssemblyState.primitiveRestartEnable = false;
 
 	VkPipelineRasterizationStateCreateInfo rasterizerState = {};
-	rasterizerState.sType            = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-	rasterizerState.pNext            = nullptr;
-	rasterizerState.flags            = 0;
-	rasterizerState.polygonMode      = crvk::GetVkPolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
-	rasterizerState.cullMode         = crvk::GetVkPolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
-	rasterizerState.frontFace        = crvk::GetVkFrontFace(pipelineDescriptor.rasterizerState.frontFace);
+	rasterizerState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizerState.pNext = nullptr;
+	rasterizerState.flags = 0;
+	rasterizerState.polygonMode = crvk::GetVkPolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
+	rasterizerState.cullMode = crvk::GetVkPolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
+	rasterizerState.frontFace = crvk::GetVkFrontFace(pipelineDescriptor.rasterizerState.frontFace);
 
 	// Depth clamp is the opposite of depth clip. See discussion here https://github.com/gpuweb/gpuweb/issues/2100
 	rasterizerState.depthClampEnable = !pipelineDescriptor.rasterizerState.depthClipEnable;
@@ -34,11 +39,11 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	//rasterizerState.depthBiasEnable = false;
 
 	VkPipelineColorBlendStateCreateInfo colorBlendState;
-	colorBlendState.sType         = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	colorBlendState.pNext         = nullptr;
-	colorBlendState.flags         = 0;
+	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlendState.pNext = nullptr;
+	colorBlendState.flags = 0;
 	colorBlendState.logicOpEnable = false;
-	colorBlendState.logicOp       = VK_LOGIC_OP_NO_OP;
+	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
 	CrFixedVector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments;
 	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
@@ -49,13 +54,13 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		if (renderTarget.colorFormats[i] != cr3d::DataFormat::Invalid)
 		{
 			VkPipelineColorBlendAttachmentState& blendAttachment = blendAttachments.push_back();
-			blendAttachment.colorWriteMask      = renderTargetBlend.colorWriteMask;
-			blendAttachment.blendEnable         = renderTargetBlend.enable;
-			blendAttachment.colorBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
+			blendAttachment.colorWriteMask = renderTargetBlend.colorWriteMask;
+			blendAttachment.blendEnable = renderTargetBlend.enable;
+			blendAttachment.colorBlendOp = crvk::GetVkBlendOp(renderTargetBlend.colorBlendOp);
 			blendAttachment.dstColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstColorBlendFactor);
 			blendAttachment.srcColorBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcColorBlendFactor);
 
-			blendAttachment.alphaBlendOp        = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
+			blendAttachment.alphaBlendOp = crvk::GetVkBlendOp(renderTargetBlend.alphaBlendOp);
 			blendAttachment.dstAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.dstAlphaBlendFactor);
 			blendAttachment.srcAlphaBlendFactor = crvk::GetVkBlendFactor(renderTargetBlend.srcAlphaBlendFactor);
 		}
@@ -74,15 +79,15 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 
 	// Multi sampling state
 	VkPipelineMultisampleStateCreateInfo multisampleState;
-	multisampleState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	multisampleState.pNext                 = nullptr;
-	multisampleState.flags                 = 0;
-	multisampleState.rasterizationSamples  = crvk::GetVkSampleCount(pipelineDescriptor.sampleCount);
-	multisampleState.sampleShadingEnable   = false;
-	multisampleState.minSampleShading      = 0.0f;
-	multisampleState.pSampleMask           = nullptr;
+	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisampleState.pNext = nullptr;
+	multisampleState.flags = 0;
+	multisampleState.rasterizationSamples = crvk::GetVkSampleCount(pipelineDescriptor.sampleCount);
+	multisampleState.sampleShadingEnable = false;
+	multisampleState.minSampleShading = 0.0f;
+	multisampleState.pSampleMask = nullptr;
 	multisampleState.alphaToCoverageEnable = false;
-	multisampleState.alphaToOneEnable      = false;
+	multisampleState.alphaToOneEnable = false;
 
 	// Depth stencil state
 	VkPipelineDepthStencilStateCreateInfo depthStencilState;
@@ -91,42 +96,42 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	depthStencilState.flags = 0;
 
 	// Depth
-	depthStencilState.depthTestEnable       = pipelineDescriptor.depthStencilState.depthTestEnable;
-	depthStencilState.depthWriteEnable      = pipelineDescriptor.depthStencilState.depthWriteEnable;
-	depthStencilState.depthCompareOp        = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.depthCompareOp);
+	depthStencilState.depthTestEnable = pipelineDescriptor.depthStencilState.depthTestEnable;
+	depthStencilState.depthWriteEnable = pipelineDescriptor.depthStencilState.depthWriteEnable;
+	depthStencilState.depthCompareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.depthCompareOp);
 	depthStencilState.depthBoundsTestEnable = pipelineDescriptor.depthStencilState.depthBoundsTestEnable;
 
 	// Stencil
 	depthStencilState.stencilTestEnable = pipelineDescriptor.depthStencilState.stencilTestEnable;
 
 	depthStencilState.front.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontDepthFailOp);
-	depthStencilState.front.failOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilFailOp);
-	depthStencilState.front.passOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilPassOp);
-	depthStencilState.front.compareOp   = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.frontStencilCompareOp);
+	depthStencilState.front.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilFailOp);
+	depthStencilState.front.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.frontStencilPassOp);
+	depthStencilState.front.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.frontStencilCompareOp);
 	depthStencilState.front.compareMask = pipelineDescriptor.depthStencilState.stencilReadMask;
-	depthStencilState.front.writeMask   = pipelineDescriptor.depthStencilState.stencilWriteMask;
-	depthStencilState.front.reference   = pipelineDescriptor.depthStencilState.reference;
+	depthStencilState.front.writeMask = pipelineDescriptor.depthStencilState.stencilWriteMask;
+	depthStencilState.front.reference = pipelineDescriptor.depthStencilState.reference;
 
 	depthStencilState.back.depthFailOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backDepthFailOp);
-	depthStencilState.back.failOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilFailOp);
-	depthStencilState.back.passOp      = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilPassOp);
-	depthStencilState.back.compareOp   = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.backStencilCompareOp);
+	depthStencilState.back.failOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilFailOp);
+	depthStencilState.back.passOp = crvk::GetVkStencilOp(pipelineDescriptor.depthStencilState.backStencilPassOp);
+	depthStencilState.back.compareOp = crvk::GetVkCompareOp(pipelineDescriptor.depthStencilState.backStencilCompareOp);
 	depthStencilState.back.compareMask = pipelineDescriptor.depthStencilState.stencilReadMask;
-	depthStencilState.back.writeMask   = pipelineDescriptor.depthStencilState.stencilWriteMask;
-	depthStencilState.back.reference   = pipelineDescriptor.depthStencilState.reference;
+	depthStencilState.back.writeMask = pipelineDescriptor.depthStencilState.stencilWriteMask;
+	depthStencilState.back.reference = pipelineDescriptor.depthStencilState.reference;
 
 	depthStencilState.minDepthBounds = 0.0f;
 	depthStencilState.maxDepthBounds = 1.0f;
 
 	// Viewport state
 	VkPipelineViewportStateCreateInfo viewportState;
-	viewportState.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	viewportState.pNext         = nullptr;
-	viewportState.flags         = 0;
+	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.pNext = nullptr;
+	viewportState.flags = 0;
 	viewportState.viewportCount = 1; // One viewport
-	viewportState.pViewports    = nullptr;
-	viewportState.scissorCount  = 1; // One scissor rectangle
-	viewportState.pScissors     = nullptr;
+	viewportState.pViewports = nullptr;
+	viewportState.scissorCount = 1; // One scissor rectangle
+	viewportState.pScissors = nullptr;
 
 	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines
 	// just for changing a viewport's dimensions or a scissor box
@@ -139,10 +144,10 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	};
 
 	VkPipelineDynamicStateCreateInfo dynamicState;
-	dynamicState.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicState.pNext             = nullptr;
-	dynamicState.flags             = 0;
-	dynamicState.pDynamicStates    = dynamicStateEnables.data();
+	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicState.pNext = nullptr;
+	dynamicState.flags = 0;
+	dynamicState.pDynamicStates = dynamicStateEnables.data();
 	dynamicState.dynamicStateCount = (uint32_t)dynamicStateEnables.size();
 
 	VkResult vkResult;
@@ -175,13 +180,13 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 
 	// Pipeline Resource Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
-	pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCreateInfo.pNext                  = nullptr;
-	pipelineLayoutCreateInfo.flags                  = 0;
-	pipelineLayoutCreateInfo.setLayoutCount         = 1; // TODO Handle when we have more than one layout
-	pipelineLayoutCreateInfo.pSetLayouts            = descriptorSetLayouts;
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCreateInfo.pNext = nullptr;
+	pipelineLayoutCreateInfo.flags = 0;
+	pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Handle when we have more than one layout
+	pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
-	pipelineLayoutCreateInfo.pPushConstantRanges    = nullptr;
+	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 	// TODO Push constants? Need to be part of the psoDescriptor?
 
 	vkResult = vkCreatePipelineLayout(vulkanRenderDevice->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &m_vkPipelineLayout);
@@ -223,13 +228,13 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 
 	// Assign to vertex buffer
 	VkPipelineVertexInputStateCreateInfo vertexInputState;
-	vertexInputState.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputState.pNext                           = nullptr;
-	vertexInputState.flags                           = 0;
-	vertexInputState.vertexBindingDescriptionCount   = vertexStreamCount;
-	vertexInputState.pVertexBindingDescriptions      = bindingDescriptions.data();
+	vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputState.pNext = nullptr;
+	vertexInputState.flags = 0;
+	vertexInputState.vertexBindingDescriptionCount = vertexStreamCount;
+	vertexInputState.pVertexBindingDescriptions = bindingDescriptions.data();
 	vertexInputState.vertexAttributeDescriptionCount = attributeCount;
-	vertexInputState.pVertexAttributeDescriptions    = attributeDescriptions.data();
+	vertexInputState.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	// We don't need the real renderpass here to create pipeline state objects, a compatible one is enough
 	// to make it work. I suspect the only thing it really needs is the description of how we're going to
@@ -251,11 +256,11 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		{
 			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 			VkAttachmentDescription attachmentDescription = {};
-			attachmentDescription.flags         = 0;
-			attachmentDescription.format        = crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
-			attachmentDescription.samples       = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
-			attachmentDescription.finalLayout   = VK_IMAGE_LAYOUT_GENERAL;
-			attachmentDescription.loadOp        = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescription.flags = 0;
+			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
+			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
+			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachments.push_back(attachmentDescription);
 		}
@@ -264,11 +269,11 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		{
 			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 			VkAttachmentDescription attachmentDescription = {};
-			attachmentDescription.flags         = 0;
-			attachmentDescription.format        = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
-			attachmentDescription.samples       = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
-			attachmentDescription.finalLayout   = VK_IMAGE_LAYOUT_GENERAL;
-			attachmentDescription.loadOp        = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescription.flags = 0;
+			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
+			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
+			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
+			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachments.push_back(attachmentDescription);
 			numDepthAttachments = 1;
@@ -277,28 +282,28 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 		// All render passes need at least one subpass to work.
 		// By defining a subpass dependency as external on both sides, we get the simplest render pass
 		VkSubpassDescription subpassDescription;
-		subpassDescription.flags                   = 0;
-		subpassDescription.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount    = 0;
-		subpassDescription.pInputAttachments       = nullptr;
-		subpassDescription.colorAttachmentCount    = numColorAttachments;
-		subpassDescription.pColorAttachments       = colorReferences.data();
-		subpassDescription.pResolveAttachments     = nullptr;
+		subpassDescription.flags = 0;
+		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassDescription.inputAttachmentCount = 0;
+		subpassDescription.pInputAttachments = nullptr;
+		subpassDescription.colorAttachmentCount = numColorAttachments;
+		subpassDescription.pColorAttachments = colorReferences.data();
+		subpassDescription.pResolveAttachments = nullptr;
 		subpassDescription.pDepthStencilAttachment = numDepthAttachments > 0 ? &depthReference : nullptr;
 		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments    = nullptr;
+		subpassDescription.pPreserveAttachments = nullptr;
 
 		// Create the renderpass
 		VkRenderPassCreateInfo renderPassInfo;
-		renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.pNext           = nullptr;
-		renderPassInfo.flags           = 0;
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.pNext = nullptr;
+		renderPassInfo.flags = 0;
 		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
-		renderPassInfo.pAttachments    = attachments.data();
-		renderPassInfo.subpassCount    = 1;
-		renderPassInfo.pSubpasses      = &subpassDescription;
+		renderPassInfo.pAttachments = attachments.data();
+		renderPassInfo.subpassCount = 1;
+		renderPassInfo.pSubpasses = &subpassDescription;
 		renderPassInfo.dependencyCount = 0;
-		renderPassInfo.pDependencies   = nullptr;
+		renderPassInfo.pDependencies = nullptr;
 
 		vkResult = vkCreateRenderPass(vulkanRenderDevice->GetVkDevice(), &renderPassInfo, nullptr, &vkCompatibleRenderPass);
 		CrAssert(vkResult == VK_SUCCESS);
@@ -331,16 +336,25 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 
 CrGraphicsPipelineVulkan::~CrGraphicsPipelineVulkan()
 {
+	Deinitialize();
+}
+
+void CrGraphicsPipelineVulkan::Deinitialize()
+{
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
-	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
-	vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
+	vkDestroyPipeline(vulkanRenderDevice->GetVkDevice(), m_vkPipeline, nullptr);
 
-	vkDestroyPipelineLayout(vkDevice, m_vkPipelineLayout, nullptr);
+	vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
 }
 
 CrComputePipelineVulkan::CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(vulkanRenderDevice, computeShader)
+{
+	Initialize(vulkanRenderDevice, computeShader);
+}
+
+void CrComputePipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
 {
 	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader.get());
 
@@ -381,8 +395,30 @@ CrComputePipelineVulkan::CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRen
 
 CrComputePipelineVulkan::~CrComputePipelineVulkan()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
-	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
-
-	vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
+	Deinitialize();
 }
+
+void CrComputePipelineVulkan::Deinitialize()
+{
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+
+	vkDestroyPipeline(vulkanRenderDevice->GetVkDevice(), m_vkPipeline, nullptr);
+
+	vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
+}
+
+#if !defined(CR_CONFIG_FINAL)
+
+void CrGraphicsPipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+{
+	Deinitialize();
+	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), pipelineDescriptor, graphicsShader, vertexDescriptor);
+}
+
+void CrComputePipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+{
+	Deinitialize();
+	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), computeShader);
+}
+
+#endif

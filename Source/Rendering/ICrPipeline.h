@@ -193,6 +193,16 @@ private:
 	CrGraphicsShaderHandle m_shader;
 	
 	uint32_t m_usedVertexStreamCount = 0;
+
+#if !defined(CR_CONFIG_FINAL)
+
+public:
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+
+	CrGraphicsPipelineDescriptor m_pipelineDescriptor;
+
+#endif
 };
 
 class ICrComputePipeline : public CrGPUAutoDeletable
@@ -204,6 +214,12 @@ public:
 	virtual ~ICrComputePipeline();
 
 	const CrComputeShaderHandle& GetShader() const { return m_shader; }
+
+#if !defined(CR_CONFIG_FINAL)
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
+
+#endif
 
 private:
 

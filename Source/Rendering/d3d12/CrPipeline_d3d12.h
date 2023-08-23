@@ -22,7 +22,17 @@ public:
 
 	D3D12_PRIMITIVE_TOPOLOGY GetD3D12PrimitiveTopologyType() const { return m_d3d12PrimitiveTopology; }
 
+#if !defined(CR_CONFIG_FINAL)
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+
+#endif
+
 private:
+
+	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+
+	void Deinitialize();
 
 	D3D12_PRIMITIVE_TOPOLOGY m_d3d12PrimitiveTopology;
 
@@ -43,7 +53,17 @@ public:
 
 	ID3D12RootSignature* GetD3D12RootSignature() const { return m_d3d12RootSignature; }
 
+#if !defined(CR_CONFIG_FINAL)
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
+
+#endif
+
 private:
+
+	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+
+	void Deinitialize();
 
 	ID3D12RootSignature* m_d3d12RootSignature;
 

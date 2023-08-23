@@ -20,7 +20,17 @@ public:
 
 	VkPipelineLayout GetVkPipelineLayout() const { return m_vkPipelineLayout; }
 
+#if !defined(CR_CONFIG_FINAL)
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+
+#endif
+
 private:
+
+	void Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+
+	void Deinitialize();
 
 	// Describes the resource binding layout for this pipeline
 	// This is later used to bind the descriptor sets
@@ -41,7 +51,17 @@ public:
 
 	VkPipelineLayout GetVkPipelineLayout() const { return m_vkPipelineLayout; }
 
+#if !defined(CR_CONFIG_FINAL)
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
+
+#endif
+
 private:
+
+	void Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+
+	void Deinitialize();
 
 	VkPipelineLayout m_vkPipelineLayout;
 

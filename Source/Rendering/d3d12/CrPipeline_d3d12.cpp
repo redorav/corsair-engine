@@ -12,6 +12,11 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 )
 	: ICrGraphicsPipeline(d3d12RenderDevice, graphicsShader, vertexDescriptor)
 {
+	Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
+}
+
+void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+{
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
 	d3d12PipelineStateDescriptor.SampleMask = 0xffffffff;
@@ -192,11 +197,21 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 
 CrGraphicsPipelineD3D12::~CrGraphicsPipelineD3D12()
 {
+	Deinitialize();
+}
+
+void CrGraphicsPipelineD3D12::Deinitialize()
+{
 	m_d3d12PipelineState->Release();
 }
 
 CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(d3d12RenderDevice, computeShader)
+{
+	Initialize(d3d12RenderDevice, computeShader);
+}
+
+void CrComputePipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 	d3d12PipelineStateDescriptor.NodeMask = 0;
@@ -204,7 +219,7 @@ CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderD
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
 	const CrShaderBytecodeHandle& bytecode = computeShader->GetBytecode();
-	d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size()};
+	d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() };
 
 	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12ComputeRootSignature();
 
@@ -214,5 +229,26 @@ CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderD
 
 CrComputePipelineD3D12::~CrComputePipelineD3D12()
 {
+	Deinitialize();
+}
+
+void CrComputePipelineD3D12::Deinitialize()
+{
 	m_d3d12PipelineState->Release();
 }
+
+#if !defined(CR_CONFIG_FINAL)
+
+void CrGraphicsPipelineD3D12::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+{
+	Deinitialize();
+	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), pipelineDescriptor, graphicsShader, vertexDescriptor);
+}
+
+void CrComputePipelineD3D12::Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+{
+	Deinitialize();
+	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), computeShader);
+}
+
+#endif

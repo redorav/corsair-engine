@@ -86,13 +86,6 @@ SamplerState AllPointWrapSampler;
 SamplerState AllLinearWrapSampler;
 SamplerState AllAnisotropicWrapSampler;
 
-Texture2D DiffuseTexture0;
-Texture2D NormalTexture0;
-Texture2D SpecularTexture0;
-Texture2D EmissiveTexture0;
-Texture2D DisplacementTexture0; 
-Texture2D DisplacementTexture3;
-
 RWTexture1D<float4> RWTexture_1;
 RWTexture2D<float4> RWTexture_2;
 RWTexture3D<float4> RWTexture_3;

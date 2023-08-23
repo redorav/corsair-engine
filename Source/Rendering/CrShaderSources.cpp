@@ -66,11 +66,11 @@ void CrShaderSources::Initialize()
 				{
 					if (!line.empty())
 					{
-						CrStringUtilities::EraseAll(line, ' ');
-						CrStringUtilities::EraseAll(line, '\t');
-						CrStringUtilities::EraseAll(line, '\r');
-						CrStringUtilities::EraseAll(line, '\n');
-
+						line.erase_all(' ');
+						line.erase_all('\t');
+						line.erase_all('\r');
+						line.erase_all('\n');
+						
 						// Check empty again after we've removed everything
 						if (!line.empty())
 						{

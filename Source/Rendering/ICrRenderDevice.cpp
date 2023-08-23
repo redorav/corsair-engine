@@ -160,10 +160,10 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 
 	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
+#if defined(RENDER_DEVICE_LOGS)
+	
 	// Print out a message that includes meaningful information
 	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
-	
-#if defined(RENDER_DEVICE_LOGS)
 
 	// Add entry point names
 	CrFixedString128 entryPoints("(");

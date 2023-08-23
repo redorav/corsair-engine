@@ -8,7 +8,9 @@
 #include "Editor.hlsl"
 
 // Never include Ubershader.hlsl. It depends on defines that aren't present during metadata generation
+// Instead we include UbershaderResources which has all the type information without the actual shader
 // #include "Ubershader.hlsl"
+#include "UbershaderResources.hlsl"
 
 float4 metadata() : SV_Target0
 {	

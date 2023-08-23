@@ -1,6 +1,7 @@
 #ifndef UBERSHADER_HLSL
 #define UBERSHADER_HLSL
 
+#include "UbershaderResources.hlsl"
 #include "Common.hlsl"
 #include "Brdf.hlsl"
 #include "Surface.hlsl"

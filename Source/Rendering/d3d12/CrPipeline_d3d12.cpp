@@ -10,7 +10,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
-	: ICrGraphicsPipeline(d3d12RenderDevice, graphicsShader, vertexDescriptor)
+	: ICrGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 {
 	Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
@@ -239,10 +239,10 @@ void CrComputePipelineD3D12::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineD3D12::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrGraphicsPipelineD3D12::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
-	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), pipelineDescriptor, graphicsShader, vertexDescriptor);
+	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
 void CrComputePipelineD3D12::Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)

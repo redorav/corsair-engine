@@ -4,6 +4,7 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrDataFormats.h"
 #include "Rendering/CrGPUDeletable.h"
+#include "Rendering/CrVertexDescriptor.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/CrHash.h"
@@ -176,11 +177,16 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
+namespace CrBuiltinShaders
+{
+	enum T : uint32_t;
+}
+
 class ICrGraphicsPipeline : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	virtual ~ICrGraphicsPipeline();
 
@@ -198,9 +204,27 @@ private:
 
 public:
 
-	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
+
+	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
+
+	CrBuiltinShaders::T GetPixelShaderIndex() const { return m_pixelShaderIndex; }
+
+	void SetShaderIndices(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex)
+	{
+		m_vertexShaderIndex = vertexShaderIndex;
+		m_pixelShaderIndex = pixelShaderIndex;
+	}
+
+protected:
 
 	CrGraphicsPipelineDescriptor m_pipelineDescriptor;
+
+	CrVertexDescriptor m_vertexDescriptor;
+
+	CrBuiltinShaders::T m_vertexShaderIndex = (CrBuiltinShaders::T)-1;
+
+	CrBuiltinShaders::T m_pixelShaderIndex = (CrBuiltinShaders::T)-1;
 
 #endif
 };
@@ -215,13 +239,23 @@ public:
 
 	const CrComputeShaderHandle& GetShader() const { return m_shader; }
 
-#if !defined(CR_CONFIG_FINAL)
-
-	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
-
-#endif
-
 private:
 
 	CrComputeShaderHandle m_shader;
+
+#if !defined(CR_CONFIG_FINAL)
+
+public:
+
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
+
+	CrBuiltinShaders::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
+	
+	void SetComputeShaderIndex(CrBuiltinShaders::T computeShaderIndex) { m_computeShaderIndex = computeShaderIndex; }
+
+private:
+
+	CrBuiltinShaders::T m_computeShaderIndex = (CrBuiltinShaders::T)-1;
+
+#endif
 };

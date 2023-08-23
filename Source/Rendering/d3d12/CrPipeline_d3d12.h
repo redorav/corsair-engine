@@ -24,7 +24,7 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) override;
 
 #endif
 

@@ -4,8 +4,13 @@
 #include "Rendering/ICrShader.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-ICrGraphicsPipeline::ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
-	: CrGPUAutoDeletable(renderDevice), m_shader(graphicsShader)
+ICrGraphicsPipeline::ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	: CrGPUAutoDeletable(renderDevice)
+	, m_shader(graphicsShader)
+#if !defined(CR_CONFIG_FINAL)
+	, m_pipelineDescriptor(pipelineDescriptor)
+	, m_vertexDescriptor(vertexDescriptor)
+#endif
 {
 	m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
 }

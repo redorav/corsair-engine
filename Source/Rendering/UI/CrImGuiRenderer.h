@@ -36,7 +36,7 @@ private:
 
 	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
 
-	CrBuiltinGraphicsPipeline m_imguiGraphicsPipeline;
+	CrGraphicsPipelineHandle m_imguiGraphicsPipeline;
 
 	CrTextureHandle m_fontAtlas;
 

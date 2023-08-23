@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Containers/CrArray.h"
-#include "Core/Logging/ICrDebug.h"
 #include "Core/Containers/CrBitSet.h"
 #include "Core/CrHash.h"
 #include "Core/String/CrString.h"

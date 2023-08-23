@@ -111,7 +111,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
 
-		m_imguiGraphicsPipeline = CrBuiltinGraphicsPipeline(renderDevice.get(), psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
+		m_imguiGraphicsPipeline = CrBuiltinPipelines::GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
 	}
 
 	// Font atlas:
@@ -225,7 +225,7 @@ void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId 
 		}
 
 		// Setup global config:
-		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.GetPipeline());
+		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
 		commandBuffer->BindIndexBuffer(indexBuffer);
 		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
 		commandBuffer->BindSampler(Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());

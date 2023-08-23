@@ -8,7 +8,7 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
-	: ICrGraphicsPipeline(vulkanRenderDevice, graphicsShader, vertexDescriptor)
+	: ICrGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 {
 	Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
@@ -409,10 +409,10 @@ void CrComputePipelineVulkan::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrGraphicsPipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
-	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), pipelineDescriptor, graphicsShader, vertexDescriptor);
+	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
 void CrComputePipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)

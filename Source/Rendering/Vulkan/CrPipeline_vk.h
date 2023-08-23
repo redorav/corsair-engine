@@ -14,6 +14,8 @@ public:
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
+	~CrGraphicsPipelineVulkan();
+
 	VkPipeline GetVkPipeline() const { return m_vkPipeline; }
 
 	VkPipelineLayout GetVkPipelineLayout() const { return m_vkPipelineLayout; }
@@ -32,6 +34,8 @@ class CrComputePipelineVulkan final : public ICrComputePipeline
 public:
 
 	CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+
+	~CrComputePipelineVulkan();
 
 	VkPipeline GetVkPipeline() const { return m_vkPipeline; }
 

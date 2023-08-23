@@ -329,6 +329,16 @@ CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
 
+CrGraphicsPipelineVulkan::~CrGraphicsPipelineVulkan()
+{
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+
+	vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
+
+	vkDestroyPipelineLayout(vkDevice, m_vkPipelineLayout, nullptr);
+}
+
 CrComputePipelineVulkan::CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(vulkanRenderDevice, computeShader)
 {
@@ -367,4 +377,12 @@ CrComputePipelineVulkan::CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRen
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShader->GetDebugName());
+}
+
+CrComputePipelineVulkan::~CrComputePipelineVulkan()
+{
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+
+	vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
 }

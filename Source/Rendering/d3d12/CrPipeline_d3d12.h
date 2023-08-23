@@ -14,6 +14,8 @@ public:
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
+	~CrGraphicsPipelineD3D12();
+
 	ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState; }
 
 	ID3D12RootSignature* GetD3D12RootSignature() const { return m_d3d12RootSignature; }
@@ -34,6 +36,8 @@ class CrComputePipelineD3D12 final : public ICrComputePipeline
 public:
 
 	CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+
+	~CrComputePipelineD3D12();
 
 	ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState; }
 

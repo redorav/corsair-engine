@@ -190,6 +190,11 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
 }
 
+CrGraphicsPipelineD3D12::~CrGraphicsPipelineD3D12()
+{
+	m_d3d12PipelineState->Release();
+}
+
 CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(d3d12RenderDevice, computeShader)
 {
@@ -205,4 +210,9 @@ CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderD
 
 	HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateComputePipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
 	CrAssertMsg(hResult == S_OK, "Failed to create compute pipeline");
+}
+
+CrComputePipelineD3D12::~CrComputePipelineD3D12()
+{
+	m_d3d12PipelineState->Release();
 }

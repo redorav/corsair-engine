@@ -172,76 +172,86 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 
 	process.Wait();
 
-	// Load the new pipelines after compilation
-
-	for (auto iter = m_builtinComputePipelines.begin(); iter != m_builtinComputePipelines.end(); ++iter)
+	if (process.GetReturnValue() >= 0)
 	{
-		CrBuiltinComputePipelineHandle& builtinPipeline = iter->second;
+		// Load the new pipelines after compilation
 
-		const CrBuiltinShaderMetadata& builtinShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetComputeShaderIndex(), deviceProperties.graphicsApi);
-
-		CrFixedPath binaryPath = outputPath;
-		binaryPath /= builtinShaderMetadata.uniqueBinaryName;
-
-		CrReadFileStream shaderBytecodeStream(binaryPath.c_str());
-
-		if (shaderBytecodeStream.GetFile())
+		for (auto iter = m_builtinComputePipelines.begin(); iter != m_builtinComputePipelines.end(); ++iter)
 		{
-			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
-			shaderBytecodeStream << *bytecode.get();
+			CrBuiltinComputePipelineHandle& builtinPipeline = iter->second;
 
-			CrComputeShaderDescriptor computeShaderDescriptor;
-			computeShaderDescriptor.m_debugName = builtinShaderMetadata.name.c_str();
-			computeShaderDescriptor.m_bytecode = bytecode;
+			const CrBuiltinShaderMetadata& builtinShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetComputeShaderIndex(), deviceProperties.graphicsApi);
 
-			CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
+			CrFixedPath binaryPath = outputPath;
+			binaryPath /= builtinShaderMetadata.uniqueBinaryName;
 
-			CrComputePipelineHandle pipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
+			CrReadFileStream shaderBytecodeStream(binaryPath.c_str());
+
+			if (shaderBytecodeStream.GetFile())
+			{
+				const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+				shaderBytecodeStream << *bytecode.get();
+
+				CrComputeShaderDescriptor computeShaderDescriptor;
+				computeShaderDescriptor.m_debugName = builtinShaderMetadata.name.c_str();
+				computeShaderDescriptor.m_bytecode = bytecode;
+
+				CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
+
+				CrComputePipelineHandle pipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
+
+				builtinPipeline->SetPipeline(pipeline);
+			}
+		}
+
+		for (auto iter = m_builtinGraphicsPipelines.begin(); iter != m_builtinGraphicsPipelines.end(); ++iter)
+		{
+			CrBuiltinGraphicsPipelineHandle& builtinPipeline = iter->second;
+
+			const CrBuiltinShaderMetadata& vertexShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetVertexShaderIndex(), deviceProperties.graphicsApi);
+			const CrBuiltinShaderMetadata& pixelShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetPixelShaderIndex(), deviceProperties.graphicsApi);
+
+			CrGraphicsShaderDescriptor graphicsShaderDescriptor;
+			graphicsShaderDescriptor.m_debugName += vertexShaderMetadata.name.c_str();
+			graphicsShaderDescriptor.m_debugName += "_";
+			graphicsShaderDescriptor.m_debugName += pixelShaderMetadata.name.c_str();
+
+			CrFixedPath vertexBinaryPath = outputPath;
+			vertexBinaryPath /= vertexShaderMetadata.uniqueBinaryName;
+
+			CrReadFileStream vertexShaderBytecodeStream(vertexBinaryPath.c_str());
+
+			if (vertexShaderBytecodeStream.GetFile())
+			{
+				const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+				vertexShaderBytecodeStream << *bytecode.get();
+				graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
+			}
+
+			CrFixedPath pixelBinaryPath = outputPath;
+			pixelBinaryPath /= pixelShaderMetadata.uniqueBinaryName;
+
+			CrReadFileStream pixelShaderBytecodeStream(pixelBinaryPath.c_str());
+
+			if (pixelShaderBytecodeStream.GetFile())
+			{
+				const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+				pixelShaderBytecodeStream << *bytecode.get();
+				graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
+			}
+
+			CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
+
+			CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(builtinPipeline->GetPipelineDescriptor(), shader, builtinPipeline->GetVertexDescriptor());
 
 			builtinPipeline->SetPipeline(pipeline);
 		}
 	}
-
-	for (auto iter = m_builtinGraphicsPipelines.begin(); iter != m_builtinGraphicsPipelines.end(); ++iter)
+	else
 	{
-		CrBuiltinGraphicsPipelineHandle& builtinPipeline = iter->second;
-
-		const CrBuiltinShaderMetadata& vertexShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetVertexShaderIndex(), deviceProperties.graphicsApi);
-		const CrBuiltinShaderMetadata& pixelShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetPixelShaderIndex(), deviceProperties.graphicsApi);
-
-		CrGraphicsShaderDescriptor graphicsShaderDescriptor;
-		graphicsShaderDescriptor.m_debugName += vertexShaderMetadata.name.c_str();
-		graphicsShaderDescriptor.m_debugName += "_";
-		graphicsShaderDescriptor.m_debugName += pixelShaderMetadata.name.c_str();
-
-		CrFixedPath vertexBinaryPath = outputPath;
-		vertexBinaryPath /= vertexShaderMetadata.uniqueBinaryName;
-
-		CrReadFileStream vertexShaderBytecodeStream(vertexBinaryPath.c_str());
-
-		if (vertexShaderBytecodeStream.GetFile())
-		{
-			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
-			vertexShaderBytecodeStream << *bytecode.get();
-			graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
-		}
-
-		CrFixedPath pixelBinaryPath = outputPath;
-		pixelBinaryPath /= pixelShaderMetadata.uniqueBinaryName;
-
-		CrReadFileStream pixelShaderBytecodeStream(pixelBinaryPath.c_str());
-
-		if (pixelShaderBytecodeStream.GetFile())
-		{
-			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
-			pixelShaderBytecodeStream << *bytecode.get();
-			graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
-		}
-
-		CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
-
-		CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(builtinPipeline->GetPipelineDescriptor(), shader, builtinPipeline->GetVertexDescriptor());
-
-		builtinPipeline->SetPipeline(pipeline);
+		CrString processOutput;
+		processOutput.resize_uninitialized(2048);
+		process.ReadStdOut(processOutput.data(), processOutput.size());
+		CrLog("%s", processOutput.c_str());
 	}
 }

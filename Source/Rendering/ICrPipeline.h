@@ -204,7 +204,7 @@ private:
 
 public:
 
-	virtual void Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
+	virtual void Recompile(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
 
 	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
 
@@ -247,7 +247,7 @@ private:
 
 public:
 
-	virtual void Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
+	virtual void Recompile(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
 
 	CrBuiltinShaders::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 	

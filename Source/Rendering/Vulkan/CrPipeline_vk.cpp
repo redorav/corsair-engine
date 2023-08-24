@@ -409,13 +409,13 @@ void CrComputePipelineVulkan::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
+void CrGraphicsPipelineVulkan::Recompile(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
 	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
-void CrComputePipelineVulkan::Recreate(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineVulkan::Recompile(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
 {
 	Deinitialize();
 	Initialize(static_cast<CrRenderDeviceVulkan*>(renderDevice), computeShader);

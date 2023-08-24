@@ -163,9 +163,9 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 	
 		for (auto iter = m_builtinComputePipelines.begin(); iter != m_builtinComputePipelines.end(); ++iter)
 		{
-			CrComputePipelineHandle& builtinPipeline = iter->second;
+			CrComputePipelineHandle& computePipeline = iter->second;
 	
-			const CrBuiltinShaderMetadata& builtinShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetComputeShaderIndex(), deviceProperties.graphicsApi);
+			const CrBuiltinShaderMetadata& builtinShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(computePipeline->GetComputeShaderIndex(), deviceProperties.graphicsApi);
 	
 			CrFixedPath binaryPath = outputPath;
 			binaryPath /= builtinShaderMetadata.uniqueBinaryName;
@@ -183,16 +183,16 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 	
 				CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
 	
-				builtinPipeline->Recreate(renderDevice, shader);
+				computePipeline->Recompile(renderDevice, shader);
 			}
 		}
 	
 		for (auto iter = m_builtinGraphicsPipelines.begin(); iter != m_builtinGraphicsPipelines.end(); ++iter)
 		{
-			CrGraphicsPipelineHandle& builtinPipeline = iter->second;
+			CrGraphicsPipelineHandle& graphicsPipeline = iter->second;
 	
-			const CrBuiltinShaderMetadata& vertexShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetVertexShaderIndex(), deviceProperties.graphicsApi);
-			const CrBuiltinShaderMetadata& pixelShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(builtinPipeline->GetPixelShaderIndex(), deviceProperties.graphicsApi);
+			const CrBuiltinShaderMetadata& vertexShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(graphicsPipeline->GetVertexShaderIndex(), deviceProperties.graphicsApi);
+			const CrBuiltinShaderMetadata& pixelShaderMetadata = CrBuiltinShaders::GetBuiltinShaderMetadata(graphicsPipeline->GetPixelShaderIndex(), deviceProperties.graphicsApi);
 	
 			CrGraphicsShaderDescriptor graphicsShaderDescriptor;
 			graphicsShaderDescriptor.m_debugName += vertexShaderMetadata.name.c_str();
@@ -225,7 +225,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 	
 			CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 	
-			builtinPipeline->Recreate(renderDevice, shader);
+			graphicsPipeline->Recompile(renderDevice, shader);
 		}
 	}
 	else

@@ -477,6 +477,14 @@ void CrFrame::Process()
 	m_cameraConstantData.world2View = m_camera->GetWorld2ViewMatrix();
 	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
 	m_cameraConstantData.projectionParams = m_camera->ComputeProjectionParams();
+	m_cameraConstantData.screenResolution = float4
+	(
+		m_camera->GetResolutionWidth(),
+		m_camera->GetResolutionHeight(),
+		1.0f / m_camera->GetResolutionWidth(),
+		1.0f / m_camera->GetResolutionHeight()
+	);
+	m_cameraConstantData.worldPosition = float4(m_camera->GetPosition(), 0.0f);
 
 	CrGPUBufferViewT<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
 	Camera* cameraData = cameraDataBuffer.GetData();

@@ -218,30 +218,62 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			mainPacket.material     = material;
 			mainPacket.numInstances = 1;
 
-			// Create render packets and add to the render lists
-			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
-			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-			m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
+			const ICrGraphicsPipeline* transparencyPipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
+			const ICrGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
+			const ICrGraphicsPipeline* debugPipeline        = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 
-			mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
-			mainPacket.sortKey  = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-			m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
+			if (transparencyPipeline)
+			{
+				// Create render packets and add to the render lists
+				mainPacket.pipeline = transparencyPipeline;
+				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
+			}
+
+			if (gBufferPipeline)
+			{
+				mainPacket.pipeline = gBufferPipeline;
+				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
+			}
 
 			if (computeMouseSelection)
 			{
-				// m_mouseSelectionBoundingRectangle
-				bool intersectingRactangles = false; (intersectingRactangles);
+				// Compute bounding box in pixel space and check whether the mouse cursor is inside it
+				// If it is, add to the mouse selection list. This can cause slowdowns during rendering
+				// Speeding it up can also have the added benefit that we could continously do this process
+				const float4 uvScale = float4(0.5f, -0.5f, 0.0f, 0.0f);
+				const float4 uvBias = float4(0.5f, 0.5f, 0.0f, 0.0f);
+				float4 uvPositionMin(+1.0e+100);
+				float4 uvPositionMax(-1.0e+100);
 
-				// TODO Reduce list using bound selection
-				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
-				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-				mainPacket.extra = (void*)(uintptr_t)instanceId.id;
-				m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
+				for (uint32_t i = 0; i < meshProjectedCorners.size(); ++i)
+				{
+					float4 screenPosition = meshProjectedCorners[i] / meshProjectedCorners[i].wwww;
+					float4 uvPosition = screenPosition * uvScale + uvBias;
+					uvPositionMin = min(uvPositionMin, uvPosition);
+					uvPositionMax = max(uvPositionMax, uvPosition);
+				}
+
+				float4 resolution = float4(m_camera->GetResolutionWidth(), m_camera->GetResolutionHeight(), 1.0f, 1.0f);
+				float4 pixelPositionMin = uvPositionMin * resolution;
+				float4 pixelPositionMax = uvPositionMax * resolution;
+
+				if (m_mouseSelectionBoundingRectangle.x >= pixelPositionMin.x &&
+					m_mouseSelectionBoundingRectangle.x <= pixelPositionMax.x &&
+					m_mouseSelectionBoundingRectangle.y >= pixelPositionMin.y &&
+					m_mouseSelectionBoundingRectangle.y <= pixelPositionMax.y)
+				{
+					mainPacket.pipeline = debugPipeline;
+					mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+					mainPacket.extra = (void*)(uintptr_t)instanceId.id;
+					m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
+				}
 			}
 
 			if (isEditorSelected)
 			{
-				mainPacket.pipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
+				mainPacket.pipeline = debugPipeline;
 				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::EdgeSelection].AddPacket(mainPacket);
 			}

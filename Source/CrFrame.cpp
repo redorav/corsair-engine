@@ -135,6 +135,9 @@ struct CrRenderPacketBatcher
 			m_commandBuffer->BindIndexBuffer(m_renderMesh->GetIndexBuffer().get());
 
 			m_commandBuffer->DrawIndexed(m_renderMesh->GetIndexBuffer()->GetNumElements(), m_numInstances, 0, 0, 0);
+
+			// Clear the batch, we want to avoid rendering twice if we call this function again
+			m_numInstances = 0;
 		}
 	}
 
@@ -784,7 +787,10 @@ void CrFrame::Process()
 				commandBuffer->BindConstantBuffer(debugShaderBuffer);
 
 				renderPacketBatcher.ProcessRenderPacket(renderPacket);
-				renderPacketBatcher.ExecuteBatch(); // TODO Fix dodgy behavior
+
+				// TODO Fix dodgy behavior where we bind a constant buffer, bind another, then flush the batch
+				// The problem happens when we modify per-instance data that the batcher knows nothing about
+				renderPacketBatcher.ExecuteBatch();
 			});
 
 			renderPacketBatcher.ExecuteBatch(); // Execute last batch

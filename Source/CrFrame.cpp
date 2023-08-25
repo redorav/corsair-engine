@@ -555,7 +555,7 @@ void CrFrame::Process()
 		const ICrTexture* rawDepthTexture = renderGraph.GetPhysicalTexture(depthTexture);
 		const ICrTexture* linearDepth16MipChainTexture = renderGraph.GetPhysicalTexture(linearDepth16MinMaxMipChainId);
 		
-		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize->GetPipeline());
+		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize.get());
 		commandBuffer->BindTexture(Textures::RawDepthTexture, rawDepthTexture, cr3d::TexturePlane::Depth);
 		commandBuffer->BindTexture(Textures::StencilTexture, rawDepthTexture, cr3d::TexturePlane::Stencil);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, linearDepth16MipChainTexture, 0);
@@ -592,7 +592,7 @@ void CrFrame::Process()
 		commandBuffer->BindTexture(Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
 		commandBuffer->BindTexture(Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
 		commandBuffer->BindTexture(Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
-		commandBuffer->BindGraphicsPipelineState(m_directionalLightPipeline->GetPipeline());
+		commandBuffer->BindGraphicsPipelineState(m_directionalLightPipeline.get());
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
@@ -666,7 +666,7 @@ void CrFrame::Process()
 		[this, debugShaderTextureId](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 		{
 			commandBuffer->BindTexture(Textures::EditorSelectionTexture, renderGraph.GetPhysicalTexture(debugShaderTextureId));
-			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline->GetPipeline());
+			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline.get());
 			commandBuffer->Draw(3, 1, 0, 0);
 		});
 	}
@@ -680,7 +680,7 @@ void CrFrame::Process()
 	[this, preSwapchainTexture](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(Textures::CopyTexture, renderGraph.GetPhysicalTexture(preSwapchainTexture));
-		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline->GetPipeline());
+		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline.get());
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
@@ -696,7 +696,7 @@ void CrFrame::Process()
 	CrRenderGraphTextureDescriptor colorsRWTextureDescriptor(m_colorsRWTexture.get());
 	CrRenderGraphTextureId colorsRWTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Colors RW Texture"), colorsRWTextureDescriptor);
 
-	const ICrComputePipeline* exampleComputePipeline = m_exampleComputePipeline->GetPipeline();
+	const ICrComputePipeline* exampleComputePipeline = m_exampleComputePipeline.get();
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Compute 1"), float4(0.0f, 0.0, 1.0f, 1.0f), CrRenderGraphPassType::Compute,
 	[&](CrRenderGraph& renderGraph)
@@ -728,7 +728,7 @@ void CrFrame::Process()
 	},
 	[=](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		commandBuffer->BindComputePipelineState(m_createIndirectArguments->GetPipeline());
+		commandBuffer->BindComputePipelineState(m_createIndirectArguments.get());
 		commandBuffer->BindRWStorageBuffer(RWStorageBuffers::ExampleIndirectBuffer, renderGraph.GetPhysicalBuffer(indirectArgumentsBuffer));
 		commandBuffer->Dispatch(1, 1, 1);
 	});
@@ -796,7 +796,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ExecuteBatch(); // Execute last batch
 		});
 
-		const ICrComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline->GetPipeline();
+		const ICrComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline.get();
 		int32_t mouseX = mouseState.position.x;
 		int32_t mouseY = mouseState.position.y;
 

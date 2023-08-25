@@ -270,6 +270,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		m_directionalLightPipeline = CrBuiltinPipelines::GetGraphicsPipeline(directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
 	}
 
+	// Editor shaders
 	{
 		CrGraphicsPipelineDescriptor editorEdgeSelectionPipelineDescriptor;
 		editorEdgeSelectionPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
@@ -277,6 +278,17 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
 		m_editorEdgeSelectionPipeline = CrBuiltinPipelines::GetGraphicsPipeline(editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
+	
+		CrGraphicsPipelineDescriptor editorGridPipelineDescriptor;
+		editorGridPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
+		editorGridPipelineDescriptor.renderTargets.depthFormat = CrRendererConfig::DepthBufferFormat;
+		editorGridPipelineDescriptor.depthStencilState.depthTestEnable = true;
+		editorGridPipelineDescriptor.rasterizerState.depthClipEnable = false;
+		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
+		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
+		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
+		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
+		m_editorGridPipeline = CrBuiltinPipelines::GetGraphicsPipeline(editorGridPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::EditorGridVS, CrBuiltinShaders::EditorGridPS);
 	}
 
 	{
@@ -625,6 +637,27 @@ void CrFrame::Process()
 		});
 
 		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+	});
+
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Editor Grid Render"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	[=](CrRenderGraph& renderGraph)
+	{
+		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store);
+		renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store);
+	},
+	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	{
+		float subdivisionWidth = 1.0f;
+
+		CrGPUBufferViewT<EditorGridCB> gridCB = commandBuffer->AllocateConstantBuffer<EditorGridCB>();
+		EditorGridCB* gridData = gridCB.GetData();
+		{
+			gridData->gridParams = float4(1000.0f, subdivisionWidth, 0.0f, 0.0f);
+		}
+
+		commandBuffer->BindConstantBuffer(gridCB);
+		commandBuffer->BindGraphicsPipelineState(m_editorGridPipeline.get());
+		commandBuffer->Draw(6, 1, 0, 0);
 	});
 
 	CrRenderGraphTextureDescriptor debugShaderTextureDescriptor(m_debugShaderTexture.get());

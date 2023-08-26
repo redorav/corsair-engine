@@ -2,8 +2,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Core/Containers/CrHashMap.h"
-
 #include "Core/Containers/CrBitSet.h"
 
 #include "Core/Containers/CrArray.h"

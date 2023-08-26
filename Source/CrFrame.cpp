@@ -1,5 +1,7 @@
 #include "CrFrame.h"
 
+#include "Editor/CrEditor.h"
+
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrSwapchain.h"
@@ -156,6 +158,8 @@ struct CrRenderPacketBatcher
 	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
+CrEditor Editor;
+
 void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
 {
 	HashingAssert();
@@ -172,7 +176,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-
 		CrShaderSources::Get().Initialize();
 		CrShaderManager::Get().Initialize(renderDevice.get());
 		CrMaterialCompiler::Get().Initialize();
@@ -184,14 +187,20 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrImGuiRendererInitParams imguiInitParams = {};
 		imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
 		CrImGuiRenderer::Create(imguiInitParams);
+
+		Editor.Initialize();
 	}
 
 	// Create the rendering scratch. Start with 10MB
 	m_renderingStream = CrIntrusivePtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
 	m_renderingStream->Initialize(10 * 1024 * 1024);
 
+	m_camera = CrCameraHandle(new CrCamera());
+
 	// Create a render world
-	m_renderWorld = CrMakeShared<CrRenderWorld>();
+	m_renderWorld = CrRenderWorldHandle(new CrRenderWorld());
+
+	Editor.SetRenderWorld(m_renderWorld);
 
 	bool loadData = true;
 
@@ -236,7 +245,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		}
 	}
 
-	m_camera = CrSharedPtr<CrCamera>(new CrCamera());
+	m_renderWorld->SetCamera(m_camera);
 
 	CrTextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
@@ -369,15 +378,11 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 void CrFrame::Deinitialize()
 {
 	CrImGuiRenderer::Destroy();
+
+	Editor = {};
+
+	m_drawCmdBuffers.clear();
 }
-
-struct SelectionPacket
-{
-	uint32_t entityId = 0xffffffff;
-	bool isLeftShiftClicked = false;
-};
-
-SelectionPacket CurrentSelectionData;
 
 void CrFrame::Process()
 {
@@ -392,7 +397,11 @@ void CrFrame::Process()
 		m_requestSwapchainResize = false;
 	}
 
-	// 2. Rendering
+	Editor.Update();
+
+	// TODO We need to rework this once we have windows and views so that these properties are set on the camera when we change things around
+	// For now keep it this way knowing it will be changed
+	m_camera->SetupPerspective(m_swapchain->GetWidth(), m_swapchain->GetHeight(), 0.1f, 1000.0f);
 
 	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
 
@@ -407,11 +416,7 @@ void CrFrame::Process()
 	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
 	const MouseState& mouseState = CrInput.GetMouseState();
-	bool isMouseClicked = mouseState.buttonClicked[MouseButton::Left];
-	
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
-	bool isEscapeClicked = keyboardState.keyHeld[KeyboardKey::Escape];
-	bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
 
 	if (keyboardState.keyHeld[KeyboardKey::LeftCtrl] &&
 		keyboardState.keyHeld[KeyboardKey::LeftShift] &&
@@ -419,36 +424,6 @@ void CrFrame::Process()
 	{
 		CrBuiltinPipelines::RecompileComputePipelines();
 	}
-
-	if (isEscapeClicked)
-	{
-		m_renderWorld->ClearSelection();
-		CurrentSelectionData.entityId = 0xffffffff;
-	}
-	
-	if (CurrentSelectionData.entityId != 0xffffffff)
-	{
-		if (CurrentSelectionData.entityId == 65535)
-		{
-			m_renderWorld->ClearSelection();
-		}
-		else
-		{
-			if (CurrentSelectionData.isLeftShiftClicked)
-			{
-				m_renderWorld->ToggleSelected(CrModelInstanceId(CurrentSelectionData.entityId));
-			}
-			else
-			{
-				m_renderWorld->SetSelected(CrModelInstanceId(CurrentSelectionData.entityId));
-			}
-		}
-
-		CurrentSelectionData = SelectionPacket();
-	}
-
-	CrRectangle mouseRectangle(mouseState.position.x - 10, mouseState.position.y - 10, 20, 20);
-	m_renderWorld->SetMouseSelectionEnabled(isMouseClicked, mouseRectangle);
 
 	// Set up render graph to start recording passes
 	CrRenderGraphFrameParams frameRenderGraphParams;
@@ -460,8 +435,6 @@ void CrFrame::Process()
 	m_renderingStream->Reset();
 
 	m_renderWorld->BeginRendering(m_renderingStream);
-
-	m_renderWorld->SetCamera(m_camera);
 
 	m_renderWorld->ComputeVisibilityAndRenderPackets();
 
@@ -902,17 +875,20 @@ void CrFrame::Process()
 	drawCommandBuffer->Submit();
 
 	// Download the mouse selection id
-	if(isMouseClicked)
+	if (m_renderWorld->GetMouseSelectionEnabled())
 	{
 		renderDevice->DownloadBuffer
 		(
 			m_mouseSelectionBuffer->GetHardwareBuffer(),
-			[isLeftShiftClicked](const CrHardwareGPUBufferHandle& mouseIdBuffer)
+			[mouseState, keyboardState](const CrHardwareGPUBufferHandle& mouseIdBuffer)
 			{
 				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
 				{
-					CurrentSelectionData.entityId = *mouseIdMemory;
-					CurrentSelectionData.isLeftShiftClicked = isLeftShiftClicked;
+					SelectionState state;
+					state.modelInstanceId = *mouseIdMemory;
+					state.mouseState = mouseState;
+					state.keyboardState = keyboardState;
+					Editor.AddSelectionState(state);
 				}
 				mouseIdBuffer->Unlock();
 			}
@@ -1078,84 +1054,6 @@ void CrFrame::HandleWindowResize(uint32_t width, uint32_t height)
 	m_requestSwapchainResize = true;
 	m_swapchainResizeRequestWidth = width;
 	m_swapchainResizeRequestHeight = height;
-}
-
-void CrFrame::UpdateCamera()
-{
-	m_camera->SetupPerspective((float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight(), 1.0f, 1000.0f);
-
-	float3 currentLookAt = m_camera->GetLookatVector();
-	float3 currentRight = m_camera->GetRightVector();
-
-	const MouseState& mouseState = CrInput.GetMouseState();
-	const KeyboardState& keyboard = CrInput.GetKeyboardState();
-	const GamepadState& gamepadState = CrInput.GetGamepadState(0);
-
-	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
-
-	float translationSpeed = 5.0f;
-
-	if (keyboard.keyHeld[KeyboardKey::LeftShift])
-	{
-		translationSpeed *= 10.0f;
-	}
-
-	// TODO Hack to get a bit of movement on the camera
-	if (keyboard.keyHeld[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
-	{
-		m_camera->Translate(currentRight * -translationSpeed * frameDelta);
-	}
-	
-	if (keyboard.keyHeld[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
-	{
-		m_camera->Translate(currentRight * translationSpeed * frameDelta);
-	}
-	
-	if (keyboard.keyHeld[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
-	{
-		m_camera->Translate(currentLookAt * translationSpeed * frameDelta);
-	}
-	
-	if (keyboard.keyHeld[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
-	{
-		m_camera->Translate(currentLookAt * -translationSpeed * frameDelta);
-	}
-	
-	if (keyboard.keyHeld[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
-	{
-		m_camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
-	}
-	
-	if (keyboard.keyHeld[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
-	{
-		m_camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
-	}
-
-	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
-	{
-		//CrLogWarning("Moving right");
-		m_camera->Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
-		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), 0.1f);
-		//camera.LookAt(float3::zero(), float3(0, 1, 0));
-	}
-
-	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
-	{
-		//CrLogWarning("Moving left");
-		m_camera->Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
-		//camera.RotateAround(float3::zero(), float3(0.0f, 1.0f, 0.0f), -0.1f);
-		//camera.LookAt(float3::zero(), float3(0, 1, 0));
-	}
-
-	if (mouseState.buttonHeld[MouseButton::Right])
-	{
-		m_camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
-	}
-
-	m_camera->Update();
-
-	m_cameraConstantData.world2View = m_camera->GetWorld2ViewMatrix();
-	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();
 }
 
 void CrFrame::RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height)

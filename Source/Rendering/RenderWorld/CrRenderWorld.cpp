@@ -11,12 +11,21 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+#define RENDER_WORLD_VALIDATION
+
+#if defined(RENDER_WORLD_VALIDATION)
+	#define CrRenderWorldAssertMsg(condition, message, ...) CrAssertMsg(condition, message, __VA_ARGS__)
+#else
+	#define CrRenderWorldAssertMsg(condition, message, ...)
+#endif
+
 CrRenderWorld::CrRenderWorld()
 {
 	// TODO Make sure when we create a model instance all of these are updated
 	m_modelInstanceTransforms.resize(1000);
 	m_renderModels.resize(1000);
 	m_modelInstanceObbs.resize(1000);
+	m_editorProperties.resize(1000);
 
 	// Defaults to invalid id
 	m_modelInstanceIdToIndex.resize(1000);
@@ -81,6 +90,7 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_modelInstanceTransforms[destroyedInstanceIndex.id]       = m_modelInstanceTransforms[lastInstanceIndex.id];
 	m_renderModels[destroyedInstanceIndex.id]                  = m_renderModels[lastInstanceIndex.id];
 	m_modelInstanceObbs[destroyedInstanceIndex.id]             = m_modelInstanceObbs[lastInstanceIndex.id];
+	m_editorProperties[destroyedInstanceIndex.id]              = m_editorProperties[lastInstanceIndex.id];
 
 	// Free references (no need to zero out data that doesn't have a smart pointer)
 	m_renderModels[lastInstanceIndex.id]   = nullptr;
@@ -109,43 +119,32 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_numModelInstances.id--;
 }
 
-void CrRenderWorld::SetSelected(CrModelInstanceId instanceId)
+void CrRenderWorld::SetIsEditorEdgeHighlight(CrModelInstanceId instanceId, bool value)
 {
-	ClearSelection();
-
-	AddSelected(instanceId);
-}
-
-void CrRenderWorld::AddSelected(CrModelInstanceId instanceId)
-{
-	m_selectedInstances.insert(instanceId.id);
-}
-
-void CrRenderWorld::RemoveSelected(CrModelInstanceId instanceId)
-{
-	m_selectedInstances.erase(instanceId.id);
-}
-
-void CrRenderWorld::ToggleSelected(CrModelInstanceId instanceId)
-{
-	if (GetSelected(instanceId))
+	if (!GetIsEditorInstance(instanceId))
 	{
-		m_selectedInstances.erase(instanceId.id);
-	}
-	else
-	{
-		m_selectedInstances.insert(instanceId.id);
+		m_editorProperties[GetModelInstanceIndex(instanceId).id].isEdgeHighlight = value;
 	}
 }
 
-bool CrRenderWorld::GetSelected(CrModelInstanceId instanceId) const
+bool CrRenderWorld::GetIsEditorEdgeHighlight(CrModelInstanceId instanceId) const
 {
-	return m_selectedInstances.find(instanceId.id) != m_selectedInstances.end();
+	return m_editorProperties[GetModelInstanceIndex(instanceId).id].isEdgeHighlight;
 }
 
-void CrRenderWorld::ClearSelection()
+void CrRenderWorld::SetEditorInstance(CrModelInstanceId instanceId)
 {
-	m_selectedInstances.clear();
+	m_editorInstances.insert(instanceId.id);
+}
+
+bool CrRenderWorld::GetIsEditorInstance(CrModelInstanceId instanceId) const
+{
+	return m_editorInstances.find(instanceId.id) != m_editorInstances.end();
+}
+
+void CrRenderWorld::SetCamera(const CrCameraHandle& camera)
+{
+	m_camera = camera;
 }
 
 void CrRenderWorld::ComputeVisibilityAndRenderPackets()
@@ -158,7 +157,20 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		const CrBoundingBox& modelBoundingBox = renderModel->GetBoundingBox();
 		float4x4 transform = GetTransform(instanceIndex);
 
+		CrRenderWorldAssertMsg(all(modelBoundingBox.extents != 0.0f), "Invalid bounding box extents");
+
 		uint32_t meshCount = renderModel->GetRenderMeshCount();
+
+		// If this mesh is set to do constant size (like for manipulators) we need to scale by the distance in Z to the camera
+		if (GetConstantSize(instanceIndex))
+		{
+			float4 position = transform[3];
+			float3 cameraToPosition = position.xyz - m_camera->GetPosition();
+			float distanceToCamera = dot(cameraToPosition, m_camera->GetForwardVector());
+			float4x4 scaleMtx = float4x4::scale(distanceToCamera);
+			transform = mul(scaleMtx, transform);
+			transform[3] = position;
+		}
 
 		// Check for instance visibility. Only check if number of instances > 1, otherwise we duplicate work
 		if (meshCount > 1)
@@ -180,7 +192,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
 
-		bool isEditorSelected = GetSelected(instanceId);
+		bool isEditorEdgeHighlight = GetIsEditorEdgeHighlight(instanceId);
 
 		bool computeMouseSelection = GetMouseSelectionEnabled();
 
@@ -237,6 +249,8 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 			}
 
+#if defined(CR_EDITOR)
+
 			if (computeMouseSelection)
 			{
 				// Compute bounding box in pixel space and check whether the mouse cursor is inside it
@@ -271,12 +285,14 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 				}
 			}
 
-			if (isEditorSelected)
+			if (isEditorEdgeHighlight)
 			{
 				mainPacket.pipeline = debugPipeline;
 				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::EdgeSelection].AddPacket(mainPacket);
 			}
+
+#endif
 		}
 	}
 

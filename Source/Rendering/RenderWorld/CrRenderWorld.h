@@ -108,6 +108,16 @@ private:
 	CrVector<CrRenderPacket> m_renderPackets;
 };
 
+// Properties that only the editor is allowed to modify and won't be available in-game
+struct CrEditorProperties
+{
+	// Mesh has a constant size on screen
+	bool isConstantSizeOnScreen = false;
+
+	// Mesh needs to go through the editor edge highlight
+	bool isEdgeHighlight = false;
+};
+
 // CrRenderWorld is where all rendering primitives live, e.g. model instances,
 // cameras, lights and other entities that contribute to the way the frame is rendered
 // such as post effects, etc. The render world is able to create and manage the members
@@ -137,30 +147,26 @@ public:
 	void DestroyModelInstance(CrModelInstanceId instanceId);
 
 	// Set properties on the model instance, either through the instance id or the instance index
-	void SetTransform(CrModelInstanceIndex instanceId, const float4x4& transform) { m_modelInstanceTransforms[instanceId.id] = transform; }
+	void SetTransform(CrModelInstanceIndex instanceIndex, const float4x4& transform) { m_modelInstanceTransforms[instanceIndex.id] = transform; }
 	void SetTransform(CrModelInstanceId instanceId, const float4x4& transform) { SetTransform(GetModelInstanceIndex(instanceId), transform); }
-	float4x4 GetTransform(CrModelInstanceIndex instanceId) const { return m_modelInstanceTransforms[instanceId.id]; }
+	float4x4 GetTransform(CrModelInstanceIndex instanceIndex) const { return m_modelInstanceTransforms[instanceIndex.id]; }
 	float4x4 GetTransform(CrModelInstanceId instanceId) const { return GetTransform(GetModelInstanceIndex(instanceId)); }
 
-	void SetRenderModel(CrModelInstanceIndex instanceIndex, const CrRenderModelSharedHandle& renderModel) { m_renderModels[instanceIndex.id] = renderModel; }
-	void SetRenderModel(CrModelInstanceId instanceId, const CrRenderModelSharedHandle& renderModel) { SetRenderModel(GetModelInstanceIndex(instanceId), renderModel); }
-	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceIndex instanceIndex) const { return m_renderModels[instanceIndex.id]; }
-	const CrRenderModelSharedHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
+	void SetPosition(CrModelInstanceId instanceId, float3 position) { m_modelInstanceTransforms[GetModelInstanceIndex(instanceId).id][3].xyz = position; }
+	float3 GetPosition(CrModelInstanceId instanceId) { return m_modelInstanceTransforms[GetModelInstanceIndex(instanceId).id][3].xyz; }
 
-	// Editor properties
-	void SetSelected(CrModelInstanceId instanceId);
+	void SetRenderModel(CrModelInstanceIndex instanceIndex, const CrRenderModelHandle& renderModel)
+	{
+		CrAssertMsg(renderModel != nullptr, "Render model cannot be null");
+		m_renderModels[instanceIndex.id] = renderModel;
+	}
 
-	void AddSelected(CrModelInstanceId instanceId);
+	void SetRenderModel(CrModelInstanceId instanceId, const CrRenderModelHandle& renderModel) { SetRenderModel(GetModelInstanceIndex(instanceId), renderModel); }
+	const CrRenderModelHandle& GetRenderModel(CrModelInstanceIndex instanceIndex) const { return m_renderModels[instanceIndex.id]; }
+	const CrRenderModelHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
 
-	void RemoveSelected(CrModelInstanceId instanceId);
-
-	void ToggleSelected(CrModelInstanceId instanceId);
-
-	bool GetSelected(CrModelInstanceId instanceId) const;
-
-	void ClearSelection();
-
-	void SetCamera(const CrCameraHandle& camera) { m_camera = camera; }
+	void SetCamera(const CrCameraHandle& camera);
+	const CrCameraHandle& GetCamera() const { return m_camera; }
 
 	const CrRenderList& GetRenderList(CrRenderListUsage::T usage) const { return m_renderLists[usage]; }
 
@@ -190,14 +196,6 @@ public:
 	void BeginRendering(const CrIntrusivePtr<CrCPUStackAllocator>& renderingStream);
 
 	void EndRendering();
-
-	//-------
-	// Editor
-	//-------
-
-	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
-
-	bool GetMouseSelectionEnabled() const;
 
 private:
 
@@ -248,11 +246,40 @@ private:
 	// Visible model instances
 	CrVector<CrModelInstanceIndex> m_visibleModelInstances;
 
-	// Editor support
+#if defined(CR_EDITOR)
 
-	CrHashSet<CrModelInstanceId::type> m_selectedInstances;
+public:
+
+	void SetIsEditorEdgeHighlight(CrModelInstanceId instanceId, bool value);
+
+	bool GetIsEditorEdgeHighlight(CrModelInstanceId instanceId) const;
+
+	// By default all entities are selectable in the editor, so we need to exclude
+	// manipulators, icons and other editor entities
+	void SetEditorInstance(CrModelInstanceId instanceId);
+
+	bool GetIsEditorInstance(CrModelInstanceId instanceId) const;
+
+	void SetConstantSize(CrModelInstanceIndex instanceIndex, bool constantSize) { m_editorProperties[instanceIndex.id].isConstantSizeOnScreen = constantSize; }
+	void SetConstantSize(CrModelInstanceId instanceId, bool constantSize) { SetConstantSize(GetModelInstanceIndex(instanceId), constantSize); }
+	bool GetConstantSize(CrModelInstanceIndex instanceIndex) const { return m_editorProperties[instanceIndex.id].isConstantSizeOnScreen; }
+	bool GetConstantSize(CrModelInstanceId instanceId) const { return GetConstantSize(GetModelInstanceIndex(instanceId)); }
+
+	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
+
+	bool GetMouseSelectionEnabled() const;
+
+private:
+
+	// Make sure we can exclude editor entities from all the standard behavior
+	// such as selection highlight
+	CrHashSet<CrModelInstanceId::type> m_editorInstances;
+
+	CrVector<CrEditorProperties>       m_editorProperties;
 
 	bool m_computeMouseSelection = false;
 
 	CrRectangle m_mouseSelectionBoundingRectangle;
+
+#endif
 };

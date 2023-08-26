@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core/Containers/CrVector.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderGraph.h"
 #include "Rendering/CrBuiltinPipeline.h"
-
 #include "Rendering/RenderWorld/CrRenderWorld.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
+
+#include "Core/Containers/CrVector.h"
+#include "Core/SmartPointers/CrUniquePtr.h"
 
 class CrFrame
 {
@@ -44,25 +44,27 @@ private:
 
 	uint32_t m_height = 0;
 
-	CrBuiltinComputePipelineHandle m_exampleComputePipeline;
+	CrComputePipelineHandle m_exampleComputePipeline;
 
-	CrBuiltinComputePipelineHandle m_depthDownsampleLinearize;
+	CrComputePipelineHandle m_depthDownsampleLinearize;
 
-	CrBuiltinGraphicsPipelineHandle m_copyTexturePipeline;
+	CrGraphicsPipelineHandle m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer
-	CrBuiltinComputePipelineHandle m_mouseSelectionResolvePipeline;
+	CrComputePipelineHandle m_mouseSelectionResolvePipeline;
 
-	CrBuiltinGraphicsPipelineHandle m_directionalLightPipeline;
+	CrGraphicsPipelineHandle m_directionalLightPipeline;
 
-	CrBuiltinComputePipelineHandle m_createIndirectArguments;
+	CrComputePipelineHandle m_createIndirectArguments;
 
 	CrTextureHandle m_colorfulVolumeTexture;
 
 	CrTextureHandle m_colorfulTextureArray;
 
 	// Editor Shaders
-	CrBuiltinGraphicsPipelineHandle m_editorEdgeSelectionPipeline;
+	CrGraphicsPipelineHandle m_editorEdgeSelectionPipeline;
+
+	CrGraphicsPipelineHandle m_editorGridPipeline;
 
 	CrSwapchainHandle m_swapchain;
 

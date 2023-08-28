@@ -85,7 +85,7 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 
 #endif
 
-    float3 litSurface = surface.diffuseAlbedoSRGB.xyz * psInput.color.rgb;
+    float3 finalColor = surface.diffuseAlbedoSRGB.xyz * psInput.color.rgb;
 
 #if defined(EMaterialShaderVariant_Debug)
 
@@ -97,21 +97,21 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	if (debugShaderMode == DebugShaderModeInstanceID)
 	{
 		float normalizedInstanceId = cb_DebugShader.debugProperties.y / 65535.0;
-		litSurface = float3(normalizedInstanceId, normalizedInstanceId, normalizedInstanceId);
+		finalColor = float3(normalizedInstanceId, normalizedInstanceId, normalizedInstanceId);
 	}
 	else if (debugShaderMode == DebugShaderModeFlatColor)
 	{
-		litSurface = float3(1.0, 0.0, 0.0);
+		finalColor = float3(1.0, 0.0, 0.0);
 	}
 
-	pixelOutput.finalTarget = float4(litSurface, cb_Color.tint.a);
+	pixelOutput.finalTarget = float4(finalColor, cb_Color.tint.a);
 
 #elif defined(EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.diffuseAlbedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 #else
-    pixelOutput.finalTarget = float4(litSurface, cb_Color.tint.a);
+	pixelOutput.finalTarget = float4(finalColor, cb_Color.tint.a);
 #endif
 	
 	return pixelOutput;

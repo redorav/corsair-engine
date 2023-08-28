@@ -451,13 +451,13 @@ void CrFrame::Process()
 
 	// Set up default values for common constant buffers
 
-	CrGPUBufferViewT<Color> colorBuffer = drawCommandBuffer->AllocateConstantBuffer<Color>();
-	Color* colorData2 = colorBuffer.GetData();
+	CrGPUBufferViewT<Material> materialBuffer = drawCommandBuffer->AllocateConstantBuffer<Material>();
+	Material* materialData = materialBuffer.GetData();
 	{
-		colorData2->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-		colorData2->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		materialData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		materialData->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-	drawCommandBuffer->BindConstantBuffer(colorBuffer);
+	drawCommandBuffer->BindConstantBuffer(materialBuffer);
 
 	m_cameraConstantData.world2View = m_camera->GetWorld2ViewMatrix();
 	m_cameraConstantData.view2Projection = m_camera->GetView2ProjectionMatrix();

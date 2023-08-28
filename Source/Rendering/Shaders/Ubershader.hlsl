@@ -104,14 +104,14 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 		finalColor = float3(1.0, 0.0, 0.0);
 	}
 
-	pixelOutput.finalTarget = float4(finalColor, cb_Color.tint.a);
+	pixelOutput.finalTarget = float4(finalColor, cb_Material.tint.a);
 
 #elif defined(EMaterialShaderVariant_GBuffer)
 	pixelOutput.albedoTarget  = float4(surface.diffuseAlbedoSRGB, 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 #else
-	pixelOutput.finalTarget = float4(finalColor, cb_Color.tint.a);
+	pixelOutput.finalTarget = float4(finalColor, cb_Material.tint.a);
 #endif
 	
 	return pixelOutput;

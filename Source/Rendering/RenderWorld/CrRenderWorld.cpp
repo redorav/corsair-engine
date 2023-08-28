@@ -157,7 +157,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		const CrBoundingBox& modelBoundingBox = renderModel->GetBoundingBox();
 		float4x4 transform = GetTransform(instanceIndex);
 
-		CrRenderWorldAssertMsg(all(modelBoundingBox.extents != 0.0f), "Invalid bounding box extents");
+		CrRenderWorldAssertMsg(any(modelBoundingBox.extents != 0.0f), "Invalid bounding box extents");
 
 		uint32_t meshCount = renderModel->GetRenderMeshCount();
 
@@ -192,7 +192,9 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
 
-		bool isEditorEdgeHighlight = GetIsEditorEdgeHighlight(instanceId);
+		const CrEditorProperties& editorProperties = m_editorProperties[instanceIndex.id];
+
+		bool isEditorEdgeHighlight = editorProperties.isEdgeHighlight;
 
 		bool computeMouseSelection = GetMouseSelectionEnabled();
 
@@ -234,19 +236,19 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			const ICrGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
 			const ICrGraphicsPipeline* debugPipeline        = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 
+			if (gBufferPipeline)
+			{
+				mainPacket.pipeline = gBufferPipeline;
+				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
+			}
+
 			if (transparencyPipeline)
 			{
 				// Create render packets and add to the render lists
 				mainPacket.pipeline = transparencyPipeline;
 				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
-			}
-
-			if (gBufferPipeline)
-			{
-				mainPacket.pipeline = gBufferPipeline;
-				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 			}
 
 #if defined(CR_EDITOR)

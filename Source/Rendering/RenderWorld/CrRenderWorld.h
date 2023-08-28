@@ -261,8 +261,11 @@ public:
 	bool GetIsEditorInstance(CrModelInstanceId instanceId) const;
 
 	void SetConstantSize(CrModelInstanceIndex instanceIndex, bool constantSize) { m_editorProperties[instanceIndex.id].isConstantSizeOnScreen = constantSize; }
+
 	void SetConstantSize(CrModelInstanceId instanceId, bool constantSize) { SetConstantSize(GetModelInstanceIndex(instanceId), constantSize); }
+
 	bool GetConstantSize(CrModelInstanceIndex instanceIndex) const { return m_editorProperties[instanceIndex.id].isConstantSizeOnScreen; }
+
 	bool GetConstantSize(CrModelInstanceId instanceId) const { return GetConstantSize(GetModelInstanceIndex(instanceId)); }
 
 	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);

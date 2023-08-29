@@ -85,6 +85,7 @@ EASTLLibrary =
 	defines =
 	{
 		"EASTL_ASSERT_ENABLED=1",
+		"CHAR8_T_DEFINED" -- We don't want EASTL to define char8_t regardless of compiler options
 	},
 	natvis      = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,

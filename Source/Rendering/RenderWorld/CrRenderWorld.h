@@ -18,41 +18,14 @@ using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
 
 class CrCPUStackAllocator;
 
-struct CrStandardSortKey
-{
-	CrStandardSortKey() {}
-
-	CrStandardSortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
-	{
-		// Set up sort key
-		// Sorting is implementing in ascending order, so a lower depth sorts first
-
-		depthKey    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
-		pipelineKey = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
-		meshKey     = (uint16_t)((uintptr_t)renderMesh >> 3);
-		materialKey = (uint16_t)((uintptr_t)material >> 3);
-	}
-
-	union
-	{
-		struct
-		{
-			uint64_t depthKey    : 16;
-			uint64_t meshKey     : 16;
-			uint64_t materialKey : 16; // TODO Change to resource table
-			uint64_t pipelineKey : 16;
-		};
-
-		uint64_t key = 0;
-	};
-};
+typedef uint64_t CrSortKey;
 
 // Everything that is needed to render a packet
 struct CrRenderPacket
 {
-	bool operator < (const CrRenderPacket& other) const { return sortKey.key < other.sortKey.key; }
+	bool operator < (const CrRenderPacket& other) const { return sortKey < other.sortKey; }
 
-	CrStandardSortKey sortKey;
+	CrSortKey sortKey;
 
 	float4x4* transforms;
 	const CrRenderMesh* renderMesh;

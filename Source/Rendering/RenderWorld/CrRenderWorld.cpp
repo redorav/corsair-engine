@@ -19,6 +19,45 @@
 	#define CrRenderWorldAssertMsg(condition, message, ...)
 #endif
 
+static CrSortKey CreateStandardSortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
+{
+	// Sorting is implemented in ascending order, so a lower depth sorts first
+	uint64_t depthKey    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
+	uint64_t pipelineKey = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
+	uint64_t meshKey     = (uint16_t)((uintptr_t)renderMesh >> 3);
+	uint64_t materialKey = (uint16_t)((uintptr_t)material >> 3);
+
+	// Highest priority is pipeline key, we want to group objects together by pipeline to avoid context rolls
+	// Second is resource binding. We want to avoid binding resources again if they haven't changed
+	// Third is mesh. We'd like to be able to instance render meshes whenever possible
+	// Fourth is depth. Within a drawcall, sort by depth to do front to back
+	return
+		(pipelineKey << 48) |
+		(materialKey << 32) |
+		(meshKey << 16) |
+		depthKey
+		;
+}
+
+static CrSortKey CreateTransparencySortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
+{
+	uint16_t depthKeyReversed = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
+	depthKeyReversed = 0xffff - depthKeyReversed; // Invert as we're dealing with transparency
+
+	uint64_t depthKey    = depthKeyReversed;
+	uint64_t pipelineKey = (uint16_t)((uintptr_t)pipeline >> 3); // Remove last 3 bits which are likely to be equal
+	uint64_t meshKey     = (uint16_t)((uintptr_t)renderMesh >> 3);
+	uint64_t materialKey = (uint16_t)((uintptr_t)material >> 3);
+
+	// Highest priority is depth for proper depth sorting, then pipelines, then resources and mesh
+	return
+		(depthKey << 48) |
+		(pipelineKey << 32) |
+		(materialKey << 16) |
+		meshKey
+		;
+}
+
 CrRenderWorld::CrRenderWorld()
 {
 	// TODO Make sure when we create a model instance all of these are updated
@@ -231,6 +270,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			mainPacket.renderMesh   = renderMesh;
 			mainPacket.material     = material;
 			mainPacket.numInstances = 1;
+			mainPacket.extra        = nullptr;
 
 			const ICrGraphicsPipeline* transparencyPipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
 			const ICrGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
@@ -239,7 +279,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			if (gBufferPipeline)
 			{
 				mainPacket.pipeline = gBufferPipeline;
-				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				mainPacket.sortKey = CreateStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 			}
 
@@ -247,7 +287,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			{
 				// Create render packets and add to the render lists
 				mainPacket.pipeline = transparencyPipeline;
-				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				mainPacket.sortKey = CreateTransparencySortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
 			}
 
@@ -281,7 +321,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 					m_mouseSelectionBoundingRectangle.y <= pixelPositionMax.y)
 				{
 					mainPacket.pipeline = debugPipeline;
-					mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+					mainPacket.sortKey = CreateStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 					mainPacket.extra = (void*)(uintptr_t)instanceId.id;
 					m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
 				}
@@ -290,7 +330,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			if (isEditorEdgeHighlight)
 			{
 				mainPacket.pipeline = debugPipeline;
-				mainPacket.sortKey = CrStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
+				mainPacket.sortKey = CreateStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::EdgeSelection].AddPacket(mainPacket);
 			}
 

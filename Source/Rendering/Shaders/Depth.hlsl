@@ -5,6 +5,7 @@
 #include "Common.hlsl"
 
 Texture2D<float> RawDepthTexture;
+Texture2D<uint> StencilTexture;
 
 RWTexture2D<float2> RWLinearDepthMinMaxMip1;
 RWTexture2D<float2> RWLinearDepthMinMaxMip2;

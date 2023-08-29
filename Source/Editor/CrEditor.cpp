@@ -242,7 +242,7 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 {
 	if (!m_manipulator)
 	{
-		m_manipulator = CrUniquePtr(new CrManipulator());
+		m_manipulator = CrUniquePtr<CrManipulator>(new CrManipulator());
 
 		float4 red(1.0f, 0.0f, 0.0f, 1.0f);
 		float4 green(0.0f, 1.0f, 0.0f, 1.0f);

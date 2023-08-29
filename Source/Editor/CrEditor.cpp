@@ -147,17 +147,29 @@ void CrEditor::Update()
 					{
 						m_manipulatorSelected = true;
 						
-						if (m_manipulator->xAxis.GetId() == instanceId)
+						if (instanceId == m_manipulator->xAxis.GetId())
 						{
 							m_selectedAxis = CrEditorAxis::AxisX;
 						}
-						else if (m_manipulator->yAxis.GetId() == instanceId)
+						else if (instanceId == m_manipulator->yAxis.GetId())
 						{
 							m_selectedAxis = CrEditorAxis::AxisY;
 						}
-						else if (m_manipulator->zAxis.GetId() == instanceId)
+						else if (instanceId == m_manipulator->zAxis.GetId())
 						{
 							m_selectedAxis = CrEditorAxis::AxisZ;
+						}
+						else if (instanceId == m_manipulator->xzPlane.GetId())
+						{
+							m_selectedAxis = CrEditorAxis::PlaneXZ;
+						}
+						else if (instanceId == m_manipulator->xyPlane.GetId())
+						{
+							m_selectedAxis = CrEditorAxis::PlaneXY;
+						}
+						else if (instanceId == m_manipulator->yzPlane.GetId())
+						{
+							m_selectedAxis = CrEditorAxis::PlaneYZ;
 						}
 
 						CrAssertMsg(m_selectedAxis != CrEditorAxis::None, "Incorrect axis selected");
@@ -244,9 +256,13 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 	{
 		m_manipulator = CrUniquePtr<CrManipulator>(new CrManipulator());
 
-		float4 red(1.0f, 0.0f, 0.0f, 1.0f);
-		float4 green(0.0f, 1.0f, 0.0f, 1.0f);
-		float4 blue(0.0f, 0.0f, 1.0f, 1.0f);
+		float4 red(1.0f, 0.3f, 0.3f, 1.0f);
+		float4 green(0.3f, 1.0f, 0.3f, 1.0f);
+		float4 blue(0.3f, 0.3f, 1.0f, 1.0f);
+
+		float4 transparentRed(1.0f, 0.3f, 0.3f, 0.5f);
+		float4 transparentGreen(0.3f, 1.0f, 0.3f, 0.5f);
+		float4 transparentBlue(0.3f, 0.3f, 1.0f, 0.5f);
 
 		float4x4 rotXMtx = float4x4::rotation_x(CrMath::Pi / 2.0f);
 		float4x4 rotZMtx = float4x4::rotation_z(-CrMath::Pi / 2.0f);
@@ -281,6 +297,20 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		zAxisConeMtx[3] = float4(0.0f, 0.0f, 1.0f, 1.0f);
 		CrRenderMeshHandle zAxisCone = CrShapeBuilder::CreateCone({ 12, 0, zAxisConeMtx, blue });
 
+		// We want the plane to be a quarter of the size of the axis, so we divide by 2.0 (to get to the unit)
+		// and then divide by 4 (to get to a quarter)
+		float4x4 xzPlaneMtx = float4x4::scale(0.125f);
+		xzPlaneMtx[3] = float4(0.125f, 0.0f, 0.125f, 1.0f);
+		CrRenderMeshHandle xzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xzPlaneMtx, transparentGreen });
+
+		float4x4 xyPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_x(1.570796f));
+		xyPlaneMtx[3] = float4(0.125f, 0.125f, 0.0f, 1.0f);
+		CrRenderMeshHandle xyPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xyPlaneMtx, transparentBlue });
+
+		float4x4 yzPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_z(1.570796f));
+		yzPlaneMtx[3] = float4(0.0f, 0.125f, 0.125f, 1.0f);
+		CrRenderMeshHandle yzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, yzPlaneMtx, transparentRed });
+
 		// We grab the shaders from the builtin pipelines, in the knowledge that new pipeline states will be created using whatever
 		// the ubershader actually needs in terms of vertex format and render target formats
 		CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
@@ -303,34 +333,59 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		zAxisDescriptor.AddRenderMesh(zAxisCylinder, 0);
 		zAxisDescriptor.AddRenderMesh(zAxisCone, 0);
 
+		CrRenderModelDescriptor xzPlaneDescriptor;
+		xzPlaneDescriptor.AddMaterial(basicMaterial);
+		xzPlaneDescriptor.AddRenderMesh(xzPlaneQuad, 0);
+
+		CrRenderModelDescriptor xyPlaneDescriptor;
+		xyPlaneDescriptor.AddMaterial(basicMaterial);
+		xyPlaneDescriptor.AddRenderMesh(xyPlaneQuad, 0);
+
+		CrRenderModelDescriptor yzPlaneDescriptor;
+		yzPlaneDescriptor.AddMaterial(basicMaterial);
+		yzPlaneDescriptor.AddRenderMesh(yzPlaneQuad, 0);
+
 		CrRenderModelHandle xAxisRenderModel = CrRenderModelHandle(new CrRenderModel(xAxisDescriptor));
 		CrRenderModelHandle yAxisRenderModel = CrRenderModelHandle(new CrRenderModel(yAxisDescriptor));
 		CrRenderModelHandle zAxisRenderModel = CrRenderModelHandle(new CrRenderModel(zAxisDescriptor));
+		CrRenderModelHandle xzPlaneRenderModel = CrRenderModelHandle(new CrRenderModel(xzPlaneDescriptor));
+		CrRenderModelHandle xyPlaneRenderModel = CrRenderModelHandle(new CrRenderModel(xyPlaneDescriptor));
+		CrRenderModelHandle yzPlaneRenderModel = CrRenderModelHandle(new CrRenderModel(yzPlaneDescriptor));
 
 		m_manipulator->xAxis = m_renderWorld->CreateModelInstance();
 		m_manipulator->yAxis = m_renderWorld->CreateModelInstance();
 		m_manipulator->zAxis = m_renderWorld->CreateModelInstance();
+		m_manipulator->xzPlane = m_renderWorld->CreateModelInstance();
+		m_manipulator->xyPlane = m_renderWorld->CreateModelInstance();
+		m_manipulator->yzPlane = m_renderWorld->CreateModelInstance();
 
 		m_renderWorld->SetRenderModel(m_manipulator->xAxis.GetId(), xAxisRenderModel);
 		m_renderWorld->SetRenderModel(m_manipulator->yAxis.GetId(), yAxisRenderModel);
 		m_renderWorld->SetRenderModel(m_manipulator->zAxis.GetId(), zAxisRenderModel);
+		m_renderWorld->SetRenderModel(m_manipulator->xzPlane.GetId(), xzPlaneRenderModel);
+		m_renderWorld->SetRenderModel(m_manipulator->xyPlane.GetId(), xyPlaneRenderModel);
+		m_renderWorld->SetRenderModel(m_manipulator->yzPlane.GetId(), yzPlaneRenderModel);
+
+		//m_renderWorld->SetMaterial();
 
 		m_renderWorld->SetConstantSize(m_manipulator->xAxis.GetId(), true);
 		m_renderWorld->SetConstantSize(m_manipulator->yAxis.GetId(), true);
 		m_renderWorld->SetConstantSize(m_manipulator->zAxis.GetId(), true);
+		m_renderWorld->SetConstantSize(m_manipulator->xzPlane.GetId(), true);
+		m_renderWorld->SetConstantSize(m_manipulator->xyPlane.GetId(), true);
+		m_renderWorld->SetConstantSize(m_manipulator->yzPlane.GetId(), true);
 
 		m_renderWorld->SetEditorInstance(m_manipulator->xAxis.GetId());
 		m_renderWorld->SetEditorInstance(m_manipulator->yAxis.GetId());
 		m_renderWorld->SetEditorInstance(m_manipulator->zAxis.GetId());
+		m_renderWorld->SetEditorInstance(m_manipulator->xzPlane.GetId());
+		m_renderWorld->SetEditorInstance(m_manipulator->xyPlane.GetId());
+		m_renderWorld->SetEditorInstance(m_manipulator->yzPlane.GetId());
 	}
 
 	float4x4 transform = mul(float4x4::scale(0.2f), initialTransform);
 
-	m_manipulator->transformMtx = transform;
-
-	m_renderWorld->SetTransform(m_manipulator->xAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->yAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->zAxis.GetId(), transform);
+	SetManipulatorTransform(transform);
 }
 
 void CrEditor::RemoveManipulator()
@@ -340,6 +395,9 @@ void CrEditor::RemoveManipulator()
 		m_renderWorld->DestroyModelInstance(m_manipulator->xAxis.GetId());
 		m_renderWorld->DestroyModelInstance(m_manipulator->yAxis.GetId());
 		m_renderWorld->DestroyModelInstance(m_manipulator->zAxis.GetId());
+		m_renderWorld->DestroyModelInstance(m_manipulator->xzPlane.GetId());
+		m_renderWorld->DestroyModelInstance(m_manipulator->xyPlane.GetId());
+		m_renderWorld->DestroyModelInstance(m_manipulator->yzPlane.GetId());
 		m_manipulator = nullptr;
 	}
 }
@@ -363,12 +421,19 @@ float3 ClosestPointRayToRay(float3 pointA, float3 rayA, float3 pointB, float3 ra
 	return E;
 }
 
-// Assume ray is normalized
 float2 ClosestPointToRay(float2 point, float2 rayOrigin, float2 ray, float& t)
 {
 	float2 originToPoint = point - rayOrigin;
 	t = dot(originToPoint, ray) / dot(ray, ray);
 	return rayOrigin + t * ray;
+}
+
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection.html
+float3 RayPlaneIntersection(float3 planePoint, float3 planeNormal, float3 position, float3 direction)
+{
+	float3 positionToPlane = planePoint - position;
+	float t = dot(positionToPlane, planeNormal) / dot(direction, planeNormal);
+	return position + t * direction;
 }
 
 void CrEditor::TranslateManipulator(const MouseState& mouseState)
@@ -380,10 +445,7 @@ void CrEditor::TranslateManipulator(const MouseState& mouseState)
 	float4x4 transform = m_manipulatorInitialTransform;
 	transform[3].xyz += translationDelta;
 
-	m_manipulator->transformMtx = transform;
-	m_renderWorld->SetTransform(m_manipulator->xAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->yAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->zAxis.GetId(), transform);
+	SetManipulatorTransform(transform);
 
 	// Translate selected entities
 	for (const auto& selectedInstanceData : m_selectedInstances)
@@ -392,6 +454,17 @@ void CrEditor::TranslateManipulator(const MouseState& mouseState)
 		float3 newPosition = selectionData.initialTransform[3].xyz + translationDelta;
 		m_renderWorld->SetPosition(selectionData.modelInstanceId, newPosition);
 	}
+}
+
+void CrEditor::SetManipulatorTransform(const float4x4& transform)
+{
+	m_manipulator->transformMtx = transform;
+	m_renderWorld->SetTransform(m_manipulator->xAxis.GetId(), transform);
+	m_renderWorld->SetTransform(m_manipulator->yAxis.GetId(), transform);
+	m_renderWorld->SetTransform(m_manipulator->zAxis.GetId(), transform);
+	m_renderWorld->SetTransform(m_manipulator->xzPlane.GetId(), transform);
+	m_renderWorld->SetTransform(m_manipulator->xyPlane.GetId(), transform);
+	m_renderWorld->SetTransform(m_manipulator->yzPlane.GetId(), transform);
 }
 
 void CrEditor::SetSelected(CrModelInstanceId instanceId)
@@ -465,80 +538,95 @@ float3 CrEditor::ComputeSelectionPosition() const
 	return averagePosition.xyz;
 }
 
-float3 CrEditor::ComputeClosestPointMouseToManipulator(const MouseState& mouseState)
+// Compute closest point in axis to current world position
+float3 CrEditor::ComputeClosestPointToAxis(float2 mousePixel, float3 axisPositionWorld, float3 axisDirectionWorld)
 {
-	// Cast ray from mouse to screen using the camera
 	const CrCameraHandle& camera = m_renderWorld->GetCamera();
 
-	//------------------------
-	// Calculate current mouse
-	//------------------------
-	 
-	float2 mousePixel = float2(mouseState.position.x, mouseState.position.y) + 0.5f;
-	float2 mouseNormalized = mousePixel / float2(camera->GetResolutionWidth(), camera->GetResolutionHeight());
-	float2 mouseNdc = mouseNormalized * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f);
-	float2 mouseView = mouseNdc * float2(camera->GetNearPlaneWidth() / 2.0f, camera->GetNearPlaneHeight() / 2.0f);
-
-	//---------------
-	// Calculate axis
-	//---------------
-
-	// Direction of the manipulator in world space
-	float3 manipulatorDirectionWorld;
-	
-	if (m_selectedAxis == CrEditorAxis::AxisX)
-	{
-		manipulatorDirectionWorld = normalize(m_manipulatorInitialTransform[0].xyz);
-	}
-	else if (m_selectedAxis == CrEditorAxis::AxisY)
-	{
-		manipulatorDirectionWorld = normalize(m_manipulatorInitialTransform[1].xyz);
-	}
-	else if (m_selectedAxis == CrEditorAxis::AxisZ)
-	{
-		manipulatorDirectionWorld = normalize(m_manipulatorInitialTransform[2].xyz);
-	}
-
 	// Manipulator start position in world space
-	float3 manipulatorStartWorld = m_manipulatorInitialTransform[3].xyz;
+	float3 axisStartWorld = axisPositionWorld;
 
 	// Manipulator end position in world space
-	float3 manipulatorEndWorld = manipulatorStartWorld + 10.0f * manipulatorDirectionWorld;
+	float3 axisEndWorld = axisStartWorld + axisDirectionWorld;
 
 	// Manipulator start and end positions in view space
-	float4 manipulatorStartView = mul(float4(manipulatorStartWorld, 1.0f), camera->GetWorld2ViewMatrix());
+	float4 manipulatorStartView = mul(float4(axisStartWorld, 1.0f), camera->GetWorld2ViewMatrix());
 	float4 manipulatorStartNdc = mul(manipulatorStartView, camera->GetView2ProjectionMatrix());
 	manipulatorStartNdc /= manipulatorStartNdc.wwww;
 
-	float4 manipulatorEndView = mul(float4(manipulatorEndWorld, 1.0f), camera->GetWorld2ViewMatrix());
+	float4 manipulatorEndView = mul(float4(axisEndWorld, 1.0f), camera->GetWorld2ViewMatrix());
 	float4 manipulatorEndNdc = mul(manipulatorEndView, camera->GetView2ProjectionMatrix());
 	manipulatorEndNdc /= manipulatorEndNdc.wwww;
 
 	float4 uvScale(0.5f, -0.5f, 1.0f, 1.0f);
 	float4 uvBias(0.5f, 0.5f, 0.0f, 0.0f);
-	
+
 	float4 manipulatorStartUV = manipulatorStartNdc * uvScale + uvBias;
 	float4 manipulatorStartPixel = manipulatorStartUV * float4(camera->GetResolutionWidth(), camera->GetResolutionHeight(), 1.0f, 1.0f);
 
 	float4 manipulatorEndUV = manipulatorEndNdc * uvScale + uvBias;
 	float4 manipulatorEndPixel = manipulatorEndUV * float4(camera->GetResolutionWidth(), camera->GetResolutionHeight(), 1.0f, 1.0f);
 
-	// Bring the point onto the near plane by similar triangles
-	//manipulatorStartView.xy = manipulatorStartView.xy * nearPlane / manipulatorStartView.z;
-
-	//manipulatorEndView.xy = manipulatorEndView.xy * nearPlane / manipulatorEndView.z;
-
-	// Manipulator direction in NDC space
-	float2 manipulatorAxisPixel = (manipulatorEndPixel.xy - manipulatorStartPixel.xy);
+	float4 manipulatorAxisPixel = manipulatorEndPixel - manipulatorStartPixel;
 
 	float t;
-	float2 closestPointMouseToRay = ClosestPointToRay(mousePixel, manipulatorStartPixel.xy, manipulatorAxisPixel, t);
+	float2 closestPointMouseToRay = ClosestPointToRay(mousePixel, manipulatorStartPixel.xy, manipulatorAxisPixel.xy, t);
 
-	float3 interpolatedWorldPositionInvZ = lerp(manipulatorStartWorld / manipulatorStartView.z, manipulatorEndWorld / manipulatorEndView.z, t);
+	// Perspective-correct interpolation between the world positions. We need this because we found a t in pixel space, and cannot be used directly
+	float3 interpolatedWorldPositionInvZ = lerp(axisStartWorld / manipulatorStartView.z, axisEndWorld / manipulatorEndView.z, t);
 
 	float1 interpolatedInvZ = lerp(1.0f / manipulatorStartView.z, 1.0f / manipulatorEndView.z, t);
 
 	float3 interpolatedWorldPosition = interpolatedWorldPositionInvZ / interpolatedInvZ;
 
 	return interpolatedWorldPosition;
+}
+
+float3 CrEditor::ComputeClosestPointToPlane(float2 mousePixel, float3 planePositionWorld, float3 planeNormalWorld)
+{
+	const CrCameraHandle& camera = m_renderWorld->GetCamera();
+
+	float2 mouseNdc = (mousePixel / float2(camera->GetResolutionWidth(), camera->GetResolutionHeight())) * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f);
+
+	float3 viewRay = camera->GetViewRay(mouseNdc);
+
+	float3 viewRayWorld = mul(viewRay, camera->GetView2WorldRotation());
+
+	return RayPlaneIntersection(planePositionWorld, planeNormalWorld, camera->GetPosition(), viewRayWorld);
+}
+
+float3 CrEditor::ComputeClosestPointMouseToManipulator(const MouseState& mouseState)
+{
+	float2 mousePixel = float2(mouseState.position.x, mouseState.position.y) + 0.5f;
+
+	// Direction of the manipulator in world space
+	float3 manipulatorDirectionWorld;
+	float3 closestPointToManipulator;
+	
+	if (m_selectedAxis == CrEditorAxis::AxisX)
+	{
+		closestPointToManipulator = ComputeClosestPointToAxis(mousePixel, m_manipulatorInitialTransform[3].xyz, normalize(m_manipulatorInitialTransform[0].xyz));
+	}
+	else if (m_selectedAxis == CrEditorAxis::AxisY)
+	{
+		closestPointToManipulator = ComputeClosestPointToAxis(mousePixel, m_manipulatorInitialTransform[3].xyz, normalize(m_manipulatorInitialTransform[1].xyz));
+	}
+	else if (m_selectedAxis == CrEditorAxis::AxisZ)
+	{
+		closestPointToManipulator = ComputeClosestPointToAxis(mousePixel, m_manipulatorInitialTransform[3].xyz, normalize(m_manipulatorInitialTransform[2].xyz));
+	}
+	else if (m_selectedAxis == CrEditorAxis::PlaneXZ)
+	{
+		closestPointToManipulator = ComputeClosestPointToPlane(mousePixel, m_manipulatorInitialTransform[3].xyz, m_manipulatorInitialTransform[1].xyz);
+	}
+	else if (m_selectedAxis == CrEditorAxis::PlaneXY)
+	{
+		closestPointToManipulator = ComputeClosestPointToPlane(mousePixel, m_manipulatorInitialTransform[3].xyz, m_manipulatorInitialTransform[2].xyz);
+	}
+	else if (m_selectedAxis == CrEditorAxis::PlaneYZ)
+	{
+		closestPointToManipulator = ComputeClosestPointToPlane(mousePixel, m_manipulatorInitialTransform[3].xyz, m_manipulatorInitialTransform[0].xyz);
+	}
+
+	return closestPointToManipulator;
 }

@@ -42,10 +42,9 @@ struct CrManipulator
 	CrRenderModelInstance xAxis;
 	CrRenderModelInstance yAxis;
 	CrRenderModelInstance zAxis;
-
-	uint32_t screenPositionX;
-
-	bool active = false;
+	CrRenderModelInstance xzPlane;
+	CrRenderModelInstance xyPlane;
+	CrRenderModelInstance yzPlane;
 };
 
 // Properties of instances that are currently selected. We use this to be able to transform
@@ -64,6 +63,9 @@ namespace CrEditorAxis
 		AxisX,
 		AxisY,
 		AxisZ,
+		PlaneXZ,
+		PlaneXY,
+		PlaneYZ,
 		None
 	};
 };
@@ -88,6 +90,8 @@ private:
 
 	void TranslateManipulator(const MouseState& mouseState);
 
+	void SetManipulatorTransform(const float4x4& transform);
+
 	// Selection functionality
 
 	void SetSelected(CrModelInstanceId instanceId);
@@ -105,6 +109,10 @@ private:
 	bool IsAnyInstanceSelected() const;
 
 	float3 ComputeSelectionPosition() const;
+
+	float3 ComputeClosestPointToAxis(float2 mousePixel, float3 axisPositionWorld, float3 axisDirectionWorld);
+
+	float3 ComputeClosestPointToPlane(float2 mousePixel, float3 planePosition, float3 planeNormal);
 
 	float3 ComputeClosestPointMouseToManipulator(const MouseState& mouseState);
 

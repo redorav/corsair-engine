@@ -247,8 +247,10 @@ workspace 'Corsair Engine'
 
 	filter { 'configurations:Final' }
 		defines { 'CR_CONFIG_FINAL', }
-		
 	
+	filter { 'configurations:not Final' }
+		defines { 'CR_EDITOR', }
+
 -- Project definitions
 
 project (ProjectCorsairEngine)

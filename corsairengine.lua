@@ -5,6 +5,7 @@ SourceDirectory          = 'Source'
 ToolsDirectory           = 'Tools'
 MathDirectory            = SourceDirectory..'/Math'
 SourceUnitTestsDirectory = SourceDirectory..'/UnitTests'
+SourceEditorDirectory    = SourceDirectory..'/Editor'
 SourceRenderingDirectory = SourceDirectory..'/Rendering'
 SourceShadersDirectory   = SourceRenderingDirectory..'/Shaders'
 WorkspaceDirectory       = 'Workspace/'.._ACTION
@@ -33,6 +34,7 @@ ProjectBuiltinShaders   = 'CrBuiltinShaders'
 ProjectResource         = 'CrResource'
 ProjectCore             = 'CrCore'
 ProjectUnitTests        = 'CrUnitTests'
+ProjectEditor           = 'CrEditor'
 
 -- Generated Code Directories
 GeneratedShadersDirectory = WorkspaceDirectory..'/GeneratedShaders'
@@ -266,7 +268,8 @@ project (ProjectCorsairEngine)
 		ProjectCore,
 		ProjectRendering,
 		ProjectResource,
-		ProjectUnitTests
+		ProjectUnitTests,
+		ProjectEditor
 	}
 	
 	-- Only executables should link to any libraries
@@ -526,6 +529,16 @@ project(ProjectUnitTests)
 	files
 	{
 		SourceUnitTestsDirectory..'/**'
+	}
+
+group('Editor')
+
+project(ProjectEditor)
+	kind('StaticLib')
+	
+	files
+	{
+		SourceEditorDirectory..'/**'
 	}
 
 group('.Solution Generation')

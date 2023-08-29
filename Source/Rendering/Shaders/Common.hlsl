@@ -48,15 +48,15 @@ cbuffer Camera
 	Camera cb_Camera;
 };
 
-struct Color
+struct Material
 {
 	float4 color;
 	float4 tint;
 };
 
-cbuffer Color
+cbuffer Material
 {
-	Color cb_Color;
+	Material cb_Material;
 };
 
 struct Instance

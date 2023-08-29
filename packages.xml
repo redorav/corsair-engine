@@ -26,7 +26,7 @@
 	<package name="glslang">
 		<version id="be06c6f" file="glslang_2020_06_28_be06c6f.zip" repository="github"/>
 		<version id="6624e13" file="glslang_2022_01_17_6624e13.zip" repository="github"/>
-		<version id="c5117b3" file="glslang_2023_08_19_c5117b3.zip" repository="github"/>
+		<version id="c5117b3" file="glslang_2023_08_19_c5117b3.7z" repository="github"/>
 	</package>
 	
 	<package name="imgui">

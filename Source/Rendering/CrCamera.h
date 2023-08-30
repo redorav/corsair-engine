@@ -37,11 +37,11 @@ public:
 
 	void SetPosition(const float3& p);
 
-	void SetFilmWidth(float filmWidth);
+	void SetNearPlaneWidth(float filmWidth);
 
 	float GetNearPlaneWidth() const;
 
-	void SetFilmHeight(float filmHeight);
+	void SetNearPlaneHeight(float filmHeight);
 
 	float GetNearPlaneHeight() const;
 

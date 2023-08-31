@@ -300,8 +300,8 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 				// Speeding it up can also have the added benefit that we could continously do this process
 				const float4 uvScale = float4(0.5f, -0.5f, 0.0f, 0.0f);
 				const float4 uvBias = float4(0.5f, 0.5f, 0.0f, 0.0f);
-				float4 uvPositionMin(+1.0e+100);
-				float4 uvPositionMax(-1.0e+100);
+				float4 uvPositionMin( 1000.0f);
+				float4 uvPositionMax(-1000.0f);
 
 				for (uint32_t i = 0; i < meshProjectedCorners.size(); ++i)
 				{

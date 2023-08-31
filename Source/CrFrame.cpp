@@ -507,7 +507,7 @@ void CrFrame::Process()
 	CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
 	CrRenderGraphTextureId lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -563,7 +563,7 @@ void CrFrame::Process()
 		);
 	});
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Lighting Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Lighting Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddRenderTarget(lightingTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f));
@@ -589,7 +589,7 @@ void CrFrame::Process()
 		commandBuffer->Draw(3, 1, 0, 0);
 	});
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Main Render Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Transparency Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);

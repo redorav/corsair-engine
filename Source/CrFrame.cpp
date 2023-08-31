@@ -83,7 +83,7 @@ struct CrRenderPacketBatcher
 
 		if (stateMismatch || noMoreSpace)
 		{
-			ExecuteBatch();
+			FlushBatch();
 			m_batchStarted = false;
 		}
 
@@ -106,7 +106,7 @@ struct CrRenderPacketBatcher
 		m_numInstances += renderPacket.numInstances;
 	}
 
-	void ExecuteBatch()
+	void FlushBatch()
 	{
 		if (m_numInstances > 0)
 		{
@@ -531,7 +531,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
-		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+		renderPacketBatcher.FlushBatch(); // Execute the last batch
 	});
 
 	CrRenderGraphTextureDescriptor linearDepthMipChainDescriptor(m_linearDepth16MinMaxMipChain.get());
@@ -609,7 +609,7 @@ void CrFrame::Process()
 			renderPacketBatcher.ProcessRenderPacket(renderPacket);
 		});
 
-		renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+		renderPacketBatcher.FlushBatch(); // Execute the last batch
 	});
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Editor Grid Render"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -668,7 +668,7 @@ void CrFrame::Process()
 				renderPacketBatcher.ProcessRenderPacket(renderPacket);
 			});
 
-			renderPacketBatcher.ExecuteBatch(); // Execute the last batch
+			renderPacketBatcher.FlushBatch(); // Execute the last batch
 		});
 
 		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Resolve"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
@@ -792,6 +792,8 @@ void CrFrame::Process()
 
 			mouseSelectionRenderList.ForEachRenderPacket([&](const CrRenderPacket& renderPacket)
 			{
+				renderPacketBatcher.FlushBatch();
+
 				CrGPUBufferViewT<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
 				DebugShader* debugShaderData = debugShaderBuffer.GetData();
 				{
@@ -804,10 +806,10 @@ void CrFrame::Process()
 
 				// TODO Fix dodgy behavior where we bind a constant buffer, bind another, then flush the batch
 				// The problem happens when we modify per-instance data that the batcher knows nothing about
-				renderPacketBatcher.ExecuteBatch();
+				renderPacketBatcher.FlushBatch();
 			});
 
-			renderPacketBatcher.ExecuteBatch(); // Execute last batch
+			renderPacketBatcher.FlushBatch(); // Execute last batch
 		});
 
 		const ICrComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline.get();

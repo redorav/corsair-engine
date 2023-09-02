@@ -43,16 +43,13 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 		for (CrMaterialPipelineVariant::T pipelineVariant = CrMaterialPipelineVariant::First; pipelineVariant < CrMaterialPipelineVariant::Count; ++pipelineVariant)
 		{
-			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(pipelineVariant);
-
-			CrGraphicsPipelineDescriptor pipelineDescriptor;
-			pipelineDescriptor.renderTargets = passProperties.renderTargets;
+			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(mesh, pipelineVariant);
 
 			const CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
 
 			if (graphicsShader)
 			{
-				CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+				CrGraphicsPipelineHandle pipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
 				m_pipelines[meshIndex][pipelineVariant] = pipeline;
 			}

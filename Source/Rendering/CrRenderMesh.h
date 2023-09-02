@@ -29,9 +29,15 @@ public:
 
 	void SetIndexBuffer(const CrIndexBufferHandle& indexBuffer);
 
+	void SetIsDoubleSided(bool isDoubleSided) { m_isDoubleSided = isDoubleSided; }
+
+	bool GetIsDoubleSided() const { return m_isDoubleSided; }
+
 private:
 
 	void MergeVertexDescriptors();
+
+	bool m_isDoubleSided = false;
 
 	CrVector<CrVertexBufferHandle> m_vertexBuffers;
 

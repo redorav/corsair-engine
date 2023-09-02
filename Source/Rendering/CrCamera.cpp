@@ -64,7 +64,7 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 	m_projection2ViewMatrix = inverse(m_view2ProjectionMatrix);
 }
 
-void CrCamera::Update()
+void CrCamera::UpdateMatrices()
 {
 	m_view2WorldMatrix = float4x4::identity();
 	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
@@ -77,25 +77,6 @@ void CrCamera::Update()
 	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
 
 	m_projection2WorldMatrix = mul(m_projection2ViewMatrix, m_view2WorldMatrix);
-}
-
-void CrCamera::LookAtPosition(const float3& target, const float3& up)
-{
-	float3 vz = normalize(target - m_position);
-	float3 vx = normalize(cross(up, vz));
-	float3 vy = cross(vz, vx);
-
-	m_forwardWorldSpace = vz;
-	m_rightWorldSpace = vx;
-	m_upWorldSpace = vy;
-}
-
-void CrCamera::RotateAround(const float3& pivot, const float3& axis, float angle)
-{
-	quaternion rotation = quaternion::rotation_axis(axis, angle * CrMath::Deg2Rad);
-	float3 currentDirection = m_position - pivot;       // Get current direction
-	float3 direction = mul(currentDirection, rotation); // Rotate with quaternion
-	m_position = pivot + direction;                     // Get position
 }
 
 float4 CrCamera::ComputeProjectionParams() const
@@ -125,29 +106,19 @@ void CrCamera::Translate(const float3& t)
 	m_position += t;
 }
 
-void CrCamera::Rotate(const float3& r)
-{
-	// Rotate around the Y axis
-	quaternion rotationY = quaternion::rotation_y(r.y);
-
-	// Rotate around the camera's previous right axis
-	// TODO It may be better to keep hold of the current full rotation
-	quaternion rotationX = quaternion::rotation_axis(m_rightWorldSpace, r.x);
-
-	// Combine rotations
-	quaternion rotationXY = mul(rotationX, rotationY);
-
-	m_forwardWorldSpace = mul(m_forwardWorldSpace, rotationXY);
-	m_upWorldSpace     = mul(m_upWorldSpace,     rotationXY);
-	m_rightWorldSpace  = mul(m_rightWorldSpace,  rotationXY);
-}
-
 void CrCamera::SetPosition(const float3& p)
 {
 	m_position = p;
 }
 
-void CrCamera::SetFilmWidth(float filmWidth)
+void CrCamera::SetCameraRotationVectors(float3 forwardVector, float3 rightVector, float3 upVector)
+{
+	m_rightWorldSpace = rightVector;
+	m_upWorldSpace = upVector;
+	m_forwardWorldSpace = forwardVector;
+}
+
+void CrCamera::SetNearPlaneWidth(float filmWidth)
 {
 	m_nearPlaneWidth = filmWidth;
 }
@@ -157,7 +128,7 @@ float CrCamera::GetNearPlaneWidth() const
 	return m_nearPlaneWidth;
 }
 
-void CrCamera::SetFilmHeight(float filmHeight)
+void CrCamera::SetNearPlaneHeight(float filmHeight)
 {
 	m_nearPlaneHeight = filmHeight;
 }

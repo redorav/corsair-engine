@@ -56,6 +56,15 @@ struct SelectedInstanceState
 	float4x4 initialTransform;
 };
 
+struct CrEditorCameraState
+{
+	float3 focusPosition;
+	float focusDistance;
+	float defaultFocusDistance;
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+};
+
 namespace CrEditorAxis
 {
 	enum T
@@ -116,10 +125,6 @@ private:
 
 	float3 ComputeClosestPointMouseToManipulator(const MouseState& mouseState);
 
-	float3 m_cameraFocusPosition;
-
-	float m_cameraFocusDistance;
-
 	CrRenderWorldHandle m_renderWorld;
 	
 	// Manipulator and selection related variables
@@ -145,4 +150,10 @@ private:
 
 	// Closest point from ray to axis when we started dragging
 	float3 m_manipulatorInitialClosestPoint;
+
+	// Camera
+	// We keep a series of quantities so that we can build a camera matrix without relying on the original
+	// state of the camera. Instead, we build it from angles, etc.
+
+	CrEditorCameraState m_cameraState;
 };

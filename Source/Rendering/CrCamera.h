@@ -29,13 +29,13 @@ public:
 
 	void SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane);
 
-	void Update();
+	void UpdateMatrices();
 
 	void Translate(const float3& t);
 
-	void Rotate(const float3& r);
-
 	void SetPosition(const float3& p);
+	
+	void SetCameraRotationVectors(float3 forwardVector, float3 rightVector, float3 upVector);
 
 	void SetNearPlaneWidth(float filmWidth);
 
@@ -46,10 +46,6 @@ public:
 	float GetNearPlaneHeight() const;
 
 	void SetVerticalFieldOfView(float fovY);
-
-	void LookAtPosition(const float3& target, const float3& up);
-
-	void RotateAround(const float3& point, const float3& axis, float angle);
 
 	float4 ComputeProjectionParams() const;
 

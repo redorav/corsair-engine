@@ -12,6 +12,8 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/ICrShader.h"
 
+#include "Math/CrHlslppQuaternion.h"
+
 void CrEditor::Initialize()
 {
 	CrRenderMeshHandle dummyDebugMesh = CrShapeBuilder::CreateSphere({ 12 });
@@ -20,6 +22,9 @@ void CrEditor::Initialize()
 	basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = CrBuiltinPipelines::BasicUbershaderForward.get()->GetShader();
 	basicMaterial->m_shaders[CrMaterialShaderVariant::GBuffer] = CrBuiltinPipelines::BasicUbershaderGBuffer.get()->GetShader();
 	basicMaterial->m_shaders[CrMaterialShaderVariant::Debug] = CrBuiltinPipelines::BasicUbershaderDebug.get()->GetShader();
+
+	m_cameraState.defaultFocusDistance = 4.0f;
+	m_cameraState.focusDistance = m_cameraState.defaultFocusDistance;
 }
 
 void CrEditor::SetRenderWorld(const CrRenderWorldHandle& renderWorld)
@@ -42,37 +47,90 @@ void CrEditor::Update()
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
 	const GamepadState& gamepadState = CrInput.GetGamepadState(0);
 
-	float3 currentForward = camera->GetForwardVector();
-	float3 currentRight = camera->GetRightVector();
-
-	bool isEscapeClicked = keyboardState.keyHeld[KeyboardKey::Escape];
+	bool isEscapeHeld = keyboardState.keyHeld[KeyboardKey::Escape];
 	//bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
+	bool isLeftAltHeld = keyboardState.keyHeld[KeyboardKey::Alt];
+	//bool isLeftCtrlHeld = keyboardState.keyHeld[KeyboardKey::LeftCtrl];
+	bool isLeftShiftHeld = keyboardState.keyHeld[KeyboardKey::LeftShift];
+
+	bool isFPSCamera = mouseState.buttonHeld[MouseButton::Right];
+	bool isOrbitCamera = isLeftAltHeld && mouseState.buttonHeld[MouseButton::Left];
+
+	//---------
+	// Rotation
+	//---------
+
+	float mouseSensitivity = 0.005f;
+	float mouseWheelSensitivity = 0.5f;
+
+	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
+	{
+		m_cameraState.yaw += 2.0f * frameDelta;
+	}
+
+	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
+	{
+		m_cameraState.yaw += -2.0f * frameDelta;
+	}
+
+	if (gamepadState.axes[GamepadAxis::RightY] > 0.0f)
+	{
+		m_cameraState.pitch += -2.0f * frameDelta;
+	}
+
+	if (gamepadState.axes[GamepadAxis::RightY] < 0.0f)
+	{
+		m_cameraState.pitch += 2.0f * frameDelta;
+	}
+
+	if (isFPSCamera || isOrbitCamera)
+	{
+		m_cameraState.pitch += (float)mouseState.relativePosition.y * mouseSensitivity;
+		m_cameraState.yaw += (float)mouseState.relativePosition.x * mouseSensitivity;
+	}
+
+	// Restrict angles to 2pi to avoid numerical instability at large values
+	// Compute rotation from absolute angles relative to the world origin
+	// This avoids relative camera movement that can drift and avoids Y-axis nonsense
+	float3x3 xMtx = float3x3::rotation_x(m_cameraState.pitch);
+	float3x3 yMtx = float3x3::rotation_y(m_cameraState.yaw);
+	float3x3 finalMtx = mul(xMtx, yMtx);
+
+	camera->SetCameraRotationVectors(finalMtx[2], finalMtx[0], finalMtx[1]);
+
+	const float3 forwardVector = camera->GetForwardVector();
+	const float3 rightVector = camera->GetRightVector();
+	const float3 upVector = camera->GetUpVector();
+
+	//------------
+	// Translation
+	//------------
 
 	float translationSpeed = 5.0f;
 
-	if (keyboardState.keyHeld[KeyboardKey::LeftShift])
+	if (isLeftShiftHeld)
 	{
 		translationSpeed *= 10.0f;
 	}
 
 	if (keyboardState.keyHeld[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
 	{
-		camera->Translate(currentRight * -translationSpeed * frameDelta);
+		camera->Translate(rightVector * -translationSpeed * frameDelta);
 	}
 
 	if (keyboardState.keyHeld[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
 	{
-		camera->Translate(currentRight * translationSpeed * frameDelta);
+		camera->Translate(rightVector * translationSpeed * frameDelta);
 	}
 
 	if (keyboardState.keyHeld[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
 	{
-		camera->Translate(currentForward * translationSpeed * frameDelta);
+		camera->Translate(forwardVector * translationSpeed * frameDelta);
 	}
 
 	if (keyboardState.keyHeld[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
 	{
-		camera->Translate(currentForward * -translationSpeed * frameDelta);
+		camera->Translate(forwardVector * -translationSpeed * frameDelta);
 	}
 
 	if (keyboardState.keyHeld[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
@@ -89,40 +147,49 @@ void CrEditor::Update()
 	{
 		if (IsAnyInstanceSelected())
 		{
-			float3 position = ComputeSelectionPosition();
-			m_cameraFocusPosition = position;
-			float3 finalCameraPosition = position - camera->GetForwardVector() * 3.0f;
-			camera->SetPosition(finalCameraPosition);
+			m_cameraState.focusDistance = m_cameraState.defaultFocusDistance;
+			m_cameraState.focusPosition = ComputeSelectionPosition();
+			camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
 		}
 	}
 
-	if (keyboardState.keyHeld[KeyboardKey::Alt] && mouseState.buttonHeld[MouseButton::Left])
+	if (mouseState.mouseWheel.y != 0)
 	{
-		float3 pivot = m_cameraFocusPosition;
-		float3 up = float3(0.0f, 1.0f, 0.0f);
-		float angle = (float)mouseState.relativePosition.x;
-		camera->RotateAround(pivot, up, angle);
-		camera->LookAtPosition(pivot, up);
+		float translation = mouseState.mouseWheel.y * mouseWheelSensitivity;
+		camera->Translate(forwardVector * translation);
+		m_cameraState.focusDistance = distance(camera->GetPosition(), m_cameraState.focusPosition);
 	}
 
-	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
+	//-----------------
+	// Orbit and Strafe
+	//-----------------
+
+	if (isLeftAltHeld)
 	{
-		camera->Rotate(float3(0.0f, 2.0f, 0.0f) * frameDelta);
+		if (mouseState.buttonHeld[MouseButton::Left])
+		{
+			// If we're orbiting the focal point, make sure we continually point towards it
+			camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
+		}
+		else if(mouseState.buttonHeld[MouseButton::Middle])
+		{
+			float rightTranslation = (float)-mouseState.relativePosition.x * mouseSensitivity;
+			float upTranslation = (float)mouseState.relativePosition.y * mouseSensitivity;
+
+			camera->SetPosition(camera->GetPosition() + rightVector * rightTranslation + upVector * upTranslation);
+		}
+
+		// Finally update the focus position
+		m_cameraState.focusPosition = camera->GetPosition() + forwardVector * m_cameraState.focusDistance;
 	}
 
-	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
-	{
-		camera->Rotate(float3(0.0f, -2.0f, 0.0f) * frameDelta);
-	}
+	//--------------------------
+	// Update Matrices to Render
+	//--------------------------
 
-	if (mouseState.buttonHeld[MouseButton::Right])
-	{
-		camera->Rotate(float3(mouseState.relativePosition.y, mouseState.relativePosition.x, 0.0f) * frameDelta);
-	}
+	camera->UpdateMatrices();
 
-	camera->Update();
-
-	if (isEscapeClicked)
+	if (isEscapeHeld)
 	{
 		ClearSelectedInstances();
 		RemoveManipulator();
@@ -244,7 +311,9 @@ void CrEditor::Update()
 		RemoveManipulator();
 	}
 
-	bool requestMouseSelection = mouseState.buttonPressed[MouseButton::Left] || mouseState.buttonHeld[MouseButton::Left];
+	bool requestMouseSelection = 
+		(mouseState.buttonPressed[MouseButton::Left] || mouseState.buttonHeld[MouseButton::Left])
+		&& !isLeftAltHeld; // We use left alt for navigation, so we want to avoid clicking on things
 
 	CrRectangle mouseRectangle(mouseState.position.x, mouseState.position.y, 1, 1);
 	m_renderWorld->SetMouseSelectionEnabled(requestMouseSelection, mouseRectangle);
@@ -302,14 +371,17 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		float4x4 xzPlaneMtx = float4x4::scale(0.125f);
 		xzPlaneMtx[3] = float4(0.125f, 0.0f, 0.125f, 1.0f);
 		CrRenderMeshHandle xzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xzPlaneMtx, transparentGreen });
+		xzPlaneQuad->SetIsDoubleSided(true);
 
 		float4x4 xyPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_x(1.570796f));
 		xyPlaneMtx[3] = float4(0.125f, 0.125f, 0.0f, 1.0f);
 		CrRenderMeshHandle xyPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xyPlaneMtx, transparentBlue });
+		xyPlaneQuad->SetIsDoubleSided(true);
 
 		float4x4 yzPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_z(1.570796f));
 		yzPlaneMtx[3] = float4(0.0f, 0.125f, 0.125f, 1.0f);
 		CrRenderMeshHandle yzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, yzPlaneMtx, transparentRed });
+		yzPlaneQuad->SetIsDoubleSided(true);
 
 		// We grab the shaders from the builtin pipelines, in the knowledge that new pipeline states will be created using whatever
 		// the ubershader actually needs in terms of vertex format and render target formats

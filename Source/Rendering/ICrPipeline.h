@@ -43,6 +43,29 @@ struct CrRenderTargetBlendDescriptor
 		alphaBlendOp        = cr3d::BlendOp::Add;
 	}
 
+	CrRenderTargetBlendDescriptor
+	(
+		cr3d::BlendFactor srcColorBlendFactor,
+		cr3d::BlendFactor dstColorBlendFactor,
+		cr3d::BlendFactor srcAlphaBlendFactor,
+		cr3d::BlendFactor dstAlphaBlendFactor,
+		cr3d::ColorWriteMask colorWriteMask,
+		cr3d::BlendOp colorBlendOp,
+		cr3d::BlendOp alphaBlendOp,
+		uint32_t enable
+	)
+	{
+		this->bits = 0;
+		this->srcColorBlendFactor = srcColorBlendFactor;
+		this->dstColorBlendFactor = dstColorBlendFactor;
+		this->srcAlphaBlendFactor = srcAlphaBlendFactor;
+		this->dstAlphaBlendFactor = dstAlphaBlendFactor;
+		this->colorWriteMask = colorWriteMask;
+		this->colorBlendOp = colorBlendOp;
+		this->alphaBlendOp = alphaBlendOp;
+		this->enable = enable;
+	}
+
 	union
 	{
 		struct
@@ -69,6 +92,12 @@ struct CrRenderTargetBlendDescriptor
 };
 
 static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4, "CrRenderTargetBlendDescriptor size mismatch");
+
+namespace CrStandardPipelineStates
+{
+	extern CrRenderTargetBlendDescriptor OpaqueBlend;
+	extern CrRenderTargetBlendDescriptor AlphaBlend;
+};
 
 struct CrBlendStateDescriptor
 {

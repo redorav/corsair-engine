@@ -4,6 +4,30 @@
 #include "Rendering/ICrShader.h"
 #include "Rendering/CrVertexDescriptor.h"
 
+CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
+{
+	cr3d::BlendFactor::One,
+	cr3d::BlendFactor::One,
+	cr3d::BlendFactor::One,
+	cr3d::BlendFactor::One,
+	cr3d::ColorWriteComponent::All,
+	cr3d::BlendOp::Add,
+	cr3d::BlendOp::Add,
+	false
+};
+
+CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
+{
+	cr3d::BlendFactor::SrcAlpha,
+	cr3d::BlendFactor::OneMinusSrcAlpha,
+	cr3d::BlendFactor::One,
+	cr3d::BlendFactor::Zero,
+	cr3d::ColorWriteComponent::All,
+	cr3d::BlendOp::Add,
+	cr3d::BlendOp::Add,
+	true
+};
+
 ICrGraphicsPipeline::ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	: CrGPUAutoDeletable(renderDevice)
 	, m_shader(graphicsShader)

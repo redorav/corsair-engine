@@ -77,7 +77,8 @@ struct CrRenderPacketBatcher
 		bool stateMismatch =
 			renderPacket.pipeline != m_pipeline ||
 			renderPacket.material != m_material ||
-			renderPacket.renderMesh != m_renderMesh;
+			renderPacket.renderMesh != m_renderMesh ||
+			renderPacket.extra != m_extra;
 
 		bool noMoreSpace = (m_numInstances + renderPacket.numInstances) > m_maxBatchSize;
 
@@ -149,6 +150,7 @@ struct CrRenderPacketBatcher
 	const CrMaterial* m_material = nullptr;
 	const CrRenderMesh* m_renderMesh = nullptr;
 	const ICrGraphicsPipeline* m_pipeline = nullptr;
+	const void* m_extra = nullptr;
 
 	ICrCommandBuffer* m_commandBuffer = nullptr;
 

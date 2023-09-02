@@ -87,9 +87,11 @@ namespace CrMaterialPipelineVariant
 
 struct CrMaterialPassProperties
 {
-	static CrMaterialPassProperties GetMaterialPassProperties(CrMaterialPipelineVariant::T pipelineVariant);
+	static CrMaterialPassProperties GetMaterialPassProperties(const CrRenderMeshHandle& renderMesh, CrMaterialPipelineVariant::T pipelineVariant);
 
-	CrRenderTargetFormatDescriptor renderTargets;
+	// We'll modify the pipeline descriptor as we need based on the pipeline variant
+	CrGraphicsPipelineDescriptor pipelineDescriptor;
+
 	CrMaterialShaderVariant::T shaderVariant = CrMaterialShaderVariant::Count;
 };
 

@@ -421,7 +421,7 @@ struct CrShaderBytecodeCompilationDescriptor
 	(const CrFixedPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
 		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
-	const CrFixedPath                    path;
+	const CrFixedPath               path;
 	const CrFixedString128          entryPoint;
 	const cr3d::ShaderStage::T      stage;
 	const cr3d::GraphicsApi::T      graphicsApi;

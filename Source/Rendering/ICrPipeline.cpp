@@ -44,7 +44,10 @@ ICrGraphicsPipeline::~ICrGraphicsPipeline() {}
 ICrComputePipeline::ICrComputePipeline(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) 
 	: CrGPUAutoDeletable(renderDevice), m_shader(computeShader)
 {
-
+	const CrShaderReflectionHeader& reflection = computeShader->GetBytecode()->GetReflection();
+	m_threadGroupSizeX = reflection.threadGroupSizeX;
+	m_threadGroupSizeY = reflection.threadGroupSizeY;
+	m_threadGroupSizeZ = reflection.threadGroupSizeZ;
 }
 
 ICrComputePipeline::~ICrComputePipeline() {}

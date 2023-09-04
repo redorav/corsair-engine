@@ -268,7 +268,19 @@ public:
 
 	const CrComputeShaderHandle& GetShader() const { return m_shader; }
 
+	uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
+
+	uint32_t GetGroupSizeY() const { return m_threadGroupSizeY; }
+
+	uint32_t GetGroupSizeZ() const { return m_threadGroupSizeZ; }
+
 private:
+
+	uint32_t m_threadGroupSizeX;
+
+	uint32_t m_threadGroupSizeY;
+
+	uint32_t m_threadGroupSizeZ;
 
 	CrComputeShaderHandle m_shader;
 

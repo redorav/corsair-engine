@@ -239,13 +239,13 @@ void CrComputePipelineD3D12::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineD3D12::Recompile(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
+void CrGraphicsPipelineD3D12::RecompilePS(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
 	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
-void CrComputePipelineD3D12::Recompile(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineD3D12::RecompilePS(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
 {
 	Deinitialize();
 	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), computeShader);

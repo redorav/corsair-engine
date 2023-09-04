@@ -41,6 +41,16 @@ ICrGraphicsPipeline::ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const Cr
 
 ICrGraphicsPipeline::~ICrGraphicsPipeline() {}
 
+#if !defined(CR_CONFIG_FINAL)
+
+void ICrGraphicsPipeline::Recompile(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
+{
+	RecompilePS(renderDevice, graphicsShader);
+	m_shader = graphicsShader;
+}
+
+#endif
+
 ICrComputePipeline::ICrComputePipeline(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) 
 	: CrGPUAutoDeletable(renderDevice), m_shader(computeShader)
 {
@@ -51,3 +61,13 @@ ICrComputePipeline::ICrComputePipeline(ICrRenderDevice* renderDevice, const CrCo
 }
 
 ICrComputePipeline::~ICrComputePipeline() {}
+
+#if !defined(CR_CONFIG_FINAL)
+
+void ICrComputePipeline::Recompile(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+{
+	RecompilePS(renderDevice, computeShader);
+	m_shader = computeShader;
+}
+
+#endif

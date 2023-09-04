@@ -449,6 +449,8 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+
 	FlushGraphicsRenderState();
 
 	DrawPS(vertexCount, instanceCount, firstVertex, firstInstance);
@@ -460,6 +462,8 @@ inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount,
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+
 	FlushGraphicsRenderState();
 
 	DrawIndexedPS(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
@@ -471,6 +475,8 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 
 inline void ICrCommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 {
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+
 	FlushGraphicsRenderState();
 
 	DrawIndirectPS(indirectBuffer, offset, count);
@@ -491,6 +497,8 @@ inline void ICrCommandBuffer::DrawIndexedIndirect(const ICrHardwareGPUBuffer* in
 
 inline void ICrCommandBuffer::DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 {
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Compute, "Render pass type must be Compute");
+
 	FlushComputeRenderState();
 
 	DispatchIndirectPS(indirectBuffer, offset);
@@ -503,6 +511,8 @@ inline void ICrCommandBuffer::FlushGraphicsRenderState()
 
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Compute, "Render pass type must be Compute");
+
 	FlushComputeRenderState();
 
 	DispatchPS(threadGroupCountX, threadGroupCountY, threadGroupCountZ);

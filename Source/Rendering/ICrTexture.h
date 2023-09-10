@@ -23,6 +23,18 @@ struct CrTextureDescriptor
 	cr3d::SampleCount sampleCount;
 	cr3d::TextureType type;
 	cr3d::TextureUsageFlags usage;
+
+	// Defaults to zero
+	union
+	{
+		float colorClear[4] = {};
+		struct
+		{
+			float depthClear;
+			uint8_t stencilClear;
+		};
+	};
+
 	const uint8_t* initialData; // TODO do better
 	uint64_t initialDataSize; // TODO delete from here
 

@@ -74,13 +74,31 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		D3D12_HEAP_PROPERTIES heapProperties = {};
 		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
+		bool useOptimizedClearValue = IsRenderTarget();
+
+		D3D12_CLEAR_VALUE clearValue;
+		clearValue.Format = dxgiFormat;
+
+		if (cr3d::IsDepthFormat(descriptor.format))
+		{
+			clearValue.DepthStencil.Depth = descriptor.depthClear;
+			clearValue.DepthStencil.Stencil = descriptor.stencilClear;
+		}
+		else
+		{
+			clearValue.Color[0] = descriptor.colorClear[0];
+			clearValue.Color[1] = descriptor.colorClear[1];
+			clearValue.Color[2] = descriptor.colorClear[2];
+			clearValue.Color[3] = descriptor.colorClear[3];
+		}
+
 		HRESULT hResult = d3d12Device->CreateCommittedResource
 		(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&d3d12ResourceDescriptor,
 			m_d3d12InitialState,
-			nullptr,
+			useOptimizedClearValue ? &clearValue : nullptr,
 			IID_PPV_ARGS(&m_d3d12Resource)
 		);
 

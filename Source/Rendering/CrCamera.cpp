@@ -79,11 +79,12 @@ void CrCamera::UpdateMatrices()
 	m_projection2WorldMatrix = mul(m_projection2ViewMatrix, m_view2WorldMatrix);
 }
 
-float4 CrCamera::ComputeProjectionParams() const
+float4 CrCamera::ComputeLinearizationParams() const
 {
 	float projectionParamsX = 1.0f;
 	float projectionParamsY = 1.0f;
 
+	// TODO Fix and extract from the projection matrix instead
 	if (m_reverseDepth)
 	{
 		projectionParamsX = m_farPlane;
@@ -99,6 +100,22 @@ float4 CrCamera::ComputeProjectionParams() const
 	float projectionParamsW = 0.0f; // Stereo rendering offset
 
 	return float4(projectionParamsX, projectionParamsY, projectionParamsZ, projectionParamsW);
+}
+
+float4 CrCamera::ComputeBackprojectionParams(const float4x4& view2ProjectionMatrix)
+{
+	float4 backprojectionParams
+	(
+		// Take from clip space to view space
+		1.0f / view2ProjectionMatrix._m00,
+		1.0f / view2ProjectionMatrix._m11,
+
+		// Take camera offset into account
+		-view2ProjectionMatrix._m20 / view2ProjectionMatrix._m00,
+		-view2ProjectionMatrix._m21 / view2ProjectionMatrix._m11
+	);
+
+	return backprojectionParams;
 }
 
 void CrCamera::Translate(const float3& t)

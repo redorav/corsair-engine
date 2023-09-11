@@ -280,11 +280,6 @@ void CrEditor::Update()
 	{
 		if (m_manipulatorSelected)
 		{
-			CrLog("Manipulator held");
-
-			//int diffX = mouseState.position.x - m_manipulatorInitialMousePosition.x;
-			//int diffY = cachedInput.mouseState.position.y - initialMousePosition.y;
-
 			TranslateManipulator(mouseState);
 		}
 	}
@@ -385,9 +380,9 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 
 		// We grab the shaders from the builtin pipelines, in the knowledge that new pipeline states will be created using whatever
 		// the ubershader actually needs in terms of vertex format and render target formats
+		// We don't have an opaque shader here. We probably don't need them for editor meshes
 		CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
 		basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = CrBuiltinPipelines::BasicUbershaderForward.get()->GetShader();
-		basicMaterial->m_shaders[CrMaterialShaderVariant::GBuffer] = CrBuiltinPipelines::BasicUbershaderGBuffer.get()->GetShader();
 		basicMaterial->m_shaders[CrMaterialShaderVariant::Debug] = CrBuiltinPipelines::BasicUbershaderDebug.get()->GetShader();
 
 		CrRenderModelDescriptor xAxisDescriptor;

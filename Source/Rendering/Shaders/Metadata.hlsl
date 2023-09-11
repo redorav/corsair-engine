@@ -6,6 +6,7 @@
 #include "Imgui.hlsl"
 #include "GBuffer.hlsl"
 #include "Editor.hlsl"
+#include "PostProcessing.hlsl"
 
 // Never include Ubershader.hlsl. It depends on defines that aren't present during metadata generation
 // Instead we include UbershaderResources which has all the type information without the actual shader

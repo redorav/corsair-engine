@@ -47,7 +47,9 @@ public:
 
 	void SetVerticalFieldOfView(float fovY);
 
-	float4 ComputeProjectionParams() const;
+	float4 ComputeLinearizationParams() const;
+
+	static float4 ComputeBackprojectionParams(const float4x4& view2ProjectionMatrix);
 
 	float GetNearPlane() const { return m_nearPlane; }
 

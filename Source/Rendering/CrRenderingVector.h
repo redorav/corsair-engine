@@ -38,6 +38,15 @@ namespace cr3d
 		float x, y, z, w;
 	};
 
+	struct float3x4
+	{
+		float3x4() = default;
+		float3x4(hlslpp::float3x4 m) { hlslpp::store(m, &m00); }
+		float m00, m01, m02, m03,
+		      m10, m11, m12, m13,
+		      m20, m21, m22, m23;
+	};
+
 	struct float4x4
 	{
 		float4x4() = default;

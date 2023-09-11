@@ -20,27 +20,40 @@ struct BSDF
 // N is the normal
 // H is the half vector
 // alpha is the remapped roughnes (i.e. roughness^2)
-float D_TrowbridgeReitzGGX(float3 N, float3 H, float alpha)
+float D_TrowbridgeReitzGGX(float NdotH, float alpha)
 {
 	float alpha2 = alpha * alpha;
-	float NdotH = dot(N, H);
 	float denominator = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
 	return alpha2 / (pi * denominator * denominator);
 }
 
-float G_Smith_Uncorrelated_GGX(float3 N, float3 L, float3 V, float alpha)
+float G_Smith_Uncorrelated_GGX(float NdotV, float NdotL, float alpha)
 {
 	float alpha2 = alpha * alpha;
-	float NdotV = dot(N, V);
-	float LdotV = dot(L, V);
-	float numerator = 2.0 * NdotV * 2.0 * LdotV;
-	float denominator = (NdotV + sqrt(alpha2 + (1.0 - alpha2) * NdotV * NdotV)) * (LdotV + sqrt(alpha2 + (1.0 - alpha2) * LdotV * LdotV));
+	float numerator = 2.0 * NdotV * 2.0 * NdotL;
+	float denominator = (NdotV + sqrt(alpha2 + (1.0 - alpha2) * NdotV * NdotV)) * (NdotL + sqrt(alpha2 + (1.0 - alpha2) * NdotL * NdotL));
 	return numerator / denominator;
 }
 
-float3 F_Schlick(float3 F0, float3 V, float3 H)
+float3 F_Schlick(float3 F0, float VdotH)
 {
-	return F0 + (1.0 - F0) * pow5(1.0 - dot(V, H));
+	return F0 + (1.0 - F0) * pow5(1.0 - VdotH);
+}
+
+// Optimized version of the above
+float3 DFG_Trowbridge_SmithU_Schlick(float NdotV, float NdotL, float NdotH, float VdotH, float alpha, float3 F0)
+{
+	float alpha2 = alpha * alpha;
+	float Ddenominator = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
+	
+	float dfgScalarNumerator = alpha2; // D * F
+	float dfgDenominator = 1.0;
+	dfgDenominator *= (pi * Ddenominator * Ddenominator); // D
+	dfgDenominator *= (NdotV + sqrt(alpha2 + (1.0 - alpha2) * NdotV * NdotV)) * (NdotL + sqrt(alpha2 + (1.0 - alpha2) * NdotL * NdotL)); // G
+
+	float dfgScalar = dfgScalarNumerator / dfgDenominator;
+
+	return (F0 + (1.0 - F0) * pow5(1.0 - VdotH)) * dfgScalar;
 }
 
 float F0FromIOR(float ior)
@@ -53,30 +66,23 @@ float3 EvaluateDiffuseBSDF(Surface surface, Light light)
 {
 	float3 N = surface.pixelNormalWorld;
 	float3 L = light.directionPosition;
-	float NdotL = saturate(dot(N, L));	
+	float NdotL = saturate(dot(N, L));
 	return surface.diffuseAlbedoLinear * NdotL / pi;
 }
 
 float3 EvaluateSpecularBRDF(Surface surface, Light light)
 {
 	float3 N = surface.pixelNormalWorld;
-	float3 V = surface.pixelNormalTangent;
+	float3 V = surface.viewWorld;
 	float3 L = light.directionPosition;
-	
-	float NdotL = saturate(dot(N, L));
-	float NdotV = saturate(dot(N, V));
-	
 	float3 H = normalize(V + L);
 
-	float D = D_TrowbridgeReitzGGX(surface.pixelNormalWorld, H, surface.alpha);
-	
-	float G = G_Smith_Uncorrelated_GGX(N, L, V, surface.alpha);
-	
-	float3 F = F_Schlick(surface.F0, V, H);
-	
-	float scalarTerm = D * G / (4.0 * NdotL * NdotV);
-	
-	return scalarTerm * F;
+	float NdotL = saturate(dot(N, L));
+	float NdotV = saturate(dot(N, V));
+	float NdotH = saturate(dot(N, H));
+	float VdotH = saturate(dot(V, H));
+
+	return DFG_Trowbridge_SmithU_Schlick(NdotV, NdotL, NdotH, VdotH, surface.alpha, surface.F0);
 }
 
 BSDF EvaluateBRDF(Surface surface, Light light)

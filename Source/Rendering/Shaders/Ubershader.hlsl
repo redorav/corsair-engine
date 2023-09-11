@@ -118,6 +118,10 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 #else
+
+	// Convert to linear. TODO Make sure that preceding color tinting is done in the right space
+	finalColor.rgb = pow(finalColor.rgb, 2.2);
+
 	pixelOutput.finalTarget = finalColor;
 #endif
 	

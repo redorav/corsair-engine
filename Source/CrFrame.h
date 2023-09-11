@@ -48,6 +48,8 @@ private:
 
 	CrComputePipelineHandle m_depthDownsampleLinearize;
 
+	CrComputePipelineHandle m_postProcessing;
+
 	CrGraphicsPipelineHandle m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer

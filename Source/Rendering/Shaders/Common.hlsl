@@ -30,17 +30,19 @@ struct VSInputFullscreen
 
 struct VSOutputFullscreen
 {
-    float4 hwPosition	: SV_Position;
-    float2 uv			: TEXCOORD0;
+    float4 hwPosition   : SV_Position;
+	float4 screenUVClip : TEXCOORD0; // Screen position in UV space, position in [-1, 1]
 };
 
 struct Camera
 {
 	row_major float4x4 view2Projection;
 	row_major float4x4 world2View;
-	float4 projectionParams; // Use to linearize depth
-	float4 screenResolution; // Resolution of final screen
-	float4 worldPosition; // Position of the camera in world space
+	row_major float3x4 view2WorldRotation;
+	float4 linearization; // Used to linearize depth
+	float4 backprojection;
+	float4 screenResolution; // Resolution of final screen [.xy resolution, .zw 1.0 / resolution]
+	float4 worldPosition; // .xyz Position of the camera in world space, .w Near Plane
 };
 
 cbuffer Camera
@@ -132,5 +134,20 @@ float pow5(float x) { return x * x * x * x * x; }
 float pow6(float x) { return x * x * x * x * x * x; }
 float pow7(float x) { return x * x * x * x * x * x * x; }
 float pow8(float x) { return x * x * x * x * x * x * x * x; }
+
+// Returns a view vector in view space
+float3 ComputeViewRay(float2 positionNdc, float nearPlane, float4x4 projection2ViewMatrix)
+{
+	float4 viewSpacePosition = mul(float4(positionNdc, nearPlane, 1.0), projection2ViewMatrix);
+	return normalize(viewSpacePosition.xyz);
+}
+
+// Computes fragment position in world space
+float3 BackprojectView(float2 screenClip, float linearDepth)
+{
+	float2 viewSpaceXY = screenClip * linearDepth;
+
+	return float3(viewSpaceXY, linearDepth);
+}
 
 #endif

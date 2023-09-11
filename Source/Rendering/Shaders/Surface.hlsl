@@ -3,7 +3,27 @@
 
 struct Surface
 {
+	//---------------------
 	// Geometric Properties
+	//---------------------
+
+	uint2 screenPixel;
+	float2 screenUV;
+	
+	float3 positionView;
+
+	// Position in world space, relative to the camera position
+	float3 positionCameraWorld;
+	
+	// View vector in view space
+	float3 viewView;
+
+	// View vector in world space
+	float3 viewWorld;
+	
+	float rawDepth;
+	float linearDepth;
+	
 	float3 vertexNormalWorld;
 	float3 vertexTangentWorld;
 	float3 vertexBitangentWorld;
@@ -11,11 +31,6 @@ struct Surface
 	float3 pixelNormalTangent;
 
 	float3 pixelNormalWorld;
-	
-	float rawDepth;
-	float linearDepth;
-	
-	float3 viewWorld;
 
 	// Material Properties
 	float3 diffuseAlbedoSRGB;
@@ -30,6 +45,12 @@ Surface CreateDefaultSurface()
 {
 	Surface surface;
 
+	surface.screenPixel = 0;
+	surface.screenUV = 0.0;
+	
+	surface.positionCameraWorld = 0.0;
+	surface.viewWorld = float3(0.0, 0.0, 1.0);
+	
 	surface.vertexNormalWorld    = float3(0, 1, 0);
 	surface.vertexTangentWorld   = float3(1, 0, 0);
 	surface.vertexBitangentWorld = float3(0, 0, 1);

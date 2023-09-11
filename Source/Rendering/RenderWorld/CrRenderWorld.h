@@ -43,8 +43,8 @@ namespace CrRenderListUsage
 {
 	enum T
 	{
-		Forward,
 		GBuffer,
+		Transparency,
 
 		// Editor Render Lists
 		MouseSelection,
@@ -56,6 +56,8 @@ namespace CrRenderListUsage
 // A collection of render packets to be rendered
 struct CrRenderList
 {
+	CrRenderList() {}
+
 	void AddPacket(const CrRenderPacket& renderPacket)
 	{
 		m_renderPackets.push_back(renderPacket);
@@ -77,6 +79,8 @@ struct CrRenderList
 	}
 
 private:
+
+	CrRenderList(const CrRenderList& other) = delete;
 
 	CrVector<CrRenderPacket> m_renderPackets;
 };
@@ -142,6 +146,8 @@ public:
 	const CrCameraHandle& GetCamera() const { return m_camera; }
 
 	const CrRenderList& GetRenderList(CrRenderListUsage::T usage) const { return m_renderLists[usage]; }
+
+	bool HasRenderList(CrRenderListUsage::T usage) const { return m_renderLists[usage].Size() > 0; }
 
 	// Traverse the model instances
 	template<typename FunctionT>

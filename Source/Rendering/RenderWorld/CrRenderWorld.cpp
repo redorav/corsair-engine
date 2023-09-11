@@ -276,19 +276,21 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			const ICrGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
 			const ICrGraphicsPipeline* debugPipeline        = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 
+			// The default rendering for everything is opaque. However, the shading model or options in the material
+			// can make a material go down the transparency path instead. It doesn't make sense to render the same mesh
+			// as both opaque and transparent though
 			if (gBufferPipeline)
 			{
 				mainPacket.pipeline = gBufferPipeline;
 				mainPacket.sortKey = CreateStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
 				m_renderLists[CrRenderListUsage::GBuffer].AddPacket(mainPacket);
 			}
-
-			if (transparencyPipeline)
+			else if (transparencyPipeline)
 			{
 				// Create render packets and add to the render lists
 				mainPacket.pipeline = transparencyPipeline;
 				mainPacket.sortKey = CreateTransparencySortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-				m_renderLists[CrRenderListUsage::Forward].AddPacket(mainPacket);
+				m_renderLists[CrRenderListUsage::Transparency].AddPacket(mainPacket);
 			}
 
 #if defined(CR_EDITOR)

@@ -1,0 +1,3 @@
+PostProcessingCS:
+  entrypoint: PostProcessingCS
+  stage: Compute

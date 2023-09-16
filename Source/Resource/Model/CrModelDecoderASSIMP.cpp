@@ -196,23 +196,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 			else
 			{
 				const aiColor4D& vertexColor = materialColor * 255.0f;
-				additionalBufferData[vertexIndex].color = { (uint8_t)vertexColor.r, (uint8_t)vertexColor.g, (uint8_t)vertexColor.b, (uint8_t)vertexColor.a }; // Default to white
-			}
-
-			if (hasVertexColors)
-			{
-				const aiColor4D& color = mesh->mColors[0][vertexIndex];
-				additionalBufferData[vertexIndex].color =
-				{
-					(uint8_t)(color.r * 255), 
-					(uint8_t)(color.g * 255), 
-					(uint8_t)(color.b * 255), 
-					(uint8_t)(color.a * 255)
-				};
-			}
-			else
-			{
-				additionalBufferData[vertexIndex].color = { 255, 255, 255, 255 };
+				additionalBufferData[vertexIndex].color = { (uint8_t)vertexColor.r, (uint8_t)vertexColor.g, (uint8_t)vertexColor.b, (uint8_t)vertexColor.a };
 			}
 		}
 	}

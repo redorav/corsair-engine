@@ -51,7 +51,7 @@ ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const Cr
 	for (const CrShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 	{
 		m_bytecodes.push_back(bytecode);
-		m_hash <<= bytecode->GetHash();
+		m_hash << bytecode->GetHash();
 		m_debugName = graphicsShaderDescriptor.m_debugName;
 	}
 }

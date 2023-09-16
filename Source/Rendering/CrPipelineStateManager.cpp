@@ -28,7 +28,7 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	const CrHash graphicsShaderHash = graphicsShader->GetHash();
 	const CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
 
-	const CrHash combinedHash = pipelineHash << graphicsShaderHash << vertexDescriptorHash;
+	const CrHash combinedHash = pipelineHash + graphicsShaderHash + vertexDescriptorHash;
 
 	const auto& it = m_graphicsPipelines.find(combinedHash.GetHash());
 

@@ -46,7 +46,8 @@ public:
 		m_hash = ComputeHash<const char>(data, length);
 	}
 
-	CrHash& operator <<= (CrHash other)
+	// Streaming operator, incrementally adds hash by combining existing hash with incoming hash
+	CrHash& operator << (CrHash other)
 	{
 		uint64_t hashes[2] = { m_hash, other.m_hash };
 		m_hash = ComputeHash(hashes, sizeof(hashes));
@@ -86,7 +87,8 @@ private:
 	uint64_t m_hash;
 };
 
-inline CrHash operator << (CrHash first, CrHash second)
+// Combine two hashes and return the hash of both
+inline CrHash operator + (CrHash first, CrHash second)
 {
 	uint64_t hashes[2] = { first.GetHash(), second.GetHash() };
 	return CrHash(hashes, sizeof(hashes));

@@ -16,11 +16,11 @@ struct VSInput
 
 struct VSOutput
 {
-	float4 hwPosition 	: SV_Position;
-	float4 color 		: TEXCOORD0;
-	float3 normal		: TEXCOORD1;
-	float3 tangent		: TEXCOORD2;
-	float2 uv			: TEXCOORD3;
+	float4 hwPosition   : SV_Position;
+	float4 color        : COLOR;
+	float3 normal       : NORMAL;
+	float3 tangent      : TANGENT;
+	float2 uv           : TEXCOORD0;
 };
 
 struct VSInputFullscreen

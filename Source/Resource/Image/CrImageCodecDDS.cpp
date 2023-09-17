@@ -188,7 +188,7 @@ CrImageHandle CrImageDecoderDDS::Decode(const CrFileHandle& file) const
 
 		// Read in actual data (without the header)
 		uint64_t textureDataSize = file->GetSize() - desc.headerSize;
-		image->m_data.resize(textureDataSize);
+		image->m_data.resize_uninitialized(textureDataSize);
 		file->Seek(SeekOrigin::Begin, desc.headerSize);
 		file->Read(image->m_data.data(), textureDataSize);
 

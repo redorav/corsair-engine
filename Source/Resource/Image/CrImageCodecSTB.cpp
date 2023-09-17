@@ -39,7 +39,7 @@ CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize) const
 		uint32_t imageDataSize = w * h * STBI_rgb_alpha;
 
 		// Copy stb data into image
-		image->m_data.resize(imageDataSize);
+		image->m_data.resize_uninitialized(imageDataSize);
 		memcpy(image->m_data.data(), dataPointer, image->m_data.size());
 
 		image->m_width = w;

@@ -220,7 +220,7 @@ CrImageHandle CrImageDecoderDDS::Decode(void* data, uint64_t dataSize) const
 		data = (unsigned char*)data + desc.headerSize;
 		uint64_t textureDataSize = dataSize - desc.headerSize;
 
-		image->m_data.resize(textureDataSize);
+		image->m_data.resize_uninitialized(textureDataSize);
 		memcpy(image->m_data.data(), data, textureDataSize);
 
 		SetImageProperties(image, desc);

@@ -20,7 +20,7 @@ CrImageHandle CrImageDecoderSTB::Decode(const CrFileHandle& file) const
 {
 	// Read file into memory
 	CrVector<unsigned char> fileData;
-	fileData.resize(file->GetSize());
+	fileData.resize_uninitialized(file->GetSize());
 	file->Read(fileData.data(), fileData.size());
 
 	CrImageHandle image = Decode(&fileData[0], file->GetSize());

@@ -46,7 +46,7 @@ float3 DFG_Trowbridge_SmithU_Schlick(float NdotV, float NdotL, float NdotH, floa
 	float alpha2 = alpha * alpha;
 	float Ddenominator = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
 	
-	float dfgScalarNumerator = alpha2; // D * F
+	float dfgScalarNumerator = NdotL * alpha2; // D * F
 	float dfgDenominator = 1.0;
 	dfgDenominator *= (pi * Ddenominator * Ddenominator); // D
 	dfgDenominator *= (NdotV + sqrt(alpha2 + (1.0 - alpha2) * NdotV * NdotV)) * (NdotL + sqrt(alpha2 + (1.0 - alpha2) * NdotL * NdotL)); // G
@@ -67,7 +67,7 @@ float3 EvaluateDiffuseBSDF(Surface surface, Light light)
 	float3 N = surface.pixelNormalWorld;
 	float3 L = light.directionPosition;
 	float NdotL = saturate(dot(N, L));
-	return surface.diffuseAlbedoLinear * NdotL / pi;
+	return surface.diffuseAlbedoLinear * (NdotL / pi);
 }
 
 float3 EvaluateSpecularBRDF(Surface surface, Light light)

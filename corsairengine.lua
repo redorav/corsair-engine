@@ -277,6 +277,7 @@ project (ProjectCorsairEngine)
 	-- Project libraries have slimmed by about ~140MB
 	AddLibraryIncludes(AssimpLibrary)
 	LinkLibrary(AssimpLibrary)
+	LinkLibrary(StbLibrary)
 
 	AddLibraryIncludes(SDL2Library)
 	LinkLibrary(SDL2Library)

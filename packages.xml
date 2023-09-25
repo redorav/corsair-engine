@@ -54,6 +54,9 @@
 	
 	<package name="stb">
 		<version id="f54acd4" file="stb_2020_02_05_f54acd4.zip" repository="github"/>
+		<version id="5736b15" file="stb_2023_09_25_5736b15.7z" repository="github"/>
+	</package>
+	
 	</package>
 
 	<package name="vma">

@@ -149,7 +149,9 @@ SPIRVReflectLibrary =
 
 StbLibrary =
 {
-	includeDirs = LibStb..IncludeDirectory
+	includeDirs = LibStb..IncludeDirectory,
+	libDirs     = LibStb..BinaryDirectory,
+	libNames    = 'Stb.vs2022.release'
 }
 
 VulkanLibrary =

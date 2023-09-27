@@ -15,8 +15,6 @@ public:
 
 	CrHash() : m_hash(0) {}
 
-	CrHash(const CrHash& hash) : m_hash(hash.m_hash) {}
-
 	explicit CrHash(uint64_t hash) : m_hash(hash) {}
 
 	void Reset()

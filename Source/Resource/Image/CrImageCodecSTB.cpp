@@ -34,7 +34,7 @@ CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize) const
 
 	if (dataPointer)
 	{
-		CrImageHandle image = CrImageHandle(new CrImage());
+		CrImageHandle image(new CrImage());
 
 		uint32_t imageDataSize = w * h * STBI_rgb_alpha;
 

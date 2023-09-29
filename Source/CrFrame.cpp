@@ -521,7 +521,7 @@ void CrFrame::Process()
 	CrRenderGraphTextureDescriptor lightingDescriptor(m_lightingTexture.get());
 	CrRenderGraphTextureId lightingTexture = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Lighting HDR"), lightingDescriptor);
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Pass"), float4(160, 180, 150, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -551,7 +551,7 @@ void CrFrame::Process()
 	CrRenderGraphTextureDescriptor linearDepthMipChainDescriptor(m_linearDepth16MinMaxMipChain.get());
 	CrRenderGraphTextureId linearDepth16MinMaxMipChainId = m_mainRenderGraph.CreateTexture(CrRenderGraphString("Linear Depth 16 Mip Chain"), linearDepthMipChainDescriptor);
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Depth Downsample Linearize"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Depth Downsample Linearize"), float4(160, 160, 160, 255) / 255.0f, CrRenderGraphPassType::Compute,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddTexture(depthTexture, cr3d::ShaderStageFlags::Compute);
@@ -577,7 +577,7 @@ void CrFrame::Process()
 		);
 	});
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Lighting Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Lighting Pass"), float4(200, 170, 220, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddRenderTarget(lightingTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -607,7 +607,7 @@ void CrFrame::Process()
 
 	if (m_renderWorld->HasRenderList(CrRenderListUsage::Transparency))
 	{
-		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Transparency Pass"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Transparency Pass"), float4(180, 180, 204, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 		[=](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store, 0.0f);
@@ -633,7 +633,7 @@ void CrFrame::Process()
 	// Temporal AA
 
 	// PostProcessing (includes Tonemapping)
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Post Processing"), float4(160.0f, 180.0f, 150.0f, 255.0f) / 255.0f, CrRenderGraphPassType::Compute,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Post Processing"), float4(200, 170, 130, 255) / 255.0f, CrRenderGraphPassType::Compute,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddTexture(lightingTexture, cr3d::ShaderStageFlags::Compute);
@@ -658,7 +658,7 @@ void CrFrame::Process()
 		);
 	});
 
-	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Editor Grid Render"), float4(160.0f, 180.0f, 150.0f, 255.0f) / 255.0f, CrRenderGraphPassType::Graphics,
+	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Editor Grid Render"), float4(200, 70, 100, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store);
@@ -687,7 +687,7 @@ void CrFrame::Process()
 
 	if (m_renderWorld->HasRenderList(CrRenderListUsage::EdgeSelection))
 	{
-		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Render"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Render"), float4(200, 70, 100, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 		[depthTexture, debugShaderTextureId](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddDepthStencilTarget(depthTexture, CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
@@ -717,7 +717,7 @@ void CrFrame::Process()
 			renderPacketBatcher.FlushBatch(); // Execute the last batch
 		});
 
-		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Resolve"), float4(160.0f / 255.05f, 180.0f / 255.05f, 150.0f / 255.05f, 1.0f), CrRenderGraphPassType::Graphics,
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Edge Selection Resolve"), float4(200, 70, 100, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 		[=](CrRenderGraph& renderGraph)
 		{
 			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::Load, CrRenderTargetStoreOp::Store);

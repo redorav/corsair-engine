@@ -6,7 +6,7 @@
 #include "Lighting.hlsl"
 #include "BSDF.hlsl"
 
-struct DynamicLightCB
+struct DynamicLight
 {
 	float4 positionRadius;
 	float4 colorIntensity;
@@ -14,7 +14,7 @@ struct DynamicLightCB
 
 cbuffer DynamicLightCB
 {
-	DynamicLightCB cb_DynamicLight;
+	DynamicLight cb_DynamicLight;
 };
 
 struct LightComponents
@@ -23,14 +23,14 @@ struct LightComponents
 	float3 color;
 };
 
-Light ReadLight(DynamicLightCB dynamicLightCB)
+Light ReadLight(DynamicLight dynamicLight)
 {
 	Light light = (Light) 0;
 	
-	light.directionPosition = dynamicLightCB.positionRadius.xyz;
-	light.radius = dynamicLightCB.positionRadius.w;
-	light.color = dynamicLightCB.colorIntensity.rgb;
-	light.intensity = dynamicLightCB.colorIntensity.a;
+	light.directionPosition = dynamicLight.positionRadius.xyz;
+	light.radius = dynamicLight.positionRadius.w;
+	light.color = dynamicLight.colorIntensity.rgb;
+	light.intensity = dynamicLight.colorIntensity.a;
 	
 	return light;
 }

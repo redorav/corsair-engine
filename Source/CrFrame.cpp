@@ -589,8 +589,8 @@ void CrFrame::Process()
 	[this, depthTexture, gBufferAlbedoAO, gBufferNormals, gBufferMaterial]
 	(const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
 	{
-		CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
-		DynamicLightCB* lightData = lightConstantBuffer.GetData();
+		CrGPUBufferViewT<DynamicLight> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLight>();
+		DynamicLight* lightData = lightConstantBuffer.GetData();
 		{
 			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
 			lightData->colorIntensity = float4(1.0f, 1.0f, 1.0f, 1.0f);

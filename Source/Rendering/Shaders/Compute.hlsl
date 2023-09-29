@@ -3,7 +3,7 @@
 
 #include "Common.hlsl"
 #include "ComputeCommon.hlsl"
-#include "Utilities.hlsl"
+#include "IndirectRendering.hlsl"
 
 Buffer<float4> ExampleDataBufferCompute;
 RWBuffer<float4> ExampleRWDataBufferCompute;

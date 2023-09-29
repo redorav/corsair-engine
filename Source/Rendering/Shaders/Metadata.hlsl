@@ -3,6 +3,7 @@
 #include "Compute.hlsl"
 #include "CopyTexture.hlsl"
 #include "Depth.hlsl"
+#include "DeferredLighting.hlsl"
 #include "Imgui.hlsl"
 #include "GBuffer.hlsl"
 #include "Editor.hlsl"

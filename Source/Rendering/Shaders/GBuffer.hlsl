@@ -18,6 +18,21 @@ struct GBuffer
 	float rawDepth;
 };
 
+float3 PackGBufferNormalOctahedral(float3 normal)
+{
+	const float2 normalOctahedral12bits = OctahedralEncode(normal) * 4095.0;
+	const uint normalOctahedral24bits = uint(normalOctahedral12bits.x) | (uint(normalOctahedral12bits.y) << 12);
+	return float3(uint3(normalOctahedral24bits, normalOctahedral24bits >> 8, normalOctahedral24bits >> 16) & 0xff) / 255.0;
+}
+
+float3 UnpackGBufferNormalOctahedral(float3 normalPacked)
+{
+	normalPacked *= 255.0;
+	const uint normalOctahedral24Bits = uint(normalPacked.x) | (uint(normalPacked.y) << 8) | (uint(normalPacked.z) << 16);
+	const float2 normalOctahedral12bits = float2(uint2(normalOctahedral24Bits, normalOctahedral24Bits >> 12) & 0xfff) / 4095.0;
+	return OctahedralDecode(normalOctahedral12bits);
+}
+
 GBuffer ReadGBuffer(uint2 screenPixel)
 {
 	GBuffer gBuffer;
@@ -49,8 +64,8 @@ Surface DecodeGBufferSurface(uint2 screenPixel, float4 screenUVClip)
 	
 	//surface.viewWorld           = GetViewVectorWorld();
 	surface.diffuseAlbedoLinear = sRGBToLinear(gBuffer.albedoAO.rgb);
-	surface.pixelNormalWorld    = normalize(gBuffer.worldNormalRoughness.xyz * 2.0 - 1.0);
-	surface.roughness           = 0.2;
+	surface.pixelNormalWorld    = UnpackGBufferNormalOctahedral(gBuffer.worldNormalRoughness.xyz);
+	surface.roughness           = 0.4;
 	surface.alpha               = surface.roughness * surface.roughness;
 
 	return surface;

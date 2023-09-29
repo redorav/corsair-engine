@@ -5,6 +5,7 @@
 #include "Common.hlsl"
 #include "BSDF.hlsl"
 #include "Surface.hlsl"
+#include "GBuffer.hlsl"
 
 struct UbershaderPixelOutput
 {
@@ -117,7 +118,10 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 #elif defined(EMaterialShaderVariant_GBuffer)
 
 	pixelOutput.albedoTarget  = float4(LinearToSRGB(surface.diffuseAlbedoLinear), 1.0);
-	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
+
+	float3 packedNormal = PackGBufferNormalOctahedral(surface.pixelNormalWorld);
+	pixelOutput.normalsTarget = float4(packedNormal, surface.roughness);
+
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
 
 #else

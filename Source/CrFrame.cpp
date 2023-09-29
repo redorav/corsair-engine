@@ -130,6 +130,14 @@ struct CrRenderPacketBatcher
 				m_commandBuffer->BindTexture(binding.semantic, binding.texture.get());
 			}
 
+			CrGPUBufferViewT<Material> materialBuffer = m_commandBuffer->AllocateConstantBuffer<Material>();
+			Material* materialData = materialBuffer.GetData();
+			{
+				materialData->color = m_material->m_color;
+				materialData->emissive = m_material->m_emissive;
+			}
+			m_commandBuffer->BindConstantBuffer(materialBuffer);
+
 			for (uint32_t streamIndex = 0; streamIndex < m_renderMesh->GetVertexBufferCount(); ++streamIndex)
 			{
 				m_commandBuffer->BindVertexBuffer(m_renderMesh->GetVertexBuffer(streamIndex).get(), streamIndex);
@@ -457,7 +465,7 @@ void CrFrame::Process()
 	Material* materialData = materialBuffer.GetData();
 	{
 		materialData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-		materialData->tint = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		materialData->emissive = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	drawCommandBuffer->BindConstantBuffer(materialBuffer);
 

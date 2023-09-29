@@ -320,13 +320,14 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 	{
 		m_manipulator = CrUniquePtr<CrManipulator>(new CrManipulator());
 
-		float4 red(1.0f, 0.3f, 0.3f, 1.0f);
-		float4 green(0.3f, 1.0f, 0.3f, 1.0f);
-		float4 blue(0.3f, 0.3f, 1.0f, 1.0f);
+		// These colors should be in linear space as we write the manipulator to the HDR buffer
+		float4 red(1.0f, 0.07f, 0.07f, 1.0f);
+		float4 green(0.07f, 1.0f, 0.07f, 1.0f);
+		float4 blue(0.07f, 0.07f, 1.0f, 1.0f);
 
-		float4 transparentRed(1.0f, 0.3f, 0.3f, 0.5f);
-		float4 transparentGreen(0.3f, 1.0f, 0.3f, 0.5f);
-		float4 transparentBlue(0.3f, 0.3f, 1.0f, 0.5f);
+		float4 transparentRed(1.0f, 0.07f, 0.07f, 0.5f);
+		float4 transparentGreen(0.07f, 1.0f, 0.07f, 0.5f);
+		float4 transparentBlue(0.07f, 0.07f, 1.0f, 0.5f);
 
 		float4x4 rotXMtx = float4x4::rotation_x(CrMath::Pi / 2.0f);
 		float4x4 rotZMtx = float4x4::rotation_z(-CrMath::Pi / 2.0f);

@@ -277,7 +277,11 @@ project (ProjectCorsairEngine)
 	-- Project libraries have slimmed by about ~140MB
 	AddLibraryIncludes(AssimpLibrary)
 	LinkLibrary(AssimpLibrary)
+	LinkLibrary(UfbxLibrary)
+	LinkLibrary(MeshOptimizerLibrary)
+	LinkLibrary(MikkTSpaceLibrary)
 	LinkLibrary(StbLibrary)
+	LinkLibrary(WuffsLibrary)
 
 	AddLibraryIncludes(SDL2Library)
 	LinkLibrary(SDL2Library)
@@ -480,9 +484,13 @@ project(ProjectResource)
 		SourceResourceDirectory..'/**'
 	}
 
-	AddLibraryIncludes(StbLibrary)
-	AddLibraryIncludes(CGLTFLibrary)
 	AddLibraryIncludes(AssimpLibrary)
+	AddLibraryIncludes(CGLTFLibrary)
+	AddLibraryIncludes(MeshOptimizerLibrary)
+	AddLibraryIncludes(MikkTSpaceLibrary)
+	AddLibraryIncludes(StbLibrary)
+	AddLibraryIncludes(UfbxLibrary)
+	AddLibraryIncludes(WuffsLibrary)
 
 group('Core')
 

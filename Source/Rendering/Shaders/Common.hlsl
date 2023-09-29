@@ -53,7 +53,7 @@ cbuffer Camera
 struct Material
 {
 	float4 color;
-	float4 tint;
+	float4 emissive;
 };
 
 cbuffer Material
@@ -148,6 +148,16 @@ float3 BackprojectView(float2 screenClip, float linearDepth)
 	float2 viewSpaceXY = screenClip * linearDepth;
 
 	return float3(viewSpaceXY, linearDepth);
+}
+
+float3 LinearToSRGB(float3 xLinear)
+{
+	return pow(xLinear, 1.0f / 2.2f);
+}
+
+float3 sRGBToLinear(float3 xSRGB)
+{
+	return pow(xSRGB, 2.2f);
 }
 
 #endif

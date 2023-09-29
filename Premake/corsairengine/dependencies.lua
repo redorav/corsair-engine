@@ -5,25 +5,29 @@ BinaryDirectory = '/Libraries/'
 IncludeDirectory = '/Include/'
 
 -- Library Directories
-LibAgility      = DependenciesDirectory..'/agility'
-LibAssimp       = DependenciesDirectory..'/assimp'
-LibCGLTF        = DependenciesDirectory..'/cgltf'
-LibCRSTL        = DependenciesDirectory..'/crstl'
-LibDdspp        = DependenciesDirectory..'/ddspp'
-LibDxc          = DependenciesDirectory..'/dxc'
-LibEASTL        = DependenciesDirectory..'/eastl'
-LibGlslang      = DependenciesDirectory..'/glslang'
-LibHlslpp       = DependenciesDirectory..'/hlslpp'
-LibImGui        = DependenciesDirectory..'/imgui'
-LibRapidYAML    = DependenciesDirectory..'/rapidyaml'
-LibRenderDoc    = DependenciesDirectory..'/renderdoc'
-LibSDL2         = DependenciesDirectory..'/sdl2'
-LibSPIRVReflect = DependenciesDirectory..'/spirv-reflect'
-LibStb          = DependenciesDirectory..'/stb'
-LibVMA          = DependenciesDirectory..'/vma'
-LibVulkan       = DependenciesDirectory..'/vulkan'
+LibAgility            = DependenciesDirectory..'/agility'
+LibAssimp             = DependenciesDirectory..'/assimp'
+LibCGLTF              = DependenciesDirectory..'/cgltf'
+LibCRSTL              = DependenciesDirectory..'/crstl'
+LibDdspp              = DependenciesDirectory..'/ddspp'
+LibDxc                = DependenciesDirectory..'/dxc'
+LibEASTL              = DependenciesDirectory..'/eastl'
+LibGlslang            = DependenciesDirectory..'/glslang'
+LibHlslpp             = DependenciesDirectory..'/hlslpp'
+LibImGui              = DependenciesDirectory..'/imgui'
+LibMeshOptimizer      = DependenciesDirectory..'/meshoptimizer'
+LibMikkTSpace         = DependenciesDirectory..'/mikktspace'
+LibRapidYAML          = DependenciesDirectory..'/rapidyaml'
+LibRenderDoc          = DependenciesDirectory..'/renderdoc'
+LibSDL2               = DependenciesDirectory..'/sdl2'
+LibSPIRVReflect       = DependenciesDirectory..'/spirv-reflect'
+LibStb                = DependenciesDirectory..'/stb'
+LibUfbx               = DependenciesDirectory..'/ufbx'
+LibVMA                = DependenciesDirectory..'/vma'
+LibVulkan             = DependenciesDirectory..'/vulkan'
 LibWinPixEventRuntime = DependenciesDirectory..'/winpixeventruntime'
-LibxxHash       = DependenciesDirectory..'/xxHash'
+LibWuffs              = DependenciesDirectory..'/wuffs'
+LibxxHash             = DependenciesDirectory..'/xxHash'
 
 AgilityLibrary =
 {
@@ -115,6 +119,20 @@ ImguiLibrary =
 	defines = 'IMGUI_DISABLE_OBSOLETE_FUNCTIONS'
 }
 
+MeshOptimizerLibrary =
+{
+	includeDirs = LibMeshOptimizer..IncludeDirectory..'src',
+	libDirs     = LibMeshOptimizer..BinaryDirectory,
+	libNames    = 'MeshOptimizer.vs2022.release',
+}
+
+MikkTSpaceLibrary =
+{
+	includeDirs = LibMikkTSpace..IncludeDirectory,
+	libDirs     = LibMikkTSpace..BinaryDirectory,
+	libNames    = 'MikkTSpace.vs2022.release',
+}
+
 RapidYAMLLibrary =
 {
 	includeDirs = 
@@ -154,6 +172,13 @@ StbLibrary =
 	libNames    = 'Stb.vs2022.release'
 }
 
+UfbxLibrary =
+{
+	includeDirs = LibUfbx..IncludeDirectory,
+	libDirs     = LibUfbx..BinaryDirectory,
+	libNames    = 'Ufbx.vs2022.release'
+}
+
 VulkanLibrary =
 {
 	includeDirs = { LibVulkan..IncludeDirectory..'include', LibVMA..IncludeDirectory..'include' },
@@ -168,6 +193,13 @@ WinPixEventRuntimeLibrary =
 	libDirs = { LibWinPixEventRuntime..BinaryDirectory },
 	libNames = 'WinPixEventRuntime',
 	dlls = LibWinPixEventRuntime..BinaryDirectory..'WinPixEventRuntime.dll'
+}
+
+WuffsLibrary =
+{
+	includeDirs = { LibWuffs..IncludeDirectory },
+	libDirs = { LibWuffs..BinaryDirectory },
+	libNames = 'Wuffs.vs2022.release'
 }
 
 xxHashLibrary =

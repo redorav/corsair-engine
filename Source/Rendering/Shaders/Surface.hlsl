@@ -33,7 +33,6 @@ struct Surface
 	float3 pixelNormalWorld;
 
 	// Material Properties
-	float3 diffuseAlbedoSRGB;
 	float3 diffuseAlbedoLinear;
 
 	float roughness;
@@ -57,7 +56,7 @@ Surface CreateDefaultSurface()
 	surface.pixelNormalTangent   = float3(0, 0, 1);
 	surface.pixelNormalWorld     = float3(0, 1, 0);
 
-	surface.diffuseAlbedoSRGB = surface.diffuseAlbedoLinear = 1.0;
+	surface.diffuseAlbedoLinear = 1.0;
 
 	surface.roughness = 1.0;
 	surface.F0 = 0.02;

@@ -48,8 +48,7 @@ Surface DecodeGBufferSurface(uint2 screenPixel, float4 screenUVClip)
 	surface.viewWorld           = -normalize(surface.positionCameraWorld);
 	
 	//surface.viewWorld           = GetViewVectorWorld();
-	surface.diffuseAlbedoSRGB   = gBuffer.albedoAO.rgb;
-	surface.diffuseAlbedoLinear = surface.diffuseAlbedoSRGB * surface.diffuseAlbedoSRGB;
+	surface.diffuseAlbedoLinear = sRGBToLinear(gBuffer.albedoAO.rgb);
 	surface.pixelNormalWorld    = normalize(gBuffer.worldNormalRoughness.xyz * 2.0 - 1.0);
 	surface.roughness           = 0.2;
 	surface.alpha               = surface.roughness * surface.roughness;

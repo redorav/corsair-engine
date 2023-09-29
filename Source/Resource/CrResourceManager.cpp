@@ -14,10 +14,12 @@
 
 #include "Resource/Image/CrImageCodecDDS.h"
 #include "Resource/Image/CrImageCodecSTB.h"
+#include "Resource/Image/CrImageCodecWuffs.h"
 
 #include "Resource/Model/ICrModelDecoder.h"
 #include "Resource/Model/CrModelDecoderASSIMP.h"
 #include "Resource/Model/CrModelDecoderCGLTF.h"
+#include "Resource/Model/CrModelDecoderUFBX.h"
 
 CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 {
@@ -30,6 +32,10 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
 			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderCGLTF());
+		}
+		else if (extension.comparei(".fbx") == 0 || extension.comparei(".obj") == 0)
+		{
+			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderUFBX());
 		}
 		else
 		{
@@ -65,6 +71,20 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrFixedPath& fullPath)
 		if (extension.comparei(".dds") == 0)
 		{
 			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderDDS());
+		}
+		else if
+		(
+			extension.comparei(".png") == 0 ||
+			extension.comparei(".tga") == 0 ||
+			extension.comparei(".jpg") == 0 ||
+			extension.comparei(".jpeg") == 0 ||
+			extension.comparei(".gif") == 0 ||
+			extension.comparei(".bmp") == 0 ||
+			extension.comparei(".wbmp") == 0 ||
+			extension.comparei(".nie") == 0
+		)
+		{
+			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderWuffs());
 		}
 		else
 		{

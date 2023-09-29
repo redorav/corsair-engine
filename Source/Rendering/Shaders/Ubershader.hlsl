@@ -67,7 +67,13 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	surface.vertexBitangentWorld = normalize(surface.vertexBitangentWorld);
 	
 	float3x3 tbn = float3x3(surface.vertexTangentWorld, surface.vertexBitangentWorld, surface.vertexNormalWorld);
+
+	// Start off with the vertex color (in linear space)
+	float4 diffuseAlbedoAlpha = psInput.color;
 	
+	// Multiply by color (in linear space)
+	diffuseAlbedoAlpha *= cb_Material.color;
+
 #if defined(TEXTURED)
 
 	float4 diffuse0 = DiffuseTexture0.Sample(AllLinearWrapSampler, psInput.uv.xy);
@@ -80,21 +86,16 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	surface.pixelNormalTangent = normal0.xyz * 2.0 - 1.0;
 	surface.pixelNormalWorld = mul(surface.pixelNormalTangent, tbn);
 
-	surface.diffuseAlbedoSRGB = diffuse0.rgb;
-	surface.diffuseAlbedoLinear = surface.diffuseAlbedoSRGB * surface.diffuseAlbedoSRGB;
+	// TODO Make format sRGB-friendly
+	diffuseAlbedoAlpha.rgb *= sRGBToLinear(diffuse0.rgb);
 
 #endif
 
-	// Start off with the vertex color
-	float4 finalColor = psInput.color;
-	
-	// Multiply by color
-	finalColor *= cb_Material.color;
-	
-	// Multiply by albedo
-	finalColor.rgb *= surface.diffuseAlbedoSRGB.xyz;
+	surface.diffuseAlbedoLinear = diffuseAlbedoAlpha.rgb;
 
 #if defined(EMaterialShaderVariant_Debug)
+
+	float4 finalColor = float4(LinearToSRGB(diffuseAlbedoAlpha.rgb), diffuseAlbedoAlpha.a);
 
 	float debugShaderMode = cb_DebugShader.debugProperties.x;
 
@@ -114,15 +115,18 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	pixelOutput.finalTarget = finalColor;
 
 #elif defined(EMaterialShaderVariant_GBuffer)
-	pixelOutput.albedoTarget  = float4(surface.diffuseAlbedoSRGB, 1.0);
+
+	pixelOutput.albedoTarget  = float4(LinearToSRGB(surface.diffuseAlbedoLinear), 1.0);
 	pixelOutput.normalsTarget = float4(surface.pixelNormalWorld * 0.5 + 0.5, surface.roughness);
 	pixelOutput.materialTarget = float4(surface.F0, 1.0);
+
 #else
 
-	// Convert to linear. TODO Make sure that preceding color tinting is done in the right space
-	finalColor.rgb = pow(finalColor.rgb, 2.2);
+	// Assume we output to linear space here
+	// TODO optionally convert to sRGB depending on the output framebuffer
 
-	pixelOutput.finalTarget = finalColor;
+	pixelOutput.finalTarget = diffuseAlbedoAlpha;
+
 #endif
 	
 	return pixelOutput;

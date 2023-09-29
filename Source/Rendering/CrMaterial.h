@@ -9,6 +9,8 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "Math/CrHlslppVectorFloatType.h"
+
 namespace CrMaterialBlendMode
 {
 	enum T
@@ -98,7 +100,9 @@ struct CrMaterialPassProperties
 // High-level description of a material
 struct CrMaterialDescriptor
 {
+	float4 color;
 
+	float4 emissive;
 };
 
 // High-level description of a shader
@@ -135,6 +139,8 @@ class CrMaterial final : public CrIntrusivePtrInterface
 {
 public:
 
+	CrMaterial();
+
 	~CrMaterial();
 
 	const CrGraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
@@ -152,4 +158,8 @@ public:
 	CrVector<TextureBinding> m_textures;
 
 	CrGraphicsShaderHandle m_shaders[CrMaterialShaderVariant::Count];
+
+	float4 m_color;
+
+	float4 m_emissive;
 };

@@ -34,6 +34,14 @@
 		<version id="58075c4" file="imgui_2021_01_21_58075c4.zip" repository="github"/>
 	</package>
 	
+	<package name="meshoptimizer">
+		<version id="d89a48a" file="meshoptimizer_2023_9_16_d89a48a.7z" repository="github"/>
+	</package>
+	
+	<package name="mikktspace">
+		<version id="3e895b4" file="mikktspace_2023_9_16_3e895b4.7z" repository="github"/>
+	</package>
+	
 	<package name="sdl2">
 		<version id="2.0.14" file="sdl2_2.0.14.zip" repository="github"/>
 	</package>
@@ -57,6 +65,8 @@
 		<version id="5736b15" file="stb_2023_09_25_5736b15.7z" repository="github"/>
 	</package>
 	
+	<package name="ufbx">
+		<version id="e6bd7ea" file="ufbx_2023_09_12_e6bd7ea.7z" repository="github"/>
 	</package>
 
 	<package name="vma">
@@ -72,6 +82,10 @@
 	
 	<package name="winpixeventruntime">
 		<version id="1.0.220124001" file="winpixeventruntime_1.0.220124001.zip" repository="github"/>
+	</package>
+	
+	<package name="wuffs">
+		<version id="d89ec2d" file="wuffs_2023_09_25_d89ec2d.7z" repository="github"/>
 	</package>
 	
 	<package name="xxhash">

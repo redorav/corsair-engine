@@ -7,6 +7,12 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+CrMaterial::CrMaterial()
+	: m_color(1.0f, 1.0f, 1.0f, 1.0f)
+{
+
+}
+
 CrMaterial::~CrMaterial()
 {
 

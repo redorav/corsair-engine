@@ -109,17 +109,6 @@ RWBuffer<int> ExampleRWBuffer;
 ByteAddressBuffer ExampleByteBuffer;
 RWByteAddressBuffer ExampleRWByteBuffer;
 
-struct DynamicLightCB
-{
-	float4 positionRadius;
-	float4 colorIntensity;
-};
-
-cbuffer DynamicLightCB
-{
-	DynamicLightCB cb_DynamicLight;
-};
-
 static const float pi = 3.14159265359;
 
 float min3(float a, float b, float c) { return min(min(a, b), c); }

@@ -6,6 +6,17 @@
 #include "Lighting.hlsl"
 #include "BSDF.hlsl"
 
+struct DynamicLightCB
+{
+	float4 positionRadius;
+	float4 colorIntensity;
+};
+
+cbuffer DynamicLightCB
+{
+	DynamicLightCB cb_DynamicLight;
+};
+
 struct LightComponents
 {
 	float intensity;

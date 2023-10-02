@@ -49,8 +49,7 @@ CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(con
 	}
 	else if (pipelineVariant == CrMaterialPipelineVariant::Transparency)
 	{
-		// TODO Change to cr3d::DataFormat::RG11B10_Float
-		materialPassProperties.pipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
+		materialPassProperties.pipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
 		materialPassProperties.pipelineDescriptor.blendState.renderTargetBlends[0] = CrStandardPipelineStates::AlphaBlend;
 		materialPassProperties.pipelineDescriptor.renderTargets.depthFormat = mainDepthFormat;
 		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Forward;

@@ -12,7 +12,7 @@ struct DynamicLight
 	float4 colorIntensity;
 };
 
-cbuffer DynamicLightCB
+cbuffer DynamicLight
 {
 	DynamicLight cb_DynamicLight;
 };

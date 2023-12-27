@@ -16,7 +16,6 @@
 // TODO SDL-specific
 #include "Core/Input/CrInputHandlerSDL.h"
 #include <SDL.h>
-#include <SDL_syswm.h>
 
 #include "UnitTests/CrCoreUnitTests.h"
 

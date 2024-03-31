@@ -11,7 +11,7 @@
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/RenderWorld/CrRenderModelInstance.h"
 
-#include "Math/CrHlslppMatrixFloat.h"
+#include "Math/CrHlslppMatrixFloatType.h"
 
 class CrModelInstanceIndexDummy;
 using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;

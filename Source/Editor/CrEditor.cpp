@@ -13,6 +13,7 @@
 #include "Rendering/ICrShader.h"
 
 #include "Math/CrHlslppQuaternion.h"
+#include "Math/CrHlslppMatrixFloat.h"
 
 void CrEditor::Initialize()
 {

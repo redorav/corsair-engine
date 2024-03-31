@@ -2,7 +2,7 @@
 
 #include "CrEntity.h"
 
-#include "Math/CrHlslppMatrixFloat.h"
+#include "Math/CrHlslppMatrixFloatType.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 

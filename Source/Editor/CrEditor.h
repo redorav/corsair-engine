@@ -4,7 +4,7 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/RenderWorld/CrRenderModelInstance.h"
 
-#include "Math/CrHlslppMatrixFloat.h"
+#include "Math/CrHlslppMatrixFloatType.h"
 #include "Math/CrHlslppVectorFloatType.h"
 #include "Math/CrHlslppVectorIntType.h"
 

@@ -197,7 +197,18 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 	D3D12_FEATURE_DATA_D3D12_OPTIONS5 d3d12Options5 = {};
 	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options5, sizeof(d3d12Options5)) == S_OK)
 	{
-		m_renderDeviceProperties.features.raytracing = d3d12Options5.RaytracingTier > D3D12_RAYTRACING_TIER_1_0;
+		m_renderDeviceProperties.features.raytracing = d3d12Options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
+	}
+
+	D3D12_FEATURE_DATA_D3D12_OPTIONS6 d3d12Options6 = {};
+	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options6, sizeof(d3d12Options6)) == S_OK)
+	{
+	}
+
+	D3D12_FEATURE_DATA_D3D12_OPTIONS7 d3d12Options7 = {};
+	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options7, sizeof(d3d12Options7)) == S_OK)
+	{
+		m_renderDeviceProperties.features.meshShaders = d3d12Options7.MeshShaderTier >= D3D12_MESH_SHADER_TIER_1;
 	}
 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};

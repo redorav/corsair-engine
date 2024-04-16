@@ -194,6 +194,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 		m_renderDeviceProperties.isUMA = d3d12Architecture.UMA;
 	}
 
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 d3d12Options5 = {};
+	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options5, sizeof(d3d12Options5)) == S_OK)
+	{
+		m_renderDeviceProperties.features.raytracing = d3d12Options5.RaytracingTier > D3D12_RAYTRACING_TIER_1_0;
+	}
+
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

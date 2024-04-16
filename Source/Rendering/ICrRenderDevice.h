@@ -12,22 +12,6 @@
 #include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
-namespace CrRenderingFeature
-{
-	enum T
-	{
-		Tessellation,
-		GeometryShaders,
-		Raytracing,
-		MeshShaders,
-		AmplificationShaders,
-		TextureCompressionBC,
-		TextureCompressionETC,
-		TextureCompressionASTC,
-		Count
-	};
-}
-
 struct CrDriverVersion
 {
 	CrDriverVersion() = default;
@@ -67,7 +51,16 @@ struct CrRenderDeviceProperties
 
 	uint64_t gpuMemoryBytes = 0;
 
-	bool supportedFeatures[CrRenderingFeature::Count] = {};
+	struct features
+	{
+		bool raytracing = false;
+		bool geometryShaders = false;
+		bool tessellation = false;
+		bool meshShaders = false;
+		bool compressionBC = false;
+		bool compressionETC = false;
+		bool compressionASTC = false;
+	} features;
 };
 
 namespace CrCommandQueueType { enum T : uint32_t; }

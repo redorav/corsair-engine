@@ -22,7 +22,7 @@ struct ComplexVertexPosition
 struct ComplexVertexAdditional
 {
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> normal;
+	CrVertexElement<int8_t, cr3d::DataFormat::RGBA8_Snorm> normal;
 	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> tangent;
 	CrVertexElement<half, cr3d::DataFormat::RG16_Float> uv;
 };

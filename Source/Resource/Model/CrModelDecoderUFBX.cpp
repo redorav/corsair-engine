@@ -445,18 +445,18 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
 
 						if (hasNormals)
 						{
-							float3 normal = (importVertex.normal * 0.5f + 0.5f) * 255.0f;
+							float3 normal = importVertex.normal * 127.0f;
 							additionalBufferData[vertexIndex].normal =
 							{
-								(uint8_t)normal.x,
-								(uint8_t)normal.y,
-								(uint8_t)normal.z,
+								(int8_t)normal.x,
+								(int8_t)normal.y,
+								(int8_t)normal.z,
 								0
 							};
 						}
 						else
 						{
-							additionalBufferData[vertexIndex].normal = { 0, 255, 0, 0 };
+							additionalBufferData[vertexIndex].normal = { 0, 127, 0, 0 };
 						}
 
 						if (hasTangents)
@@ -488,10 +488,10 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
 						{
 							additionalBufferData[vertexIndex].color =
 							{
-								(uint8_t)(importVertex.color.x * 255.0f),
-								(uint8_t)(importVertex.color.y * 255.0f),
-								(uint8_t)(importVertex.color.z * 255.0f),
-								(uint8_t)(importVertex.color.w * 255.0f)
+								(uint8_t)(importVertex.color.x * 255.0f + 0.5f),
+								(uint8_t)(importVertex.color.y * 255.0f + 0.5f),
+								(uint8_t)(importVertex.color.z * 255.0f + 0.5f),
+								(uint8_t)(importVertex.color.w * 255.0f + 0.5f)
 							};
 						}
 						else

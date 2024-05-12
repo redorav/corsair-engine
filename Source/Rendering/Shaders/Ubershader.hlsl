@@ -38,7 +38,7 @@ VSOutput UbershaderVS(VSInput vsInput)
 	#endif
 	
 	// Careful with this code and non-uniform scaling
-	float3 vertexNormalLocal = vsInput.normal.xyz * 2.0 - 1.0;
+	float3 vertexNormalLocal = vsInput.normal.xyz;
 	float3 vertexNormalWorld = mul(float4(vertexNormalLocal, 0.0), local2WorldMatrix).xyz;
 	
 	float3 vertexTangentLocal = vsInput.tangent.xyz * 2.0 - 1.0;

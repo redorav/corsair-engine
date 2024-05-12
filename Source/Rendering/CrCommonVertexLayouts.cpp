@@ -21,7 +21,7 @@ CrVertexDescriptor PositionVertexDescriptor
 CrVertexDescriptor AdditionalVertexDescriptor
 ({
 	CrVertexAttribute(CrVertexSemantic::Color, cr3d::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::Normal, cr3d::DataFormat::RGBA8_Unorm, 0),
+	CrVertexAttribute(CrVertexSemantic::Normal, cr3d::DataFormat::RGBA8_Snorm, 0),
 	CrVertexAttribute(CrVertexSemantic::Tangent, cr3d::DataFormat::RGBA8_Unorm, 0),
 	CrVertexAttribute(CrVertexSemantic::TexCoord0, cr3d::DataFormat::RG16_Float, 0)
 });

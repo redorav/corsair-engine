@@ -148,15 +148,15 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 				normal.Normalize();
 				additionalBufferData[vertexIndex].normal = 
 				{
-					(uint8_t)((normal.x * 0.5f + 0.5f) * 255.0f), 
-					(uint8_t)((normal.y * 0.5f + 0.5f) * 255.0f), 
-					(uint8_t)((normal.z * 0.5f + 0.5f) * 255.0f), 
+					(int8_t)(normal.x * 127.0f),
+					(int8_t)(normal.y * 127.0f),
+					(int8_t)(normal.z * 127.0f),
 					0
 				};
 			}
 			else
 			{
-				additionalBufferData[vertexIndex].normal = { 0, 255, 0, 0 };
+				additionalBufferData[vertexIndex].normal = { 0, 127, 0, 0 };
 			}
 
 			if (hasTangentsBitangents)

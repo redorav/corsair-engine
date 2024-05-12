@@ -79,7 +79,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 
 				additionalData[currentVertex].uv = { (half)fx, (half)fy };
 
-				additionalData[currentVertex].normal = { 0, 255, 0 };
+				additionalData[currentVertex].normal = { 0, 127, 0 };
 
 				additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -202,7 +202,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 		{
 			const FaceProperties& faceProperties = FacePropertyArray[face];
 
-			float3 normalAsByte = (faceProperties.normal * 0.5f + 0.5f) * 255.0f;
+			float3 normalAsByte = faceProperties.normal * 127.0f;
 
 			uint32_t faceVertexCount = 0;
 
@@ -239,7 +239,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
-					additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+					additionalData[currentVertex].normal = { (int8_t)normalAsByte.r, (int8_t)normalAsByte.g, (int8_t)normalAsByte.b };
 
 					additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -362,9 +362,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 
 					additionalData[currentVertex].uv = { (half)fw, (half)fh };
 
-					float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+					float3 normalAsByte = normal * 127.0f;
 
-					additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+					additionalData[currentVertex].normal = { (int8_t)normalAsByte.r, (int8_t)normalAsByte.g, (int8_t)normalAsByte.b };
 
 					additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -457,7 +457,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 			maxVertex = max(maxVertex, position);
 			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
-			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].normal = { 0, 127, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
 			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
 			currentVertex++;
@@ -495,9 +495,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 				float3 normal = float3(x, 0.0f, z);
 
-				float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+				float3 normalAsByte = normal * 127.0f + 0.5f;
 
-				additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+				additionalData[currentVertex].normal = { (int8_t)normalAsByte.r, (int8_t)normalAsByte.g, (int8_t)normalAsByte.b };
 
 				additionalData[currentVertex].tangent = { 255, 0, 0 };
 
@@ -613,7 +613,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 			maxVertex = max(maxVertex, position);
 			positionData[currentVertex].position = { (half)position.x, (half)position.y, (half)position.z };
 			additionalData[currentVertex].uv = { 0.5_h, 0.0_h };
-			additionalData[currentVertex].normal = { 0, 255, 0 };
+			additionalData[currentVertex].normal = { 0, 127, 0 };
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
 			additionalData[currentVertex].color = { (uint8_t)colorAsByte.r, (uint8_t)colorAsByte.g, (uint8_t)colorAsByte.b, (uint8_t)colorAsByte.a };
 			currentVertex++;
@@ -640,9 +640,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 			float3 normal = float3(x, 0.0f, z);
 
-			float3 normalAsByte = (normal * 0.5f + 0.5f) * 255.0f;
+			float3 normalAsByte = normal * 127.0f;
 
-			additionalData[currentVertex].normal = { (uint8_t)normalAsByte.r, (uint8_t)normalAsByte.g, (uint8_t)normalAsByte.b };
+			additionalData[currentVertex].normal = { (int8_t)normalAsByte.r, (int8_t)normalAsByte.g, (int8_t)normalAsByte.b };
 
 			additionalData[currentVertex].tangent = { 255, 0, 0 };
 

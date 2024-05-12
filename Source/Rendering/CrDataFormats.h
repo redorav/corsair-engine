@@ -202,6 +202,9 @@ namespace cr3d
 	template<typename T> constexpr const char* CrTypeName();
 	template<typename T> constexpr const char* CrTypeName() { return CrTypeName<T>(); }
 
+	template <> constexpr const char* CrTypeName<int8_t>()   { return "int8_t"; }
+	template <> constexpr const char* CrTypeName<int16_t>()  { return "int16_t"; }
+	template <> constexpr const char* CrTypeName<int32_t>()  { return "int32_t"; }
 	template <> constexpr const char* CrTypeName<uint8_t>()  { return "uint8_t"; }
 	template <> constexpr const char* CrTypeName<uint16_t>() { return "uint16_t"; }
 	template <> constexpr const char* CrTypeName<uint32_t>() { return "uint32_t"; }
@@ -260,19 +263,19 @@ namespace cr3d
 	{
 		// 8-bit formats
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Unorm, 1, false, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Snorm, 1, false, false),
+		CreateDataFormatInfo< int8_t>(cr3d::DataFormat::R8_Snorm, 1, false, false),
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Uint,  1, false, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::R8_Sint,  1, false, false),
+		CreateDataFormatInfo< int8_t>(cr3d::DataFormat::R8_Sint,  1, false, false),
 
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Unorm, 2, false, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Snorm, 2, false, false),
+		CreateDataFormatInfo< int8_t>(cr3d::DataFormat::RG8_Snorm, 2, false, false),
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Uint,  2, false, false),
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RG8_Sint,  2, false, false),
 
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Unorm, 4, false, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Snorm, 4, false, false),
+		CreateDataFormatInfo< int8_t>(cr3d::DataFormat::RGBA8_Snorm, 4, false, false),
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Uint,  4, false, false),
-		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_Sint,  4, false, false),
+		CreateDataFormatInfo< int8_t>(cr3d::DataFormat::RGBA8_Sint,  4, false, false),
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::RGBA8_SRGB,  4, false, false),
 
 		CreateDataFormatInfo<uint8_t>(cr3d::DataFormat::BGRA8_Unorm, 4, false, false),
@@ -281,19 +284,19 @@ namespace cr3d
 		// 16-bit integer formats
 
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Unorm, 1, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Snorm, 1, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::R16_Snorm, 1, false, false),
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Uint,  1, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::R16_Sint,  1, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::R16_Sint,  1, false, false),
 
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Unorm, 2, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Snorm, 2, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::RG16_Snorm, 2, false, false),
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Uint,  2, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RG16_Sint,  2, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::RG16_Sint,  2, false, false),
 
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Unorm, 4, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Snorm, 4, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::RGBA16_Snorm, 4, false, false),
 		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Uint,  4, false, false),
-		CreateDataFormatInfo<uint16_t>(cr3d::DataFormat::RGBA16_Sint,  4, false, false),
+		CreateDataFormatInfo< int16_t>(cr3d::DataFormat::RGBA16_Sint,  4, false, false),
 
 		// 16-bit float formats
 
@@ -303,13 +306,13 @@ namespace cr3d
 
 		// 32-bit integer formats
 		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Uint,    1, false, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::R32_Sint,    1, false, false),
+		CreateDataFormatInfo< int32_t>(cr3d::DataFormat::R32_Sint,    1, false, false),
 		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Uint,   2, false, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RG32_Sint,   2, false, false),
+		CreateDataFormatInfo< int32_t>(cr3d::DataFormat::RG32_Sint,   2, false, false),
 		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Uint,  3, false, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGB32_Sint,  3, false, false),
+		CreateDataFormatInfo< int32_t>(cr3d::DataFormat::RGB32_Sint,  3, false, false),
 		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Uint, 4, false, false),
-		CreateDataFormatInfo<uint32_t>(cr3d::DataFormat::RGBA32_Sint, 4, false, false),
+		CreateDataFormatInfo< int32_t>(cr3d::DataFormat::RGBA32_Sint, 4, false, false),
 
 		// 32-bit float formats
 		CreateDataFormatInfo<float>(cr3d::DataFormat::R32_Float,    1, false, true),

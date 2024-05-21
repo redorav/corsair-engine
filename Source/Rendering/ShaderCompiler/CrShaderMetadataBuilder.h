@@ -103,8 +103,8 @@ private:
 	// RW Data Buffers
 	//----------------
 
-	static CrString BuildRWDataBufferMetadataHeader(const HLSLResources& resources);
-	static CrString BuildRWDataBufferMetadataCpp(const HLSLResources& resources);
-	static CrString PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers);
-	static CrString PrintRWDataBufferMetadataStructDeclaration();
+	static CrString BuildRWTypedBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildRWTypedBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintRWTypedBufferMetadataInstanceDefinition(const ResourceVector& rwTypedBuffers);
+	static CrString PrintRWTypedBufferMetadataStructDeclaration();
 };

@@ -253,9 +253,9 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachRWDataBuffer([&](cr3d::ShaderStage::T, RWDataBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTypedBuffer([&](cr3d::ShaderStage::T, RWTypedBuffers::T id, bindpoint_t bindPoint)
 	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwDataBuffers[id].buffer);
+		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
 
 		bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
 

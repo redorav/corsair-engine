@@ -339,7 +339,7 @@ cr3d::ShaderResourceType::T GetShaderResourceType(const SpvReflectDescriptorBind
 		case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 			return cr3d::ShaderResourceType::DataBuffer;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-			return cr3d::ShaderResourceType::RWDataBuffer;
+			return cr3d::ShaderResourceType::RWTypedBuffer;
 		default:
 			return cr3d::ShaderResourceType::Count;
 	}
@@ -389,8 +389,8 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 		case cr3d::ShaderResourceType::RWStorageBuffer:
 			reflectionHeader.rwStorageBuffers.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::RWDataBuffer:
-			reflectionHeader.rwDataBuffers.push_back(resource);
+		case cr3d::ShaderResourceType::RWTypedBuffer:
+			reflectionHeader.rwTypedBuffers.push_back(resource);
 			break;
 		default: // TODO Handle Data Buffers
 			break;
@@ -557,7 +557,7 @@ cr3d::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_
 		case D3D_SIT_UAV_RWTYPED:
 			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
 			{
-				return cr3d::ShaderResourceType::RWDataBuffer;
+				return cr3d::ShaderResourceType::RWTypedBuffer;
 			}
 			else
 			{

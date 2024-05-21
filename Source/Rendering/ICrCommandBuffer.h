@@ -109,9 +109,9 @@ public:
 
 	// RW Data Buffers
 
-	void BindRWDataBuffer(RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWDataBuffer(RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer);
+	void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer);
 
 	void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
 
@@ -314,7 +314,7 @@ protected:
 
 		StorageBufferBinding			m_rwStorageBuffers[RWStorageBuffers::Count];
 
-		StorageBufferBinding			m_rwDataBuffers[RWDataBuffers::Count];
+		StorageBufferBinding			m_rwTypedBuffers[RWTypedBuffers::Count];
 
 		uint32_t						m_stencilRef;
 		bool							m_stencilRefDirty;
@@ -608,21 +608,21 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageB
 	BindRWStorageBuffer(rwStorageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
-inline void ICrCommandBuffer::BindRWDataBuffer(RWDataBuffers::T rwBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
+inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	unused_parameter(numElements); unused_parameter(stride); unused_parameter(offset);
 
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Data), "Buffer must have data buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Typed), "Buffer must have typed buffer flag");
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
-	CrCommandBufferAssertMsg(rwBufferIndex < RWDataBuffers::Count, "Invalid binding index");
+	CrCommandBufferAssertMsg(rwBufferIndex < RWTypedBuffers::Count, "Invalid binding index");
 
-	m_currentState.m_rwDataBuffers[rwBufferIndex].buffer = buffer;
+	m_currentState.m_rwTypedBuffers[rwBufferIndex].buffer = buffer;
 }
 
-inline void ICrCommandBuffer::BindRWDataBuffer(RWDataBuffers::T rwDataBufferIndex, const ICrHardwareGPUBuffer* buffer)
+inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer)
 {
-	BindRWDataBuffer(rwDataBufferIndex, buffer, 1, 1, 0);
+	BindRWTypedBuffer(rwTypedBufferIndex, buffer, 1, 1, 0);
 }
 
 template<typename MetaType>

@@ -49,14 +49,14 @@ static const CrString RWStorageBufferSection =
 "//-------------------\n\n";
 
 static const CrString DataBufferSection =
-"//-------------\n"
-"// Data Buffers\n"
-"//-------------\n\n";
+"//--------------\n"
+"// Typed Buffers\n"
+"//--------------\n\n";
 
-static const CrString RWDataBufferSection =
-"//----------------\n"
-"// RW Data Buffers\n"
-"//----------------\n\n";
+static const CrString RWTypedBufferSection =
+"//-----------------\n"
+"// RW Typed Buffers\n"
+"//-----------------\n\n";
 
 bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
@@ -141,7 +141,7 @@ struct HLSLResources
 				}
 				case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 				{
-					rwDataBuffers.push_back(binding);
+					rwTypedBuffers.push_back(binding);
 					break;
 				}
 				default:
@@ -159,7 +159,7 @@ struct HLSLResources
 	CrVector<SpvReflectDescriptorBinding> storageBuffers;
 	CrVector<SpvReflectDescriptorBinding> rwStorageBuffers;
 	CrVector<SpvReflectDescriptorBinding> dataBuffers;
-	CrVector<SpvReflectDescriptorBinding> rwDataBuffers;
+	CrVector<SpvReflectDescriptorBinding> rwTypedBuffers;
 
 	//std::vector<SpvReflectDescriptorBinding> stageInputs;
 	//std::vector<SpvReflectDescriptorBinding> stageOutputs;
@@ -216,7 +216,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
 
 	metadataHeader += BuildDataBufferMetadataHeader(resources);
 
-	metadataHeader += BuildRWDataBufferMetadataHeader(resources);
+	metadataHeader += BuildRWTypedBufferMetadataHeader(resources);
 
 	//metadataHeader += "}\n";
 
@@ -246,7 +246,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
 
 	metadataCpp += BuildDataBufferMetadataCpp(resources);
 
-	metadataCpp += BuildRWDataBufferMetadataCpp(resources);
+	metadataCpp += BuildRWTypedBufferMetadataCpp(resources);
 
 	return true;
 }
@@ -889,55 +889,55 @@ CrString CrShaderMetadataBuilder::PrintDataBufferMetadataStructDeclaration()
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::BuildRWDataBufferMetadataHeader(const HLSLResources& resources)
+CrString CrShaderMetadataBuilder::BuildRWTypedBufferMetadataHeader(const HLSLResources& resources)
 {
 	CrString result;
 
-	result += RWDataBufferSection;
+	result += RWTypedBufferSection;
 
-	result += PrintResourceEnum("RWDataBuffer", resources.rwDataBuffers);
+	result += PrintResourceEnum("RWTypedBuffer", resources.rwTypedBuffers);
 
-	result += PrintRWDataBufferMetadataStructDeclaration();
+	result += PrintRWTypedBufferMetadataStructDeclaration();
 
-	result += PrintResourceMetadataInstanceDeclaration("RWDataBuffer", resources.rwDataBuffers);
+	result += PrintResourceMetadataInstanceDeclaration("RWTypedBuffer", resources.rwTypedBuffers);
 
-	result += "extern CrHashMap<CrString, RWDataBufferMetadata&> RWDataBufferTable;\n\n";
+	result += "extern CrHashMap<CrString, RWTypedBufferMetadata&> RWTypedBufferTable;\n\n";
 
-	result += "extern CrArray<RWDataBufferMetadata, " + CrString(resources.rwDataBuffers.size()) + "> RWDataBufferMetaTable;\n\n";
+	result += "extern CrArray<RWTypedBufferMetadata, " + CrString(resources.rwTypedBuffers.size()) + "> RWTypedBufferMetaTable;\n\n";
 
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::BuildRWDataBufferMetadataCpp(const HLSLResources& resources)
+CrString CrShaderMetadataBuilder::BuildRWTypedBufferMetadataCpp(const HLSLResources& resources)
 {
 	CrString result;
 
-	result += RWDataBufferSection;
+	result += RWTypedBufferSection;
 
-	result += PrintRWDataBufferMetadataInstanceDefinition(resources.rwDataBuffers);
+	result += PrintRWTypedBufferMetadataInstanceDefinition(resources.rwTypedBuffers);
 
-	result += PrintResourceHashmap("RWDataBuffer", resources.rwDataBuffers);
+	result += PrintResourceHashmap("RWTypedBuffer", resources.rwTypedBuffers);
 
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::PrintRWDataBufferMetadataInstanceDefinition(const ResourceVector& rwDataBuffers)
+CrString CrShaderMetadataBuilder::PrintRWTypedBufferMetadataInstanceDefinition(const ResourceVector& rwTypedBuffers)
 {
 	CrString result;
-	for (const auto& rwDataBuffer : rwDataBuffers)
+	for (const auto& rwTypedBuffer : rwTypedBuffers)
 	{
-		result += "RWDataBufferMetadata " + CrString(rwDataBuffer.name) + "MetaInstance(" + "RWDataBuffers::" + CrString(rwDataBuffer.name) + ");\n";
+		result += "RWTypedBufferMetadata " + CrString(rwTypedBuffer.name) + "MetaInstance(" + "RWTypedBuffers::" + CrString(rwTypedBuffer.name) + ");\n";
 	}
-	result += "RWDataBufferMetadata InvalidRWDataBufferMetaInstance(UINT32_MAX);\n";
+	result += "RWTypedBufferMetadata InvalidRWTypedBufferMetaInstance(UINT32_MAX);\n";
 	return result + "\n";
 }
 
-CrString CrShaderMetadataBuilder::PrintRWDataBufferMetadataStructDeclaration()
+CrString CrShaderMetadataBuilder::PrintRWTypedBufferMetadataStructDeclaration()
 {
-	CrString result = "struct RWDataBufferMetadata" \
+	CrString result = "struct RWTypedBufferMetadata" \
 		"\n{\n" \
-		"\tRWDataBufferMetadata(uint32_t id) : id(static_cast<RWDataBuffers::T>(id)) {}\n" \
-		"\tconst RWDataBuffers::T id;\n" \
+		"\tRWTypedBufferMetadata(uint32_t id) : id(static_cast<RWTypedBuffers::T>(id)) {}\n" \
+		"\tconst RWTypedBuffers::T id;\n" \
 		"};\n\n";
 	return result;
 }

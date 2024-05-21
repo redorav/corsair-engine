@@ -31,7 +31,7 @@ public:
 
 	static const RWStorageBufferMetadata& GetRWStorageBuffer(RWStorageBuffers::T id);
 
-	static const RWDataBufferMetadata& GetRWDataBuffer(const CrString& name);
+	static const RWTypedBufferMetadata& GetRWTypedBuffer(const CrString& name);
 
-	static const RWDataBufferMetadata& GetRWDataBuffer(RWDataBuffers::T id);
+	static const RWTypedBufferMetadata& GetRWTypedBuffer(RWTypedBuffers::T id);
 };

@@ -105,19 +105,19 @@ const RWStorageBufferMetadata& CrShaderMetadata::GetRWStorageBuffer(RWStorageBuf
 	return RWStorageBufferMetaTable[id];
 }
 
-const RWDataBufferMetadata& CrShaderMetadata::GetRWDataBuffer(const CrString& name)
+const RWTypedBufferMetadata& CrShaderMetadata::GetRWTypedBuffer(const CrString& name)
 {
-	auto rwDataBufferMetadata = RWDataBufferTable.find(name);
+	auto rwTypedBufferMetadata = RWTypedBufferTable.find(name);
 
-	if (rwDataBufferMetadata != RWDataBufferTable.end())
+	if (rwTypedBufferMetadata != RWTypedBufferTable.end())
 	{
-		return (*rwDataBufferMetadata).second;
+		return (*rwTypedBufferMetadata).second;
 	}
 
-	return InvalidRWDataBufferMetaInstance;
+	return InvalidRWTypedBufferMetaInstance;
 }
 
-const RWDataBufferMetadata& CrShaderMetadata::GetRWDataBuffer(RWDataBuffers::T id)
+const RWTypedBufferMetadata& CrShaderMetadata::GetRWTypedBuffer(RWTypedBuffers::T id)
 {
-	return RWDataBufferMetaTable[id];
+	return RWTypedBufferMetaTable[id];
 }

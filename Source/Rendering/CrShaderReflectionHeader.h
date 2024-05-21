@@ -79,7 +79,7 @@ struct CrShaderReflectionHeader
 			function(resource);
 		}
 
-		for (CrShaderReflectionResource& resource : rwDataBuffers)
+		for (CrShaderReflectionResource& resource : rwTypedBuffers)
 		{
 			function(resource);
 		}
@@ -97,7 +97,7 @@ struct CrShaderReflectionHeader
 	CrVector<CrShaderReflectionResource> rwTextures;
 	CrVector<CrShaderReflectionResource> storageBuffers;
 	CrVector<CrShaderReflectionResource> rwStorageBuffers;
-	CrVector<CrShaderReflectionResource> rwDataBuffers;
+	CrVector<CrShaderReflectionResource> rwTypedBuffers;
 
 	CrVector<CrShaderInterfaceVariable> stageInputs;
 	CrVector<CrShaderInterfaceVariable> stageOutputs;
@@ -121,7 +121,7 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionHeader& reflectionHeade
 	stream << reflectionHeader.rwTextures;
 	stream << reflectionHeader.storageBuffers;
 	stream << reflectionHeader.rwStorageBuffers;
-	stream << reflectionHeader.rwDataBuffers;
+	stream << reflectionHeader.rwTypedBuffers;
 
 	stream << reflectionHeader.stageInputs;
 	stream << reflectionHeader.stageOutputs;

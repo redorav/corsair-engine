@@ -63,7 +63,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_OBJECT_TYPE_BUFFER, descriptor.name);
 
-	if (descriptor.usage & cr3d::BufferUsage::Data)
+	if (descriptor.usage & cr3d::BufferUsage::Typed)
 	{
 		CrAssert(descriptor.dataFormat != cr3d::DataFormat::Count);
 
@@ -139,7 +139,7 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 		usageFlags |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::Data)
+	if (usage & cr3d::BufferUsage::Typed)
 	{
 		if (access & cr3d::MemoryAccess::GPUOnlyWrite)
 		{

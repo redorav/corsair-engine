@@ -284,7 +284,7 @@ namespace cr3d
 			StorageBuffer, // StorageBuffers include HLSL StructuredBuffer and ByteBuffer
 			RWStorageBuffer,
 			DataBuffer,
-			RWDataBuffer,
+			RWTypedBuffer,
 			Count,
 		};
 	};
@@ -512,7 +512,7 @@ namespace cr3d
 			Vertex      = 1 << 1, // Will be used as vertex buffer
 			Index       = 1 << 2, // Will be used as index buffer
 			Structured  = 1 << 3, // Will be bound as a structured buffer
-			Data        = 1 << 4, // Will be bound as a data (compressed) buffer
+			Typed       = 1 << 4, // Will be bound as a typed (compressed) buffer
 			Byte        = 1 << 5, // Will be bound as a byte (raw data) buffer
 			Indirect    = 1 << 6, // Will be used as an indirect buffer
 			TransferDst = 1 << 7, // Will be used to transfer data from the GPU to the CPU via a copy operation

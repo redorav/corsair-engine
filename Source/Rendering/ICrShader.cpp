@@ -43,7 +43,7 @@ ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResour
 	ProcessResourceArray(cr3d::ShaderResourceType::RWTexture, resources.rwTextures);
 	ProcessResourceArray(cr3d::ShaderResourceType::StorageBuffer, resources.storageBuffers);
 	ProcessResourceArray(cr3d::ShaderResourceType::RWStorageBuffer, resources.rwStorageBuffers);
-	ProcessResourceArray(cr3d::ShaderResourceType::RWDataBuffer, resources.rwDataBuffers);
+	ProcessResourceArray(cr3d::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 }
 
 ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)

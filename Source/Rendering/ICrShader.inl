@@ -48,10 +48,10 @@ inline void ICrShaderBindingLayout::AddResources(const CrShaderReflectionHeader&
 		function(reflectionHeader.shaderStage, resource);
 	}
 
-	for (const CrShaderReflectionResource& resource : reflectionHeader.rwDataBuffers)
+	for (const CrShaderReflectionResource& resource : reflectionHeader.rwTypedBuffers)
 	{
-		const RWDataBufferMetadata& metadata = CrShaderMetadata::GetRWDataBuffer(resource.name);
-		resources.rwDataBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
+		const RWTypedBufferMetadata& metadata = CrShaderMetadata::GetRWTypedBuffer(resource.name);
+		resources.rwTypedBuffers.push_back(CrShaderBinding(resource.bindPoint, reflectionHeader.shaderStage, metadata.id));
 		function(reflectionHeader.shaderStage, resource);
 	}
 }

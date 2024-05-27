@@ -568,7 +568,7 @@ void CrEditor::AddSelected(CrModelInstanceId instanceId)
 	SelectedInstanceState state;
 	state.modelInstanceId = instanceId;
 	state.initialTransform = m_renderWorld->GetTransform(instanceId);
-	m_selectedInstances.insert({ instanceId.id, state });
+	m_selectedInstances.insert(instanceId.id, state);
 }
 
 void CrEditor::RemoveSelected(CrModelInstanceId instanceId)

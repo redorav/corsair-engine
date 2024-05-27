@@ -265,7 +265,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
 		ufbx_material* ufbxMaterial = ufbxScene->materials[m];
 		CrMaterialHandle material = LoadMaterial(ufbxMaterial, filePath);
 		modelDescriptor.AddMaterial(material);
-		materialMap.insert({ ufbxMaterial, m });
+		materialMap.insert(ufbxMaterial, (uint32_t)m);
 	}
 
 	CrArray<uint32_t, 128 * 3> tempIndices;

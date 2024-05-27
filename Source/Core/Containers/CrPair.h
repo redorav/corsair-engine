@@ -1,4 +1,5 @@
 #pragma once
 
-#include "EASTL/utility.h"
+#include <crstl/pair.h>
+
 #include "Core/CrCoreForwardDeclarations.h"

@@ -42,7 +42,7 @@ CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
 	{
 		graphicsPipeline = m_renderDevice->CreateGraphicsPipeline(pipelineDescriptor, graphicsShader, vertexDescriptor);
 
-		m_graphicsPipelines.insert({ combinedHash.GetHash(), graphicsPipeline }); // Insert in the hashmap
+		m_graphicsPipelines.insert(combinedHash.GetHash(), graphicsPipeline); // Insert in the hashmap
 	}
 
 	return graphicsPipeline;
@@ -65,7 +65,7 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	{
 		computePipeline = m_renderDevice->CreateComputePipeline(computeShader);
 
-		m_computePipelines.insert({ computeShaderHash.GetHash(), computePipeline }); // Insert in the hashmap
+		m_computePipelines.insert(computeShaderHash.GetHash(), computePipeline); // Insert in the hashmap
 	}
 
 	return computePipeline;

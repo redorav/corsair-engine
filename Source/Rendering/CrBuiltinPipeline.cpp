@@ -87,7 +87,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 		CrGraphicsPipelineHandle graphicsPipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
 
-		m_builtinGraphicsPipelines.insert({ finalHash.GetHash(), graphicsPipeline });
+		m_builtinGraphicsPipelines.insert(finalHash.GetHash(), graphicsPipeline);
 		return graphicsPipeline;
 	}
 }
@@ -116,7 +116,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders:
 		CrComputePipelineHandle computePipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
 		computePipeline->SetComputeShaderIndex(computeShaderIndex);
 
-		m_builtinComputePipelines.insert({ hash.GetHash(), computePipeline });
+		m_builtinComputePipelines.insert(hash.GetHash(), computePipeline);
 
 		return computePipeline;
 	}

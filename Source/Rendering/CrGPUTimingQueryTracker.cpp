@@ -52,7 +52,7 @@ void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64
 			interval.startTimeNanoseconds = oldestPool->GetDuration(frameStartTimeTicks, intervalStart);
 			interval.durationNanoseconds = oldestPool->GetDuration(intervalStart, intervalEnd);
 
-			m_timingIntervals.insert({ hash, interval });
+			m_timingIntervals.insert(hash, interval);
 		}
 
 		m_totalFrameInterval.startTimeNanoseconds = oldestPool->GetDuration(frameStartTimeTicks, frameStartTimeTicks);
@@ -86,7 +86,7 @@ CrGPUTimingRequest CrGPUTimingQueryTracker::AllocateTimingRequest(CrHash hash)
 	request.startQuery = currentPool->Allocate();
 	request.endQuery = currentPool->Allocate();
 
-	m_timingRequests[m_currentPoolIndex].insert(CrPair<CrHash, CrGPUTimingRequest>(hash, request));
+	m_timingRequests[m_currentPoolIndex].insert(hash, request);
 
 	return request;
 }

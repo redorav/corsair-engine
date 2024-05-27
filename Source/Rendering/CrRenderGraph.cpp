@@ -51,7 +51,7 @@ void CrRenderGraph::AddRenderPass
 		m_workingPassId = m_uniquePassId;
 		setupFunction(*this);
 		m_workingPassId = CrRenderPassId(0xffffffff);
-		m_nameToLogicalPassId.insert({ name, m_uniquePassId });
+		m_nameToLogicalPassId.insert(name, m_uniquePassId);
 		m_uniquePassId.id++;
 	}
 	else
@@ -68,7 +68,7 @@ CrRenderGraphTextureId CrRenderGraph::CreateTexture(const CrRenderGraphString& n
 	{
 		CrRenderGraphTextureId textureId(m_uniqueTextureId);
 		m_textureResources.emplace_back(name, m_uniqueTextureId, descriptor);
-		m_nameToTextureId.insert({ name, textureId });
+		m_nameToTextureId.insert(name, textureId);
 		m_textureLastUsedPass.emplace_back();
 		m_uniqueTextureId++;
 		CrRenderGraphLog("Created Texture %s", name.c_str());
@@ -88,7 +88,7 @@ CrRenderGraphBufferId CrRenderGraph::CreateBuffer(const CrRenderGraphString& nam
 	{
 		CrRenderGraphBufferId bufferId(m_uniqueBufferId);
 		m_bufferResources.emplace_back(name, m_uniqueBufferId, descriptor);
-		m_nameToBufferId.insert({ name, bufferId });
+		m_nameToBufferId.insert(name, bufferId);
 		m_bufferLastUsedPass.emplace_back();
 		m_uniqueBufferId++;
 		CrRenderGraphLog("Created Buffer %s", name.c_str());
@@ -339,7 +339,7 @@ void CrRenderGraph::Execute()
 				transitionInfo.initialState = texture->descriptor.texture->GetDefaultState();
 			}
 
-			renderGraphPass->textureTransitions.insert({ texture->id.id, transitionInfo });
+			renderGraphPass->textureTransitions.insert(texture->id.id, transitionInfo);
 
 			m_textureLastUsedPass[texture->id.id] = logicalPassId;
 		}
@@ -383,7 +383,7 @@ void CrRenderGraph::Execute()
 				transitionInfo.initialShaderStages = renderGraphPass->type == CrRenderGraphPassType::Compute ? cr3d::ShaderStageFlags::Compute : cr3d::ShaderStageFlags::Graphics;
 			}
 
-			renderGraphPass->bufferTransitions.insert({ buffer->id.id, transitionInfo });
+			renderGraphPass->bufferTransitions.insert(buffer->id.id, transitionInfo);
 
 			m_bufferLastUsedPass[buffer->id.id] = logicalPassId;
 		}

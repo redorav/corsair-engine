@@ -19,9 +19,19 @@ namespace crstl
 
 	template<typename T, size_t N> class fixed_deque;
 
+	template<typename T> struct hash;
+
+	template<typename Key, typename T, size_t NodeCount,typename Hasher> class fixed_open_hashmap;
+
+	template<typename Key, typename T, typename Hasher, typename Allocator> class open_hashmap;
+
+	template<typename Key, typename Hasher, typename Allocator> class open_hashset;
+
 	template<typename T, size_t N> class fixed_vector;
 
 	template<typename T> class intrusive_ptr;
+
+	template<typename T1, typename T2> class pair;
 
 	template <typename CharT, typename Allocator> class basic_string;
 	typedef basic_string<char, allocator> string;
@@ -35,6 +45,33 @@ namespace crstl
 
 	template<typename StringInterface> class path_base;
 	typedef path_base<fixed_string512> fixed_path512;
+
+	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
+	template <typename T, typename Allocator>
+	struct hash<crstl::basic_string<T, Allocator>>
+	{
+		size_t operator()(const crstl::basic_string<T, Allocator>& x) const
+		{
+			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
+			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
+			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
+				result = (result * 16777619) ^ c;
+			return (size_t)result;
+		}
+	};
+
+	template <typename T, int N>
+	struct hash<crstl::basic_fixed_string<T, N>>
+	{
+		size_t operator()(const crstl::basic_fixed_string<T, N>& x) const
+		{
+			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
+			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
+			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
+				result = (result * 16777619) ^ c;
+			return (size_t)result;
+		}
+	};
 };
 
 // EASTL
@@ -50,13 +87,7 @@ namespace eastl
 
 	template <typename T> struct equal_to;
 
-	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_map;
-
 	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
-
-	template <typename Value, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_set;
-
-	template <typename T1, typename T2> struct pair;
 
 	template <typename Key, typename Compare, typename Allocator> class set;
 
@@ -104,17 +135,20 @@ using CrFixedDeque = crstl::fixed_deque<T, N>;
 template<typename T, size_t N>
 using CrFixedVector = crstl::fixed_vector<T, N>;
 
-template<typename Key, typename S>
-using CrHashMap = eastl::hash_map<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+template<typename Key, typename Value>
+using CrHashMap = crstl::open_hashmap<Key, Value, crstl::hash<Key>, crstl::allocator>;
 
-template<typename Key, typename S>
-using CrHashMultiMap = eastl::hash_multimap<Key, S, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+template<typename Key, typename Value, size_t NodeCount>
+using CrFixedHashMap = crstl::fixed_open_hashmap<Key, Value, NodeCount, crstl::hash<Key>>;
 
-template<typename Value>
-using CrHashSet = eastl::hash_set<Value, eastl::hash<Value>, eastl::equal_to<Value>, eastl::allocator, false>;
+template<typename Key, typename Value>
+using CrHashMultiMap = eastl::hash_multimap<Key, Value, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+
+template<typename Key>
+using CrHashSet = crstl::open_hashset<Key, crstl::hash<Key>, crstl::allocator>;
 
 template<typename T, typename S>
-using CrPair = eastl::pair<T, S>;
+using CrPair = crstl::pair<T, S>;
 
 template<typename Key>
 using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;

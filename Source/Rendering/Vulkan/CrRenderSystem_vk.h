@@ -6,7 +6,7 @@
 
 #include "Core/Containers/CrVector.h"
 
-#include "Core/Containers/CrSet.h"
+#include "Core/Containers/CrHashMap.h"
 
 class CrRenderSystemVulkan final : public ICrRenderSystem
 {
@@ -29,9 +29,9 @@ private:
 
 	VkDebugUtilsMessengerEXT m_vkDebugMessenger;
 
-	CrSet<CrString> m_supportedInstanceExtensions;
+	CrHashSet<CrString> m_supportedInstanceExtensions;
 
-	CrSet<CrString> m_supportedInstanceLayers;
+	CrHashSet<CrString> m_supportedInstanceLayers;
 
 	CrVector<const char*> m_instanceLayers;
 };

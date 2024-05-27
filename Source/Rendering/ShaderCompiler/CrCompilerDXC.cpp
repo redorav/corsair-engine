@@ -126,7 +126,7 @@ public:
 
 				CComPtr<IDxcBlobEncoding> dxcIncludeBlob;
 				m_dxcUtils->CreateBlob(includeString.data(), (uint32_t)includeString.size(), 0, &dxcIncludeBlob);
-				m_includeFiles.insert({ CrWString(pFilename), dxcIncludeBlob });
+				m_includeFiles.insert(CrWString(pFilename), dxcIncludeBlob);
 
 				*ppIncludeSource = dxcIncludeBlob;
 				(*ppIncludeSource)->AddRef();

@@ -97,8 +97,8 @@ void CrShaderSources::Initialize()
 
 				CrString filenameString = entry.filename.c_str();
 
-				m_shaderPaths.insert({ filenameString, shaderPath });
-				m_shaderSources.insert({ filenameString, shaderSource });
+				m_shaderPaths.insert(filenameString, shaderPath);
+				m_shaderSources.insert(filenameString, shaderSource);
 			}
 		}
 

@@ -326,7 +326,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 				CrAssertMsg(false, "Texture not loaded");
 			}
 
-			textureMap.insert({ &gltfData->textures[t], texture });
+			textureMap.insert(&gltfData->textures[t], texture);
 		}
 
 		const auto ProcessMaterialTexture = [&](const CrMaterialHandle& material, void* cgltfKey, Textures::T semantic)
@@ -356,7 +356,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 
 			modelDescriptor.AddMaterial(material);
 
-			materialMap.insert({ &gltfData->materials[m], m });
+			materialMap.insert(&gltfData->materials[m], m);
 		}
 
 		// Create the render model and setup the material. Note that by now, images have been loaded

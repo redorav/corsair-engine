@@ -92,6 +92,20 @@ inline CrHash operator + (CrHash first, CrHash second)
 	return CrHash(hashes, sizeof(hashes));
 }
 
+namespace crstl
+{
+	template<typename T> struct hash;
+
+	template<>
+	struct hash<CrHash>
+	{
+		size_t operator()(const CrHash& h) const
+		{
+			return (size_t)h.GetHash();
+		}
+	};
+};
+
 namespace eastl
 {
 	template<>

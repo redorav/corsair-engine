@@ -191,7 +191,7 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 	CrHash textureHash(&texture, sizeof(texture));
 
 	// Add to the open uploads for when we end the texture upload
-	m_openTextureUploads.insert({ textureHash, textureUpload });
+	m_openTextureUploads.insert(textureHash, textureUpload);
 
 	return (uint8_t*)vulkanStagingBuffer->Lock();
 }
@@ -274,8 +274,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 		}
 
-		// Cast to const_iterator to conform to EASTL's interface
-		m_openTextureUploads.erase((CrHashMap<CrHash, CrTextureUpload>::const_iterator)textureUploadIter);
+		m_openTextureUploads.erase(textureUploadIter);
 	}
 }
 
@@ -295,10 +294,10 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 	bufferUpload.sourceOffsetBytes = 0;
 	bufferUpload.destinationOffsetBytes = 0; // TODO Add as parameter
 
-	CrHash textureHash(&destinationBuffer, sizeof(destinationBuffer));
+	CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
 
 	// Add to the open uploads for when we end the texture upload
-	m_openBufferUploads.insert({ textureHash, bufferUpload });
+	m_openBufferUploads.insert(bufferHash, bufferUpload);
 
 	return (uint8_t*)vulkanStagingBuffer->Lock();
 }
@@ -351,8 +350,7 @@ void CrRenderDeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destina
 			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 		}
 
-		// Cast to const_iterator to conform to EASTL's interface
-		m_openBufferUploads.erase((CrHashMap<CrHash, CrBufferUpload>::const_iterator)bufferUploadIter);
+		m_openBufferUploads.erase(bufferUploadIter);
 	}
 }
 

@@ -12,7 +12,6 @@
 #include "crstl/vector.h"
 
 warnings_off
-#include <EASTL/hash_map.h>
 #include <EASTL/set.h>
 warnings_on
 

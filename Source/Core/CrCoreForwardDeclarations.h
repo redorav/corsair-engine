@@ -27,6 +27,8 @@ namespace crstl
 
 	template<typename Key, typename Hasher, typename Allocator> class open_hashset;
 
+	template<typename Key, typename T, typename Hasher, typename Allocator> class open_multi_hashmap;
+
 	template<typename T, size_t N> class fixed_vector;
 
 	template<typename T> class intrusive_ptr;
@@ -82,41 +84,7 @@ namespace eastl
 	class dummy_allocator;
 
 	template <typename T> struct less;
-
-	template <typename T> struct hash;
-
-	template <typename T> struct equal_to;
-
-	template <typename Key, typename T, typename Hash, typename Predicate, typename Allocator, bool bCacheHashCode> class hash_multimap;
-
 	template <typename Key, typename Compare, typename Allocator> class set;
-
-	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
-	template <typename T, typename Allocator>
-	struct hash<crstl::basic_string<T, Allocator>>
-	{
-		size_t operator()(const crstl::basic_string<T, Allocator>& x) const
-		{
-			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
-			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
-			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
-				result = (result * 16777619) ^ c;
-			return (size_t)result;
-		}
-	};
-
-	template <typename T, int N>
-	struct hash<crstl::basic_fixed_string<T, N>>
-	{
-		size_t operator()(const crstl::basic_fixed_string<T, N>& x) const
-		{
-			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
-			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
-			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
-				result = (result * 16777619) ^ c;
-			return (size_t)result;
-		}
-	};
 };
 
 // Containers
@@ -142,7 +110,7 @@ template<typename Key, typename Value, size_t NodeCount>
 using CrFixedHashMap = crstl::fixed_open_hashmap<Key, Value, NodeCount, crstl::hash<Key>>;
 
 template<typename Key, typename Value>
-using CrHashMultiMap = eastl::hash_multimap<Key, Value, eastl::hash<Key>, eastl::equal_to<Key>, eastl::allocator, false>;
+using CrHashMultiMap = crstl::open_multi_hashmap<Key, Value, crstl::hash<Key>, crstl::allocator>;
 
 template<typename Key>
 using CrHashSet = crstl::open_hashset<Key, crstl::hash<Key>, crstl::allocator>;

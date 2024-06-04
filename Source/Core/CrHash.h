@@ -105,15 +105,3 @@ namespace crstl
 		}
 	};
 };
-
-namespace eastl
-{
-	template<>
-	struct hash<CrHash>
-	{
-		size_t operator()(const CrHash& h) const
-		{
-			return (size_t)h.GetHash();
-		}
-	};
-};

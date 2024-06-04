@@ -2,7 +2,7 @@
 #include "CrShaderSources.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/Containers/CrHashSet.h"
+#include "Core/Containers/CrHashMap.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/FileSystem/ICrFile.h"

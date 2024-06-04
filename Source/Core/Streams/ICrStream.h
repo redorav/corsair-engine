@@ -2,6 +2,8 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
+#include <type_traits>
+
 namespace CrStreamType
 {
 	enum T
@@ -88,7 +90,7 @@ StreamT& operator << (StreamT& stream, CrVector<T>& value)
 		value.resize(size);
 	}
 
-	if (std::is_trivially_copyable<T>::value)
+	if (crstl_is_trivially_copyable(T))
 	{
 		if (stream.IsReading())
 		{

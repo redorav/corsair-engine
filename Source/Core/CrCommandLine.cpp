@@ -63,12 +63,12 @@ CrCommandLineParser::CrCommandLineParser(int argcInput, char* argvInput[])
 			// If it has a value and the value is not an option string
 			if ((i + 1) < argc && argv[i + 1][0] != '-')
 			{
-				commandLineArgs.insert({ CrString(argv[i]), CrString(argv[i + 1]) }); // Insert value option
+				commandLineArgs.insert(CrString(argv[i]), CrString(argv[i + 1])); // Insert value option
 				++i; // Skip next argument
 			}
 			else
 			{
-				commandLineArgs.insert({ CrString(argv[i]), CrString() });
+				commandLineArgs.insert(CrString(argv[i]), CrString());
 			}
 		}
 	}

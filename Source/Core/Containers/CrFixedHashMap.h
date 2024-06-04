@@ -2,7 +2,6 @@
 
 #include "Core/CrMacros.h"
 
-warnings_off
-#include <EASTL/hash_set.h>
-warnings_on
+#include <crstl/fixed_open_hashmap.h>
+
 #include "Core/CrCoreForwardDeclarations.h"

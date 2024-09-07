@@ -142,8 +142,14 @@ void CrGPUDeletionQueue::Finalize()
 			// Add current fence to the deletion list. We can now guarantee this it the last usage of this list
 			deletionList->fence = nullptr;
 
-			for (CrGPUDeletable* deletable : deletionList->deletables)
+			// We need to get the last element, pop it out, and then delete it, because resources can be holding on
+			// to resources that get added to the list while we start deleting, for example a command buffer that
+			// holds reference to an auxiliary buffer. We assume in this model that the lifetimes for these are tied
+			// such that one of them won't be in flight at the same time that the parent has been synchronized
+			while (!deletionList->deletables.empty())
 			{
+				CrGPUDeletable* deletable = deletionList->deletables.back();
+				deletionList->deletables.pop_back();
 				delete deletable;
 			}
 

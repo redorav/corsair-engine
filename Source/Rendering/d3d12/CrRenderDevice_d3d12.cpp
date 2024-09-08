@@ -496,10 +496,9 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
-	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 
 	CrTextureUpload textureUpload;
-	textureUpload.buffer = stagingBuffer;
+	textureUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	textureUpload.mipmapStart = 0;
 	textureUpload.mipmapCount = texture->GetMipmapCount();
 	textureUpload.sliceStart = 0;
@@ -510,71 +509,70 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 	// Add to the open uploads for when we end the texture upload
 	m_openTextureUploads.insert(textureHash, textureUpload);
 
-	return (uint8_t*)stagingBuffer->Lock();
+	return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get())->Lock();
 }
 
 void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTexture)
 {
 	CrHash textureHash(&destinationTexture, sizeof(destinationTexture));
 	const auto textureUploadIter = m_openTextureUploads.find(textureHash);
-	if (textureUploadIter != m_openTextureUploads.end())
+	CrAssertMsg(textureUploadIter != m_openTextureUploads.end(), "Tried ending texture upload with no begin");
+
+	const CrTextureUpload& textureUpload = textureUploadIter->second;
+
+	const CrTextureD3D12* d3d12DestinationTexture = static_cast<const CrTextureD3D12*>(destinationTexture);
+	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get());
+
+	d3d12StagingBuffer->Unlock();
+
+	CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 	{
-		const CrTextureUpload& textureUpload = textureUploadIter->second;
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = d3d12DestinationTexture->GetD3D12Resource();
+		barrier.Transition.StateBefore = d3d12DestinationTexture->GetDefaultResourceState();
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-		const CrTextureD3D12* d3d12DestinationTexture = static_cast<const CrTextureD3D12*>(destinationTexture);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.buffer.get());
+		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 
-		d3d12StagingBuffer->Unlock();
+		cr3d::DataFormat::T format = destinationTexture->GetFormat();
 
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
+		uint32_t blockWidth = cr3d::DataFormats[format].blockWidth;
+		uint32_t blockHeight = cr3d::DataFormats[format].blockHeight;
+
+		for (uint32_t slice = textureUpload.sliceStart; slice < textureUpload.sliceCount; ++slice)
 		{
-			D3D12_RESOURCE_BARRIER barrier = {};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Transition.pResource = d3d12DestinationTexture->GetD3D12Resource();
-			barrier.Transition.StateBefore = d3d12DestinationTexture->GetDefaultResourceState();
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
-
-			cr3d::DataFormat::T format = destinationTexture->GetFormat();
-
-			uint32_t blockWidth = cr3d::DataFormats[format].blockWidth;
-			uint32_t blockHeight = cr3d::DataFormats[format].blockHeight;
-
-			for (uint32_t slice = textureUpload.sliceStart; slice < textureUpload.sliceCount; ++slice)
+			for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapCount; ++mip)
 			{
-				for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapCount; ++mip)
-				{
-					cr3d::MipmapLayout mipmapLayout = destinationTexture->GetHardwareMipSliceLayout(mip, slice);
+				cr3d::MipmapLayout mipmapLayout = destinationTexture->GetHardwareMipSliceLayout(mip, slice);
 
-					D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
-					textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Resource();
-					textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-					textureCopySource.PlacedFootprint.Offset = mipmapLayout.offsetBytes;
-					textureCopySource.PlacedFootprint.Footprint.Format   = crd3d::GetDXGIFormat(format);
-					textureCopySource.PlacedFootprint.Footprint.Width    = CrMax(blockWidth, destinationTexture->GetWidth() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Height   = CrMax(blockHeight, destinationTexture->GetHeight() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Depth    = CrMax(1u, destinationTexture->GetDepth() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.RowPitch = mipmapLayout.rowPitchBytes;
+				D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
+				textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Resource();
+				textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+				textureCopySource.PlacedFootprint.Offset = mipmapLayout.offsetBytes;
+				textureCopySource.PlacedFootprint.Footprint.Format   = crd3d::GetDXGIFormat(format);
+				textureCopySource.PlacedFootprint.Footprint.Width    = CrMax(blockWidth, destinationTexture->GetWidth() >> mip);
+				textureCopySource.PlacedFootprint.Footprint.Height   = CrMax(blockHeight, destinationTexture->GetHeight() >> mip);
+				textureCopySource.PlacedFootprint.Footprint.Depth    = CrMax(1u, destinationTexture->GetDepth() >> mip);
+				textureCopySource.PlacedFootprint.Footprint.RowPitch = mipmapLayout.rowPitchBytes;
 
-					D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
-					textureCopyDestination.pResource = d3d12DestinationTexture->GetD3D12Resource();
-					textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-					textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, destinationTexture->GetMipmapCount(), destinationTexture->GetArraySize());
+				D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
+				textureCopyDestination.pResource = d3d12DestinationTexture->GetD3D12Resource();
+				textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+				textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, destinationTexture->GetMipmapCount(), destinationTexture->GetArraySize());
 
-					d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
-				}
+				d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
 			}
-
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			barrier.Transition.StateAfter = d3d12DestinationTexture->GetDefaultResourceState();
-
-			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 		}
 
-		m_openTextureUploads.erase(textureUploadIter);
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = d3d12DestinationTexture->GetDefaultResourceState();
+
+		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 	}
+
+	m_openTextureUploads.erase(textureUploadIter);
 }
 
 uint8_t* CrRenderDeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
@@ -583,11 +581,9 @@ uint8_t* CrRenderDeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* de
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
-	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 
 	CrBufferUpload bufferUpload;
-	bufferUpload.stagingBuffer = stagingBuffer;
+	bufferUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	bufferUpload.destinationBuffer = destinationBuffer;
 	bufferUpload.sizeBytes = destinationBuffer->GetSizeBytes();
 	bufferUpload.sourceOffsetBytes = 0;
@@ -598,36 +594,35 @@ uint8_t* CrRenderDeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* de
 	// Add to the open uploads for when we end the texture upload
 	m_openBufferUploads.insert(bufferHash, bufferUpload);
 
-	return (uint8_t*)d3d12StagingBuffer->Lock();
+	return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get())->Lock();
 }
 
 void CrRenderDeviceD3D12::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
 {
 	CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
 	const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
-	if (bufferUploadIter != m_openBufferUploads.end())
+	CrAssertMsg(bufferUploadIter != m_openBufferUploads.end(), "Tried ending buffer upload with no begin");
+
+	const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+
+	const CrHardwareGPUBufferD3D12* d3d12DestinationBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(destinationBuffer);
+	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get());
+
+	d3d12StagingBuffer->Unlock();
+
+	CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 	{
-		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+		// TODO Consider using CopyResource when copying the entire resource
 
-		const CrHardwareGPUBufferD3D12* d3d12DestinationBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(destinationBuffer);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get());
-
-		d3d12StagingBuffer->Unlock();
-
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
-		{
-			// TODO Consider using CopyResource when copying the entire resource
-
-			d3d12CommandBuffer->GetD3D12CommandList()->CopyBufferRegion
-			(
-				d3d12DestinationBuffer->GetD3D12Resource(), bufferUpload.destinationOffsetBytes, 
-				d3d12StagingBuffer->GetD3D12Resource(), bufferUpload.sourceOffsetBytes,
-				bufferUpload.sizeBytes
-			);
-		}
-
-		m_openBufferUploads.erase(bufferUploadIter);
+		d3d12CommandBuffer->GetD3D12CommandList()->CopyBufferRegion
+		(
+			d3d12DestinationBuffer->GetD3D12Resource(), bufferUpload.destinationOffsetBytes, 
+			d3d12StagingBuffer->GetD3D12Resource(), bufferUpload.sourceOffsetBytes,
+			bufferUpload.sizeBytes
+		);
 	}
+
+	m_openBufferUploads.erase(bufferUploadIter);
 }
 
 CrHardwareGPUBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)

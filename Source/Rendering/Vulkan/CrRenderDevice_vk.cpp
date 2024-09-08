@@ -178,11 +178,9 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
-	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrTextureUpload textureUpload;
-	textureUpload.buffer = stagingBuffer;
+	textureUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	textureUpload.mipmapStart = 0;
 	textureUpload.mipmapCount = texture->GetMipmapCount();
 	textureUpload.sliceStart = 0;
@@ -193,89 +191,88 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 	// Add to the open uploads for when we end the texture upload
 	m_openTextureUploads.insert(textureHash, textureUpload);
 
-	return (uint8_t*)vulkanStagingBuffer->Lock();
+	return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get())->Lock();
 }
 
 void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 {
 	CrHash textureHash(&texture, sizeof(texture));
 	const auto textureUploadIter = m_openTextureUploads.find(textureHash);
-	if (textureUploadIter != m_openTextureUploads.end())
+	CrAssertMsg(textureUploadIter != m_openTextureUploads.end(), "Tried ending texture upload with no begin");
+
+	const CrTextureUpload& textureUpload = textureUploadIter->second;
+
+	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get());
+
+	vulkanStagingBuffer->Unlock();
+
+	const CrVkImageStateInfo& vkImageStateInfo = crvk::GetVkImageStateInfo(texture->GetFormat(), vulkanTexture->GetDefaultState().layout);
+
+	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 	{
-		const CrTextureUpload& textureUpload = textureUploadIter->second;
+		VkImageAspectFlags vkImageAspectMask = crvk::GetVkImageAspectFlags(vulkanTexture->GetFormat());
 
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.buffer.get());
+		// Transition the texture image layout to transfer target, so we can safely copy our buffer data into it
+		VkImageSubresourceRange subresourceRange;
+		subresourceRange.aspectMask     = vkImageAspectMask;
+		subresourceRange.baseMipLevel   = textureUpload.mipmapStart;
+		subresourceRange.levelCount     = textureUpload.mipmapCount;
+		subresourceRange.baseArrayLayer = textureUpload.sliceStart;
+		subresourceRange.layerCount     = textureUpload.sliceCount;
 
-		vulkanStagingBuffer->Unlock();
+		VkImageMemoryBarrier imageMemoryBarrier;
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.pNext = nullptr;
+		imageMemoryBarrier.image = vulkanTexture->GetVkImage();
+		imageMemoryBarrier.subresourceRange = subresourceRange;
+		imageMemoryBarrier.srcAccessMask = 0;
+		imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		imageMemoryBarrier.oldLayout = vkImageStateInfo.imageLayout;
+		imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-		const CrVkImageStateInfo& vkImageStateInfo = crvk::GetVkImageStateInfo(texture->GetFormat(), vulkanTexture->GetDefaultState().layout);
+		// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+		// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
+		// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
-		{
-			VkImageAspectFlags vkImageAspectMask = crvk::GetVkImageAspectFlags(vulkanTexture->GetFormat());
-
-			// Transition the texture image layout to transfer target, so we can safely copy our buffer data into it
-			VkImageSubresourceRange subresourceRange;
-			subresourceRange.aspectMask     = vkImageAspectMask;
-			subresourceRange.baseMipLevel   = textureUpload.mipmapStart;
-			subresourceRange.levelCount     = textureUpload.mipmapCount;
-			subresourceRange.baseArrayLayer = textureUpload.sliceStart;
-			subresourceRange.layerCount     = textureUpload.sliceCount;
-
-			VkImageMemoryBarrier imageMemoryBarrier;
-			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			imageMemoryBarrier.pNext = nullptr;
-			imageMemoryBarrier.image = vulkanTexture->GetVkImage();
-			imageMemoryBarrier.subresourceRange = subresourceRange;
-			imageMemoryBarrier.srcAccessMask = 0;
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			imageMemoryBarrier.oldLayout = vkImageStateInfo.imageLayout;
-			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-			// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
-			// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
-
-			// Setup buffer copy regions for each mip level
-			CrFixedVector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
+		// Setup buffer copy regions for each mip level
+		CrFixedVector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
 			
-			for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapStart + textureUpload.mipmapCount; mip++)
-			{
-				VkBufferImageCopy bufferCopyRegion;
-				bufferCopyRegion.imageSubresource.aspectMask = vkImageAspectMask;
-				bufferCopyRegion.imageSubresource.mipLevel = mip;
-				bufferCopyRegion.imageSubresource.baseArrayLayer = textureUpload.sliceStart;
-				bufferCopyRegion.imageSubresource.layerCount = textureUpload.sliceCount;
-				bufferCopyRegion.imageExtent = { CrMax(texture->GetWidth() >> mip, 1u), CrMax(texture->GetHeight() >> mip, 1u), CrMax(texture->GetDepth() >> mip, 1u) };
-				bufferCopyRegion.imageOffset = { 0, 0, 0 };
+		for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapStart + textureUpload.mipmapCount; mip++)
+		{
+			VkBufferImageCopy bufferCopyRegion;
+			bufferCopyRegion.imageSubresource.aspectMask = vkImageAspectMask;
+			bufferCopyRegion.imageSubresource.mipLevel = mip;
+			bufferCopyRegion.imageSubresource.baseArrayLayer = textureUpload.sliceStart;
+			bufferCopyRegion.imageSubresource.layerCount = textureUpload.sliceCount;
+			bufferCopyRegion.imageExtent = { CrMax(texture->GetWidth() >> mip, 1u), CrMax(texture->GetHeight() >> mip, 1u), CrMax(texture->GetDepth() >> mip, 1u) };
+			bufferCopyRegion.imageOffset = { 0, 0, 0 };
 
-				bufferCopyRegion.bufferOffset = texture->GetGenericMipSliceLayout(mip, 0).offsetBytes;
-				bufferCopyRegion.bufferRowLength = 0;
-				bufferCopyRegion.bufferImageHeight = 0;
-				bufferCopyRegions.push_back(bufferCopyRegion);
-			}
-
-			// Copy mip levels from staging buffer into texture memory
-			vkCmdCopyBufferToImage(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanTexture->GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
-
-			// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			imageMemoryBarrier.newLayout = vkImageStateInfo.imageLayout;
-
-			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-			// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-			// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
-			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+			bufferCopyRegion.bufferOffset = texture->GetGenericMipSliceLayout(mip, 0).offsetBytes;
+			bufferCopyRegion.bufferRowLength = 0;
+			bufferCopyRegion.bufferImageHeight = 0;
+			bufferCopyRegions.push_back(bufferCopyRegion);
 		}
 
-		m_openTextureUploads.erase(textureUploadIter);
+		// Copy mip levels from staging buffer into texture memory
+		vkCmdCopyBufferToImage(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanTexture->GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+
+		// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
+		imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		imageMemoryBarrier.newLayout = vkImageStateInfo.imageLayout;
+
+		// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+		// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+		// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 	}
+
+	m_openTextureUploads.erase(textureUploadIter);
 }
 
 uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
@@ -284,11 +281,9 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 
 	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
-	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 	CrBufferUpload bufferUpload;
-	bufferUpload.stagingBuffer = stagingBuffer;
+	bufferUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	bufferUpload.destinationBuffer = destinationBuffer;
 	bufferUpload.sizeBytes = destinationBuffer->GetSizeBytes();
 	bufferUpload.sourceOffsetBytes = 0;
@@ -299,59 +294,58 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 	// Add to the open uploads for when we end the texture upload
 	m_openBufferUploads.insert(bufferHash, bufferUpload);
 
-	return (uint8_t*)vulkanStagingBuffer->Lock();
+	return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get())->Lock();
 }
 
 void CrRenderDeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
 {
 	CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
 	const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
-	if (bufferUploadIter != m_openBufferUploads.end())
+	CrAssertMsg(bufferUploadIter != m_openBufferUploads.end(), "Tried ending buffer upload with no begin");
+
+	const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+
+	const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(destinationBuffer);
+	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());
+
+	vulkanStagingBuffer->Unlock();
+
+	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 	{
-		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+		VkBufferMemoryBarrier bufferMemoryBarrier;
+		bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		bufferMemoryBarrier.pNext = nullptr;
+		bufferMemoryBarrier.srcAccessMask = VK_ACCESS_NONE_KHR;
+		bufferMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		bufferMemoryBarrier.buffer = vulkanDestinationBuffer->GetVkBuffer();
+		bufferMemoryBarrier.offset = 0;
+		bufferMemoryBarrier.size = vulkanDestinationBuffer->GetSizeBytes();
 
-		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(destinationBuffer);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());
+		// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+		// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
+		// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 
-		vulkanStagingBuffer->Unlock();
+		VkBufferCopy bufferCopyRegion;
+		bufferCopyRegion.size = vulkanDestinationBuffer->GetSizeBytes();
+		bufferCopyRegion.srcOffset = bufferUpload.sourceOffsetBytes;
+		bufferCopyRegion.dstOffset = bufferUpload.destinationOffsetBytes;
 
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
-		{
-			VkBufferMemoryBarrier bufferMemoryBarrier;
-			bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			bufferMemoryBarrier.pNext = nullptr;
-			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_NONE_KHR;
-			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			bufferMemoryBarrier.buffer = vulkanDestinationBuffer->GetVkBuffer();
-			bufferMemoryBarrier.offset = 0;
-			bufferMemoryBarrier.size = vulkanDestinationBuffer->GetSizeBytes();
+		vkCmdCopyBuffer(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanDestinationBuffer->GetVkBuffer(), 1, &bufferCopyRegion);
 
-			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-			// Source pipeline stage is host write/read execution (VK_PIPELINE_STAGE_HOST_BIT)
-			// Destination pipeline stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+		// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
+		bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-			VkBufferCopy bufferCopyRegion;
-			bufferCopyRegion.size = vulkanDestinationBuffer->GetSizeBytes();
-			bufferCopyRegion.srcOffset = bufferUpload.sourceOffsetBytes;
-			bufferCopyRegion.dstOffset = bufferUpload.destinationOffsetBytes;
-
-			vkCmdCopyBuffer(vulkanCommandBuffer->GetVkCommandBuffer(), vulkanStagingBuffer->GetVkBuffer(), vulkanDestinationBuffer->GetVkBuffer(), 1, &bufferCopyRegion);
-
-			// Once the data has been uploaded we transfer to the texture image to the shader read layout, so it can be sampled from
-			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-			// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
-			// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
-			// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
-			vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
-		}
-
-		m_openBufferUploads.erase(bufferUploadIter);
+		// Insert a memory dependency at the proper pipeline stages that will execute the image layout transition 
+		// Source pipeline stage stage is copy command execution (VK_PIPELINE_STAGE_TRANSFER_BIT)
+		// Destination pipeline stage fragment shader access (VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
+		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 	}
+
+	m_openBufferUploads.erase(bufferUploadIter);
 }
 
 CrHardwareGPUBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)

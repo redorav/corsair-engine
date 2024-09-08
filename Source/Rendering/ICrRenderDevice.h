@@ -72,7 +72,7 @@ struct CrTextureUpload
 {
 	~CrTextureUpload();
 
-	CrHardwareGPUBufferHandle buffer;
+	CrHardwareGPUBufferHandle stagingBuffer;
 	ICrTexture* texture;
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;

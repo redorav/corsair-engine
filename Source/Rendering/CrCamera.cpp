@@ -67,10 +67,10 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 void CrCamera::UpdateMatrices()
 {
 	m_view2WorldMatrix = float4x4::identity();
-	m_view2WorldMatrix._m00_m01_m02 = m_rightWorldSpace;
-	m_view2WorldMatrix._m10_m11_m12 = m_upWorldSpace;
-	m_view2WorldMatrix._m20_m21_m22 = m_forwardWorldSpace;
-	m_view2WorldMatrix._m30_m31_m32 = m_position;
+	m_view2WorldMatrix[0].xyz = m_rightWorldSpace;
+	m_view2WorldMatrix[1].xyz = m_upWorldSpace;
+	m_view2WorldMatrix[2].xyz = m_forwardWorldSpace;
+	m_view2WorldMatrix[3].xyz = m_position;
 
 	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
 

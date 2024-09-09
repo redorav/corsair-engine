@@ -84,9 +84,9 @@ public:
 
 	cr3d::TextureState GetDefaultState() const { return m_defaultState; }
 
-	static cr3d::MipmapLayout GetGenericMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
+	static cr3d::MipmapLayout GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
-	cr3d::MipmapLayout GetGenericMipSliceLayout(uint32_t mip, uint32_t slice) const;
+	cr3d::MipmapLayout GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const;
 
 	cr3d::MipmapLayout GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const;
 

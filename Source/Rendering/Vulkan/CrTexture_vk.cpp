@@ -276,7 +276,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 	{
-		cr3d::MipmapLayout genericMipLayout = GetGenericMipSliceLayout(mip, 0);
+		cr3d::MipmapLayout genericMipLayout = GetDDSMipSliceLayout(mip, 0);
 		cr3d::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
 		mipmapLayout.rowPitchBytes        = genericMipLayout.rowPitchBytes;
 		mipmapLayout.offsetBytes          = genericMipLayout.offsetBytes;
@@ -285,7 +285,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	if (m_arraySize > 1)
 	{
-		m_slicePitchBytes = GetGenericMipSliceLayout(m_mipmapCount, 0).offsetBytes;
+		m_slicePitchBytes = GetDDSMipSliceLayout(m_mipmapCount, 0).offsetBytes;
 	}
 
 	// If we have initial data, copy it here

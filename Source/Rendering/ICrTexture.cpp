@@ -6,6 +6,8 @@
 
 #include "Math/CrMath.h"
 
+#include "ddspp.h"
+
 CrTextureDescriptor::CrTextureDescriptor()
 	: width(1)
 	, height(1)
@@ -93,83 +95,39 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	m_hardwareMipmapLayouts = {};
 }
 
-cr3d::MipmapLayout ICrTexture::GetGenericMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
+enum DXGI_FORMAT;
+
+namespace crd3d
+{
+	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
+}
+
+cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
 {
 	cr3d::MipmapLayout mipmapLayout;
 
-	// The mip/slice arrangement is different between texture arrays and volume textures
-	//
-	// Arrays
-	// 
-	//      0         1    2       0         1    2       0         1    2
-	//  __________  _____  __  __________  _____  __  __________  _____  __ 
-	// |          ||     ||__||          ||     ||__||          ||     ||__|
-	// |          ||_____|    |          ||_____|    |          ||_____|
-	// |          |           |          |           |          |
-	// |__________|           |__________|           |__________|
-	//
-	// Volume
-	// 
-	//      0                                 1                  2
-	//  __________  __________  __________  _____  _____  _____  __  __  __ 
-	// |          ||          ||          ||     ||     ||     ||__||__||__|
-	// |          ||          ||          ||_____||_____||_____|
-	// |          ||          ||          |
-	// |__________||__________||__________|
-	//
+	// TODO Move GetDXGIFormat to an actually generic place
+	ddspp::DXGIFormat dxgiFormat = (ddspp::DXGIFormat)crd3d::GetDXGIFormat(format);
 
-	uint32_t blockWidth, blockHeight;
-	cr3d::GetFormatBlockWidthHeight(format, blockWidth, blockHeight);
-	uint32_t bitsPerPixelOrBlock = cr3d::GetFormatBitsPerPixelOrBlock(format);
+	ddspp::Descriptor ddsDescriptor = {};
+	ddsDescriptor.format = dxgiFormat;
+	ddsDescriptor.width = width;
+	ddsDescriptor.height = height;
+	ddsDescriptor.numMips = numMipmaps;
+	ddsDescriptor.type = isVolume ? ddspp::Texture3D : ddspp::Texture2D;
+	ddsDescriptor.bitsPerPixelOrBlock = ddspp::get_bits_per_pixel_or_block(ddsDescriptor.format);
+	ddspp::get_block_size(ddsDescriptor.format, ddsDescriptor.blockWidth, ddsDescriptor.blockHeight);
 
-	uint64_t rowPitch = width * bitsPerPixelOrBlock / (8 * blockWidth);
-	uint64_t heightInPixelsBlocks = height / blockHeight;
-	uint64_t depthPitch = rowPitch * heightInPixelsBlocks;
-
-	uint64_t offset = 0;
-	uint64_t mip0Size = depthPitch * 8; // Work in bits
-
-	if (isVolume)
-	{
-		// There are no slices in volume textures, we ignore the parameter
-		for (uint32_t m = 0; m < mip; ++m)
-		{
-			offset += (mip0Size >> 2 * m);
-		}
-
-		offset *= numMipmaps;
-	}
-	else
-	{
-		uint64_t mipChainSize = 0;
-
-		for (uint32_t m = 0; m < numMipmaps; ++m)
-		{
-			uint64_t mipSize = mip0Size >> 2 * m; // Divide by 2 in width and height
-			mipChainSize += mipSize > bitsPerPixelOrBlock ? mipSize : bitsPerPixelOrBlock;
-		}
-
-		offset += mipChainSize * slice;
-
-		for (uint32_t m = 0; m < mip; ++m)
-		{
-			uint64_t mipSize = mip0Size >> 2 * m; // Divide by 2 in width and height
-			offset += mipSize > bitsPerPixelOrBlock ? mipSize : bitsPerPixelOrBlock;
-		}
-	}
-
-	offset /= 8; // Back to bytes
-
-	mipmapLayout.offsetBytes          = (uint32_t)offset;
-	mipmapLayout.rowPitchBytes        = (uint32_t)rowPitch >> mip;
-	mipmapLayout.heightInPixelsBlocks = (uint32_t)heightInPixelsBlocks >> mip;
+	mipmapLayout.offsetBytes = (uint32_t)ddspp::get_offset(ddsDescriptor, mip, slice);
+	mipmapLayout.rowPitchBytes = (uint32_t)ddspp::get_row_pitch(ddsDescriptor, mip);
+	mipmapLayout.heightInPixelsBlocks = ddspp::get_height_pixels_blocks(ddsDescriptor, mip);
 
 	return mipmapLayout;
 }
 
-cr3d::MipmapLayout ICrTexture::GetGenericMipSliceLayout(uint32_t mip, uint32_t slice) const
+cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const
 {
-	return GetGenericMipSliceLayout(m_format, m_width, m_height, m_mipmapCount, IsVolumeTexture(), mip, slice);
+	return GetDDSMipSliceLayout(m_format, m_width, m_height, m_mipmapCount, IsVolumeTexture(), mip, slice);
 }
 
 cr3d::MipmapLayout ICrTexture::GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const
@@ -181,7 +139,7 @@ cr3d::MipmapLayout ICrTexture::GetHardwareMipSliceLayout(uint32_t mip, uint32_t 
 
 void ICrTexture::CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* sourceData, uint32_t mip, uint32_t slice)
 {
-	cr3d::MipmapLayout sourceMipLayout = GetGenericMipSliceLayout(mip, slice);
+	cr3d::MipmapLayout sourceMipLayout = GetDDSMipSliceLayout(mip, slice);
 	cr3d::MipmapLayout destinationMipLayout = GetHardwareMipSliceLayout(mip, slice);
 
 	uint32_t depth = GetDepth();

@@ -251,7 +251,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 			bufferCopyRegion.imageExtent = { CrMax(texture->GetWidth() >> mip, 1u), CrMax(texture->GetHeight() >> mip, 1u), CrMax(texture->GetDepth() >> mip, 1u) };
 			bufferCopyRegion.imageOffset = { 0, 0, 0 };
 
-			bufferCopyRegion.bufferOffset = texture->GetGenericMipSliceLayout(mip, 0).offsetBytes;
+			bufferCopyRegion.bufferOffset = texture->GetDDSMipSliceLayout(mip, 0).offsetBytes;
 			bufferCopyRegion.bufferRowLength = 0;
 			bufferCopyRegion.bufferImageHeight = 0;
 			bufferCopyRegions.push_back(bufferCopyRegion);

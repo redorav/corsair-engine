@@ -48,7 +48,7 @@ static const CrString RWStorageBufferSection =
 "// RW Storage Buffers\n"
 "//-------------------\n\n";
 
-static const CrString DataBufferSection =
+static const CrString TypedBufferSection =
 "//--------------\n"
 "// Typed Buffers\n"
 "//--------------\n\n";
@@ -136,7 +136,7 @@ struct HLSLResources
 				}
 				case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
 				{
-					dataBuffers.push_back(binding);
+					typedBuffers.push_back(binding);
 					break;
 				}
 				case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
@@ -158,7 +158,7 @@ struct HLSLResources
 	CrVector<SpvReflectDescriptorBinding> rwTextures;
 	CrVector<SpvReflectDescriptorBinding> storageBuffers;
 	CrVector<SpvReflectDescriptorBinding> rwStorageBuffers;
-	CrVector<SpvReflectDescriptorBinding> dataBuffers;
+	CrVector<SpvReflectDescriptorBinding> typedBuffers;
 	CrVector<SpvReflectDescriptorBinding> rwTypedBuffers;
 
 	//std::vector<SpvReflectDescriptorBinding> stageInputs;
@@ -214,7 +214,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
 
 	metadataHeader += BuildRWStorageBufferMetadataHeader(resources);
 
-	metadataHeader += BuildDataBufferMetadataHeader(resources);
+	metadataHeader += BuildTypedBufferMetadataHeader(resources);
 
 	metadataHeader += BuildRWTypedBufferMetadataHeader(resources);
 
@@ -244,7 +244,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
 
 	metadataCpp += BuildRWStorageBufferMetadataCpp(resources);
 
-	metadataCpp += BuildDataBufferMetadataCpp(resources);
+	metadataCpp += BuildTypedBufferMetadataCpp(resources);
 
 	metadataCpp += BuildRWTypedBufferMetadataCpp(resources);
 
@@ -836,55 +836,55 @@ CrString CrShaderMetadataBuilder::PrintRWStorageBufferMetadataStructDeclaration(
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::BuildDataBufferMetadataHeader(const HLSLResources& resources)
+CrString CrShaderMetadataBuilder::BuildTypedBufferMetadataHeader(const HLSLResources& resources)
 {
 	CrString result;
 
-	result += DataBufferSection;
+	result += TypedBufferSection;
 
-	result += PrintResourceEnum("DataBuffer", resources.dataBuffers);
+	result += PrintResourceEnum("TypedBuffer", resources.typedBuffers);
 
-	result += PrintDataBufferMetadataStructDeclaration();
+	result += PrintTypedBufferMetadataStructDeclaration();
 
-	result += PrintResourceMetadataInstanceDeclaration("DataBuffer", resources.dataBuffers);
+	result += PrintResourceMetadataInstanceDeclaration("TypedBuffer", resources.typedBuffers);
 
-	result += "extern CrHashMap<CrString, DataBufferMetadata&> DataBufferTable;\n\n";
+	result += "extern CrHashMap<CrString, TypedBufferMetadata&> TypedBufferTable;\n\n";
 
-	result += "extern CrArray<DataBufferMetadata, " + CrString(resources.dataBuffers.size()) + "> DataBufferMetaTable;\n\n";
+	result += "extern CrArray<TypedBufferMetadata, " + CrString(resources.typedBuffers.size()) + "> TypedBufferMetaTable;\n\n";
 
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::BuildDataBufferMetadataCpp(const HLSLResources& resources)
+CrString CrShaderMetadataBuilder::BuildTypedBufferMetadataCpp(const HLSLResources& resources)
 {
 	CrString result;
 
-	result += DataBufferSection;
+	result += TypedBufferSection;
 
-	result += PrintDataBufferMetadataInstanceDefinition(resources.dataBuffers);
+	result += PrintTypedBufferMetadataInstanceDefinition(resources.typedBuffers);
 
-	result += PrintResourceHashmap("DataBuffer", resources.dataBuffers);
+	result += PrintResourceHashmap("TypedBuffer", resources.typedBuffers);
 
 	return result;
 }
 
-CrString CrShaderMetadataBuilder::PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers)
+CrString CrShaderMetadataBuilder::PrintTypedBufferMetadataInstanceDefinition(const ResourceVector& typedBuffers)
 {
 	CrString result;
-	for (const auto& dataBuffer : dataBuffers)
+	for (const auto& typedBuffer : typedBuffers)
 	{
-		result += "DataBufferMetadata " + CrString(dataBuffer.name) + "MetaInstance(" + "DataBuffers::" + CrString(dataBuffer.name) + ");\n";
+		result += "TypedBufferMetadata " + CrString(typedBuffer.name) + "MetaInstance(" + "TypedBuffers::" + CrString(typedBuffer.name) + ");\n";
 	}
-	result += "DataBufferMetadata InvalidDataBufferMetaInstance(UINT32_MAX);\n";
+	result += "TypedBufferMetadata InvalidTypedBufferMetaInstance(UINT32_MAX);\n";
 	return result + "\n";
 }
 
-CrString CrShaderMetadataBuilder::PrintDataBufferMetadataStructDeclaration()
+CrString CrShaderMetadataBuilder::PrintTypedBufferMetadataStructDeclaration()
 {
-	CrString result = "struct DataBufferMetadata" \
+	CrString result = "struct TypedBufferMetadata" \
 		"\n{\n" \
-		"\tDataBufferMetadata(uint32_t id) : id(static_cast<DataBuffers::T>(id)) {}\n" \
-		"\tconst DataBuffers::T id;\n" \
+		"\tTypedBufferMetadata(uint32_t id) : id(static_cast<TypedBuffers::T>(id)) {}\n" \
+		"\tconst TypedBuffers::T id;\n" \
 		"};\n\n";
 	return result;
 }

@@ -94,10 +94,10 @@ private:
 	// Data Buffers
 	//-------------
 
-	static CrString BuildDataBufferMetadataHeader(const HLSLResources& resources);
-	static CrString BuildDataBufferMetadataCpp(const HLSLResources& resources);
-	static CrString PrintDataBufferMetadataInstanceDefinition(const ResourceVector& dataBuffers);
-	static CrString PrintDataBufferMetadataStructDeclaration();
+	static CrString BuildTypedBufferMetadataHeader(const HLSLResources& resources);
+	static CrString BuildTypedBufferMetadataCpp(const HLSLResources& resources);
+	static CrString PrintTypedBufferMetadataInstanceDefinition(const ResourceVector& typedBuffers);
+	static CrString PrintTypedBufferMetadataStructDeclaration();
 
 	//----------------
 	// RW Data Buffers

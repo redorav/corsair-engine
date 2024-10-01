@@ -771,7 +771,7 @@ void CrFrame::Process()
 		commandBuffer->BindComputePipelineState(exampleComputePipeline);
 		commandBuffer->BindStorageBuffer(StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
 		commandBuffer->BindRWStorageBuffer(RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
-		commandBuffer->BindRWTypedBuffer(RWTypedBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWTypedBuffer));
+		commandBuffer->BindRWTypedBuffer(RWTypedBuffers::ExampleRWTypedBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWTypedBuffer));
 		commandBuffer->BindRWTexture(RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
 		commandBuffer->BindTexture(Textures::ExampleTexture3DCompute, m_colorfulVolumeTexture.get());
 		commandBuffer->BindTexture(Textures::ExampleTextureArrayCompute, m_colorfulTextureArray.get());
@@ -806,7 +806,7 @@ void CrFrame::Process()
 		commandBuffer->BindComputePipelineState(exampleComputePipeline);
 		commandBuffer->BindStorageBuffer(StorageBuffers::ExampleStructuredBufferCompute, renderGraph.GetPhysicalBuffer(structuredBuffer));
 		commandBuffer->BindRWStorageBuffer(RWStorageBuffers::ExampleRWStructuredBufferCompute, renderGraph.GetPhysicalBuffer(rwStructuredBuffer));
-		commandBuffer->BindRWTypedBuffer(RWTypedBuffers::ExampleRWDataBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWTypedBuffer));
+		commandBuffer->BindRWTypedBuffer(RWTypedBuffers::ExampleRWTypedBufferCompute, renderGraph.GetPhysicalBuffer(colorsRWTypedBuffer));
 		commandBuffer->BindRWTexture(RWTextures::ExampleRWTextureCompute, renderGraph.GetPhysicalTexture(colorsRWTexture), 0);
 		commandBuffer->BindTexture(Textures::ExampleTexture3DCompute, m_colorfulVolumeTexture.get());
 		commandBuffer->BindTexture(Textures::ExampleTextureArrayCompute, m_colorfulTextureArray.get());

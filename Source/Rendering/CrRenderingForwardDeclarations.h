@@ -166,8 +166,8 @@ class CrStructuredBuffer;
 template<typename Metadata>
 using CrStructuredBufferHandle = CrIntrusivePtr<CrStructuredBuffer<Metadata>>;
 
-class CrDataBuffer;
-using CrDataBufferHandle = CrIntrusivePtr<CrDataBuffer>;
+class CrTypedBuffer;
+using CrTypedBufferHandle = CrIntrusivePtr<CrTypedBuffer>;
 
 typedef CrFixedFunction<128, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 

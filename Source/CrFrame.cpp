@@ -265,8 +265,8 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	rwTextureParams.name = "Colors RW Texture";
 	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
 
-	m_colorsRWTypedBuffer = renderDevice->CreateDataBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 
+	m_colorsRWTypedBuffer = renderDevice->CreateTypedBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
 	m_exampleComputePipeline = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::ExampleCompute);
 	m_depthDownsampleLinearize = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::DepthDownsampleLinearizeMinMax);
 	m_mouseSelectionResolvePipeline = CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders::EditorMouseSelectionResolveCS);

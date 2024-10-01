@@ -342,10 +342,10 @@ public:
 // Data Buffer
 //------------
 
-class CrDataBuffer : public CrGPUBuffer
+class CrTypedBuffer : public CrGPUBuffer
 {
 public:
 
-	CrDataBuffer(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+	CrTypedBuffer(ICrRenderDevice* renderDevice, cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 		: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(cr3d::BufferUsage::Typed, access), numElements, dataFormat) {}
 };

@@ -71,7 +71,7 @@ struct CrShaderBindingLayoutResources
 
 	CrFixedVector<CrShaderBinding, 32> storageBuffers;
 	CrFixedVector<CrShaderBinding, 32> rwStorageBuffers;
-	CrFixedVector<CrShaderBinding, 32> dataBuffers;
+	CrFixedVector<CrShaderBinding, 32> typedBuffers;
 	CrFixedVector<CrShaderBinding, 32> rwTypedBuffers;
 };
 

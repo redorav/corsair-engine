@@ -252,9 +252,9 @@ CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T a
 	return CrVertexBufferHandle(new CrVertexBuffer(this, access, vertexDescriptor, numVertices));
 }
 
-CrDataBufferHandle ICrRenderDevice::CreateDataBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+CrTypedBufferHandle ICrRenderDevice::CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 {
-	return CrDataBufferHandle(new CrDataBuffer(this, access, dataFormat, numElements));
+	return CrTypedBufferHandle(new CrTypedBuffer(this, access, dataFormat, numElements));
 }
 
 cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)

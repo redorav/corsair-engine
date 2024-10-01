@@ -93,7 +93,7 @@ private:
 
 	CrStructuredBufferHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
 
-	CrDataBufferHandle m_colorsRWTypedBuffer;
+	CrTypedBufferHandle m_colorsRWTypedBuffer;
 
 	CrGPUBufferHandle m_indirectDispatchArguments;
 

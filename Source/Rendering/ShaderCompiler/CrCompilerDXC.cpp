@@ -337,7 +337,7 @@ cr3d::ShaderResourceType::T GetShaderResourceType(const SpvReflectDescriptorBind
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE:
 			return cr3d::ShaderResourceType::RWTexture;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-			return cr3d::ShaderResourceType::DataBuffer;
+			return cr3d::ShaderResourceType::TypedBuffer;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
 			return cr3d::ShaderResourceType::RWTypedBuffer;
 		default:
@@ -546,7 +546,7 @@ cr3d::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_
 		case D3D_SIT_TEXTURE:
 			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
 			{
-				return cr3d::ShaderResourceType::DataBuffer;
+				return cr3d::ShaderResourceType::TypedBuffer;
 			}
 			else
 			{

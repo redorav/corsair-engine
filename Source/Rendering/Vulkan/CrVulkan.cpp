@@ -566,7 +566,7 @@ VkDescriptorType crvk::GetVkDescriptorType(cr3d::ShaderResourceType::T resourceT
 		case cr3d::ShaderResourceType::StorageBuffer:
 		case cr3d::ShaderResourceType::RWStorageBuffer:
 			return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		case cr3d::ShaderResourceType::DataBuffer:
+		case cr3d::ShaderResourceType::TypedBuffer:
 			return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
 		case cr3d::ShaderResourceType::RWTypedBuffer:
 			return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;

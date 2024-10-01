@@ -5,7 +5,7 @@
 #include "ComputeCommon.hlsl"
 #include "IndirectRendering.hlsl"
 
-Buffer<float4> ExampleDataBufferCompute;
+Buffer<float4> ExampleTypedBufferCompute;
 RWBuffer<float4> ExampleRWDataBufferCompute;
 RWTexture2D<float4> ExampleRWTextureCompute;
 Texture2D ExampleTextureCompute;

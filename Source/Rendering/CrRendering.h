@@ -283,7 +283,7 @@ namespace cr3d
 			RWTexture,
 			StorageBuffer, // StorageBuffers include HLSL StructuredBuffer and ByteBuffer
 			RWStorageBuffer,
-			DataBuffer,
+			TypedBuffer,
 			RWTypedBuffer,
 			Count,
 		};

@@ -25,10 +25,6 @@
 #define RENDER_DEVICE_LOGS
 #endif
 
-CrTextureUpload::~CrTextureUpload() {}
-
-CrBufferUpload::~CrBufferUpload() {}
-
 ICrRenderDevice::ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor)
 	: m_renderSystem(renderSystem)
 	, m_isValidPipelineCache(false)

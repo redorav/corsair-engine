@@ -70,8 +70,6 @@ namespace CrCommandQueueType { enum T : uint32_t; }
 // only provide the data in a linear format
 struct CrTextureUpload
 {
-	~CrTextureUpload();
-
 	CrHardwareGPUBufferHandle stagingBuffer;
 	ICrTexture* texture;
 	uint32_t mipmapStart;
@@ -82,8 +80,6 @@ struct CrTextureUpload
 
 struct CrBufferUpload
 {
-	~CrBufferUpload();
-
 	CrHardwareGPUBufferHandle stagingBuffer;
 	const ICrHardwareGPUBuffer* destinationBuffer;
 	uint32_t sizeBytes;

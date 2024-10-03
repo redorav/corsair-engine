@@ -639,7 +639,7 @@ float3 CrEditor::ComputeClosestPointToAxis(float2 mousePixel, float3 axisPositio
 	float4 manipulatorAxisPixel = manipulatorEndPixel - manipulatorStartPixel;
 
 	float t;
-	float2 closestPointMouseToRay = ClosestPointToRay(mousePixel, manipulatorStartPixel.xy, manipulatorAxisPixel.xy, t);
+	ClosestPointToRay(mousePixel, manipulatorStartPixel.xy, manipulatorAxisPixel.xy, t);
 
 	// Perspective-correct interpolation between the world positions. We need this because we found a t in pixel space, and cannot be used directly
 	float3 interpolatedWorldPositionInvZ = lerp(axisStartWorld / manipulatorStartView.z, axisEndWorld / manipulatorEndView.z, t);

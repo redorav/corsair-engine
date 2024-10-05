@@ -4,4 +4,4 @@
 
 using CrString = crstl::string;
 using CrWString = crstl::wstring;
-using CrStringNoInitialize = crstl::ctor_no_initialize;
+constexpr crstl::ctor_no_initialize_e CrStringNoInitialize = crstl::ctor_no_initialize;

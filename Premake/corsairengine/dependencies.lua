@@ -12,7 +12,6 @@ LibCRSTL              = DependenciesDirectory..'/crstl'
 LibDdspp              = DependenciesDirectory..'/ddspp'
 LibDxc                = DependenciesDirectory..'/dxc'
 LibEASTL              = DependenciesDirectory..'/eastl'
-LibGlslang            = DependenciesDirectory..'/glslang'
 LibHlslpp             = DependenciesDirectory..'/hlslpp'
 LibImGui              = DependenciesDirectory..'/imgui'
 LibMeshOptimizer      = DependenciesDirectory..'/meshoptimizer'
@@ -94,13 +93,6 @@ EASTLLibrary =
 	natvis      = LibEASTL..IncludeDirectory..'doc/**.natvis',
 	libDirs     = LibEASTL..BinaryDirectory,
 	libNames    = 'EASTL.vs2019.release'
-}
-
-GlslangLibrary =
-{
-	includeDirs = LibGlslang..IncludeDirectory,
-	libDirs     = LibGlslang..BinaryDirectory,
-	libNames    = 'Glslang.vs2019.release'
 }
 
 HlslppLibrary =

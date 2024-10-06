@@ -452,9 +452,6 @@ project(ProjectShaderCompiler)
 	
 	AddLibraryIncludes(DxcLibrary)
 	LinkLibrary(DxcLibrary)
-
-	AddLibraryIncludes(GlslangLibrary)
-	LinkLibrary(GlslangLibrary)
 	
 	LinkLibrary(EASTLLibrary)
 	

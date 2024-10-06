@@ -24,11 +24,6 @@
 #include <shellapi.h>
 #endif
 
-warnings_off
-// Glslang
-#include <glslang/Public/ShaderLang.h>
-warnings_on
-
 void CompilationDescriptor::Process() const
 {
 	if (!processed)
@@ -79,12 +74,12 @@ const CrFixedPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, c
 
 void CrShaderCompiler::Initialize()
 {
-	glslang::InitializeProcess();
+	
 }
 
 void CrShaderCompiler::Finalize()
 {
-	glslang::FinalizeProcess();
+	
 }
 
 bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)

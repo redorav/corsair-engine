@@ -2,8 +2,6 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include <vector>
-
 struct SpvReflectDescriptorBinding;
 struct SpvReflectTypeDescription;
 
@@ -21,7 +19,7 @@ public:
 private:
 
 	// Takes SPIRV as input and creates two text files, one for the header and one for the cpp
-	static bool BuildSPIRVMetadata(const std::vector<uint32_t>& spirvBytecode, CrString& metadataHeader, CrString& metadataCpp);
+	static bool BuildSPIRVMetadata(const CrVector<uint32_t>& spirvBytecode, CrString& metadataHeader, CrString& metadataCpp, CrString& compilationStatus);
 
 	static CrString PrintResourceMetadataInstanceDeclaration(const CrString& resourceType, const ResourceVector& uniformBuffers);
 

@@ -31,14 +31,14 @@
 
 // DXC Argument handling
 static const wchar_t* DXCArgumentWarningsAsErrors  = L"-WX";
-//static const wchar_t* DXCArgumentOptimization0     = L"-O0";
-//static const wchar_t* DXCArgumentOptimization1     = L"-O1";
-//static const wchar_t* DXCArgumentOptimization2     = L"-O2";
+static const wchar_t* DXCArgumentOptimization0     = L"-O0";
+static const wchar_t* DXCArgumentOptimization1     = L"-O1";
+static const wchar_t* DXCArgumentOptimization2     = L"-O2";
 static const wchar_t* DXCArgumentOptimization3     = L"-O3";
 static const wchar_t* DXCArgumentEnableDebug       = L"-Zi";
 
 //static const wchar_t* DXCArgumentSkipValidation    = L"-Vd";
-//static const wchar_t* DXCArgumentSkipOptimizations = L"-Od";
+static const wchar_t* DXCArgumentSkipOptimizations = L"-Od";
 
 static const wchar_t* DXCArgumentEntryPoint        = L"-E";
 static const wchar_t* DXCArgumentShaderProfile     = L"-T";
@@ -156,7 +156,7 @@ private:
 
 // This code was adapted from spirv_reflect utils/stripper.cpp
 // Removes the PDB instructions
-bool SpvStripDebugData(CrVector<uint8_t>& spirvData)
+bool SpvStripDebugData(CrVector<uint32_t>& spirvData)
 {
 	// https://www.khronos.org/registry/SPIR-V/specs/unified1/SPIRV.pdf
 	const uint32_t kHeaderLength = 5;
@@ -175,7 +175,7 @@ bool SpvStripDebugData(CrVector<uint8_t>& spirvData)
 
 	// Treat original data as uint32_t as that is more natural for SPIR-V handling
 	uint32_t* data = (uint32_t*)spirvData.data();
-	size_t length = spirvData.size() / 4;
+	size_t length = spirvData.size();
 
 	// Make sure we at least have a header and the magic number is correct
 	if (!data || length < kHeaderLength || data[0] != kMagicNumber)
@@ -249,9 +249,7 @@ bool SpvStripDebugData(CrVector<uint8_t>& spirvData)
 		pos += inst_len;
 	}
 
-	spirvData.resize(intermediateSpirv.size() * 4);
-
-	memcpy(spirvData.data(), intermediateSpirv.data(), spirvData.size());
+	spirvData = intermediateSpirv;
 
 	return true;
 }
@@ -283,7 +281,6 @@ HRESULT CrDXCCompileShader
 	CrVector<const wchar_t*> arguments =
 	{
 		DXCArgumentWarningsAsErrors, // Warnings as errors
-		DXCArgumentOptimization3, // Add full optimizations
 		DXCArgumentEnableDebug, // Add debug data (for PDBs)
 		DXCArgumentAllResourcesBound, // Assume all resources are bound correctly
 		wInputPath.c_str(),
@@ -292,6 +289,22 @@ HRESULT CrDXCCompileShader
 		DXCArgumentEntryPoint,
 		wEntryPoint.c_str()
 	};
+
+	switch (compilationDescriptor.optimization)
+	{
+		case OptimizationLevel::O3:
+			arguments.push_back(DXCArgumentOptimization3); break;
+		case OptimizationLevel::O2:
+			arguments.push_back(DXCArgumentOptimization2); break;
+		case OptimizationLevel::O1:
+			arguments.push_back(DXCArgumentOptimization1); break;
+		case OptimizationLevel::O0:
+			arguments.push_back(DXCArgumentOptimization0); break;
+		case OptimizationLevel::None:
+			arguments.push_back(DXCArgumentSkipOptimizations); break;
+		default:
+			arguments.push_back(DXCArgumentOptimization3);
+	}
 
 	// Set Vulkan-specific options here
 	if (compilationDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
@@ -397,7 +410,7 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 	}
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrVector<uint32_t>& bytecode, CrString& compilationStatus)
 {
 	CComPtr<IDxcUtils> dxcUtils;
 	DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
@@ -406,42 +419,52 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
 
 	CComPtr<CrDxcIncludeHandler> dxcIncludeHandler = new CrDxcIncludeHandler(dxcUtils);
-	
+
 	CComPtr<IDxcResult> dxcCompilationResult;
+	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = cr3d::GraphicsApi::Vulkan;
 	HRESULT compilationHResult = CrDXCCompileShader(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
-	
+
 	HRESULT hResult;
 	dxcCompilationResult->GetStatus(&hResult);
-	
+
 	if (compilationHResult != S_OK || hResult != S_OK)
 	{
 		IDxcBlobUtf8* errorMessage = nullptr;
 		dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
-	
+
 		if (errorMessage)
 		{
 			compilationStatus += errorMessage->GetStringPointer();
 		}
-	
+
 		return false;
 	}
 	else
 	{
 		CComPtr<IDxcBlob> compilationResultBlob;
 		dxcCompilationResult->GetResult(&compilationResultBlob);
-	
-		CrVector<uint8_t> bytecode
+
+		bytecode = CrVector<uint32_t>
 		(
-			(uint8_t*)compilationResultBlob->GetBufferPointer(),
-			(uint8_t*)compilationResultBlob->GetBufferPointer() + compilationResultBlob->GetBufferSize()
+			(uint32_t*)compilationResultBlob->GetBufferPointer(),
+			(uint32_t*)compilationResultBlob->GetBufferPointer() + compilationResultBlob->GetBufferSize() / 4
 		);
-	
-		CrHash shaderHash = CrHash(bytecode.data(), bytecode.size());
-	
+
+		return true;
+	}
+}
+
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
+{
+	CrVector<uint32_t> spirvBytecode;
+	if (CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus))
+	{
+		CrHash shaderHash = CrHash(spirvBytecode.data(), spirvBytecode.size_bytes());
+
 		// Create platform-independent reflection data from the platform-specific reflection
 		SpvReflectShaderModule shaderModule;
-		SpvReflectResult reflectResult = spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &shaderModule);
-	
+		SpvReflectResult reflectResult = spvReflectCreateShaderModule(spirvBytecode.size_bytes(), spirvBytecode.data(), &shaderModule);
+
 		if (reflectResult != SPV_REFLECT_RESULT_SUCCESS)
 		{
 			compilationStatus += "Failed shader reflection";
@@ -452,36 +475,36 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		reflectionHeader.entryPoint = shaderModule.entry_point_name;
 		reflectionHeader.shaderStage = compilationDescriptor.shaderStage;
 		reflectionHeader.bytecodeHash = shaderHash.GetHash();
-	
+
 		// Remap the assigned binding points to the ones for each stage
 		uint32_t currentBindPoint = GetShaderStageBindpointNamespace(compilationDescriptor.shaderStage);
-	
+
 		for (uint32_t i = 0; i < shaderModule.descriptor_binding_count; ++i)
 		{
 			const SpvReflectDescriptorBinding& binding = shaderModule.descriptor_bindings[i];
-	
+
 			if (binding.accessed)
 			{
 				uint32_t remappedBinding = currentBindPoint;
-	
+
 				CrShaderReflectionResource resource;
 				resource.name = binding.name;
 				resource.type = GetShaderResourceType(binding);
-	
+
 				// Register the binding and make sure the shader knows about it too
 				resource.bindPoint = (uint8_t)remappedBinding;
-	
-				*((uint32_t*)&(bytecode.data()[binding.word_offset.binding * 4])) = remappedBinding;
-	
+
+				spirvBytecode[binding.word_offset.binding] = remappedBinding;
+
 				InsertResourceIntoHeader(reflectionHeader, resource);
-	
+
 				currentBindPoint++;
 			}
 		}
-	
+
 		const auto ProcessInterfaceVariables = []
 		(
-			uint32_t variableCount, 
+			uint32_t variableCount,
 			SpvReflectInterfaceVariable** variables,
 			CrVector<CrShaderInterfaceVariable>& interfaceVariables)
 		{
@@ -499,18 +522,18 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 				interfaceVariables.push_back(interfaceVariable);
 			}
 		};
-	
+
 		ProcessInterfaceVariables(shaderModule.input_variable_count, shaderModule.input_variables, reflectionHeader.stageInputs);
-	
+
 		ProcessInterfaceVariables(shaderModule.output_variable_count, shaderModule.output_variables, reflectionHeader.stageOutputs);
-	
+
 		if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
 		{
 			reflectionHeader.threadGroupSizeX = shaderModule.entry_points[0].local_size.x;
 			reflectionHeader.threadGroupSizeY = shaderModule.entry_points[0].local_size.y;
 			reflectionHeader.threadGroupSizeZ = shaderModule.entry_points[0].local_size.z;
 		}
-	
+
 		// The PDB mechanism for SPIR-V is not the same as DXIL because SPIR-V doesn't have a defined PDB format
 		// Renderdoc recommends having two copies, one with debug information, the other without, and creating an
 		// association at module load time
@@ -521,19 +544,26 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
 			if (pdbFile)
 			{
-				pdbFile->Write(bytecode.data(), bytecode.size());
+				pdbFile->Write(spirvBytecode.data(), spirvBytecode.size_bytes());
 			}
 		}
-	
+
 		// This doesn't strip the reflection data we need to create the reflection header
-		SpvStripDebugData(bytecode);
+		SpvStripDebugData(spirvBytecode);
 
 		// Write reflection header and shader bytecode
 		CrWriteFileStream writeFileStream(compilationDescriptor.outputPath.c_str());
 		writeFileStream << reflectionHeader;
-		writeFileStream << bytecode;
-	
+
+		// Reinterpret our current vector as a uint8_t vector to serialize back in
+		CrVector<uint8_t> uint8Bytecode(crstl_move(spirvBytecode));
+		writeFileStream << uint8Bytecode;
+
 		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

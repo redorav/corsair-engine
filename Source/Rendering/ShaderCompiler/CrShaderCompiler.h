@@ -6,6 +6,18 @@
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Containers/CrVector.h"
 
+namespace OptimizationLevel
+{
+	enum T
+	{
+		O0,
+		O1,
+		O2,
+		O3,
+		None
+	};
+};
+
 struct CompilationDescriptor
 {
 	CompilationDescriptor()
@@ -13,6 +25,7 @@ struct CompilationDescriptor
 	, graphicsApi(cr3d::GraphicsApi::Count)
 	, shaderStage(cr3d::ShaderStage::Count)
 	, buildReflection(true)
+	, optimization(OptimizationLevel::O3)
 	, processed(false)
 	{}
 
@@ -28,6 +41,7 @@ struct CompilationDescriptor
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;
 	bool buildReflection;
+	OptimizationLevel::T optimization;
 
 private:
 

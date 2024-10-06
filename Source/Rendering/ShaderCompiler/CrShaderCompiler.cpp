@@ -17,7 +17,6 @@
 #include "Core/CrMacros.h"
 #include "Core/CrGlobalPaths.h"
 
-#include "CrCompilerGLSLANG.h"
 #include "CrCompilerDXC.h"
 
 #if defined(_WIN32)
@@ -275,6 +274,9 @@ int main(int argc, char* argv[])
 		compilationDescriptor.outputPath = outputPath;
 		compilationDescriptor.entryPoint = entryPoint;
 		compilationDescriptor.shaderStage = cr3d::ShaderStage::Pixel;
+
+		// Make sure resources aren't stripped out
+		compilationDescriptor.optimization = OptimizationLevel::None;
 
 		CrString compilationStatus;
 		bool success = CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor, compilationStatus);

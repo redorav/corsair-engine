@@ -4,7 +4,7 @@
 #include "CrShaderCompilerUtilities.h"
 
 #include "CrShaderCompiler.h"
-#include "CrCompilerGLSLANG.h"
+#include "CrCompilerDXC.h"
 
 #include "Core/FileSystem/CrFixedPath.h"
 
@@ -60,8 +60,8 @@ static const CrString RWTypedBufferSection =
 
 bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
 {
-	std::vector<uint32_t> spirvBytecode;
-	bool compiled = CrCompilerGLSLANG::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus);
+	CrVector<uint32_t> spirvBytecode;
+	bool compiled = CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus);
 
 	if (!compiled)
 	{
@@ -69,7 +69,7 @@ bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compila
 	}
 
 	CrString metadataHeader, metadataCpp;
-	bool builtMetadata = BuildSPIRVMetadata(spirvBytecode, metadataHeader, metadataCpp);
+	bool builtMetadata = BuildSPIRVMetadata(spirvBytecode, metadataHeader, metadataCpp, compilationStatus);
 
 	if (!builtMetadata)
 	{
@@ -121,7 +121,11 @@ struct HLSLResources
 				{
 					if (binding.resource_type == SPV_REFLECT_RESOURCE_FLAG_UAV)
 					{
-						rwStorageBuffers.push_back(binding);
+						// Exclude the counters
+						if (crstl::string_find(binding.name, "counter.var") == nullptr)
+						{
+							rwStorageBuffers.push_back(binding);
+						}
 					}
 					else
 					{
@@ -169,16 +173,20 @@ struct HLSLResources
 	//std::vector<SpvReflectDescriptorBinding> pushConstantBuffers;
 };
 
-bool CrShaderMetadataBuilder::BuildSPIRVMetadata(
-	const std::vector<uint32_t>& spirvBytecode, 
-	CrString& metadataHeader, CrString& metadataCpp)
+bool CrShaderMetadataBuilder::BuildSPIRVMetadata
+(
+	const CrVector<uint32_t>& spirvBytecode,
+	CrString& metadataHeader, CrString& metadataCpp,
+	CrString& compilationStatus
+)
 {
 	// This needs to be kept alive
-	spv_reflect::ShaderModule spvReflectModule(spirvBytecode.size() * 4, spirvBytecode.data());
+	spv_reflect::ShaderModule spvReflectModule(spirvBytecode.size_bytes(), spirvBytecode.data());
 
 	if (spvReflectModule.GetResult() != SPV_REFLECT_RESULT_SUCCESS)
 	{
-		// TODO Quit with message (message gets piped to VS)
+		compilationStatus += "Invalid reflection";
+		return false;
 	}
 
 	HLSLResources resources(spvReflectModule.GetShaderModule());
@@ -267,7 +275,7 @@ CrString CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLSLRe
 		
 		uint32_t indentationLevel = 0;
 
-		CrString constantBufferName = uniformBuffer.type_description->type_name;
+		CrString constantBufferName = CrString(uniformBuffer.name) != "" ? uniformBuffer.name : uniformBuffer.type_description->type_name;
 
 		for (uint32_t memberIndex = 0; memberIndex < uniformBuffer.type_description->member_count; ++memberIndex)
 		{

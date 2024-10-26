@@ -16,6 +16,7 @@
 	
 	<package name="dxc">
 		<version id="1.6.2112" file="dxc_1.6.2112.zip" repository="github"/>
+		<version id="1.8.2407" file="dxc_1.8.2407_clang_cl.7z" repository="github"/>
 	</package>
 	
 	<package name="eastl">

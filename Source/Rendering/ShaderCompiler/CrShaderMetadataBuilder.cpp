@@ -121,11 +121,7 @@ struct HLSLResources
 				{
 					if (binding.resource_type == SPV_REFLECT_RESOURCE_FLAG_UAV)
 					{
-						// Exclude the counters
-						if (crstl::string_find(binding.name, "counter.var") == nullptr)
-						{
-							rwStorageBuffers.push_back(binding);
-						}
+						rwStorageBuffers.push_back(binding);
 					}
 					else
 					{

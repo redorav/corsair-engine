@@ -92,7 +92,7 @@ struct stb_memcpy
 static void WriteToMemorySTB(void* context, void* imageData, int dataSize)
 {
 	stb_memcpy* memcpy_context = (stb_memcpy*)context;
-	CrAssertMsg(memcpy_context->dataSize == dataSize, "Sizes not equal");
+	CrAssertMsg(memcpy_context->dataSize == (uint64_t)dataSize, "Sizes not equal");
 	memcpy(memcpy_context, imageData, dataSize);
 }
 

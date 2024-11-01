@@ -5,6 +5,7 @@
 #include "Common.hlsl"
 #include "Lighting.hlsl"
 #include "BSDF.hlsl"
+#include "DeferredLightingShared.hlsl"
 
 struct DynamicLight
 {
@@ -66,4 +67,45 @@ float4 DeferredLightingPS(VSOutputFullscreen psInput) : SV_Target0
 		return float4(lighting, 1.0);
 	}
 }
+
+struct GBufferDebug
+{
+	uint4 decodeOptions; // .x decode target
+};
+
+cbuffer GBufferDebug
+{
+	GBufferDebug cb_GBufferDebug;
+};
+
+float4 GBufferDebugPS(VSOutputFullscreen psInput) : SV_Target0
+{
+	int2 screenPixel = psInput.hwPosition.xy;
+
+	Surface surface = DecodeGBufferSurface(screenPixel, psInput.screenUVClip);
+
+	uint gbufferDebugMode = cb_GBufferDebug.decodeOptions.x;
+
+	float3 debugColor = 0.0;
+
+	if(gbufferDebugMode == GBufferDebugMode::Albedo)
+	{
+		debugColor = LinearToSRGB(surface.diffuseAlbedoLinear);
+	}
+		else if (gbufferDebugMode == GBufferDebugMode::WorldNormals)
+	{
+		debugColor = surface.pixelNormalWorld.xyz * 0.5 + 0.5;
+	}
+	else if (gbufferDebugMode == GBufferDebugMode::Roughness)
+	{
+		debugColor = surface.roughness.xxx;
+	}
+	else if(gbufferDebugMode == GBufferDebugMode::F0)
+	{
+		debugColor = surface.F0;
+	}
+
+	return float4(debugColor, 1.0);
+}
+
 #endif

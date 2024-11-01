@@ -1,3 +1,7 @@
 DirectionalLightPS:
   entrypoint: DeferredLightingPS
   stage: Pixel
+
+GBufferDebugPS:
+  entrypoint: GBufferDebugPS
+  stage: Pixel

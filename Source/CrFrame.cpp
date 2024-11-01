@@ -47,6 +47,21 @@
 #include "Math/CrMath.h"
 #include "Math/CrHalf.h"
 
+#include "Rendering/Shaders/DeferredLightingShared.hlsl"
+
+static const char* GBufferDebugString[] =
+{
+	"None",
+	"Albedo",
+	"World Normals",
+	"Roughness",
+	"F0",
+	"Depth",
+	"Depth Linear"
+};
+
+static_assert(sizeof_array(GBufferDebugString) == GBufferDebugMode::Count, "");
+
 // TODO Put somewhere else
 bool HashingAssert()
 {
@@ -286,9 +301,18 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
 		directionalLightPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
 		directionalLightPipelineDescriptor.depthStencilState.depthTestEnable = false;
+		directionalLightPipelineDescriptor.depthStencilState.depthWriteEnable = false;
 		m_directionalLightPipeline = CrBuiltinPipelines::GetGraphicsPipeline(directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
 	}
-
+	
+	{
+		CrGraphicsPipelineDescriptor gbufferDebugPipelineDescriptor;
+		gbufferDebugPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
+		gbufferDebugPipelineDescriptor.depthStencilState.depthTestEnable = false;
+		gbufferDebugPipelineDescriptor.depthStencilState.depthWriteEnable = false;
+		m_gbufferDebugPipeline = CrBuiltinPipelines::GetGraphicsPipeline(gbufferDebugPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::GBufferDebugPS);
+	}
+	
 	// Editor shaders
 	{
 		CrGraphicsPipelineDescriptor editorEdgeSelectionPipelineDescriptor;
@@ -731,6 +755,36 @@ void CrFrame::Process()
 		});
 	}
 
+	if (m_gbufferDebugMode != GBufferDebugMode::None)
+	{
+		// Override with the decoded GBuffer
+		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Debug Pass"), float4(128.0f, 0.0f, 128.0f, 1.0f) / 255.0f, CrRenderGraphPassType::Graphics,
+		[=](CrRenderGraph& renderGraph)
+		{
+			renderGraph.AddTexture(depthTexture, cr3d::ShaderStageFlags::Pixel);
+			renderGraph.AddTexture(gBufferAlbedoAO, cr3d::ShaderStageFlags::Pixel);
+			renderGraph.AddTexture(gBufferNormals, cr3d::ShaderStageFlags::Pixel);
+			renderGraph.AddTexture(gBufferMaterial, cr3d::ShaderStageFlags::Pixel);
+			renderGraph.AddRenderTarget(preSwapchainTexture, CrRenderTargetLoadOp::DontCare, CrRenderTargetStoreOp::Store, float4(0.0f));
+		},
+		[this, depthTexture, gBufferAlbedoAO, gBufferNormals, gBufferMaterial](const CrRenderGraph& renderGraph, ICrCommandBuffer* commandBuffer)
+		{
+			CrGPUBufferViewT<GBufferDebug> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebug>();
+			GBufferDebug* gbufferDebugData = gbufferDebug.GetData();
+			{
+				gbufferDebugData->decodeOptions = uint4((uint32_t)m_gbufferDebugMode, 0.0f, 0.0f, 0.0f);
+			}
+			commandBuffer->BindConstantBuffer(gbufferDebug);
+
+			commandBuffer->BindTexture(Textures::GBufferDepthTexture, renderGraph.GetPhysicalTexture(depthTexture));
+			commandBuffer->BindTexture(Textures::GBufferAlbedoAOTexture, renderGraph.GetPhysicalTexture(gBufferAlbedoAO));
+			commandBuffer->BindTexture(Textures::GBufferNormalsTexture, renderGraph.GetPhysicalTexture(gBufferNormals));
+			commandBuffer->BindTexture(Textures::GBufferMaterialTexture, renderGraph.GetPhysicalTexture(gBufferMaterial));
+			commandBuffer->BindGraphicsPipelineState(m_gbufferDebugPipeline.get());
+			commandBuffer->Draw(3, 1, 0, 0);
+		});
+	}
+
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Copy Pass"), float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[=](CrRenderGraph& renderGraph)
 	{
@@ -1084,13 +1138,34 @@ void CrFrame::DrawDebugUI()
 
 	if (s_ShowWorldInfo)
 	{
-		if (ImGui::Begin("World Information", &s_ShowWorldInfo))
+		if (ImGui::Begin("Rendering Debug", &s_ShowWorldInfo))
 		{
 			const float3& cameraPosition = m_camera->GetPosition();
 			const float3& cameraForward = m_camera->GetForwardVector();
 
 			ImGui::Text("Camera Position: (%.3f, %.3f, %.3f)", (float)cameraPosition.x, (float)cameraPosition.y, (float)cameraPosition.z);
 			ImGui::Text("Camera Forward: (%.3f, %.3f, %.3f)", (float)cameraForward.x, (float)cameraForward.y, (float)cameraForward.z);
+
+			ImGui::Separator();
+
+			if (ImGui::BeginCombo("GBuffer Debug", GBufferDebugString[m_gbufferDebugMode], 0))
+			{
+				for (size_t n = 0; n < GBufferDebugMode::Count; n++)
+				{
+					bool isSelected = m_gbufferDebugMode == n;
+					if (ImGui::Selectable(GBufferDebugString[n], isSelected))
+					{
+						m_gbufferDebugMode = (GBufferDebugMode::T)n;
+					}
+
+					if (isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
 
 			ImGui::End();
 		}

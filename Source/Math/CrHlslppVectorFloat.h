@@ -1,4 +1,4 @@
 #pragma once
 
-#include <hlsl++_vector_float.h>
+#include <hlsl++/vector_float.h>
 using namespace hlslpp;

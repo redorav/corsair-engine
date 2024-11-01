@@ -1,4 +1,4 @@
 #pragma once
 
-#include <hlsl++_vector_int_type.h>
+#include <hlsl++/vector_int_type.h>
 using namespace hlslpp;

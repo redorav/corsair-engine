@@ -1,4 +1,4 @@
 #pragma once
 
-#include <hlsl++_quaternion.h>
+#include <hlsl++/quaternion.h>
 using namespace hlslpp;

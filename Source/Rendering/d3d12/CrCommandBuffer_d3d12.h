@@ -78,17 +78,17 @@ private:
 		CrBarrierVectorD3D12& resourceBarriers
 	);
 
-	void WriteCBV(const ConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
+	void WriteCBV(const CrConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
 
-	void WriteTextureSRV(const TextureBinding& textureBinding, crd3d::DescriptorD3D12 srvHandle);
+	void WriteTextureSRV(const CrTextureBinding& textureBinding, crd3d::DescriptorD3D12 srvHandle);
 
 	void WriteSamplerView(const ICrSampler* sampler, crd3d::DescriptorD3D12 samplerHandle);
 
-	void WriteRWTextureUAV(const RWTextureBinding& rwTextureBinding, crd3d::DescriptorD3D12 uavHandle);
+	void WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, crd3d::DescriptorD3D12 uavHandle);
 
-	void WriteStorageBufferSRV(const StorageBufferBinding& binding, crd3d::DescriptorD3D12 srvHandle);
+	void WriteStorageBufferSRV(const CrStorageBufferBinding& binding, crd3d::DescriptorD3D12 srvHandle);
 
-	void WriteRWStorageBufferUAV(const StorageBufferBinding& binding, crd3d::DescriptorD3D12 uavHandle);
+	void WriteRWStorageBufferUAV(const CrStorageBufferBinding& binding, crd3d::DescriptorD3D12 uavHandle);
 
 	D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 

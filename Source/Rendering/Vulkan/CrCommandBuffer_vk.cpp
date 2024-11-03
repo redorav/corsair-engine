@@ -139,7 +139,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
+		const CrConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
@@ -177,7 +177,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
-		const TextureBinding& textureBinding = m_currentState.m_textures[id];
+		const CrTextureBinding& textureBinding = m_currentState.m_textures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(textureBinding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
@@ -204,7 +204,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		const RWTextureBinding& binding = m_currentState.m_rwTextures[id];
+		const CrRWTextureBinding& binding = m_currentState.m_rwTextures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
@@ -221,7 +221,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		const StorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
+		const CrStorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
@@ -238,7 +238,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
+		const CrStorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 	
 		VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
@@ -316,7 +316,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 			for (uint32_t streamId = 0; streamId < usedVertexStreamCount; ++streamId)
 			{
-				const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
+				const CrVertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
 				vkOffsets[streamId] = binding.offset;
 				vkBuffers[streamId] = static_cast<const CrHardwareGPUBufferVulkan*>(binding.vertexBuffer)->GetVkBuffer();
 			}

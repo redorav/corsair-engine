@@ -42,22 +42,22 @@ struct CrCommandBufferDescriptor
 };
 
 // TODO Do all platforms support binding a buffer and an offset inside?
-struct ConstantBufferBinding
+struct CrConstantBufferBinding
 {
-	ConstantBufferBinding() = default;
+	CrConstantBufferBinding() = default;
 
-	ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
+	CrConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
 
 	const ICrHardwareGPUBuffer* buffer = nullptr;
 	uint32_t sizeBytes = 0;
 	uint32_t offsetBytes = 0;
 };
 
-struct StorageBufferBinding
+struct CrStorageBufferBinding
 {
-	StorageBufferBinding() = default;
+	CrStorageBufferBinding() = default;
 
-	StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
+	CrStorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
 		: buffer(buffer), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
 	{
 		sizeBytes = numElements * strideBytes;
@@ -70,31 +70,31 @@ struct StorageBufferBinding
 	uint32_t strideBytes = 0;
 };
 
-struct TextureBinding
+struct CrTextureBinding
 {
-	TextureBinding() = default;
+	CrTextureBinding() = default;
 
-	TextureBinding(const ICrTexture* texture, cr3d::TexturePlane::T plane) : texture(texture), plane(plane) {}
+	CrTextureBinding(const ICrTexture* texture, cr3d::TexturePlane::T plane) : texture(texture), plane(plane) {}
 
 	const ICrTexture* texture = nullptr;
 
 	cr3d::TexturePlane::T plane = cr3d::TexturePlane::Color;
 };
 
-struct RWTextureBinding
+struct CrRWTextureBinding
 {
-	RWTextureBinding() {}
+	CrRWTextureBinding() {}
 
-	RWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
+	CrRWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
 
 	const ICrTexture* texture = nullptr;
 	uint32_t mip = 0;
 };
 
-struct VertexBufferBinding
+struct CrVertexBufferBinding
 {
-	VertexBufferBinding() = default;
-	VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
+	CrVertexBufferBinding() = default;
+	CrVertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
 		: vertexBuffer(vertexBuffer), vertexCount(vertexCount), offset(offset), stride(stride) {}
 
 	const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
@@ -287,7 +287,7 @@ protected:
 		cr3d::DataFormat::T             m_indexBufferFormat;
 		bool                            m_indexBufferDirty = false;
 
-		VertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
+		CrVertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = false;
 
 		CrRectangle                     m_scissor;
@@ -302,19 +302,19 @@ protected:
 		const ICrComputePipeline*       m_computePipeline;
 		bool                            m_computePipelineDirty;
 
-		ConstantBufferBinding			m_constantBuffers[ConstantBuffers::Count];
+		CrConstantBufferBinding			m_constantBuffers[ConstantBuffers::Count];
 
 		const ICrSampler*				m_samplers[Samplers::Count];
 
-		TextureBinding					m_textures[Textures::Count];
+		CrTextureBinding					m_textures[Textures::Count];
 
-		RWTextureBinding				m_rwTextures[RWTextures::Count];
+		CrRWTextureBinding				m_rwTextures[RWTextures::Count];
 
-		StorageBufferBinding			m_storageBuffers[StorageBuffers::Count];
+		CrStorageBufferBinding			m_storageBuffers[StorageBuffers::Count];
 
-		StorageBufferBinding			m_rwStorageBuffers[RWStorageBuffers::Count];
+		CrStorageBufferBinding			m_rwStorageBuffers[RWStorageBuffers::Count];
 
-		StorageBufferBinding			m_rwTypedBuffers[RWTypedBuffers::Count];
+		CrStorageBufferBinding			m_rwTypedBuffers[RWTypedBuffers::Count];
 
 		uint32_t						m_stencilRef;
 		bool							m_stencilRefDirty;
@@ -566,7 +566,7 @@ inline void ICrCommandBuffer::BindTexture(Textures::T textureIndex, const ICrTex
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
 	CrCommandBufferAssertMsg((plane == cr3d::TexturePlane::Plane0) ? true : cr3d::IsDepthStencilFormat(texture->GetFormat()), "Invalid plane specified");
 
-	m_currentState.m_textures[textureIndex] = TextureBinding(texture, plane);
+	m_currentState.m_textures[textureIndex] = CrTextureBinding(texture, plane);
 }
 
 inline void ICrCommandBuffer::BindRWTexture(RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)
@@ -576,7 +576,7 @@ inline void ICrCommandBuffer::BindRWTexture(RWTextures::T rwTextureIndex, const 
 	CrCommandBufferAssertMsg(mip < texture->GetMipmapCount(), "Texture doesn't have enough mipmaps!");
 	CrCommandBufferAssertMsg(rwTextureIndex < RWTextures::Count, "Invalid binding index");
 
-	m_currentState.m_rwTextures[rwTextureIndex] = RWTextureBinding(texture, mip);
+	m_currentState.m_rwTextures[rwTextureIndex] = CrRWTextureBinding(texture, mip);
 }
 
 inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
@@ -585,7 +585,7 @@ inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferI
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 	CrCommandBufferAssertMsg(storageBufferIndex < StorageBuffers::Count, "Invalid binding index");
 
-	m_currentState.m_storageBuffers[storageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
+	m_currentState.m_storageBuffers[storageBufferIndex] = CrStorageBufferBinding(buffer, numElements, stride, offset);
 }
 
 inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer)
@@ -600,7 +600,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageB
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 	CrCommandBufferAssertMsg(rwStorageBufferIndex < RWStorageBuffers::Count, "Invalid binding index");
 
-	m_currentState.m_rwStorageBuffers[rwStorageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
+	m_currentState.m_rwStorageBuffers[rwStorageBufferIndex] = CrStorageBufferBinding(buffer, numElements, stride, offset);
 }
 
 inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer)

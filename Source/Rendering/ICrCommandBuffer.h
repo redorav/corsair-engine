@@ -41,6 +41,68 @@ struct CrCommandBufferDescriptor
 	uint32_t dynamicConstantBufferSizeBytes = 0;
 };
 
+// TODO Do all platforms support binding a buffer and an offset inside?
+struct ConstantBufferBinding
+{
+	ConstantBufferBinding() = default;
+
+	ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
+
+	const ICrHardwareGPUBuffer* buffer = nullptr;
+	uint32_t sizeBytes = 0;
+	uint32_t offsetBytes = 0;
+};
+
+struct StorageBufferBinding
+{
+	StorageBufferBinding() = default;
+
+	StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
+		: buffer(buffer), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
+	{
+		sizeBytes = numElements * strideBytes;
+	}
+
+	const ICrHardwareGPUBuffer* buffer = nullptr;
+	uint32_t numElements = 0;
+	uint32_t offsetBytes = 0;
+	uint32_t sizeBytes = 0;
+	uint32_t strideBytes = 0;
+};
+
+struct TextureBinding
+{
+	TextureBinding() = default;
+
+	TextureBinding(const ICrTexture* texture, cr3d::TexturePlane::T plane) : texture(texture), plane(plane) {}
+
+	const ICrTexture* texture = nullptr;
+
+	cr3d::TexturePlane::T plane = cr3d::TexturePlane::Color;
+};
+
+struct RWTextureBinding
+{
+	RWTextureBinding() {}
+
+	RWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
+
+	const ICrTexture* texture = nullptr;
+	uint32_t mip = 0;
+};
+
+struct VertexBufferBinding
+{
+	VertexBufferBinding() = default;
+	VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
+		: vertexBuffer(vertexBuffer), vertexCount(vertexCount), offset(offset), stride(stride) {}
+
+	const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
+	uint32_t vertexCount = 0;
+	uint32_t offset = 0;
+	uint32_t stride = 0;
+};
+
 class ICrCommandBuffer : public CrGPUAutoDeletable
 {
 public:
@@ -214,68 +276,6 @@ protected:
 	virtual void FlushGraphicsRenderStatePS() = 0;
 
 	virtual void FlushComputeRenderStatePS() = 0;
-
-	// TODO Do all platforms support binding a buffer and an offset inside?
-	struct ConstantBufferBinding
-	{
-		ConstantBufferBinding() = default;
-
-		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
-
-		const ICrHardwareGPUBuffer* buffer = nullptr;
-		uint32_t sizeBytes = 0;
-		uint32_t offsetBytes = 0;
-	};
-
-	struct StorageBufferBinding
-	{
-		StorageBufferBinding() = default;
-
-		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
-			: buffer(buffer), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
-		{
-			sizeBytes = numElements * strideBytes;
-		}
-
-		const ICrHardwareGPUBuffer* buffer = nullptr;
-		uint32_t numElements = 0;
-		uint32_t offsetBytes = 0;
-		uint32_t sizeBytes = 0;
-		uint32_t strideBytes = 0;
-	};
-
-	struct TextureBinding
-	{
-		TextureBinding() = default;
-
-		TextureBinding(const ICrTexture* texture, cr3d::TexturePlane::T plane) : texture(texture), plane(plane) {}
-
-		const ICrTexture* texture = nullptr;
-
-		cr3d::TexturePlane::T plane = cr3d::TexturePlane::Color;
-	};
-
-	struct RWTextureBinding
-	{
-		RWTextureBinding() {}
-
-		RWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
-
-		const ICrTexture* texture = nullptr;
-		uint32_t mip = 0;
-	};
-
-	struct VertexBufferBinding
-	{
-		VertexBufferBinding() = default;
-		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
-			: vertexBuffer(vertexBuffer), vertexCount(vertexCount), offset(offset), stride(stride) {}
-
-		const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
-		uint32_t vertexCount = 0;
-		uint32_t offset = 0;
-		uint32_t stride = 0;
-	};
 
 	// TODO Have inline accessors here instead. We need to be able to tell if we're missing
 	// a resource and even bind a dummy one if we have a safe mode

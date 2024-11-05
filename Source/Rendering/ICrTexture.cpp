@@ -37,6 +37,10 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	m_type = descriptor.type;
 	m_sampleCount = descriptor.sampleCount;
 	m_arraySize = descriptor.arraySize;
+
+#if !defined(CR_CONFIG_FINAL)
+	m_debugName = descriptor.name;
+#endif
 	
 	switch (descriptor.type)
 	{

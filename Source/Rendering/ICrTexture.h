@@ -100,6 +100,15 @@ public:
 		uint32_t startMip, uint32_t mipCount, uint32_t startSlice, uint32_t sliceCount
 	);
 
+#if !defined(CR_CONFIG_FINAL)
+
+	const char* GetDebugName() const
+	{
+		return m_debugName.c_str();
+	}
+
+#endif
+
 protected:
 
 	// We don't allow the constructor externally
@@ -134,4 +143,10 @@ protected:
 
 	// Distance between two consecutive slices
 	uint32_t m_slicePitchBytes;
+
+#if !defined(CR_CONFIG_FINAL)
+
+	CrFixedString128 m_debugName;
+
+#endif
 };

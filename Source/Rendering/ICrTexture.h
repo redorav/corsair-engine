@@ -80,7 +80,7 @@ public:
 
 	uint32_t GetMipmapCount() const { return m_mipmapCount; }
 
-	uint32_t GetArraySize() const { return m_arraySize; }
+	uint32_t GetSliceCount() const { return m_arraySize; }
 
 	cr3d::TextureState GetDefaultState() const { return m_defaultState; }
 

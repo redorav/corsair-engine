@@ -184,7 +184,7 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 	textureUpload.mipmapStart = 0;
 	textureUpload.mipmapCount = texture->GetMipmapCount();
 	textureUpload.sliceStart = 0;
-	textureUpload.sliceCount = texture->GetArraySize();
+	textureUpload.sliceCount = texture->GetSliceCount();
 
 	CrHash textureHash(&texture, sizeof(texture));
 
@@ -902,7 +902,7 @@ void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVul
 	subresourceRange.baseMipLevel = 0;
 	subresourceRange.levelCount = vulkanTexture->GetMipmapCount();
 	subresourceRange.baseArrayLayer = 0;
-	subresourceRange.layerCount = vulkanTexture->GetArraySize();
+	subresourceRange.layerCount = vulkanTexture->GetSliceCount();
 
 	const CrVkImageStateInfo& imageStateInfo = crvk::GetVkImageStateInfo(vulkanTexture->GetFormat(), textureState.layout);
 

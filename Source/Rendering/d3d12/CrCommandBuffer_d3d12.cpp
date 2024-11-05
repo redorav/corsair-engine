@@ -94,7 +94,7 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 			textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
 			(
 				descriptor.mipmapStart, descriptor.sliceStart, planeSlice,
-				d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
+				d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
 			);
 
 			resourceBarriers.push_back(textureBarrier);
@@ -134,7 +134,7 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
 		(
 			renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
-			d3d12Texture->GetMipmapCount(), d3d12Texture->GetArraySize()
+			d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
 		);
 
 		resourceBarriers.push_back(textureBarrier);

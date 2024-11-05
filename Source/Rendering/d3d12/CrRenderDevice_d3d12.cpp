@@ -502,7 +502,7 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 	textureUpload.mipmapStart = 0;
 	textureUpload.mipmapCount = texture->GetMipmapCount();
 	textureUpload.sliceStart = 0;
-	textureUpload.sliceCount = texture->GetArraySize();
+	textureUpload.sliceCount = texture->GetSliceCount();
 
 	CrHash textureHash(&texture, sizeof(texture));
 
@@ -560,7 +560,7 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 				D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};
 				textureCopyDestination.pResource = d3d12DestinationTexture->GetD3D12Resource();
 				textureCopyDestination.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-				textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, destinationTexture->GetMipmapCount(), destinationTexture->GetArraySize());
+				textureCopyDestination.SubresourceIndex = crd3d::CalculateSubresource(mip, slice, 0, destinationTexture->GetMipmapCount(), destinationTexture->GetSliceCount());
 
 				d3d12CommandBuffer->GetD3D12CommandList()->CopyTextureRegion(&textureCopyDestination, 0, 0, 0, &textureCopySource, nullptr);
 			}

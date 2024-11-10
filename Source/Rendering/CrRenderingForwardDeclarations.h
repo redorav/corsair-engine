@@ -59,6 +59,7 @@ namespace Textures { enum T : uint8_t; }
 namespace RWTextures { enum T : uint8_t; }
 namespace StorageBuffers { enum T : uint8_t; }
 namespace RWStorageBuffers { enum T : uint8_t; }
+namespace TypedBuffers { enum T : uint8_t; }
 namespace RWTypedBuffers { enum T : uint8_t; }
 
 struct ConstantBufferMetadata;

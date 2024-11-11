@@ -94,6 +94,15 @@ public:
 
 	bool HasAccess(cr3d::MemoryAccess::T access) const { return (m_access & access) != 0; }
 
+#if !defined(CR_CONFIG_FINAL)
+
+	const char* GetDebugName() const
+	{
+		return m_debugName.c_str();
+	}
+
+#endif
+
 protected:
 
 	cr3d::BufferUsage::T m_usage;
@@ -109,6 +118,12 @@ protected:
 	uint32_t m_strideBytes;
 
 	uint32_t m_numElements;
+
+#if !defined(CR_CONFIG_FINAL)
+
+	CrFixedString128 m_debugName;
+
+#endif
 };
 
 inline void* ICrHardwareGPUBuffer::Lock()

@@ -13,12 +13,15 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 	, m_sizeBytes(descriptor.numElements * descriptor.stride)
 	, m_strideBytes(descriptor.stride)
 	, m_numElements(descriptor.numElements)
-#if !defined(CR_CONFIG_FINAL)
-	, m_debugName(descriptor.name)
-#endif
 {
 	CrAssertMsg(m_sizeBytes > 0, "Size must be greater than zero");
 	CrAssertMsg(descriptor.initialData ? descriptor.initialDataSize <= m_sizeBytes : true, "Size must be less or equal");
+#if !defined(CR_CONFIG_FINAL)
+	if (descriptor.name)
+	{
+		m_debugName = descriptor.name;
+	}
+#endif
 }
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor

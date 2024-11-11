@@ -28,7 +28,7 @@ public:
 
 	void NewFrame(uint32_t width, uint32_t height);
 
-	void Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId swapchainTextureId);
+	void Render(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
 
 private:
 

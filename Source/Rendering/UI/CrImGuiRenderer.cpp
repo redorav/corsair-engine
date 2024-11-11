@@ -188,14 +188,14 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, CrRenderGraphTextureId swapchainTextureId)
+void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture)
 {
 	renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
 	[&](CrRenderGraph& renderGraph)
 	{
-		renderGraph.AddRenderTarget(swapchainTextureId);
+		renderGraph.BindRenderTarget(swapchainTexture.get());
 	},
-	[this](const CrRenderGraph& /*renderGraph*/, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		ImGui::Render();
 

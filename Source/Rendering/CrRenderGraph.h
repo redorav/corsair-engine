@@ -2,16 +2,56 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
-#include "Rendering/CrDataFormats.h"
 
-#include "Core/Containers/CrHashMap.h"
-#include "Core/Containers/CrVector.h"
-#include "Core/String/CrFixedString.h"
 #include "Core/Function/CrFixedFunction.h"
-#include "Core/CrTypedId.h"
-#include "Core/Logging/ICrDebug.h"
+#include "Core/Containers/CrFixedHashMap.h"
+#include "Core/Containers/CrFixedVector.h"
+#include "Core/String/CrFixedString.h"
+#include "Core/CrHash.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
+
+//#define RENDER_GRAPH_LOGS
+
+#if defined(RENDER_GRAPH_LOGS)
+#define CrRenderGraphLog2(format, ...) CrLog(format, __VA_ARGS__)
+#else
+#define CrRenderGraphLog2(format, ...)
+#endif
+
+// Objectives
+// 
+// There are certain features we are looking for in a render graph. Here is a non-exhaustive list
+// of what the render graph wants to achieve
+//
+// 1) Deduce source and destination transitions for each subresource in a pass automatically
+// 2) Dispatch portions of the render graph to different queues and command buffers, in different threads
+// 3) Reserve render target or buffer memory automatically if needed
+// 4) Express split barriers
+// 5) Express memory dependencies
+// 6) Express temporal or history buffers
+// 7) Inject passes between existing passes, and remove passes
+// 8) Handle async compute
+// 9) Reuse code (e.g. blur) without having name clashes
+// 10) Multiple render passes inside a rendering (e.g. Renderdoc) scope
+
+// API and Usage
+//
+// 1) Add a render pass by doing renderGraph.AddPass
+// 1.1) A pass has name, a type, a debug color and two functions: setup and execution
+//
+// 2) Resources are bound to the render graph with a similar API to the command buffer, this is tracked by the render graph
+// 2.1) For regular resources, these already come with their memory and views premade
+// 2.2) For transient resources, the resource itself will know whether it manages its own memory or not./ The resource does
+// not assume what that is, it merely provides an API for an external system to do it
+// 2.3) Subresources internally have unique ids so that we can track the transitions and barriers appropriately
+// 
+// 3) Execution takes in the render graph and a command buffer, where actual commands are executed
+// 3.1) All passes are executed sequentially once their order has been determined. One has to think of the render graph as an
+// independent execution timeline from the one where the lambda was created
+
+class CrRenderGraph;
+struct CrRenderGraphPass2;
 
 using CrRenderGraphSetupFunction = CrFixedFunction<32, void(CrRenderGraph& renderGraph)>;
 using CrRenderGraphExecutionFunction = CrFixedFunction<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
@@ -27,38 +67,14 @@ namespace CrRenderGraphPassType
 	};
 };
 
-struct CrRenderGraphTextureDescriptor
+// How the texture is intended to be used by a given pass
+struct CrRenderGraphTextureUsage2
 {
-	CrRenderGraphTextureDescriptor(const ICrTexture* texture) : texture(texture) {}
+	CrRenderGraphTextureUsage2() 
+		: textureIndex((Textures::T)-1)
+	{}
 
-	cr3d::DataFormat::T format = cr3d::DataFormat::RGBA8_Unorm;
-	int usage = 0;
-	uint32_t width = 1;
-	uint32_t height = 1;
-	uint32_t mipmapCount = 1;
-	uint32_t sliceCount = 1;
-
-	// Physical texture. Can be assigned manually or pulled from a pool
-	const ICrTexture* texture = nullptr;
-};
-
-struct CrRenderGraphBufferDescriptor
-{
-	CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t size, uint32_t offset);
-
-	CrRenderGraphBufferDescriptor(const ICrHardwareGPUBuffer* hardwareBuffer);
-
-	const ICrHardwareGPUBuffer* hardwareBuffer = nullptr;
-
-	uint32_t size = 0;
-
-	uint32_t offset = 0;
-};
-
-// How the texture is used by a given pass
-struct CrRenderGraphTextureUsage
-{
-	CrRenderGraphTextureId textureId;
+	ICrTexture* texture = nullptr;
 
 	uint32_t mipmapStart = 0;
 	uint32_t mipmapCount = 1;
@@ -68,59 +84,66 @@ struct CrRenderGraphTextureUsage
 
 	cr3d::TexturePlane::T texturePlane = cr3d::TexturePlane::Color;
 
+	// TODO Move to subresource
+	uint64_t subresourceId = 0xffffffff;
+
+	union
+	{
+		Textures::T textureIndex;
+		RWTextures::T rwTextureIndex;
+	};
+
 	float4 clearColor;
 	float depthClearValue = 0.0f;
 	uint8_t stencilClearValue = 0;
 
-	CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load;
-	CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store;
-	CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare;
+	CrRenderTargetLoadOp loadOp          = CrRenderTargetLoadOp::Load;
+	CrRenderTargetStoreOp storeOp        = CrRenderTargetStoreOp::Store;
+	CrRenderTargetLoadOp stencilLoadOp   = CrRenderTargetLoadOp::DontCare;
 	CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare;
 
 	cr3d::TextureState state;
 };
 
-struct CrRenderGraphBufferUsage
+// A transition structure that describes the intended state, the state before and the intended state after
+struct CrRenderGraphTextureTransitionInfo2
 {
-	CrRenderGraphBufferId bufferId;
-
-	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined;
-	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
-};
-
-// Description of a texture in the render graph. The properties in the descriptor
-// are used to allocate the temporary resource as and when it's required.
-struct CrRenderGraphTextureResource
-{
-	CrRenderGraphTextureResource(const CrRenderGraphString& name, CrRenderGraphTextureId id, const CrRenderGraphTextureDescriptor& descriptor)
-		: name(name), id(id), descriptor(descriptor) {}
-
-	CrRenderGraphString name;
-	CrRenderGraphTextureId id;
-	CrRenderGraphTextureDescriptor descriptor;
-};
-
-struct CrRenderGraphTextureTransition
-{
-	CrRenderGraphString name;
-	ICrTexture* texture = nullptr;
-
 	uint32_t mipmapStart = 0;
 	uint32_t mipmapCount = 1;
 
 	uint32_t sliceStart = 0;
 	uint32_t sliceCount = 1;
 
-	cr3d::TextureState initialState; // State it comes in
-	cr3d::TextureState usageState; // State I want it to be used in
-	cr3d::TextureState finalState; // State it needs to be left in
+	cr3d::TextureState initialState; // State it was in before
+	cr3d::TextureState usageState;   // State we want it to be used in
+	cr3d::TextureState finalState;   // State it needs to be left in for the next pass
 };
 
-struct CrRenderGraphBufferTransition
+// How this buffer is intended to be used in this pass
+struct CrRenderGraphBufferUsage2
 {
-	CrRenderGraphString name;
-	CrGPUBuffer* buffer = nullptr;
+	const ICrHardwareGPUBuffer* buffer = nullptr;
 
+	union
+	{
+		StorageBuffers::T storageBufferIndex;
+		RWStorageBuffers::T rwStorageBufferIndex;
+		TypedBuffers::T typedBufferIndex;
+		RWTypedBuffers::T rwTypedBufferIndex;
+	};
+
+	uint32_t bufferId;
+	uint32_t size;
+	uint32_t offset;
+
+	cr3d::ShaderResourceType::T resourceType = cr3d::ShaderResourceType::Count;
+	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined;
+	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
+};
+
+// A transition structure that describes the intended state, the state before and the intended state after
+struct CrRenderGraphBufferTransitionInfo2
+{
 	uint32_t offset = 0;
 	uint32_t size = 0;
 
@@ -133,88 +156,35 @@ struct CrRenderGraphBufferTransition
 	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
 };
 
-struct CrRenderGraphBufferResource
+struct CrRenderGraphPass2
 {
-	CrRenderGraphBufferResource(const CrRenderGraphString& name, CrRenderGraphBufferId id, const CrRenderGraphBufferDescriptor& descriptor)
-		: name(name), id(id), descriptor(descriptor) {}
-
-	CrRenderGraphString name;
-	CrRenderGraphBufferId id;
-	CrRenderGraphBufferDescriptor descriptor;
-};
-
-struct CrRenderGraphPass
-{
-	CrRenderGraphPass(const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, const CrRenderGraphExecutionFunction& executionFunction)
-		: name(name), color(color), type(type), executionFunction(executionFunction) {}
-
 	CrRenderGraphString name;
 
 	float4 color;
 
 	CrRenderGraphPassType::T type;
 
+	CrFixedVector<CrRenderGraphTextureUsage2, 16> textureUsages;
+
+	CrFixedVector<CrRenderGraphBufferUsage2, 16> bufferUsages;
+
+	CrFixedHashMap<uint64_t, CrRenderGraphTextureTransitionInfo2, 16> textureTransitionInfos;
+
+	CrFixedHashMap<uint64_t, CrRenderGraphBufferTransitionInfo2, 16> bufferTransitionInfos;
+
+	ICrTexture* depthTexture;
+
 	CrRenderGraphExecutionFunction executionFunction;
-
-	// Texture usage for this pass
-	CrVector<CrRenderGraphTextureUsage> textureUsages;
-
-	CrHashMap<uint32_t, CrRenderGraphTextureTransition> textureTransitions;
-	
-	// Buffer usage for this pass
-	CrVector<CrRenderGraphBufferUsage> bufferUsages;
-
-	CrHashMap<uint32_t, CrRenderGraphBufferTransition> bufferTransitions;
-
-	// Texture used as depth buffer for this render pass. The reason we want this is that the depth buffer
-	// can take a multitude of states depending on whether we're also trying to sample it, stencil, etc.
-
-	int32_t depthBufferTextureIndex = -1;
-
-	CrRenderGraphTextureId depthBufferTextureId;
 };
-
-// Objectives
-// 
-// There are certain features we are looking for in a render graph. Here is a non-exhaustive list
-// of what the render graph wants to achieve
-//
-// 1) Deduce source and destination transitions for each resource in a pass automatically
-// 2) Dispatch portions of the render graph to different queues and command buffers, in different threads
-// 3) Reserve render target or buffer memory automatically if needed
-// 4) Express split barriers
-// 5) Express memory dependencies
-// 6) Express temporal or history buffers
-// 7) Inject passes between existing passes, and remove passes
-// 8) Handle async compute
-// 9) Reuse code (e.g. blur) without having name clashes
-// 10) Multiple render passes inside a rendering (e.g. renderdoc) scope
-
-// API and Usage
-//
-// 1) Add a render pass by doing renderGraph.AddPass
-// 1.1) A pass has a unique name, and two functions: setup and execution. Adding a pass with the same name is an error
-// 1.2) A pass gets assigned a unique id, and has a type that determines its purpose and behavior
-// 
-// 2) Resources are declared outside the setup of a render pass. That allows passes to be independent in terms of resources.
-// e.g. if a depth texture is incrementally constructed through the prepass, the gbuffer, decals, etc but the prepass and decals are optional.
-// 2.1) Resources are described when adding to the graph. Resources can be transient or fixed (like a history buffer)
-// We have the option to attach a physical resource, but failing that, they get allocated from a pool in a platform-specific way. As resources
-// are allocated based on their usage, a declared resource that's never used doesn't use any memory. This is not an error
-// 2.2) Each resource has a unique id and name. Adding a resource with the same name is an error
-// 
-// 3) Setup takes in the rendergraph, and is a place to register resource usage. Note that resources can also be declared inside the setup pass
-// but one cannot use the result of the setup pass inside the execution pass if capturing by value
-// 3.1) Resources can be used by name or directly by resource id. Using the id directly is more efficient
-// and less error-prone but only makes sense inside the engine or with a certain amount of coupling. Using the name
-// makes sense when extending it from a "game" perspective, where we might have a database of names but not the handle itself.
-// 
-// 4) Execution takes in the render graph and a command buffer, where actual commands are executed
-// 4.1) All passes are executed sequentially once their order has been determined. One has to think of the render graph as an
-// independent execution timeline from the one where the lambda was created
 
 struct CrRenderGraphFrameParams
 {
+	CrRenderGraphFrameParams()
+		: commandBuffer(nullptr)
+		, timingQueryTracker(nullptr)
+		, frameIndex(0)
+	{}
+
 	ICrCommandBuffer* commandBuffer;
 	CrGPUTimingQueryTracker* timingQueryTracker;
 	uint64_t frameIndex;
@@ -224,106 +194,106 @@ class CrRenderGraph
 {
 public:
 
-	CrRenderGraph();
+	CrRenderGraph()
+		: m_workingPassIndex(0)
+		, m_subresourceIdCounter(0)
+		, m_bufferIdCounter(0)
+	{}
 
 	void AddRenderPass(const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, const CrRenderGraphSetupFunction& setupFunction, const CrRenderGraphExecutionFunction& executionFunction);
 
-	CrRenderGraphTextureId CreateTexture(const CrRenderGraphString& name, const CrRenderGraphTextureDescriptor& descriptor);
+	//----------------
+	// Texture binding
+	//----------------
 
-	CrRenderGraphBufferId CreateBuffer(const CrRenderGraphString& name, const CrRenderGraphBufferDescriptor& descriptor);
+	uint32_t GetSubresourceId(CrHash subresourceHash);
 
-	void AddTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages);
+	void BindTexture(Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages);
 
-	void AddRWTexture(CrRenderGraphTextureId textureId, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmapStart = 0, uint32_t mipmapCount = 1, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
+	void BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
 
-	void AddRenderTarget
+	void BindRenderTarget
 	(
-		CrRenderGraphTextureId textureId,
+		ICrTexture* texture,
 		CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load,
 		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
 		float4 clearColor = float4(),
 		uint32_t mipmap = 0, uint32_t slice = 0
 	);
 
-	void AddDepthStencilTarget
+	void BindDepthStencilTarget
 	(
-		CrRenderGraphTextureId textureId,
+		ICrTexture* texture,
 		CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load,
 		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
 		float depthClearValue = 0.0f,
-		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare, 
-		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare, 
+		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare,
+		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare,
 		uint8_t stencilClearValue = 0,
 		uint32_t mipmap = 0, uint32_t slice = 0,
 		bool readOnlyDepth = false, bool readOnlyStencil = false
 	);
 
-	void AddSwapchain(CrRenderGraphTextureId textureId);
+	void BindSwapchain(ICrTexture* texture, uint32_t mipmap = 0, uint32_t slice = 0);
 
-	void AddBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages);
+	//---------------
+	// Buffer binding
+	//---------------
 
-	void AddRWBuffer(CrRenderGraphBufferId bufferId, cr3d::ShaderStageFlags::T shaderStages);
+	uint32_t GetUniqueBufferId(CrHash bufferHash);
 
-	const ICrTexture* GetPhysicalTexture(CrRenderGraphTextureId textureId) const
-	{
-		return m_textureResources[textureId.id].descriptor.texture;
-	}
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	const ICrHardwareGPUBuffer* GetPhysicalBuffer(CrRenderGraphBufferId bufferId) const
-	{
-		return m_bufferResources[bufferId.id].descriptor.hardwareBuffer;
-	}
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+
+	void Begin(const CrRenderGraphFrameParams& frameParams);
 
 	void Execute();
-
-	void Begin(const CrRenderGraphFrameParams& setupParams);
 
 	void End();
 
 	template<typename FunctionT>
 	void ForEachPass(const FunctionT& function)
 	{
-		for (CrRenderPassId logicalPassId(0); logicalPassId < CrRenderPassId((uint32_t)m_logicalPasses.size()); ++logicalPassId)
+		for (size_t i = 0; i < m_workingPasses.size(); ++i)
 		{
-			function(m_logicalPasses[logicalPassId.id]);
+			function(m_workingPasses[i]);
 		}
 	}
 
 private:
 
-	CrRenderGraphPass& GetWorkingPass() { return m_logicalPasses[m_workingPassId.id]; }
+	CrRenderGraphPass2& GetWorkingRenderPass() { return m_workingPasses[m_workingPassIndex]; }
 
-	CrRenderPassId m_uniquePassId;
+	size_t m_workingPassIndex;
 
-	// Values available during the setup pass and invalid outside of its scope
-	CrRenderPassId m_workingPassId;
+	CrFixedVector<CrRenderGraphPass2, 128> m_workingPasses;
 
-	CrRenderGraphTextureId m_uniqueTextureId;
-	CrRenderGraphBufferId m_uniqueBufferId;
+	uint32_t m_subresourceIdCounter;
 
-	// Vector of passes in submission order
-	CrVector<CrRenderGraphPass> m_logicalPasses;
+	uint32_t m_bufferIdCounter;
 
-	// From name to pass id
-	CrHashMap<CrRenderGraphString, CrRenderPassId> m_nameToLogicalPassId;
+	CrFixedHashMap<CrHash, uint32_t, 256> m_textureSubresourceIds;
 
-	// Textures declared for this graph
-	CrVector<CrRenderGraphTextureResource> m_textureResources;
+	CrFixedHashMap<CrHash, uint32_t, 256> m_bufferIds;
 
-	// From name to texture id
-	CrHashMap<CrRenderGraphString, CrRenderGraphTextureId> m_nameToTextureId;
+	// Last render pass a certain subresource was used in. Null if it wasn't used yet
+	CrFixedVector<CrRenderGraphPass2*, 256> m_textureLastUsedPass;
 
-	// Buffers declared for this graph
-	CrVector<CrRenderGraphBufferResource> m_bufferResources;
-
-	// From name to buffer id
-	CrHashMap<CrRenderGraphString, CrRenderGraphBufferId> m_nameToBufferId;
-
-	// Pass these resources were last seen in. As we traverse the graph we take note of which resources
-	// we've been encountering and update passes as necessary
-	CrVector<CrRenderPassId> m_textureLastUsedPass;
-
-	CrVector<CrRenderPassId> m_bufferLastUsedPass;
+	// Last render pass a certain buffer was used in. Null if it wasn't used yet
+	CrFixedVector<CrRenderGraphPass2*, 256> m_bufferLastUsedPass;
 
 	CrRenderGraphFrameParams m_frameParams;
 };

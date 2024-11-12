@@ -11,14 +11,6 @@
 
 #include "Math/CrHlslppVectorFloatType.h"
 
-//#define RENDER_GRAPH_LOGS
-
-#if defined(RENDER_GRAPH_LOGS)
-#define CrRenderGraphLog2(format, ...) CrLog(format, __VA_ARGS__)
-#else
-#define CrRenderGraphLog2(format, ...)
-#endif
-
 // Objectives
 // 
 // There are certain features we are looking for in a render graph. Here is a non-exhaustive list

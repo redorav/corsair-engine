@@ -7,6 +7,14 @@
 
 #include "Core/Logging/ICrDebug.h"
 
+//#define RENDER_GRAPH_LOGS
+
+#if defined(RENDER_GRAPH_LOGS)
+#define CrRenderGraphLog2(format, ...) CrLog(format, __VA_ARGS__)
+#else
+#define CrRenderGraphLog2(format, ...)
+#endif
+
 void CrRenderGraph::AddRenderPass
 (
 	const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, 
@@ -42,7 +50,9 @@ uint32_t CrRenderGraph::GetSubresourceId(CrHash subresourceHash)
 	return subresourceId;
 }
 
-void CrRenderGraph::BindTexture(Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages)
+void CrRenderGraph::BindTexture
+(
+	Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages)
 {
 	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
 
@@ -393,9 +403,9 @@ void CrRenderGraph::Execute()
 			{
 				// By definition the pass that references it has a transition info set up
 				CrRenderGraphTextureTransitionInfo2& lastUsedTransitionInfo = lastUsedRenderPass->textureTransitionInfos.find(textureUsage.subresourceId)->second;
-				lastUsedTransitionInfo.finalState = textureUsage.state;
-
 				transitionInfo.initialState = lastUsedTransitionInfo.finalState;
+
+				lastUsedTransitionInfo.finalState = textureUsage.state;
 			}
 			else
 			{
@@ -563,15 +573,15 @@ void CrRenderGraph::Execute()
 				}
 
 				// Bind the texture to the slot it was assigned to
-				//switch (textureUsage.state.layout)
-				//{
-				//	case cr3d::TextureLayout::RWTexture:
-				//		m_frameParams.commandBuffer->BindRWTexture(textureUsage.rwTextureIndex, textureUsage.texture, textureUsage.mipmapStart);
-				//		break;
-				//	case cr3d::TextureLayout::ShaderInput:
-				//		m_frameParams.commandBuffer->BindTexture(textureUsage.textureIndex, textureUsage.texture, textureUsage.texturePlane);
-				//		break;
-				//}
+				switch (textureUsage.state.layout)
+				{
+					case cr3d::TextureLayout::RWTexture:
+						m_frameParams.commandBuffer->BindRWTexture(textureUsage.rwTextureIndex, textureUsage.texture, textureUsage.mipmapStart);
+						break;
+					case cr3d::TextureLayout::ShaderInput:
+						m_frameParams.commandBuffer->BindTexture(textureUsage.textureIndex, textureUsage.texture, textureUsage.texturePlane);
+						break;
+				}
 			}
 
 			for (uint32_t i = 0; i < renderGraphPass.bufferUsages.size(); ++i)

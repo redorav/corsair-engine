@@ -125,7 +125,8 @@ struct CrRenderGraphBufferUsage2
 	};
 
 	uint32_t bufferId;
-	uint32_t size;
+	uint32_t numElements;
+	uint32_t stride;
 	uint32_t offset;
 
 	cr3d::ShaderResourceType::T resourceType = cr3d::ShaderResourceType::Count;

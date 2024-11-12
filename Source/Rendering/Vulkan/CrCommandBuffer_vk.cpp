@@ -425,7 +425,7 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 
 	bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
 	bufferMemoryBarrier.offset = bufferDescriptor.offset;
-	bufferMemoryBarrier.size = bufferDescriptor.size;
+	bufferMemoryBarrier.size = bufferDescriptor.numElements * bufferDescriptor.stride;
 }
 
 void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture,

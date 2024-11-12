@@ -270,11 +270,10 @@ void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHa
 	bufferUsage.storageBufferIndex = bufferIndex;
 	bufferUsage.resourceType = cr3d::ShaderResourceType::StorageBuffer;
 	bufferUsage.bufferId = GetUniqueBufferId(bufferHash);
+	bufferUsage.numElements = numElements;
+	bufferUsage.stride = stride;
+	bufferUsage.offset = offset;
 	workingPass.bufferUsages.push_back(bufferUsage);
-
-	unused_parameter(numElements);
-	unused_parameter(stride);
-	unused_parameter(offset);
 }
 
 void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages)
@@ -290,17 +289,16 @@ void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const I
 	bufferHash << (uintptr_t)buffer;
 
 	CrRenderGraphBufferUsage2 bufferUsage;
-	bufferUsage.buffer = buffer;
-	bufferUsage.usageState = cr3d::BufferState::ReadWrite;
-	bufferUsage.shaderStages = shaderStages;
+	bufferUsage.buffer               = buffer;
+	bufferUsage.usageState           = cr3d::BufferState::ReadWrite;
+	bufferUsage.shaderStages         = shaderStages;
 	bufferUsage.rwStorageBufferIndex = bufferIndex;
-	bufferUsage.resourceType = cr3d::ShaderResourceType::RWStorageBuffer;
-	bufferUsage.bufferId = GetUniqueBufferId(bufferHash);
+	bufferUsage.resourceType         = cr3d::ShaderResourceType::RWStorageBuffer;
+	bufferUsage.bufferId             = GetUniqueBufferId(bufferHash);
+	bufferUsage.numElements          = numElements;
+	bufferUsage.stride               = stride;
+	bufferUsage.offset               = offset;
 	workingPass.bufferUsages.push_back(bufferUsage);
-
-	unused_parameter(numElements);
-	unused_parameter(stride);
-	unused_parameter(offset);
 }
 
 void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages)
@@ -316,17 +314,16 @@ void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwa
 	bufferHash << (uintptr_t)buffer;
 
 	CrRenderGraphBufferUsage2 bufferUsage;
-	bufferUsage.buffer = buffer;
-	bufferUsage.usageState = cr3d::BufferState::ShaderInput;
-	bufferUsage.shaderStages = shaderStages;
+	bufferUsage.buffer           = buffer;
+	bufferUsage.usageState       = cr3d::BufferState::ShaderInput;
+	bufferUsage.shaderStages     = shaderStages;
 	bufferUsage.typedBufferIndex = bufferIndex;
-	bufferUsage.resourceType = cr3d::ShaderResourceType::TypedBuffer;
-	bufferUsage.bufferId = GetUniqueBufferId(bufferHash);
+	bufferUsage.resourceType     = cr3d::ShaderResourceType::TypedBuffer;
+	bufferUsage.bufferId         = GetUniqueBufferId(bufferHash);
+	bufferUsage.numElements      = numElements;
+	bufferUsage.stride           = stride;
+	bufferUsage.offset           = offset;
 	workingPass.bufferUsages.push_back(bufferUsage);
-
-	unused_parameter(numElements);
-	unused_parameter(stride);
-	unused_parameter(offset);
 }
 
 void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages)
@@ -342,17 +339,16 @@ void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHa
 	bufferHash << (uintptr_t)buffer;
 
 	CrRenderGraphBufferUsage2 bufferUsage;
-	bufferUsage.buffer = buffer;
-	bufferUsage.usageState = cr3d::BufferState::ReadWrite;
-	bufferUsage.shaderStages = shaderStages;
+	bufferUsage.buffer             = buffer;
+	bufferUsage.usageState         = cr3d::BufferState::ReadWrite;
+	bufferUsage.shaderStages       = shaderStages;
 	bufferUsage.rwTypedBufferIndex = bufferIndex;
-	bufferUsage.resourceType = cr3d::ShaderResourceType::TypedBuffer;
-	bufferUsage.bufferId = GetUniqueBufferId(bufferHash);
+	bufferUsage.resourceType       = cr3d::ShaderResourceType::TypedBuffer;
+	bufferUsage.bufferId           = GetUniqueBufferId(bufferHash);
+	bufferUsage.numElements        = numElements;
+	bufferUsage.stride             = stride;
+	bufferUsage.offset             = offset;
 	workingPass.bufferUsages.push_back(bufferUsage);
-
-	unused_parameter(numElements);
-	unused_parameter(stride);
-	unused_parameter(offset);
 }
 
 void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages)
@@ -537,6 +533,8 @@ void CrRenderGraph::Execute()
 					case cr3d::TextureLayout::RWTexture:
 					case cr3d::TextureLayout::ShaderInput:
 					{
+						// The texture state specifies both the layout and the stage it wants to be transitioned for
+						// Internally the API checks whether those things matter or not
 						if (transitionInfo.initialState != transitionInfo.usageState)
 						{
 							renderPassDescriptor.beginTextures.emplace_back
@@ -590,7 +588,8 @@ void CrRenderGraph::Execute()
 					
 				if (transitionInfo.initialState != transitionInfo.usageState)
 				{
-					renderPassDescriptor.beginBuffers.emplace_back(bufferUsage.buffer, bufferUsage.size, bufferUsage.offset,
+					renderPassDescriptor.beginBuffers.emplace_back(bufferUsage.buffer,
+						bufferUsage.numElements, bufferUsage.stride, bufferUsage.offset,
 						transitionInfo.initialState, transitionInfo.initialShaderStages,
 						transitionInfo.usageState, transitionInfo.usageShaderStages);
 
@@ -601,7 +600,8 @@ void CrRenderGraph::Execute()
 
 				if (transitionInfo.usageState != transitionInfo.finalState)
 				{
-					renderPassDescriptor.endBuffers.emplace_back(bufferUsage.buffer, bufferUsage.size, bufferUsage.offset,
+					renderPassDescriptor.endBuffers.emplace_back(bufferUsage.buffer,
+						bufferUsage.numElements, bufferUsage.stride, bufferUsage.offset,
 						transitionInfo.usageState, transitionInfo.usageShaderStages,
 						transitionInfo.finalState, transitionInfo.finalShaderStages);
 

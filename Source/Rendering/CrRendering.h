@@ -194,9 +194,9 @@ namespace cr3d
 			Count
 		};
 
-		inline const char* ToString(cr3d::TextureLayout::T textureState)
+		inline const char* ToString(cr3d::TextureLayout::T textureLayout)
 		{
-			switch (textureState)
+			switch (textureLayout)
 			{
 				case Undefined: return "Undefined";
 				case ShaderInput: return "ShaderInput";

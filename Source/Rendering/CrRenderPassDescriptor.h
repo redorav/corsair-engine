@@ -51,14 +51,15 @@ struct CrRenderPassBufferDescriptor
 {
 	CrRenderPassBufferDescriptor
 	(
-		const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t size, uint32_t offset,
+		const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t offset,
 		cr3d::BufferState::T sourceState, cr3d::ShaderStageFlags::T sourceShaderStages, 
 		cr3d::BufferState::T destinationState, cr3d::ShaderStageFlags::T destinationShaderStages)
-		: hardwareBuffer(hardwareBuffer), size(size), offset(offset), sourceState(sourceState), sourceShaderStages(sourceShaderStages),
+		: hardwareBuffer(hardwareBuffer), numElements(numElements), stride(stride), offset(offset), sourceState(sourceState), sourceShaderStages(sourceShaderStages),
 		destinationState(destinationState), destinationShaderStages(destinationShaderStages) {}
 	
 	const ICrHardwareGPUBuffer* hardwareBuffer;
-	uint32_t size;
+	uint32_t numElements;
+	uint32_t stride;
 	uint32_t offset;
 
 	cr3d::BufferState::T sourceState;

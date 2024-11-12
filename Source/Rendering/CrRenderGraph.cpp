@@ -403,9 +403,8 @@ void CrRenderGraph::Execute()
 			{
 				// By definition the pass that references it has a transition info set up
 				CrRenderGraphTextureTransitionInfo2& lastUsedTransitionInfo = lastUsedRenderPass->textureTransitionInfos.find(textureUsage.subresourceId)->second;
-				transitionInfo.initialState = lastUsedTransitionInfo.finalState;
-
 				lastUsedTransitionInfo.finalState = textureUsage.state;
+				transitionInfo.initialState = textureUsage.state;
 			}
 			else
 			{

@@ -584,6 +584,7 @@ inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferI
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 	CrCommandBufferAssertMsg(storageBufferIndex < StorageBuffers::Count, "Invalid binding index");
+	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 
 	m_currentState.m_storageBuffers[storageBufferIndex] = CrStorageBufferBinding(buffer, numElements, stride, offset);
 }
@@ -599,6 +600,7 @@ inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageB
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 	CrCommandBufferAssertMsg(rwStorageBufferIndex < RWStorageBuffers::Count, "Invalid binding index");
+	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 
 	m_currentState.m_rwStorageBuffers[rwStorageBufferIndex] = CrStorageBufferBinding(buffer, numElements, stride, offset);
 }
@@ -616,13 +618,14 @@ inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwBufferIndex,
 	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Typed), "Buffer must have typed buffer flag");
 	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 	CrCommandBufferAssertMsg(rwBufferIndex < RWTypedBuffers::Count, "Invalid binding index");
+	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 
 	m_currentState.m_rwTypedBuffers[rwBufferIndex].buffer = buffer;
 }
 
 inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer)
 {
-	BindRWTypedBuffer(rwTypedBufferIndex, buffer, 1, 1, 0);
+	BindRWTypedBuffer(rwTypedBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
 template<typename MetaType>

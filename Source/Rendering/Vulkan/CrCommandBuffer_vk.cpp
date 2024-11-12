@@ -443,16 +443,16 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	const CrVkImageStateInfo& resourceStateInfoSource = crvk::GetVkImageStateInfo(texture->GetFormat(), sourceLayout);
 	const CrVkImageStateInfo& resourceStateInfoDestination = crvk::GetVkImageStateInfo(texture->GetFormat(), destinationLayout);
 
-	imageMemoryBarrier.oldLayout = resourceStateInfoSource.imageLayout;
-	imageMemoryBarrier.newLayout = resourceStateInfoDestination.imageLayout;
-	imageMemoryBarrier.image = vulkanTexture->GetVkImage();
-	imageMemoryBarrier.subresourceRange.aspectMask = crvk::GetVkImageAspectFlags(texture->GetFormat());
-	imageMemoryBarrier.subresourceRange.baseMipLevel = mipmapStart;
-	imageMemoryBarrier.subresourceRange.levelCount = mipmapCount;
+	imageMemoryBarrier.oldLayout                       = resourceStateInfoSource.imageLayout;
+	imageMemoryBarrier.newLayout                       = resourceStateInfoDestination.imageLayout;
+	imageMemoryBarrier.image                           = vulkanTexture->GetVkImage();
+	imageMemoryBarrier.subresourceRange.aspectMask     = crvk::GetVkImageAspectFlags(texture->GetFormat());
+	imageMemoryBarrier.subresourceRange.baseMipLevel   = mipmapStart;
+	imageMemoryBarrier.subresourceRange.levelCount     = mipmapCount;
 	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;
-	imageMemoryBarrier.subresourceRange.layerCount = sliceCount;
-	imageMemoryBarrier.srcAccessMask = resourceStateInfoSource.accessMask;
-	imageMemoryBarrier.dstAccessMask = resourceStateInfoDestination.accessMask;
+	imageMemoryBarrier.subresourceRange.layerCount     = sliceCount;
+	imageMemoryBarrier.srcAccessMask                   = resourceStateInfoSource.accessMask;
+	imageMemoryBarrier.dstAccessMask                   = resourceStateInfoDestination.accessMask;
 }
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)

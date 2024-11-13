@@ -4,6 +4,7 @@
 
 	<package name="agility">
 		<version id="1.610.4" file="agility_1_610_4.zip" repository="github"/>
+		<version id="1.614.1" file="agility_1.614.1.7z" repository="github"/>
 	</package>
 
 	<package name="assimp">

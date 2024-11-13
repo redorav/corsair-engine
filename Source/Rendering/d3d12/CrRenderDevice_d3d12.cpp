@@ -26,7 +26,7 @@
 
 // Let the application know we want to look for the Agility SDK
 // https://devblogs.microsoft.com/directx/gettingstarted-dx12agility/#parametersa
-extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 610; }
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 614; }
 
 extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
@@ -142,15 +142,16 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 		{ D3D_FEATURE_LEVEL_12_0, "12.0" }
 	};
 
-	uint32_t currentFeatureLevel = 0;
-	FeatureLevelString selectedFeatureLevel;
-	
-	while (D3D12CreateDevice(m_dxgiAdapter, featureLevels[currentFeatureLevel].level, IID_PPV_ARGS(&m_d3d12Device)) != S_OK && currentFeatureLevel < sizeof_array(featureLevels))
-	{
-		currentFeatureLevel++;
-	}
+	FeatureLevelString selectedFeatureLevel = {};
 
-	selectedFeatureLevel = featureLevels[currentFeatureLevel];
+	for (uint32_t i = 0; i < sizeof_array(featureLevels); ++i)
+	{
+		if (D3D12CreateDevice(m_dxgiAdapter, featureLevels[i].level, IID_PPV_ARGS(&m_d3d12Device)) == S_OK)
+		{
+			selectedFeatureLevel = featureLevels[i];
+			break;
+		}
+	}
 
 	CrAssertMsg(m_d3d12Device != nullptr, "Error creating D3D12 device");
 

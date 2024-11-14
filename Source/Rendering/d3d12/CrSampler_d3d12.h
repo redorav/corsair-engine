@@ -4,8 +4,6 @@
 
 #include "CrD3D12.h"
 
-#include <d3d12.h>
-
 class ICrRenderDevice;
 
 class CrSamplerD3D12 final : public ICrSampler

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Rendering/ICrSwapchain.h"
-#include <d3d12.h>
+
+#include "d3d12.h"
 
 class CrSwapchainD3D12 final : public ICrSwapchain
 {

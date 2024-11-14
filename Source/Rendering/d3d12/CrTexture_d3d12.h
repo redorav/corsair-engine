@@ -7,8 +7,6 @@
 #include "Core/Containers/CrArray.h"
 #include "Core/Containers/CrVector.h"
 
-#include <d3d12.h>
-
 class ICrRenderDevice;
 
 struct CrD3D12AdditionalTextureViews

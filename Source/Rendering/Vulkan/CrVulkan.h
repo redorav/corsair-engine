@@ -17,17 +17,17 @@ extern PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessenger;
 extern PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger;
 extern PFN_vkSubmitDebugUtilsMessageEXT    vkSubmitDebugUtilsMessage;
 
-// Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
-// This shows how to make the combinations but it tries to tie them with the point in the pipeline at which they
-// are used, whereas we decouple that and get fewer combinations
-struct CrVkImageStateInfo
-{
-	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
-	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
-};
-
 namespace crvk
 {
+	// Sourced from https://github.com/Tobski/simple_vulkan_synchronization/blob/master/thsvs_simpler_vulkan_synchronization.h
+	// This shows how to make the combinations but it tries to tie them with the point in the pipeline at which they
+	// are used, whereas we decouple that and get fewer combinations
+	struct VkImageTransitionInfo
+	{
+		VkImageLayout imageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
+		VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
+	};
+
 	VkFormat GetVkFormat(cr3d::DataFormat::T format);
 
 	inline VkIndexType GetVkIndexType(cr3d::DataFormat::T format)
@@ -83,7 +83,7 @@ namespace crvk
 
 	VkImageAspectFlags GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat);
 
-	CrVkImageStateInfo GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout);
+	VkImageTransitionInfo GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout);
 
 	VkPipelineStageFlags GetVkPipelineStageFlags(const cr3d::TextureState& textureState);
 

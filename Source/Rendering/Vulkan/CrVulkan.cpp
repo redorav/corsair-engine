@@ -667,7 +667,7 @@ VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat
 	return aspectFlags;
 }
 
-CrVkImageStateInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout)
+crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout)
 {
 	bool depthOnlyFormat = cr3d::IsDepthOnlyFormat(textureFormat);
 

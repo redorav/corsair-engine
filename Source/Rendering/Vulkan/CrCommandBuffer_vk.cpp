@@ -440,8 +440,8 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-	const CrVkImageStateInfo& resourceStateInfoSource = crvk::GetVkImageStateInfo(texture->GetFormat(), sourceLayout);
-	const CrVkImageStateInfo& resourceStateInfoDestination = crvk::GetVkImageStateInfo(texture->GetFormat(), destinationLayout);
+	const crvk::VkImageTransitionInfo& resourceStateInfoSource = crvk::GetVkImageStateInfo(texture->GetFormat(), sourceLayout);
+	const crvk::VkImageTransitionInfo& resourceStateInfoDestination = crvk::GetVkImageStateInfo(texture->GetFormat(), destinationLayout);
 
 	imageMemoryBarrier.oldLayout                       = resourceStateInfoSource.imageLayout;
 	imageMemoryBarrier.newLayout                       = resourceStateInfoDestination.imageLayout;

@@ -650,7 +650,8 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers()
 		VkPipelineStageFlags srcStageMask = m_srcStageMask != 0 ? m_srcStageMask : VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		VkPipelineStageFlags destStageMask = m_destStageMask != 0 ? m_destStageMask : VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
-		vkCmdPipelineBarrier(
+		vkCmdPipelineBarrier
+		(
 			m_vkCommandBuffer,
 			srcStageMask,
 			destStageMask,
@@ -660,7 +661,8 @@ void CrCommandBufferVulkan::FlushImageAndBufferBarriers()
 			(uint32_t)m_bufferMemoryBarriers.size(),
 			m_bufferMemoryBarriers.data(),
 			(uint32_t)m_imageMemoryBarriers.size(),
-			m_imageMemoryBarriers.data());
+			m_imageMemoryBarriers.data()
+		);
 
 		// Reset state
 		m_srcStageMask = VK_PIPELINE_STAGE_NONE;

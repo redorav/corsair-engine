@@ -302,26 +302,26 @@ protected:
 		const ICrComputePipeline*       m_computePipeline;
 		bool                            m_computePipelineDirty;
 
-		CrConstantBufferBinding			m_constantBuffers[ConstantBuffers::Count];
+		CrConstantBufferBinding         m_constantBuffers[ConstantBuffers::Count];
 
-		const ICrSampler*				m_samplers[Samplers::Count];
+		const ICrSampler*               m_samplers[Samplers::Count];
 
-		CrTextureBinding					m_textures[Textures::Count];
+		CrTextureBinding                m_textures[Textures::Count];
 
-		CrRWTextureBinding				m_rwTextures[RWTextures::Count];
+		CrRWTextureBinding              m_rwTextures[RWTextures::Count];
 
-		CrStorageBufferBinding			m_storageBuffers[StorageBuffers::Count];
+		CrStorageBufferBinding          m_storageBuffers[StorageBuffers::Count];
 
-		CrStorageBufferBinding			m_rwStorageBuffers[RWStorageBuffers::Count];
+		CrStorageBufferBinding          m_rwStorageBuffers[RWStorageBuffers::Count];
 
-		CrStorageBufferBinding			m_rwTypedBuffers[RWTypedBuffers::Count];
+		CrStorageBufferBinding          m_rwTypedBuffers[RWTypedBuffers::Count];
 
-		uint32_t						m_stencilRef;
-		bool							m_stencilRefDirty;
+		uint32_t                        m_stencilRef;
+		bool                            m_stencilRefDirty;
 
-		CrRenderPassDescriptor			m_currentRenderPass;
+		CrRenderPassDescriptor          m_currentRenderPass;
 
-		bool							m_renderPassActive;
+		bool                            m_renderPassActive;
 	};
 
 	CurrentState					m_currentState;

@@ -434,7 +434,7 @@ D3D12_RESOURCE_STATES crd3d::GetD3D12LegacyResourceState(const cr3d::TextureStat
 		case cr3d::TextureLayout::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
 		case cr3d::TextureLayout::ShaderInput:
 		{
-			// Simplify by always specifying both. This is deprecated anyway so we don't care too much
+			// Simplify upstream rendergraph code by always specifying both. We'll deprecate this eventually so it's not that important
 			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		}
 		case cr3d::TextureLayout::RenderTarget:          return D3D12_RESOURCE_STATE_RENDER_TARGET;

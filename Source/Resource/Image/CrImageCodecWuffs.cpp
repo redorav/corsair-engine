@@ -100,7 +100,7 @@ CrImageHandle CrImageDecoderWuffs::Decode(void* data, uint64_t dataSize) const
 		}
 		case WUFFS_BASE__FOURCC__JPEG:
 		{
-			wuffsDecoderMemory.resize(sizeof__wuffs_wbmp__decoder());
+			wuffsDecoderMemory.resize(sizeof__wuffs_jpeg__decoder());
 			wuffs_jpeg__decoder* wjpegImageDecoder = (wuffs_jpeg__decoder*)wuffsDecoderMemory.data();
 			initializeStatus = wuffs_jpeg__decoder__initialize(wjpegImageDecoder, wuffsDecoderMemory.size(), WUFFS_VERSION, WUFFS_INITIALIZE__ALREADY_ZEROED);
 			wuffsImageDecoder = (wuffs_base__image_decoder*)wjpegImageDecoder;

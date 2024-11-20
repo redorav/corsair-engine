@@ -27,20 +27,16 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderS
 		}
 	}
 
-	hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory1));
+	// Assume DXGI 1.4
+	hResult = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory4));
 	CrAssertMsg(SUCCEEDED(hResult), "Failed to create DXGIFactory");
 
-	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory4)) == S_OK)
+	if (m_dxgiFactory4->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory6)) == S_OK)
 	{
 
 	}
 
-	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory6)) == S_OK)
-	{
-
-	}
-
-	if (m_dxgiFactory1->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory7)) == S_OK)
+	if (m_dxgiFactory4->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory7)) == S_OK)
 	{
 
 	}

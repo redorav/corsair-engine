@@ -8,6 +8,18 @@ namespace CrCommandQueueType { enum T : uint32_t; }
 
 namespace crd3d
 {
+	struct TextureBarrierInfoD3D12
+	{
+		D3D12_BARRIER_SYNC sync     = D3D12_BARRIER_SYNC_NONE;
+		D3D12_BARRIER_ACCESS access = D3D12_BARRIER_ACCESS_COMMON;
+	};
+
+	struct BufferBarrierInfoD3D12
+	{
+		D3D12_BARRIER_SYNC sync = D3D12_BARRIER_SYNC_NONE;
+		D3D12_BARRIER_ACCESS access = D3D12_BARRIER_ACCESS_COMMON;
+	};
+
 	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
 
 	D3D12_TEXTURE_ADDRESS_MODE GetD3DAddressMode(cr3d::AddressMode addressMode);
@@ -38,7 +50,13 @@ namespace crd3d
 
 	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
 
-	D3D12_RESOURCE_STATES GetTextureState(const cr3d::TextureState& textureState);
+	D3D12_RESOURCE_STATES GetD3D12LegacyResourceState(const cr3d::TextureState& textureState);
+
+	TextureBarrierInfoD3D12 GetD3D12TextureBarrierInfo(const cr3d::TextureState& textureState);
+
+	BufferBarrierInfoD3D12 GetD3D12BufferBarrierInfo(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);
+
+	D3D12_BARRIER_LAYOUT GetD3D12BarrierTextureLayout(const cr3d::TextureLayout::T textureLayout);
 
 	// https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/d3dx12.h
 	// Copied from D3D12CalcSubresource

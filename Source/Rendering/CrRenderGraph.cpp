@@ -119,7 +119,7 @@ void CrRenderGraph::BindRenderTarget
 	textureUsage.clearColor = clearColor;
 	textureUsage.storeOp = storeOp;
 	textureUsage.loadOp = loadOp;
-	textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel);
+	textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Unused);
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
@@ -211,7 +211,7 @@ void CrRenderGraph::BindDepthStencilTarget
 
 	CrAssertMsg(layout != cr3d::TextureLayout::Count, "Invalid layout selected");
 
-	textureUsage.state = { layout, cr3d::ShaderStageFlags::Pixel };
+	textureUsage.state = { layout, cr3d::ShaderStageFlags::Unused };
 
 	workingPass.depthTexture = texture;
 
@@ -231,7 +231,7 @@ void CrRenderGraph::BindSwapchain(ICrTexture* texture, uint32_t mipmap, uint32_t
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = mipmap;
 	textureUsage.sliceStart = slice;
-	textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
+	textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Unused };
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
@@ -533,9 +533,7 @@ void CrRenderGraph::Execute()
 					case cr3d::TextureLayout::RWTexture:
 					case cr3d::TextureLayout::ShaderInput:
 					{
-						// The texture state specifies both the layout and the stage it wants to be transitioned for
-						// Internally the API checks whether those things matter or not
-						if (transitionInfo.initialState != transitionInfo.usageState)
+						if (transitionInfo.initialState.layout != transitionInfo.usageState.layout)
 						{
 							renderPassDescriptor.beginTextures.emplace_back
 							(
@@ -549,7 +547,7 @@ void CrRenderGraph::Execute()
 								cr3d::TextureLayout::ToString(transitionInfo.usageState.layout));
 						}
 
-						if (transitionInfo.usageState != transitionInfo.finalState)
+						if (transitionInfo.usageState.layout != transitionInfo.finalState.layout)
 						{
 							renderPassDescriptor.endTextures.emplace_back
 							(

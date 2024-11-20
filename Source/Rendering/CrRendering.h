@@ -153,8 +153,8 @@ namespace cr3d
 			Domain   = 1 << ShaderStage::Domain,
 			Geometry = 1 << ShaderStage::Geometry,
 			Compute  = 1 << ShaderStage::Compute,
-			Present, // Only used to help validation
-			Graphics = Vertex | Pixel | Hull | Domain | Geometry
+			Graphics = Vertex | Pixel | Hull | Domain | Geometry,
+			Unused   = 0xffffffff
 		};
 
 		inline ShaderStageFlags::T operator | (ShaderStageFlags::T flag1, ShaderStageFlags::T flag2)
@@ -422,19 +422,13 @@ namespace cr3d
 	{
 		enum T : uint32_t
 		{
-			None    = 0,
-			Plane0  = 1 << 0,
-			Plane1  = 1 << 1,
-			Plane2  = 1 << 2,
+			Plane0  = 0,
+			Plane1  = 1,
+			Plane2  = 2,
 			Color   = Plane0,
 			Depth   = Plane0,
 			Stencil = Plane1,
 		};
-
-		inline TexturePlane::T operator | (TexturePlane::T flag1, TexturePlane::T flag2)
-		{
-			return (TexturePlane::T)((uint32_t)flag1 | (uint32_t)flag2);
-		}
 	};
 
 	enum class CompareOp : uint32_t

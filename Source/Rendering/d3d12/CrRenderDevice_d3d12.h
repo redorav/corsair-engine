@@ -23,6 +23,8 @@ public:
 
 	ID3D12Device* GetD3D12Device() const { return m_d3d12Device; }
 
+	ID3D12Device10* GetD3D12Device10() const { return m_d3d12Device10; }
+
 	// This command queue isn't really used for anything other than to build the swapchain and do other tasks
 	// that the device used to do but now requires a queue. Don't use for actual rendering
 	ID3D12CommandQueue* GetD3D12GraphicsCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
@@ -50,6 +52,8 @@ public:
 	void FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor);
 
 	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
+
+	bool GetIsEnhancedBarriersSupported() const { return m_enhancedBarriersSupported; }
 
 private:
 
@@ -139,6 +143,36 @@ private:
 	IDXGIAdapter1* m_dxgiAdapter;
 
 	ID3D12Device* m_d3d12Device;
+
+	ID3D12Device1* m_d3d12Device1;
+
+	ID3D12Device2* m_d3d12Device2;
+
+	ID3D12Device3* m_d3d12Device3;
+
+	ID3D12Device4* m_d3d12Device4;
+
+	ID3D12Device5* m_d3d12Device5;
+
+	ID3D12Device6* m_d3d12Device6;
+
+	ID3D12Device7* m_d3d12Device7;
+
+	ID3D12Device8* m_d3d12Device8;
+
+	ID3D12Device9* m_d3d12Device9;
+
+	ID3D12Device10* m_d3d12Device10;
+
+	ID3D12Device11* m_d3d12Device11;
+
+	ID3D12Device12* m_d3d12Device12;
+
+	ID3D12Device13* m_d3d12Device13;
+
+	ID3D12Device14* m_d3d12Device14;
+
+	bool m_enhancedBarriersSupported;
 };
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()

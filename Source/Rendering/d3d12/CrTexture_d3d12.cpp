@@ -15,12 +15,14 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
+	ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
 
-	m_d3d12InitialState = crd3d::GetTextureState(m_defaultState);
+	m_d3d12LegacyInitialState = crd3d::GetD3D12LegacyResourceState(m_defaultState);
+	m_d3d12InitialLayout = crd3d::GetD3D12BarrierTextureLayout(m_defaultState.layout);
 
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
 
-	D3D12_RESOURCE_DESC d3d12ResourceDescriptor = {};
+	D3D12_RESOURCE_DESC1 d3d12ResourceDescriptor = {};
 	d3d12ResourceDescriptor.Width = m_width;
 	d3d12ResourceDescriptor.Height = m_height;
 	d3d12ResourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
@@ -92,15 +94,35 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 			clearValue.Color[3] = descriptor.colorClear[3];
 		}
 
-		HRESULT hResult = d3d12Device->CreateCommittedResource
-		(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&d3d12ResourceDescriptor,
-			m_d3d12InitialState,
-			useOptimizedClearValue ? &clearValue : nullptr,
-			IID_PPV_ARGS(&m_d3d12Resource)
-		);
+		HRESULT hResult = S_FALSE;
+
+		if (d3d12RenderDevice->GetIsEnhancedBarriersSupported())
+		{
+			hResult = d3d12Device10->CreateCommittedResource3
+			(
+				&heapProperties,
+				D3D12_HEAP_FLAG_NONE,
+				&d3d12ResourceDescriptor,
+				m_d3d12InitialLayout,
+				useOptimizedClearValue ? &clearValue : nullptr,
+				nullptr,
+				0,
+				nullptr,
+				IID_PPV_ARGS(&m_d3d12Resource)
+			);
+		}
+		else
+		{
+			hResult = d3d12Device->CreateCommittedResource
+			(
+				&heapProperties,
+				D3D12_HEAP_FLAG_NONE,
+				(D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor,
+				m_d3d12LegacyInitialState,
+				useOptimizedClearValue ? &clearValue : nullptr,
+				IID_PPV_ARGS(&m_d3d12Resource)
+			);
+		}
 
 		CrAssertMsg(SUCCEEDED(hResult), "Failed to create texture");
 	}
@@ -345,7 +367,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	// Calculate number of subresources by computing the last subresource in the resource
 	m_d3d12SubresourceCount = crd3d::CalculateSubresource(m_mipmapCount - 1, m_arraySize - 1, 0, m_mipmapCount, m_arraySize) + 1;
 
-	D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo = d3d12RenderDevice->GetD3D12Device()->GetResourceAllocationInfo(0, 1, &d3d12ResourceDescriptor);
+	D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo = d3d12RenderDevice->GetD3D12Device()->GetResourceAllocationInfo(0, 1, (D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor);
 	m_usedGPUMemoryBytes = (uint32_t)d3d12ResourceAllocationInfo.SizeInBytes;
 
 	// Prepare the hardware mipmap layout
@@ -354,7 +376,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		const uint32_t MaxSubresources = 2 * cr3d::MaxMipmaps;
 		D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
 		UINT numRows[MaxSubresources];
-		d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints(&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
+		d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints((D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
 
 		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{

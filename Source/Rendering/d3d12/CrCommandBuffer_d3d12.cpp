@@ -24,13 +24,17 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 
-	D3D12_COMMAND_LIST_TYPE d3dc12CommandListType = crd3d::GetD3D12CommandQueueType(descriptor.queueType);
+	D3D12_COMMAND_LIST_TYPE d3d12CommandListType = crd3d::GetD3D12CommandQueueType(descriptor.queueType);
 
-	d3d12RenderDevice->GetD3D12Device()->CreateCommandAllocator(d3dc12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator));
+	ID3D12Device* d3dDevice = d3d12RenderDevice->GetD3D12Device();
 
-	d3d12RenderDevice->GetD3D12Device()->CreateCommandList(0, d3dc12CommandListType, m_d3d12CommandAllocator, nullptr, IID_PPV_ARGS(&m_d3d12GraphicsCommandList));
+	d3dDevice->CreateCommandAllocator(d3d12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator));
+
+	d3dDevice->CreateCommandList(0, d3d12CommandListType, m_d3d12CommandAllocator, nullptr, IID_PPV_ARGS(&m_d3d12GraphicsCommandList));
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12GraphicsCommandList, descriptor.name.c_str());
+
+	m_d3d12GraphicsCommandList->QueryInterface(IID_PPV_ARGS(&m_d3d12GraphicsCommandList7));
 
 	m_d3d12GraphicsCommandList->Close();
 
@@ -69,7 +73,7 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 	}
 }
 
-void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
+void CrCommandBufferD3D12::ProcessLegacyTextureAndBufferBarriers
 (
 	const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
 	const CrRenderPassDescriptor::TextureTransitionVector& textures, 
@@ -84,28 +88,79 @@ void CrCommandBufferD3D12::ProcessTextureAndBufferBarriers
 		textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-		textureBarrier.Transition.StateBefore = crd3d::GetTextureState(descriptor.sourceState);
-		textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(descriptor.destinationState);
+		textureBarrier.Transition.StateBefore = crd3d::GetD3D12LegacyResourceState(descriptor.sourceState);
+		textureBarrier.Transition.StateAfter  = crd3d::GetD3D12LegacyResourceState(descriptor.destinationState);
+		CrAssertMsg(textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter, "States cannot be the same");
 
-		if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
-		{
-			unsigned int planeSlice = descriptor.texturePlane == cr3d::TexturePlane::Stencil ? 1 : 0;
+		// TODO Handle subresource transitions
+		unsigned int planeSlice = descriptor.texturePlane == cr3d::TexturePlane::Stencil ? 1 : 0;
 
-			textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-			(
-				descriptor.mipmapStart, descriptor.sliceStart, planeSlice,
-				d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
-			);
+		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
+		(
+			descriptor.mipmapStart, descriptor.sliceStart, planeSlice,
+			d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
+		);
 
-			resourceBarriers.push_back(textureBarrier);
-		}
+		resourceBarriers.push_back(textureBarrier);
 	}
 
 	// TODO Handle buffer transitions
 	unused_parameter(buffers);
 }
 
-void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
+void CrCommandBufferD3D12::ProcessTextureBarriers
+(
+	const CrRenderPassDescriptor::TextureTransitionVector& textures,
+	CrTextureBarrierVectorD3D12& d3d12TextureBarriers
+)
+{
+	for (const CrRenderPassTextureDescriptor& descriptor : textures)
+	{
+		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(descriptor.texture);
+
+		crd3d::TextureBarrierInfoD3D12 sourceTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(descriptor.sourceState);
+		crd3d::TextureBarrierInfoD3D12 destinationTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(descriptor.destinationState);
+
+		D3D12_TEXTURE_BARRIER& d3d12TextureBarrier = d3d12TextureBarriers.push_back_uninitialized();
+		d3d12TextureBarrier.SyncBefore                        = sourceTextureBarrierInfo.sync;
+		d3d12TextureBarrier.SyncAfter                         = destinationTextureBarrierInfo.sync;
+		d3d12TextureBarrier.AccessBefore                      = sourceTextureBarrierInfo.access;
+		d3d12TextureBarrier.AccessAfter                       = destinationTextureBarrierInfo.access;
+		d3d12TextureBarrier.LayoutBefore                      = crd3d::GetD3D12BarrierTextureLayout(descriptor.sourceState.layout);
+		d3d12TextureBarrier.LayoutAfter                       = crd3d::GetD3D12BarrierTextureLayout(descriptor.destinationState.layout);
+		d3d12TextureBarrier.pResource                         = d3d12Texture->GetD3D12Resource();
+		d3d12TextureBarrier.Subresources.IndexOrFirstMipLevel = descriptor.mipmapStart;
+		d3d12TextureBarrier.Subresources.NumMipLevels         = descriptor.mipmapCount;
+		d3d12TextureBarrier.Subresources.FirstArraySlice      = descriptor.sliceStart;
+		d3d12TextureBarrier.Subresources.NumArraySlices       = descriptor.sliceCount;
+		d3d12TextureBarrier.Subresources.FirstPlane           = descriptor.texturePlane;
+		d3d12TextureBarrier.Subresources.NumPlanes            = 1;
+		d3d12TextureBarrier.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
+		CrAssertMsg(d3d12TextureBarrier.LayoutBefore != d3d12TextureBarrier.LayoutAfter, "Layouts cannot be the same");
+	}
+}
+
+void CrCommandBufferD3D12::ProcessBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers)
+{
+	for (const CrRenderPassBufferDescriptor& descriptor : buffers)
+	{
+		const CrHardwareGPUBufferD3D12* d3d12Buffer = static_cast<const CrHardwareGPUBufferD3D12*>(descriptor.hardwareBuffer);
+
+		crd3d::BufferBarrierInfoD3D12 sourceBufferBarrierInfo = crd3d::GetD3D12BufferBarrierInfo(descriptor.sourceState, descriptor.sourceShaderStages);
+		crd3d::BufferBarrierInfoD3D12 destinationBufferBarrierInfo = crd3d::GetD3D12BufferBarrierInfo(descriptor.destinationState, descriptor.destinationShaderStages);
+
+		D3D12_BUFFER_BARRIER& d3d12BufferBarrier = d3d12BufferBarriers.push_back_uninitialized();
+		d3d12BufferBarrier.SyncBefore   = sourceBufferBarrierInfo.sync;
+		d3d12BufferBarrier.SyncAfter    = destinationBufferBarrierInfo.sync;
+		d3d12BufferBarrier.AccessBefore = sourceBufferBarrierInfo.access;
+		d3d12BufferBarrier.AccessAfter  = destinationBufferBarrierInfo.access;
+		d3d12BufferBarrier.pResource    = d3d12Buffer->GetD3D12Resource();
+		d3d12BufferBarrier.Offset       = 0;
+		d3d12BufferBarrier.Size         = d3d12Buffer->GetSizeBytes();
+	}
+}
+
+void CrCommandBufferD3D12::ProcessLegacyRenderTargetBarrier(
 	const CrRenderTargetDescriptor& renderTargetDescriptor, 
 	const cr3d::TextureState& initialState,
 	const cr3d::TextureState& finalState,
@@ -119,8 +174,8 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-	textureBarrier.Transition.StateBefore = crd3d::GetTextureState(initialState);
-	textureBarrier.Transition.StateAfter  = crd3d::GetTextureState(finalState);
+	textureBarrier.Transition.StateBefore = crd3d::GetD3D12LegacyResourceState(initialState);
+	textureBarrier.Transition.StateAfter  = crd3d::GetD3D12LegacyResourceState(finalState);
 
 #if defined(COMMAND_BUFFER_VALIDATION)
 	if (finalState.layout != cr3d::TextureLayout::Present)
@@ -129,42 +184,124 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier(
 	}
 #endif
 
-	if (textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter)
-	{
-		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-		(
-			renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
-			d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
-		);
+	CrAssertMsg(textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter, "States cannot be the same");
 
-		resourceBarriers.push_back(textureBarrier);
-	}
+	textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
+	(
+		renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
+		d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
+	);
+
+	resourceBarriers.push_back(textureBarrier);
+}
+
+void CrCommandBufferD3D12::ProcessRenderTargetBarrier
+(
+	const CrRenderTargetDescriptor& renderTargetDescriptor,
+	const cr3d::TextureState& initialState,
+	const cr3d::TextureState& finalState,
+	CrTextureBarrierVectorD3D12& d3d12TextureBarriers
+)
+{
+	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
+
+	crd3d::TextureBarrierInfoD3D12 sourceTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(initialState);
+	crd3d::TextureBarrierInfoD3D12 destinationTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(finalState);
+
+	D3D12_TEXTURE_BARRIER d3d12TextureBarrier = {};
+	d3d12TextureBarrier.SyncBefore                        = sourceTextureBarrierInfo.sync;
+	d3d12TextureBarrier.SyncAfter                         = destinationTextureBarrierInfo.sync;
+	d3d12TextureBarrier.AccessBefore                      = sourceTextureBarrierInfo.access;
+	d3d12TextureBarrier.AccessAfter                       = destinationTextureBarrierInfo.access;
+	d3d12TextureBarrier.LayoutBefore                      = crd3d::GetD3D12BarrierTextureLayout(initialState.layout);
+	d3d12TextureBarrier.LayoutAfter                       = crd3d::GetD3D12BarrierTextureLayout(finalState.layout);
+	d3d12TextureBarrier.pResource                         = d3d12Texture->GetD3D12Resource();
+	d3d12TextureBarrier.Subresources.IndexOrFirstMipLevel = renderTargetDescriptor.mipmap;
+	d3d12TextureBarrier.Subresources.NumMipLevels         = 1;
+	d3d12TextureBarrier.Subresources.FirstArraySlice      = renderTargetDescriptor.slice;
+	d3d12TextureBarrier.Subresources.NumArraySlices       = 1;
+	d3d12TextureBarrier.Subresources.FirstPlane           = 0;
+	d3d12TextureBarrier.Subresources.NumPlanes            = 1;
+	d3d12TextureBarrier.Flags                             = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
+	CrAssertMsg(d3d12TextureBarrier.LayoutBefore != d3d12TextureBarrier.LayoutAfter, "Layouts cannot be the same");
+
+	d3d12TextureBarriers.push_back(d3d12TextureBarrier);
 }
 
 void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
 	CrBarrierVectorD3D12 resourceBarriers;
+	CrTextureBarrierVectorD3D12 textureBarriers;
+	CrBufferBarrierVectorD3D12 bufferBarriers;
 
-	ProcessTextureAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures, resourceBarriers);
-
-	for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
-	{
-		if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
-		{
-			ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, resourceBarriers);
-		}
-	}
+	bool enhancedBarriersSupported = static_cast<CrRenderDeviceD3D12*>(m_renderDevice)->GetIsEnhancedBarriersSupported();
 
 	const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
-	if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
+	if (enhancedBarriersSupported)
 	{
-		ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, resourceBarriers);
-	}
+		ProcessTextureBarriers(renderPassDescriptor.beginTextures, textureBarriers);
 
-	if (resourceBarriers.size() > 0)
+		ProcessBufferBarriers(renderPassDescriptor.beginBuffers, bufferBarriers);
+
+		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+		{
+			if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
+			{
+				ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, textureBarriers);
+			}
+		}
+
+		if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
+		{
+			ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, textureBarriers);
+		}
+
+		crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
+		size_t barrierGroupCount = 0;
+
+		if (textureBarriers.size() > 0)
+		{
+			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
+			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
+			barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
+			barrierGroupCount++;
+		}
+
+		if (bufferBarriers.size() > 0)
+		{
+			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
+			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
+			barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
+			barrierGroupCount++;
+		}
+
+		if (barrierGroupCount)
+		{
+			m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
+		}
+	}
+	else
 	{
-		m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
+		ProcessLegacyTextureAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures, resourceBarriers);
+
+		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+		{
+			if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
+			{
+				ProcessLegacyRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, resourceBarriers);
+			}
+		}
+
+		if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
+		{
+			ProcessLegacyRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, resourceBarriers);
+		}
+
+		if (resourceBarriers.size() > 0)
+		{
+			m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
+		}
 	}
 
 	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
@@ -225,33 +362,88 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 void CrCommandBufferD3D12::EndRenderPassPS()
 {
 	CrBarrierVectorD3D12 resourceBarriers;
+	CrTextureBarrierVectorD3D12 textureBarriers;
+	CrBufferBarrierVectorD3D12 bufferBarriers;
 	const CrRenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
+
+	bool enhancedBarriersEnabled = static_cast<CrRenderDeviceD3D12*>(m_renderDevice)->GetIsEnhancedBarriersSupported();
 
 	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
 	{
 		m_d3d12GraphicsCommandList->EndRenderPass();
 
-		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
-		{
-			if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
-			{
-				ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, resourceBarriers);
-			}
-		}
-
 		const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
-		if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
+		if (enhancedBarriersEnabled)
 		{
-			ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, resourceBarriers);
+			for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+			{
+				if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
+				{
+					ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, textureBarriers);
+				}
+			}
+
+			if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
+			{
+				ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, textureBarriers);
+			}
+		}
+		else
+		{
+			for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+			{
+				if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
+				{
+					ProcessLegacyRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, resourceBarriers);
+				}
+			}
+
+			if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
+			{
+				ProcessLegacyRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, resourceBarriers);
+			}
 		}
 	}
 
-	ProcessTextureAndBufferBarriers(renderPassDescriptor.endBuffers, renderPassDescriptor.endTextures, resourceBarriers);
-
-	if (resourceBarriers.size() > 0)
+	if (enhancedBarriersEnabled)
 	{
-		m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
+		ProcessTextureBarriers(renderPassDescriptor.endTextures, textureBarriers);
+
+		ProcessBufferBarriers(renderPassDescriptor.endBuffers, bufferBarriers);
+
+		crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
+		size_t barrierGroupCount = 0;
+
+		if (textureBarriers.size() > 0)
+		{
+			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
+			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
+			barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
+			barrierGroupCount++;
+		}
+
+		if (bufferBarriers.size() > 0)
+		{
+			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
+			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
+			barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
+			barrierGroupCount++;
+		}
+
+		if (barrierGroupCount)
+		{
+			m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
+		}
+	}
+	else
+	{
+		ProcessLegacyTextureAndBufferBarriers(renderPassDescriptor.endBuffers, renderPassDescriptor.endTextures, resourceBarriers);
+
+		if (resourceBarriers.size() > 0)
+		{
+			m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
+		}
 	}
 }
 

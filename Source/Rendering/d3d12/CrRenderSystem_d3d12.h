@@ -12,8 +12,6 @@ public:
 
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const override;
 
-	IDXGIFactory1* GetDXGIFactory1() const { return m_dxgiFactory1; }
-
 	IDXGIFactory4* GetDXGIFactory4() const { return m_dxgiFactory4; }
 
 	IDXGIFactory6* GetDXGIFactory6() const { return m_dxgiFactory6; }
@@ -23,8 +21,6 @@ public:
 private:
 
 	ID3D12Debug* m_d3d12DebugController;
-
-	IDXGIFactory1* m_dxgiFactory1 = nullptr;
 
 	IDXGIFactory4* m_dxgiFactory4 = nullptr;
 

@@ -32,11 +32,25 @@ extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\
 
 #endif
 
+// Good documentation regarding how to create the device can be found here
+// https://walbourn.github.io/anatomy-of-direct3d-12-create-device/
+
+const char* GetD3DFeatureLevelString(D3D_FEATURE_LEVEL featureLevel)
+{
+	switch (featureLevel)
+	{
+		case D3D_FEATURE_LEVEL_12_0: return "12.0";
+		case D3D_FEATURE_LEVEL_12_1: return "12.1";
+		case D3D_FEATURE_LEVEL_12_2: return "12.2";
+		default: return "";
+	}
+}
+
 CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 {
 	const CrRenderSystemD3D12* d3d12RenderSystem = static_cast<const CrRenderSystemD3D12*>(renderSystem);
-	IDXGIFactory1* dxgiFactory = d3d12RenderSystem->GetDXGIFactory1();
-
+	IDXGIFactory4* dxgiFactory4 = d3d12RenderSystem->GetDXGIFactory4();
+	
 	struct PriorityKey
 	{
 		uint64_t deviceMemory = 0;
@@ -64,7 +78,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 	IDXGIAdapter2* dxgiAdapter2 = nullptr;
 	IDXGIAdapter4* dxgiAdapter4 = nullptr;
 
-	for(UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
+	for(UINT i = 0; dxgiFactory4->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
 	{
 		// Provide a union here as they are incremental
 		union
@@ -128,32 +142,39 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	HRESULT hResult = S_OK;
 
-	struct FeatureLevelString
+	if (D3D12CreateDevice(m_dxgiAdapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_d3d12Device)) != S_OK)
 	{
-		D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_1_0_CORE;
-		const char* version = nullptr;
-	};
-
-	// We'll try the higher first, then go down the list
-	FeatureLevelString featureLevels[] =
-	{
-		{ D3D_FEATURE_LEVEL_12_2, "12.2" },
-		{ D3D_FEATURE_LEVEL_12_1, "12.1" },
-		{ D3D_FEATURE_LEVEL_12_0, "12.0" }
-	};
-
-	FeatureLevelString selectedFeatureLevel = {};
-
-	for (uint32_t i = 0; i < sizeof_array(featureLevels); ++i)
-	{
-		if (D3D12CreateDevice(m_dxgiAdapter, featureLevels[i].level, IID_PPV_ARGS(&m_d3d12Device)) == S_OK)
-		{
-			selectedFeatureLevel = featureLevels[i];
-			break;
-		}
+		CrAssertMsg(false, "Unable to create device");
 	}
 
 	CrAssertMsg(m_d3d12Device != nullptr, "Error creating D3D12 device");
+
+	D3D_FEATURE_LEVEL supportedFeatureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_12_2,
+		D3D_FEATURE_LEVEL_12_1,
+		D3D_FEATURE_LEVEL_12_0
+	};
+
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device1));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device2));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device3));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device4));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device5));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device6));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device7));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device8));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device9));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device10));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device11));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device12));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device13));
+	m_d3d12Device->QueryInterface(IID_PPV_ARGS(&m_d3d12Device14));
+
+	D3D12_FEATURE_DATA_FEATURE_LEVELS featureLevels = {};
+	featureLevels.NumFeatureLevels = (UINT)crstl::array_size(supportedFeatureLevels);
+	featureLevels.pFeatureLevelsRequested = supportedFeatureLevels;
+	m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featureLevels, sizeof(featureLevels));
 
 #if defined(USE_AGILITY_SDK)
 
@@ -175,7 +196,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	// Parse render device properties
 	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
-	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", cr3d::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), selectedFeatureLevel.version);
+	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", cr3d::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), GetD3DFeatureLevelString(featureLevels.MaxSupportedFeatureLevel));
 
 #if defined(USE_AGILITY_SDK)
 	if (usingAgility)
@@ -537,11 +558,38 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Transition.pResource = d3d12DestinationTexture->GetD3D12Resource();
-		barrier.Transition.StateBefore = d3d12DestinationTexture->GetDefaultResourceState();
+		barrier.Transition.StateBefore = d3d12DestinationTexture->GetD3D12DefaultLegacyResourceState();
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+		D3D12_TEXTURE_BARRIER d3d12TextureBarrier;
+		d3d12TextureBarrier.SyncBefore                        = D3D12_BARRIER_SYNC_NONE;
+		d3d12TextureBarrier.SyncAfter                         = D3D12_BARRIER_SYNC_COPY;
+		d3d12TextureBarrier.AccessBefore                      = D3D12_BARRIER_ACCESS_NO_ACCESS;
+		d3d12TextureBarrier.AccessAfter                       = D3D12_BARRIER_ACCESS_COPY_DEST;
+		d3d12TextureBarrier.LayoutBefore                      = D3D12_BARRIER_LAYOUT_UNDEFINED;
+		d3d12TextureBarrier.LayoutAfter                       = D3D12_BARRIER_LAYOUT_COPY_DEST;
+		d3d12TextureBarrier.pResource                         = d3d12DestinationTexture->GetD3D12Resource();
+		d3d12TextureBarrier.Subresources.IndexOrFirstMipLevel = 0;
+		d3d12TextureBarrier.Subresources.NumMipLevels         = d3d12DestinationTexture->GetMipmapCount();
+		d3d12TextureBarrier.Subresources.FirstArraySlice      = 0;
+		d3d12TextureBarrier.Subresources.NumArraySlices       = d3d12DestinationTexture->GetSliceCount();
+		d3d12TextureBarrier.Subresources.FirstPlane           = 0;
+		d3d12TextureBarrier.Subresources.NumPlanes            = 1;
+		d3d12TextureBarrier.Flags                             = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
+
+		if (m_enhancedBarriersSupported)
+		{
+			D3D12_BARRIER_GROUP textureBarrierGroup;
+			textureBarrierGroup.Type = D3D12_BARRIER_TYPE_TEXTURE;
+			textureBarrierGroup.NumBarriers = 1;
+			textureBarrierGroup.pTextureBarriers = &d3d12TextureBarrier;
+			d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &textureBarrierGroup);
+		}
+		else
+		{
+			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+		}
 
 		cr3d::DataFormat::T format = destinationTexture->GetFormat();
 
@@ -573,10 +621,28 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 			}
 		}
 
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = d3d12DestinationTexture->GetDefaultResourceState();
+		if (m_enhancedBarriersSupported)
+		{
+			d3d12TextureBarrier.SyncBefore   = D3D12_BARRIER_SYNC_COPY;
+			d3d12TextureBarrier.SyncAfter    = D3D12_BARRIER_SYNC_ALL;
+			d3d12TextureBarrier.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST;
+			d3d12TextureBarrier.AccessAfter  = D3D12_BARRIER_ACCESS_COMMON;
+			d3d12TextureBarrier.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_DEST;
+			d3d12TextureBarrier.LayoutAfter  = d3d12DestinationTexture->GetD3D12DefaultTextureLayout();
 
-		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+			D3D12_BARRIER_GROUP textureBarrierGroup;
+			textureBarrierGroup.Type = D3D12_BARRIER_TYPE_TEXTURE;
+			textureBarrierGroup.NumBarriers = 1;
+			textureBarrierGroup.pTextureBarriers = &d3d12TextureBarrier;
+
+			d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &textureBarrierGroup);
+		}
+		else
+		{
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			barrier.Transition.StateAfter = d3d12DestinationTexture->GetD3D12DefaultLegacyResourceState();
+			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+		}
 	}
 
 	m_openTextureUploads.erase(textureUploadIter);

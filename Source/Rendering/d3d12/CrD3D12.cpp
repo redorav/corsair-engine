@@ -427,28 +427,15 @@ D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(CrRenderTar
 	}
 }
 
-D3D12_RESOURCE_STATES crd3d::GetTextureState(const cr3d::TextureState& textureState)
+D3D12_RESOURCE_STATES crd3d::GetD3D12LegacyResourceState(const cr3d::TextureState& textureState)
 {
 	switch (textureState.layout)
 	{
 		case cr3d::TextureLayout::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
 		case cr3d::TextureLayout::ShaderInput:
 		{
-			D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COMMON;
-
-			// If the pixel shader is using the resource
-			if (textureState.stages & cr3d::ShaderStageFlags::Pixel)
-			{
-				resourceState |= D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-			}
-
-			// If any other stages are using the resource
-			if ((textureState.stages & ~cr3d::ShaderStageFlags::Pixel) != 0)
-			{
-				resourceState |= D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			}
-
-			return resourceState;
+			// Simplify by always specifying both. This is deprecated anyway so we don't care too much
+			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		}
 		case cr3d::TextureLayout::RenderTarget:          return D3D12_RESOURCE_STATE_RENDER_TARGET;
 		case cr3d::TextureLayout::RWTexture:             return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -461,6 +448,160 @@ D3D12_RESOURCE_STATES crd3d::GetTextureState(const cr3d::TextureState& textureSt
 		case cr3d::TextureLayout::StencilWriteDepthReadOnly: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
 		case cr3d::TextureLayout::DepthWriteStencilReadOnly: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
 		case cr3d::TextureLayout::DepthStencilReadOnly:      return D3D12_RESOURCE_STATE_DEPTH_READ;
-		default: return D3D12_RESOURCE_STATE_COMMON;
+		default:
+			CrAssertMsg(false, "Unhandled texture layout");
+			return D3D12_RESOURCE_STATE_COMMON;
+	}
+}
+
+D3D12_BARRIER_SYNC GetD3D12BarrierShaderSyncFlags(cr3d::ShaderStageFlags::T stages)
+{
+	D3D12_BARRIER_SYNC barrierSync = D3D12_BARRIER_SYNC_NONE;
+
+	if (stages & (cr3d::ShaderStageFlags::Vertex | cr3d::ShaderStageFlags::Geometry | cr3d::ShaderStageFlags::Hull | cr3d::ShaderStageFlags::Domain))
+	{
+		barrierSync |= D3D12_BARRIER_SYNC_VERTEX_SHADING;
+	}
+
+	if (stages & cr3d::ShaderStageFlags::Pixel)
+	{
+		barrierSync |= D3D12_BARRIER_SYNC_PIXEL_SHADING;
+	}
+
+	if (stages & cr3d::ShaderStageFlags::Compute)
+	{
+		barrierSync |= D3D12_BARRIER_SYNC_COMPUTE_SHADING;
+	}
+
+	return barrierSync;
+}
+
+crd3d::TextureBarrierInfoD3D12 crd3d::GetD3D12TextureBarrierInfo(const cr3d::TextureState& textureState)
+{
+	crd3d::TextureBarrierInfoD3D12 textureBarrierInfo;
+	textureBarrierInfo.sync = D3D12_BARRIER_SYNC_NONE;
+	textureBarrierInfo.access = D3D12_BARRIER_ACCESS_COMMON;
+
+	switch (textureState.layout)
+	{
+		case cr3d::TextureLayout::RenderTarget:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_RENDER_TARGET;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_RENDER_TARGET;
+			break;
+		}
+		case cr3d::TextureLayout::DepthStencilReadWrite:
+		case cr3d::TextureLayout::DepthStencilWrite:
+		case cr3d::TextureLayout::StencilWriteDepthReadOnly:
+		case cr3d::TextureLayout::DepthWriteStencilReadOnly:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_DEPTH_STENCIL;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE;
+			break;
+		}
+		case cr3d::TextureLayout::DepthStencilReadOnly:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_DEPTH_STENCIL;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ;
+			break;
+		}
+		case cr3d::TextureLayout::ShaderInput:
+		{
+			textureBarrierInfo.sync |= GetD3D12BarrierShaderSyncFlags(textureState.stages);
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_SHADER_RESOURCE;
+			break;
+		}
+		case cr3d::TextureLayout::RWTexture:
+		{
+			textureBarrierInfo.sync |= GetD3D12BarrierShaderSyncFlags(textureState.stages);
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_UNORDERED_ACCESS;
+			break;
+		}
+		case cr3d::TextureLayout::CopySource:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_COPY;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_COPY_SOURCE;
+			break;
+		}
+		case cr3d::TextureLayout::CopyDestination:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_COPY;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_COPY_DEST;
+			break;
+		}
+		case cr3d::TextureLayout::Present:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_ALL;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_COMMON;
+			break;
+		}
+		default:
+			CrAssertMsg(false, "Unhandled texture state");
+			break;
+	}
+
+	return textureBarrierInfo;
+}
+
+crd3d::BufferBarrierInfoD3D12 crd3d::GetD3D12BufferBarrierInfo(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages)
+{
+	crd3d::BufferBarrierInfoD3D12 bufferBarrierInfo;
+
+	switch (bufferState)
+	{
+		case cr3d::BufferState::ShaderInput:
+			bufferBarrierInfo.sync = GetD3D12BarrierShaderSyncFlags(shaderStages);
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_SHADER_RESOURCE;
+			break;
+		case cr3d::BufferState::ReadWrite:
+			bufferBarrierInfo.sync = GetD3D12BarrierShaderSyncFlags(shaderStages);
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_UNORDERED_ACCESS;
+			break;
+		case cr3d::BufferState::CopySource:
+			bufferBarrierInfo.sync = D3D12_BARRIER_SYNC_COPY;
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_COPY_SOURCE;
+			break;
+		case cr3d::BufferState::CopyDestination:
+			bufferBarrierInfo.sync = D3D12_BARRIER_SYNC_COPY;
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_COPY_DEST;
+			break;
+		case cr3d::BufferState::IndirectArgument:
+			bufferBarrierInfo.sync = D3D12_BARRIER_SYNC_EXECUTE_INDIRECT;
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_INDIRECT_ARGUMENT;
+			break;
+		case cr3d::BufferState::Undefined:
+			bufferBarrierInfo.sync = D3D12_BARRIER_SYNC_NONE;
+			bufferBarrierInfo.access = D3D12_BARRIER_ACCESS_NO_ACCESS;
+			break;
+		default:
+			CrAssertMsg(false, "Unhandled buffer state");
+			break;
+	}
+
+	return bufferBarrierInfo;
+}
+
+D3D12_BARRIER_LAYOUT crd3d::GetD3D12BarrierTextureLayout(const cr3d::TextureLayout::T textureLayout)
+{
+	switch (textureLayout)
+	{
+		case cr3d::TextureLayout::ShaderInput:
+			return D3D12_BARRIER_LAYOUT_SHADER_RESOURCE;
+		case cr3d::TextureLayout::RenderTarget:
+			return D3D12_BARRIER_LAYOUT_RENDER_TARGET;
+		case cr3d::TextureLayout::RWTexture:
+			return D3D12_BARRIER_LAYOUT_UNORDERED_ACCESS;
+		case cr3d::TextureLayout::Present:
+			return D3D12_BARRIER_LAYOUT_PRESENT;
+		case cr3d::TextureLayout::CopySource:
+			return D3D12_BARRIER_LAYOUT_COPY_SOURCE;
+		case cr3d::TextureLayout::CopyDestination:
+			return D3D12_BARRIER_LAYOUT_COPY_DEST;
+		case cr3d::TextureLayout::DepthStencilReadWrite:
+		case cr3d::TextureLayout::DepthStencilWrite:
+			return D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE;
+		default:
+			CrAssertMsg(false, "Unhandled texture layout");
+			return D3D12_BARRIER_LAYOUT_COMMON;
 	}
 }

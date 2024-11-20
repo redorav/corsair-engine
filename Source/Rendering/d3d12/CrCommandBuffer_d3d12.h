@@ -12,6 +12,8 @@
 class CrTextureD3D12;
 
 typedef CrFixedVector<D3D12_RESOURCE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrBarrierVectorD3D12;
+typedef CrFixedVector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrTextureBarrierVectorD3D12;
+typedef CrFixedVector<D3D12_BUFFER_BARRIER, CrRenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
 
 class CrCommandBufferD3D12 final : public ICrCommandBuffer
 {
@@ -20,6 +22,8 @@ public:
 	CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor);
 
 	ID3D12GraphicsCommandList4* GetD3D12CommandList() const { return m_d3d12GraphicsCommandList; }
+
+	ID3D12GraphicsCommandList7* GetD3D12CommandList7() const { return m_d3d12GraphicsCommandList7; }
 
 private:
 
@@ -63,19 +67,31 @@ private:
 
 	virtual void EndRenderPassPS() override;
 
-	void ProcessTextureAndBufferBarriers
+	void ProcessLegacyTextureAndBufferBarriers
 	(
 		const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
 		const CrRenderPassDescriptor::TextureTransitionVector& textures,
 		CrBarrierVectorD3D12& transitions
 	);
 
-	void ProcessRenderTargetBarrier
+	void ProcessTextureBarriers(const CrRenderPassDescriptor::TextureTransitionVector& textures, CrTextureBarrierVectorD3D12& d3d12TextureBarriers);
+
+	void ProcessBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers);
+
+	void ProcessLegacyRenderTargetBarrier
 	(
 		const CrRenderTargetDescriptor& renderTargetDescriptor, 
 		const cr3d::TextureState& initialState,
 		const cr3d::TextureState& finalState,
 		CrBarrierVectorD3D12& resourceBarriers
+	);
+
+	void ProcessRenderTargetBarrier
+	(
+		const CrRenderTargetDescriptor& renderTargetDescriptor,
+		const cr3d::TextureState& initialState,
+		const cr3d::TextureState& finalState,
+		CrTextureBarrierVectorD3D12& textureBarriers
 	);
 
 	void WriteCBV(const CrConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
@@ -107,6 +123,8 @@ private:
 	ID3D12CommandAllocator* m_d3d12CommandAllocator;
 
 	ID3D12GraphicsCommandList4* m_d3d12GraphicsCommandList;
+
+	ID3D12GraphicsCommandList7* m_d3d12GraphicsCommandList7;
 };
 
 inline void CrCommandBufferD3D12::DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)

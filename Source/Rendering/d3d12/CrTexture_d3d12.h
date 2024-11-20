@@ -48,7 +48,9 @@ public:
 
 	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
 
-	D3D12_RESOURCE_STATES GetDefaultResourceState() const { return m_d3d12InitialState; }
+	D3D12_RESOURCE_STATES GetD3D12DefaultLegacyResourceState() const { return m_d3d12LegacyInitialState; }
+
+	D3D12_BARRIER_LAYOUT GetD3D12DefaultTextureLayout() const { return m_d3d12InitialLayout; }
 
 	const D3D12_SHADER_RESOURCE_VIEW_DESC& GetD3D12SRVDescriptor() const { return m_d3d12SRVDescriptor; }
 
@@ -67,7 +69,8 @@ private:
 
 	uint32_t m_d3d12SubresourceCount;
 
-	D3D12_RESOURCE_STATES m_d3d12InitialState;
+	D3D12_RESOURCE_STATES m_d3d12LegacyInitialState;
+	D3D12_BARRIER_LAYOUT m_d3d12InitialLayout;
 
 	ID3D12Resource* m_d3d12Resource = nullptr;
 };

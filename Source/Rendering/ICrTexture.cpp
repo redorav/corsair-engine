@@ -79,11 +79,11 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	// operations if not explicitly declared
 	if (IsRenderTarget())
 	{
-		m_defaultState = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Pixel };
+		m_defaultState = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Unused };
 	}
 	else if (IsDepthStencil())
 	{
-		m_defaultState = { cr3d::TextureLayout::DepthStencilReadWrite, cr3d::ShaderStageFlags::Pixel };
+		m_defaultState = { cr3d::TextureLayout::DepthStencilReadWrite, cr3d::ShaderStageFlags::Unused };
 	}
 	else if (IsUnorderedAccess())
 	{
@@ -91,7 +91,7 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	}
 	else if (IsSwapchain())
 	{
-		m_defaultState = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Present };
+		m_defaultState = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Unused };
 	}
 	else
 	{

@@ -107,7 +107,7 @@ ImguiLibrary =
 {
 	includeDirs = LibImGui..IncludeDirectory,
 	libDirs     = LibImGui..BinaryDirectory,
-	libNames    = 'ImGui.vs2019.release',
+	libNames    = 'ImGui.vs2022.release',
 	defines = 'IMGUI_DISABLE_OBSOLETE_FUNCTIONS'
 }
 

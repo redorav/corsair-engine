@@ -5,7 +5,7 @@
 	<dependency name="cgltf" version="2819427"/>
 	<dependency name="dxc" version="1.8.2407"/>
 	<dependency name="eastl" version="db16065"/>
-	<dependency name="imgui" version="ec48681"/>
+	<dependency name="imgui" version="docking_d66f4e5"/>
 	<dependency name="meshoptimizer" version="d89a48a"/>
 	<dependency name="mikktspace" version="3e895b4"/>
 	<dependency name="rapidyaml" version="4a8fb19"/>

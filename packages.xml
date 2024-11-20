@@ -26,6 +26,7 @@
 	</package>
 	
 	<package name="imgui">
+		<version id="docking_d66f4e5" file="imgui_docking_2024_11_20_d66f4e5.7z" repository="github"/>
 		<version id="ec48681" file="imgui_docking_2022_04_24_ec48681.zip" repository="github"/>
 		<version id="58075c4" file="imgui_2021_01_21_58075c4.zip" repository="github"/>
 	</package>

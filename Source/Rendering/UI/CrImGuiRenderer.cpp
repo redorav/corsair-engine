@@ -83,6 +83,8 @@ CrImGuiRenderer& CrImGuiRenderer::Get()
 	return *ImGuiRenderer;
 }
 
+static ImGuiKey s_ImguiKeys[KeyboardKey::Code::Count] = {};
+
 void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 {
 	m_initParams = initParams;
@@ -134,28 +136,28 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 	}
 
 	{
-		io.KeyMap[ImGuiKey_Tab]         = KeyboardKey::Tab;
-		io.KeyMap[ImGuiKey_LeftArrow]   = KeyboardKey::LeftArrow;
-		io.KeyMap[ImGuiKey_RightArrow]  = KeyboardKey::RightArrow;
-		io.KeyMap[ImGuiKey_UpArrow]     = KeyboardKey::UpArrow;
-		io.KeyMap[ImGuiKey_DownArrow]   = KeyboardKey::DownArrow;
-		io.KeyMap[ImGuiKey_PageUp]      = KeyboardKey::PageUp;
-		io.KeyMap[ImGuiKey_PageDown]    = KeyboardKey::PageDown;
-		io.KeyMap[ImGuiKey_Home]        = KeyboardKey::Home;
-		io.KeyMap[ImGuiKey_End]         = KeyboardKey::End;
-		io.KeyMap[ImGuiKey_Insert]      = KeyboardKey::Insert;
-		io.KeyMap[ImGuiKey_Delete]      = KeyboardKey::Delete;
-		io.KeyMap[ImGuiKey_Backspace]   = KeyboardKey::Backspace;
-		io.KeyMap[ImGuiKey_Space]       = KeyboardKey::Space;
-		io.KeyMap[ImGuiKey_Enter]       = KeyboardKey::Intro;
-		io.KeyMap[ImGuiKey_Escape]      = KeyboardKey::Escape;
-		io.KeyMap[ImGuiKey_KeypadEnter] = KeyboardKey::KeypadEnter;
-		io.KeyMap[ImGuiKey_A]           = KeyboardKey::A;
-		io.KeyMap[ImGuiKey_C]           = KeyboardKey::C;
-		io.KeyMap[ImGuiKey_V]           = KeyboardKey::V;
-		io.KeyMap[ImGuiKey_X]           = KeyboardKey::X;
-		io.KeyMap[ImGuiKey_Y]           = KeyboardKey::Y;
-		io.KeyMap[ImGuiKey_Z]           = KeyboardKey::Z;
+		s_ImguiKeys[KeyboardKey::Tab]         = ImGuiKey_Tab;
+		s_ImguiKeys[KeyboardKey::LeftArrow]   = ImGuiKey_LeftArrow;
+		s_ImguiKeys[KeyboardKey::RightArrow]  = ImGuiKey_RightArrow;
+		s_ImguiKeys[KeyboardKey::UpArrow]     = ImGuiKey_UpArrow;
+		s_ImguiKeys[KeyboardKey::DownArrow]   = ImGuiKey_DownArrow;
+		s_ImguiKeys[KeyboardKey::PageUp]      = ImGuiKey_PageUp;
+		s_ImguiKeys[KeyboardKey::PageDown]    = ImGuiKey_PageDown;
+		s_ImguiKeys[KeyboardKey::Home]        = ImGuiKey_Home;
+		s_ImguiKeys[KeyboardKey::End]         = ImGuiKey_End;
+		s_ImguiKeys[KeyboardKey::Insert]      = ImGuiKey_Insert;
+		s_ImguiKeys[KeyboardKey::Delete]      = ImGuiKey_Delete;
+		s_ImguiKeys[KeyboardKey::Backspace]   = ImGuiKey_Backspace;
+		s_ImguiKeys[KeyboardKey::Space]       = ImGuiKey_Space;
+		s_ImguiKeys[KeyboardKey::Intro]       = ImGuiKey_Enter;
+		s_ImguiKeys[KeyboardKey::Escape]      = ImGuiKey_Escape;
+		s_ImguiKeys[KeyboardKey::KeypadEnter] = ImGuiKey_KeypadEnter;
+		s_ImguiKeys[KeyboardKey::A]           = ImGuiKey_A;
+		s_ImguiKeys[KeyboardKey::C]           = ImGuiKey_C;
+		s_ImguiKeys[KeyboardKey::V]           = ImGuiKey_V;
+		s_ImguiKeys[KeyboardKey::X]           = ImGuiKey_X;
+		s_ImguiKeys[KeyboardKey::Y]           = ImGuiKey_Y;
+		s_ImguiKeys[KeyboardKey::Z]           = ImGuiKey_Z;
 	}
 	
 	// Default resolution for the first frame, we need to query the real viewport during NewFrame()
@@ -182,7 +184,8 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 
 	for (uint32_t k = 0; k < KeyboardKey::Count; ++k)
 	{
-		io.KeysDown[k] = keyboardState.keyHeld[k];
+		KeyboardKey::Code key = (KeyboardKey::Code)keyboardState.keyHeld[k];
+		io.KeysData[s_ImguiKeys[key]].Down = true;
 	}
 
 	ImGui::NewFrame();

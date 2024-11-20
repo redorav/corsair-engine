@@ -29,6 +29,10 @@ namespace cr3d
 
 	namespace TexturePlane { enum T : uint32_t; }
 
+	namespace BufferState { enum T : uint32_t; }
+
+	namespace ShaderStageFlags { enum T : uint32_t; }
+
 	enum class AddressMode : uint32_t;
 	enum class BorderColor : uint32_t;
 	enum class BlendFactor : uint32_t;

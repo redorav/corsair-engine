@@ -234,7 +234,7 @@ namespace cr3d
 
 	namespace BufferState
 	{
-		enum T
+		enum T : uint32_t
 		{
 			Undefined,
 			ShaderInput, // StructuredBuffer, Buffer, ByteAddressBuffer

@@ -10,6 +10,8 @@
 #include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrUniquePtr.h"
 
+namespace GBufferDebugMode { enum T : uint32_t; }
+
 class CrFrame
 {
 public:
@@ -56,6 +58,8 @@ private:
 	CrComputePipelineHandle m_mouseSelectionResolvePipeline;
 
 	CrGraphicsPipelineHandle m_directionalLightPipeline;
+
+	CrGraphicsPipelineHandle m_gbufferDebugPipeline;
 
 	CrComputePipelineHandle m_createIndirectArguments;
 
@@ -112,4 +116,8 @@ private:
 
 	// This would need to be buffered to account for multiple threads
 	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;
+
+#if !defined(CR_CONFIG_FINAL)
+	GBufferDebugMode::T m_gbufferDebugMode = (GBufferDebugMode::T)0;
+#endif
 };

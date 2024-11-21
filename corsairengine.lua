@@ -283,8 +283,8 @@ project (ProjectCorsairEngine)
 	LinkLibrary(StbLibrary)
 	LinkLibrary(WuffsLibrary)
 
-	AddLibraryIncludes(SDL2Library)
-	LinkLibrary(SDL2Library)
+	AddLibraryIncludes(SDL3Library)
+	LinkLibrary(SDL3Library)
 	
 	LinkLibrary(EASTLLibrary)
 	
@@ -299,7 +299,7 @@ project (ProjectCorsairEngine)
 	-- Copy necessary files or DLLs
 	postbuildcommands
 	{
-		CopyFileCommand(path.getabsolute(SDL2Library.dlls), '%{cfg.buildtarget.directory}')
+		CopyFileCommand(path.getabsolute(SDL3Library.dlls), '%{cfg.buildtarget.directory}')
 	}
 	
 	filter {}
@@ -507,7 +507,7 @@ project(ProjectCore)
 
 	AddLibraryNatvis(CRSTLLibrary)
 	AddLibraryNatvis(EASTLLibrary)
-	AddLibraryIncludes(SDL2Library)
+	AddLibraryIncludes(SDL3Library)
 
 	ExcludePlatformSpecificCode(SourceCoreDirectory)
 	

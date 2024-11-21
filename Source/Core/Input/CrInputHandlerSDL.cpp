@@ -11,65 +11,65 @@ void CrInputHandlerSDL::HandleEvent(const SDL_Event& event)
 {
 	switch (event.type)
 	{
-		case SDL_KEYDOWN:
+		case SDL_EVENT_KEY_DOWN:
 		{
-			CrInput.OnKeyboardDown(m_keyboardMap[event.key.keysym.scancode]);
+			CrInput.OnKeyboardDown(m_keyboardMap[event.key.scancode]);
 			break;
 		}
-		case SDL_KEYUP:
+		case SDL_EVENT_KEY_UP:
 		{
-			CrInput.OnKeyboardUp(m_keyboardMap[event.key.keysym.scancode]);
+			CrInput.OnKeyboardUp(m_keyboardMap[event.key.scancode]);
 			break;
 		}
-		case SDL_MOUSEBUTTONDOWN:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		{
 			CrInput.OnMouseButtonDown(m_mouseButtonMap[event.button.button]);
 			break;
 		}
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 		{
 			CrInput.OnMouseButtonUp(m_mouseButtonMap[event.button.button]);
 			break;
 		}
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 		{
-			CrInput.OnMouseMove(event.motion.x, event.motion.y);
-			CrInput.OnMouseRelativeMove(event.motion.xrel, event.motion.yrel);
+			CrInput.OnMouseMove((int32_t)event.motion.x, (int32_t)event.motion.y);
+			CrInput.OnMouseRelativeMove((int32_t)event.motion.xrel, (int32_t)event.motion.yrel);
 			break;
 		}
-		case SDL_MOUSEWHEEL:
+		case SDL_EVENT_MOUSE_WHEEL:
 		{
-			CrInput.OnMouseWheel(event.wheel.x, event.wheel.y);
+			CrInput.OnMouseWheel((int32_t)event.wheel.x, (int32_t)event.wheel.y);
 			break;
 		}
-		case SDL_CONTROLLERDEVICEADDED:
+		case SDL_EVENT_GAMEPAD_ADDED:
 		{
-			m_connectedControllers[event.cdevice.which] = SDL_GameControllerOpen(event.cdevice.which);
+			m_connectedControllers[event.cdevice.which] = SDL_OpenGamepad(event.cdevice.which);
 			CrInput.OnControllerConnected(event.cdevice.which);
 			break;
 		}
-		case SDL_CONTROLLERDEVICEREMOVED:
+		case SDL_EVENT_GAMEPAD_REMOVED:
 		{
-			SDL_GameControllerClose(m_connectedControllers[event.cdevice.which]);
+			SDL_CloseGamepad(m_connectedControllers[event.cdevice.which]);
 			CrInput.OnControllerDisconnected(event.cdevice.which);
 			break;
 		}
-		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 		{
-			CrInput.OnGamepadButtonDown(event.cbutton.which, m_controllerButtonMap[event.cbutton.button]);
+			CrInput.OnGamepadButtonDown(event.button.which, m_gamepadButtonMap[event.button.button]);
 			break;
 		}
-		case SDL_CONTROLLERBUTTONUP:
+		case SDL_EVENT_GAMEPAD_BUTTON_UP:
 		{
-			CrInput.OnGamepadButtonUp(event.cbutton.which, m_controllerButtonMap[event.cbutton.button]);
+			CrInput.OnGamepadButtonUp(event.button.which, m_gamepadButtonMap[event.button.button]);
 			break;
 		}
-		case SDL_CONTROLLERAXISMOTION:
+		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
 		{
 			// Normalize the axis value (input range is -32768 to 32767)
-			float axisNormalized = event.caxis.value / (event.caxis.value >= 0 ? 32767.0f : 32768.0f);
+			float axisNormalized = event.gaxis.value / (event.gaxis.value >= 0 ? 32767.0f : 32768.0f);
 
-			GamepadAxis::Code axisCode = m_controllerAxisMap[event.caxis.axis];
+			GamepadAxis::Code axisCode = m_gamepadAxisMap[event.gaxis.axis];
 
 			// Invert to keep it sensible
 			if (axisCode == GamepadAxis::LeftY || axisCode == GamepadAxis::RightY)
@@ -77,7 +77,7 @@ void CrInputHandlerSDL::HandleEvent(const SDL_Event& event)
 				axisNormalized *= -1.0f;
 			}
 
-			CrInput.OnGamepadAxis(event.caxis.which, axisCode, axisNormalized);
+			CrInput.OnGamepadAxis(event.gaxis.which, axisCode, axisNormalized);
 			break;
 		}
 	}
@@ -194,51 +194,51 @@ void CrInputHandlerSDL::SetupSDLInputMappings()
 	m_keyboardMap[SDL_SCANCODE_KP_0]        = KeyboardKey::Keypad0;
 	m_keyboardMap[SDL_SCANCODE_KP_PERIOD]   = KeyboardKey::KeypadPeriod;
 
-	m_keyboardMap[SDL_SCANCODE_LCTRL] = KeyboardKey::LeftCtrl;
+	m_keyboardMap[SDL_SCANCODE_LCTRL]  = KeyboardKey::LeftCtrl;
 	m_keyboardMap[SDL_SCANCODE_LSHIFT] = KeyboardKey::LeftShift;
-	m_keyboardMap[SDL_SCANCODE_LALT] = KeyboardKey::Alt; // Alt, Option
-	m_keyboardMap[SDL_SCANCODE_LGUI] = KeyboardKey::LeftWindowsCmd; // Windows, Command (Apple), meta
-	m_keyboardMap[SDL_SCANCODE_RCTRL] = KeyboardKey::RightCtrl;
+	m_keyboardMap[SDL_SCANCODE_LALT]   = KeyboardKey::Alt; // Alt, Option
+	m_keyboardMap[SDL_SCANCODE_LGUI]   = KeyboardKey::LeftWindowsCmd; // Windows, Command (Apple), meta
+	m_keyboardMap[SDL_SCANCODE_RCTRL]  = KeyboardKey::RightCtrl;
 	m_keyboardMap[SDL_SCANCODE_RSHIFT] = KeyboardKey::RightShift;
-	m_keyboardMap[SDL_SCANCODE_RALT] = KeyboardKey::AltGr; // Alt Gr, Option
-	m_keyboardMap[SDL_SCANCODE_RGUI] = KeyboardKey::RightWindowsCmd; // Windows, Command (Apple), meta
+	m_keyboardMap[SDL_SCANCODE_RALT]   = KeyboardKey::AltGr; // Alt Gr, Option
+	m_keyboardMap[SDL_SCANCODE_RGUI]   = KeyboardKey::RightWindowsCmd; // Windows, Command (Apple), meta
 
 	// Mouse
 
-	m_mouseButtonMap[SDL_BUTTON_LEFT] = MouseButton::Left;
-	m_mouseButtonMap[SDL_BUTTON_RIGHT] = MouseButton::Right;
+	m_mouseButtonMap[SDL_BUTTON_LEFT]   = MouseButton::Left;
+	m_mouseButtonMap[SDL_BUTTON_RIGHT]  = MouseButton::Right;
 	m_mouseButtonMap[SDL_BUTTON_MIDDLE] = MouseButton::Middle;
-	m_mouseButtonMap[SDL_BUTTON_X1] = MouseButton::X1;
-	m_mouseButtonMap[SDL_BUTTON_X2] = MouseButton::X2;
+	m_mouseButtonMap[SDL_BUTTON_X1]     = MouseButton::X1;
+	m_mouseButtonMap[SDL_BUTTON_X2]     = MouseButton::X2;
 
 	// Gamepad
 
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_A] = GamepadButton::A;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_B] = GamepadButton::B;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_X] = GamepadButton::X;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_Y] = GamepadButton::Y;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_BACK] = GamepadButton::Back;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_GUIDE] = GamepadButton::Guide;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_START] = GamepadButton::Start;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_LEFTSTICK] = GamepadButton::LeftStick;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_RIGHTSTICK] = GamepadButton::RightStick;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = GamepadButton::LeftShoulder;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = GamepadButton::RightShoulder;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_DPAD_UP] = GamepadButton::DpadUp;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_DPAD_DOWN] = GamepadButton::DpadDown;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_DPAD_LEFT] = GamepadButton::DpadLeft;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = GamepadButton::DpadRight;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_MISC1] = GamepadButton::Misc1;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_PADDLE1] = GamepadButton::Paddle1;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_PADDLE2] = GamepadButton::Paddle2;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_PADDLE3] = GamepadButton::Paddle3;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_PADDLE4] = GamepadButton::Paddle4;
-	m_controllerButtonMap[SDL_CONTROLLER_BUTTON_TOUCHPAD] = GamepadButton::Touchpad;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_SOUTH]          = GamepadButton::A;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_EAST]           = GamepadButton::B;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_WEST]           = GamepadButton::X;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_NORTH]          = GamepadButton::Y;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_BACK]           = GamepadButton::Back;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_GUIDE]          = GamepadButton::Guide;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_START]          = GamepadButton::Start;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_LEFT_STICK]     = GamepadButton::LeftStick;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_RIGHT_STICK]    = GamepadButton::RightStick;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_LEFT_SHOULDER]  = GamepadButton::LeftShoulder;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER] = GamepadButton::RightShoulder;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_DPAD_UP]        = GamepadButton::DpadUp;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_DPAD_DOWN]      = GamepadButton::DpadDown;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_DPAD_LEFT]      = GamepadButton::DpadLeft;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_DPAD_RIGHT]     = GamepadButton::DpadRight;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_MISC1]          = GamepadButton::Misc1;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_LEFT_PADDLE1]   = GamepadButton::Paddle1;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_LEFT_PADDLE2]   = GamepadButton::Paddle2;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1]  = GamepadButton::Paddle3;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2]  = GamepadButton::Paddle4;
+	m_gamepadButtonMap[SDL_GAMEPAD_BUTTON_TOUCHPAD]       = GamepadButton::Touchpad;
 
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_LEFTX] = GamepadAxis::LeftX;
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_LEFTY] = GamepadAxis::LeftY;
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_RIGHTX] = GamepadAxis::RightX;
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_RIGHTY] = GamepadAxis::RightY;
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_TRIGGERLEFT] = GamepadAxis::LeftTrigger;
-	m_controllerAxisMap[SDL_CONTROLLER_AXIS_TRIGGERRIGHT] = GamepadAxis::RightTrigger;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_LEFTX]         = GamepadAxis::LeftX;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_LEFTY]         = GamepadAxis::LeftY;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_RIGHTX]        = GamepadAxis::RightX;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_RIGHTY]        = GamepadAxis::RightY;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_LEFT_TRIGGER]  = GamepadAxis::LeftTrigger;
+	m_gamepadAxisMap[SDL_GAMEPAD_AXIS_RIGHT_TRIGGER] = GamepadAxis::RightTrigger;
 }

@@ -15,7 +15,7 @@
 
 // TODO SDL-specific
 #include "Core/Input/CrInputHandlerSDL.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "UnitTests/CrCoreUnitTests.h"
 
@@ -24,7 +24,7 @@ uint32_t screenHeight = 720;
 
 int main(int argc, char* argv[])
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
 	{
 		return 1;
 	}
@@ -105,6 +105,15 @@ int main(int argc, char* argv[])
 
 	CrRenderingResources::Get().Initialize(renderDevice.get());
 
+	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
+
+	void* hWnd = mainWindow->GetNativeWindowHandle();
+
+	// HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
+	// Valid for the current executable (not valid for a dll)
+	// http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
+
 	CrFrame frame;
 	frame.Initialize(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
 
@@ -122,41 +131,34 @@ int main(int argc, char* argv[])
 		{
 			switch (event.type)
 			{
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 				{
 					applicationRunning = false;
 					break;
 				}
-				case SDL_WINDOWEVENT:
+				case SDL_EVENT_WINDOW_MINIMIZED: CrLog("Window minimized"); break;
+				case SDL_EVENT_WINDOW_MAXIMIZED: CrLog("Window maximized"); break;
+				case SDL_EVENT_WINDOW_RESTORED: CrLog("Window restored"); break;
+				case SDL_EVENT_WINDOW_RESIZED:
 				{
-					switch (event.window.event)
-					{
-						case SDL_WINDOWEVENT_MINIMIZED: CrLog("Window minimized"); break;
-						case SDL_WINDOWEVENT_MAXIMIZED: CrLog("Window maximized"); break;
-						case SDL_WINDOWEVENT_RESTORED: CrLog("Window restored"); break;
-						case SDL_WINDOWEVENT_RESIZED:
-						{
-							uint32_t width = event.window.data1;
-							uint32_t height = event.window.data2;
-							frame.HandleWindowResize(width, height);
-							CrLog("Window resized");
-							break;
-						}
-						case SDL_WINDOWEVENT_SIZE_CHANGED: CrLog("Window size changed"); break;
-					}
+					uint32_t width = event.window.data1;
+					uint32_t height = event.window.data2;
+					frame.HandleWindowResize(width, height);
+					CrLog("Window resized");
 					break;
 				}
-				case SDL_CONTROLLERDEVICEADDED:
-				case SDL_CONTROLLERDEVICEREMOVED:
-				case SDL_KEYDOWN:
-				case SDL_KEYUP:
-				case SDL_MOUSEBUTTONDOWN:
-				case SDL_MOUSEBUTTONUP:
-				case SDL_MOUSEMOTION:
-				case SDL_MOUSEWHEEL:
-				case SDL_CONTROLLERAXISMOTION:
-				case SDL_CONTROLLERBUTTONDOWN:
-				case SDL_CONTROLLERBUTTONUP:
+				case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: CrLog("Window size changed"); break;
+				case SDL_EVENT_GAMEPAD_ADDED:
+				case SDL_EVENT_GAMEPAD_REMOVED:
+				case SDL_EVENT_KEY_DOWN:
+				case SDL_EVENT_KEY_UP:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				case SDL_EVENT_MOUSE_BUTTON_UP:
+				case SDL_EVENT_MOUSE_MOTION:
+				case SDL_EVENT_MOUSE_WHEEL:
+				case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+				case SDL_EVENT_GAMEPAD_BUTTON_UP:
 				{
 					inputHandler.HandleEvent(event);
 					break;

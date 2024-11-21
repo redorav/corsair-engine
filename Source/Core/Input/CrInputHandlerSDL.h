@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "CrInputManager.h"
 
@@ -18,13 +18,13 @@ private:
 
 	void SetupSDLInputMappings();
 
-	CrArray<SDL_GameController*, CrInputManager::MaxControllers> m_connectedControllers = {};
+	CrArray<SDL_Gamepad*, CrInputManager::MaxControllers> m_connectedControllers = {};
 
-	CrArray<GamepadButton::Code, SDL_CONTROLLER_BUTTON_MAX> m_controllerButtonMap;
+	CrArray<GamepadButton::Code, SDL_GAMEPAD_BUTTON_COUNT> m_gamepadButtonMap;
 
-	CrArray<GamepadAxis::Code, SDL_CONTROLLER_AXIS_MAX> m_controllerAxisMap;
+	CrArray<GamepadAxis::Code, SDL_GAMEPAD_AXIS_COUNT> m_gamepadAxisMap;
 
-	CrArray<KeyboardKey::Code, SDL_NUM_SCANCODES> m_keyboardMap;
+	CrArray<KeyboardKey::Code, SDL_SCANCODE_COUNT> m_keyboardMap;
 
 	CrArray<MouseButton::Code, SDL_BUTTON_X2 + 1> m_mouseButtonMap;
 };

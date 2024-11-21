@@ -19,6 +19,7 @@ LibMikkTSpace         = DependenciesDirectory..'/mikktspace'
 LibRapidYAML          = DependenciesDirectory..'/rapidyaml'
 LibRenderDoc          = DependenciesDirectory..'/renderdoc'
 LibSDL2               = DependenciesDirectory..'/sdl2'
+LibSDL3               = DependenciesDirectory..'/sdl3'
 LibSPIRVReflect       = DependenciesDirectory..'/spirv-reflect'
 LibStb                = DependenciesDirectory..'/stb'
 LibUfbx               = DependenciesDirectory..'/ufbx'
@@ -148,6 +149,15 @@ SDL2Library =
 	libNames    = 'SDL2',
 	defines     = 'SDL_MAIN_HANDLED',
 	dlls        = LibSDL2..BinaryDirectory..'SDL2.dll'
+}
+
+SDL3Library =
+{
+	includeDirs = LibSDL3..IncludeDirectory..'include',
+	libDirs     = LibSDL3..BinaryDirectory,
+	libNames    = 'SDL3',
+	defines     = 'SDL_MAIN_HANDLED',
+	dlls        = LibSDL3..BinaryDirectory..'SDL3.dll'
 }
 
 SPIRVReflectLibrary =

@@ -1,17 +1,22 @@
 #include "ICrOSWindow.h"
 
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_properties.h>
 
 ICrOSWindow::ICrOSWindow(uint32_t width, uint32_t height)
 {
 	m_width = width;
 	m_height = height;
 
-	int windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-
-	// TODO Read title from global
-	m_window = SDL_CreateWindow("Corsair Engine 0.01", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
+	SDL_PropertiesID props = SDL_CreateProperties();
+	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "Corsair Engine 0.01");
+	//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x);
+	//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
+	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+	m_window = SDL_CreateWindowWithProperties(props);
+	SDL_DestroyProperties(props);
 }
 
 ICrOSWindow::~ICrOSWindow()
@@ -26,9 +31,5 @@ bool ICrOSWindow::GetIsMinimized() const
 
 void* ICrOSWindow::GetNativeWindowHandle() const
 {
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(m_window, &info);
-	HWND hwnd = info.info.win.window;
-	return (void*)hwnd;
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(m_window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 }

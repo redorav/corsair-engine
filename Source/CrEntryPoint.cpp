@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
 	while(applicationRunning)
 	{
-		CrInput.Update();
+		CrInput.Reset();
 
 		SDL_Event event;
 

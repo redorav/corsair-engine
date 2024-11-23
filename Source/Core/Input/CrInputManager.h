@@ -162,7 +162,7 @@ public:
 
 	// Relative position values like mouse relative and wheel need to be reset on every update before we process
 	// events, because these don't get 'reset' in any way
-	void Update()
+	void Reset()
 	{
 		m_mouseState.relativePosition.x = 0;
 		m_mouseState.relativePosition.y = 0;

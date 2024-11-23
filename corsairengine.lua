@@ -158,35 +158,33 @@ workspace 'Corsair Engine'
 		GraphicsApis = { GraphicsApiVulkan, GraphicsApiD3D12 }
 		defines
 		{
-			'WINDOWS_PLATFORM',
-			'VULKAN_API', 'VK_USE_PLATFORM_WIN32_KHR',
-			'D3D12_API'
+			'CR_PLATFORM_WINDOWS', 'VULKAN_API', 'D3D12_API'
 		}
 
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
 		architecture 'x64'
-		defines { 'VULKAN_API', 'VK_USE_PLATFORM_MACOS_MVK', 'MAC_PLATFORM' }
+		defines { 'VULKAN_API', 'CR_PLATFORM_MACOS' }
 		
 	--filter { 'platforms:'..VulkanAndroid }
 		--system 'android'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_ANDROID_KHR', 'ANDROID_PLATFORM' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_ANDROID' }
 		
 	--filter { 'platforms:'..VulkanLinux }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_XCB_KHR', 'LINUX_PLATFORM' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_LINUX' }
 		
 	--filter { 'platforms:'..VulkanIOS }
 		--system 'ios'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_IOS_MVK', 'IOS_PLATFORM' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_IOS' }
 		
 	--filter { 'platforms:'..VulkanSwitch }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'VK_USE_PLATFORM_VI_NN', 'SWITCH_PLATFORM' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_SWITCH' }
 		
 	filter {}
 	
@@ -546,6 +544,9 @@ project(ProjectEditor)
 	{
 		SourceEditorDirectory..'/**'
 	}
+	
+	AddLibraryIncludes(SDL3Library)
+	AddLibraryIncludes(ImguiLibrary)
 
 group('.Solution Generation')
 

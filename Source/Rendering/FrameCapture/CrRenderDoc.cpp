@@ -8,13 +8,13 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrFixedPath.h"
 
-#if defined(WINDOWS_PLATFORM)
+#if defined(CR_PLATFORM_WINDOWS)
 #include <shellapi.h>
 #endif
 
 void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
-#if defined(WINDOWS_PLATFORM)
+#if defined(CR_PLATFORM_WINDOWS)
 
 	// Try to load it directly if it's been loaded already. This is the safest option since it means the program
 	// has been launched from the renderdoc interface, and that is the dll we want to use

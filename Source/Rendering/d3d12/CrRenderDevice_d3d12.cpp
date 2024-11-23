@@ -18,7 +18,7 @@
 
 #include "Math/CrMath.h"
 
-#if defined(WINDOWS_PLATFORM)
+#if defined(CR_PLATFORM_WINDOWS)
 #define USE_AGILITY_SDK
 #endif
 

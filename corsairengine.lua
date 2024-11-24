@@ -158,33 +158,33 @@ workspace 'Corsair Engine'
 		GraphicsApis = { GraphicsApiVulkan, GraphicsApiD3D12 }
 		defines
 		{
-			'CR_PLATFORM_WINDOWS', 'VULKAN_API', 'D3D12_API'
+			'CR_PLATFORM_WINDOWS', 'VULKAN_API', 'D3D12_API', 'VK_USE_PLATFORM_WIN32_KHR'
 		}
 
 	filter { 'platforms:'..VulkanOSX }
 		system('macosx')
 		architecture 'x64'
-		defines { 'VULKAN_API', 'CR_PLATFORM_MACOS' }
+		defines { 'VULKAN_API', 'CR_PLATFORM_MACOS', 'VK_USE_PLATFORM_MACOS_MVK' }
 		
 	--filter { 'platforms:'..VulkanAndroid }
 		--system 'android'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'CR_PLATFORM_ANDROID' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_ANDROID', 'VK_USE_PLATFORM_ANDROID_KHR' }
 		
 	--filter { 'platforms:'..VulkanLinux }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'CR_PLATFORM_LINUX' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_LINUX', 'VK_USE_PLATFORM_XCB_KHR' }
 		
 	--filter { 'platforms:'..VulkanIOS }
 		--system 'ios'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'CR_PLATFORM_IOS' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_IOS', 'VK_USE_PLATFORM_IOS_MVK' }
 		
 	--filter { 'platforms:'..VulkanSwitch }
 		--system 'linux'
 		--architecture 'x64'
-		--defines { 'VULKAN_API', 'CR_PLATFORM_SWITCH' }
+		--defines { 'VULKAN_API', 'CR_PLATFORM_SWITCH', 'VK_USE_PLATFORM_VI_NN' }
 		
 	filter {}
 	

@@ -25,35 +25,35 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	VkResult vkResult;
 
 	// Create a surface for the supplied window handle
-#if defined(CR_PLATFORM_WINDOWS)
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
 	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.platformHandle;
 	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.platformWindow;
 	vkResult = vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(CR_PLATFORM_ANDROID)
+#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.platformWindow;
 	vkResult = vkCreateAndroidSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(CR_PLATFORM_LINUX)
+#elif defined(VK_USE_PLATFORM_XCB_KHR)
 	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.connection = connection;
 	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.platformWindow;
 	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.platformHandle;
 	vkResult = vkCreateXcbSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(CR_PLATFORM_SWITCH) // Nintendo Switch
+#elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
 	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
 	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.platformWindow;
 	vkResult = vkCreateViSurfaceNN(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(CR_PLATFORM_MACOS)
+#elif defined(VK_USE_PLATFORM_MACOS_MVK)
 	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
 	vkResult = vkCreateMacOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
-#elif defined(CR_PLATFORM_IOS)
+#elif defined(VK_USE_PLATFORM_IOS_MVK)
 	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
 	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;

@@ -280,7 +280,10 @@ void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 	VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
 
-	VkResult vkResult;
+	VkResult vkResult = VK_SUCCESS;
+
+	m_width = width;
+	m_height = height;
 
 	// Call this function again to silence the validation layer about resolution mismatches. I think it has the values cached and
 	// checks against those, which are the old ones. What we can do is assert that the width and height are not larger

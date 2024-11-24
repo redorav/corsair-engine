@@ -116,6 +116,9 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 {
 	CrAssertMsg(m_d3d12Swapchain != nullptr, "Swapchain must have been previously created");
 
+	m_width = width;
+	m_height = height;
+
 	// Assert that no one else has a reference to the swapchain texture. We cannot resize a swapchain with outstanding references to it
 	// We also release the swapchain resource manually to avoid depending on the deletion queue to resize the swapchain
 	for (uint32_t i = 0; i < m_imageCount; i++)

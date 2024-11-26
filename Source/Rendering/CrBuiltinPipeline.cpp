@@ -76,7 +76,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 
 		CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 
-		CrGraphicsPipelineHandle graphicsPipeline = PipelineStateManager.GetGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
+		CrGraphicsPipelineHandle graphicsPipeline = renderDevice->CreateGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
 
 		m_builtinGraphicsPipelines.insert(finalHash.GetHash(), graphicsPipeline);
@@ -93,19 +93,20 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders:
 	if (pipelineIter != m_builtinComputePipelines.end())
 	{
 		return pipelineIter->second;
-		
 	}
 	else
 	{
-		const CrRenderDeviceProperties& properties = ICrRenderSystem::GetRenderDevice()->GetProperties();
+		ICrRenderDevice* renderDevice = ICrRenderSystem::GetRenderDevice().get();
+
+		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 
 		CrComputeShaderDescriptor computeShaderDescriptor;
 		computeShaderDescriptor.m_debugName = CrBuiltinShaders::GetBuiltinShaderMetadata(computeShaderIndex, properties.graphicsApi).name.c_str();
 		computeShaderDescriptor.m_bytecode = ICrRenderSystem::GetBuiltinShaderBytecode(computeShaderIndex);
 
-		CrComputeShaderHandle shader = ICrRenderSystem::GetRenderDevice()->CreateComputeShader(computeShaderDescriptor);
+		CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
 
-		CrComputePipelineHandle computePipeline = PipelineStateManager.GetComputePipeline(shader);
+		CrComputePipelineHandle computePipeline = renderDevice->CreateComputePipeline(shader);
 		computePipeline->SetComputeShaderIndex(computeShaderIndex);
 
 		m_builtinComputePipelines.insert(hash.GetHash(), computePipeline);

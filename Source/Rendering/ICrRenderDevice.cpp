@@ -104,6 +104,10 @@ void ICrRenderDevice::FinalizeDeletion()
 	// Finalize any resources that are platform-specific, such as custom fences
 	FinalizeDeletionPS();
 
+	m_graphicsPipelines.clear();
+	
+	m_computePipelines.clear();
+
 	// Process any pending transfers
 	m_gpuTransferCallbackQueue->Process();
 	m_gpuTransferCallbackQueue = nullptr;
@@ -152,52 +156,89 @@ CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShader
 
 CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
-	CrTimer pipelineCreationTime;
+	CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 
-	CrGraphicsPipelineHandle pipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+	const CrHash pipelineHash = pipelineDescriptor.ComputeHash();
+	const CrHash graphicsShaderHash = graphicsShader->GetHash();
+	const CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
+
+	const CrHash combinedHash = pipelineHash + graphicsShaderHash + vertexDescriptorHash;
+
+	const auto& pipelineIter = m_graphicsPipelines.find(combinedHash.GetHash());
+
+	CrGraphicsPipelineHandle graphicsPipeline;
+
+	if (pipelineIter != m_graphicsPipelines.end())
+	{
+		graphicsPipeline = pipelineIter->second;
+	}
+	else
+	{
+		CrTimer pipelineCreationTime;
+
+		graphicsPipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
 #if defined(RENDER_DEVICE_LOGS)
-	
-	// Print out a message that includes meaningful information
-	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
-	// Add entry point names
-	CrFixedString128 entryPoints("(");
-	entryPoints.append(bytecodes[0]->GetEntryPoint().c_str());
+		// Print out a message that includes meaningful information
+		const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
-	if (bytecodes.size() > 1)
-	{
-		for (uint32_t i = 1; i < bytecodes.size(); ++i)
+		// Add entry point names
+		CrFixedString128 entryPoints("(");
+		entryPoints.append(bytecodes[0]->GetEntryPoint().c_str());
+
+		if (bytecodes.size() > 1)
 		{
-			entryPoints.append(", ");
-			entryPoints.append(bytecodes[i]->GetEntryPoint().c_str());
+			for (uint32_t i = 1; i < bytecodes.size(); ++i)
+			{
+				entryPoints.append(", ");
+				entryPoints.append(bytecodes[i]->GetEntryPoint().c_str());
+			}
 		}
-	}
 
-	entryPoints.append(")");
+		entryPoints.append(")");
 
-	CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+		CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
 
 #endif
 
-	return pipeline;
+		m_graphicsPipelines.insert(combinedHash.GetHash(), graphicsPipeline); // Insert in the hashmap
+	}
+
+	return graphicsPipeline;
 }
 
 CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeShaderHandle& computeShader)
 {
-	CrTimer pipelineCreationTime;
+	CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
 
-	CrComputePipelineHandle computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
+	const CrHash computeShaderHash = computeShader->GetHash();
+
+	const auto& pipelineIter = m_computePipelines.find(computeShaderHash.GetHash());
+	CrComputePipelineHandle computePipeline;
+
+	if (pipelineIter != m_computePipelines.end())
+	{
+		computePipeline = pipelineIter->second;
+	}
+	else
+	{
+		CrTimer pipelineCreationTime;
+
+		computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
 
 #if defined(RENDER_DEVICE_LOGS)
 
-	CrFixedString128 entryPoint("(");
-	entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
-	entryPoint.append(")");
+		CrFixedString128 entryPoint("(");
+		entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
+		entryPoint.append(")");
 
-	CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+		CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
 
 #endif
+
+		m_computePipelines.insert(computeShaderHash.GetHash(), computePipeline); // Insert in the hashmap
+	}
 
 	return computePipeline;
 }

@@ -66,3 +66,5 @@ protected:
 
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const = 0;
 };
+
+extern CrUniquePtr<ICrRenderSystem> RenderSystem;

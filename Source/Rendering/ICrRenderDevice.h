@@ -277,6 +277,10 @@ protected:
 	// Buffer uploads that have started but haven't been committed yet
 	CrHashMap<CrHash, CrBufferUpload> m_openBufferUploads;
 
+	//--------------------------
+	// Pipeline State Management
+	//--------------------------
+
 	// The platform-specific code is able to determine whether
 	// the pipeline is valid or not
 	bool m_isValidPipelineCache;
@@ -284,6 +288,10 @@ protected:
 	CrString m_pipelineCacheDirectory;
 
 	CrString m_pipelineCacheFilename;
+
+	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
+
+	CrHashMap<uint64_t, CrComputePipelineHandle> m_computePipelines;
 
 private:
 

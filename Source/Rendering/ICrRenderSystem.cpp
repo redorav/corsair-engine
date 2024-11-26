@@ -21,7 +21,7 @@
 
 #include "Core/SmartPointers/CrUniquePtr.h"
 
-static CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
+CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)

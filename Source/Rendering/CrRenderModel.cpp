@@ -3,8 +3,9 @@
 #include "Rendering/CrRenderModel.h"
 #include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrMaterial.h"
-#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrPipeline.h"
+#include "Rendering/ICrRenderSystem.h"
+#include "Rendering/ICrRenderDevice.h"
 
 uint32_t CrRenderModelDescriptor::AddMaterial(const CrMaterialHandle& material)
 {
@@ -49,7 +50,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 			if (graphicsShader)
 			{
-				CrGraphicsPipelineHandle pipeline = PipelineStateManager.GetGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+				CrGraphicsPipelineHandle pipeline = RenderSystem->GetRenderDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
 				m_pipelines[meshIndex][pipelineVariant] = pipeline;
 			}

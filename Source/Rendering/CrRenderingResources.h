@@ -9,11 +9,9 @@ class CrRenderingResources
 {
 public:
 
-	static CrRenderingResources& Get();
+	static void Initialize(ICrRenderDevice* renderDevice);
 
-	void Initialize(ICrRenderDevice* renderDevice);
-
-	void Deinitialize();
+	static void Deinitialize();
 
 	// Global samplers
 
@@ -31,4 +29,10 @@ public:
 
 	// Points up in tangent space
 	CrTextureHandle NormalsSmallTexture;
+
+private:
+
+	CrRenderingResources(ICrRenderDevice* renderDevice);
 };
+
+extern CrRenderingResources* RenderingResources;

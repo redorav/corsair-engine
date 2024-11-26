@@ -1,6 +1,10 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrRenderingResources.h"
+#include "Rendering/CrShaderSources.h"
+#include "Rendering/CrShaderManager.h"
+#include "Rendering/CrMaterialCompiler.h"
+#include "Rendering/CrBuiltinPipeline.h"
 #include "CrFrame.h"
 
 #include "Core/Input/CrInputManager.h"
@@ -100,7 +104,11 @@ int main(int argc, char* argv[])
 
 	CrPrintProcessMemory("After Render Device");
 
-	CrRenderingResources::Get().Initialize(renderDevice.get());
+	CrShaderSources::Initialize();
+	CrShaderManager::Initialize(renderDevice.get());
+	CrMaterialCompiler::Initialize();
+	CrBuiltinPipelines::Initialize();
+	CrRenderingResources::Initialize(renderDevice.get());
 
 	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
 
@@ -172,7 +180,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	CrRenderingResources::Get().Deinitialize();
+	CrRenderingResources::Deinitialize();
 
 	frame.Deinitialize();
 

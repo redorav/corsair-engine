@@ -219,7 +219,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
 		commandBuffer->BindIndexBuffer(indexBuffer);
 		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
-		commandBuffer->BindSampler(Samplers::UISampleState, CrRenderingResources::Get().AllLinearClampSampler.get());
+		commandBuffer->BindSampler(Samplers::UISampleState, RenderingResources->AllLinearClampSampler.get());
 
 		// Projection matrix. TODO: this could be cached.
 		CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();

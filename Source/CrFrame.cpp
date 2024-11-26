@@ -7,7 +7,6 @@
 #include "Rendering/ICrSwapchain.h"
 #include "Rendering/CrShaderManager.h"
 #include "Rendering/ICrShader.h"
-#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrCommandBuffer.h"
 #include "Rendering/CrGPUBuffer.h"
@@ -199,11 +198,6 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 	// TODO Move block to rendering subsystem initialization function
 	{
-		CrShaderSources::Initialize();
-		CrShaderManager::Initialize(renderDevice.get());
-		CrMaterialCompiler::Initialize();
-		CrBuiltinPipelines::Initialize();
-
 		// Initialize ImGui renderer
 		CrImGuiRendererInitParams imguiInitParams = {};
 		imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
@@ -469,14 +463,14 @@ void CrFrame::Process()
 
 	drawCommandBuffer->Begin();
 
-	drawCommandBuffer->BindTexture(Textures::DiffuseTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
-	drawCommandBuffer->BindTexture(Textures::NormalTexture0, CrRenderingResources::Get().NormalsSmallTexture.get());
-	drawCommandBuffer->BindTexture(Textures::SpecularTexture0, CrRenderingResources::Get().WhiteSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::DiffuseTexture0, RenderingResources->WhiteSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::NormalTexture0, RenderingResources->NormalsSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::SpecularTexture0, RenderingResources->WhiteSmallTexture.get());
 
-	drawCommandBuffer->BindSampler(Samplers::AllLinearClampSampler, CrRenderingResources::Get().AllLinearClampSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllLinearWrapSampler, CrRenderingResources::Get().AllLinearWrapSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllPointClampSampler, CrRenderingResources::Get().AllPointClampSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllPointWrapSampler, CrRenderingResources::Get().AllPointWrapSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllLinearClampSampler, RenderingResources->AllLinearClampSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllLinearWrapSampler, RenderingResources->AllLinearWrapSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllPointClampSampler, RenderingResources->AllPointClampSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllPointWrapSampler, RenderingResources->AllPointWrapSampler.get());
 
 	// Set up default values for common constant buffers
 

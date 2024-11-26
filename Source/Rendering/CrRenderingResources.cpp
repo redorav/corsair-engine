@@ -6,14 +6,21 @@
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrRenderDevice.h"
 
-CrRenderingResources GlobalRenderResources;
-
-CrRenderingResources& CrRenderingResources::Get()
-{
-	return GlobalRenderResources;
-}
+CrRenderingResources* RenderingResources;
 
 void CrRenderingResources::Initialize(ICrRenderDevice* renderDevice)
+{
+	CrAssert(RenderingResources == nullptr);
+	RenderingResources = new CrRenderingResources(renderDevice);
+}
+
+void CrRenderingResources::Deinitialize()
+{
+	CrAssert(RenderingResources != nullptr);
+	delete RenderingResources;
+}
+
+CrRenderingResources::CrRenderingResources(ICrRenderDevice* renderDevice)
 {
 	//------------------------
 	// Create default samplers
@@ -107,10 +114,4 @@ void CrRenderingResources::Initialize(ICrRenderDevice* renderDevice)
 		defaultNormalTextureDescriptor.name = "Normal Map Small Texture";
 		NormalsSmallTexture = renderDevice->CreateTexture(defaultNormalTextureDescriptor);
 	}
-}
-
-void CrRenderingResources::Deinitialize()
-{
-	// Call destructors of all local variables
-	*this = {};
 }

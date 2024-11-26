@@ -4,7 +4,6 @@
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/ICrShader.h"
-#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/CrRendererConfig.h"
 #include "Rendering/CrCommonVertexLayouts.h"
 

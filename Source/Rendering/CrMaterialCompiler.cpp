@@ -75,7 +75,7 @@ CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 		materialShaderDescriptor.shaderStage, materialShaderDescriptor.graphicsApi, materialShaderDescriptor.platform);
 
 		// Compile bytecode
-		shaderBytecode = ShaderManager.CompileShaderBytecode(compilationDescriptor, defines);
+		shaderBytecode = ShaderManager->CompileShaderBytecode(compilationDescriptor, defines);
 
 		CrAssertMsg(shaderBytecode != nullptr, "Bytecode compilation failed.");
 
@@ -158,7 +158,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 
-		material->m_shaders[variant] = ShaderManager.GetRenderDevice()->CreateGraphicsShader(shaderDescriptor);
+		material->m_shaders[variant] = ShaderManager->GetRenderDevice()->CreateGraphicsShader(shaderDescriptor);
 	}
 
 	return material;

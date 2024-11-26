@@ -18,7 +18,7 @@
 #include "Core/CrPlatform.h"
 #include "Core/Streams/CrFileStream.h"
 
-CrShaderManager ShaderManager;
+CrShaderManager* ShaderManager;
 
 const char* CrShaderManager::GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi)
 {
@@ -70,7 +70,15 @@ CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr
 
 void CrShaderManager::Initialize(ICrRenderDevice* renderDevice)
 {
-	m_renderDevice = renderDevice;
+	CrAssert(renderDevice != nullptr);
+	CrAssert(ShaderManager == nullptr);
+	ShaderManager = new CrShaderManager(renderDevice);
+}
+
+void CrShaderManager::Deinitialize()
+{
+	CrAssert(ShaderManager != nullptr);
+	delete ShaderManager;
 }
 
 CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
@@ -172,4 +180,9 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 
 		return nullptr;
 	}
+}
+
+CrShaderManager::CrShaderManager(ICrRenderDevice* renderDevice)
+{
+	m_renderDevice = renderDevice;
 }

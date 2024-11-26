@@ -200,7 +200,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	// TODO Move block to rendering subsystem initialization function
 	{
 		CrShaderSources::Initialize();
-		ShaderManager.Initialize(renderDevice.get());
+		CrShaderManager::Initialize(renderDevice.get());
 		MaterialCompiler.Initialize();
 		PipelineStateManager.Initialize(renderDevice.get());
 

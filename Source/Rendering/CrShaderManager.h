@@ -16,7 +16,9 @@ public:
 
 	static const char* GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi);
 
-	void Initialize(ICrRenderDevice* renderDevice);
+	static void Initialize(ICrRenderDevice* renderDevice);
+
+	static void Deinitialize();
 
 	ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
 
@@ -32,7 +34,9 @@ public:
 
 protected:
 
+	CrShaderManager(ICrRenderDevice* renderDevice);
+
 	ICrRenderDevice* m_renderDevice;
 };
 
-extern CrShaderManager ShaderManager;
+extern CrShaderManager* ShaderManager;

@@ -17,8 +17,6 @@
 #include "Core/Input/CrInputHandlerSDL.h"
 #include <SDL3/SDL.h>
 
-#include "UnitTests/CrCoreUnitTests.h"
-
 uint32_t screenWidth = 1280;
 uint32_t screenHeight = 720;
 

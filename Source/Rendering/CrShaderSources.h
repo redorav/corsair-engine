@@ -17,7 +17,9 @@ class CrShaderSources
 {
 public:
 
-	void Initialize();
+	static void Initialize();
+
+	static void Deinitialize();
 
 	const CrString& GetUbershaderSource() const;
 
@@ -26,6 +28,8 @@ public:
 	const CrHash GetUbershaderHash() const;
 
 private:
+
+	CrShaderSources();
 
 	CrHashMap<CrString, CrFixedPath> m_shaderPaths;
 
@@ -47,4 +51,4 @@ private:
 	CrHash m_ubershaderHash;
 };
 
-extern CrShaderSources ShaderSources;
+extern CrShaderSources* ShaderSources;

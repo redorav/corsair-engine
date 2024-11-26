@@ -67,7 +67,6 @@ int main(int argc, char* argv[])
 
 	CrGlobalPaths::SetupGlobalPaths(argv[0], dataPath.c_str());
 
-	CrCoreUnitTests::RunCrPathUnitTests();
 
 	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
 

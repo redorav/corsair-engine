@@ -4,7 +4,6 @@ require("premake/corsairengine/dependencies")
 SourceDirectory          = 'Source'
 ToolsDirectory           = 'Tools'
 MathDirectory            = SourceDirectory..'/Math'
-SourceUnitTestsDirectory = SourceDirectory..'/UnitTests'
 SourceEditorDirectory    = SourceDirectory..'/Editor'
 SourceRenderingDirectory = SourceDirectory..'/Rendering'
 SourceShadersDirectory   = SourceRenderingDirectory..'/Shaders'
@@ -33,7 +32,6 @@ ProjectShaders          = 'CrShaders'
 ProjectBuiltinShaders   = 'CrBuiltinShaders'
 ProjectResource         = 'CrResource'
 ProjectCore             = 'CrCore'
-ProjectUnitTests        = 'CrUnitTests'
 ProjectEditor           = 'CrEditor'
 
 -- Generated Code Directories
@@ -266,7 +264,6 @@ project (ProjectCorsairEngine)
 		ProjectCore,
 		ProjectRendering,
 		ProjectResource,
-		ProjectUnitTests,
 		ProjectEditor
 	}
 	
@@ -524,16 +521,6 @@ project(ProjectMath)
 	
 	AddLibraryFiles(HlslppLibrary)
 	AddLibraryNatvis(HlslppLibrary)
-
-group('UnitTests')
-
-project(ProjectUnitTests)
-	kind('StaticLib')
-	
-	files
-	{
-		SourceUnitTestsDirectory..'/**'
-	}
 
 group('Editor')
 

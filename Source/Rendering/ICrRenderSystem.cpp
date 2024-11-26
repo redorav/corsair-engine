@@ -64,11 +64,6 @@ ICrRenderSystem::~ICrRenderSystem()
 
 }
 
-ICrRenderSystem* ICrRenderSystem::Get()
-{
-	return RenderSystem.get();
-}
-
 void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
 	CrAssertMsg(renderSystemDescriptor.enablePIX ? renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12 : true, "PIX is only compatible with D3D12");

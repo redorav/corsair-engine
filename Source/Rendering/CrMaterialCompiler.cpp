@@ -106,7 +106,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 {
 	unused_parameter(descriptor); // TODO
 
-	cr3d::GraphicsApi::T graphicsApi = ICrRenderSystem::Get()->GetGraphicsApi();
+	cr3d::GraphicsApi::T graphicsApi = RenderSystem->GetGraphicsApi();
 	cr::Platform::T platform = cr::Platform::Windows;
 
 	// Generate header with defines

@@ -36,8 +36,6 @@ public:
 
 	virtual ~ICrRenderSystem();
 
-	static ICrRenderSystem* Get();
-
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
 	static const CrRenderDeviceHandle& GetRenderDevice();

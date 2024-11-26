@@ -18,7 +18,7 @@ class CrImGuiRenderer
 {
 public:
 
-	static void Create(const CrImGuiRendererInitParams& initParams);
+	static void Initialize(const CrImGuiRendererInitParams& initParams);
 
 	static void Destroy();
 

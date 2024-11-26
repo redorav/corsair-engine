@@ -13,7 +13,9 @@ class CrBuiltinPipelines
 {
 public:
 
-	void Initialize();
+	static void Initialize();
+
+	static void Deinitialize();
 
 	CrGraphicsPipelineHandle GetGraphicsPipeline
 	(
@@ -35,9 +37,13 @@ public:
 
 	CrGraphicsPipelineHandle BasicUbershaderDebug;
 
+private:
+
+	CrBuiltinPipelines();
+
 	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
 
 	CrHashMap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
 };
 
-extern CrBuiltinPipelines BuiltinPipelines;
+extern CrBuiltinPipelines* BuiltinPipelines;

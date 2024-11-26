@@ -202,13 +202,12 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		CrShaderSources::Initialize();
 		CrShaderManager::Initialize(renderDevice.get());
 		CrMaterialCompiler::Initialize();
-
-		BuiltinPipelines.Initialize();
+		CrBuiltinPipelines::Initialize();
 
 		// Initialize ImGui renderer
 		CrImGuiRendererInitParams imguiInitParams = {};
 		imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
-		CrImGuiRenderer::Create(imguiInitParams);
+		CrImGuiRenderer::Initialize(imguiInitParams);
 
 		Editor.Initialize();
 	}
@@ -278,27 +277,27 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
 
 	m_colorsRWTypedBuffer = renderDevice->CreateTypedBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
-	m_exampleComputePipeline = BuiltinPipelines.GetComputePipeline(CrBuiltinShaders::ExampleCompute);
-	m_depthDownsampleLinearize = BuiltinPipelines.GetComputePipeline(CrBuiltinShaders::DepthDownsampleLinearizeMinMax);
-	m_mouseSelectionResolvePipeline = BuiltinPipelines.GetComputePipeline(CrBuiltinShaders::EditorMouseSelectionResolveCS);
+	m_exampleComputePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::ExampleCompute);
+	m_depthDownsampleLinearize = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::DepthDownsampleLinearizeMinMax);
+	m_mouseSelectionResolvePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::EditorMouseSelectionResolveCS);
 
 	{
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
 		copyTextureGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_copyTexturePipeline = BuiltinPipelines.GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
+		m_copyTexturePipeline = BuiltinPipelines->GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 
-	m_createIndirectArguments = BuiltinPipelines.GetComputePipeline(CrBuiltinShaders::CreateIndirectArguments);
+	m_createIndirectArguments = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::CreateIndirectArguments);
 
-	m_postProcessing = BuiltinPipelines.GetComputePipeline(CrBuiltinShaders::PostProcessingCS);
+	m_postProcessing = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::PostProcessingCS);
 
 	{
 		CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
 		directionalLightPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
 		directionalLightPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		directionalLightPipelineDescriptor.depthStencilState.depthWriteEnable = false;
-		m_directionalLightPipeline = BuiltinPipelines.GetGraphicsPipeline(directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
+		m_directionalLightPipeline = BuiltinPipelines->GetGraphicsPipeline(directionalLightPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::DirectionalLightPS);
 	}
 
 	{
@@ -306,7 +305,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		gbufferDebugPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
 		gbufferDebugPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		gbufferDebugPipelineDescriptor.depthStencilState.depthWriteEnable = false;
-		m_gbufferDebugPipeline = BuiltinPipelines.GetGraphicsPipeline(gbufferDebugPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::GBufferDebugPS);
+		m_gbufferDebugPipeline = BuiltinPipelines->GetGraphicsPipeline(gbufferDebugPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::GBufferDebugPS);
 	}
 
 	// Editor shaders
@@ -316,7 +315,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		editorEdgeSelectionPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
-		m_editorEdgeSelectionPipeline = BuiltinPipelines.GetGraphicsPipeline(editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
+		m_editorEdgeSelectionPipeline = BuiltinPipelines->GetGraphicsPipeline(editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
 	
 		CrGraphicsPipelineDescriptor editorGridPipelineDescriptor;
 		editorGridPipelineDescriptor.renderTargets.colorFormats[0] = cr3d::DataFormat::BGRA8_Unorm;
@@ -327,7 +326,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
 		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
 		editorGridPipelineDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-		m_editorGridPipeline = BuiltinPipelines.GetGraphicsPipeline(editorGridPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::EditorGridVS, CrBuiltinShaders::EditorGridPS);
+		m_editorGridPipeline = BuiltinPipelines->GetGraphicsPipeline(editorGridPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::EditorGridVS, CrBuiltinShaders::EditorGridPS);
 	}
 
 	{

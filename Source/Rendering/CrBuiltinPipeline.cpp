@@ -13,9 +13,21 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-CrBuiltinPipelines BuiltinPipelines;
+CrBuiltinPipelines* BuiltinPipelines;
 
 void CrBuiltinPipelines::Initialize()
+{
+	CrAssert(BuiltinPipelines == nullptr);
+	BuiltinPipelines = new CrBuiltinPipelines();
+}
+
+void CrBuiltinPipelines::Deinitialize()
+{
+	CrAssert(BuiltinPipelines != nullptr);
+	delete BuiltinPipelines;
+}
+
+CrBuiltinPipelines::CrBuiltinPipelines()
 {
 	// Builtin ubershaders
 	{

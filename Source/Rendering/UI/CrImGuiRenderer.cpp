@@ -64,7 +64,7 @@ CrImGuiRenderer::CrImGuiRenderer()
 {
 }
 
-void CrImGuiRenderer::Create(const CrImGuiRendererInitParams& initParams)
+void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 {
 	CrAssert(ImGuiRenderer == nullptr);
 	ImGuiRenderer = new CrImGuiRenderer;
@@ -113,7 +113,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
 
-		m_imguiGraphicsPipeline = BuiltinPipelines.GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
+		m_imguiGraphicsPipeline = BuiltinPipelines->GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
 	}
 
 	// Font atlas:

@@ -201,7 +201,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	{
 		CrShaderSources::Initialize();
 		CrShaderManager::Initialize(renderDevice.get());
-		MaterialCompiler.Initialize();
+		CrMaterialCompiler::Initialize();
 		PipelineStateManager.Initialize(renderDevice.get());
 
 		BuiltinPipelines.Initialize();

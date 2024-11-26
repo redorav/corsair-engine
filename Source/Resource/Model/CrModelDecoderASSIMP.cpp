@@ -233,7 +233,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial, const CrFixedPath& materialPath)
 {
 	CrMaterialDescriptor materialDescriptor;
-	CrMaterialHandle material = MaterialCompiler.CompileMaterial(materialDescriptor);
+	CrMaterialHandle material = MaterialCompiler->CompileMaterial(materialDescriptor);
 
 	aiString name;
 	aiMaterial->Get(AI_MATKEY_NAME, name);

@@ -14,7 +14,7 @@
 
 CrString CrShaderHeaderGenerator::HashDefine = "#define ";
 
-CrMaterialCompiler MaterialCompiler;
+CrMaterialCompiler* MaterialCompiler = nullptr;
 
 template<typename Enum>
 const char* GetMaterialShaderEnum(Enum);
@@ -49,6 +49,19 @@ void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 
 void CrMaterialCompiler::Initialize()
 {
+	CrAssert(MaterialCompiler == nullptr);
+	MaterialCompiler = new CrMaterialCompiler();
+}
+
+void CrMaterialCompiler::Deinitialize()
+{
+	CrAssert(MaterialCompiler != nullptr);
+	delete MaterialCompiler;
+}
+
+CrMaterialCompiler::CrMaterialCompiler()
+{
+	CrAssert(ShaderSources != nullptr);
 	m_bytecodeDiskCache = CrShaderDiskCache(ShaderSources->GetUbershaderTempDirectory() / "Bytecode Cache", "Ubershader.hash", ShaderSources->GetUbershaderHash());
 }
 

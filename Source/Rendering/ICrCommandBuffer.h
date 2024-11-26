@@ -544,7 +544,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(ConstantBuffers::T constantBuff
 	CrCommandBufferAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must have constant buffer flag");
 	CrCommandBufferAssertMsg(constantBufferIndex < ConstantBuffers::Count, "Invalid binding index");
 
-	m_currentState.m_constantBuffers[constantBufferIndex] = ConstantBufferBinding(constantBuffer, size, offset);
+	m_currentState.m_constantBuffers[constantBufferIndex] = CrConstantBufferBinding(constantBuffer, size, offset);
 }
 
 inline void ICrCommandBuffer::BindConstantBuffer(const CrGPUBufferView& constantBufferView)

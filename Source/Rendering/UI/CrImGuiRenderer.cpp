@@ -113,7 +113,7 @@ void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 
 		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
 
-		m_imguiGraphicsPipeline = CrBuiltinPipelines::GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
+		m_imguiGraphicsPipeline = BuiltinPipelines.GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
 	}
 
 	// Font atlas:

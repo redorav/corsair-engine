@@ -13,15 +13,7 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-CrGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderForward;
-
-CrGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderGBuffer;
-
-CrGraphicsPipelineHandle CrBuiltinPipelines::BasicUbershaderDebug;
-
-CrHashMap<uint64_t, CrGraphicsPipelineHandle> CrBuiltinPipelines::m_builtinGraphicsPipelines;
-
-CrHashMap<uint64_t, CrComputePipelineHandle> CrBuiltinPipelines::m_builtinComputePipelines;
+CrBuiltinPipelines BuiltinPipelines;
 
 void CrBuiltinPipelines::Initialize()
 {
@@ -84,7 +76,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 
 		CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
 
-		CrGraphicsPipelineHandle graphicsPipeline = CrPipelineStateManager::Get().GetGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
+		CrGraphicsPipelineHandle graphicsPipeline = PipelineStateManager.GetGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
 
 		m_builtinGraphicsPipelines.insert(finalHash.GetHash(), graphicsPipeline);
@@ -113,7 +105,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders:
 
 		CrComputeShaderHandle shader = ICrRenderSystem::GetRenderDevice()->CreateComputeShader(computeShaderDescriptor);
 
-		CrComputePipelineHandle computePipeline = CrPipelineStateManager::Get().GetComputePipeline(shader);
+		CrComputePipelineHandle computePipeline = PipelineStateManager.GetComputePipeline(shader);
 		computePipeline->SetComputeShaderIndex(computeShaderIndex);
 
 		m_builtinComputePipelines.insert(hash.GetHash(), computePipeline);

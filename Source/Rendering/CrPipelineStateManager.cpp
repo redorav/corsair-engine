@@ -8,11 +8,11 @@
 #include "Core/CrMacros.h"
 #include "Core/Containers/CrPair.h"
 
-static CrPipelineStateManager PipelineStateManager;
+CrPipelineStateManager PipelineStateManager;
 
-CrPipelineStateManager& CrPipelineStateManager::Get()
+void CrPipelineStateManager::Initialize(ICrRenderDevice* renderDevice)
 {
-	return PipelineStateManager;
+	m_renderDevice = renderDevice;
 }
 
 CrGraphicsPipelineHandle CrPipelineStateManager::GetGraphicsPipeline
@@ -69,9 +69,4 @@ CrComputePipelineHandle CrPipelineStateManager::GetComputePipeline(const CrCompu
 	}
 
 	return computePipeline;
-}
-
-void CrPipelineStateManager::Initialize(ICrRenderDevice* renderDevice)
-{
-	m_renderDevice = renderDevice;
 }

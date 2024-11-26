@@ -346,7 +346,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
 		{
 			const cgltf_material& cgltfMaterial = gltfData->materials[m];
 			CrMaterialDescriptor materialDescriptor;
-			CrMaterialHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
+			CrMaterialHandle material = MaterialCompiler.CompileMaterial(materialDescriptor);
 
 			ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.base_color_texture.texture, Textures::DiffuseTexture0);
 			ProcessMaterialTexture(material, cgltfMaterial.pbr_metallic_roughness.metallic_roughness_texture.texture, Textures::SpecularTexture0);

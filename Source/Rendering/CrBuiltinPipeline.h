@@ -4,6 +4,8 @@
 #include "Rendering/ICrPipeline.h"
 #include "Rendering/CrVertexDescriptor.h"
 
+#include "Core/Containers/CrHashMap.h"
+
 namespace CrBuiltinShaders { enum T : uint32_t; }
 
 // A collection of all builtin pipelines compiled on boot. They are available to any program that wants them
@@ -11,9 +13,9 @@ class CrBuiltinPipelines
 {
 public:
 
-	static void Initialize();
+	void Initialize();
 
-	static CrGraphicsPipelineHandle GetGraphicsPipeline
+	CrGraphicsPipelineHandle GetGraphicsPipeline
 	(
 		const CrGraphicsPipelineDescriptor& graphicsPipelineDescriptor,
 		const CrVertexDescriptor& vertexDescriptor,
@@ -21,19 +23,21 @@ public:
 		CrBuiltinShaders::T pixelShader
 	);
 
-	static CrComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
+	CrComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
 
-	static void RecompileComputePipelines();
+	void RecompileComputePipelines();
 
 	// Ubershader builtin pipelines
 
-	static CrGraphicsPipelineHandle BasicUbershaderForward;
+	CrGraphicsPipelineHandle BasicUbershaderForward;
 
-	static CrGraphicsPipelineHandle BasicUbershaderGBuffer;
+	CrGraphicsPipelineHandle BasicUbershaderGBuffer;
 
-	static CrGraphicsPipelineHandle BasicUbershaderDebug;
+	CrGraphicsPipelineHandle BasicUbershaderDebug;
 
-	static CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
+	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
 
-	static CrHashMap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
+	CrHashMap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
 };
+
+extern CrBuiltinPipelines BuiltinPipelines;

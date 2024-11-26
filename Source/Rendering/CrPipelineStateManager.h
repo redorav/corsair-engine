@@ -22,8 +22,6 @@ public:
 
 	CrComputePipelineHandle GetComputePipeline(const CrComputeShaderHandle& computeShader);
 
-	static CrPipelineStateManager& Get();
-
 protected:
 
 	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
@@ -32,3 +30,5 @@ protected:
 
 	ICrRenderDevice* m_renderDevice = nullptr;
 };
+
+extern CrPipelineStateManager PipelineStateManager;

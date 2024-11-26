@@ -68,7 +68,7 @@ CrFixedPath CrShaderDiskCache::CreateCachedFilePath(const CrHash& hash, cr3d::Gr
 	CrString hashString = CrString(hash.GetHash());
 	CrFixedPath cachedBytecodePath = m_cachePath;
 	cachedBytecodePath /= hashString.c_str();
-	cachedBytecodePath.replace_extension(CrShaderManager::Get().GetShaderBytecodeExtension(graphicsApi));
+	cachedBytecodePath.replace_extension(ShaderManager.GetShaderBytecodeExtension(graphicsApi));
 	return cachedBytecodePath;
 }
 

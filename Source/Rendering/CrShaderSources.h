@@ -17,8 +17,6 @@ class CrShaderSources
 {
 public:
 
-	static CrShaderSources& Get();
-
 	void Initialize();
 
 	const CrString& GetUbershaderSource() const;
@@ -48,3 +46,5 @@ private:
 	// Ubershader hash computed with current sources (used to determine whether shaders in cache are usable)
 	CrHash m_ubershaderHash;
 };
+
+extern CrShaderSources ShaderSources;

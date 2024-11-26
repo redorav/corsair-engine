@@ -9,14 +9,9 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/String/CrStringUtilities.h"
 
-static CrShaderSources ShaderSources;
+CrShaderSources ShaderSources;
 
 static CrString UbershaderEntryFile = "Ubershader.hlsl";
-
-CrShaderSources& CrShaderSources::Get()
-{
-	return ShaderSources;
-}
 
 void CrShaderSources::Initialize()
 {

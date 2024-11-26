@@ -44,8 +44,6 @@ public:
 
 	CrMaterialCompiler() {}
 
-	static CrMaterialCompiler& Get();
-
 	void Initialize();
 
 	// Creates set of defines based on the material shader descriptor
@@ -62,3 +60,5 @@ private:
 
 	CrShaderDiskCache m_bytecodeDiskCache;
 };
+
+extern CrMaterialCompiler MaterialCompiler;

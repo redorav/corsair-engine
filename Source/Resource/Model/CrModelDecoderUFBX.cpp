@@ -138,7 +138,7 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 	(void)materialPath;
 
 	CrMaterialDescriptor materialDescriptor;
-	CrMaterialHandle material = CrMaterialCompiler::Get().CompileMaterial(materialDescriptor);
+	CrMaterialHandle material = MaterialCompiler.CompileMaterial(materialDescriptor);
 
 	for (size_t p = 0; p < ufbxMaterial->props.props.count; ++p)
 	{

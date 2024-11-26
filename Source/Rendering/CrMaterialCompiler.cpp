@@ -14,7 +14,7 @@
 
 CrString CrShaderHeaderGenerator::HashDefine = "#define ";
 
-static CrMaterialCompiler MaterialCompiler;
+CrMaterialCompiler MaterialCompiler;
 
 template<typename Enum>
 const char* GetMaterialShaderEnum(Enum);
@@ -30,11 +30,6 @@ const char* GetMaterialShaderEnum(CrMaterialShaderVariant::T materialShaderVaria
 		case CrMaterialShaderVariant::Debug:   return "EMaterialShaderVariant_Debug";
 		default: return "Invalid";
 	}
-}
-
-CrMaterialCompiler& CrMaterialCompiler::Get()
-{
-	return MaterialCompiler;
 }
 
 void CrShaderHeaderGenerator::Define(const char* define)
@@ -54,8 +49,7 @@ void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 
 void CrMaterialCompiler::Initialize()
 {
-	const CrShaderSources& shaderSources = CrShaderSources::Get();
-	m_bytecodeDiskCache = CrShaderDiskCache(shaderSources.GetUbershaderTempDirectory() / "Bytecode Cache", "Ubershader.hash", shaderSources.GetUbershaderHash());
+	m_bytecodeDiskCache = CrShaderDiskCache(ShaderSources.GetUbershaderTempDirectory() / "Bytecode Cache", "Ubershader.hash", ShaderSources.GetUbershaderHash());
 }
 
 void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines)
@@ -81,7 +75,7 @@ CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 		materialShaderDescriptor.shaderStage, materialShaderDescriptor.graphicsApi, materialShaderDescriptor.platform);
 
 		// Compile bytecode
-		shaderBytecode = CrShaderManager::Get().CompileShaderBytecode(compilationDescriptor, defines);
+		shaderBytecode = ShaderManager.CompileShaderBytecode(compilationDescriptor, defines);
 
 		CrAssertMsg(shaderBytecode != nullptr, "Bytecode compilation failed.");
 
@@ -108,10 +102,10 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 	CrString patchedShaderSource;
 	patchedShaderSource += shaderHeaderGenerator.GetString();
-	patchedShaderSource += CrShaderSources::Get().GetUbershaderSource();
+	patchedShaderSource += ShaderSources.GetUbershaderSource();
 
 	// Create directory for ubershader shaders
-	CrFixedPath patchedShaderSourcePath = CrShaderSources::Get().GetUbershaderTempDirectory();
+	CrFixedPath patchedShaderSourcePath = ShaderSources.GetUbershaderTempDirectory();
 
 	// Make sure directory exists
 	ICrFile::CreateDirectories(patchedShaderSourcePath.c_str());
@@ -164,7 +158,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 
-		material->m_shaders[variant] = CrShaderManager::Get().GetRenderDevice()->CreateGraphicsShader(shaderDescriptor);
+		material->m_shaders[variant] = ShaderManager.GetRenderDevice()->CreateGraphicsShader(shaderDescriptor);
 	}
 
 	return material;

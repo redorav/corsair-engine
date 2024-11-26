@@ -20,19 +20,15 @@ public:
 
 	static void Initialize(const CrImGuiRendererInitParams& initParams);
 
-	static void Destroy();
-
-	static CrImGuiRenderer& Get();
-
-	void Initialize(const CrImGuiRendererInitParams& initParams);
+	static void Deinitialize();
 
 	void NewFrame(uint32_t width, uint32_t height);
 
-	void Render(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
+	void AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
 
 private:
 
-	CrImGuiRenderer();
+	CrImGuiRenderer(const CrImGuiRendererInitParams& initParams);
 
 	CrImGuiRenderer(const CrImGuiRenderer& other) = delete;
 
@@ -42,3 +38,5 @@ private:
 
 	CrImGuiRendererInitParams m_initParams;
 };
+
+extern CrImGuiRenderer* ImGuiRenderer;

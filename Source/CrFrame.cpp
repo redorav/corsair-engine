@@ -406,7 +406,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 
 void CrFrame::Deinitialize()
 {
-	CrImGuiRenderer::Destroy();
+	CrImGuiRenderer::Deinitialize();
 
 	Editor = {};
 
@@ -442,7 +442,7 @@ void CrFrame::Process()
 
 	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
 
-	CrImGuiRenderer::Get().NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
+	ImGuiRenderer->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
@@ -451,7 +451,7 @@ void CrFrame::Process()
 		keyboardState.keyHeld[KeyboardKey::LeftShift] &&
 		keyboardState.keyPressed[KeyboardKey::F5])
 	{
-		BuiltinPipelines.RecompileComputePipelines();
+		BuiltinPipelines->RecompileComputePipelines();
 	}
 
 	// Set up render graph to start recording passes
@@ -891,7 +891,7 @@ void CrFrame::Process()
 	});
 
 	// Render ImGui
-	CrImGuiRenderer::Get().Render(m_mainRenderGraph, swapchainTexture);
+	ImGuiRenderer->AddRenderPass(m_mainRenderGraph, swapchainTexture);
 
 	// Create a render pass that transitions the frame. We need to give the render graph visibility over what's going to happen with the texture, but not necessarily
 	// execute the behavior inside as we may want to do further work before we end the command buffer

@@ -9,7 +9,6 @@
 #include "Rendering/CrGPUBuffer.h"
 #include "Rendering/ICrShader.h"
 #include "Rendering/CrShaderManager.h"
-#include "Rendering/CrPipelineStateManager.h"
 #include "Rendering/ICrTexture.h"
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -60,32 +59,21 @@ float4x4 ComputeProjectionMatrix(ImDrawData* data)
 
 CrImGuiRenderer* ImGuiRenderer = nullptr;
 
-CrImGuiRenderer::CrImGuiRenderer()
-{
-}
-
 void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
 {
 	CrAssert(ImGuiRenderer == nullptr);
-	ImGuiRenderer = new CrImGuiRenderer;
-	ImGuiRenderer->Initialize(initParams);
+	ImGuiRenderer = new CrImGuiRenderer(initParams);
 }
 
-void CrImGuiRenderer::Destroy()
+void CrImGuiRenderer::Deinitialize()
 {
 	CrAssert(ImGuiRenderer != nullptr);
 	delete ImGuiRenderer;
 }
 
-CrImGuiRenderer& CrImGuiRenderer::Get()
-{
-	CrAssert(ImGuiRenderer != nullptr);
-	return *ImGuiRenderer;
-}
-
 static ImGuiKey s_ImguiKeys[KeyboardKey::Code::Count] = {};
 
-void CrImGuiRenderer::Initialize(const CrImGuiRendererInitParams& initParams)
+CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 {
 	m_initParams = initParams;
 
@@ -191,7 +179,7 @@ void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::Render(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture)
+void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture)
 {
 	renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
 	[&](CrRenderGraph& renderGraph)

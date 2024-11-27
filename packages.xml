@@ -38,11 +38,7 @@
 	<package name="mikktspace">
 		<version id="3e895b4" file="mikktspace_2023_9_16_3e895b4.7z" repository="github"/>
 	</package>
-	
-	<package name="sdl2">
-		<version id="2.0.14" file="sdl2_2.0.14.zip" repository="github"/>
-	</package>
-	
+
 	<package name="sdl3">
 		<version id="preview-3.1.6" file="sdl3-preview-3.1.6.7z" repository="github"/>
 	</package>

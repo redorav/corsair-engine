@@ -10,7 +10,6 @@
 	<dependency name="mikktspace" version="3e895b4"/>
 	<dependency name="rapidyaml" version="4a8fb19"/>
 	<dependency name="renderdoc" version="1.5.0"/>
-	<dependency name="sdl2" version="2.0.14"/>
 	<dependency name="sdl3" version="preview-3.1.6"/>
 	<dependency name="spirv-reflect" version="8542f37"/>
 	<dependency name="stb" version="5736b15"/>

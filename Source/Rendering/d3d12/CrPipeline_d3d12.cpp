@@ -36,7 +36,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 	rasterizerDesc.MultisampleEnable = pipelineDescriptor.rasterizerState.multisampleEnable;
 	rasterizerDesc.AntialiasedLineEnable = pipelineDescriptor.rasterizerState.antialiasedLineEnable;
 	rasterizerDesc.ForcedSampleCount = 0;
-	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+	rasterizerDesc.ConservativeRaster = pipelineDescriptor.rasterizerState.conservativeRasterization ? D3D12_CONSERVATIVE_RASTERIZATION_MODE_ON : D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
 	uint32_t numRenderTargets = 0;
 

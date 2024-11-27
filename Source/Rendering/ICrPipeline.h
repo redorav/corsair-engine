@@ -18,8 +18,9 @@ struct CrRasterizerStateDescriptor
 	uint32_t depthClipEnable : 1;
 	uint32_t multisampleEnable : 1;
 	uint32_t antialiasedLineEnable : 1;
+	uint32_t conservativeRasterization : 1;
 
-	uint32_t padding : 24;
+	uint32_t padding : 23;
 	
 	float depthBias;
 	float depthBiasClamp;

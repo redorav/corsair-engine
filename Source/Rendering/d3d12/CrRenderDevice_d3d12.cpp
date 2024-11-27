@@ -216,6 +216,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 		m_renderDeviceProperties.isUMA = d3d12Architecture.UMA;
 	}
 
+	D3D12_FEATURE_DATA_D3D12_OPTIONS d3d12Options = {};
+	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &d3d12Options, sizeof(d3d12Options)) == S_OK)
+	{
+		m_renderDeviceProperties.features.conservativeRasterization = d3d12Options.ConservativeRasterizationTier >= D3D12_CONSERVATIVE_RASTERIZATION_TIER_1;
+	}
+
 	D3D12_FEATURE_DATA_D3D12_OPTIONS5 d3d12Options5 = {};
 	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options5, sizeof(d3d12Options5)) == S_OK)
 	{

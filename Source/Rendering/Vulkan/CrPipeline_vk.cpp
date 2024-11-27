@@ -22,7 +22,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	inputAssemblyState.topology = crvk::GetVkPrimitiveTopology(pipelineDescriptor.primitiveTopology);
 	inputAssemblyState.primitiveRestartEnable = false;
 
-	VkPipelineRasterizationStateCreateInfo rasterizerState = {};
+	VkPipelineRasterizationStateCreateInfo rasterizerState {};
 	rasterizerState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizerState.pNext = nullptr;
 	rasterizerState.flags = 0;
@@ -37,6 +37,15 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	rasterizerState.lineWidth = 1.0f;
 	//rasterizerState.rasterizerDiscardEnable = false;
 	//rasterizerState.depthBiasEnable = false;
+
+	if (pipelineDescriptor.rasterizerState.conservativeRasterization)
+	{
+		VkPipelineRasterizationConservativeStateCreateInfoEXT conservativeRasterizationState {};
+		conservativeRasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_CONSERVATIVE_STATE_CREATE_INFO_EXT;
+		conservativeRasterizationState.conservativeRasterizationMode = VK_CONSERVATIVE_RASTERIZATION_MODE_OVERESTIMATE_EXT;
+		conservativeRasterizationState.extraPrimitiveOverestimationSize = 1.0f;
+		rasterizerState.pNext = &conservativeRasterizationState;
+	}
 
 	VkPipelineColorBlendStateCreateInfo colorBlendState;
 	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

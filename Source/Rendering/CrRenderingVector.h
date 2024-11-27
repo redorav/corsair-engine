@@ -59,31 +59,49 @@ namespace cr3d
 
 	struct int2
 	{
+		int2() = default;
+		int2(hlslpp::int2 u) { hlslpp::store(u, &x); }
+
 		int32_t x, y;
 	};
 
 	struct int3
 	{
+		int3() = default;
+		int3(hlslpp::int3 u) { hlslpp::store(u, &x); }
+
 		int32_t x, y, z;
 	};
 
 	struct int4
 	{
+		int4() = default;
+		int4(hlslpp::int4 u) { hlslpp::store(u, &x); }
+
 		int32_t x, y, z, w;
 	};
 
 	struct uint2
 	{
+		uint2() = default;
+		uint2(hlslpp::uint2 u) { hlslpp::store(u, &x); }
+
 		uint32_t x, y;
 	};
 
 	struct uint3
 	{
+		uint3() = default;
+		uint3(hlslpp::uint3 u) { hlslpp::store(u, &x); }
+
 		uint32_t x, y, z;
 	};
 
 	struct uint4
 	{
+		uint4() = default;
+		uint4(hlslpp::uint4 u) { hlslpp::store(u, &x); }
+
 		uint32_t x, y, z, w;
 	};
 }

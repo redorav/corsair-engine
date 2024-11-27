@@ -6,6 +6,7 @@
 #include "Core/Containers/CrHashMap.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
+#include "Core/Logging/ICrDebug.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderModel.h"

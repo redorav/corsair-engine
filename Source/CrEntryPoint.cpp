@@ -69,16 +69,6 @@ int main(int argc, char* argv[])
 
 	CrGlobalPaths::SetupGlobalPaths(argv[0], dataPath.c_str());
 
-
-	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
-
-	void* hWnd = mainWindow->GetNativeWindowHandle();
-
-	// HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
-	// Valid for the current executable (not valid for a dll)
-	// http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
-	HINSTANCE hInstance = GetModuleHandle(nullptr);
-
 	CrPrintProcessMemory("Before Render Device");
 
 	CrRenderSystemDescriptor renderSystemDescriptor;

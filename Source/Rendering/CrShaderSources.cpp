@@ -48,70 +48,70 @@ CrShaderSources::CrShaderSources()
 
 	// Load all the files in this directory and put them in a hashmap based on filename
 	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), false, [this](const CrDirectoryEntry& entry)
+	{
+		if (!entry.isDirectory)
 		{
-			if (!entry.isDirectory)
+			CrFixedPath shaderPath = entry.directory;
+			shaderPath /= entry.filename.c_str();
+
+			CrFileHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
+
+			if (shaderSourceFile)
 			{
-				CrFixedPath shaderPath = entry.directory;
-				shaderPath /= entry.filename.c_str();
+				CrString shaderSource(CrStringNoInitialize, shaderSourceFile->GetSize(), shaderSourceFile->GetSize());
+				shaderSourceFile->Read(shaderSource.data(), shaderSource.size());
 
-				CrFileHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
+				// Preprocess the shader source to remove anything that cannot
+				// add anything meaningful to the final binary, such as whitespace, 
+				// tabs, lines, and comments
 
-				if (shaderSourceFile)
+				CrVector<CrString> lines;
+				CrStringUtilities::SplitLines(lines, shaderSource);
+
+				// TODO Add a competent preprocessor here, instead of manually parsing
+				CrVector<CrString> preprocessedLines;
+				for (CrString& line : lines)
 				{
-					CrString shaderSource(CrStringNoInitialize, shaderSourceFile->GetSize(), shaderSourceFile->GetSize());
-					shaderSourceFile->Read(shaderSource.data(), shaderSource.size());
-
-					// Preprocess the shader source to remove anything that cannot
-					// add anything meaningful to the final binary, such as whitespace, 
-					// tabs, lines, and comments
-
-					CrVector<CrString> lines;
-					CrStringUtilities::SplitLines(lines, shaderSource);
-
-					// TODO Add a competent preprocessor here, instead of manually parsing
-					CrVector<CrString> preprocessedLines;
-					for (CrString& line : lines)
+					if (!line.empty())
 					{
+						line.erase_all(' ');
+						line.erase_all('\t');
+						line.erase_all('\r');
+						line.erase_all('\n');
+
+						// Check empty again after we've removed everything
 						if (!line.empty())
 						{
-							line.erase_all(' ');
-							line.erase_all('\t');
-							line.erase_all('\r');
-							line.erase_all('\n');
-
-							// Check empty again after we've removed everything
-							if (!line.empty())
+							char firstChar = line[0];
+							if (firstChar != '/')
 							{
-								char firstChar = line[0];
-								if (firstChar != '/')
-								{
-									preprocessedLines.push_back(line);
-								}
+								preprocessedLines.push_back(line);
 							}
 						}
 					}
-
-					// This source is in a good format for hashing, as any spurious spaces,
-					// tabs, formatting of any sort won't affect the hash and therefore not
-					// trigger any extra compilations
-					// Only consider ubershader files for the ubershader hash
-					if (UbershaderFiles.find(entry.filename.c_str()) != UbershaderFiles.end())
-					{
-						for (const CrString& line : preprocessedLines)
-						{
-							m_hashableUbershaderSource += line;
-						}
-					}
-
-					CrString filenameString = entry.filename.c_str();
-
-					m_shaderPaths.insert(filenameString, shaderPath);
-					m_shaderSources.insert(filenameString, shaderSource);
 				}
-			}
 
-			return true;
-		});
+				// This source is in a good format for hashing, as any spurious spaces,
+				// tabs, formatting of any sort won't affect the hash and therefore not
+				// trigger any extra compilations
+				// Only consider ubershader files for the ubershader hash
+				if (UbershaderFiles.find(entry.filename.c_str()) != UbershaderFiles.end())
+				{
+					for (const CrString& line : preprocessedLines)
+					{
+						m_hashableUbershaderSource += line;
+					}
+				}
+
+				CrString filenameString = entry.filename.c_str();
+
+				m_shaderPaths.insert(filenameString, shaderPath);
+				m_shaderSources.insert(filenameString, shaderSource);
+			}
+		}
+
+		return true;
+	});
 
 	m_ubershaderHash = CrHash(m_hashableUbershaderSource.c_str(), m_hashableUbershaderSource.length());
 

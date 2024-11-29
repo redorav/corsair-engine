@@ -43,7 +43,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 		VkPipelineRasterizationConservativeStateCreateInfoEXT conservativeRasterizationState {};
 		conservativeRasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_CONSERVATIVE_STATE_CREATE_INFO_EXT;
 		conservativeRasterizationState.conservativeRasterizationMode = VK_CONSERVATIVE_RASTERIZATION_MODE_OVERESTIMATE_EXT;
-		conservativeRasterizationState.extraPrimitiveOverestimationSize = 1.0f;
+		conservativeRasterizationState.extraPrimitiveOverestimationSize = 0.0f;
 		rasterizerState.pNext = &conservativeRasterizationState;
 	}
 

@@ -383,7 +383,7 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		// We don't have an opaque shader here. We probably don't need them for editor meshes
 		CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
 		basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForward->GetShader();
-		basicMaterial->m_shaders[CrMaterialShaderVariant::Debug] = BuiltinPipelines->BasicUbershaderDebug->GetShader();
+		basicMaterial->m_shaders[CrMaterialShaderVariant::Debug]   = BuiltinPipelines->BasicUbershaderDebug->GetShader();
 
 		CrRenderModelDescriptor xAxisDescriptor;
 		xAxisDescriptor.AddMaterial(basicMaterial);

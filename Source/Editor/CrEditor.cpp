@@ -307,9 +307,7 @@ void CrEditor::Update()
 		RemoveManipulator();
 	}
 
-	bool requestMouseSelection = 
-		(mouseState.buttonPressed[MouseButton::Left] || mouseState.buttonHeld[MouseButton::Left])
-		&& !isLeftAltHeld; // We use left alt for navigation, so we want to avoid clicking on things
+	bool requestMouseSelection = mouseState.buttonPressed[MouseButton::Left] && !isLeftAltHeld; // We use left alt for navigation, so we want to avoid clicking on things
 
 	CrRectangle mouseRectangle(mouseState.position.x, mouseState.position.y, 1, 1);
 	m_renderWorld->SetMouseSelectionEnabled(requestMouseSelection, mouseRectangle);

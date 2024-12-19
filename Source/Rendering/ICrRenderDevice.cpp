@@ -57,7 +57,7 @@ void ICrRenderDevice::Initialize()
 	for (uint32_t i = 0; i < m_auxiliaryCommandBufferCount; ++i)
 	{
 		CrCommandBufferDescriptor descriptor;
-		descriptor.name.append("Render Device Auxiliary Command Buffer %i", i);
+		descriptor.name.append_sprintf("Render Device Auxiliary Command Buffer %i", i);
 		m_auxiliaryCommandBuffers.push_back(CreateCommandBuffer(descriptor));
 	}
 }

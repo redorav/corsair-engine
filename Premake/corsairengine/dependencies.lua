@@ -18,7 +18,6 @@ LibMeshOptimizer      = DependenciesDirectory..'/meshoptimizer'
 LibMikkTSpace         = DependenciesDirectory..'/mikktspace'
 LibRapidYAML          = DependenciesDirectory..'/rapidyaml'
 LibRenderDoc          = DependenciesDirectory..'/renderdoc'
-LibSDL2               = DependenciesDirectory..'/sdl2'
 LibSDL3               = DependenciesDirectory..'/sdl3'
 LibSPIRVReflect       = DependenciesDirectory..'/spirv-reflect'
 LibStb                = DependenciesDirectory..'/stb'
@@ -140,15 +139,6 @@ RapidYAMLLibrary =
 RenderDocLibrary =
 {
 	includeDirs = { LibRenderDoc..IncludeDirectory }
-}
-
-SDL2Library =
-{
-	includeDirs = LibSDL2..IncludeDirectory..'include',
-	libDirs     = LibSDL2..BinaryDirectory,
-	libNames    = 'SDL2',
-	defines     = 'SDL_MAIN_HANDLED',
-	dlls        = LibSDL2..BinaryDirectory..'SDL2.dll'
 }
 
 SDL3Library =

@@ -218,6 +218,10 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
+	VkFenceCreateInfo vkFenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+	vkFenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_swapchainRecreationFence);
+
 	CreateSwapchainTextures();
 
 	m_presentCompleteSemaphores.resize(m_imageCount);
@@ -236,6 +240,8 @@ CrSwapchainVulkan::~CrSwapchainVulkan()
 	vkDestroySwapchainKHR(vkDevice, m_vkSwapchain, nullptr);
 
 	vkDestroySurfaceKHR(vkInstance, m_vkSurface, nullptr);
+
+	vkDestroyFence(vkDevice, m_swapchainRecreationFence, nullptr);
 }
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseconds)
@@ -320,6 +326,8 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	VkResult vkResult = vkGetSwapchainImagesKHR(vulkanDevice->GetVkDevice(), m_vkSwapchain, &m_imageCount, images.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
+	vkWaitForFences(vulkanDevice->GetVkDevice(), 1, &m_swapchainRecreationFence, VK_TRUE, UINT64_MAX);
+
 	m_textures = CrVector<CrTextureHandle>(m_imageCount);
 
 	CrTextureDescriptor swapchainTextureParams;
@@ -365,10 +373,12 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	vkCmdPipelineBarrier(vulkanDevice->GetVkSwapchainCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, (uint32_t)imageMemoryBarriers.size(), imageMemoryBarriers.data());
 	vkEndCommandBuffer(swapchainCommandBuffer);
 
+	vkResetFences(vulkanDevice->GetVkDevice(), 1, &m_swapchainRecreationFence);
+
 	// Submit to the queue immediately
 	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &swapchainCommandBuffer;
-	VkResult result = vkQueueSubmit(vulkanDevice->GetVkQueue(CrCommandQueueType::Graphics), 1, &submitInfo, nullptr);
+	VkResult result = vkQueueSubmit(vulkanDevice->GetVkQueue(CrCommandQueueType::Graphics), 1, &submitInfo, m_swapchainRecreationFence);
 	CrAssert(result == VK_SUCCESS);
 }

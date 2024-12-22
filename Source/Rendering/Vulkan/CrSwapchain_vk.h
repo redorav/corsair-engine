@@ -39,6 +39,8 @@ private:
 
 	VkColorSpaceKHR		m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
+	VkFence				m_swapchainRecreationFence = nullptr;
+
 	// We use this mainly to resize the swapchain. There's a couple of things
 	// we can modify but the rest stays the same
 	VkSwapchainCreateInfoKHR m_vkSwapchainCreateInfo;

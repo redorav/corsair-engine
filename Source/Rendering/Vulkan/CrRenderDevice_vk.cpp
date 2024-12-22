@@ -927,8 +927,8 @@ void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVul
 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
 	// No need to specify anything special
-	CrCommandBufferVulkan* vulkanCommanddBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
-	vkCmdPipelineBarrier(vulkanCommanddBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+	CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+	vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 }
 
 void CrRenderDeviceVulkan::SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const

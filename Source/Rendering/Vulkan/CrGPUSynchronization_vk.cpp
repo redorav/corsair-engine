@@ -7,11 +7,8 @@ CrGPUFenceVulkan::CrGPUFenceVulkan(ICrRenderDevice* renderDevice) : ICrGPUFence(
 {
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
-	VkFenceCreateInfo info = {};
-	info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	info.flags = 0;
-
-	vkCreateFence(vkDevice, &info, nullptr, &m_vkFence);
+	VkFenceCreateInfo vkFenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+	vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_vkFence);
 }
 
 CrGPUFenceVulkan::~CrGPUFenceVulkan()

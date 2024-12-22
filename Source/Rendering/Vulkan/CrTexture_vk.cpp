@@ -158,6 +158,11 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		CrAssert(vkResult == VK_SUCCESS);
 
 		m_usedGPUMemoryBytes = (uint32_t)vmaAllocationInfo.size; // Take note of GPU memory usage
+
+		// We don't handle swapchain transitions because we need a more immediate response inside the
+		// swapchain class. Continuous resizes cannot be queued on the same command buffer if a deleted
+		// VkImage is being referenced, so our generic auxiliary command buffer can't be used
+		vulkanRenderDevice->TransitionVkTextureToInitialLayout(this, m_defaultState);
 	}
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkImage, VK_OBJECT_TYPE_IMAGE, descriptor.name);
@@ -271,8 +276,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			CrAssert(vkResult == VK_SUCCESS);
 		}
 	}
-
-	vulkanRenderDevice->TransitionVkTextureToInitialLayout(this, m_defaultState);
 
 	for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 	{

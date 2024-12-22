@@ -677,7 +677,7 @@ crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textur
 		case cr3d::TextureLayout::ShaderInput:     return { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_SHADER_READ_BIT };
 		case cr3d::TextureLayout::RenderTarget:    return { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
 		case cr3d::TextureLayout::RWTexture:       return { VK_IMAGE_LAYOUT_GENERAL,                  VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-		case cr3d::TextureLayout::Present:         return { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,          0 };
+		case cr3d::TextureLayout::Present:         return { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,          VK_ACCESS_NONE_KHR };
 		case cr3d::TextureLayout::CopySource:      return { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,     VK_ACCESS_TRANSFER_READ_BIT };
 		case cr3d::TextureLayout::CopyDestination: return { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,     VK_ACCESS_TRANSFER_WRITE_BIT };
 		case cr3d::TextureLayout::DepthStencilReadWrite:

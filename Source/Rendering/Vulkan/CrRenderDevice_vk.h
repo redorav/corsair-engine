@@ -39,6 +39,8 @@ public:
 
 	VkQueue GetVkQueue(CrCommandQueueType::T queueType) const;
 
+	VkCommandBuffer GetVkSwapchainCommandBuffer() const;
+
 	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
 
 	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState);
@@ -164,4 +166,8 @@ private:
 
 	VkQueue m_vkGraphicsQueue;
 	VkCommandPool m_vkGraphicsCommandPool;
+
+	// Swapchain command list
+	VkCommandPool m_vkSwapchainCommandPool;
+	VkCommandBuffer m_vkSwapchainCommandBuffer;
 };

@@ -107,6 +107,17 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, 
 
 	vkResult = vkCreatePipelineCache(m_vkDevice, &pipelineCacheCreateInfo, nullptr, &m_vkPipelineCache);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline cache");
+
+	// Create command buffer just for swapchain transitions
+	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
+	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	commandBufferAllocateInfo.commandPool = m_vkGraphicsCommandPool;
+	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	commandBufferAllocateInfo.commandBufferCount = 1;
+	VkResult result = vkAllocateCommandBuffers(m_vkDevice, &commandBufferAllocateInfo, &m_vkSwapchainCommandBuffer);
+	CrAssert(result == VK_SUCCESS);
+
+	SetVkObjectName((uint64_t)m_vkSwapchainCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "Swapchain Command Buffer");
 }
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
@@ -886,6 +897,11 @@ VkQueue CrRenderDeviceVulkan::GetVkQueue(CrCommandQueueType::T queueType) const
 		case CrCommandQueueType::Graphics: return m_vkGraphicsQueue;
 		default: return m_vkGraphicsQueue;
 	}
+}
+
+VkCommandBuffer CrRenderDeviceVulkan::GetVkSwapchainCommandBuffer() const
+{
+	return m_vkSwapchainCommandBuffer;
 }
 
 VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queueType) const

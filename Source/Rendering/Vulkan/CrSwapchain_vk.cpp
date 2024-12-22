@@ -316,7 +316,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 
-	CrVector<VkImage> images(m_imageCount);
+	CrFixedVector<VkImage, 8> images(m_imageCount);
 	VkResult vkResult = vkGetSwapchainImagesKHR(vulkanDevice->GetVkDevice(), m_vkSwapchain, &m_imageCount, images.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
@@ -328,6 +328,8 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	swapchainTextureParams.format = m_format;
 	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
+	CrFixedVector<VkImageMemoryBarrier, 8> imageMemoryBarriers(m_imageCount);
+
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
 		CrFixedString128 swapchainTextureName(m_name);
@@ -335,5 +337,38 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 		swapchainTextureParams.name = swapchainTextureName.c_str();
 		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
 		m_textures[i] = vulkanDevice->CreateTexture(swapchainTextureParams);
+
+		VkImageSubresourceRange subresourceRange = {};
+		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange.levelCount = 1;
+		subresourceRange.layerCount = 1;
+
+		imageMemoryBarriers[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarriers[i].image = images[i];
+		imageMemoryBarriers[i].subresourceRange = subresourceRange;
+		imageMemoryBarriers[i].srcAccessMask = VK_ACCESS_NONE;
+		imageMemoryBarriers[i].dstAccessMask = VK_ACCESS_NONE;
+
+		imageMemoryBarriers[i].oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageMemoryBarriers[i].newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		imageMemoryBarriers[i].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarriers[i].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	}
+
+	// Transition swapchain textures. We don't do that in the CreateTexture as we need
+	// a more immediate response to window resize changes. We use a special command
+	// buffer to queue only these transitions
+	VkCommandBuffer swapchainCommandBuffer = vulkanDevice->GetVkSwapchainCommandBuffer();
+
+	VkCommandBufferBeginInfo commandBufferInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+	vkBeginCommandBuffer(swapchainCommandBuffer, &commandBufferInfo);
+	vkCmdPipelineBarrier(vulkanDevice->GetVkSwapchainCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, (uint32_t)imageMemoryBarriers.size(), imageMemoryBarriers.data());
+	vkEndCommandBuffer(swapchainCommandBuffer);
+
+	// Submit to the queue immediately
+	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &swapchainCommandBuffer;
+	VkResult result = vkQueueSubmit(vulkanDevice->GetVkQueue(CrCommandQueueType::Graphics), 1, &submitInfo, nullptr);
+	CrAssert(result == VK_SUCCESS);
 }

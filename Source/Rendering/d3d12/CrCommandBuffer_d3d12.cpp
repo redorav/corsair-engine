@@ -566,7 +566,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 		D3D12_INDEX_BUFFER_VIEW d3d12IndexBufferView;
 		d3d12IndexBufferView.BufferLocation = d3d12Resource->GetGPUVirtualAddress() + m_currentState.m_indexBufferOffset;
-		d3d12IndexBufferView.SizeInBytes = d3d12GPUBuffer->GetSizeBytes();
+		d3d12IndexBufferView.SizeInBytes = m_currentState.m_indexBufferSize;
 		d3d12IndexBufferView.Format = crd3d::GetDXGIFormat(m_currentState.m_indexBufferFormat);
 
 		m_d3d12GraphicsCommandList->IASetIndexBuffer(&d3d12IndexBufferView);

@@ -129,7 +129,7 @@ public:
 
 	// Index Buffer
 
-	void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, cr3d::DataFormat::T indexFormat);
+	void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, cr3d::DataFormat::T indexFormat);
 
 	void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
 
@@ -284,10 +284,11 @@ protected:
 	{
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
+		uint32_t                        m_indexBufferSize;
 		cr3d::DataFormat::T             m_indexBufferFormat;
 		bool                            m_indexBufferDirty = false;
 
-		CrVertexBufferBinding             m_vertexBuffers[cr3d::MaxVertexStreams];
+		CrVertexBufferBinding           m_vertexBuffers[cr3d::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = false;
 
 		CrRectangle                     m_scissor;
@@ -370,7 +371,7 @@ inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
 	}
 }
 
-inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, cr3d::DataFormat::T indexFormat)
+inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, cr3d::DataFormat::T indexFormat)
 {
 	CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
 	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer must have index buffer flag");
@@ -378,23 +379,25 @@ inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexB
 
 	if (m_currentState.m_indexBuffer != indexBuffer ||
 		m_currentState.m_indexBufferOffset != byteOffset ||
+		m_currentState.m_indexBufferSize != sizeBytes ||
 		m_currentState.m_indexBufferFormat != indexFormat)
 	{
-		m_currentState.m_indexBuffer = indexBuffer;
+		m_currentState.m_indexBuffer       = indexBuffer;
 		m_currentState.m_indexBufferOffset = byteOffset;
+		m_currentState.m_indexBufferSize   = sizeBytes;
 		m_currentState.m_indexBufferFormat = indexFormat;
-		m_currentState.m_indexBufferDirty = true;
+		m_currentState.m_indexBufferDirty  = true;
 	}
 }
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrGPUBufferView& indexBufferView)
 {
-	BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetFormat());
+	BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetSizeBytes(), indexBufferView.GetFormat());
 }
 
 inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBuffer* indexBuffer, uint32_t elementOffset)
 {
-	BindIndexBuffer(indexBuffer->GetHardwareBuffer(), elementOffset * indexBuffer->GetStride(), indexBuffer->GetFormat());
+	BindIndexBuffer(indexBuffer->GetHardwareBuffer(), elementOffset * indexBuffer->GetStride(), indexBuffer->GetNumElements() * indexBuffer->GetStride(), indexBuffer->GetFormat());
 }
 
 inline void ICrCommandBuffer::BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride)
@@ -549,7 +552,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(ConstantBuffers::T constantBuff
 
 inline void ICrCommandBuffer::BindConstantBuffer(const CrGPUBufferView& constantBufferView)
 {
-	BindConstantBuffer((ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSize(), constantBufferView.GetByteOffset());
+	BindConstantBuffer((ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSizeBytes(), constantBufferView.GetByteOffset());
 }
 
 inline void ICrCommandBuffer::BindSampler(Samplers::T samplerIndex, const ICrSampler* sampler)

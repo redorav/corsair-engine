@@ -3,11 +3,17 @@
 #include "CrGPUSynchronization_vk.h"
 #include "CrRenderDevice_vk.h"
 
-CrGPUFenceVulkan::CrGPUFenceVulkan(ICrRenderDevice* renderDevice) : ICrGPUFence(renderDevice)
+CrGPUFenceVulkan::CrGPUFenceVulkan(ICrRenderDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
 {
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
 	VkFenceCreateInfo vkFenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+
+	if (signaled)
+	{
+		vkFenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	}
+
 	vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_vkFence);
 }
 

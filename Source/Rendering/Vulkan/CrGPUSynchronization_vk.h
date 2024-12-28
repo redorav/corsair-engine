@@ -9,18 +9,18 @@ class CrGPUFenceVulkan final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceVulkan(ICrRenderDevice* renderDevice);
+	CrGPUFenceVulkan(ICrRenderDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceVulkan();
 
-	const VkFence& GetVkFence() const;
+	VkFence GetVkFence() const;
 
 private:
 
 	VkFence m_vkFence;
 };
 
-inline const VkFence& CrGPUFenceVulkan::GetVkFence() const
+inline VkFence CrGPUFenceVulkan::GetVkFence() const
 {
 	return m_vkFence;
 }
@@ -33,14 +33,14 @@ public:
 
 	~CrGPUSemaphoreVulkan();
 
-	const VkSemaphore& GetVkSemaphore() const;
+	VkSemaphore GetVkSemaphore() const;
 
 private:
 
 	VkSemaphore m_vkSemaphore;
 };
 
-inline const VkSemaphore& CrGPUSemaphoreVulkan::GetVkSemaphore() const
+inline VkSemaphore CrGPUSemaphoreVulkan::GetVkSemaphore() const
 {
 	return m_vkSemaphore;
 }

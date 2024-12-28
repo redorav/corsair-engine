@@ -136,7 +136,9 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 
 cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
-	VkResult result = vkWaitForFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence(), true, timeoutNanoseconds);
+	VkFence vkFence = static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence();
+
+	VkResult result = vkWaitForFences(m_vkDevice, 1, &vkFence, true, timeoutNanoseconds);
 
 	switch (result)
 	{
@@ -175,7 +177,8 @@ void CrRenderDeviceVulkan::SignalFencePS(CrCommandQueueType::T queueType, const 
 
 void CrRenderDeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
 {
-	vkResetFences(m_vkDevice, 1, &static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+	VkFence vkFence = static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence();
+	vkResetFences(m_vkDevice, 1, &vkFence);
 }
 
 void CrRenderDeviceVulkan::WaitIdlePS()
@@ -410,14 +413,16 @@ void CrRenderDeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* command
 
 	if (waitSemaphore)
 	{
-		submitInfo.pWaitSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
+		VkSemaphore vkSemaphore = static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
+		submitInfo.pWaitSemaphores = &vkSemaphore;
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitDstStageMask = &waitStageMask;
 	}
 
 	if (signalSemaphore)
 	{
-		submitInfo.pSignalSemaphores = &static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
+		VkSemaphore vkSemaphore = static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
+		submitInfo.pSignalSemaphores = &vkSemaphore;
 		submitInfo.signalSemaphoreCount = 1;
 	}
 
@@ -664,9 +669,9 @@ ICrCommandBuffer* CrRenderDeviceVulkan::CreateCommandBufferPS(const CrCommandBuf
 	return new CrCommandBufferVulkan(this, descriptor);
 }
 
-ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS()
+ICrGPUFence* CrRenderDeviceVulkan::CreateGPUFencePS(bool signaled)
 {
-	return new CrGPUFenceVulkan(this);
+	return new CrGPUFenceVulkan(this, signaled);
 }
 
 ICrGPUSemaphore* CrRenderDeviceVulkan::CreateGPUSemaphorePS()

@@ -379,9 +379,9 @@ ICrCommandBuffer* CrRenderDeviceD3D12::CreateCommandBufferPS(const CrCommandBuff
 	return new CrCommandBufferD3D12(this, descriptor);
 }
 
-ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS()
+ICrGPUFence* CrRenderDeviceD3D12::CreateGPUFencePS(bool signaled)
 {
-	return new CrGPUFenceD3D12(this);
+	return new CrGPUFenceD3D12(this, signaled);
 }
 
 ICrGPUSemaphore* CrRenderDeviceD3D12::CreateGPUSemaphorePS()

@@ -55,7 +55,7 @@ private:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
-	virtual ICrGPUFence* CreateGPUFencePS() override;
+	virtual ICrGPUFence* CreateGPUFencePS(bool signaled) override;
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
 

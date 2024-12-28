@@ -9,7 +9,7 @@ class CrGPUFenceD3D12 final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceD3D12(ICrRenderDevice* renderDevice);
+	CrGPUFenceD3D12(ICrRenderDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceD3D12();
 

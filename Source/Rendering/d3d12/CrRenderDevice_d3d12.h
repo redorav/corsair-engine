@@ -25,8 +25,6 @@ public:
 
 	ID3D12Device10* GetD3D12Device10() const { return m_d3d12Device10; }
 
-	// This command queue isn't really used for anything other than to build the swapchain and do other tasks
-	// that the device used to do but now requires a queue. Don't use for actual rendering
 	ID3D12CommandQueue* GetD3D12GraphicsCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
 
 	ID3D12RootSignature* GetD3D12GraphicsRootSignature() const { return m_d3d12GraphicsRootSignature; }
@@ -63,7 +61,7 @@ private:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
-	virtual ICrGPUFence* CreateGPUFencePS() override;
+	virtual ICrGPUFence* CreateGPUFencePS(bool signaled) override;
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
 

@@ -129,9 +129,9 @@ CrCommandBufferHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBuffer
 	return CrCommandBufferHandle(CreateCommandBufferPS(descriptor));
 }
 
-CrGPUFenceHandle ICrRenderDevice::CreateGPUFence()
+CrGPUFenceHandle ICrRenderDevice::CreateGPUFence(bool signaled)
 {
-	return CrGPUFenceHandle(CreateGPUFencePS());
+	return CrGPUFenceHandle(CreateGPUFencePS(signaled));
 }
 
 CrGPUSemaphoreHandle ICrRenderDevice::CreateGPUSemaphore()

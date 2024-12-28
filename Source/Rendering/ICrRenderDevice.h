@@ -155,7 +155,7 @@ public:
 
 	CrHardwareGPUBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-	CrGPUFenceHandle CreateGPUFence();
+	CrGPUFenceHandle CreateGPUFence(bool signaled = false);
 
 	CrGPUSemaphoreHandle CreateGPUSemaphore();
 
@@ -204,7 +204,7 @@ protected:
 
 	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
 
-	virtual ICrGPUFence* CreateGPUFencePS() = 0;
+	virtual ICrGPUFence* CreateGPUFencePS(bool signaled) = 0;
 
 	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
 

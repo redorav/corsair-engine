@@ -199,6 +199,11 @@ xxHashLibrary =
 	includeDirs = LibxxHash..IncludeDirectory
 }
 
+XInputLibrary =
+{
+	libNames = 'xinput'
+}
+
 function AddLibraryIncludes(library)
 	includedirs(library.includeDirs)
 	if(library['defines']) then

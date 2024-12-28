@@ -290,6 +290,7 @@ project (ProjectCorsairEngine)
 	LinkLibrary(VulkanLibrary)
 	LinkLibrary(D3D12Library)
 	LinkLibrary(WinPixEventRuntimeLibrary)
+	LinkLibrary(XInputLibrary)
 
 	-- Copy necessary files or DLLs
 	postbuildcommands
@@ -503,6 +504,7 @@ project(ProjectCore)
 	AddLibraryNatvis(CRSTLLibrary)
 	AddLibraryNatvis(EASTLLibrary)
 	AddLibraryIncludes(SDL3Library)
+	AddLibraryIncludes(ImguiLibrary)
 
 	ExcludePlatformSpecificCode(SourceCoreDirectory)
 	

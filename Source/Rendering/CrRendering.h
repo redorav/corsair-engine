@@ -569,7 +569,14 @@ struct CrViewport
 		: x(x), y(y), width(width), height(height), minDepth(minDepth), maxDepth(maxDepth)
 	{}
 
+	explicit CrViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height, float minDepth, float maxDepth)
+		: x((float)x), y((float)y), width((float)width), height((float)height), minDepth(minDepth), maxDepth(maxDepth)
+	{}
+
 	CrViewport(float x, float y, float width, float height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
+	{}
+
+	explicit CrViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
 	{}
 
 	bool operator == (const CrViewport& viewport)

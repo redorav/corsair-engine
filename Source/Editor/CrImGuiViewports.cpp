@@ -1,6 +1,6 @@
 #include "CrImGuiViewports.h"
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -100,7 +100,7 @@ static void ImGuiViewportsCreateWindow(ImGuiViewport* viewport)
 	windowDescriptor.name            = "No Title Yet";
 	windowDescriptor.swapchainFormat = CrRendererConfig::SwapchainFormat;
 
-	ICrOSWindow* osWindow = new ICrOSWindow(windowDescriptor);
+	CrOSWindow* osWindow = new CrOSWindow(windowDescriptor);
 	viewportData->osWindow = osWindow;
 	viewportData->windowOwned = true;
 }
@@ -193,7 +193,7 @@ static bool ImGuiViewportsGetWindowMinimized(ImGuiViewport* viewport)
 	return viewportData->osWindow->GetIsMinimized();
 }
 
-void CrImGuiViewports::Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
+void CrImGuiViewports::Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow)
 {
 	unused_parameter(mainWindow);
 	CrAssertMsg(ImGui::GetCurrentContext() != nullptr, "Imgui must have been created");

@@ -15,14 +15,14 @@
 #include "Math/CrHlslppQuaternion.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 #include "CrImGuiViewports.h"
 
 #include <imgui.h>
 
 CrEditor* Editor;
 
-void CrEditor::Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
+void CrEditor::Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow)
 {
 	CrAssert(Editor == nullptr);
 	Editor = new CrEditor(mainWindow);
@@ -35,7 +35,7 @@ void CrEditor::Deinitialize()
 	Editor = nullptr;
 }
 
-CrEditor::CrEditor(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
+CrEditor::CrEditor(const CrIntrusivePtr<CrOSWindow>& mainWindow)
 {
 	CrImGuiViewports::Initialize(mainWindow);
 

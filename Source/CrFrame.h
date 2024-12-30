@@ -12,7 +12,7 @@
 
 namespace GBufferDebugMode { enum T : uint32_t; }
 
-class ICrOSWindow;
+class CrOSWindow;
 
 class CrFrame
 {
@@ -22,7 +22,7 @@ public:
 
 	~CrFrame();
 
-	void Initialize(CrIntrusivePtr<ICrOSWindow> mainWindow);
+	void Initialize(CrIntrusivePtr<CrOSWindow> mainWindow);
 
 	void Deinitialize();
 
@@ -93,7 +93,7 @@ private:
 
 	CrGPUBufferHandle m_indirectDispatchArguments;
 
-	CrIntrusivePtr<ICrOSWindow> m_mainWindow;
+	CrIntrusivePtr<CrOSWindow> m_mainWindow;
 
 	// We use these two variables to trigger render target resizing after a window resize
 	uint32_t m_currentWindowWidth;

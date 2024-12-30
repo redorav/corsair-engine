@@ -7,7 +7,7 @@
 #include "CrGPUSynchronization_d3d12.h"
 #include "CrD3D12.h"
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"

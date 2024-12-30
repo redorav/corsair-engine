@@ -27,7 +27,7 @@ struct CrOSWindowDescriptor
 	uint32_t positionY;
 	uint32_t width;
 	uint32_t height;
-	ICrOSWindow* parentWindow;
+	CrOSWindow* parentWindow;
 	CrFixedString128 name;
 	cr3d::DataFormat::T swapchainFormat;
 	uint32_t decoration : 1;
@@ -52,13 +52,13 @@ namespace CursorType
 	};
 }
 
-class ICrOSWindow : public CrIntrusivePtrInterface
+class CrOSWindow : public CrIntrusivePtrInterface
 {
 public:
 
-	ICrOSWindow(const CrOSWindowDescriptor& windowDescriptor);
+	CrOSWindow(const CrOSWindowDescriptor& windowDescriptor);
 
-	~ICrOSWindow();
+	~CrOSWindow();
 
 	// Initialize the windowing system
 	static void Initialize();

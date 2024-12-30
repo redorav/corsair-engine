@@ -19,7 +19,7 @@
 #include "Rendering/CrRenderingResources.h"
 #include "Rendering/CrRendering.h"
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 #include "Editor/CrImGuiViewports.h"
 
@@ -137,7 +137,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f);
 }
 
-void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
+void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<CrOSWindow>& mainWindow)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -175,7 +175,7 @@ void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
 			case ImGuiMouseCursor_NotAllowed: cursorType = CursorType::NotAllowed; break;
 		}
 
-		ICrOSWindow::SetCursor(cursorType);
+		CrOSWindow::SetCursor(cursorType);
 	}
 
 	ImGui::NewFrame();
@@ -198,7 +198,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 	{
 		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
 		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
-		ICrOSWindow* osWindow = viewportData->osWindow;
+		CrOSWindow* osWindow = viewportData->osWindow;
 		CrSwapchainHandle swapchain = osWindow->GetSwapchain();
 
 		renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,

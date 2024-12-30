@@ -79,13 +79,13 @@ namespace CrEditorAxis
 	};
 };
 
-class ICrOSWindow;
+class CrOSWindow;
 
 class CrEditor
 {
 public:
 
-	static void Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
+	static void Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow);
 
 	static void Deinitialize();
 
@@ -97,7 +97,7 @@ public:
 
 private:
 
-	CrEditor(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
+	CrEditor(const CrIntrusivePtr<CrOSWindow>& mainWindow);
 
 	void SpawnManipulator(const float4x4& initialTransform);
 

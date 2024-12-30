@@ -10,7 +10,7 @@
 
 #include "Math/CrMath.h"
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 	: ICrSwapchain(renderDevice, swapchainDescriptor)

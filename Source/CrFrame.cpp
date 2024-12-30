@@ -44,7 +44,7 @@
 
 #include <Math/CrHlslppDataPacking.h>
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"
 
 #include "Rendering/Shaders/DeferredLightingShared.hlsl"
@@ -185,7 +185,7 @@ struct CrRenderPacketBatcher
 	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
-void CrFrame::Initialize(CrIntrusivePtr<ICrOSWindow> mainWindow)
+void CrFrame::Initialize(CrIntrusivePtr<CrOSWindow> mainWindow)
 {
 	HashingAssert();
 
@@ -422,7 +422,7 @@ void CrFrame::Process()
 	{
 		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
 		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
-		ICrOSWindow* osWindow = viewportData->osWindow;
+		CrOSWindow* osWindow = viewportData->osWindow;
 		if (osWindow)
 		{
 			osWindow->GetSwapchain()->AcquireNextImage();
@@ -950,7 +950,7 @@ void CrFrame::Process()
 	{
 		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
 		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
-		ICrOSWindow* osWindow = viewportData->osWindow;
+		CrOSWindow* osWindow = viewportData->osWindow;
 		if (osWindow)
 		{
 			osWindow->GetSwapchain()->Present();

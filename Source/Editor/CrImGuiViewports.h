@@ -2,11 +2,11 @@
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
-class ICrOSWindow;
+class CrOSWindow;
 
 struct ImGuiViewportsData
 {
-	ICrOSWindow* osWindow;
+	CrOSWindow* osWindow;
 	bool         windowOwned;
 
 	ImGuiViewportsData()
@@ -21,5 +21,5 @@ class CrImGuiViewports
 {
 public:
 
-	static void Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
+	static void Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow);
 };

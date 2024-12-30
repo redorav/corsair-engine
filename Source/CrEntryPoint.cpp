@@ -17,7 +17,7 @@
 
 #include <windows.h> // TODO Remove
 
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 uint32_t screenWidth = 1280;
 uint32_t screenHeight = 720;
@@ -93,14 +93,14 @@ int main(int argc, char* argv[])
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
 	CrRenderingResources::Initialize(renderDevice.get());
-	ICrOSWindow::Initialize();
+	CrOSWindow::Initialize();
 
 	CrOSWindowDescriptor osWindowDescriptor;
 	osWindowDescriptor.swapchainFormat = CrRendererConfig::SwapchainFormat;
 	osWindowDescriptor.width = screenWidth;
 	osWindowDescriptor.height = screenHeight;
 	osWindowDescriptor.name = "Main Window";
-	CrIntrusivePtr<ICrOSWindow> mainWindow = CrIntrusivePtr<ICrOSWindow>(new ICrOSWindow(osWindowDescriptor));
+	CrIntrusivePtr<CrOSWindow> mainWindow = CrIntrusivePtr<CrOSWindow>(new CrOSWindow(osWindowDescriptor));
 
 	CrFrame frame;
 	frame.Initialize(mainWindow);

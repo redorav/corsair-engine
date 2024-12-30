@@ -1,4 +1,4 @@
-#include "ICrOSWindow.h"
+#include "CrOSWindow.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Input/CrInputManager.h"
@@ -205,7 +205,7 @@ KeyboardKey::Code GetKeyboardKeyFromVkKey(USHORT virtualKey)
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	ICrOSWindow* osWindow = (ICrOSWindow*)::GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	CrOSWindow* osWindow = (CrOSWindow*)::GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	LRESULT wndProcResult = 0;
 
@@ -500,7 +500,7 @@ HINSTANCE ModuleHandle;
 
 static LPCWSTR szClassName = L"Corsair Engine";
 
-ICrOSWindow::ICrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
+CrOSWindow::CrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
 {
 	m_style = WS_OVERLAPPEDWINDOW;
 
@@ -565,14 +565,14 @@ ICrOSWindow::ICrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
 	}
 }
 
-ICrOSWindow::~ICrOSWindow()
+CrOSWindow::~CrOSWindow()
 {
 	Destroy();
 }
 
 HCURSOR CursorMappingTable[(uint32_t)CursorType::Count] = {};
 
-void ICrOSWindow::Initialize()
+void CrOSWindow::Initialize()
 {
 	CrAssert(ModuleHandle == nullptr);
 
@@ -629,12 +629,12 @@ void ICrOSWindow::Initialize()
 	}
 }
 
-void ICrOSWindow::SetCursor(CursorType::T cursorType)
+void CrOSWindow::SetCursor(CursorType::T cursorType)
 {
 	::SetCursor(CursorMappingTable[cursorType]);
 }
 
-void ICrOSWindow::Destroy()
+void CrOSWindow::Destroy()
 {
 	if (m_hwnd)
 	{
@@ -643,38 +643,38 @@ void ICrOSWindow::Destroy()
 	}
 }
 
-bool ICrOSWindow::GetIsMinimized() const
+bool CrOSWindow::GetIsMinimized() const
 {
 	// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-isiconic?redirectedfrom=MSDN
 	return ::IsIconic((HWND)m_hwnd);
 }
 
-bool ICrOSWindow::GetIsFocused() const
+bool CrOSWindow::GetIsFocused() const
 {
 	return ::GetFocus() == (HWND)m_hwnd;
 }
 
-bool ICrOSWindow::GetIsDestroyed() const
+bool CrOSWindow::GetIsDestroyed() const
 {
 	return m_hwnd == nullptr;
 }
 
-void* ICrOSWindow::GetNativeWindowHandle() const
+void* CrOSWindow::GetNativeWindowHandle() const
 {
 	return m_hwnd;
 }
 
-void* ICrOSWindow::GetParentWindowHandle() const
+void* CrOSWindow::GetParentWindowHandle() const
 {
 	return m_parentHwnd;
 }
 
-void* ICrOSWindow::GetNativeInstanceHandle() const
+void* CrOSWindow::GetNativeInstanceHandle() const
 {
 	return m_hInstance;
 }
 
-void ICrOSWindow::GetPosition(uint32_t& positionX, uint32_t& positionY) const
+void CrOSWindow::GetPosition(uint32_t& positionX, uint32_t& positionY) const
 {
 	POINT pos = { 0, 0 };
 	::ClientToScreen((HWND)m_hwnd, &pos);
@@ -682,7 +682,7 @@ void ICrOSWindow::GetPosition(uint32_t& positionX, uint32_t& positionY) const
 	positionY = pos.y;
 }
 
-void ICrOSWindow::GetSizePixels(uint32_t& width, uint32_t& height) const
+void CrOSWindow::GetSizePixels(uint32_t& width, uint32_t& height) const
 {
 	RECT rect;
 	::GetClientRect((HWND)m_hwnd, &rect);
@@ -690,31 +690,31 @@ void ICrOSWindow::GetSizePixels(uint32_t& width, uint32_t& height) const
 	height = rect.bottom - rect.top;
 }
 
-void ICrOSWindow::SetPosition(uint32_t positionX, uint32_t positionY)
+void CrOSWindow::SetPosition(uint32_t positionX, uint32_t positionY)
 {
 	RECT rect = { (LONG)positionX, (LONG)positionY, (LONG)positionX, (LONG)positionY };
 	::AdjustWindowRectEx(&rect, (DWORD)m_style, FALSE, (DWORD)m_exStyle);
 	::SetWindowPos((HWND)m_hwnd, nullptr, rect.left, rect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
-void ICrOSWindow::SetSizePixels(uint32_t width, uint32_t height)
+void CrOSWindow::SetSizePixels(uint32_t width, uint32_t height)
 {
 	RECT rect = { 0, 0, (LONG)width, (LONG)height };
 	::AdjustWindowRectEx(&rect, (DWORD)m_style, FALSE, (DWORD)m_exStyle); // Client to Screen
 	::SetWindowPos((HWND)m_hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
-void ICrOSWindow::SetFocus()
+void CrOSWindow::SetFocus()
 {
 	::SetFocus((HWND)m_hwnd);
 }
 
-void ICrOSWindow::SetTitle(const char* title)
+void CrOSWindow::SetTitle(const char* title)
 {
 	::SetWindowTextA((HWND)m_hwnd, title);
 }
 
-void ICrOSWindow::SetTransparencyAlpha(float alpha)
+void CrOSWindow::SetTransparencyAlpha(float alpha)
 {
 	CrAssert(alpha > 0.0f && alpha <= 1.0f);
 
@@ -731,7 +731,7 @@ void ICrOSWindow::SetTransparencyAlpha(float alpha)
 	}
 }
 
-void ICrOSWindow::Show()
+void CrOSWindow::Show()
 {
 	::ShowWindow((HWND)m_hwnd, SW_NORMAL);
 }

@@ -126,38 +126,38 @@ public:
 	// Resource Creation
 	//------------------
 
-	CrCommandBufferHandle CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
+	ICrCommandBuffer* CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
-	CrIndexBufferHandle CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
+	CrIndexBuffer* CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
 
-	CrSamplerHandle CreateSampler(const CrSamplerDescriptor& descriptor);
+	ICrSampler* CreateSampler(const CrSamplerDescriptor& descriptor);
 
-	CrSwapchainHandle CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
+	ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
-	CrTextureHandle CreateTexture(const CrTextureDescriptor& descriptor);
+	ICrTexture* CreateTexture(const CrTextureDescriptor& descriptor);
 
-	CrVertexBufferHandle CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+	CrVertexBuffer* CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 	template<typename Metadata>
-	CrStructuredBufferHandle<Metadata> CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
+	CrStructuredBuffer<Metadata>* CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
 
-	CrTypedBufferHandle CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
+	CrTypedBuffer* CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
 
-	CrGraphicsShaderHandle CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	ICrGraphicsShader* CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
-	CrComputeShaderHandle CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor);
+	ICrComputeShader* CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor);
 
 	CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 	
 	CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
 
-	CrGPUQueryPoolHandle CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
+	ICrGPUQueryPool* CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
 
-	CrHardwareGPUBufferHandle CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-	CrGPUFenceHandle CreateGPUFence(bool signaled = false);
+	ICrGPUFence* CreateGPUFence(bool signaled = false);
 
-	CrGPUSemaphoreHandle CreateGPUSemaphore();
+	ICrGPUSemaphore* CreateGPUSemaphore();
 
 	void AddToDeletionQueue(CrGPUDeletable* resource);
 
@@ -310,7 +310,7 @@ private:
 };
 
 template<typename Metadata>
-CrStructuredBufferHandle<Metadata> ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
+CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
 {
-	return CrStructuredBufferHandle<Metadata>(new CrStructuredBuffer<Metadata>(this, access, numElements));
+	return new CrStructuredBuffer<Metadata>(this, access, numElements);
 }

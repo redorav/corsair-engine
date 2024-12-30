@@ -124,19 +124,19 @@ void ICrRenderDevice::FinalizeDeletion()
 	m_gpuDeletionQueue->Finalize();
 }
 
-CrCommandBufferHandle ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
+ICrCommandBuffer* ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
 {
-	return CrCommandBufferHandle(CreateCommandBufferPS(descriptor));
+	return CreateCommandBufferPS(descriptor);
 }
 
-CrGPUFenceHandle ICrRenderDevice::CreateGPUFence(bool signaled)
+ICrGPUFence* ICrRenderDevice::CreateGPUFence(bool signaled)
 {
-	return CrGPUFenceHandle(CreateGPUFencePS(signaled));
+	return CreateGPUFencePS(signaled);
 }
 
-CrGPUSemaphoreHandle ICrRenderDevice::CreateGPUSemaphore()
+ICrGPUSemaphore* ICrRenderDevice::CreateGPUSemaphore()
 {
-	return CrGPUSemaphoreHandle(CreateGPUSemaphorePS());
+	return CreateGPUSemaphorePS();
 }
 
 void ICrRenderDevice::AddToDeletionQueue(CrGPUDeletable* resource)
@@ -144,14 +144,14 @@ void ICrRenderDevice::AddToDeletionQueue(CrGPUDeletable* resource)
 	m_gpuDeletionQueue->AddToQueue(resource);
 }
 
-CrGraphicsShaderHandle ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+ICrGraphicsShader* ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
-	return CrGraphicsShaderHandle(CreateGraphicsShaderPS(graphicsShaderDescriptor));
+	return CreateGraphicsShaderPS(graphicsShaderDescriptor);
 }
 
-CrComputeShaderHandle ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
+ICrComputeShader* ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
 {
-	return CrComputeShaderHandle(CreateComputeShaderPS(computeShaderDescriptor));
+	return CreateComputeShaderPS(computeShaderDescriptor);
 }
 
 CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
@@ -244,32 +244,32 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeSh
 	return computePipeline;
 }
 
-CrGPUQueryPoolHandle ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+ICrGPUQueryPool* ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
 {
-	return CrGPUQueryPoolHandle(CreateGPUQueryPoolPS(queryPoolDescriptor));
+	return CreateGPUQueryPoolPS(queryPoolDescriptor);
 }
 
-CrHardwareGPUBufferHandle ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 {
-	return CrHardwareGPUBufferHandle(CreateHardwareGPUBufferPS(descriptor));
+	return CreateHardwareGPUBufferPS(descriptor);
 }
 
-CrIndexBufferHandle ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
+CrIndexBuffer* ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
 {
-	return CrIndexBufferHandle(new CrIndexBuffer(this, access, dataFormat, numIndices));
+	return new CrIndexBuffer(this, access, dataFormat, numIndices);
 }
 
-CrSamplerHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
+ICrSampler* ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 {
-	return CrSamplerHandle(CreateSamplerPS(descriptor));
+	return CreateSamplerPS(descriptor);
 }
 
-CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
+ICrSwapchain* ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
 	CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
-	CrSwapchainHandle swapchain = CrSwapchainHandle(CreateSwapchainPS(swapchainDescriptor));
+	ICrSwapchain* swapchain = CreateSwapchainPS(swapchainDescriptor);
 
 	CrAssertMsg(swapchain->GetWidth() > 0, "Swapchain must have a width");
 	CrAssertMsg(swapchain->GetHeight() > 0, "Swapchain must have a height");
@@ -279,19 +279,19 @@ CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& 
 	return swapchain;
 }
 
-CrTextureHandle ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
+ICrTexture* ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 {
-	return CrTextureHandle(CreateTexturePS(descriptor));
+	return CreateTexturePS(descriptor);
 }
 
-CrVertexBufferHandle ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+CrVertexBuffer* ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 {
-	return CrVertexBufferHandle(new CrVertexBuffer(this, access, vertexDescriptor, numVertices));
+	return new CrVertexBuffer(this, access, vertexDescriptor, numVertices);
 }
 
-CrTypedBufferHandle ICrRenderDevice::CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+CrTypedBuffer* ICrRenderDevice::CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
 {
-	return CrTypedBufferHandle(new CrTypedBuffer(this, access, dataFormat, numElements));
+	return new CrTypedBuffer(this, access, dataFormat, numElements);
 }
 
 cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)

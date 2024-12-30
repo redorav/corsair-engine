@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 		{
 			if (!mainWindow->GetIsMinimized())
 			{
-				frame.Process(); // Process the main loop
+				frame.Process();
 			}
 		}
 	}

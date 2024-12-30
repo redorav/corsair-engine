@@ -412,11 +412,11 @@ CrTextureD3D12::~CrTextureD3D12()
 {
 	CrRenderDeviceD3D12* renderDeviceD3D12 = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
 
-	if (IsRenderTarget())
+	if (IsRenderTarget() || IsSwapchain())
 	{
 		for (size_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
-			const auto& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
+			const CrVector<crd3d::DescriptorD3D12>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
 
 			for (const auto& descriptor : sliceArray)
 			{

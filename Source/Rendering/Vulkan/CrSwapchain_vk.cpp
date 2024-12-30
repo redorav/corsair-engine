@@ -10,6 +10,8 @@
 
 #include "Math/CrMath.h"
 
+#include "ICrOSWindow.h"
+
 CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 	: ICrSwapchain(renderDevice, swapchainDescriptor)
 
@@ -28,35 +30,35 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
 	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.platformHandle;
-	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.hinstance = (HINSTANCE)swapchainDescriptor.window->GetNativeInstanceHandle();
+	surfaceCreateInfo.hwnd = (HWND)swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
-	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.window = (ANativeWindow*)swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateAndroidSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.connection = connection;
-	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.platformWindow;
-	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.platformHandle;
+	surfaceCreateInfo.window = *(xcb_window_t*)swapchainDescriptor.window->GetNativeInstanceHandle();
+	surfaceCreateInfo.connection = (xcb_connection_t*)swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateXcbSurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_VI_NN) // Nintendo Switch
 	VkViSurfaceCreateInfoNN surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN;
-	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.window = *(nn::vi::NativeWindowHandle*)swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateViSurfaceNN(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
 	VkMacOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
-	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.pView = swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateMacOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #elif defined(VK_USE_PLATFORM_IOS_MVK)
 	VkIOSSurfaceCreateInfoMVK surfaceCreateInfo = {};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
-	surfaceCreateInfo.pView = swapchainDescriptor.platformWindow;
+	surfaceCreateInfo.pView = swapchainDescriptor.window->GetNativeWindowHandle();
 	vkResult = vkCreateIOSSurfaceMVK(vkInstance, &surfaceCreateInfo, nullptr, &m_vkSurface);
 #endif
 
@@ -218,11 +220,9 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
-	VkFenceCreateInfo vkFenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-	vkFenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-	vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_swapchainRecreationFence);
-
-	CreateSwapchainTextures();
+	VkFenceCreateInfo vkSwapchainRecreateFenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+	vkSwapchainRecreateFenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	vkCreateFence(vkDevice, &vkSwapchainRecreateFenceInfo, nullptr, &m_swapchainRecreationFence);
 
 	m_presentCompleteSemaphores.resize(m_imageCount);
 
@@ -230,6 +230,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	{
 		waitSemaphore = m_renderDevice->CreateGPUSemaphore();
 	}
+
+	CreateSwapchainTextures();
 }
 
 CrSwapchainVulkan::~CrSwapchainVulkan()
@@ -246,26 +248,44 @@ CrSwapchainVulkan::~CrSwapchainVulkan()
 
 CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
-
-	const ICrGPUSemaphore* signalSemaphore = m_presentCompleteSemaphores[m_currentSemaphoreIndex].get();
-
-	// Acquire image signals the semaphore we pass in
-	VkResult res = vkAcquireNextImageKHR(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSwapchain, timeoutNanoseconds, 
-		static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore(), (VkFence)nullptr, &m_currentBufferIndex);
-
-	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
+	if (!m_acquired)
 	{
-		return CrSwapchainResult::Invalid;
-	}
+		VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
+		m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
+
+		//const ICrGPUSemaphore* signalSemaphore = m_presentCompleteSemaphores[m_currentSemaphoreIndex].get();
+
+		CrGPUFenceVulkan* imageReadyFence = static_cast<CrGPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
+
+		// Acquire image signals the semaphore we pass in
+		VkResult res = vkAcquireNextImageKHR(vkDevice, m_vkSwapchain, timeoutNanoseconds, nullptr, imageReadyFence->GetVkFence(), &m_currentBufferIndex);
+		CrAssert(res == VK_SUCCESS);
+
+		// TODO Recreate if out of date or suboptimal
+
+		m_acquired = true;
+	}
+	
 	return CrSwapchainResult::Success;
 }
 
 void CrSwapchainVulkan::PresentPS()
 {
-	VkQueue vkQueue = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkQueue(CrCommandQueueType::Graphics);
-	CrGPUSemaphoreVulkan* waitSemaphore = static_cast<CrGPUSemaphoreVulkan*>(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get());
+	CrAssert(m_acquired == true);
+
+	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+
+	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+	VkQueue vkQueue = vulkanRenderDevice->GetVkGraphicsQueue();
+	//CrGPUSemaphoreVulkan* waitSemaphore = static_cast<CrGPUSemaphoreVulkan*>(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get());
+
+	CrGPUFenceVulkan* imageReadyFence = static_cast<CrGPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
+	VkFence vkImageReadyFence = imageReadyFence->GetVkFence();
+
+	vkWaitForFences(vkDevice, 1, &vkImageReadyFence, true, UINT64_MAX);
+
+	vkResetFences(vkDevice, 1, &vkImageReadyFence);
 
 	// Present image (swap buffers)
 	// TODO Put this on the device and batch submit swapchains
@@ -275,9 +295,11 @@ void CrSwapchainVulkan::PresentPS()
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_vkSwapchain;
 	presentInfo.pImageIndices = &m_currentBufferIndex;
-	presentInfo.pWaitSemaphores = &waitSemaphore->GetVkSemaphore();
-	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = nullptr;// &waitSemaphore->GetVkSemaphore();
+	presentInfo.waitSemaphoreCount = 0;
 	vkQueuePresentKHR(vkQueue, &presentInfo);
+
+	m_acquired = false;
 }
 
 void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
@@ -290,6 +312,7 @@ void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
 
 	m_width = width;
 	m_height = height;
+	m_acquired = false;
 
 	// Call this function again to silence the validation layer about resolution mismatches. I think it has the values cached and
 	// checks against those, which are the old ones. What we can do is assert that the width and height are not larger
@@ -316,17 +339,20 @@ void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
 	}
 
 	CreateSwapchainTextures();
+
+	AcquireNextImage();
 }
 
 void CrSwapchainVulkan::CreateSwapchainTextures()
 {
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 
 	CrFixedVector<VkImage, 8> images(m_imageCount);
-	VkResult vkResult = vkGetSwapchainImagesKHR(vulkanDevice->GetVkDevice(), m_vkSwapchain, &m_imageCount, images.data());
+	VkResult vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
-	vkWaitForFences(vulkanDevice->GetVkDevice(), 1, &m_swapchainRecreationFence, VK_TRUE, UINT64_MAX);
+	vkWaitForFences(vkDevice, 1, &m_swapchainRecreationFence, VK_TRUE, UINT64_MAX);
 
 	m_textures = CrVector<CrTextureHandle>(m_imageCount);
 
@@ -363,22 +389,28 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 		imageMemoryBarriers[i].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	}
 
-	// Transition swapchain textures. We don't do that in the CreateTexture as we need
-	// a more immediate response to window resize changes. We use a special command
-	// buffer to queue only these transitions
+	// Transition swapchain textures. We don't do it in the CreateTexture as we need a more immediate response to window resizes
+	// We use a special command buffer to queue only these transitions
 	VkCommandBuffer swapchainCommandBuffer = vulkanDevice->GetVkSwapchainCommandBuffer();
 
 	VkCommandBufferBeginInfo commandBufferInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
 	vkBeginCommandBuffer(swapchainCommandBuffer, &commandBufferInfo);
-	vkCmdPipelineBarrier(vulkanDevice->GetVkSwapchainCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, (uint32_t)imageMemoryBarriers.size(), imageMemoryBarriers.data());
+	vkCmdPipelineBarrier(swapchainCommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, (uint32_t)imageMemoryBarriers.size(), imageMemoryBarriers.data());
 	vkEndCommandBuffer(swapchainCommandBuffer);
 
-	vkResetFences(vulkanDevice->GetVkDevice(), 1, &m_swapchainRecreationFence);
+	vkResetFences(vkDevice, 1, &m_swapchainRecreationFence);
 
 	// Submit to the queue immediately
 	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &swapchainCommandBuffer;
-	VkResult result = vkQueueSubmit(vulkanDevice->GetVkQueue(CrCommandQueueType::Graphics), 1, &submitInfo, m_swapchainRecreationFence);
+	VkResult result = vkQueueSubmit(vulkanDevice->GetVkGraphicsQueue(), 1, &submitInfo, m_swapchainRecreationFence);
 	CrAssert(result == VK_SUCCESS);
+
+	m_imageReadyFences.resize(m_imageCount);
+
+	for (CrGPUFenceHandle& imageReadyFence : m_imageReadyFences)
+	{
+		imageReadyFence = m_renderDevice->CreateGPUFence();
+	}
 }

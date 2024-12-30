@@ -15,10 +15,32 @@
 #include "Math/CrHlslppQuaternion.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
-void CrEditor::Initialize()
+#include "ICrOSWindow.h"
+#include "CrImGuiViewports.h"
+
+#include <imgui.h>
+
+CrEditor* Editor;
+
+void CrEditor::Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
 {
+	CrAssert(Editor == nullptr);
+	Editor = new CrEditor(mainWindow);
+}
+
+void CrEditor::Deinitialize()
+{
+	CrAssert(Editor != nullptr);
+	delete Editor;
+	Editor = nullptr;
+}
+
+CrEditor::CrEditor(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
+{
+	CrImGuiViewports::Initialize(mainWindow);
+
 	CrRenderMeshHandle dummyDebugMesh = CrShapeBuilder::CreateSphere({ 12 });
-	
+
 	CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
 	basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForward->GetShader();
 	basicMaterial->m_shaders[CrMaterialShaderVariant::GBuffer] = BuiltinPipelines->BasicUbershaderGBuffer->GetShader();
@@ -44,273 +66,322 @@ void CrEditor::Update()
 
 	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
 
-	const MouseState& mouseState = CrInput.GetMouseState();
-	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
-	const GamepadState& gamepadState = CrInput.GetGamepadState(0);
+	ImGuiIO& io = ImGui::GetIO();
 
-	bool isEscapeHeld = keyboardState.keyHeld[KeyboardKey::Escape];
-	//bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
-	bool isLeftAltHeld = keyboardState.keyHeld[KeyboardKey::Alt];
-	//bool isLeftCtrlHeld = keyboardState.keyHeld[KeyboardKey::LeftCtrl];
-	bool isLeftShiftHeld = keyboardState.keyHeld[KeyboardKey::LeftShift];
-
-	bool isFPSCamera = mouseState.buttonHeld[MouseButton::Right];
-	bool isOrbitCamera = isLeftAltHeld && mouseState.buttonHeld[MouseButton::Left];
-
-	//---------
-	// Rotation
-	//---------
-
-	float mouseSensitivity = 0.005f;
-	float mouseWheelSensitivity = 0.5f;
-
-	if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
+	if (ImGui::BeginMainMenuBar())
 	{
-		m_cameraState.yaw += 2.0f * frameDelta;
-	}
-
-	if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
-	{
-		m_cameraState.yaw += -2.0f * frameDelta;
-	}
-
-	if (gamepadState.axes[GamepadAxis::RightY] > 0.0f)
-	{
-		m_cameraState.pitch += -2.0f * frameDelta;
-	}
-
-	if (gamepadState.axes[GamepadAxis::RightY] < 0.0f)
-	{
-		m_cameraState.pitch += 2.0f * frameDelta;
-	}
-
-	if (isFPSCamera || isOrbitCamera)
-	{
-		m_cameraState.pitch += (float)mouseState.relativePosition.y * mouseSensitivity;
-		m_cameraState.yaw += (float)mouseState.relativePosition.x * mouseSensitivity;
-	}
-
-	// Restrict angles to 2pi to avoid numerical instability at large values
-	// Compute rotation from absolute angles relative to the world origin
-	// This avoids relative camera movement that can drift and avoids Y-axis nonsense
-	float3x3 xMtx = float3x3::rotation_x(m_cameraState.pitch);
-	float3x3 yMtx = float3x3::rotation_y(m_cameraState.yaw);
-	float3x3 finalMtx = mul(xMtx, yMtx);
-
-	camera->SetCameraRotationVectors(finalMtx[2], finalMtx[0], finalMtx[1]);
-
-	const float3 forwardVector = camera->GetForwardVector();
-	const float3 rightVector = camera->GetRightVector();
-	const float3 upVector = camera->GetUpVector();
-
-	//------------
-	// Translation
-	//------------
-
-	float translationSpeed = 5.0f;
-
-	if (isLeftShiftHeld)
-	{
-		translationSpeed *= 10.0f;
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
-	{
-		camera->Translate(rightVector * -translationSpeed * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
-	{
-		camera->Translate(rightVector * translationSpeed * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
-	{
-		camera->Translate(forwardVector * translationSpeed * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
-	{
-		camera->Translate(forwardVector * -translationSpeed * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
-	{
-		camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
-	{
-		camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
-	}
-
-	if (keyboardState.keyHeld[KeyboardKey::F])
-	{
-		if (IsAnyInstanceSelected())
+		if (ImGui::BeginMenu("File"))
 		{
-			m_cameraState.focusDistance = m_cameraState.defaultFocusDistance;
-			m_cameraState.focusPosition = ComputeSelectionPosition();
-			camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
-		}
-	}
-
-	if (mouseState.mouseWheel.y != 0)
-	{
-		float translation = mouseState.mouseWheel.y * mouseWheelSensitivity;
-		camera->Translate(forwardVector * translation);
-		m_cameraState.focusDistance = distance(camera->GetPosition(), m_cameraState.focusPosition);
-	}
-
-	//-----------------
-	// Orbit and Strafe
-	//-----------------
-
-	if (isLeftAltHeld)
-	{
-		if (mouseState.buttonHeld[MouseButton::Left])
-		{
-			// If we're orbiting the focal point, make sure we continually point towards it
-			camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
-		}
-		else if(mouseState.buttonHeld[MouseButton::Middle])
-		{
-			float rightTranslation = (float)-mouseState.relativePosition.x * mouseSensitivity;
-			float upTranslation = (float)mouseState.relativePosition.y * mouseSensitivity;
-
-			camera->SetPosition(camera->GetPosition() + rightVector * rightTranslation + upVector * upTranslation);
-		}
-
-		// Finally update the focus position
-		m_cameraState.focusPosition = camera->GetPosition() + forwardVector * m_cameraState.focusDistance;
-	}
-
-	//--------------------------
-	// Update Matrices to Render
-	//--------------------------
-
-	camera->UpdateMatrices();
-
-	if (isEscapeHeld)
-	{
-		ClearSelectedInstances();
-		RemoveManipulator();
-	}
-
-	for (size_t i = 0; i < m_selectionStateQueue.size(); ++i)
-	{
-		const SelectionState& selectionState = m_selectionStateQueue[i];
-
-		// If we have a valid entity, we can start seeing how to react
-		if (selectionState.modelInstanceId != 0xffffffff)
-		{
-			if (selectionState.modelInstanceId != 65535) // TODO Why this double check?
+			if (ImGui::MenuItem("Create"))
 			{
-				CrModelInstanceId instanceId = CrModelInstanceId(selectionState.modelInstanceId);
+			}
 
-				bool isEditorInstance = m_renderWorld->GetIsEditorInstance(instanceId);
+			if (ImGui::MenuItem("Open", "Ctrl+O"))
+			{
+			}
 
-				if (selectionState.mouseState.buttonPressed[MouseButton::Left])
+			if (ImGui::MenuItem("Save", "Ctrl+S"))
+			{
+			}
+
+			if (ImGui::MenuItem("Save as.."))
+			{
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Edit"))
+		{
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Debug Menu"))
+		{
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Help"))
+		{
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+
+	if (!io.WantCaptureKeyboard && !io.WantCaptureMouse)
+	{
+		const MouseState& mouseState = CrInput.GetMouseState();
+		const KeyboardState& keyboardState = CrInput.GetKeyboardState();
+		const GamepadState& gamepadState = CrInput.GetGamepadState(0);
+
+		bool isEscapeHeld = keyboardState.keyHeld[KeyboardKey::Escape];
+		//bool isLeftShiftClicked = keyboardState.keyHeld[KeyboardKey::LeftShift];
+		bool isLeftAltHeld = keyboardState.keyHeld[KeyboardKey::Alt];
+		//bool isLeftCtrlHeld = keyboardState.keyHeld[KeyboardKey::LeftCtrl];
+		bool isLeftShiftHeld = keyboardState.keyHeld[KeyboardKey::LeftShift];
+
+		bool isFPSCamera = mouseState.buttonHeld[MouseButton::Right];
+		bool isOrbitCamera = isLeftAltHeld && mouseState.buttonHeld[MouseButton::Left];
+
+		//---------
+		// Rotation
+		//---------
+
+		float mouseSensitivity = 0.005f;
+		float mouseWheelSensitivity = 0.5f;
+
+		if (gamepadState.axes[GamepadAxis::RightX] > 0.0f)
+		{
+			m_cameraState.yaw += 2.0f * frameDelta;
+		}
+
+		if (gamepadState.axes[GamepadAxis::RightX] < 0.0f)
+		{
+			m_cameraState.yaw += -2.0f * frameDelta;
+		}
+
+		if (gamepadState.axes[GamepadAxis::RightY] > 0.0f)
+		{
+			m_cameraState.pitch += -2.0f * frameDelta;
+		}
+
+		if (gamepadState.axes[GamepadAxis::RightY] < 0.0f)
+		{
+			m_cameraState.pitch += 2.0f * frameDelta;
+		}
+
+		if (isFPSCamera || isOrbitCamera)
+		{
+			m_cameraState.pitch += (float)mouseState.relativePosition.y * mouseSensitivity;
+			m_cameraState.yaw += (float)mouseState.relativePosition.x * mouseSensitivity;
+		}
+
+		// Restrict angles to 2pi to avoid numerical instability at large values
+		// Compute rotation from absolute angles relative to the world origin
+		// This avoids relative camera movement that can drift and avoids Y-axis nonsense
+		float3x3 xMtx = float3x3::rotation_x(m_cameraState.pitch);
+		float3x3 yMtx = float3x3::rotation_y(m_cameraState.yaw);
+		float3x3 finalMtx = mul(xMtx, yMtx);
+
+		camera->SetCameraRotationVectors(finalMtx[2], finalMtx[0], finalMtx[1]);
+
+		const float3 forwardVector = camera->GetForwardVector();
+		const float3 rightVector = camera->GetRightVector();
+		const float3 upVector = camera->GetUpVector();
+
+		//------------
+		// Translation
+		//------------
+
+		float translationSpeed = 5.0f;
+
+		if (isLeftShiftHeld)
+		{
+			translationSpeed *= 10.0f;
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::A] || gamepadState.axes[GamepadAxis::LeftX] < 0.0f)
+		{
+			camera->Translate(rightVector * -translationSpeed * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::D] || gamepadState.axes[GamepadAxis::LeftX] > 0.0f)
+		{
+			camera->Translate(rightVector * translationSpeed * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::W] || gamepadState.axes[GamepadAxis::LeftY] > 0.0f)
+		{
+			camera->Translate(forwardVector * translationSpeed * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::S] || gamepadState.axes[GamepadAxis::LeftY] < 0.0f)
+		{
+			camera->Translate(forwardVector * -translationSpeed * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::Q] || gamepadState.axes[GamepadAxis::LeftTrigger] > 0.0f)
+		{
+			camera->Translate(float3(0.0f, -translationSpeed, 0.0f) * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::E] || gamepadState.axes[GamepadAxis::RightTrigger] > 0.0f)
+		{
+			camera->Translate(float3(0.0f, translationSpeed, 0.0f) * frameDelta);
+		}
+
+		if (keyboardState.keyHeld[KeyboardKey::F])
+		{
+			if (IsAnyInstanceSelected())
+			{
+				m_cameraState.focusDistance = m_cameraState.defaultFocusDistance;
+				m_cameraState.focusPosition = ComputeSelectionPosition();
+				camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
+			}
+		}
+
+		if (mouseState.mouseWheel.y != 0)
+		{
+			float translation = mouseState.mouseWheel.y * mouseWheelSensitivity;
+			camera->Translate(forwardVector * translation);
+			m_cameraState.focusDistance = distance(camera->GetPosition(), m_cameraState.focusPosition);
+		}
+
+		//-----------------
+		// Orbit and Strafe
+		//-----------------
+
+		if (isLeftAltHeld)
+		{
+			if (mouseState.buttonHeld[MouseButton::Left])
+			{
+				// If we're orbiting the focal point, make sure we continually point towards it
+				camera->SetPosition(m_cameraState.focusPosition - forwardVector * m_cameraState.focusDistance);
+			}
+			else if (mouseState.buttonHeld[MouseButton::Middle])
+			{
+				float rightTranslation = (float)-mouseState.relativePosition.x * mouseSensitivity;
+				float upTranslation = (float)mouseState.relativePosition.y * mouseSensitivity;
+
+				camera->SetPosition(camera->GetPosition() + rightVector * rightTranslation + upVector * upTranslation);
+			}
+
+			// Finally update the focus position
+			m_cameraState.focusPosition = camera->GetPosition() + forwardVector * m_cameraState.focusDistance;
+		}
+
+		//--------------------------
+		// Update Matrices to Render
+		//--------------------------
+
+		camera->UpdateMatrices();
+
+		if (isEscapeHeld)
+		{
+			ClearSelectedInstances();
+			RemoveManipulator();
+		}
+
+		for (size_t i = 0; i < m_selectionStateQueue.size(); ++i)
+		{
+			const SelectionState& selectionState = m_selectionStateQueue[i];
+
+			// If we have a valid entity, we can start seeing how to react
+			if (selectionState.modelInstanceId != 0xffffffff)
+			{
+				if (selectionState.modelInstanceId != 65535) // TODO Why this double check?
 				{
-					if (isEditorInstance)
+					CrModelInstanceId instanceId = CrModelInstanceId(selectionState.modelInstanceId);
+
+					bool isEditorInstance = m_renderWorld->GetIsEditorInstance(instanceId);
+
+					if (selectionState.mouseState.buttonPressed[MouseButton::Left])
 					{
-						m_manipulatorSelected = true;
-						
-						if (instanceId == m_manipulator->xAxis.GetId())
+						if (isEditorInstance)
 						{
-							m_selectedAxis = CrEditorAxis::AxisX;
-						}
-						else if (instanceId == m_manipulator->yAxis.GetId())
-						{
-							m_selectedAxis = CrEditorAxis::AxisY;
-						}
-						else if (instanceId == m_manipulator->zAxis.GetId())
-						{
-							m_selectedAxis = CrEditorAxis::AxisZ;
-						}
-						else if (instanceId == m_manipulator->xzPlane.GetId())
-						{
-							m_selectedAxis = CrEditorAxis::PlaneXZ;
-						}
-						else if (instanceId == m_manipulator->xyPlane.GetId())
-						{
-							m_selectedAxis = CrEditorAxis::PlaneXY;
-						}
-						else if (instanceId == m_manipulator->yzPlane.GetId())
-						{
-							m_selectedAxis = CrEditorAxis::PlaneYZ;
-						}
+							m_manipulatorSelected = true;
 
-						CrAssertMsg(m_selectedAxis != CrEditorAxis::None, "Incorrect axis selected");
+							if (instanceId == m_manipulator->xAxis.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::AxisX;
+							}
+							else if (instanceId == m_manipulator->yAxis.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::AxisY;
+							}
+							else if (instanceId == m_manipulator->zAxis.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::AxisZ;
+							}
+							else if (instanceId == m_manipulator->xzPlane.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::PlaneXZ;
+							}
+							else if (instanceId == m_manipulator->xyPlane.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::PlaneXY;
+							}
+							else if (instanceId == m_manipulator->yzPlane.GetId())
+							{
+								m_selectedAxis = CrEditorAxis::PlaneYZ;
+							}
 
-						m_manipulatorInitialMouseState = selectionState.mouseState;
-						m_manipulatorInitialTransform = m_manipulator->transformMtx;
-						m_manipulatorInitialClosestPoint = ComputeClosestPointMouseToManipulator(selectionState.mouseState);
-					}
-					else
-					{
-						if (selectionState.keyboardState.keyHeld[KeyboardKey::LeftShift])
-						{
-							ToggleSelected(instanceId);
+							CrAssertMsg(m_selectedAxis != CrEditorAxis::None, "Incorrect axis selected");
 
-							// TODO when deselecting, don't spawn the manipulator there
-							SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+							m_manipulatorInitialMouseState = selectionState.mouseState;
+							m_manipulatorInitialTransform = m_manipulator->transformMtx;
+							m_manipulatorInitialClosestPoint = ComputeClosestPointMouseToManipulator(selectionState.mouseState);
 						}
 						else
 						{
-							SetSelected(CrModelInstanceId(selectionState.modelInstanceId));
+							if (selectionState.keyboardState.keyHeld[KeyboardKey::LeftShift])
+							{
+								ToggleSelected(instanceId);
 
-							SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+								// TODO when deselecting, don't spawn the manipulator there
+								SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+							}
+							else
+							{
+								SetSelected(CrModelInstanceId(selectionState.modelInstanceId));
+
+								SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+							}
 						}
 					}
-				}
-				else if (selectionState.mouseState.buttonHeld[MouseButton::Left])
-				{
-					
-				}
-				else if (selectionState.mouseState.buttonClicked[MouseButton::Left])
-				{
-					
+					else if (selectionState.mouseState.buttonHeld[MouseButton::Left])
+					{
+
+					}
+					else if (selectionState.mouseState.buttonClicked[MouseButton::Left])
+					{
+
+					}
 				}
 			}
 		}
-	}
 
-	m_selectionStateQueue.clear();
+		m_selectionStateQueue.clear();
 
-	if (mouseState.buttonHeld[MouseButton::Left])
-	{
-		if (m_manipulatorSelected)
+		if (mouseState.buttonHeld[MouseButton::Left])
 		{
-			TranslateManipulator(mouseState);
+			if (m_manipulatorSelected)
+			{
+				TranslateManipulator(mouseState);
+			}
 		}
-	}
-	else if (mouseState.buttonClicked[MouseButton::Left])
-	{
-		for (auto& selectedInstanceData : m_selectedInstances)
+		else if (mouseState.buttonClicked[MouseButton::Left])
 		{
-			SelectedInstanceState& selectionData = selectedInstanceData.second;
-			selectionData.initialTransform = m_renderWorld->GetTransform(selectionData.modelInstanceId);
-		}
+			for (auto& selectedInstanceData : m_selectedInstances)
+			{
+				SelectedInstanceState& selectionData = selectedInstanceData.second;
+				selectionData.initialTransform = m_renderWorld->GetTransform(selectionData.modelInstanceId);
+			}
 
-		m_manipulatorSelected = false;
-	}
-
-	if (keyboardState.keyPressed[KeyboardKey::Delete])
-	{
-		for (const auto& selectedInstance : m_selectedInstances)
-		{
-			m_renderWorld->DestroyModelInstance(selectedInstance.second.modelInstanceId);
+			m_manipulatorSelected = false;
 		}
 
-		m_selectedInstances.clear();
+		if (keyboardState.keyPressed[KeyboardKey::Delete])
+		{
+			for (const auto& selectedInstance : m_selectedInstances)
+			{
+				m_renderWorld->DestroyModelInstance(selectedInstance.second.modelInstanceId);
+			}
 
-		RemoveManipulator();
+			m_selectedInstances.clear();
+
+			RemoveManipulator();
+		}
+
+		bool requestMouseSelection = mouseState.buttonPressed[MouseButton::Left] && !isLeftAltHeld; // We use left alt for navigation, so we want to avoid clicking on things
+
+		CrRectangle mouseRectangle(mouseState.position.x, mouseState.position.y, 1, 1);
+		m_renderWorld->SetMouseSelectionEnabled(requestMouseSelection, mouseRectangle);
 	}
-
-	bool requestMouseSelection = mouseState.buttonPressed[MouseButton::Left] && !isLeftAltHeld; // We use left alt for navigation, so we want to avoid clicking on things
-
-	CrRectangle mouseRectangle(mouseState.position.x, mouseState.position.y, 1, 1);
-	m_renderWorld->SetMouseSelectionEnabled(requestMouseSelection, mouseRectangle);
 }
 
 void CrEditor::SpawnManipulator(const float4x4& initialTransform)

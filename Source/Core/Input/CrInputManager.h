@@ -13,6 +13,7 @@ namespace KeyboardKey
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Alpha0, Alpha1, Alpha2, Alpha3, Alpha4, Alpha5, Alpha6, Alpha7, Alpha8, Alpha9,
 		F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, 
+		F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,
 		Tab, CapsLock, LeftShift, RightShift, 
 		Space, LeftCtrl, RightCtrl, Intro, Backspace, Alt, AltGr, Escape,
 		UpArrow, DownArrow, LeftArrow, RightArrow, 
@@ -25,7 +26,6 @@ namespace KeyboardKey
 	};
 };
 
-// Use SDL terminology as the abstraction
 namespace GamepadButton
 {
 	enum Code
@@ -130,7 +130,7 @@ struct MouseState
 	// Number of pixels the mouse has moved since the last time it was updated
 	crinput::int2 relativePosition;
 
-	crinput::int2 mouseWheel;
+	crinput::float2 mouseWheel;
 };
 
 struct KeyboardState
@@ -160,119 +160,41 @@ public:
 
 	static const uint32_t MaxControllers = 8;
 
+	static void Initialize();
+
 	// Relative position values like mouse relative and wheel need to be reset on every update before we process
 	// events, because these don't get 'reset' in any way
-	void Reset()
-	{
-		m_mouseState.relativePosition.x = 0;
-		m_mouseState.relativePosition.y = 0;
-		m_mouseState.mouseWheel.x = 0;
-		m_mouseState.mouseWheel.y = 0;
+	void Update();
 
-		m_mouseState.buttonClicked = 0;
-		m_mouseState.buttonPressed = 0;
+	const MouseState& GetMouseState() const;
 
-		m_keyboardState.keyClicked = 0;
-		m_keyboardState.keyPressed = 0;
-	}
+	const KeyboardState& GetKeyboardState() const;
 
-	const MouseState& GetMouseState() const
-	{
-		return m_mouseState;
-	}
+	const GamepadState& GetGamepadState(uint32_t index) const;
 
-	const KeyboardState& GetKeyboardState() const
-	{
-		return m_keyboardState;
-	}
+	void OnControllerConnected(uint32_t controllerIndex);
 
-	const GamepadState& GetGamepadState(uint32_t index) const
-	{
-		return m_gamepadStates[index];
-	}
+	void OnControllerDisconnected(uint32_t controllerIndex);
 
-	void OnControllerConnected(uint32_t controllerIndex)
-	{
-		m_gamepadStates[controllerIndex].connected = true;
-	}
+	void OnKeyboardDown(KeyboardKey::Code code);
 
-	void OnControllerDisconnected(uint32_t controllerIndex)
-	{
-		m_gamepadStates[controllerIndex] = GamepadState();
-	}
+	void OnKeyboardUp(KeyboardKey::Code code);
 
-	void OnKeyboardDown(KeyboardKey::Code code)
-	{
-		m_keyboardState.keyPressed[code] = true;
+	void OnMouseMove(int32_t windowPositionX, int32_t windowPositionY, int32_t clientX, int32_t clientY);
 
-		m_keyboardState.keyHeld[code] = true;
-	}
+	void OnMouseRelativeMove(int32_t relativeX, int32_t relativeY);
 
-	void OnKeyboardUp(KeyboardKey::Code code)
-	{
-		// If we used to be pressed but now we're not, we'll mark as clicked (for this frame)
-		if (m_keyboardState.keyHeld[code])
-		{
-			m_keyboardState.keyClicked[code] = true;
-		}
+	void OnMouseWheelX(float x);
 
-		m_keyboardState.keyHeld[code] = false;
-	}
+	void OnMouseWheelY(float y);
 
-	void OnMouseMove(int32_t x, int32_t y)
-	{
-		m_mouseState.position.x = x;
-		m_mouseState.position.y = y;
-	}
+	void OnMouseButtonDown(MouseButton::Code code);
 
-	void OnMouseRelativeMove(int32_t x, int32_t y)
-	{
-		m_mouseState.relativePosition.x = x;
-		m_mouseState.relativePosition.y = y;
-	}
+	void OnMouseButtonUp(MouseButton::Code code);
 
-	void OnMouseWheel(int32_t x, int32_t y)
-	{
-		m_mouseState.mouseWheel.x = x;
-		m_mouseState.mouseWheel.y = y;
-	}
+	void OnGamepadButton(uint32_t controllerIndex, GamepadButton::Code code, bool pressed);
 
-	void OnMouseButtonDown(MouseButton::Code code)
-	{
-		m_mouseState.buttonPressed[code] = true;
-
-		m_mouseState.buttonHeld[code] = true;
-	}
-
-	void OnMouseButtonUp(MouseButton::Code code)
-	{
-		// If we used to be pressed but now we're not, we'll mark as clicked (for this frame)
-		if (m_mouseState.buttonHeld[code])
-		{
-			m_mouseState.buttonClicked[code] = true;
-		}
-
-		m_mouseState.buttonHeld[code] = false;
-	}
-
-	void OnGamepadButtonDown(uint32_t controllerIndex, GamepadButton::Code code)
-	{
-		m_gamepadStates[controllerIndex].buttonPressed.set(code, true);
-	}
-
-	void OnGamepadButtonUp(uint32_t gamepadIndex, GamepadButton::Code code)
-	{
-		m_gamepadStates[gamepadIndex].buttonPressed.set(code, false);
-	}
-
-	void OnGamepadAxis(uint32_t gamepadIndex, GamepadAxis::Code code, float value)
-	{
-		float threshold = 0.3f;
-
-		value = (value < threshold && value > -threshold) ? 0.0f : value;
-
-		m_gamepadStates[gamepadIndex].axes[code] = value;
-	}
+	void OnGamepadAxis(uint32_t gamepadIndex, GamepadAxis::Code code, float value);
 
 private:
 

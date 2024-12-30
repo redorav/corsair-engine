@@ -14,6 +14,8 @@ struct CrImGuiRendererInitParams
 	cr3d::SampleCount m_sampleCount;
 };
 
+class ICrOSWindow;
+
 class CrImGuiRenderer
 {
 public:
@@ -22,7 +24,7 @@ public:
 
 	static void Deinitialize();
 
-	void NewFrame(uint32_t width, uint32_t height);
+	void NewFrame(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
 
 	void AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
 

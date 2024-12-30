@@ -5,9 +5,11 @@
 #include "Rendering/CrShaderManager.h"
 #include "Rendering/CrMaterialCompiler.h"
 #include "Rendering/CrBuiltinPipeline.h"
+#include "Rendering/CrRendererConfig.h"
 #include "CrFrame.h"
 
 #include "Core/Input/CrInputManager.h"
+#include "Core/Input/CrPlatformInput.h"
 #include "Core/CrCommandLine.h"
 #include "Core/Logging/ICrDebug.h"
 
@@ -17,20 +19,11 @@
 
 #include "ICrOSWindow.h"
 
-// TODO SDL-specific
-#include "Core/Input/CrInputHandlerSDL.h"
-#include <SDL3/SDL.h>
-
 uint32_t screenWidth = 1280;
 uint32_t screenHeight = 720;
 
 int main(int argc, char* argv[])
 {
-	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
-	{
-		return 1;
-	}
-
 	crcore::CommandLine = CrCommandLineParser(argc, argv);
 
 	const CrString& dataPath             = crcore::CommandLine("-root");
@@ -94,85 +87,61 @@ int main(int argc, char* argv[])
 
 	CrPrintProcessMemory("After Render Device");
 
+	CrInputManager::Initialize();
 	CrShaderSources::Initialize();
 	CrShaderManager::Initialize(renderDevice.get());
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
 	CrRenderingResources::Initialize(renderDevice.get());
+	ICrOSWindow::Initialize();
 
-	ICrOSWindow* mainWindow = new ICrOSWindow(screenWidth, screenHeight);
-
-	void* hWnd = mainWindow->GetNativeWindowHandle();
-
-	// HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
-	// Valid for the current executable (not valid for a dll)
-	// http://stackoverflow.com/questions/21718027/getmodulehandlenull-vs-hinstance
-	HINSTANCE hInstance = GetModuleHandle(nullptr);
+	CrOSWindowDescriptor osWindowDescriptor;
+	osWindowDescriptor.swapchainFormat = CrRendererConfig::SwapchainFormat;
+	osWindowDescriptor.width = screenWidth;
+	osWindowDescriptor.height = screenHeight;
+	osWindowDescriptor.name = "Main Window";
+	CrIntrusivePtr<ICrOSWindow> mainWindow = CrIntrusivePtr<ICrOSWindow>(new ICrOSWindow(osWindowDescriptor));
 
 	CrFrame frame;
-	frame.Initialize(hInstance, hWnd, mainWindow->GetWidth(), mainWindow->GetHeight());
-
-	CrInputHandlerSDL inputHandler;
+	frame.Initialize(mainWindow);
 
 	bool applicationRunning = true;
 
 	while(applicationRunning)
 	{
-		CrInput.Reset();
+		CrInput.Update();
 
-		SDL_Event event;
-
-		while (SDL_PollEvent(&event))
+		MSG msg;
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			switch (event.type)
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		
+			switch (msg.message)
 			{
-				case SDL_EVENT_QUIT:
-				{
+				case WM_QUIT:
 					applicationRunning = false;
-					break;
-				}
-				case SDL_EVENT_WINDOW_MINIMIZED: CrLog("Window minimized"); break;
-				case SDL_EVENT_WINDOW_MAXIMIZED: CrLog("Window maximized"); break;
-				case SDL_EVENT_WINDOW_RESTORED: CrLog("Window restored"); break;
-				case SDL_EVENT_WINDOW_RESIZED:
-				{
-					uint32_t width = event.window.data1;
-					uint32_t height = event.window.data2;
-					frame.HandleWindowResize(width, height);
-					CrLog("Window resized");
-					break;
-				}
-				case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: CrLog("Window size changed"); break;
-				case SDL_EVENT_GAMEPAD_ADDED:
-				case SDL_EVENT_GAMEPAD_REMOVED:
-				case SDL_EVENT_KEY_DOWN:
-				case SDL_EVENT_KEY_UP:
-				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				case SDL_EVENT_MOUSE_BUTTON_UP:
-				case SDL_EVENT_MOUSE_MOTION:
-				case SDL_EVENT_MOUSE_WHEEL:
-				case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-				case SDL_EVENT_GAMEPAD_BUTTON_UP:
-				{
-					inputHandler.HandleEvent(event);
-					break;
-				}
-				default:
-					CrLog("Unhandled SDL message %i", event.type);
 					break;
 			}
 		}
 
-		if (!mainWindow->GetIsMinimized())
+		if (mainWindow->GetIsDestroyed())
 		{
-			frame.Process(); // Process the main loop
+			applicationRunning = false;
+		}
+
+		if (applicationRunning)
+		{
+			if (!mainWindow->GetIsMinimized())
+			{
+				frame.Process(); // Process the main loop
+			}
 		}
 	}
 
-	CrRenderingResources::Deinitialize();
-
 	frame.Deinitialize();
+
+	CrRenderingResources::Deinitialize();
 
 	return 0;
 }

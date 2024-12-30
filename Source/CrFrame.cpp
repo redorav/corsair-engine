@@ -37,14 +37,19 @@
 
 #include "Resource/CrResourceManager.h"
 
-#include <imgui.h>
-
 #include "GeneratedShaders/BuiltinShaders.h"
 
 #include "Math/CrMath.h"
 #include "Math/CrHalf.h"
 
+#include <Math/CrHlslppDataPacking.h>
+
+#include "ICrOSWindow.h"
+#include "Editor/CrImGuiViewports.h"
+
 #include "Rendering/Shaders/DeferredLightingShared.hlsl"
+
+#include <imgui.h>
 
 static const char* GBufferDebugString[] =
 {
@@ -180,30 +185,22 @@ struct CrRenderPacketBatcher
 	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
-CrEditor Editor;
-
-void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height)
+void CrFrame::Initialize(CrIntrusivePtr<ICrOSWindow> mainWindow)
 {
 	HashingAssert();
 
-	m_platformHandle = platformHandle;
-	m_platformWindow = platformWindow;
-
-	m_width = width;
-	m_height = height;
+	m_mainWindow = mainWindow;
 
 	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
-
-	RecreateSwapchainAndRenderTargets(m_width, m_height);
 
 	// TODO Move block to rendering subsystem initialization function
 	{
 		// Initialize ImGui renderer
 		CrImGuiRendererInitParams imguiInitParams = {};
-		imguiInitParams.m_swapchainFormat = m_swapchain->GetFormat();
+		imguiInitParams.m_swapchainFormat = CrRendererConfig::SwapchainFormat; // TODO How to conform to swapchain format?
 		CrImGuiRenderer::Initialize(imguiInitParams);
 
-		Editor.Initialize();
+		CrEditor::Initialize(mainWindow);
 	}
 
 	// Create the rendering scratch. Start with 10MB
@@ -215,7 +212,7 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	// Create a render world
 	m_renderWorld = CrRenderWorldHandle(new CrRenderWorld());
 
-	Editor.SetRenderWorld(m_renderWorld);
+	Editor->SetRenderWorld(m_renderWorld);
 
 	bool loadData = true;
 
@@ -393,16 +390,13 @@ void CrFrame::Initialize(void* platformHandle, void* platformWindow, uint32_t wi
 	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
 	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
 	m_mouseSelectionBuffer = CrGPUBufferHandle(new CrGPUBuffer(renderDevice.get(), mouseSelectionBufferDescriptor, 1, 4));
-
-	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
-	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 }
 
 void CrFrame::Deinitialize()
 {
 	CrImGuiRenderer::Deinitialize();
 
-	Editor = {};
+	CrEditor::Deinitialize();
 
 	m_drawCmdBuffers.clear();
 }
@@ -411,32 +405,33 @@ void CrFrame::Process()
 {
 	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
 
-	// Swapchain resizes are not immediately processed but deferred to the main loop. That way we have control over where it happens
-	if (m_requestSwapchainResize)
+	uint32_t windowWidth, windowHeight;
+	m_mainWindow->GetSizePixels(windowWidth, windowHeight);
+
+	// Resource resizes are not immediately processed but deferred to the main loop. That way we have control over where it happens
+	if (m_currentWindowWidth != windowWidth || m_currentWindowHeight != windowHeight)
 	{
-		RecreateSwapchainAndRenderTargets(m_swapchainResizeRequestWidth, m_swapchainResizeRequestHeight);
-		m_width = m_swapchainResizeRequestWidth;
-		m_height = m_swapchainResizeRequestHeight;
-		m_requestSwapchainResize = false;
+		RecreateRenderTargets();
+		m_currentWindowWidth = windowWidth;
+		m_currentWindowHeight = windowHeight;
 	}
 
-	Editor.Update();
+	const ImGuiPlatformIO& imguiPlatformIO = ImGui::GetPlatformIO();
 
-	// TODO We need to rework this once we have windows and views so that these properties are set on the camera when we change things around
-	// For now keep it this way knowing it will be changed
-	m_camera->SetupPerspective(m_swapchain->GetWidth(), m_swapchain->GetHeight(), 0.1f, 1000.0f);
-
-	CrSwapchainResult swapchainResult = m_swapchain->AcquireNextImage(UINT64_MAX);
-
-	CrAssertMsg(swapchainResult != CrSwapchainResult::Invalid, "Was unable to acquire next swapchain image");
-
-	renderDevice->ProcessQueuedCommands();
+	for (int i = 0; i < imguiPlatformIO.Viewports.Size; i++)
+	{
+		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
+		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
+		ICrOSWindow* osWindow = viewportData->osWindow;
+		if (osWindow)
+		{
+			osWindow->GetSwapchain()->AcquireNextImage();
+		}
+	}
 
 	CrRenderingStatistics::Reset();
 
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_swapchain->GetCurrentFrameIndex()].get();
-
-	ImGuiRenderer->NewFrame(m_swapchain->GetWidth(), m_swapchain->GetHeight());
+	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_currentCommandBuffer].get();
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
@@ -447,6 +442,20 @@ void CrFrame::Process()
 	{
 		BuiltinPipelines->RecompileComputePipelines();
 	}
+
+	ImGuiRenderer->NewFrame(m_mainWindow);
+
+	Editor->Update();
+
+	// TODO We need to rework this once we have windows and views so that these properties are set on the camera when we change things around
+	// For now keep it this way knowing it will be changed
+	m_camera->SetupPerspective(m_swapchain->GetWidth(), m_swapchain->GetHeight(), 0.1f, 1000.0f);
+
+	//--------------
+	// RENDER THREAD
+	//--------------
+
+	renderDevice->ProcessQueuedCommands();
 
 	// Set up render graph to start recording passes
 	CrRenderGraphFrameParams frameRenderGraphParams;
@@ -738,7 +747,7 @@ void CrFrame::Process()
 		});
 	}
 
-	CrTextureHandle swapchainTexture = m_swapchain->GetTexture(m_swapchain->GetCurrentFrameIndex());
+	CrTextureHandle swapchainTexture = m_swapchain->GetCurrentTexture();
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Copy Pass"), float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[this, &swapchainTexture](CrRenderGraph& renderGraph)
@@ -925,15 +934,30 @@ void CrFrame::Process()
 					state.modelInstanceId = *mouseIdMemory;
 					state.mouseState = mouseState;
 					state.keyboardState = keyboardState;
-					Editor.AddSelectionState(state);
+					Editor->AddSelectionState(state);
 				}
 				mouseIdBuffer->Unlock();
 			}
 		);
 	}
 
-	// Present the swapchain
-	m_swapchain->Present();
+	ImGui::EndFrame();
+
+	ImGui::UpdatePlatformWindows();
+
+	// Present all available swapchains
+	for (int i = 0; i < imguiPlatformIO.Viewports.Size; i++)
+	{
+		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
+		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
+		ICrOSWindow* osWindow = viewportData->osWindow;
+		if (osWindow)
+		{
+			osWindow->GetSwapchain()->Present();
+		}
+	}
+
+	m_currentCommandBuffer = (m_currentCommandBuffer + 1) % m_drawCmdBuffers.size();
 
 	// Clears render lists
 	m_renderWorld->EndRendering();
@@ -1107,37 +1131,14 @@ void CrFrame::DrawDebugUI()
 	}
 }
 
-void CrFrame::HandleWindowResize(uint32_t width, uint32_t height)
-{
-	m_requestSwapchainResize = true;
-	m_swapchainResizeRequestWidth = width;
-	m_swapchainResizeRequestHeight = height;
-}
-
-void CrFrame::RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height)
+void CrFrame::RecreateRenderTargets()
 {
 	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();
 
-	// Resize swapchain if it already exists, create if null
-	if (m_swapchain)
-	{
-		m_swapchain->Resize(width, height);
-	}
-	else
-	{
-		CrSwapchainDescriptor swapchainDescriptor = {};
-		swapchainDescriptor.name = "Main Swapchain";
-		swapchainDescriptor.platformWindow = m_platformWindow;
-		swapchainDescriptor.platformHandle = m_platformHandle;
-		swapchainDescriptor.requestedWidth = width;
-		swapchainDescriptor.requestedHeight = height;
-		swapchainDescriptor.format = CrRendererConfig::SwapchainFormat;
-		swapchainDescriptor.requestedBufferCount = 3;
-		m_swapchain = renderDevice->CreateSwapchain(swapchainDescriptor);
-	}
+	m_swapchain = m_mainWindow->GetSwapchain();
 
 	// Recreate depth stencil texture
 	CrTextureDescriptor depthTextureDescriptor;
@@ -1230,6 +1231,9 @@ void CrFrame::RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height)
 		descriptor.name.append_sprintf("Draw Command Buffer %i", i);
 		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(descriptor);
 	}
+
+	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
+	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 
 	// Make sure all of this work is finished
 	renderDevice->WaitIdle();

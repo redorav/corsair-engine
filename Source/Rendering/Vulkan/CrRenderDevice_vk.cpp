@@ -893,15 +893,9 @@ uint32_t CrRenderDeviceVulkan::GetVkQueueFamilyIndex() const
 	return m_commandQueueFamilyIndex;
 }
 
-VkQueue CrRenderDeviceVulkan::GetVkQueue(CrCommandQueueType::T queueType) const
+VkQueue CrRenderDeviceVulkan::GetVkGraphicsQueue() const
 {
-	CrAssertMsg(queueType == CrCommandQueueType::Graphics, "Graphics queue not implemented");
-
-	switch (queueType)
-	{
-		case CrCommandQueueType::Graphics: return m_vkGraphicsQueue;
-		default: return m_vkGraphicsQueue;
-	}
+	return m_vkGraphicsQueue;
 }
 
 VkCommandBuffer CrRenderDeviceVulkan::GetVkSwapchainCommandBuffer() const
@@ -909,15 +903,9 @@ VkCommandBuffer CrRenderDeviceVulkan::GetVkSwapchainCommandBuffer() const
 	return m_vkSwapchainCommandBuffer;
 }
 
-VkCommandPool CrRenderDeviceVulkan::GetVkCommandPool(CrCommandQueueType::T queueType) const
+VkCommandPool CrRenderDeviceVulkan::GetVkGraphicsCommandPool() const
 {
-	CrAssertMsg(queueType == CrCommandQueueType::Graphics, "Graphics queue not implemented");
-
-	switch (queueType)
-	{
-		case CrCommandQueueType::Graphics: return m_vkGraphicsCommandPool;
-		default: return m_vkGraphicsCommandPool;
-	}
+	return m_vkGraphicsCommandPool;
 }
 
 // Transitions texture to an initial, predictable state

@@ -8,8 +8,7 @@ class ICrRenderDevice;
 
 CrSwapchainDescriptor::CrSwapchainDescriptor()
 	: name("")
-	, platformWindow(nullptr)
-	, platformHandle(nullptr)
+	, window(nullptr)
 	, requestedWidth(0)
 	, requestedHeight(0)
 	, requestedBufferCount(0)
@@ -72,8 +71,7 @@ void ICrSwapchain::Resize(uint32_t width, uint32_t height)
 	m_height = height;
 }
 
-const CrTextureHandle& ICrSwapchain::GetTexture(uint32_t index)
+const CrTextureHandle& ICrSwapchain::GetCurrentTexture()
 {
-	CrAssert(index < m_textures.size());
-	return m_textures[index];
+	return m_textures[m_currentBufferIndex];
 }

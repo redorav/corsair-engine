@@ -12,6 +12,8 @@
 
 namespace GBufferDebugMode { enum T : uint32_t; }
 
+class ICrOSWindow;
+
 class CrFrame
 {
 public:
@@ -20,7 +22,7 @@ public:
 
 	~CrFrame();
 
-	void Initialize(void* platformHandle, void* platformWindow, uint32_t width, uint32_t height);
+	void Initialize(CrIntrusivePtr<ICrOSWindow> mainWindow);
 
 	void Deinitialize();
 
@@ -28,24 +30,14 @@ public:
 
 	void DrawDebugUI();
 
-	void HandleWindowResize(uint32_t width, uint32_t height);
-
-	void RecreateSwapchainAndRenderTargets(uint32_t width, uint32_t height);
+	void RecreateRenderTargets();
 
 private:
 
-	bool m_requestSwapchainResize = false;
-
-	uint32_t m_swapchainResizeRequestWidth;
-
-	uint32_t m_swapchainResizeRequestHeight;
+	uint32_t m_currentCommandBuffer = 0;
 
 	CrVector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	
-	uint32_t m_width = 0;
-
-	uint32_t m_height = 0;
-
 	CrComputePipelineHandle m_exampleComputePipeline;
 
 	CrComputePipelineHandle m_depthDownsampleLinearize;
@@ -101,8 +93,12 @@ private:
 
 	CrGPUBufferHandle m_indirectDispatchArguments;
 
-	void* m_platformWindow = nullptr;
-	void* m_platformHandle = nullptr;
+	CrIntrusivePtr<ICrOSWindow> m_mainWindow;
+
+	// We use these two variables to trigger render target resizing after a window resize
+	uint32_t m_currentWindowWidth;
+
+	uint32_t m_currentWindowHeight;
 
 	CrCameraHandle m_camera;
 

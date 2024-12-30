@@ -1,42 +1,118 @@
 #pragma once
 
+#include "Rendering/ICrSwapchain.h"
+#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Rendering/CrDataFormats.h"
+
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Math/CrMath.h"
 
-struct SDL_Window;
+struct CrOSWindowDescriptor
+{
+	CrOSWindowDescriptor()
+		: positionX(0)
+		, positionY(0)
+		, width(1)
+		, height(1)
+		, parentWindow(nullptr)
+		, swapchainFormat(cr3d::DataFormat::Invalid)
+		, decoration(true)
+		, topMost(false)
+	{
+
+	}
+
+	uint32_t positionX;
+	uint32_t positionY;
+	uint32_t width;
+	uint32_t height;
+	ICrOSWindow* parentWindow;
+	CrFixedString128 name;
+	cr3d::DataFormat::T swapchainFormat;
+	uint32_t decoration : 1;
+	uint32_t topMost : 1;
+};
+
+namespace CursorType
+{
+	enum T
+	{
+		Arrow,
+		TextInput,
+		ResizeAll,
+		ResizeEW,
+		ResizeNS,
+		ResizeNESW,
+		ResizeNWSE,
+		Hand,
+		NotAllowed,
+		None,
+		Count
+	};
+}
 
 class ICrOSWindow : public CrIntrusivePtrInterface
 {
 public:
 
-	ICrOSWindow(uint32_t width, uint32_t height);
+	ICrOSWindow(const CrOSWindowDescriptor& windowDescriptor);
 
 	~ICrOSWindow();
 
+	// Initialize the windowing system
+	static void Initialize();
+
+	static void SetCursor(CursorType::T cursorType);
+	
+	// Destroy the window. A window can be destroyed externally while the object or pointer is still active. For that reason we
+	// can query whether a window has been destroyed to avoid using its resources in an invalid state. A destroyed window cannot
+	// be recreated, a new one must be built
+	void Destroy();
+
 	bool GetIsMinimized() const;
+
+	bool GetIsFocused() const;
+
+	bool GetIsDestroyed() const;
 
 	void* GetNativeWindowHandle() const;
 
-	uint32_t GetWidth() const;
+	void* GetParentWindowHandle() const;
 
-	uint32_t GetHeight() const;
+	void* GetNativeInstanceHandle() const;
+
+	void GetPosition(uint32_t& positionX, uint32_t& positionY) const;
+
+	void GetSizePixels(uint32_t& width, uint32_t& height) const;
+
+	void SetPosition(uint32_t positionX, uint32_t positionY);
+
+	void SetSizePixels(uint32_t width, uint32_t height);
+
+	void SetFocus();
+
+	void SetTitle(const char* title);
+
+	void SetTransparencyAlpha(float alpha);
+
+	void Show();
+
+	const CrSwapchainHandle& GetSwapchain() { return m_swapchain; }
 
 private:
 
-	uint32_t m_width = 0;
+	void* m_hwnd = nullptr;
 
-	uint32_t m_height = 0;
+	void* m_parentHwnd = nullptr;
 
-	SDL_Window* m_window = nullptr;
+	void* m_hInstance = nullptr;
+
+	uint64_t m_style = 0;
+
+	uint64_t m_exStyle = 0;
+
+	bool m_resized = false;
+
+	CrSwapchainHandle m_swapchain;
 };
-
-inline uint32_t ICrOSWindow::GetWidth() const
-{
-	return m_width;
-}
-
-inline uint32_t ICrOSWindow::GetHeight() const
-{
-	return m_height;
-}

@@ -19,6 +19,10 @@
 #include "Rendering/CrRenderingResources.h"
 #include "Rendering/CrRendering.h"
 
+#include "ICrOSWindow.h"
+
+#include "Editor/CrImGuiViewports.h"
+
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "imgui.h"
@@ -71,15 +75,14 @@ void CrImGuiRenderer::Deinitialize()
 	delete ImGuiRenderer;
 }
 
-static ImGuiKey s_ImguiKeys[KeyboardKey::Code::Count] = {};
-
 CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 {
 	m_initParams = initParams;
 
-	// Generic ImGui setup:
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
 	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
@@ -122,153 +125,170 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 		CrAssertMsg(m_fontAtlas.get(), "Failed to create the ImGui font atlas");
 		io.Fonts->TexID = (ImTextureID)m_fontAtlas.get();
 	}
-
-	{
-		s_ImguiKeys[KeyboardKey::Tab]         = ImGuiKey_Tab;
-		s_ImguiKeys[KeyboardKey::LeftArrow]   = ImGuiKey_LeftArrow;
-		s_ImguiKeys[KeyboardKey::RightArrow]  = ImGuiKey_RightArrow;
-		s_ImguiKeys[KeyboardKey::UpArrow]     = ImGuiKey_UpArrow;
-		s_ImguiKeys[KeyboardKey::DownArrow]   = ImGuiKey_DownArrow;
-		s_ImguiKeys[KeyboardKey::PageUp]      = ImGuiKey_PageUp;
-		s_ImguiKeys[KeyboardKey::PageDown]    = ImGuiKey_PageDown;
-		s_ImguiKeys[KeyboardKey::Home]        = ImGuiKey_Home;
-		s_ImguiKeys[KeyboardKey::End]         = ImGuiKey_End;
-		s_ImguiKeys[KeyboardKey::Insert]      = ImGuiKey_Insert;
-		s_ImguiKeys[KeyboardKey::Delete]      = ImGuiKey_Delete;
-		s_ImguiKeys[KeyboardKey::Backspace]   = ImGuiKey_Backspace;
-		s_ImguiKeys[KeyboardKey::Space]       = ImGuiKey_Space;
-		s_ImguiKeys[KeyboardKey::Intro]       = ImGuiKey_Enter;
-		s_ImguiKeys[KeyboardKey::Escape]      = ImGuiKey_Escape;
-		s_ImguiKeys[KeyboardKey::KeypadEnter] = ImGuiKey_KeypadEnter;
-		s_ImguiKeys[KeyboardKey::A]           = ImGuiKey_A;
-		s_ImguiKeys[KeyboardKey::C]           = ImGuiKey_C;
-		s_ImguiKeys[KeyboardKey::V]           = ImGuiKey_V;
-		s_ImguiKeys[KeyboardKey::X]           = ImGuiKey_X;
-		s_ImguiKeys[KeyboardKey::Y]           = ImGuiKey_Y;
-		s_ImguiKeys[KeyboardKey::Z]           = ImGuiKey_Z;
-	}
 	
+	// Set up Imgui style
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
 	// Default resolution for the first frame, we need to query the real viewport during NewFrame()
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f);
 }
 
-void CrImGuiRenderer::NewFrame(uint32_t width, uint32_t height)
+void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<ICrOSWindow>& mainWindow)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	// Generic io:
-	io.DisplaySize = ImVec2((float)width, (float)height);
+	uint32_t windowWidth, windowHeight;
+	mainWindow->GetSizePixels(windowWidth, windowHeight);
+
+	io.DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
 	io.DeltaTime = (float)CrFrameTime::GetFrameDelta().AsSeconds();
-		
-	// Update input:
-	const MouseState& mouseState = CrInput.GetMouseState();
-	io.MouseDown[0] = mouseState.buttonHeld[MouseButton::Left];
-	io.MouseDown[1] = mouseState.buttonHeld[MouseButton::Right];
-	io.MouseDown[2] = mouseState.buttonHeld[MouseButton::Middle];
-	io.MousePos = ImVec2((float)mouseState.position.x, (float)mouseState.position.y);
-	io.MouseWheel = (float)mouseState.mouseWheel.y;
-
-	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
-
-	for (uint32_t k = 0; k < KeyboardKey::Count; ++k)
+	if (io.DeltaTime == 0.0f)
 	{
-		KeyboardKey::Code key = (KeyboardKey::Code)keyboardState.keyHeld[k];
-		io.KeysData[s_ImguiKeys[key]].Down = true;
+		io.DeltaTime = (float)(1.0f / 60.0f);
+	}
+
+	// Update Mouse Cursor (perhaps this needs to be in ImguiViewports?)
+
+	if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
+	{
+		static CursorType::T prevCursorType = CursorType::Count;
+
+		ImGuiMouseCursor imguiMouseCursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
+
+		CursorType::T cursorType = CursorType::Count;
+
+		switch (imguiMouseCursor)
+		{
+			case ImGuiMouseCursor_None:       cursorType = CursorType::None; break;
+			case ImGuiMouseCursor_Arrow:      cursorType = CursorType::Arrow; break;
+			case ImGuiMouseCursor_TextInput:  cursorType = CursorType::TextInput; break;
+			case ImGuiMouseCursor_ResizeAll:  cursorType = CursorType::ResizeAll; break;
+			case ImGuiMouseCursor_ResizeEW:   cursorType = CursorType::ResizeEW; break;
+			case ImGuiMouseCursor_ResizeNS:   cursorType = CursorType::ResizeNS; break;
+			case ImGuiMouseCursor_ResizeNESW: cursorType = CursorType::ResizeNESW; break;
+			case ImGuiMouseCursor_ResizeNWSE: cursorType = CursorType::ResizeNWSE; break;
+			case ImGuiMouseCursor_Hand:       cursorType = CursorType::Hand; break;
+			case ImGuiMouseCursor_NotAllowed: cursorType = CursorType::NotAllowed; break;
+		}
+
+		ICrOSWindow::SetCursor(cursorType);
 	}
 
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture)
+void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle&)
 {
-	renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
-	[&](CrRenderGraph& renderGraph)
+	renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render Viewports"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Behavior,
+	[&](CrRenderGraph&)
 	{
-		renderGraph.BindRenderTarget(swapchainTexture.get());
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, ICrCommandBuffer*)
 	{
 		ImGui::Render();
+	});
 
-		// Query the draw data for this frame:
-		ImDrawData* data = ImGui::GetDrawData();
-		if (!data || !data->Valid || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
+	const ImGuiPlatformIO& imguiPlatformIO = ImGui::GetPlatformIO();
+
+	for (int i = 0; i < imguiPlatformIO.Viewports.Size; ++i)
+	{
+		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
+		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
+		ICrOSWindow* osWindow = viewportData->osWindow;
+		CrSwapchainHandle swapchain = osWindow->GetSwapchain();
+
+		renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
+		[swapchain](CrRenderGraph& renderGraph)
 		{
-			return;
-		}
-
-		// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-		CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
-		CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
-
-		// Update contents:
-		ImDrawIdx* pIdx = (ImDrawIdx*)indexBuffer.GetData();
-		ImDrawVert* pVtx = (ImDrawVert*)vertexBuffer.GetData();
-		for (int i = 0; i < data->CmdListsCount; ++i)
+			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get());
+		},
+		[this, imguiViewport, osWindow, swapchain](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
-			ImDrawList* drawList = data->CmdLists[i];
-
-			memcpy(pIdx, drawList->IdxBuffer.Data, drawList->IdxBuffer.Size * sizeof(ImDrawIdx));
-			memcpy(pVtx, drawList->VtxBuffer.Data, drawList->VtxBuffer.Size * sizeof(ImDrawVert));
-
-			pIdx += drawList->IdxBuffer.Size;
-			pVtx += drawList->VtxBuffer.Size;
-		}
-
-		// Setup global config:
-		commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
-		commandBuffer->BindIndexBuffer(indexBuffer);
-		commandBuffer->BindVertexBuffer(vertexBuffer, 0);
-		commandBuffer->BindSampler(Samplers::UISampleState, RenderingResources->AllLinearClampSampler.get());
-
-		// Projection matrix. TODO: this could be cached.
-		CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
-		UIData* uiData = uiDataBuffer.GetData();
-		{
-			uiData->projection = ComputeProjectionMatrix(data);
-		}
-		commandBuffer->BindConstantBuffer(uiDataBuffer);
-
-		// Iterate over each draw list -> draw command: 
-		ImVec2 clipOffset = data->DisplayPos;
-		uint32_t acumVtxOffset = 0;
-		uint32_t acumIdxOffset = 0;
-		for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
-		{
-			const ImDrawList* drawList = data->CmdLists[listIdx];
-			for (int cmdIdx = 0; cmdIdx < drawList->CmdBuffer.Size; ++cmdIdx)
+			// Query the draw data for this frame:
+			ImDrawData* data = imguiViewport->DrawData;
+			if (!data || !data->Valid || !data->CmdListsCount || (data->DisplaySize.x * data->DisplaySize.y) <= 0.0f)
 			{
-				const ImDrawCmd* drawCmd = &drawList->CmdBuffer[cmdIdx];
+				return;
+			}
 
-				uint32_t x = (uint32_t)(drawCmd->ClipRect.x - clipOffset.x);
-				uint32_t y = (uint32_t)(drawCmd->ClipRect.y - clipOffset.y);
-				uint32_t width = (uint32_t)(drawCmd->ClipRect.z - x);
-				uint32_t height = (uint32_t)(drawCmd->ClipRect.w - y);
+			// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
+			CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
+			CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
 
-				if (!drawCmd->UserCallback)
+			// Update contents:
+			ImDrawIdx* indexBufferData = (ImDrawIdx*)indexBuffer.GetData();
+			ImDrawVert* vertexBufferData = (ImDrawVert*)vertexBuffer.GetData();
+			for (int cmdListIndex = 0; cmdListIndex < data->CmdListsCount; ++cmdListIndex)
+			{
+				ImDrawList* imDrawList = data->CmdLists[cmdListIndex];
+
+				memcpy(indexBufferData, imDrawList->IdxBuffer.Data, imDrawList->IdxBuffer.Size * sizeof(ImDrawIdx));
+				memcpy(vertexBufferData, imDrawList->VtxBuffer.Data, imDrawList->VtxBuffer.Size * sizeof(ImDrawVert));
+
+				indexBufferData += imDrawList->IdxBuffer.Size;
+				vertexBufferData += imDrawList->VtxBuffer.Size;
+			}
+
+			commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
+			commandBuffer->BindIndexBuffer(indexBuffer);
+			commandBuffer->BindVertexBuffer(vertexBuffer, 0);
+			commandBuffer->BindSampler(Samplers::UISampleState, RenderingResources->AllLinearClampSampler.get());
+			commandBuffer->SetViewport(CrViewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
+
+			// Projection matrix. TODO: this could be cached.
+			CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
+			UIData* uiData = uiDataBuffer.GetData();
+			{
+				uiData->projection = ComputeProjectionMatrix(data);
+			}
+			commandBuffer->BindConstantBuffer(uiDataBuffer);
+
+			// Iterate over each draw list -> draw command: 
+			ImVec2 clipOffset = data->DisplayPos;
+			uint32_t totalVertexOffset = 0;
+			uint32_t totalIndexOffset = 0;
+			for (int listIdx = 0; listIdx < data->CmdListsCount; ++listIdx)
+			{
+				const ImDrawList* imDrawList = data->CmdLists[listIdx];
+				for (int cmdIdx = 0; cmdIdx < imDrawList->CmdBuffer.Size; ++cmdIdx)
 				{
-					// Generic rendering.
-					ICrTexture* texture = (ICrTexture*)drawCmd->TextureId;
-					commandBuffer->BindTexture(Textures::UITexture, texture);
-					commandBuffer->SetScissor(CrRectangle(x, y, width, height));
-					commandBuffer->DrawIndexed(drawCmd->ElemCount, 1, drawCmd->IdxOffset + acumIdxOffset, drawCmd->VtxOffset + acumVtxOffset, 0);
-				}
-				else
-				{
-					// Handle user callback:
-					if (drawCmd->UserCallback == ImDrawCallback_ResetRenderState)
+					const ImDrawCmd* imDrawCmd = &imDrawList->CmdBuffer[cmdIdx];
+
+					uint32_t x = (uint32_t)(imDrawCmd->ClipRect.x - clipOffset.x);
+					uint32_t y = (uint32_t)(imDrawCmd->ClipRect.y - clipOffset.y);
+					uint32_t width = (uint32_t)(imDrawCmd->ClipRect.z - x);
+					uint32_t height = (uint32_t)(imDrawCmd->ClipRect.w - y);
+
+					if (!imDrawCmd->UserCallback)
 					{
-						// This is a special case to reset the render state.. What should we do here?
-						CrAssertMsg(false, "Not implemented");
+						// Generic rendering.
+						ICrTexture* texture = (ICrTexture*)imDrawCmd->TextureId;
+						commandBuffer->BindTexture(Textures::UITexture, texture);
+						commandBuffer->SetScissor(CrRectangle(x, y, width, height));
+						commandBuffer->DrawIndexed(imDrawCmd->ElemCount, 1, imDrawCmd->IdxOffset + totalIndexOffset, imDrawCmd->VtxOffset + totalVertexOffset, 0);
 					}
 					else
 					{
-						drawCmd->UserCallback(drawList, drawCmd);
+						// Handle user callback:
+						if (imDrawCmd->UserCallback == ImDrawCallback_ResetRenderState)
+						{
+							// This is a special case to reset the render state.. What should we do here?
+							CrAssertMsg(false, "Not implemented");
+						}
+						else
+						{
+							imDrawCmd->UserCallback(imDrawList, imDrawCmd);
+						}
 					}
 				}
+
+				totalIndexOffset += imDrawList->IdxBuffer.Size;
+				totalVertexOffset += imDrawList->VtxBuffer.Size;
 			}
-			acumIdxOffset += drawList->IdxBuffer.Size;
-			acumVtxOffset += drawList->VtxBuffer.Size;
-		}
-	});
+		});
+	}
 }

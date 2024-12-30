@@ -37,11 +37,11 @@ public:
 
 	uint32_t GetVkQueueFamilyIndex() const;
 
-	VkQueue GetVkQueue(CrCommandQueueType::T queueType) const;
+	VkQueue GetVkGraphicsQueue() const;
 
 	VkCommandBuffer GetVkSwapchainCommandBuffer() const;
 
-	VkCommandPool GetVkCommandPool(CrCommandQueueType::T queueType) const;
+	VkCommandPool GetVkGraphicsCommandPool() const;
 
 	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState);
 

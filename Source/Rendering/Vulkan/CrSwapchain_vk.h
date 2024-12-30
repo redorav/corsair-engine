@@ -26,6 +26,8 @@ private:
 	// Semaphores are signaled when present completes
 	CrVector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
 
+	CrVector<CrGPUFenceHandle> m_imageReadyFences;
+
 	// We need to have another index for the semaphore because we don't really know
 	// the buffer index until we have acquired the image, but we need to signal the
 	// semaphore during that call
@@ -40,6 +42,8 @@ private:
 	VkColorSpaceKHR		m_vkColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
 	VkFence				m_swapchainRecreationFence = nullptr;
+
+	bool				m_acquired = false;
 
 	// We use this mainly to resize the swapchain. There's a couple of things
 	// we can modify but the rest stays the same

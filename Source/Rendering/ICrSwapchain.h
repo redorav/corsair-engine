@@ -8,6 +8,8 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/ICrTexture.h"
 
+class ICrOSWindow;
+
 enum class CrSwapchainResult : uint32_t
 {
 	Success,
@@ -19,8 +21,7 @@ struct CrSwapchainDescriptor
 	CrSwapchainDescriptor();
 
 	const char* name;
-	void* platformWindow;
-	void* platformHandle;
+	ICrOSWindow* window;
 	uint32_t requestedWidth;
 	uint32_t requestedHeight;
 	uint32_t requestedBufferCount; // How many surfaces to request for this swapchain
@@ -51,7 +52,7 @@ public:
 
 	void Resize(uint32_t width, uint32_t height);
 
-	const CrTextureHandle& GetTexture(uint32_t index);
+	const CrTextureHandle& GetCurrentTexture();
 
 protected:
 

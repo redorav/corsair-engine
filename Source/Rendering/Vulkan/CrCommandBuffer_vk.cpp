@@ -55,7 +55,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandBufferAllocateInfo.commandPool = vulkanRenderDevice->GetVkCommandPool(descriptor.queueType);
+	commandBufferAllocateInfo.commandPool = vulkanRenderDevice->GetVkGraphicsCommandPool();
 	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	commandBufferAllocateInfo.commandBufferCount = 1;
 
@@ -99,7 +99,7 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 
 	vkDestroyDescriptorPool(vulkanRenderDevice->GetVkDevice(), m_vkDescriptorPool, nullptr);
 
-	vkFreeCommandBuffers(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkCommandPool(m_queueType), 1, &m_vkCommandBuffer);
+	vkFreeCommandBuffers(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkGraphicsCommandPool(), 1, &m_vkCommandBuffer);
 }
 
 // TODO This should become CreateShaderResourceTable and should be cached, reused, etc

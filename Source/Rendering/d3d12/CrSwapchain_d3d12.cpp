@@ -7,6 +7,8 @@
 #include "CrGPUSynchronization_d3d12.h"
 #include "CrD3D12.h"
 
+#include "ICrOSWindow.h"
+
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
 
@@ -40,7 +42,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapch
 	HRESULT hResult = static_cast<const CrRenderSystemD3D12*>(RenderSystem.get())->GetDXGIFactory4()->CreateSwapChainForHwnd
 	(
 		d3d12RenderDevice->GetD3D12GraphicsCommandQueue(),
-		(HWND)swapchainDescriptor.platformWindow,
+		(HWND)swapchainDescriptor.window->GetNativeWindowHandle(),
 		&d3d12SwapchainDescriptor,
 		nullptr, // TODO Handle fullscreen
 		nullptr,
@@ -116,6 +118,8 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 {
 	CrAssertMsg(m_d3d12Swapchain != nullptr, "Swapchain must have been previously created");
 
+	m_renderDevice->WaitIdle();
+
 	m_width = width;
 	m_height = height;
 
@@ -130,7 +134,7 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 
 	m_textures.clear();
 
-	HRESULT hResult = m_d3d12Swapchain->ResizeBuffers(0, width, height, crd3d::GetDXGIFormat(m_format), m_d3d12SwapchainFlags);
+	HRESULT hResult = m_d3d12Swapchain->ResizeBuffers(0, width, height, crd3d::GetDXGIFormat(m_format), 0);
 
 	if (hResult == 0x887A0001)
 	{

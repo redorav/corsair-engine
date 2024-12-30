@@ -174,7 +174,7 @@ public:
 
 	uint32_t GetStride() const { return m_stride; }
 
-	uint32_t GetSize() const { return m_stride * m_numElements; }
+	uint32_t GetSizeBytes() const { return m_stride * m_numElements; }
 
 	uint32_t GetByteOffset() const { return m_byteOffset; }
 

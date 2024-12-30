@@ -79,11 +79,15 @@ namespace CrEditorAxis
 	};
 };
 
+class ICrOSWindow;
+
 class CrEditor
 {
 public:
 
-	void Initialize();
+	static void Initialize(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
+
+	static void Deinitialize();
 
 	void SetRenderWorld(const CrRenderWorldHandle& renderWorld);
 
@@ -92,6 +96,8 @@ public:
 	void Update();
 
 private:
+
+	CrEditor(const CrIntrusivePtr<ICrOSWindow>& mainWindow);
 
 	void SpawnManipulator(const float4x4& initialTransform);
 
@@ -137,7 +143,7 @@ private:
 	CrUniquePtr<CrManipulator> m_manipulator;
 
 	// Whether the manipulator is selected (e.g. we started dragging)
-	bool m_manipulatorSelected;
+	bool m_manipulatorSelected = false;
 
 	// Which axis we have selected when dragging the manipulator
 	CrEditorAxis::T m_selectedAxis = CrEditorAxis::None;
@@ -157,3 +163,5 @@ private:
 
 	CrEditorCameraState m_cameraState;
 };
+
+extern CrEditor* Editor;

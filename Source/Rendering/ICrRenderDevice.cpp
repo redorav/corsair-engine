@@ -266,8 +266,7 @@ CrSamplerHandle ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descri
 
 CrSwapchainHandle ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
-	CrAssertMsg(swapchainDescriptor.platformWindow, "Platform window cannot be null");
-	CrAssertMsg(swapchainDescriptor.platformHandle, "Platform handle cannot be null");
+	CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
 
 	CrSwapchainHandle swapchain = CrSwapchainHandle(CreateSwapchainPS(swapchainDescriptor));

@@ -201,7 +201,10 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 		CrOSWindow* osWindow = viewportData->osWindow;
 		CrSwapchainHandle swapchain = osWindow->GetSwapchain();
 
-		renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
+		CrRenderGraphString imguiPassString;
+		imguiPassString.append_sprintf("ImGui Render Viewport %i", i);
+
+		renderGraph.AddRenderPass(imguiPassString, float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
 		[swapchain](CrRenderGraph& renderGraph)
 		{
 			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get());

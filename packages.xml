@@ -39,6 +39,10 @@
 		<version id="3e895b4" file="mikktspace_2023_9_16_3e895b4.7z" repository="github"/>
 	</package>
 
+	<package name="nvapi">
+		<version id="r560" file="nvapi_r560.7z" repository="github"/>
+	</package>
+
 	<package name="sdl3">
 		<version id="preview-3.1.6" file="sdl3-preview-3.1.6.7z" repository="github"/>
 	</package>

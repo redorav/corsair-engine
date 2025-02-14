@@ -30,7 +30,7 @@ struct VkPipelineCacheHeader
 	uint8_t uuid[VK_UUID_SIZE]; // A pipeline cache ID equal to VkPhysicalDeviceProperties::pipelineCacheUUID
 };
 
-CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
+CrRenderDeviceVulkan::CrRenderDeviceVulkan(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 	, m_numCommandQueues(0)
 {
 	m_vkInstance = static_cast<const CrRenderSystemVulkan*>(renderSystem)->GetVkInstance();
@@ -118,6 +118,11 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, 
 	CrAssert(result == VK_SUCCESS);
 
 	SetVkObjectName((uint64_t)m_vkSwapchainCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "Swapchain Command Buffer");
+
+	if (descriptor.enableRenderDoc)
+	{
+		RenderSystem->InitializeRenderdoc();
+	}
 }
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()

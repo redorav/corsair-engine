@@ -81,7 +81,9 @@ int main(int argc, char* argv[])
 
 	CrRenderDeviceDescriptor renderDeviceDescriptor;
 	renderDeviceDescriptor.preferredVendor = cr3d::GraphicsVendor::FromString(graphicsVendorString.c_str());
-	ICrRenderSystem::CreateRenderDevice(renderDeviceDescriptor);
+	renderDeviceDescriptor.enableRenderDoc = enableRenderDoc;
+	renderDeviceDescriptor.enablePIX       = enablePIX;
+	RenderSystem->CreateRenderDevice(renderDeviceDescriptor);
 
 	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
 

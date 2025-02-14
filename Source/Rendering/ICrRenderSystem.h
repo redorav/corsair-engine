@@ -16,12 +16,6 @@ struct CrRenderSystemDescriptor
 
 	// e.g. Vulkan layers, D3D debug layer
 	bool enableValidation = false;
-	
-	// On PC we can programmatically load multiple debuggers. They cannot
-	// all be simultaneously loaded or loaded for all platforms
-	bool enableRenderDoc = false;
-
-	bool enablePIX = false;
 };
 
 namespace CrBuiltinShaders { enum T : uint32_t; };
@@ -38,17 +32,19 @@ public:
 
 	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
-	static const CrRenderDeviceHandle& GetRenderDevice();
+	// Only the render device calls these functions, as it knows what device we are using
 
-	static void CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor);
+	void InitializeRenderdoc();
 
-	static bool GetIsValidationEnabled();
+	const CrRenderDeviceHandle& GetRenderDevice() const;
 
-	static bool GetIsRenderDocEnabled();
+	void CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor);
 
-	static cr3d::GraphicsApi::T GetGraphicsApi();
+	bool GetIsValidationEnabled() const;
 
-	static const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
+	cr3d::GraphicsApi::T GetGraphicsApi() const;
+
+	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const;
 
 protected:
 
@@ -62,7 +58,7 @@ protected:
 
 	CrPIX m_pix;
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const = 0;
+	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) = 0;
 };
 
 extern CrUniquePtr<ICrRenderSystem> RenderSystem;

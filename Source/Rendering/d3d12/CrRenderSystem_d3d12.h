@@ -10,13 +10,17 @@ public:
 
 	CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const override;
+	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) override;
 
 	IDXGIFactory4* GetDXGIFactory4() const { return m_dxgiFactory4; }
 
 	IDXGIFactory6* GetDXGIFactory6() const { return m_dxgiFactory6; }
 
 	IDXGIFactory6* GetDXGIFactory7() const { return m_dxgiFactory7; }
+
+	bool InitializeNVAPI();
+
+	bool InitializePIX();
 
 private:
 
@@ -27,4 +31,8 @@ private:
 	IDXGIFactory6* m_dxgiFactory6 = nullptr;
 
 	IDXGIFactory7* m_dxgiFactory7 = nullptr;
+
+	bool m_nvapiInitialized = false;
+
+	bool m_pixInitialized = false;
 };

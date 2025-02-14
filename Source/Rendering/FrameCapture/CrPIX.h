@@ -6,7 +6,7 @@ class CrPIX
 {
 public:
 
-	void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
+	bool Initialize();
 
 	void TriggerCapture();
 

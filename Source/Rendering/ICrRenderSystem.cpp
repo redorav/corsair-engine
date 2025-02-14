@@ -26,15 +26,6 @@ CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)
 {
-	if (renderSystemDescriptor.enableRenderDoc)
-	{
-		m_renderDoc.Initialize(renderSystemDescriptor);
-	}
-	else if (renderSystemDescriptor.enablePIX && renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12)
-	{
-		m_pix.Initialize(renderSystemDescriptor);
-	}
-
 	// Load builtin shaders here. The render system is only instantiated once and knows
 	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
 	// rest of the engine interacts with them and not the raw data that was passed in, 
@@ -66,8 +57,6 @@ ICrRenderSystem::~ICrRenderSystem()
 
 void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
 {
-	CrAssertMsg(renderSystemDescriptor.enablePIX ? renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12 : true, "PIX is only compatible with D3D12");
-
 	ICrRenderSystem* renderSystem = nullptr;
 
 	// Treat this like a factory (on PC) through the API. That way the rest of the code
@@ -89,34 +78,34 @@ void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDes
 	RenderSystem = CrUniquePtr<ICrRenderSystem>(renderSystem);
 }
 
-const CrRenderDeviceHandle& ICrRenderSystem::GetRenderDevice()
+void ICrRenderSystem::InitializeRenderdoc()
 {
-	return RenderSystem->m_mainDevice;
+	m_renderDoc.Initialize(m_descriptor);
+}
+
+const CrRenderDeviceHandle& ICrRenderSystem::GetRenderDevice() const
+{
+	return m_mainDevice;
 }
 
 void ICrRenderSystem::CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor)
 {
-	RenderSystem->m_mainDevice = CrRenderDeviceHandle(RenderSystem->CreateRenderDevicePS(descriptor));
+	m_mainDevice = CrRenderDeviceHandle(CreateRenderDevicePS(descriptor));
 
-	RenderSystem->m_mainDevice->Initialize();
+	m_mainDevice->Initialize();
 }
 
-bool ICrRenderSystem::GetIsValidationEnabled()
+bool ICrRenderSystem::GetIsValidationEnabled() const
 {
-	return RenderSystem->m_descriptor.enableValidation;
+	return m_descriptor.enableValidation;
 }
 
-bool ICrRenderSystem::GetIsRenderDocEnabled()
+cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
 {
-	return RenderSystem->m_descriptor.enableRenderDoc;
+	return m_descriptor.graphicsApi;
 }
 
-cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi()
+const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
 {
-	return RenderSystem->m_descriptor.graphicsApi;
-}
-
-const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
-{
-	return RenderSystem->m_builtinShaderBytecodes[builtinShader];
+	return m_builtinShaderBytecodes[builtinShader];
 }

@@ -15,7 +15,7 @@ class CrRenderDeviceD3D12 final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
+	CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	~CrRenderDeviceD3D12();
 
@@ -52,6 +52,8 @@ public:
 	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
 
 	bool GetIsEnhancedBarriersSupported() const { return m_enhancedBarriersSupported; }
+
+	bool GetIsNVAPIEnabled() const { return m_nvapiEnabled; }
 
 private:
 
@@ -126,51 +128,55 @@ private:
 
 	CrGPUFenceHandle m_waitIdleFence;
 
-	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue;
+	ID3D12CommandQueue* m_d3d12GraphicsCommandQueue = nullptr;
 
-	ID3D12RootSignature* m_d3d12GraphicsRootSignature;
+	ID3D12RootSignature* m_d3d12GraphicsRootSignature = nullptr;
 
-	ID3D12RootSignature* m_d3d12ComputeRootSignature;
+	ID3D12RootSignature* m_d3d12ComputeRootSignature = nullptr;
 
-	ID3D12CommandSignature* m_d3d12DrawIndirectCommandSignature;
+	ID3D12CommandSignature* m_d3d12DrawIndirectCommandSignature = nullptr;
 
-	ID3D12CommandSignature* m_d3d12DrawIndexedIndirectCommandSignature;
+	ID3D12CommandSignature* m_d3d12DrawIndexedIndirectCommandSignature = nullptr;
 
-	ID3D12CommandSignature* m_d3d12DispatchIndirectCommandSignature;
+	ID3D12CommandSignature* m_d3d12DispatchIndirectCommandSignature = nullptr;
 
-	IDXGIAdapter1* m_dxgiAdapter;
+	IDXGIAdapter1* m_dxgiAdapter = nullptr;
 
-	ID3D12Device* m_d3d12Device;
+	ID3D12Device* m_d3d12Device = nullptr;
 
-	ID3D12Device1* m_d3d12Device1;
+	ID3D12Device1* m_d3d12Device1 = nullptr;
 
-	ID3D12Device2* m_d3d12Device2;
+	ID3D12Device2* m_d3d12Device2 = nullptr;
 
-	ID3D12Device3* m_d3d12Device3;
+	ID3D12Device3* m_d3d12Device3 = nullptr;
 
-	ID3D12Device4* m_d3d12Device4;
+	ID3D12Device4* m_d3d12Device4 = nullptr;
 
-	ID3D12Device5* m_d3d12Device5;
+	ID3D12Device5* m_d3d12Device5 = nullptr;
 
-	ID3D12Device6* m_d3d12Device6;
+	ID3D12Device6* m_d3d12Device6 = nullptr;
 
-	ID3D12Device7* m_d3d12Device7;
+	ID3D12Device7* m_d3d12Device7 = nullptr;
 
-	ID3D12Device8* m_d3d12Device8;
+	ID3D12Device8* m_d3d12Device8 = nullptr;
 
-	ID3D12Device9* m_d3d12Device9;
+	ID3D12Device9* m_d3d12Device9 = nullptr;
 
-	ID3D12Device10* m_d3d12Device10;
+	ID3D12Device10* m_d3d12Device10 = nullptr;
 
-	ID3D12Device11* m_d3d12Device11;
+	ID3D12Device11* m_d3d12Device11 = nullptr;
 
-	ID3D12Device12* m_d3d12Device12;
+	ID3D12Device12* m_d3d12Device12 = nullptr;
 
-	ID3D12Device13* m_d3d12Device13;
+	ID3D12Device13* m_d3d12Device13 = nullptr;
 
-	ID3D12Device14* m_d3d12Device14;
+	ID3D12Device14* m_d3d12Device14 = nullptr;
 
-	bool m_enhancedBarriersSupported;
+	bool m_enhancedBarriersSupported = false;
+
+	bool m_nvapiEnabled = false;
+
+	bool m_pixEnabled = false;
 };
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()

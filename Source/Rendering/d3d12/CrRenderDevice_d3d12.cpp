@@ -46,9 +46,9 @@ const char* GetD3DFeatureLevelString(D3D_FEATURE_LEVEL featureLevel)
 	}
 }
 
-CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
+CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 {
-	const CrRenderSystemD3D12* d3d12RenderSystem = static_cast<const CrRenderSystemD3D12*>(renderSystem);
+	CrRenderSystemD3D12* d3d12RenderSystem = static_cast<CrRenderSystemD3D12*>(renderSystem);
 	IDXGIFactory4* dxgiFactory4 = d3d12RenderSystem->GetDXGIFactory4();
 	
 	struct PriorityKey
@@ -251,7 +251,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12GraphicsCommandQueue));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating command queue");
 
-	if (ICrRenderSystem::GetIsValidationEnabled())
+	if (RenderSystem->GetIsValidationEnabled())
 	{
 		ID3D12InfoQueue* d3d12InfoQueue = NULL;
 		if (SUCCEEDED(m_d3d12Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&d3d12InfoQueue)))
@@ -302,12 +302,12 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 
 	// Create root signatures
 
- 	const CrShaderBytecodeHandle& graphicsRootSignatureBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);
+ 	const CrShaderBytecodeHandle& graphicsRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);
 	hResult = m_d3d12Device->CreateRootSignature(0, graphicsRootSignatureBytecode->GetBytecode().data(), graphicsRootSignatureBytecode->GetBytecode().size(),
 		__uuidof(ID3D12RootSignature), (void**)&m_d3d12GraphicsRootSignature);
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating graphics root signature");
 
-	const CrShaderBytecodeHandle& computeRootSignatureBytecode = ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureCompute);
+	const CrShaderBytecodeHandle& computeRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureCompute);
 	hResult = m_d3d12Device->CreateRootSignature(0, computeRootSignatureBytecode->GetBytecode().data(), computeRootSignatureBytecode->GetBytecode().size(),
 		__uuidof(ID3D12RootSignature), (void**)&m_d3d12ComputeRootSignature);
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating compute root signature");
@@ -357,6 +357,22 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(const ICrRenderSystem* renderSystem, co
 	}
 
 	m_waitIdleFence = CreateGPUFence();
+
+	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
+	if (descriptor.enableNVAPI && m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::NVIDIA)
+	{
+		m_nvapiEnabled = d3d12RenderSystem->InitializeNVAPI();
+	}
+
+	if (descriptor.enableRenderDoc)
+	{
+		d3d12RenderSystem->InitializeRenderdoc();
+	}
+
+	if (descriptor.enablePIX)
+	{
+		m_pixEnabled = d3d12RenderSystem->InitializePIX();
+	}
 }
 
 CrRenderDeviceD3D12::~CrRenderDeviceD3D12()

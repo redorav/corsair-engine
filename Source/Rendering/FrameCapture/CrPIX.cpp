@@ -5,9 +5,10 @@
 
 #include "Rendering/Extensions/CrPIXHeader.h"
 
-void CrPIX::Initialize(const CrRenderSystemDescriptor& /*renderSystemDescriptor*/)
+bool CrPIX::Initialize()
 {
 	m_pixHandle = PIXLoadLatestWinPixGpuCapturerLibrary();
+	return m_pixHandle != nullptr;
 }
 
 void CrPIX::StartCapture()

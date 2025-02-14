@@ -20,7 +20,7 @@ public:
 
 	bool IsVkInstanceLayerSupported(const CrString& layer);
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) const override;
+	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) override;
 
 private:
 

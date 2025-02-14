@@ -12,7 +12,7 @@ class CrRenderDeviceVulkan final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceVulkan(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
+	CrRenderDeviceVulkan(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	~CrRenderDeviceVulkan();
 

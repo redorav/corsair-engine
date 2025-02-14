@@ -61,6 +61,7 @@ struct CrRenderDeviceProperties
 		bool compressionETC = false;
 		bool compressionASTC = false;
 		bool conservativeRasterization = false;
+		bool rectangleRasterization = false;
 	} features;
 };
 
@@ -95,13 +96,16 @@ class CrGPUDeletable;
 struct CrRenderDeviceDescriptor
 {
 	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
+	bool enableRenderDoc = false;
+	bool enablePIX = false;
+	bool enableNVAPI = true;
 };
 
 class ICrRenderDevice : public CrIntrusivePtrInterfaceBase
 {
 public:
 
-	ICrRenderDevice(const ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
+	ICrRenderDevice(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
 
 	virtual ~ICrRenderDevice();
 
@@ -198,6 +202,8 @@ public:
 
 	bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
 
+	bool SupportsRectangleRasterization() const { return m_renderDeviceProperties.features.rectangleRasterization; }
+
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
 protected:
@@ -269,8 +275,6 @@ protected:
 	CrUniquePtr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
 	CrUniquePtr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
-
-	const ICrRenderSystem* m_renderSystem;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 

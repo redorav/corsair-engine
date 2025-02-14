@@ -291,6 +291,7 @@ project (ProjectCorsairEngine)
 	LinkLibrary(D3D12Library)
 	LinkLibrary(WinPixEventRuntimeLibrary)
 	LinkLibrary(XInputLibrary)
+	LinkLibrary(NVAPILibrary)
 
 	-- Copy necessary files or DLLs
 	postbuildcommands
@@ -338,12 +339,14 @@ project(ProjectRendering)
 	AddLibraryIncludes(ImguiLibrary)
 	AddLibraryIncludes(SPIRVReflectLibrary)
 	AddLibraryIncludes(RenderDocLibrary)
-	
+
 	filter { Win64PlatformFilter }
-		files { SourceRenderingDirectory..'/Vulkan/*' }
-		files { SourceRenderingDirectory..'/D3D12/*' }
+		files { SourceRenderingDirectory..'/Vulkan/**' }
+		files { SourceRenderingDirectory..'/D3D12/**' }
+		files { SourceRenderingDirectory..'/Extensions/**' }
 		AddLibraryIncludes(VulkanLibrary)
 		AddLibraryIncludes(WinPixEventRuntimeLibrary)
+		AddLibraryIncludes(NVAPILibrary)
 		
 		postbuildcommands
 		{

@@ -185,10 +185,6 @@ WinPixEventRuntimeLibrary =
 	libDirs = { LibWinPixEventRuntime..BinaryDirectory },
 	libNames = 'WinPixEventRuntime',
 	dlls = LibWinPixEventRuntime..BinaryDirectory..'WinPixEventRuntime.dll',
-	defines     =
-	{
-		"USE_PIX"
-	}
 }
 
 WuffsLibrary =

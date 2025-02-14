@@ -85,7 +85,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	CrRenderDeviceHandle renderDevice = ICrRenderSystem::GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = RenderSystem->GetRenderDevice();
 
 	// Pipeline description:
 	{

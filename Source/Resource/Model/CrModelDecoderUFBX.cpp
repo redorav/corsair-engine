@@ -185,7 +185,7 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
-			CrTextureHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{
@@ -297,7 +297,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
 
 				CrRenderMeshHandle renderMesh = CrRenderMeshHandle(new CrRenderMesh());
 
-				const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+				const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
 
 				bool hasUVs = ufbxMesh->vertex_uv.exists;
 				bool hasNormals = ufbxMesh->vertex_normal.exists;

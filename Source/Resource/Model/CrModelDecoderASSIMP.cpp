@@ -119,7 +119,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 	aiColor4D materialColor(1.0f, 1.0f, 1.0f, 1.0f);
 	aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &materialColor);
 
-	const CrRenderDeviceHandle& renderDevice = ICrRenderSystem::GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
 
 	CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
@@ -267,7 +267,7 @@ CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = cr3d::TextureUsage::Default;
 
-			CrTextureHandle texture = ICrRenderSystem::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{

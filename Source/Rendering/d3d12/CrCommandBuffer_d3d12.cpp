@@ -7,13 +7,9 @@
 #include "CrSampler_d3d12.h"
 #include "CrShader_d3d12.h"
 
+#include "Rendering/Extensions/CrPIXHeader.h"
+
 #include "Core/CrAlignment.h"
-
-warnings_off
-#define USE_PIX
-#include "WinPixEventRuntime/pix3.h"
-warnings_on
-
 #include "Core/Logging/ICrDebug.h"
 
 CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)

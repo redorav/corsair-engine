@@ -184,7 +184,11 @@ WinPixEventRuntimeLibrary =
 	includeDirs = { LibWinPixEventRuntime..IncludeDirectory },
 	libDirs = { LibWinPixEventRuntime..BinaryDirectory },
 	libNames = 'WinPixEventRuntime',
-	dlls = LibWinPixEventRuntime..BinaryDirectory..'WinPixEventRuntime.dll'
+	dlls = LibWinPixEventRuntime..BinaryDirectory..'WinPixEventRuntime.dll',
+	defines     =
+	{
+		"USE_PIX"
+	}
 }
 
 WuffsLibrary =

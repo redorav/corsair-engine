@@ -3,10 +3,7 @@
 #include "CrPIX.h"
 #include "Core/CrMacros.h"
 
-warnings_off
-#define USE_PIX
-#include "WinPixEventRuntime/pix3.h"
-warnings_on
+#include "Rendering/Extensions/CrPIXHeader.h"
 
 void CrPIX::Initialize(const CrRenderSystemDescriptor& /*renderSystemDescriptor*/)
 {

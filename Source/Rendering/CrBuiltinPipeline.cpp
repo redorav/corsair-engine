@@ -57,7 +57,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	CrBuiltinShaders::T pixelShaderIndex
 )
 {
-	ICrRenderDevice* renderDevice = ICrRenderSystem::GetRenderDevice().get();
+	ICrRenderDevice* renderDevice = RenderSystem->GetRenderDevice().get();
 
 	CrHash pipelineHash = graphicsPipelineDescriptor.ComputeHash();
 	CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
@@ -107,7 +107,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders:
 	}
 	else
 	{
-		ICrRenderDevice* renderDevice = ICrRenderSystem::GetRenderDevice().get();
+		ICrRenderDevice* renderDevice = RenderSystem->GetRenderDevice().get();
 
 		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 
@@ -130,7 +130,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 {
 #if !defined(CR_CONFIG_FINAL)
 
-	ICrRenderDevice* renderDevice = ICrRenderSystem::GetRenderDevice().get();
+	ICrRenderDevice* renderDevice = RenderSystem->GetRenderDevice().get();
 	
 	const CrRenderDeviceProperties& deviceProperties = renderDevice->GetProperties();
 	

@@ -16,6 +16,7 @@ LibHlslpp             = DependenciesDirectory..'/hlslpp'
 LibImGui              = DependenciesDirectory..'/imgui'
 LibMeshOptimizer      = DependenciesDirectory..'/meshoptimizer'
 LibMikkTSpace         = DependenciesDirectory..'/mikktspace'
+LibNVAPI              = DependenciesDirectory..'/nvapi'
 LibRapidYAML          = DependenciesDirectory..'/rapidyaml'
 LibRenderDoc          = DependenciesDirectory..'/renderdoc'
 LibSDL3               = DependenciesDirectory..'/sdl3'
@@ -123,6 +124,13 @@ MikkTSpaceLibrary =
 	includeDirs = LibMikkTSpace..IncludeDirectory,
 	libDirs     = LibMikkTSpace..BinaryDirectory,
 	libNames    = 'MikkTSpace.vs2022.release',
+}
+
+NVAPILibrary =
+{
+	includeDirs = LibNVAPI..IncludeDirectory,
+	libDirs     = LibNVAPI..BinaryDirectory,
+	libNames    = 'nvapi64'
 }
 
 RapidYAMLLibrary =

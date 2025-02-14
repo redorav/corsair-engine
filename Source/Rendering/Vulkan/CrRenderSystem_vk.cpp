@@ -54,7 +54,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 
 	uint32_t vulkanApiVersion = VK_VERSION_1_0;
 
-	if(&vkEnumerateInstanceVersion != nullptr)
+	if(vkEnumerateInstanceVersion != nullptr)
 	{
 		vkEnumerateInstanceVersion(&vulkanApiVersion);
 	}

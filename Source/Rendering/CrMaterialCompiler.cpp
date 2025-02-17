@@ -125,10 +125,11 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 	patchedShaderSourcePath /= "ShaderTemp.hlsl";
 
-	// Save patched code. We overwrite any existing file (hence ForceCreate)
-	CrFileHandle patchedSourceFile = ICrFile::OpenFile(patchedShaderSourcePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-	patchedSourceFile->Write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
-	patchedSourceFile = nullptr;
+	// Save patched code. We overwrite any existing file
+	if (crstl::file patchedSourceFile = crstl::file(patchedShaderSourcePath.c_str(), crstl::file_flags::force_create | crstl::file_flags::write))
+	{
+		patchedSourceFile.write((void*)patchedShaderSource.c_str(), patchedShaderSource.length());
+	}
 
 	CrMaterialHandle material = CrMaterialHandle(new CrMaterial());
 

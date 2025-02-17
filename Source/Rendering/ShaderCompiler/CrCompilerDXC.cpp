@@ -116,13 +116,11 @@ public:
 			CrString filename;
 			filename.append_convert<wchar_t>(pFilename);
 
-			CrFileHandle file = ICrFile::OpenFile(filename.c_str(), FileOpenFlags::Read);
-
-			if (file)
+			if (crstl::file file = crstl::file(filename.c_str(), crstl::file_flags::read))
 			{
 				CrString includeString;
-				includeString.resize(file->GetSize());
-				file->Read(includeString.data(), (uint32_t)includeString.size());
+				includeString.resize(file.get_size());
+				file.read(includeString.data(), (uint32_t)includeString.size());
 
 				CComPtr<IDxcBlobEncoding> dxcIncludeBlob;
 				m_dxcUtils->CreateBlob(includeString.data(), (uint32_t)includeString.size(), 0, &dxcIncludeBlob);
@@ -541,10 +539,10 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 			CrFixedPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 			pdbFilePath /= CrString(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
-			CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-			if (pdbFile)
+
+			if (crstl::file pdbFile = crstl::file(pdbFilePath.c_str(), crstl::file_flags::force_create | crstl::file_flags::write))
 			{
-				pdbFile->Write(spirvBytecode.data(), spirvBytecode.size_bytes());
+				pdbFile.write(spirvBytecode.data(), spirvBytecode.size_bytes());
 			}
 		}
 
@@ -683,10 +681,9 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				const CrFixedPath& pdbDirectory = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
 				CrFixedPath pdbFilePath = pdbDirectory / pdbNameAsUtf8->GetStringPointer();
 
-				CrFileHandle pdbFile = ICrFile::OpenFile(pdbFilePath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-				if (pdbFile)
+				if (crstl::file pdbFile = crstl::file(pdbFilePath.c_str(), crstl::file_flags::force_create | crstl::file_flags::write))
 				{
-					pdbFile->Write(pdbBlob->GetBufferPointer(), pdbBlob->GetBufferSize());
+					pdbFile.write(pdbBlob->GetBufferPointer(), pdbBlob->GetBufferSize());
 				}
 			}
 

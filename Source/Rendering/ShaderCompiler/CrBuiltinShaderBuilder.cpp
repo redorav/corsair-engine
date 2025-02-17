@@ -30,12 +30,12 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 			CrFixedPath shadersFilePath = CrFixedPath(entry.directory) / entry.filename;
 
 			// Load .shaders file
-			CrFileHandle file = ICrFile::OpenFile(shadersFilePath.c_str(), FileOpenFlags::Read);
+			crstl::file file = crstl::file(shadersFilePath.c_str(), crstl::file_flags::read);
 
 			// Read in data
 			CrString shadersFile;
-			shadersFile.resize(file->GetSize());
-			file->Read(shadersFile.data(), shadersFile.size());
+			shadersFile.resize(file.get_size());
+			file.read(shadersFile.data(), shadersFile.size());
 
 			// Assume we have an hlsl file with the same name where the entry points defined in the .shaders file live
 			CrFixedPath hlslFilePath = shadersFilePath;
@@ -281,18 +281,16 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			const CompilationDescriptor& compilationDescriptor = shaderJob.compilationDescriptor;
 
 			// Load binary file
-			CrFileHandle file = ICrFile::OpenFile(compilationDescriptor.outputPath.c_str(), FileOpenFlags::Read);
-
 			CrString shaderStageString = "cr3d::ShaderStage::";
 			shaderStageString += cr3d::ShaderStage::ToString(compilationDescriptor.shaderStage);
 
-			if (file)
+			if (crstl::file file = crstl::file(compilationDescriptor.outputPath.c_str(), crstl::file_flags::read))
 			{
-				uint64_t codeSize = file->GetSize();
+				uint64_t codeSize = file.get_size();
 
 				CrVector<uint8_t> shaderBinaryData;
 				shaderBinaryData.resize(codeSize);
-				file->Read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
+				file.read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
 
 				CrString shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + CrString(codeSize) + "]";
 				builtinShaderDataCpp += shaderBinaryName + " =\n{";
@@ -313,9 +311,6 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 				}
 
 				builtinShaderDataCpp += "\n};\n\n";
-
-				// Close file and delete original binary
-				file = nullptr;
 			}
 			else
 			{

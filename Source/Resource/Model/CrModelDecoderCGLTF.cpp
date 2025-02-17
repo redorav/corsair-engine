@@ -231,14 +231,14 @@ static cgltf_result cgltfFileRead(const struct cgltf_memory_options* memory_opti
 	void* (*memory_alloc)(void*, cgltf_size) = memory_options->alloc ? memory_options->alloc : &cgltf_default_alloc;
 	void (*memory_free)(void*, void*) = memory_options->free ? memory_options->free : &cgltf_default_free;
 
-	CrFileHandle file = ICrFile::OpenFile(resourcePath.c_str(), FileOpenFlags::Read);
+	crstl::file file = crstl::file(resourcePath.c_str(), crstl::file_flags::read);
 
 	if (!file)
 	{
 		return cgltf_result_file_not_found;
 	}
 
-	cgltf_size fileSize = size ? *size : file->GetSize();
+	cgltf_size fileSize = size ? *size : file.get_size();
 
 	if (fileSize == 0)
 	{
@@ -251,7 +251,7 @@ static cgltf_result cgltfFileRead(const struct cgltf_memory_options* memory_opti
 		return cgltf_result_out_of_memory;
 	}
 
-	cgltf_size readSize = file->Read(fileData, fileSize);
+	cgltf_size readSize = file.read(fileData, fileSize);
 
 	if (readSize != fileSize)
 	{

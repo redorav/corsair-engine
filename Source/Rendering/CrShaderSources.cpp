@@ -54,12 +54,10 @@ CrShaderSources::CrShaderSources()
 			CrFixedPath shaderPath = entry.directory;
 			shaderPath /= entry.filename.c_str();
 
-			CrFileHandle shaderSourceFile = ICrFile::OpenFile(shaderPath.c_str(), FileOpenFlags::Read);
-
-			if (shaderSourceFile)
+			if (crstl::file shaderSourceFile = crstl::file(shaderPath.c_str(), crstl::file_flags::read))
 			{
-				CrString shaderSource(CrStringNoInitialize, shaderSourceFile->GetSize(), shaderSourceFile->GetSize());
-				shaderSourceFile->Read(shaderSource.data(), shaderSource.size());
+				CrString shaderSource(CrStringNoInitialize, shaderSourceFile.get_size(), shaderSourceFile.get_size());
+				shaderSourceFile.read(shaderSource.data(), shaderSource.size());
 
 				// Preprocess the shader source to remove anything that cannot
 				// add anything meaningful to the final binary, such as whitespace, 

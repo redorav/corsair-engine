@@ -21,9 +21,9 @@ CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* h
 
 	// If we have a hash, check whether we've produced the same hash. If so, the cache is valid
 	// If not, create the hash file and store it
-	if (CrFileHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::Read))
+	if (crstl::file hashFile = crstl::file(hashPath.c_str(), crstl::file_flags::read))
 	{
-		hashFile->Read((void*)&storedHash, sizeof(storedHash));
+		hashFile.read((void*)&storedHash, sizeof(storedHash));
 
 		// If we have the same hash, the cache is valid and we don't need to do anything about it
 		// If not, delete the contents of the folder and start again
@@ -33,7 +33,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* h
 		}
 	}
 
-	if (ICrFile::DirectoryExists(cachePath.c_str()))
+	if (crstl::exists(cachePath.c_str()))
 	{
 		if (clearCache)
 		{
@@ -43,7 +43,7 @@ CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* h
 				{
 					CrFixedPath filePath = entry.directory;
 					filePath /= entry.filename;
-					ICrFile::FileDelete(filePath.c_str());
+					crstl::delete_file(filePath.c_str());
 				}
 
 				return true;
@@ -53,13 +53,13 @@ CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* h
 	else
 	{
 		// Make sure directory exists
-		ICrFile::CreateDirectories(cachePath.c_str());
+		crstl::create_directories(cachePath.c_str());
 	}
 
 	if (clearCache)
 	{
-		CrFileHandle hashFile = ICrFile::OpenFile(hashPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
-		hashFile->Write((void*)&currentHash, sizeof(currentHash));
+		crstl::file hashFile = crstl::file(hashPath.c_str(), crstl::file_flags::force_create | crstl::file_flags::write);
+		hashFile.write((void*)&currentHash, sizeof(currentHash));
 	}
 }
 

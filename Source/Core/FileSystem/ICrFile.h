@@ -9,6 +9,8 @@
 
 #include "stdint.h"
 
+#include "crstl/filesystem.h"
+
 struct CrDirectoryEntry
 {
 	// Points to the directory passed in to the find function. Useful to build full path

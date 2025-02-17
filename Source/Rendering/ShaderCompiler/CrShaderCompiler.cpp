@@ -247,9 +247,9 @@ int main(int argc, char* argv[])
 			pdbPath += "_";
 			pdbPath += cr3d::GraphicsApi::ToString(graphicsApi);
 
-			if (!ICrFile::DirectoryExists(pdbPath.c_str()))
+			if (!crstl::exists(pdbPath.c_str()))
 			{
-				ICrFile::CreateDirectories(pdbPath.c_str());
+				crstl::create_directories(pdbPath.c_str());
 			}
 		}
 	}
@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
 		builtinShadersDescriptor.outputPath = outputFilePath;
 		builtinShadersDescriptor.buildBuiltinHeaders = buildBuiltinHeaders;
 
-		ICrFile::CreateDirectories(outputFilePath.c_str());
+		crstl::create_directories(outputFilePath.c_str());
 
 		for (const CrString& graphicsApiString : graphicsApiStrings)
 		{

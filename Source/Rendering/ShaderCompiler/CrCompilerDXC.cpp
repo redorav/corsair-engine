@@ -261,67 +261,73 @@ HRESULT CrDXCCompileShader
 	CComPtr<IDxcResult>& dxcCompilationResult
 )
 {
-	// Read in source code
-	CrVector<uint8_t> sourceCode;
-	CrFileUniqueHandle sourceCodeFile = ICrFile::OpenUnique(compilationDescriptor.inputPath.c_str(), FileOpenFlags::Read);
-	sourceCode.resize(sourceCodeFile->GetSize());
-	sourceCodeFile->Read(sourceCode.data(), sourceCode.size());
-	sourceCodeFile = nullptr;
-
-	DxcBuffer sourceCodeBuffer = { sourceCode.data(), (uint32_t)sourceCode.size(), 0 };
-
-	// Add command line parameters. These are the same as the ones DXC uses
-	CrWString wInputPath;
-	wInputPath.append_convert(compilationDescriptor.inputPath.c_str());
-	CrWString wEntryPoint;
-	wEntryPoint.append_convert(compilationDescriptor.entryPoint.c_str());
-
-	CrVector<const wchar_t*> arguments =
+	if (crstl::file sourceCodeFile = crstl::file(compilationDescriptor.inputPath.c_str(), crstl::file_flags::read))
 	{
-		DXCArgumentWarningsAsErrors, // Warnings as errors
-		DXCArgumentEnableDebug, // Add debug data (for PDBs)
-		DXCArgumentAllResourcesBound, // Assume all resources are bound correctly
-		wInputPath.c_str(),
-		DXCArgumentShaderProfile,
-		GetDXCShaderProfile(compilationDescriptor.shaderStage),
-		DXCArgumentEntryPoint,
-		wEntryPoint.c_str()
-	};
+		// Read in source code
+		CrVector<uint8_t> sourceCode;
 
-	switch (compilationDescriptor.optimization)
-	{
-		case OptimizationLevel::O3:
-			arguments.push_back(DXCArgumentOptimization3); break;
-		case OptimizationLevel::O2:
-			arguments.push_back(DXCArgumentOptimization2); break;
-		case OptimizationLevel::O1:
-			arguments.push_back(DXCArgumentOptimization1); break;
-		case OptimizationLevel::O0:
-			arguments.push_back(DXCArgumentOptimization0); break;
-		case OptimizationLevel::None:
-			arguments.push_back(DXCArgumentSkipOptimizations); break;
-		default:
-			arguments.push_back(DXCArgumentOptimization3);
+		sourceCode.resize(sourceCodeFile.get_size());
+		sourceCodeFile.read(sourceCode.data(), sourceCode.size());
+
+		DxcBuffer sourceCodeBuffer = { sourceCode.data(), (uint32_t)sourceCode.size(), 0 };
+
+		// Add command line parameters. These are the same as the ones DXC uses
+		CrWString wInputPath;
+		wInputPath.append_convert(compilationDescriptor.inputPath.c_str());
+		CrWString wEntryPoint;
+		wEntryPoint.append_convert(compilationDescriptor.entryPoint.c_str());
+
+		CrVector<const wchar_t*> arguments =
+		{
+			DXCArgumentWarningsAsErrors, // Warnings as errors
+			DXCArgumentEnableDebug, // Add debug data (for PDBs)
+			DXCArgumentAllResourcesBound, // Assume all resources are bound correctly
+			wInputPath.c_str(),
+			DXCArgumentShaderProfile,
+			GetDXCShaderProfile(compilationDescriptor.shaderStage),
+			DXCArgumentEntryPoint,
+			wEntryPoint.c_str()
+		};
+
+		switch (compilationDescriptor.optimization)
+		{
+			case OptimizationLevel::O3:
+				arguments.push_back(DXCArgumentOptimization3); break;
+			case OptimizationLevel::O2:
+				arguments.push_back(DXCArgumentOptimization2); break;
+			case OptimizationLevel::O1:
+				arguments.push_back(DXCArgumentOptimization1); break;
+			case OptimizationLevel::O0:
+				arguments.push_back(DXCArgumentOptimization0); break;
+			case OptimizationLevel::None:
+				arguments.push_back(DXCArgumentSkipOptimizations); break;
+			default:
+				arguments.push_back(DXCArgumentOptimization3);
+		}
+
+		// Set Vulkan-specific options here
+		if (compilationDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
+		{
+			arguments.push_back(L"-spirv");
+		}
+
+		// Include defines here
+		CrVector<CrWString> wDefines;
+		wDefines.resize(compilationDescriptor.defines.size());
+
+		for (uint32_t i = 0; i < compilationDescriptor.defines.size(); ++i)
+		{
+			wDefines[i].append_convert(compilationDescriptor.defines[i]);
+			arguments.push_back(DXCArgumentDefine);
+			arguments.push_back(wDefines[i].c_str());
+		}
+
+		return dxcCompiler->Compile(&sourceCodeBuffer, arguments.data(), (uint32_t)arguments.size(), dxcIncludeHandler, IID_PPV_ARGS(&dxcCompilationResult));
 	}
-
-	// Set Vulkan-specific options here
-	if (compilationDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
+	else
 	{
-		arguments.push_back(L"-spirv");
+		return E_FAIL;
 	}
-
-	// Include defines here
-	CrVector<CrWString> wDefines;
-	wDefines.resize(compilationDescriptor.defines.size());
-
-	for (uint32_t i = 0; i < compilationDescriptor.defines.size(); ++i)
-	{
-		wDefines[i].append_convert(compilationDescriptor.defines[i]);
-		arguments.push_back(DXCArgumentDefine);
-		arguments.push_back(wDefines[i].c_str());
-	}
-
-	return dxcCompiler->Compile(&sourceCodeBuffer, arguments.data(), (uint32_t)arguments.size(), dxcIncludeHandler, IID_PPV_ARGS(&dxcCompilationResult));
 }
 
 cr3d::ShaderResourceType::T GetShaderResourceType(const SpvReflectDescriptorBinding& spvDescriptorBinding)

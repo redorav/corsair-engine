@@ -105,12 +105,12 @@ void CrGlobalPaths::SetupGlobalPaths
 	CrFixedPath overrideShaderSources = currentExecutableDirectory / "Shader Source";
 
 	// If the directory does not exist, try to find a local one instead
-	if (!ICrFile::DirectoryExists(GlobalPaths::ShaderSourceDirectory))
+	if (!crstl::exists(GlobalPaths::ShaderSourceDirectory))
 	{
 		ShaderSourceDirectory = overrideShaderSources.c_str();
 	}
 
-	if (ICrFile::DirectoryExists(overrideShaderSources.c_str()))
+	if (crstl::exists(overrideShaderSources.c_str()))
 	{
 		ShaderSourceDirectory = overrideShaderSources.c_str();
 	}

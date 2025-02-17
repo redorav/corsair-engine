@@ -94,7 +94,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 {
 	CrFixedPath ShaderCacheDirectory = GetCompiledShadersPath(bytecodeDescriptor.platform, bytecodeDescriptor.graphicsApi);
 
-	ICrFile::CreateDirectories(ShaderCacheDirectory.c_str());
+	crstl::create_directories(ShaderCacheDirectory.c_str());
 
 	CrFixedString512 outputPath(ShaderCacheDirectory.c_str());
 

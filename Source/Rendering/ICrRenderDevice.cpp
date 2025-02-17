@@ -372,11 +372,10 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 	{
 		CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 
-		// We assume the directory has been created by now
-		if (ICrFile::CreateDirectories(m_pipelineCacheDirectory.c_str()))
+		if (crstl::create_directories(m_pipelineCacheDirectory.c_str()))
 		{
-			CrFileHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Write | FileOpenFlags::Create);
-			file->Write(pipelineCacheData, pipelineCacheSize);
+			crstl::file pipelineCacheFile = crstl::file(pipelineCachePath.c_str(), crstl::file_flags::write | crstl::file_flags::create);
+			pipelineCacheFile.write(pipelineCacheData, pipelineCacheSize);
 		}
 		else
 		{
@@ -390,12 +389,11 @@ void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
 	if (m_isValidPipelineCache)
 	{
 		CrFixedPath pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
-		CrFileHandle file = ICrFile::OpenFile(pipelineCachePath.c_str(), FileOpenFlags::Read);
 
-		if (file)
+		if (crstl::file file = crstl::file(pipelineCachePath.c_str(), crstl::file_flags::read))
 		{
-			pipelineCacheData.resize(file->GetSize());
-			file->Read(pipelineCacheData.data(), pipelineCacheData.size());
+			pipelineCacheData.resize(file.get_size());
+			file.read(pipelineCacheData.data(), pipelineCacheData.size());
 			CrLog("Successfully loaded serialized pipeline cache from %s", pipelineCachePath.c_str());
 		}
 	}

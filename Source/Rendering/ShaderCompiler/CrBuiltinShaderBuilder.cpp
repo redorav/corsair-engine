@@ -23,9 +23,12 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 	CrVector<CrShaderInfo> shaderInfos;
 
 	// Find every .shaders file in the specified directory
-	ICrFile::ForEachDirectoryEntry(builtinShadersDescriptor.inputPath.c_str(), true, [&compilationJobs, &builtinShadersDescriptor, &shaderInfos](const CrDirectoryEntry& entry)
+	crstl::for_each_directory_entry(builtinShadersDescriptor.inputPath.c_str(), true, [&compilationJobs, &builtinShadersDescriptor, &shaderInfos](const crstl::directory_entry& entry)
 	{
-		if (entry.filename.extension() == ".shaders")
+		// TODO Replace extension with a path_view
+		CrFixedPath filename = entry.filename;
+
+		if (filename.extension() == ".shaders")
 		{
 			CrFixedPath shadersFilePath = CrFixedPath(entry.directory) / entry.filename;
 

@@ -37,9 +37,9 @@ CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* h
 	{
 		if (clearCache)
 		{
-			ICrFile::ForEachDirectoryEntry(cachePath.c_str(), true, [](const CrDirectoryEntry& entry)
+			crstl::for_each_directory_entry(cachePath.c_str(), true, [](const crstl::directory_entry& entry)
 			{
-				if (!entry.isDirectory)
+				if (!entry.is_directory)
 				{
 					CrFixedPath filePath = entry.directory;
 					filePath /= entry.filename;

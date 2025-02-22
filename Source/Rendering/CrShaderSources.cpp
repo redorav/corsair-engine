@@ -32,7 +32,7 @@ CrShaderSources::CrShaderSources()
 	m_ubershaderTempDirectory = CrGlobalPaths::GetTempEngineDirectory();
 	m_ubershaderTempDirectory /= "Ubershader Temp";
 
-	ICrFile::CreateDirectories(m_ubershaderTempDirectory.c_str());
+	crstl::create_directories(m_ubershaderTempDirectory.c_str());
 
 	// Files that contribute to ubershader building
 	// Perhaps more flexible in a text file
@@ -47,12 +47,12 @@ CrShaderSources::CrShaderSources()
 	const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 	// Load all the files in this directory and put them in a hashmap based on filename
-	ICrFile::ForEachDirectoryEntry(ShaderSourceDirectory.c_str(), false, [this](const CrDirectoryEntry& entry)
+	crstl::for_each_directory_entry(ShaderSourceDirectory.c_str(), false, [this](const crstl::directory_entry& entry)
 	{
-		if (!entry.isDirectory)
+		if (!entry.is_directory)
 		{
 			CrFixedPath shaderPath = entry.directory;
-			shaderPath /= entry.filename.c_str();
+			shaderPath /= entry.filename;
 
 			if (crstl::file shaderSourceFile = crstl::file(shaderPath.c_str(), crstl::file_flags::read))
 			{
@@ -93,7 +93,7 @@ CrShaderSources::CrShaderSources()
 				// tabs, formatting of any sort won't affect the hash and therefore not
 				// trigger any extra compilations
 				// Only consider ubershader files for the ubershader hash
-				if (UbershaderFiles.find(entry.filename.c_str()) != UbershaderFiles.end())
+				if (UbershaderFiles.find(entry.filename) != UbershaderFiles.end())
 				{
 					for (const CrString& line : preprocessedLines)
 					{
@@ -101,7 +101,7 @@ CrShaderSources::CrShaderSources()
 					}
 				}
 
-				CrString filenameString = entry.filename.c_str();
+				CrString filenameString = entry.filename;
 
 				m_shaderPaths.insert(filenameString, shaderPath);
 				m_shaderSources.insert(filenameString, shaderSource);

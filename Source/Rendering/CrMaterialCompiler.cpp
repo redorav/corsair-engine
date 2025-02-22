@@ -121,7 +121,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	CrFixedPath patchedShaderSourcePath = ShaderSources->GetUbershaderTempDirectory();
 
 	// Make sure directory exists
-	ICrFile::CreateDirectories(patchedShaderSourcePath.c_str());
+	crstl::create_directories(patchedShaderSourcePath.c_str());
 
 	patchedShaderSourcePath /= "ShaderTemp.hlsl";
 

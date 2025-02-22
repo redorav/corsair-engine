@@ -74,8 +74,6 @@ int main(int argc, char* argv[])
 	}
 
 	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
-	renderSystemDescriptor.enableRenderDoc  = enableRenderDoc;
-	renderSystemDescriptor.enablePIX        = enablePIX;
 
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
 

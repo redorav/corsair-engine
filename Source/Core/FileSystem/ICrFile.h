@@ -75,38 +75,10 @@ public:
 
 	const char* GetFilePath() const;
 
-	static CrFileUniqueHandle OpenUnique(const char* filePath, FileOpenFlags::T openFlags);
-
 	// TODO Move this elsewhere when we have a FileDevice
 	// We need to be able to create different files for different platforms, functionality, etc
 	// Functions like FileExists also would want to be part of the file device
 	static CrFileHandle OpenFile(const char* filePath, FileOpenFlags::T openFlags);
-
-	// Copy a file to a different location
-	static bool FileCopy(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);
-
-	// Unconditionally delete a file. If successfully deleted or file didn't exist, return true
-	static bool FileDelete(const char* filePath);
-
-	// Query if file exists
-	static bool FileExists(const char* filePath);
-
-	// Move a file to a different location
-	static bool FileMove(const char* sourcefilePath, const char* destinationFilePath, bool replace = false);
-
-	// Query if directory exists
-	static bool DirectoryExists(const char* directoryPath);
-
-	// Create directory, including the tree that leads up to it
-	// If folder was created successfully or folder already exists, return true
-	static bool CreateDirectories(const char* directoryPath);
-
-	// Create directory if you know that the rest of the directory structure is present
-	// If folder was created successfully or folder already exists, return true
-	static bool CreateDirectorySingle(const char* directoryPath);
-
-	// Iterate over directory entries
-	static bool ForEachDirectoryEntry(const char* directoryPath, bool recursive, const FileIteratorFunction& function);
 
 private:
 

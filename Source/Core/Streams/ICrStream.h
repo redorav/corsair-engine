@@ -68,10 +68,7 @@ public:
 	virtual ICrStream& operator << (const float& value) = 0;
 	virtual ICrStream& operator << (const double& value) = 0;
 
-private:
-
 	virtual void Read(void* dstBuffer, size_t sizeBytes) = 0;
-
 	virtual void Write(const void* srcBuffer, size_t sizeBytes) = 0;
 };
 

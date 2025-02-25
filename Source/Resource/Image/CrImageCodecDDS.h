@@ -13,7 +13,7 @@ public:
 
 	CrImageDecoderDDS();
 
-	virtual CrImageHandle Decode(const CrFileHandle& file) const override;
+	virtual CrImageHandle Decode(crstl::file& file) const override;
 
 	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const override;
 
@@ -28,7 +28,7 @@ public:
 
 	CrImageEncoderDDS();
 
-	virtual void Encode(const CrImageHandle& image, const CrFileHandle& file) const override;
+	virtual void Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const override;
 
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const override;
 
@@ -37,5 +37,5 @@ public:
 private:
 
 	template<typename StreamT>
-	void Encode(const CrImageHandle& image, StreamT& stream) const;
+	void EncodeInternal(const CrImageHandle& image, StreamT& stream) const;
 };

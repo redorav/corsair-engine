@@ -7,7 +7,7 @@ class CrImageDecoderSTB final : public ICrImageDecoder
 {
 public:
 
-	virtual CrImageHandle Decode(const CrFileHandle& file) const override;
+	virtual CrImageHandle Decode(crstl::file& file) const override;
 
 	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const override;
 };
@@ -18,7 +18,7 @@ public:
 
 	CrImageEncoderSTB(CrImageContainerFormat::T containerFormat);
 
-	virtual void Encode(const CrImageHandle& image, const CrFileHandle& file) const override;
+	virtual void Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const override;
 
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const override;
 

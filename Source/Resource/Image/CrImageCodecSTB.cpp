@@ -16,14 +16,14 @@
 #include <stb_image_write.h>
 #pragma warning(pop)
 
-CrImageHandle CrImageDecoderSTB::Decode(const CrFileHandle& file) const
+CrImageHandle CrImageDecoderSTB::Decode(crstl::file& file) const
 {
 	// Read file into memory
 	CrVector<unsigned char> fileData;
-	fileData.resize_uninitialized(file->GetSize());
-	file->Read(fileData.data(), fileData.size());
+	fileData.resize_uninitialized(file.get_size());
+	file.read(fileData.data(), fileData.size());
 
-	CrImageHandle image = Decode(&fileData[0], file->GetSize());
+	CrImageHandle image = Decode(&fileData[0], file.get_size());
 	return image;
 }
 
@@ -79,8 +79,8 @@ CrImageEncoderSTB::CrImageEncoderSTB(CrImageContainerFormat::T containerFormat)
 
 static void WriteToFileSTB(void* context, void* imageData, int dataSize)
 {
-	ICrFile* file = (ICrFile*)context;
-	file->Write(imageData, dataSize);
+	CrWriteFileStream* fileStream = (CrWriteFileStream*)context;
+	fileStream->Write(imageData, dataSize);
 }
 
 struct stb_memcpy
@@ -96,7 +96,7 @@ static void WriteToMemorySTB(void* context, void* imageData, int dataSize)
 	memcpy(memcpy_context, imageData, dataSize);
 }
 
-void CrImageEncoderSTB::Encode(const CrImageHandle& image, const CrFileHandle& file) const
+void CrImageEncoderSTB::Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const
 {
 	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
 
@@ -106,24 +106,24 @@ void CrImageEncoderSTB::Encode(const CrImageHandle& image, const CrFileHandle& f
 
 	if (m_containerFormat == CrImageContainerFormat::PNG)
 	{
-		/*int result = */stbi_write_png_to_func(WriteToFileSTB, file.get(), width, height, channelCount, (const unsigned char*)image->GetData(), strideBytes);
+		/*int result = */stbi_write_png_to_func(WriteToFileSTB, (void*)&fileStream, width, height, channelCount, (const unsigned char*)image->GetData(), strideBytes);
 	}
 	else if (m_containerFormat == CrImageContainerFormat::JPG)
 	{
 		int quality = 100;
-		/*int result = */stbi_write_jpg_to_func(WriteToFileSTB, file.get(), width, height, channelCount, (const unsigned char*)image->GetData(), quality);
+		/*int result = */stbi_write_jpg_to_func(WriteToFileSTB, (void*)&fileStream, width, height, channelCount, (const unsigned char*)image->GetData(), quality);
 	}
 	else if (m_containerFormat == CrImageContainerFormat::TGA)
 	{
-		/*int result = */stbi_write_tga_to_func(WriteToFileSTB, file.get(), width, height, channelCount, (const unsigned char*)image->GetData());
+		/*int result = */stbi_write_tga_to_func(WriteToFileSTB, (void*)&fileStream, width, height, channelCount, (const unsigned char*)image->GetData());
 	}
 	else if (m_containerFormat == CrImageContainerFormat::BMP)
 	{
-		/*int result = */stbi_write_bmp_to_func(WriteToFileSTB, file.get(), width, height, channelCount, (const unsigned char*)image->GetData());
+		/*int result = */stbi_write_bmp_to_func(WriteToFileSTB, (void*)&fileStream, width, height, channelCount, (const unsigned char*)image->GetData());
 	}
 	else if (m_containerFormat == CrImageContainerFormat::HDR)
 	{
-		/*int result = */stbi_write_hdr_to_func(WriteToFileSTB, file.get(), width, height, channelCount, (const float*)image->GetData());
+		/*int result = */stbi_write_hdr_to_func(WriteToFileSTB, (void*)&fileStream, width, height, channelCount, (const float*)image->GetData());
 	}
 }
 

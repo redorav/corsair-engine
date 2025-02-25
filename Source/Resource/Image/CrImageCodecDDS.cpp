@@ -172,11 +172,11 @@ CrImageDecoderDDS::CrImageDecoderDDS()
 	m_containerFormat = CrImageContainerFormat::DDS;
 }
 
-CrImageHandle CrImageDecoderDDS::Decode(const CrFileHandle& file) const
+CrImageHandle CrImageDecoderDDS::Decode(crstl::file& file) const
 {
 	// Read in the header
 	unsigned char ddsHeaderData[ddspp::MAX_HEADER_SIZE];
-	file->Read(ddsHeaderData, ddspp::MAX_HEADER_SIZE);
+	file.read(ddsHeaderData, ddspp::MAX_HEADER_SIZE);
 
 	// Decode the header
 	ddspp::Descriptor desc;
@@ -187,10 +187,10 @@ CrImageHandle CrImageDecoderDDS::Decode(const CrFileHandle& file) const
 		CrImageHandle image = CrImageHandle(new CrImage());
 
 		// Read in actual data (without the header)
-		uint64_t textureDataSize = file->GetSize() - desc.headerSize;
+		uint64_t textureDataSize = file.get_size() - desc.headerSize;
 		image->m_data.resize_uninitialized(textureDataSize);
-		file->Seek(SeekOrigin::Begin, desc.headerSize);
-		file->Read(image->m_data.data(), textureDataSize);
+		file.seek(crstl::file_seek_origin::begin, desc.headerSize);
+		file.read(image->m_data.data(), textureDataSize);
 
 		SetImageProperties(image, desc);
 
@@ -249,7 +249,7 @@ CrImageEncoderDDS::CrImageEncoderDDS()
 }
 
 template<typename StreamT>
-void CrImageEncoderDDS::Encode(const CrImageHandle& image, StreamT& stream) const
+void CrImageEncoderDDS::EncodeInternal(const CrImageHandle& image, StreamT& stream) const
 {
 	const ddspp::DXGIFormat format = DataFormatToDdspp(image->GetFormat());
 	const ddspp::TextureType type = TextureTypeToDdspp(image->GetType());
@@ -267,16 +267,15 @@ void CrImageEncoderDDS::Encode(const CrImageHandle& image, StreamT& stream) cons
 	stream.Write(image->GetData(), image->GetDataSize());
 }
 
-void CrImageEncoderDDS::Encode(const CrImageHandle& image, const CrFileHandle& file) const
+void CrImageEncoderDDS::Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const
 {
-	CrWriteFileStream fileStream(file);
-	Encode(image, fileStream);
+	EncodeInternal(image, fileStream);
 }
 
 void CrImageEncoderDDS::Encode(const CrImageHandle& image, void* data, uint64_t /*dataSize*/) const
 {
 	CrWriteMemoryStream memoryStream((uint8_t*)data);
-	Encode(image, memoryStream);
+	EncodeInternal(image, memoryStream);
 }
 
 bool CrImageEncoderDDS::IsImageFormatSupported(cr3d::DataFormat::T format) const

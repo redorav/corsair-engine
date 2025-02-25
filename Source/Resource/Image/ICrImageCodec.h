@@ -4,6 +4,8 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Resource/Image/CrImageForwardDeclarations.h"
 
+#include "Core/Streams/CrFileStream.h" // TODO Delete once crstl is good
+
 #include <stdint.h>
 
 class ICrImageCodec
@@ -22,7 +24,7 @@ public:
 	virtual ~ICrImageDecoder() {}
 
 	// Decode image in file
-	virtual CrImageHandle Decode(const CrFileHandle& file) const = 0;
+	virtual CrImageHandle Decode(crstl::file& file) const = 0;
 
 	// Decode image in provided data
 	virtual CrImageHandle Decode(void* data, uint64_t dataSize) const = 0;
@@ -35,7 +37,7 @@ public:
 	virtual ~ICrImageEncoder() {}
 
 	// Encode image to file
-	virtual void Encode(const CrImageHandle& image, const CrFileHandle& file) const = 0;
+	virtual void Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const = 0;
 
 	// Encode image in raw data
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const = 0;

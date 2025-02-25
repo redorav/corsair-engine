@@ -24,14 +24,14 @@ cr3d::DataFormat::T WuffFormatToDataFormat(uint32_t wuffsFormat)
 	}
 }
 
-CrImageHandle CrImageDecoderWuffs::Decode(const CrFileHandle& file) const
+CrImageHandle CrImageDecoderWuffs::Decode(crstl::file& file) const
 {
 	// Read file into memory
 	CrVector<unsigned char> fileData;
-	fileData.resize_uninitialized(file->GetSize());
-	file->Read(fileData.data(), fileData.size());
+	fileData.resize_uninitialized(file.get_size());
+	file.read(fileData.data(), fileData.size());
 
-	CrImageHandle image = Decode(&fileData[0], file->GetSize());
+	CrImageHandle image = Decode(&fileData[0], file.get_size());
 	return image;
 }
 

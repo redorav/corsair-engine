@@ -17,33 +17,16 @@ public:
 	// Initialize file stream from a path
 	CrFileStream(const char* filePath)
 	{
-		FileOpenFlags::T openFlags = FileOpenFlags::None;
+		crstl::file_flags::t openFlags = crstl::file_flags::none;
 
 		switch (StreamTypeT)
 		{
-			case CrStreamType::Read: openFlags = FileOpenFlags::Read; break;
-			case CrStreamType::Write: openFlags = FileOpenFlags::Write | FileOpenFlags::ForceCreate; break;
-			case CrStreamType::ReadWrite: openFlags = FileOpenFlags::Read | FileOpenFlags::Write | FileOpenFlags::ForceCreate; break;
+			case CrStreamType::Read: openFlags = crstl::file_flags::read; break;
+			case CrStreamType::Write: openFlags = crstl::file_flags::write | crstl::file_flags::force_create; break;
+			case CrStreamType::ReadWrite: openFlags = crstl::file_flags::read | crstl::file_flags::write | crstl::file_flags::force_create; break;
 		}
 
-		m_file = ICrFile::OpenFile(filePath, openFlags);
-	}
-
-	// Initialize file stream from an opened file. We need to make sure the required
-	// flags are set on the file
-	CrFileStream(const CrFileHandle& file)
-	{
-		if (IsWriting())
-		{
-			CrAssertMsg(file->GetFlags() & FileOpenFlags::Write, "File needs the write flag");
-		}
-	
-		if (IsReading())
-		{
-			CrAssertMsg(file->GetFlags() & FileOpenFlags::Read, "File needs the read flag");
-		}
-
-		m_file = file;
+		m_file = crstl::file(filePath, openFlags);
 	}
 
 	virtual CrFileStream& operator << (bool& value) override { IsReading() ? Read(&value, sizeof(value)) : Write(&value, sizeof(value)); return *this; }
@@ -113,24 +96,24 @@ public:
 		return *this;
 	}
 
-	const ICrFile* GetFile() const
+	const crstl::file& GetFile() const
 	{
-		return m_file.get();
+		return m_file;
 	}
 
 	virtual void Read(void* dstBuffer, size_t sizeBytes) override
 	{
-		m_file->Read(dstBuffer, sizeBytes);
+		m_file.read(dstBuffer, sizeBytes);
 	}
 
 	virtual void Write(const void* srcBuffer, size_t sizeBytes) override
 	{
-		m_file->Write(srcBuffer, sizeBytes);
+		m_file.write(srcBuffer, sizeBytes);
 	}
 
 private:
 
-	CrFileHandle m_file;
+	crstl::file m_file;
 };
 
 typedef CrFileStream<CrStreamType::Read> CrReadFileStream;

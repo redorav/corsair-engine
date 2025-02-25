@@ -62,7 +62,7 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrFixedPath& fullPath)
 {
 	CrFixedPath extension = fullPath.extension();
 
-	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
+	crstl::file file(fullPath.c_str(), crstl::file_flags::read);
 
 	CrUniquePtr<ICrImageDecoder> imageDecoder;
 
@@ -106,9 +106,9 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrFixe
 {
 	CrFixedPath extension = fullPath.extension();
 
-	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::ForceCreate | FileOpenFlags::Write);
+	CrWriteFileStream fileStream(fullPath.c_str());
 
-	if (file)
+	if (fileStream.GetFile())
 	{
 		CrUniquePtr<ICrImageEncoder> imageEncoder;
 
@@ -139,7 +139,7 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrFixe
 
 		if (imageEncoder && imageEncoder->IsImageFormatSupported(image->GetFormat()))
 		{
-			imageEncoder->Encode(image, file);
+			imageEncoder->Encode(image, fileStream);
 		}
 	}
 }

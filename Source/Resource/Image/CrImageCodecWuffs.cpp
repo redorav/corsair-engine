@@ -2,8 +2,6 @@
 
 #include "CrImageCodecWuffs.h"
 
-#include "Core/FileSystem/ICrFile.h"
-
 #include "Rendering/CrImage.h"
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrDataFormats.h"

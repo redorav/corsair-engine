@@ -10,7 +10,6 @@
 
 #include "Core/CrGlobalPaths.h"
 #include "Core/CrPlatform.h"
-#include "Core/FileSystem/ICrFile.h"
 
 CrString CrShaderHeaderGenerator::HashDefine = "#define ";
 

@@ -20,7 +20,6 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrShaderReflectionHeader.h"
 
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Streams/CrFileStream.h"
 #include "Core/CrHash.h"

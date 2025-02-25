@@ -9,13 +9,14 @@
 #include "Core/Containers/CrPair.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrCommandLine.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/String/CrStringUtilities.h"
 #include "Core/CrMacros.h"
 #include "Core/CrGlobalPaths.h"
+
+#include "crstl/filesystem.h"
 
 #include "CrCompilerDXC.h"
 

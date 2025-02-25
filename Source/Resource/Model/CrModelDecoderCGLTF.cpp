@@ -3,8 +3,8 @@
 #include "CrModelDecoderCGLTF.h"
 
 #include "Core/FileSystem/CrFixedPath.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrHashMap.h"
+#include "crstl/filesystem.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -278,14 +278,14 @@ static void cgltfFileRelease(const struct cgltf_memory_options* memory_options, 
 	memfree(memory_options->user_data, data);
 }
 
-CrRenderModelHandle CrModelDecoderCGLTF::Decode(const CrFileHandle& file)
+CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 {
-	uint64_t fileSize = file->GetSize();
+	uint64_t fileSize = file.get_size();
 	CrUniquePtr<uint8_t[]> fileData = CrUniquePtr<uint8_t[]>(new uint8_t[fileSize]);
-	file->Read(fileData.get(), fileSize);
+	file.read(fileData.get(), fileSize);
 
 	CgltfUserData userData;
-	userData.parentPath = CrFixedPath(file->GetFilePath()).parent_path();
+	userData.parentPath = file.get_path().parent_path().c_str();
 
 	cgltf_options gltfOptions = {};
 	gltfOptions.file.read = cgltfFileRead;

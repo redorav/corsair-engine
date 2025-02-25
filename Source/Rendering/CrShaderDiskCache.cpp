@@ -5,7 +5,6 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/ICrShader.h"
 
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
 #include "Core/Function/CrFixedFunction.h"

@@ -13,7 +13,6 @@
 #include "CrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Time/CrTimer.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"

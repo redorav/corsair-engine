@@ -5,11 +5,11 @@
 #include "CrShaderCompilerUtilities.h"
 
 #include "Core/Containers/CrHashMap.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Core/Containers/CrArray.h"
+#include "crstl/filesystem.h"
 
 // RapidYAML
 #define RYML_USE_ASSERT 0

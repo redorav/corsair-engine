@@ -2,9 +2,10 @@
 
 #include "ICrStream.h"
 
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
+
+#include "crstl/filesystem.h"
 
 template<CrStreamType::T StreamTypeT>
 class CrFileStream final : public ICrStream

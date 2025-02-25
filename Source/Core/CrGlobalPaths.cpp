@@ -6,7 +6,7 @@
 
 #include "Core/FileSystem/CrFixedPath.h"
 
-#include "Core/FileSystem/ICrFile.h"
+#include "crstl/filesystem.h"
 
 #if defined(_WIN32)
 #include <windows.h>

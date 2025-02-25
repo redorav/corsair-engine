@@ -48,6 +48,8 @@ namespace crstl
 	template<typename StringInterface> class path_base;
 	typedef path_base<fixed_string512> fixed_path512;
 
+	class file;
+
 	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
 	template <typename T, typename Allocator>
 	struct hash<crstl::basic_string<T, Allocator>>

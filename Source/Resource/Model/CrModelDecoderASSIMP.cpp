@@ -2,10 +2,10 @@
 
 #include "CrModelDecoderASSIMP.h"
 
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrPair.h"
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/CrMacros.h"
+#include "crstl/filesystem.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -65,12 +65,12 @@ static void ProcessNode(const aiScene* scene, const aiNode* parentNode, const ai
 	}
 }
 
-CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
+CrRenderModelHandle CrModelDecoderASSIMP::Decode(const crstl::file& file)
 {
 	// Read the raw data:
-	uint64_t fileSize = file->GetSize();
+	uint64_t fileSize = file.get_size();
 	void* fileRawData = malloc(fileSize);
-	if (file->Read(fileRawData, fileSize) != fileSize)
+	if (file.read(fileRawData, fileSize) != fileSize)
 	{
 		free(fileRawData);
 		return nullptr;
@@ -93,7 +93,8 @@ CrRenderModelHandle CrModelDecoderASSIMP::Decode(const CrFileHandle& file)
 	ProcessNode(scene, scene->mRootNode, scene->mRootNode->mTransformation, modelDescriptor);
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
-	const CrFixedPath filePath = file->GetFilePath();
+	// TODO Rework this with path_view
+	const CrFixedPath filePath = file.get_path().c_str();
 
 	for (size_t m = 0; m < scene->mNumMaterials; ++m)
 	{

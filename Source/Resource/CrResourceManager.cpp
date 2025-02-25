@@ -8,7 +8,6 @@
 #include "Rendering/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrFixedPath.h"
 
@@ -23,7 +22,7 @@
 
 CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 {
-	CrFileHandle file = ICrFile::OpenFile(fullPath.c_str(), FileOpenFlags::Read);
+	crstl::file file(fullPath.c_str(), crstl::file_flags::read);
 
 	if (file)
 	{

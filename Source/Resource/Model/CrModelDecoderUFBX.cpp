@@ -2,8 +2,8 @@
 
 #include "CrModelDecoderUFBX.h"
 
-#include "Core/FileSystem/ICrFile.h"
 #include "Core/Containers/CrVector.h"
+#include "crstl/filesystem.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -220,15 +220,15 @@ static bool IsRightHandedCoordinateSystem(ufbx_coordinate_axes axes)
 	return false;
 }
 
-CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
+CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 {
 	// Read the raw data
-	uint64_t fileSize = file->GetSize();
+	uint64_t fileSize = file.get_size();
 
 	CrVector<uint8_t> fileRawData;
 	fileRawData.resize_uninitialized(fileSize);
 
-	if (file->Read(fileRawData.data(), fileSize) != fileSize)
+	if (file.read(fileRawData.data(), fileSize) != fileSize)
 	{
 		return nullptr;
 	}
@@ -258,7 +258,8 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const CrFileHandle& file)
 	CrHashMap<ufbx_material*, uint32_t> materialMap;
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
-	const CrFixedPath filePath = file->GetFilePath();
+	// TODO Rework using path_view
+	const CrFixedPath filePath = file.get_path().c_str();
 
 	for (size_t m = 0; m < ufbxScene->materials.count; ++m)
 	{

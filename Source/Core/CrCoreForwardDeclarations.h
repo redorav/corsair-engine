@@ -4,38 +4,6 @@
 
 #include "crstl/forward_declarations.h"
 
-// CRSTL
-
-namespace crstl
-{
-	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
-	template <typename T, typename Allocator>
-	struct hash<crstl::basic_string<T, Allocator>>
-	{
-		size_t operator()(const crstl::basic_string<T, Allocator>& x) const
-		{
-			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
-			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
-			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
-				result = (result * 16777619) ^ c;
-			return (size_t)result;
-		}
-	};
-
-	template <typename T, int N>
-	struct hash<crstl::basic_fixed_string<T, N>>
-	{
-		size_t operator()(const crstl::basic_fixed_string<T, N>& x) const
-		{
-			const unsigned char* p = (const unsigned char*)x.c_str(); // To consider: limit p to at most 256 chars.
-			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash.
-			while ((c = *p++) != 0) // Using '!=' disables compiler warnings.
-				result = (result * 16777619) ^ c;
-			return (size_t)result;
-		}
-	};
-};
-
 // EASTL
 
 namespace eastl

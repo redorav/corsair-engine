@@ -2,54 +2,12 @@
 
 #include "stdint.h"
 
+#include "crstl/forward_declarations.h"
+
 // CRSTL
 
 namespace crstl
 {
-	class allocator;
-
-	template<typename T, size_t N> class array;
-
-	template<typename T, int N> class basic_fixed_string;
-	typedef basic_fixed_string<char, 512> fixed_string512;
-
-	template<size_t N, typename WordType> class bitset;
-
-	template<typename T, typename Allocator, size_t ChunkSize> class deque;
-
-	template<typename T, size_t N> class fixed_deque;
-
-	template<typename T> struct hash;
-
-	template<typename Key, typename T, size_t NodeCount,typename Hasher> class fixed_open_hashmap;
-
-	template<typename Key, typename T, typename Hasher, typename Allocator> class open_hashmap;
-
-	template<typename Key, typename Hasher, typename Allocator> class open_hashset;
-
-	template<typename Key, typename T, typename Hasher, typename Allocator> class open_multi_hashmap;
-
-	template<typename T, size_t N> class fixed_vector;
-
-	template<typename T> class intrusive_ptr;
-
-	template<typename T1, typename T2> class pair;
-
-	template <typename CharT, typename Allocator> class basic_string;
-	typedef basic_string<char, allocator> string;
-	typedef basic_string<wchar_t, allocator> wstring;
-
-	template<typename T> class unique_ptr;
-
-	template<typename T, typename Allocator> class vector;
-
-	template<int SizeBytes, typename Return> class fixed_function;
-
-	template<typename StringInterface> class path_base;
-	typedef path_base<fixed_string512> fixed_path512;
-
-	class file;
-
 	// Copied from <EASTL/string>. Keep here until CRSTL provides hash and replaces hashmap/set
 	template <typename T, typename Allocator>
 	struct hash<crstl::basic_string<T, Allocator>>
@@ -83,7 +41,6 @@ namespace crstl
 namespace eastl
 {
 	class allocator;
-	class dummy_allocator;
 
 	template <typename T> struct less;
 	template <typename Key, typename Compare, typename Allocator> class set;
@@ -174,10 +131,6 @@ template<int SIZE_IN_BYTES, typename R>
 using CrFixedFunction = crstl::fixed_function<SIZE_IN_BYTES, R>;
 
 class CrHash;
-
-class ICrFile;
-using CrFileHandle = CrIntrusivePtr<ICrFile>;
-using CrFileUniqueHandle = CrUniquePtr<ICrFile>;
 
 using CrFixedPath = crstl::fixed_path512;
 

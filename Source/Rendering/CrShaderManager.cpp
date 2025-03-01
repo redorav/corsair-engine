@@ -9,13 +9,13 @@
 
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
-#include "Core/Process/CrProcess.h"
 #include "Core/CrPlatform.h"
 #include "Core/Time/CrTimer.h"
 #include "Core/Containers/CrArray.h"
 #include "Core/CrGlobalPaths.h"
-#include "Core/CrPlatform.h"
 #include "Core/Streams/CrFileStream.h"
+
+#include "crstl/process.h"
 
 CrShaderManager* ShaderManager;
 
@@ -95,28 +95,21 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 
 	crstl::create_directories(ShaderCacheDirectory.c_str());
 
-	CrFixedString512 outputPath(ShaderCacheDirectory.c_str());
+	CrFixedString512 commandLine;
 
-	CrProcessDescriptor processDescriptor;
+	commandLine += " -input \"";
+	commandLine += bytecodeDescriptor.path.c_str();
+	commandLine += "\" ";
+	
+	commandLine += "-entrypoint ";
+	commandLine += bytecodeDescriptor.entryPoint.c_str();
+	commandLine += " ";
 
-	// TODO We need a searching policy here. If we were to distribute this as a build we'd
-	// want the shader compiler in a known directory, or several directories that we search
-	// The platform-specific compilers also need to be in directories relative to the main one
-	processDescriptor.commandLine += CrGlobalPaths::GetShaderCompilerPath().c_str();
+	commandLine += "-stage ";
+	commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage, true);
+	commandLine += " ";
 
-	processDescriptor.commandLine += " -input \"";
-	processDescriptor.commandLine += bytecodeDescriptor.path.c_str();
-	processDescriptor.commandLine += "\" ";
-		
-	processDescriptor.commandLine += "-entrypoint ";
-	processDescriptor.commandLine += bytecodeDescriptor.entryPoint.c_str();
-	processDescriptor.commandLine += " ";
-
-	processDescriptor.commandLine += "-stage ";
-	processDescriptor.commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage, true);
-	processDescriptor.commandLine += " ";
-
-	processDescriptor.commandLine += "-reflection ";
+	commandLine += "-reflection ";
 
 	CrFixedPath filename = bytecodeDescriptor.path.filename();
 	size_t extensionDotPosition = filename.find_last_of(".");
@@ -129,56 +122,68 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	filename += bytecodeDescriptor.entryPoint.c_str();
 	filename += GetShaderBytecodeExtension(bytecodeDescriptor.graphicsApi);
 
+	CrFixedString512 outputPath(ShaderCacheDirectory.c_str());
 	outputPath += filename.c_str();
 
-	processDescriptor.commandLine += "-output \"";
-	processDescriptor.commandLine += outputPath.c_str();
-	processDescriptor.commandLine += "\" ";
+	commandLine += "-output \"";
+	commandLine += outputPath.c_str();
+	commandLine += "\" ";
 
-	processDescriptor.commandLine += "-platform ";
-	processDescriptor.commandLine += cr::Platform::ToString(bytecodeDescriptor.platform, true);
-	processDescriptor.commandLine += " ";
+	commandLine += "-platform ";
+	commandLine += cr::Platform::ToString(bytecodeDescriptor.platform, true);
+	commandLine += " ";
 
-	processDescriptor.commandLine += "-graphicsapi ";
-	processDescriptor.commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi, true);
-	processDescriptor.commandLine += " ";
+	commandLine += "-graphicsapi ";
+	commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi, true);
+	commandLine += " ";
 
 	for (uint32_t i = 0; i < defines.GetDefines().size(); ++i)
 	{
-		processDescriptor.commandLine += " -D ";
-		processDescriptor.commandLine += defines.GetDefines()[i].c_str();
+		commandLine += " -D ";
+		commandLine += defines.GetDefines()[i].c_str();
 	}
 
 	CrTimer compilationTime;
 
-	CrProcess process(processDescriptor);
-	process.Wait();
+	// TODO We need a searching policy here. If we were to distribute this as a build we'd
+	// want the shader compiler in a known directory, or several directories that we search
+	// The platform-specific compilers also need to be in directories relative to the main one
+	crstl::process process(CrGlobalPaths::GetShaderCompilerPath().c_str(), commandLine.c_str());
 
-	if (process.GetReturnValue() >= 0)
+	if (process.is_launched())
 	{
-		// Serialize in bytecode
-		CrReadFileStream compilationOutput(outputPath.c_str());
-		CrShaderBytecodeHandle bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
-		compilationOutput << *bytecode.get();
+		crstl::process_exit_status exitStatus = process.wait();
 
-		CrLog("Compiled %s [%s] for %s %s (%f ms)",
-			bytecodeDescriptor.entryPoint.c_str(),
-			bytecodeDescriptor.path.c_str(),
-			cr::Platform::ToString(bytecodeDescriptor.platform),
-			cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
-			compilationTime.GetCurrent().AsMilliseconds());
+		if (exitStatus.get_exit_code() >= 0)
+		{
+			// Serialize in bytecode
+			CrReadFileStream compilationOutput(outputPath.c_str());
+			CrShaderBytecodeHandle bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+			compilationOutput << *bytecode.get();
 
-		return bytecode;
+			CrLog("Compiled %s [%s] for %s %s (%f ms)",
+				bytecodeDescriptor.entryPoint.c_str(),
+				bytecodeDescriptor.path.c_str(),
+				cr::Platform::ToString(bytecodeDescriptor.platform),
+				cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
+				compilationTime.GetCurrent().AsMilliseconds());
+
+			return bytecode;
+		}
+		else
+		{
+			CrString processOutput;
+			processOutput.resize_uninitialized(2048);
+			process.read_stdout(processOutput.data(), processOutput.size());
+			CrAssertMsg(false, "%s", processOutput.data());
+		}
 	}
 	else
 	{
-		CrString processOutput;
-		processOutput.resize_uninitialized(2048);
-		process.ReadStdOut(processOutput.data(), processOutput.size());
-		CrAssertMsg(false, "%s", processOutput.data());
-
-		return nullptr;
+		CrLog("Failed to launch shader compiler process");
 	}
+
+	return nullptr;
 }
 
 CrShaderManager::CrShaderManager(ICrRenderDevice* renderDevice)

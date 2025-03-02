@@ -2,8 +2,9 @@
 
 #include "stdint.h"
 
-#include "Core/Time/CrTime.h"
 #include "Core/Containers/CrArray.h"
+
+#include "crstl/timer.h"
 
 class CrFrameTime
 {
@@ -11,13 +12,13 @@ public:
 	
 	static void IncrementFrameCount();
 
-	static CrTime GetFrameDelta();
+	static crstl::time GetFrameDelta();
 
-	static CrTime GetFrameDeltaAverage();
+	static crstl::time GetFrameDeltaAverage();
 
-	static CrTime GetFrameDeltaMin();
+	static crstl::time GetFrameDeltaMin();
 
-	static CrTime GetFrameDeltaMax();
+	static crstl::time GetFrameDeltaMax();
 
 	static uint64_t GetFrameIndex();
 
@@ -25,17 +26,17 @@ private:
 
 	static uint64_t			m_frameCount;
 
-	static CrTime			m_frameDelta;
+	static crstl::time		m_frameDelta;
 
-	static CrTime			m_frameDeltaAverage;
+	static crstl::time		m_frameDeltaAverage;
 
-	static CrTime			m_frameDeltaMin;
+	static crstl::time		m_frameDeltaMin;
 
-	static CrTime			m_frameDeltaMax;
+	static crstl::time		m_frameDeltaMax;
 
-	static CrTime			m_framePreviousEndTime;
+	static crstl::time		m_framePreviousEndTime;
 
-	static CrTime			m_lastUpdatedTime;
+	static crstl::time		m_lastUpdatedTime;
 
 	static uint64_t			m_lastUpdatedFrameCount;
 

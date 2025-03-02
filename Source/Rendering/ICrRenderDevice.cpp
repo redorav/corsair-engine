@@ -13,12 +13,13 @@
 #include "CrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
-#include "Core/Time/CrTimer.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"
 
 #include "Rendering/CrGPUDeletionQueue.h"
 #include "Rendering/CrGPUTransferCallbackQueue.h"
+
+#include "crstl/timer.h"
 
 #if !defined(CR_CONFIG_FINAL)
 #define RENDER_DEVICE_LOGS
@@ -174,7 +175,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 	}
 	else
 	{
-		CrTimer pipelineCreationTime;
+		crstl::timer pipelineCreationTime;
 
 		graphicsPipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
@@ -198,7 +199,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 
 		entryPoints.append(")");
 
-		CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+		CrLog("Graphics Pipeline %s created (%f ms)", entryPoints.c_str(), (float)pipelineCreationTime.elapsed().milliseconds());
 
 #endif
 
@@ -223,7 +224,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeSh
 	}
 	else
 	{
-		CrTimer pipelineCreationTime;
+		crstl::timer pipelineCreationTime;
 
 		computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
 
@@ -233,7 +234,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeSh
 		entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
 		entryPoint.append(")");
 
-		CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.GetCurrent().AsMilliseconds());
+		CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.elapsed().milliseconds());
 
 #endif
 

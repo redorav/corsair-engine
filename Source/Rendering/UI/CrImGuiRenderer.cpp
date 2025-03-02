@@ -145,7 +145,7 @@ void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<CrOSWindow>& mainWindow)
 	mainWindow->GetSizePixels(windowWidth, windowHeight);
 
 	io.DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
-	io.DeltaTime = (float)CrFrameTime::GetFrameDelta().AsSeconds();
+	io.DeltaTime = (float)CrFrameTime::GetFrameDelta().seconds();
 	if (io.DeltaTime == 0.0f)
 	{
 		io.DeltaTime = (float)(1.0f / 60.0f);

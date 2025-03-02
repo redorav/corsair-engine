@@ -16,6 +16,7 @@
 #include "Core/Streams/CrFileStream.h"
 
 #include "crstl/process.h"
+#include "crstl/timer.h"
 
 CrShaderManager* ShaderManager;
 
@@ -143,7 +144,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 		commandLine += defines.GetDefines()[i].c_str();
 	}
 
-	CrTimer compilationTime;
+	crstl::timer compilationTime;
 
 	// TODO We need a searching policy here. If we were to distribute this as a build we'd
 	// want the shader compiler in a known directory, or several directories that we search
@@ -166,7 +167,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 				bytecodeDescriptor.path.c_str(),
 				cr::Platform::ToString(bytecodeDescriptor.platform),
 				cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
-				compilationTime.GetCurrent().AsMilliseconds());
+				compilationTime.elapsed().milliseconds());
 
 			return bytecode;
 		}

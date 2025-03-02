@@ -1010,16 +1010,16 @@ void CrFrame::DrawDebugUI()
 	{
 		if (ImGui::Begin("Statistics", &s_ShowGeneralStatistics))
 		{
-			CrTime delta = CrFrameTime::GetFrameDelta();
-			CrTime averageDelta = CrFrameTime::GetFrameDeltaAverage();
+			crstl::time delta = CrFrameTime::GetFrameDelta();
+			crstl::time averageDelta = CrFrameTime::GetFrameDeltaAverage();
 
 			const CrRenderDeviceProperties& properties = RenderSystem->GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
 			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, properties.graphicsApiDisplay.c_str());
 			ImGui::Text("Frame: %llu", CrFrameTime::GetFrameIndex());
-			ImGui::Text("CPU Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.AsMilliseconds(), averageDelta.AsMilliseconds(), CrFrameTime::GetFrameDeltaMax().AsMilliseconds());
-			ImGui::Text("CPU FPS: [Instant] %.2f fps [Average] %.2f fps", delta.AsFPS(), averageDelta.AsFPS());
+			ImGui::Text("CPU Delta: [Instant] %.2f ms [Average] %.2fms [Max] %.2fms", delta.milliseconds(), averageDelta.milliseconds(), CrFrameTime::GetFrameDeltaMax().milliseconds());
+			ImGui::Text("CPU FPS: [Instant] %.2f fps [Average] %.2f fps", delta.ticks_per_second(), averageDelta.ticks_per_second());
 			ImGui::Text("Drawcalls: %d Instances: %d Vertices: %d", CrRenderingStatistics::GetDrawcallCount(), CrRenderingStatistics::GetInstanceCount(), CrRenderingStatistics::GetVertexCount());
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();

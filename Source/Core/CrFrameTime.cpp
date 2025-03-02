@@ -6,20 +6,20 @@
 #include "Core/Logging/ICrDebug.h"
 
 uint64_t CrFrameTime::m_frameCount = 0;
-CrTime CrFrameTime::m_frameDelta;
-CrTime CrFrameTime::m_framePreviousEndTime;
+crstl::time CrFrameTime::m_frameDelta;
+crstl::time CrFrameTime::m_framePreviousEndTime;
 
 uint64_t CrFrameTime::m_lastUpdatedFrameCount;
-CrTime CrFrameTime::m_lastUpdatedTime;
-CrTime CrFrameTime::m_frameDeltaAverage;
-CrTime CrFrameTime::m_frameDeltaMin;
-CrTime CrFrameTime::m_frameDeltaMax;
+crstl::time CrFrameTime::m_lastUpdatedTime;
+crstl::time CrFrameTime::m_frameDeltaAverage;
+crstl::time CrFrameTime::m_frameDeltaMin;
+crstl::time CrFrameTime::m_frameDeltaMax;
 
 void CrFrameTime::IncrementFrameCount()
 {
-	CrTime currentTime = CrTime::Current();
+	crstl::time currentTime = crstl::time::now();
 
-	if ((currentTime - m_lastUpdatedTime).AsSeconds() > 1.0f)
+	if ((currentTime - m_lastUpdatedTime).seconds() > 1.0f)
 	{
 		//CrPrintProcessMemory("Frame Memory");
 
@@ -28,7 +28,7 @@ void CrFrameTime::IncrementFrameCount()
 	}
 
 	// If the previous end time hasn't been initialized yet, set it to the current time
-	if (m_framePreviousEndTime.AsTicks() == 0)
+	if (m_framePreviousEndTime.ticks() == 0)
 	{
 		m_framePreviousEndTime = currentTime;
 	}
@@ -48,22 +48,22 @@ void CrFrameTime::IncrementFrameCount()
 	m_frameDeltaAverage += (m_frameDelta - m_frameDeltaAverage) / 64;
 }
 
-CrTime CrFrameTime::GetFrameDelta()
+crstl::time CrFrameTime::GetFrameDelta()
 {
 	return m_frameDelta;
 }
 
-CrTime CrFrameTime::GetFrameDeltaAverage()
+crstl::time CrFrameTime::GetFrameDeltaAverage()
 {
 	return m_frameDeltaAverage;
 }
 
-CrTime CrFrameTime::GetFrameDeltaMin()
+crstl::time CrFrameTime::GetFrameDeltaMin()
 {
 	return m_frameDeltaMin;
 }
 
-CrTime CrFrameTime::GetFrameDeltaMax()
+crstl::time CrFrameTime::GetFrameDeltaMax()
 {
 	return m_frameDeltaMax;
 }

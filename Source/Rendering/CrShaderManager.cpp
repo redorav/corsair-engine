@@ -10,7 +10,6 @@
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrPlatform.h"
-#include "Core/Time/CrTimer.h"
 #include "Core/Containers/CrArray.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/Streams/CrFileStream.h"

@@ -10,6 +10,8 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrGPUDeletable.h"
 
+#include "crstl/array.h"
+
 struct CrTextureDescriptor
 {
 	CrTextureDescriptor();
@@ -139,7 +141,7 @@ protected:
 	cr3d::TextureUsageFlags m_usage;
 
 	// Mipmap layout that is platform-dependent
-	CrArray<cr3d::MipmapLayout, cr3d::MaxMipmaps> m_hardwareMipmapLayouts;
+	crstl::array<cr3d::MipmapLayout, cr3d::MaxMipmaps> m_hardwareMipmapLayouts;
 
 	// Distance between two consecutive slices
 	uint32_t m_slicePitchBytes;

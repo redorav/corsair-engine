@@ -153,8 +153,8 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 
 	D3D12_INPUT_LAYOUT_DESC& inputLayoutDescriptor = d3d12PipelineStateDescriptor.InputLayout;
 
-	CrArray<D3D12_INPUT_ELEMENT_DESC, cr3d::MaxVertexAttributes> inputElementDescriptors;
-	CrArray<CrFixedString16, cr3d::MaxVertexAttributes> renamedAttributes;
+	crstl::array<D3D12_INPUT_ELEMENT_DESC, cr3d::MaxVertexAttributes> inputElementDescriptors;
+	crstl::array<CrFixedString16, cr3d::MaxVertexAttributes> renamedAttributes;
 
 	for (uint32_t i = 0; i < vertexDescriptor.GetAttributeCount(); ++i)
 	{

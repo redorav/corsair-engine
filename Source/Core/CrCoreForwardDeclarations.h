@@ -15,8 +15,6 @@ namespace eastl
 };
 
 // Containers
-template<typename T, size_t N>
-using CrArray = crstl::array<T, N>;
 
 template<size_t N, typename WordType = size_t>
 using CrBitset = crstl::bitset<N, WordType>;

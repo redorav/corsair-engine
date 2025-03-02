@@ -4,16 +4,17 @@
 
 #include "CrD3D12.h"
 
-#include "Core/Containers/CrArray.h"
 #include "Core/Containers/CrVector.h"
+
+#include "crstl/array.h"
 
 class ICrRenderDevice;
 
 struct CrD3D12AdditionalTextureViews
 {
 	// RTVs
-	CrArray<CrVector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
-	CrArray<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
+	crstl::array<CrVector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
+	crstl::array<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
 
 	// DSVs
 	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSlice;
@@ -23,7 +24,7 @@ struct CrD3D12AdditionalTextureViews
 	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSliceReadOnlyStencil;
 
 	// UAVs
-	CrArray<D3D12_UNORDERED_ACCESS_VIEW_DESC, cr3d::MaxMipmaps>	m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
+	crstl::array<D3D12_UNORDERED_ACCESS_VIEW_DESC, cr3d::MaxMipmaps>	m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC m_d3d12StencilSRVDescriptor;
 };

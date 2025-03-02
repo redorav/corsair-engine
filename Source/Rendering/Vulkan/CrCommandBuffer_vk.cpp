@@ -10,8 +10,9 @@
 #include "Rendering/CrShaderResourceMetadata.h"
 #include "Rendering/CrRendering.h"
 
-#include "Core/Containers/CrArray.h"
 #include "Core/Logging/ICrDebug.h"
+
+#include "crstl/array.h"
 
 CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrCommandBufferDescriptor& descriptor)
 	: ICrCommandBuffer(vulkanRenderDevice, descriptor)
@@ -19,7 +20,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
-	CrArray<VkDescriptorPoolSize, 4> typeCounts;
+	crstl::array<VkDescriptorPoolSize, 4> typeCounts;
 
 	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	typeCounts[0].descriptorCount = 64;
@@ -125,11 +126,11 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	CrAssert(result == VK_SUCCESS);
 
 	// 2. Get current resources and update the descriptor set
-	CrArray<VkDescriptorBufferInfo, 64> bufferInfos;
-	CrArray<VkDescriptorImageInfo, 64>  imageInfos;
-	CrArray<VkBufferView, 64>           bufferViews;
-	CrArray<VkWriteDescriptorSet, 64>   writeDescriptorSets;
-	CrArray<uint32_t, 64>               dynamicOffsets;
+	crstl::array<VkDescriptorBufferInfo, 64> bufferInfos;
+	crstl::array<VkDescriptorImageInfo, 64>  imageInfos;
+	crstl::array<VkBufferView, 64>           bufferViews;
+	crstl::array<VkWriteDescriptorSet, 64>   writeDescriptorSets;
+	crstl::array<uint32_t, 64>               dynamicOffsets;
 
 	uint32_t descriptorCount = 0;    // Total number of descriptors
 	uint32_t bufferCount = 0;        // Total number of buffers (constant + storage)

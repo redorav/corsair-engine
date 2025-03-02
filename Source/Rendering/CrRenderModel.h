@@ -10,7 +10,8 @@
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Containers/CrPair.h"
-#include "Core/Containers/CrArray.h"
+
+#include "crstl/array.h"
 
 struct CrRenderModelDescriptor
 {
@@ -90,5 +91,5 @@ private:
 
 	CrVector<CrMaterialHandle> m_materials;
 
-	CrVector<CrArray<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
+	CrVector<crstl::array<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
 };

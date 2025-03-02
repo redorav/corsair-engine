@@ -18,7 +18,7 @@ namespace CrVertexSemantic
 		}
 	}
 
-	CrArray<Data, CrVertexSemantic::Count> VertexSemanticData;
+	crstl::array<Data, CrVertexSemantic::Count> VertexSemanticData;
 
 	bool CreateVertexSemanticData()
 	{

@@ -199,7 +199,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 
 	// Maybe there is a better way of not writing these headers directly. They depend on the physical
 	// structure of the code which can change
-	metadataHeader += "#include \"Core/Containers/CrArray.h\"\n";
+	metadataHeader += "#include \"crstl/array.h\"\n";
 	metadataHeader += "#include \"Core/Containers/CrHashMap.h\"\n";
 	metadataHeader += "#include \"Core/Containers/CrVector.h\"\n";
 	metadataHeader += "#include \"Core/String/CrString.h\"\n";
@@ -290,7 +290,7 @@ CrString CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const HLSLRe
 
 	result += "extern CrHashMap<CrString, ConstantBufferMetadata&> ConstantBufferTable;\n\n";
 
-	result += "extern CrArray<ConstantBufferMetadata, " + CrString(resources.constantBuffers.size()) + CrString("> ConstantBufferMetaTable;\n\n");
+	result += "extern crstl::array<ConstantBufferMetadata, " + CrString(resources.constantBuffers.size()) + CrString("> ConstantBufferMetaTable;\n\n");
 
 	return result;
 }
@@ -336,7 +336,7 @@ CrString CrShaderMetadataBuilder::PrintResourceHashmap(const CrString& resourceT
 	}
 	result += "\n};\n\n";
 
-	result += "CrArray<" + resourceTypeName + "Metadata, " + CrString(resources.size()) + "> " + resourceTypeName + "MetaTable =\n{";
+	result += "crstl::array<" + resourceTypeName + "Metadata, " + CrString(resources.size()) + "> " + resourceTypeName + "MetaTable =\n{";
 
 	for (const auto& resource : resources)
 	{
@@ -529,7 +529,7 @@ CrString CrShaderMetadataBuilder::BuildTextureMetadataHeader(const HLSLResources
 
 	result += "extern CrHashMap<CrString, TextureMetadata&> TextureTable;\n\n";
 
-	result += "extern CrArray<TextureMetadata, " + CrString(resources.textures.size()) + "> TextureMetaTable;\n\n";
+	result += "extern crstl::array<TextureMetadata, " + CrString(resources.textures.size()) + "> TextureMetaTable;\n\n";
 
 	return result;
 }
@@ -582,7 +582,7 @@ CrString CrShaderMetadataBuilder::BuildSamplerMetadataHeader(const HLSLResources
 
 	result += "extern CrHashMap<CrString, SamplerMetadata&> SamplerTable;\n\n";
 
-	result += "extern CrArray<SamplerMetadata, " + CrString(resources.samplers.size()) + "> SamplerMetaTable;\n\n";
+	result += "extern crstl::array<SamplerMetadata, " + CrString(resources.samplers.size()) + "> SamplerMetaTable;\n\n";
 
 	return result;
 }
@@ -632,7 +632,7 @@ CrString CrShaderMetadataBuilder::BuildRWTextureMetadataHeader(const HLSLResourc
 
 	result += "extern CrHashMap<CrString, RWTextureMetadata&> RWTextureTable;\n\n";
 
-	result += "extern CrArray<RWTextureMetadata, " + CrString(resources.rwTextures.size()) + "> RWTextureMetaTable;\n\n";
+	result += "extern crstl::array<RWTextureMetadata, " + CrString(resources.rwTextures.size()) + "> RWTextureMetaTable;\n\n";
 
 	return result;
 }
@@ -733,7 +733,7 @@ CrString CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HLSLRes
 
 	result += "extern CrHashMap<CrString, StorageBufferMetadata&> StorageBufferTable;\n\n";
 
-	result += "extern CrArray<StorageBufferMetadata, " + CrString(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
+	result += "extern crstl::array<StorageBufferMetadata, " + CrString(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -798,7 +798,7 @@ CrString CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const HLSLR
 
 	result += "extern CrHashMap<CrString, RWStorageBufferMetadata&> RWStorageBufferTable;\n\n";
 
-	result += "extern CrArray<RWStorageBufferMetadata, " + CrString(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
+	result += "extern crstl::array<RWStorageBufferMetadata, " + CrString(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -854,7 +854,7 @@ CrString CrShaderMetadataBuilder::BuildTypedBufferMetadataHeader(const HLSLResou
 
 	result += "extern CrHashMap<CrString, TypedBufferMetadata&> TypedBufferTable;\n\n";
 
-	result += "extern CrArray<TypedBufferMetadata, " + CrString(resources.typedBuffers.size()) + "> TypedBufferMetaTable;\n\n";
+	result += "extern crstl::array<TypedBufferMetadata, " + CrString(resources.typedBuffers.size()) + "> TypedBufferMetaTable;\n\n";
 
 	return result;
 }
@@ -907,7 +907,7 @@ CrString CrShaderMetadataBuilder::BuildRWTypedBufferMetadataHeader(const HLSLRes
 
 	result += "extern CrHashMap<CrString, RWTypedBufferMetadata&> RWTypedBufferTable;\n\n";
 
-	result += "extern CrArray<RWTypedBufferMetadata, " + CrString(resources.rwTypedBuffers.size()) + "> RWTypedBufferMetaTable;\n\n";
+	result += "extern crstl::array<RWTypedBufferMetadata, " + CrString(resources.rwTypedBuffers.size()) + "> RWTypedBufferMetaTable;\n\n";
 
 	return result;
 }

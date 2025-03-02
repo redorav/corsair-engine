@@ -8,7 +8,8 @@
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/CrHash.h"
-#include "Core/Containers/CrArray.h"
+
+#include "crstl/array.h"
 
 struct CrRasterizerStateDescriptor
 {
@@ -102,7 +103,7 @@ namespace CrStandardPipelineStates
 
 struct CrBlendStateDescriptor
 {
-	CrArray<CrRenderTargetBlendDescriptor, cr3d::MaxRenderTargets> renderTargetBlends;
+	crstl::array<CrRenderTargetBlendDescriptor, cr3d::MaxRenderTargets> renderTargetBlends;
 
 	// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
 	// in the blend state and not a per render target field.
@@ -148,7 +149,7 @@ static_assert(sizeof(CrDepthStencilStateDescriptor) == 16, "CrDepthStencilStateD
 
 struct CrRenderTargetFormatDescriptor
 {
-	CrArray<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats =
+	crstl::array<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats =
 	{
 		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid,
 		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid

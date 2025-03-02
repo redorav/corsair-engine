@@ -182,7 +182,7 @@ struct CrRenderPacketBatcher
 	uint32_t m_maxBatchSize = 0;
 
 	// Has to match the maximum number of matrices declared in the shader
-	CrArray<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
+	crstl::array<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
 void CrFrame::Initialize(CrIntrusivePtr<CrOSWindow> mainWindow)

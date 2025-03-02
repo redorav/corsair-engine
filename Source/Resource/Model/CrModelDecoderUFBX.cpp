@@ -269,7 +269,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 		materialMap.insert(ufbxMaterial, (uint32_t)m);
 	}
 
-	CrArray<uint32_t, 128 * 3> tempIndices;
+	crstl::array<uint32_t, 128 * 3> tempIndices;
 
 	for (size_t nodeIndex = 0; nodeIndex < ufbxScene->nodes.count; nodeIndex++)
 	{

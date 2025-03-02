@@ -2,8 +2,6 @@
 
 #include "CrVisibility.h"
 
-#include "Core/Containers/CrArray.h"
-
 #include "Math/CrHlslppVectorFloat.h"
 #include "Math/CrHlslppMatrixFloat.h"
 
@@ -15,7 +13,7 @@ void CrVisibility::ComputeObbProjection(const CrBoundingBox& obb, const float4x4
 	float4 cornerMin = float4(obb.center, 1.0f) - float4(obb.extents, 0.0f);
 	float4 cornerMax = float4(obb.center, 1.0f) + float4(obb.extents, 0.0f);
 
-	CrArray<float4, 8> boxVertices =
+	crstl::array<float4, 8> boxVertices =
 	{
 		cornerMax,
 		float4(cornerMin.x, cornerMax.yzw),
@@ -59,7 +57,7 @@ bool CrVisibility::IsObbInFrustum
 	const float4x4& viewProjectionMatrix
 )
 {
-	CrArray<float4, 8> projectedCorners;
+	crstl::array<float4, 8> projectedCorners;
 	ComputeObbProjection(obb, worldTransform, viewProjectionMatrix, projectedCorners);
 
 	return AreProjectedPointsOnScreen(projectedCorners);

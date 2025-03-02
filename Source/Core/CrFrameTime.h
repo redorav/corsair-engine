@@ -2,8 +2,6 @@
 
 #include "stdint.h"
 
-#include "Core/Containers/CrArray.h"
-
 #include "crstl/timer.h"
 
 class CrFrameTime

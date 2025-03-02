@@ -2,18 +2,19 @@
 
 #include "Rendering/ICrTexture.h"
 
-#include "Core/Containers/CrArray.h"
 #include "Core/Containers/CrVector.h"
 
 #include <vulkan/vulkan.h>
 #include "CrVMA.h"
 
+#include "crstl/array.h"
+
 class ICrRenderDevice;
 
 struct CrVkAdditionalTextureViews
 {
-	CrArray<CrVector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
-	CrArray<VkImageView, cr3d::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
+	crstl::array<CrVector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
+	crstl::array<VkImageView, cr3d::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
 
 	VkImageView m_vkImageViewStencil;
 };

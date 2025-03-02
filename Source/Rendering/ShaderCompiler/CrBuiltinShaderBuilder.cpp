@@ -8,7 +8,6 @@
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Core/Containers/CrArray.h"
 #include "crstl/filesystem.h"
 
 // RapidYAML
@@ -272,7 +271,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
 		builtinShadersGenericHeaderGetFunction += "::GetBuiltinShaderMetadata(builtinShader);\n\t}\n\n";
 
-		CrString builtinShadersMetadataTable = "CrArray<CrBuiltinShaderMetadata, " + CrString(graphicsApiCompilationJobs.size()) + "> BuiltinShaderMetadataTable =\n{\n";
+		CrString builtinShadersMetadataTable = "crstl::array<CrBuiltinShaderMetadata, " + CrString(graphicsApiCompilationJobs.size()) + "> BuiltinShaderMetadataTable =\n{\n";
 
 		CrString builtinShaderDataCpp;
 
@@ -341,7 +340,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 
 		CrString builtinShadersCpp;
 		builtinShadersCpp += "#include \"BuiltinShaders.h\"\n";
-		builtinShadersCpp += "#include \"Core/Containers/CrArray.h\"\n";
+		builtinShadersCpp += "#include \"crstl/array.h\"\n";
 		builtinShadersCpp += "\n";
 		builtinShadersCpp += namespaceDeclarationBegin;
 		builtinShadersCpp += builtinShaderDataCpp;

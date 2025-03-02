@@ -145,7 +145,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	// Dynamic states can be set even after the pipeline has been created, so there is no need to create new pipelines
 	// just for changing a viewport's dimensions or a scissor box
 	// The dynamic state properties themselves are stored in the command buffer
-	CrArray<VkDynamicState, 3> dynamicStateEnables =
+	crstl::array<VkDynamicState, 3> dynamicStateEnables =
 	{
 		VK_DYNAMIC_STATE_VIEWPORT,
 		VK_DYNAMIC_STATE_SCISSOR,
@@ -203,7 +203,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
 	uint32_t vertexStreamCount = vertexDescriptor.GetStreamCount();
-	CrArray<VkVertexInputBindingDescription, cr3d::MaxVertexStreams> bindingDescriptions;
+	crstl::array<VkVertexInputBindingDescription, cr3d::MaxVertexStreams> bindingDescriptions;
 
 	for (uint32_t streamId = 0; streamId < vertexStreamCount; ++streamId)
 	{
@@ -213,7 +213,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	}
 
 	uint32_t attributeCount = vertexDescriptor.GetAttributeCount();
-	CrArray<VkVertexInputAttributeDescription, cr3d::MaxVertexAttributes> attributeDescriptions;
+	crstl::array<VkVertexInputAttributeDescription, cr3d::MaxVertexAttributes> attributeDescriptions;
 
 	uint32_t offset = 0;
 	uint32_t streamId = 0;

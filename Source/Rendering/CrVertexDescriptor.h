@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Core/Containers/CrArray.h"
 #include "Core/Containers/CrBitSet.h"
 #include "Core/CrHash.h"
 #include "Core/String/CrString.h"
+
+#include "crstl/array.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
@@ -38,7 +39,7 @@ namespace CrVertexSemantic
 		uint32_t indexOffset; // Where in the string the first digit is
 	};
 
-	extern CrArray<Data, CrVertexSemantic::Count> VertexSemanticData;
+	extern crstl::array<Data, CrVertexSemantic::Count> VertexSemanticData;
 
 	bool CreateVertexSemanticData();
 
@@ -202,7 +203,7 @@ struct CrVertexDescriptor
 private:
 
 	// Attributes
-	CrArray<CrVertexAttribute, cr3d::MaxVertexAttributes> m_attributes;
+	crstl::array<CrVertexAttribute, cr3d::MaxVertexAttributes> m_attributes;
 
 	// Indicates which streams are being used
 	CrBitset<cr3d::MaxVertexStreams, uint16_t> m_streamMask;

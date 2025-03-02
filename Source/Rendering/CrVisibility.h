@@ -23,7 +23,7 @@ struct CrBoundingSphere
 	float4 centerRadius;
 };
 
-typedef CrArray<float4, 8> CrBoxVertices;
+typedef crstl::array<float4, 8> CrBoxVertices;
 
 class CrVisibility
 {

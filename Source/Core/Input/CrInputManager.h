@@ -4,7 +4,7 @@
 
 #include "Core/Containers/CrBitSet.h"
 
-#include "Core/Containers/CrArray.h"
+#include "crstl/array.h"
 
 namespace KeyboardKey
 {
@@ -151,7 +151,7 @@ struct GamepadState
 
 	CrBitset<GamepadButton::Count, uint8_t> buttonPressed;
 
-	CrArray<float, GamepadAxis::Count> axes;
+	crstl::array<float, GamepadAxis::Count> axes;
 };
 
 class CrInputManager
@@ -198,7 +198,7 @@ public:
 
 private:
 
-	CrArray<GamepadState, MaxControllers> m_gamepadStates;
+	crstl::array<GamepadState, MaxControllers> m_gamepadStates;
 
 	MouseState m_mouseState;
 

@@ -199,7 +199,7 @@ void CrHardwareGPUBufferVulkan::UnlockPS()
 	vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
 }
 
-CrArray<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTable;
+crstl::array<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTable;
 
 static bool PopulateVkBufferResourceTable()
 {

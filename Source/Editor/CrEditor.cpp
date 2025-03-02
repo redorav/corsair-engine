@@ -64,7 +64,7 @@ void CrEditor::Update()
 {
 	const CrCameraHandle& camera = m_renderWorld->GetCamera();
 
-	float frameDelta = (float)CrFrameTime::GetFrameDelta().AsSeconds();
+	float frameDelta = (float)CrFrameTime::GetFrameDelta().seconds();
 
 	ImGuiIO& io = ImGui::GetIO();
 

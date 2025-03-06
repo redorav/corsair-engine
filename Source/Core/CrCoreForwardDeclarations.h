@@ -16,9 +16,6 @@ namespace eastl
 
 // Containers
 
-template<typename T, size_t N>
-using CrFixedVector = crstl::fixed_vector<T, N>;
-
 template<typename Key, typename Value>
 using CrHashMap = crstl::open_hashmap<Key, Value, crstl::hash<Key>, crstl::allocator>;
 

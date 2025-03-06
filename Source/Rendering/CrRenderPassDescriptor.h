@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/Containers/CrFixedVector.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
+
+#include "crstl/fixed_vector.h"
 
 using CrRenderPassNameString = CrFixedString32;
 
@@ -93,15 +93,15 @@ struct CrRenderPassDescriptor
 {
 	static const uint32_t MaxTransitionCount = 32;
 
-	typedef CrFixedVector<CrRenderPassBufferDescriptor, MaxTransitionCount> BufferTransitionVector;
-	typedef CrFixedVector<CrRenderPassTextureDescriptor, MaxTransitionCount> TextureTransitionVector;
+	typedef crstl::fixed_vector<CrRenderPassBufferDescriptor, MaxTransitionCount> BufferTransitionVector;
+	typedef crstl::fixed_vector<CrRenderPassTextureDescriptor, MaxTransitionCount> TextureTransitionVector;
 
 	cr3d::RenderPassType::T type;
 	
 	CrRenderPassNameString debugName;
 	float4 debugColor;
 
-	CrFixedVector<CrRenderTargetDescriptor, cr3d::MaxRenderTargets> color;
+	crstl::fixed_vector<CrRenderTargetDescriptor, cr3d::MaxRenderTargets> color;
 	CrRenderTargetDescriptor depth;
 
 	// Transitions when beginning a pass

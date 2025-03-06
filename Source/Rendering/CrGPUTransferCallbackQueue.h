@@ -2,10 +2,10 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "Core/Containers/CrFixedVector.h"
 #include "Core/Function/CrFixedFunction.h"
 
 #include "crstl/deque.h"
+#include "crstl/fixed_vector.h"
 
 struct CrGPUDownloadCallback
 {
@@ -50,7 +50,7 @@ private:
 	crstl::deque<CrDownloadCallbackList*> m_activeCallbackLists;
 
 	// Available callback lists are there to be reused
-	CrFixedVector<CrDownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;
+	crstl::fixed_vector<CrDownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;
 
-	CrFixedVector<CrDownloadCallbackList, MaximumCallbackLists> m_callbackLists;
+	crstl::fixed_vector<CrDownloadCallbackList, MaximumCallbackLists> m_callbackLists;
 };

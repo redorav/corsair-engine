@@ -7,11 +7,11 @@
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrVector.h"
-#include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Containers/CrPair.h"
 
 #include "crstl/array.h"
+#include "crstl/fixed_vector.h"
 
 struct CrRenderModelDescriptor
 {
@@ -31,11 +31,11 @@ struct CrRenderModelDescriptor
 
 private:
 
-	CrFixedVector<CrRenderMeshHandle, 256> m_meshes;
+	crstl::fixed_vector<CrRenderMeshHandle, 256> m_meshes;
 
-	CrFixedVector<uint8_t, 256> m_materialIndices;
+	crstl::fixed_vector<uint8_t, 256> m_materialIndices;
 
-	CrFixedVector<CrMaterialHandle, 256> m_materials;
+	crstl::fixed_vector<CrMaterialHandle, 256> m_materials;
 };
 
 class CrRenderModel final : public CrIntrusivePtrInterface

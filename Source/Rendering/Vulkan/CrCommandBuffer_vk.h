@@ -96,9 +96,9 @@ private:
 
 	VkPipelineStageFlags m_destStageMask = VK_PIPELINE_STAGE_NONE; // destStageMask is an OR of all pipeline barrier stage masks
 
-	CrFixedVector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_bufferMemoryBarriers;
+	crstl::fixed_vector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_bufferMemoryBarriers;
 
-	CrFixedVector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_imageMemoryBarriers;
+	crstl::fixed_vector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_imageMemoryBarriers;
 };
 
 inline const VkCommandBuffer& CrCommandBufferVulkan::GetVkCommandBuffer() const

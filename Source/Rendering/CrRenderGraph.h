@@ -5,11 +5,12 @@
 
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/Containers/CrFixedHashMap.h"
-#include "Core/Containers/CrFixedVector.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/CrHash.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
+
+#include "crstl/fixed_vector.h"
 
 // Objectives
 // 
@@ -157,9 +158,9 @@ struct CrRenderGraphPass2
 
 	CrRenderGraphPassType::T type;
 
-	CrFixedVector<CrRenderGraphTextureUsage2, 16> textureUsages;
+	crstl::fixed_vector<CrRenderGraphTextureUsage2, 16> textureUsages;
 
-	CrFixedVector<CrRenderGraphBufferUsage2, 16> bufferUsages;
+	crstl::fixed_vector<CrRenderGraphBufferUsage2, 16> bufferUsages;
 
 	CrFixedHashMap<uint64_t, CrRenderGraphTextureTransitionInfo2, 16> textureTransitionInfos;
 
@@ -272,7 +273,7 @@ private:
 
 	size_t m_workingPassIndex;
 
-	CrFixedVector<CrRenderGraphPass2, 128> m_workingPasses;
+	crstl::fixed_vector<CrRenderGraphPass2, 128> m_workingPasses;
 
 	uint32_t m_subresourceIdCounter;
 
@@ -283,10 +284,10 @@ private:
 	CrFixedHashMap<CrHash, uint32_t, 256> m_bufferIds;
 
 	// Last render pass a certain subresource was used in. Null if it wasn't used yet
-	CrFixedVector<CrRenderGraphPass2*, 256> m_textureLastUsedPass;
+	crstl::fixed_vector<CrRenderGraphPass2*, 256> m_textureLastUsedPass;
 
 	// Last render pass a certain buffer was used in. Null if it wasn't used yet
-	CrFixedVector<CrRenderGraphPass2*, 256> m_bufferLastUsedPass;
+	crstl::fixed_vector<CrRenderGraphPass2*, 256> m_bufferLastUsedPass;
 
 	CrRenderGraphFrameParams m_frameParams;
 };

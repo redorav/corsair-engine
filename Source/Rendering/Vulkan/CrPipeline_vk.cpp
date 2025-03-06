@@ -54,7 +54,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	colorBlendState.logicOpEnable = false;
 	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
-	CrFixedVector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments;
+	crstl::fixed_vector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments;
 	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
@@ -254,8 +254,8 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	// to create the render pass on the stack by using a custom allocator.
 	VkRenderPass vkCompatibleRenderPass;
 	{
-		CrFixedVector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
-		CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
+		crstl::fixed_vector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
+		crstl::fixed_vector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
 		VkAttachmentReference depthReference;
 
 		uint32_t numColorAttachments = colorBlendState.attachmentCount;

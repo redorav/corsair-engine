@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Containers/CrFixedVector.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/FileSystem/CrFixedPath.h"
 
@@ -13,6 +12,8 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
+
+#include "crstl/fixed_vector.h"
 
 using bindpoint_t = uint8_t;
 
@@ -64,15 +65,15 @@ static_assert(cr3d::ShaderResourceType::Count < 16);
 // them on (sorted) to the shader binding layout.
 struct CrShaderBindingLayoutResources
 {
-	CrFixedVector<CrShaderBinding, 64> constantBuffers;
-	CrFixedVector<CrShaderBinding, 16> samplers;
-	CrFixedVector<CrShaderBinding, 64> textures;
-	CrFixedVector<CrShaderBinding, 32> rwTextures;
+	crstl::fixed_vector<CrShaderBinding, 64> constantBuffers;
+	crstl::fixed_vector<CrShaderBinding, 16> samplers;
+	crstl::fixed_vector<CrShaderBinding, 64> textures;
+	crstl::fixed_vector<CrShaderBinding, 32> rwTextures;
 
-	CrFixedVector<CrShaderBinding, 32> storageBuffers;
-	CrFixedVector<CrShaderBinding, 32> rwStorageBuffers;
-	CrFixedVector<CrShaderBinding, 32> typedBuffers;
-	CrFixedVector<CrShaderBinding, 32> rwTypedBuffers;
+	crstl::fixed_vector<CrShaderBinding, 32> storageBuffers;
+	crstl::fixed_vector<CrShaderBinding, 32> rwStorageBuffers;
+	crstl::fixed_vector<CrShaderBinding, 32> typedBuffers;
+	crstl::fixed_vector<CrShaderBinding, 32> rwTypedBuffers;
 };
 
 // Represents the resources needed by every stage. It is designed to be 
@@ -243,7 +244,7 @@ private:
 	// so we don't take up unnecessary space
 	crstl::array<crstl::array<ShaderResourceOffset, cr3d::ShaderStage::GraphicsStageCount>, cr3d::ShaderResourceType::Count> m_stageResourceOffsets = {};
 
-	CrFixedVector<CrShaderBinding, 64> m_bindings;
+	crstl::fixed_vector<CrShaderBinding, 64> m_bindings;
 };
 
 struct CrVertexInput
@@ -256,7 +257,7 @@ static_assert(sizeof(CrVertexInput) == 2, "CrVertexInput size mismatch");
 
 struct CrInputSignature
 {
-	CrFixedVector<CrVertexInput, cr3d::MaxVertexStreams> inputs;
+	crstl::fixed_vector<CrVertexInput, cr3d::MaxVertexStreams> inputs;
 };
 
 // Bytecode represents a shader code, e.g. vertex, pixel, etc

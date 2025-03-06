@@ -466,12 +466,12 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 	if(renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
 	{
 		// Attachment are up to number of render targets, plus depth
-		CrFixedVector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
-		CrFixedVector<VkImageView, cr3d::MaxRenderTargets + 1> attachmentImageViews;
-		CrFixedVector<VkClearValue, cr3d::MaxRenderTargets + 1> clearValues;
+		crstl::fixed_vector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
+		crstl::fixed_vector<VkImageView, cr3d::MaxRenderTargets + 1> attachmentImageViews;
+		crstl::fixed_vector<VkClearValue, cr3d::MaxRenderTargets + 1> clearValues;
 
 		// Attachment references are set in subpasses
-		CrFixedVector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
+		crstl::fixed_vector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
 		VkAttachmentReference depthReference;
 
 		uint32_t numColorAttachments = (uint32_t)renderPassDescriptor.color.size();

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/Containers/CrFixedVector.h"
 #include "Core/Containers/CrHashMap.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"

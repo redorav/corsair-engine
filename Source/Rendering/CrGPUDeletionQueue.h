@@ -4,9 +4,8 @@
 
 #include "Rendering/ICrGPUSynchronization.h"
 
-#include "Core/Containers/CrFixedVector.h"
-
 #include "crstl/deque.h"
+#include "crstl/fixed_vector.h"
 
 class CrGPUDeletable;
 
@@ -51,10 +50,10 @@ private:
 	crstl::deque<CrDeletionList*> m_activeDeletionLists;
 
 	// Available deletion lists are there to be reused
-	CrFixedVector<CrDeletionList*, MaximumDeletionLists> m_availableDeletionLists;
+	crstl::fixed_vector<CrDeletionList*, MaximumDeletionLists> m_availableDeletionLists;
 
 	// These are the actual contents of the CrDeletionList
 	// The other lists point to the contents here. We cannot
 	// have reallocation on these lists so we use fixed size vectors
-	CrFixedVector<CrDeletionList, MaximumDeletionLists> m_deletionLists;
+	crstl::fixed_vector<CrDeletionList, MaximumDeletionLists> m_deletionLists;
 };

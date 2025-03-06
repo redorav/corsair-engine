@@ -258,7 +258,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 
 		// Setup buffer copy regions for each mip level
-		CrFixedVector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
+		crstl::fixed_vector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
 			
 		for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapStart + textureUpload.mipmapCount; mip++)
 		{

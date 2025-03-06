@@ -43,6 +43,7 @@ void DepthDownsampleLinearizeMinMaxCS(CSInput csInput)
 	float2 centerUV = (2 * pixelCoordMip1.xy + 0.5) / (float2)depthTextureResolution;
 
 	float4 rawDepths = RawDepthTexture.GatherRed(AllPointClampSampler, centerUV);
+	uint stencil = StencilTexture.Load(uint3(0, 0, 0));
 
 	float4 linearDepths = LinearizeDepth(rawDepths, cb_Camera.linearization);
 
@@ -55,7 +56,7 @@ void DepthDownsampleLinearizeMinMaxCS(CSInput csInput)
 	GroupMemoryBarrierWithGroupSync();
 
 	// Process Mip 2
-	if ((pixelCoordMip1.x % 2) == 0 && (pixelCoordMip1.y % 2) == 0)
+	if (stencil != 0xffffffff && (pixelCoordMip1.x % 2) == 0 && (pixelCoordMip1.y % 2) == 0)
 	{
 		float2 minMaxTL = gs_minMaxDepth[groupThreadId.x + 0][groupThreadId.y + 0];
 		float2 minMaxTR = gs_minMaxDepth[groupThreadId.x + 1][groupThreadId.y + 0];

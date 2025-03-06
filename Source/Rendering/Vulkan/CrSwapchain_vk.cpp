@@ -348,7 +348,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 
-	CrFixedVector<VkImage, 8> images(m_imageCount);
+	crstl::fixed_vector<VkImage, 8> images(m_imageCount);
 	VkResult vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, images.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
@@ -362,7 +362,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	swapchainTextureParams.format = m_format;
 	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
 
-	CrFixedVector<VkImageMemoryBarrier, 8> imageMemoryBarriers(m_imageCount);
+	crstl::fixed_vector<VkImageMemoryBarrier, 8> imageMemoryBarriers(m_imageCount);
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{

@@ -6,7 +6,7 @@
 
 #include "Core/Containers/CrFixedVector.h"
 
-#include "Core/Containers/CrDeque.h"
+#include "crstl/deque.h"
 
 class CrGPUDeletable;
 
@@ -48,7 +48,7 @@ private:
 	// Active deletion lists have had fence signal commands scheduled on
 	// the GPU, and are waiting to receive that on the CPU. We want to
 	// push back, but then get front to query the fence
-	CrDeque<CrDeletionList*> m_activeDeletionLists;
+	crstl::deque<CrDeletionList*> m_activeDeletionLists;
 
 	// Available deletion lists are there to be reused
 	CrFixedVector<CrDeletionList*, MaximumDeletionLists> m_availableDeletionLists;

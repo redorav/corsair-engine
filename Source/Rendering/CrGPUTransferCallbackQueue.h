@@ -5,7 +5,7 @@
 #include "Core/Containers/CrFixedVector.h"
 #include "Core/Function/CrFixedFunction.h"
 
-#include "Core/Containers/CrDeque.h"
+#include "crstl/deque.h"
 
 struct CrGPUDownloadCallback
 {
@@ -47,7 +47,7 @@ private:
 	// Active callback lists have had fence signal commands scheduled on
 	// the GPU, and are waiting to receive that on the CPU. We want to
 	// push back, but then get front to query the fence
-	CrDeque<CrDownloadCallbackList*> m_activeCallbackLists;
+	crstl::deque<CrDownloadCallbackList*> m_activeCallbackLists;
 
 	// Available callback lists are there to be reused
 	CrFixedVector<CrDownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;

@@ -16,12 +16,6 @@ namespace eastl
 
 // Containers
 
-template<typename T>
-using CrDeque = crstl::deque<T, crstl::allocator, 16>;
-
-template<typename T, size_t N>
-using CrFixedDeque = crstl::fixed_deque<T, N>;
-
 template<typename T, size_t N>
 using CrFixedVector = crstl::fixed_vector<T, N>;
 

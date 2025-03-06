@@ -8,7 +8,8 @@
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
+
+#include "crstl/unique_ptr.h"
 
 namespace GBufferDebugMode { enum T : uint32_t; }
 
@@ -108,7 +109,7 @@ private:
 
 	CrRenderGraph m_mainRenderGraph;
 
-	CrUniquePtr<CrGPUTimingQueryTracker> m_timingQueryTracker;
+	crstl::unique_ptr<CrGPUTimingQueryTracker> m_timingQueryTracker;
 
 	// This would need to be buffered to account for multiple threads
 	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;

@@ -129,7 +129,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
-		m_additionalViews = CrUniquePtr<CrD3D12AdditionalTextureViews>(new CrD3D12AdditionalTextureViews());
+		m_additionalViews = crstl::unique_ptr<CrD3D12AdditionalTextureViews>(new CrD3D12AdditionalTextureViews());
 	}
 
 	// Create Render Target views

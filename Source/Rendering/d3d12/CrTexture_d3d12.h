@@ -66,7 +66,7 @@ private:
 	// Main resource view, can access all mips and slices
 	D3D12_SHADER_RESOURCE_VIEW_DESC m_d3d12SRVDescriptor;
 
-	CrUniquePtr<CrD3D12AdditionalTextureViews> m_additionalViews;
+	crstl::unique_ptr<CrD3D12AdditionalTextureViews> m_additionalViews;
 
 	uint32_t m_d3d12SubresourceCount;
 

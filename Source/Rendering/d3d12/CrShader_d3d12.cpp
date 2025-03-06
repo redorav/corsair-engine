@@ -20,7 +20,7 @@ CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(ICrRenderDevice* renderDevice, cons
 		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [](cr3d::ShaderStage::T, const CrShaderReflectionResource&){});
 	}
 
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
+	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
 
 CrGraphicsShaderD3D12::~CrGraphicsShaderD3D12()
@@ -34,5 +34,5 @@ CrComputeShaderD3D12::CrComputeShaderD3D12(ICrRenderDevice* renderDevice, const 
 	CrShaderBindingLayoutResources resources;
 	const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
 	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [](cr3d::ShaderStage::T, const CrShaderReflectionResource&){});
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
+	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }

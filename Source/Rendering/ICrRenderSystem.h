@@ -61,4 +61,4 @@ protected:
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) = 0;
 };
 
-extern CrUniquePtr<ICrRenderSystem> RenderSystem;
+extern crstl::unique_ptr<ICrRenderSystem> RenderSystem;

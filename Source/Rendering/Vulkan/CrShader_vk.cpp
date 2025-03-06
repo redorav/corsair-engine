@@ -106,7 +106,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 
 	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
+	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
 
 CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
@@ -156,7 +156,7 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, cons
 	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
 	// Create the optimized shader resource table
-	m_bindingLayout = CrUniquePtr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
+	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
 
 CrComputeShaderVulkan::~CrComputeShaderVulkan()

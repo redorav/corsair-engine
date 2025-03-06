@@ -327,11 +327,11 @@ protected:
 
 	CurrentState					m_currentState;
 
-	CrUniquePtr<CrGPUStackAllocator> m_constantBufferGPUStack;
+	crstl::unique_ptr<CrGPUStackAllocator> m_constantBufferGPUStack;
 
-	CrUniquePtr<CrGPUStackAllocator> m_vertexBufferGPUStack;
+	crstl::unique_ptr<CrGPUStackAllocator> m_vertexBufferGPUStack;
 
-	CrUniquePtr<CrGPUStackAllocator> m_indexBufferGPUStack;
+	crstl::unique_ptr<CrGPUStackAllocator> m_indexBufferGPUStack;
 
 	// Signal fence when execution completes
 	CrGPUFenceHandle			m_completionFence;

@@ -24,7 +24,7 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 		{
 			CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::MemoryAccess::CPUStreamToGPU, descriptor.dynamicConstantBufferSizeBytes);
 			constantBufferStack.name = "Constant Buffer Stack";
-			m_constantBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+			m_constantBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
 		}
 
 		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size of each vertex and index
@@ -37,11 +37,11 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 
 			CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
 			vertexBufferStack.name = "Vertex Buffer Stack";
-			m_vertexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
+			m_vertexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
 			CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, cr3d::DataFormats[cr3d::DataFormat::R16_Uint].dataOrBlockSize);
 			indexBufferStack.name = "Index Buffer Stack";
-			m_indexBufferGPUStack = CrUniquePtr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
+			m_indexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 		}
 	}
 

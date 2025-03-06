@@ -39,9 +39,6 @@ using CrVector = crstl::vector<T, crstl::allocator>;
 
 // Smart Pointers
 
-template <typename T>
-using CrUniquePtr = crstl::unique_ptr<T>;
-
 template<typename T>
 using CrIntrusivePtr = crstl::intrusive_ptr<T>;
 

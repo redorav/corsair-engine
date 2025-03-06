@@ -281,7 +281,7 @@ static void cgltfFileRelease(const struct cgltf_memory_options* memory_options, 
 CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 {
 	uint64_t fileSize = file.get_size();
-	CrUniquePtr<uint8_t[]> fileData = CrUniquePtr<uint8_t[]>(new uint8_t[fileSize]);
+	crstl::unique_ptr<uint8_t[]> fileData = crstl::unique_ptr<uint8_t[]>(new uint8_t[fileSize]);
 	file.read(fileData.get(), fileSize);
 
 	CgltfUserData userData;

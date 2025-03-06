@@ -388,7 +388,7 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 {
 	if (!m_manipulator)
 	{
-		m_manipulator = CrUniquePtr<CrManipulator>(new CrManipulator());
+		m_manipulator = crstl::unique_ptr<CrManipulator>(new CrManipulator());
 
 		// These colors should be in linear space as we write the manipulator to the HDR buffer
 		float4 red(1.0f, 0.07f, 0.07f, 1.0f);

@@ -6,7 +6,6 @@
 #include "Rendering/CrVertexDescriptor.h"
 
 #include "Core/CrHash.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/String/CrFixedString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 

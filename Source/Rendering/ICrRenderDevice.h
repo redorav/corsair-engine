@@ -9,8 +9,9 @@
 #include "Core/String/CrString.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
+
+#include "crstl/unique_ptr.h"
 
 struct CrDriverVersion
 {
@@ -272,9 +273,9 @@ protected:
 
 	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
 
-	CrUniquePtr<CrGPUDeletionQueue> m_gpuDeletionQueue;
+	crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
-	CrUniquePtr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
+	crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
 
 	CrRenderDeviceProperties m_renderDeviceProperties;
 

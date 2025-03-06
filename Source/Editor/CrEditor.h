@@ -10,9 +10,10 @@
 
 #include "Core/Input/CrInputManager.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 #include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
+
+#include "crstl/unique_ptr.h"
 
 // Stores state when we selected or clicked something so that we're able to
 // determine the appropriate action from that
@@ -140,7 +141,7 @@ private:
 	CrHashMap<CrModelInstanceId::type, SelectedInstanceState> m_selectedInstances;
 
 	// Pointer to a currently spawned manipulator
-	CrUniquePtr<CrManipulator> m_manipulator;
+	crstl::unique_ptr<CrManipulator> m_manipulator;
 
 	// Whether the manipulator is selected (e.g. we started dragging)
 	bool m_manipulatorSelected = false;

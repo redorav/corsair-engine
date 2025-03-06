@@ -5,7 +5,6 @@
 
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
-#include "Core/SmartPointers/CrUniquePtr.h"
 
 #include "Rendering/CrVertexDescriptor.h"
 #include "Rendering/CrShaderReflectionHeader.h"
@@ -14,6 +13,7 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "crstl/fixed_vector.h"
+#include "crstl/unique_ptr.h"
 
 using bindpoint_t = uint8_t;
 
@@ -353,7 +353,7 @@ protected:
 
 	CrShaderDebugString m_debugName;
 
-	CrUniquePtr<ICrShaderBindingLayout> m_bindingLayout;
+	crstl::unique_ptr<ICrShaderBindingLayout> m_bindingLayout;
 
 	// Hash produced from the bytecodes belonging to this shader
 	CrHash m_hash;

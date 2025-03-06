@@ -19,9 +19,9 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-#include "Core/SmartPointers/CrUniquePtr.h"
+#include "crstl/unique_ptr.h"
 
-CrUniquePtr<ICrRenderSystem> RenderSystem = nullptr;
+crstl::unique_ptr<ICrRenderSystem> RenderSystem = nullptr;
 
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)
@@ -75,7 +75,7 @@ void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDes
 	}
 #endif
 
-	RenderSystem = CrUniquePtr<ICrRenderSystem>(renderSystem);
+	RenderSystem = crstl::unique_ptr<ICrRenderSystem>(renderSystem);
 }
 
 void ICrRenderSystem::InitializeRenderdoc()

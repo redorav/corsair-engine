@@ -174,7 +174,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// TODO This needs reworking. Only create if mips or slices are > 1
 	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
 	{
-		m_additionalViews = CrUniquePtr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
+		m_additionalViews = crstl::unique_ptr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
 	}
 
 	// There are two parts to the aspect mask it seems:

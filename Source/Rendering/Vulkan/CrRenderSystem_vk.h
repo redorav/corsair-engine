@@ -2,11 +2,10 @@
 
 #include "Rendering/ICrRenderSystem.h"
 
-#include "Core/String/CrString.h"
-
 #include "Core/Containers/CrVector.h"
-
 #include "Core/Containers/CrHashMap.h"
+
+#include "crstl/string.h"
 
 class CrRenderSystemVulkan final : public ICrRenderSystem
 {
@@ -16,9 +15,9 @@ public:
 
 	VkInstance GetVkInstance() const { return m_vkInstance; }
 
-	bool IsVkInstanceExtensionSupported(const CrString& extension);
+	bool IsVkInstanceExtensionSupported(const crstl::string& extension);
 
-	bool IsVkInstanceLayerSupported(const CrString& layer);
+	bool IsVkInstanceLayerSupported(const crstl::string& layer);
 
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) override;
 
@@ -29,9 +28,9 @@ private:
 
 	VkDebugUtilsMessengerEXT m_vkDebugMessenger;
 
-	CrHashSet<CrString> m_supportedInstanceExtensions;
+	CrHashSet<crstl::string> m_supportedInstanceExtensions;
 
-	CrHashSet<CrString> m_supportedInstanceLayers;
+	CrHashSet<crstl::string> m_supportedInstanceLayers;
 
 	CrVector<const char*> m_instanceLayers;
 };

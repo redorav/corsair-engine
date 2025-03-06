@@ -5,12 +5,12 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/String/CrFixedString.h"
-#include "Core/String/CrString.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
+#include "crstl/fixed_string.h"
+#include "crstl/string.h"
 #include "crstl/unique_ptr.h"
 
 struct CrDriverVersion
@@ -36,14 +36,14 @@ struct CrRenderDeviceProperties
 	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
 
 	// Just for display
-	CrFixedString32 graphicsApiDisplay;
+	crstl::fixed_string32 graphicsApiDisplay;
 
 	// Version of the driver
 	CrDriverVersion driverVersion;
 
 	bool isUMA = false; // Whether a unified memory architecture is used here
 
-	CrFixedString128 description;
+	crstl::fixed_string128 description;
 
 	uint32_t maxConstantBufferRange = 0;
 	uint32_t maxTextureDimension1D = 0;
@@ -293,9 +293,9 @@ protected:
 	// the pipeline is valid or not
 	bool m_isValidPipelineCache;
 
-	CrString m_pipelineCacheDirectory;
+	crstl::string m_pipelineCacheDirectory;
 
-	CrString m_pipelineCacheFilename;
+	crstl::string m_pipelineCacheFilename;
 
 	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
 

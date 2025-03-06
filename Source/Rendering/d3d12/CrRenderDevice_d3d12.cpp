@@ -384,7 +384,7 @@ void CrRenderDeviceD3D12::SetD3D12ObjectName(ID3D12Object* object, const char* n
 {
 	if (name && name[0] != 0)
 	{
-		CrFixedWString128 wName;
+		crstl::fixed_wstring128 wName;
 		wName.append_convert<char>(name);
 		object->SetName(wName.c_str());
 	}

@@ -2,10 +2,11 @@
 
 #include "CrStringUtilities.h"
 
-#include "Core/String/CrString.h"
 #include "Core/Containers/CrVector.h"
 
-void CrStringUtilities::SplitLines(CrVector<CrString>& lines, const CrString& input)
+#include "crstl/string.h"
+
+void CrStringUtilities::SplitLines(CrVector<crstl::string>& lines, const crstl::string& input)
 {
 	size_t lineStartPosition = 0;
 	size_t lineEndPosition = input.find('\n');

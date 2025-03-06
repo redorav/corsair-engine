@@ -12,7 +12,7 @@
 
 CrShaderSources* ShaderSources;
 
-static CrString UbershaderEntryFile = "Ubershader.hlsl";
+static crstl::string UbershaderEntryFile = "Ubershader.hlsl";
 
 void CrShaderSources::Initialize()
 {
@@ -37,7 +37,7 @@ CrShaderSources::CrShaderSources()
 
 	// Files that contribute to ubershader building
 	// Perhaps more flexible in a text file
-	static const CrHashSet<CrString> UbershaderFiles =
+	static const CrHashSet<crstl::string> UbershaderFiles =
 	{
 		"BSDF.hlsl",
 		"Common.hlsl",
@@ -45,7 +45,7 @@ CrShaderSources::CrShaderSources()
 		UbershaderEntryFile,
 	};
 
-	const CrString& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
+	const crstl::string& ShaderSourceDirectory = CrGlobalPaths::GetShaderSourceDirectory();
 
 	// Load all the files in this directory and put them in a hashmap based on filename
 	crstl::for_each_directory_entry(ShaderSourceDirectory.c_str(), false, [this](const crstl::directory_entry& entry)
@@ -57,19 +57,19 @@ CrShaderSources::CrShaderSources()
 
 			if (crstl::file shaderSourceFile = crstl::file(shaderPath.c_str(), crstl::file_flags::read))
 			{
-				CrString shaderSource(CrStringNoInitialize, shaderSourceFile.get_size(), shaderSourceFile.get_size());
+				crstl::string shaderSource(crstl::ctor_no_initialize, shaderSourceFile.get_size(), shaderSourceFile.get_size());
 				shaderSourceFile.read(shaderSource.data(), shaderSource.size());
 
 				// Preprocess the shader source to remove anything that cannot
 				// add anything meaningful to the final binary, such as whitespace, 
 				// tabs, lines, and comments
 
-				CrVector<CrString> lines;
+				CrVector<crstl::string> lines;
 				CrStringUtilities::SplitLines(lines, shaderSource);
 
 				// TODO Add a competent preprocessor here, instead of manually parsing
-				CrVector<CrString> preprocessedLines;
-				for (CrString& line : lines)
+				CrVector<crstl::string> preprocessedLines;
+				for (crstl::string& line : lines)
 				{
 					if (!line.empty())
 					{
@@ -96,13 +96,13 @@ CrShaderSources::CrShaderSources()
 				// Only consider ubershader files for the ubershader hash
 				if (UbershaderFiles.find(entry.filename) != UbershaderFiles.end())
 				{
-					for (const CrString& line : preprocessedLines)
+					for (const crstl::string& line : preprocessedLines)
 					{
 						m_hashableUbershaderSource += line;
 					}
 				}
 
-				CrString filenameString = entry.filename;
+				crstl::string filenameString = entry.filename;
 
 				m_shaderPaths.insert(filenameString, shaderPath);
 				m_shaderSources.insert(filenameString, shaderSource);
@@ -159,14 +159,14 @@ CrShaderSources::CrShaderSources()
 					if (endQuote != m_resolvedUbershaderSource.npos)
 					{
 						// Get the filename of the include
-						const CrString includeFilename = m_resolvedUbershaderSource.substr(startQuote + 1, endQuote - startQuote - 1);
+						const crstl::string includeFilename = m_resolvedUbershaderSource.substr(startQuote + 1, endQuote - startQuote - 1);
 
 						const auto& includeFilenameIter = m_shaderSources.find(includeFilename);
 
 						// If the include filename is in the cache, we may proceed to inject it
 						if (includeFilenameIter != m_shaderSources.end())
 						{
-							const CrString& includedSourceFile = m_shaderSources.find(includeFilename)->second;
+							const crstl::string& includedSourceFile = m_shaderSources.find(includeFilename)->second;
 							m_resolvedUbershaderSource.replace(includePosition, endLine - includePosition, includedSourceFile);
 							includeSuccess = true;
 						}
@@ -193,7 +193,7 @@ CrShaderSources::CrShaderSources()
 	}
 }
 
-const CrString& CrShaderSources::GetUbershaderSource() const
+const crstl::string& CrShaderSources::GetUbershaderSource() const
 {
 	return m_resolvedUbershaderSource;
 }

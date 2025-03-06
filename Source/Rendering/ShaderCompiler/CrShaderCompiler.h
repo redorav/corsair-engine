@@ -2,9 +2,10 @@
 
 #include "Rendering/CrRendering.h"
 #include "Core/CrPlatform.h"
-#include "Core/String/CrString.h"
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Containers/CrVector.h"
+
+#include "crstl/string.h"
 
 namespace OptimizationLevel
 {
@@ -34,9 +35,9 @@ struct CompilationDescriptor
 	CrFixedPath inputPath;
 	CrFixedPath outputPath;
 	CrFixedPath tempPath; // Filename compiler can use to dump intermediate data
-	CrString entryPoint;
-	CrString uniqueBinaryName;
-	mutable CrVector<CrString> defines;
+	crstl::string entryPoint;
+	crstl::string uniqueBinaryName;
+	mutable CrVector<crstl::string> defines;
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;
@@ -52,9 +53,9 @@ class CrShaderCompiler
 {
 public:
 
-	static const CrString& GetExecutableDirectory();
+	static const crstl::string& GetExecutableDirectory();
 
-	static CrString ExecutableDirectory;
+	static crstl::string ExecutableDirectory;
 
 	static CrFixedPath PDBDirectory;
 
@@ -66,5 +67,5 @@ public:
 
 	static void Finalize();
 
-	static bool Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus);
+	static bool Compile(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus);
 };

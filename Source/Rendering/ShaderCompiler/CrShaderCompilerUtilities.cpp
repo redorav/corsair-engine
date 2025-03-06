@@ -2,12 +2,13 @@
 
 #include "CrShaderCompilerUtilities.h"
 
-#include "Core/String/CrString.h"
+#include "crstl/string.h"
 
+// TODO Use file
 #include <fstream>
 #include <sstream>
 
-void CrShaderCompilerUtilities::WriteToFile(const CrString& filename, const CrString& text)
+void CrShaderCompilerUtilities::WriteToFile(const crstl::string& filename, const crstl::string& text)
 {
 	std::ofstream fileStream;
 	fileStream.open(filename.c_str(), std::ios::out);
@@ -16,14 +17,14 @@ void CrShaderCompilerUtilities::WriteToFile(const CrString& filename, const CrSt
 	printf("Wrote contents of file to %s\n", filename.c_str());
 }
 
-void CrShaderCompilerUtilities::WriteToFileIfChanged(const CrString& filename, const CrString& text)
+void CrShaderCompilerUtilities::WriteToFileIfChanged(const crstl::string& filename, const crstl::string& text)
 {
 	std::ifstream originalFile(filename.c_str());
 	std::stringstream originalFileStream;
 	originalFileStream << originalFile.rdbuf();
 	originalFile.close();
 
-	const CrString& originalContents = originalFileStream.str().c_str();
+	const crstl::string& originalContents = originalFileStream.str().c_str();
 
 	if (originalContents != text)
 	{
@@ -31,7 +32,7 @@ void CrShaderCompilerUtilities::WriteToFileIfChanged(const CrString& filename, c
 	}
 }
 
-void CrShaderCompilerUtilities::QuitWithMessage(const CrString& errorMessage)
+void CrShaderCompilerUtilities::QuitWithMessage(const crstl::string& errorMessage)
 {
 	// We need a message pump that flushes every message for the shader compiler, otherwise a crash won't allow us to see them
 	printf("%s", errorMessage.c_str());

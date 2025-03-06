@@ -6,10 +6,11 @@
 #include "Rendering/CrVertexDescriptor.h"
 
 #include "Core/CrHash.h"
-#include "Core/String/CrFixedString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Core/Logging/ICrDebug.h"
+
+#include "crstl/fixed_string.h"
 
 struct CrHardwareGPUBufferDescriptor
 {
@@ -120,7 +121,7 @@ protected:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	CrFixedString128 m_debugName;
+	crstl::fixed_string128 m_debugName;
 
 #endif
 };

@@ -3,8 +3,9 @@
 #include "Rendering/ICrRenderDevice.h"
 
 #include "Core/Containers/CrSet.h"
-#include "Core/String/CrString.h"
 #include "Core/CrCoreForwardDeclarations.h"
+
+#include "crstl/string.h"
 
 class CrTextureVulkan;
 
@@ -115,7 +116,7 @@ private:
 
 	// Vulkan-specific support query functions
 
-	bool IsVkDeviceExtensionSupported(const CrString& extension);
+	bool IsVkDeviceExtensionSupported(const crstl::string& extension);
 
 	// Came from RenderSystem. This is the instance this device was created from
 	VkInstance m_vkInstance;
@@ -127,7 +128,7 @@ private:
 
 	VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
-	CrSet<CrString> m_supportedDeviceExtensions;
+	CrSet<crstl::string> m_supportedDeviceExtensions;
 
 	// TODO Make this platform-independent
 	CrSet<VkFormat> m_supportedRenderTargetFormats;

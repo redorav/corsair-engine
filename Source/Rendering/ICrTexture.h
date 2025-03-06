@@ -10,6 +10,7 @@
 #include "Rendering/CrGPUDeletable.h"
 
 #include "crstl/array.h"
+#include "crstl/fixed_string.h"
 
 struct CrTextureDescriptor
 {
@@ -147,7 +148,7 @@ protected:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	CrFixedString128 m_debugName;
+	crstl::fixed_string128 m_debugName;
 
 #endif
 };

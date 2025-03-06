@@ -32,7 +32,7 @@ struct CrCommandBufferDescriptor
 {
 	CrCommandQueueType::T queueType = CrCommandQueueType::Graphics;
 
-	CrFixedString64 name;
+	crstl::fixed_string64 name;
 
 	// Use this to stream per-frame vertex data (includes index buffer)
 	uint32_t dynamicVertexBufferSizeVertices = 0;

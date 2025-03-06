@@ -4,7 +4,8 @@
 #include "Rendering/CrShaderDiskCache.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/String/CrString.h"
+
+#include "crstl/string.h"
 
 struct CrMaterialDescriptor;
 struct CrMaterialShaderDescriptor;
@@ -12,7 +13,7 @@ struct CrMaterialShaderDescriptor;
 // Used to define variables, options, etc
 struct CrShaderHeaderGenerator
 {
-	static CrString HashDefine;
+	static crstl::string HashDefine;
 
 	// Adds a define, with no value, e.g. #define Example
 	void Define(const char* define);
@@ -23,14 +24,14 @@ struct CrShaderHeaderGenerator
 	// Adds a define with an integer value, e.g. #define Example 2
 	void DefineInt(const char* define, int value);
 
-	const CrString& GetString() const
+	const crstl::string& GetString() const
 	{
 		return m_header;
 	}
 
 private:
 
-	CrString m_header;
+	crstl::string m_header;
 };
 
 // Creates materials out of a material definition. It takes a descriptor
@@ -54,7 +55,7 @@ public:
 
 	// Gets a material shader through the internal cache, or if not available, sends it off for compilation
 	CrShaderBytecodeHandle GetDiskCachedOrCompileShaderBytecode
-	(const CrFixedPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor);
+	(const CrFixedPath& shaderSourcePath, const crstl::string& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor);
 
 private:
 

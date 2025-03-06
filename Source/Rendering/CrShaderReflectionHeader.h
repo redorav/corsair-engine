@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Core/String/CrString.h"
 #include "Core/Containers/CrVector.h"
+
+#include "crstl/string.h"
 
 namespace CrShaderReflectionVersion
 {
@@ -16,7 +17,7 @@ struct CrShaderReflectionResource
 {
 	uint8_t bindPoint;
 	cr3d::ShaderResourceType::T type;
-	CrString name;
+	crstl::string name;
 };
 
 template<typename StreamT>
@@ -32,7 +33,7 @@ struct CrShaderInterfaceVariable
 {
 	uint8_t bindPoint;
 	cr3d::ShaderInterfaceBuiltinType::T type;
-	CrString name;
+	crstl::string name;
 };
 
 template<typename StreamT>
@@ -87,7 +88,7 @@ struct CrShaderReflectionHeader
 
 	CrShaderReflectionVersion::T version = CrShaderReflectionVersion::CurrentVersion;
 
-	CrString entryPoint;
+	crstl::string entryPoint;
 	cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
 	uint64_t bytecodeHash = (uint64_t)-1;
 	

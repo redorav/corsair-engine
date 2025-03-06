@@ -11,7 +11,7 @@
 #include "Core/CrGlobalPaths.h"
 #include "Core/CrPlatform.h"
 
-CrString CrShaderHeaderGenerator::HashDefine = "#define ";
+crstl::string CrShaderHeaderGenerator::HashDefine = "#define ";
 
 CrMaterialCompiler* MaterialCompiler = nullptr;
 
@@ -43,7 +43,7 @@ void CrShaderHeaderGenerator::DefineString(const char* define, const char* strin
 
 void CrShaderHeaderGenerator::DefineInt(const char* define, int value)
 {
-	m_header += HashDefine + define + " " + CrString(value) + "\n";
+	m_header += HashDefine + define + " " + crstl::string(value) + "\n";
 }
 
 void CrMaterialCompiler::Initialize()
@@ -66,12 +66,12 @@ CrMaterialCompiler::CrMaterialCompiler()
 
 void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescriptor& materialShaderDescriptor, CrShaderCompilerDefines& defines)
 {
-	CrString materialShaderVariantDefine = GetMaterialShaderEnum(materialShaderDescriptor.shaderVariant);
+	crstl::string materialShaderVariantDefine = GetMaterialShaderEnum(materialShaderDescriptor.shaderVariant);
 	defines.AddDefine(materialShaderVariantDefine);
 }
 
 CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
-(const CrFixedPath& shaderSourcePath, const CrString& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
+(const CrFixedPath& shaderSourcePath, const crstl::string& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
 {
 	// Try to load bytecode from cache
 	CrShaderBytecodeHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache(shaderHash, materialShaderDescriptor.graphicsApi);
@@ -83,7 +83,7 @@ CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 		CrShaderCompilerDefines defines;
 		CreateMaterialShaderDefines(materialShaderDescriptor, defines);
 
-		CrShaderBytecodeCompilationDescriptor compilationDescriptor(shaderSourcePath, CrFixedString128(entryPoint.c_str()),
+		CrShaderBytecodeCompilationDescriptor compilationDescriptor(shaderSourcePath, crstl::fixed_string128(entryPoint.c_str()),
 		materialShaderDescriptor.shaderStage, materialShaderDescriptor.graphicsApi, materialShaderDescriptor.platform);
 
 		// Compile bytecode
@@ -112,7 +112,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	CrShaderHeaderGenerator shaderHeaderGenerator;
 	shaderHeaderGenerator.Define("TEXTURED");
 
-	CrString patchedShaderSource;
+	crstl::string patchedShaderSource;
 	patchedShaderSource += shaderHeaderGenerator.GetString();
 	patchedShaderSource += ShaderSources->GetUbershaderSource();
 
@@ -138,7 +138,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	baseShaderDescriptor.platform = platform;
 	baseShaderDescriptor.graphicsApi = graphicsApi;
 
-	CrString entryPoints[cr3d::ShaderStage::GraphicsStageCount] = 
+	crstl::string entryPoints[cr3d::ShaderStage::GraphicsStageCount] =
 	{
 		"UbershaderVS",
 		"UbershaderPS",

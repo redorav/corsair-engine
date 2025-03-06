@@ -65,7 +65,7 @@ public:
 		return *this;
 	}
 
-	virtual CrMemoryStream& operator << (CrString& value) override
+	virtual CrMemoryStream& operator << (crstl::string& value) override
 	{
 		uint32_t stringSize;
 

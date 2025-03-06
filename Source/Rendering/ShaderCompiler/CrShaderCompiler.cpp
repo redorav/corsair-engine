@@ -57,13 +57,13 @@ void CompilationDescriptor::Process() const
 	}
 }
 
-CrString CrShaderCompiler::ExecutableDirectory;
+crstl::string CrShaderCompiler::ExecutableDirectory;
 
 CrFixedPath CrShaderCompiler::PDBDirectory;
 
 CrFixedPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
 
-const CrString& CrShaderCompiler::GetExecutableDirectory()
+const crstl::string& CrShaderCompiler::GetExecutableDirectory()
 {
 	return ExecutableDirectory;
 }
@@ -83,7 +83,7 @@ void CrShaderCompiler::Finalize()
 	
 }
 
-bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
+bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus)
 {
 	// Patches the compilation descriptor with information derived from the current state (such as defines that identify
 	// the shader stage, the platform, etc)
@@ -109,7 +109,7 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	return false;
 }
 
-static cr3d::ShaderStage::T ParseShaderStage(const CrString& stageString)
+static cr3d::ShaderStage::T ParseShaderStage(const crstl::string& stageString)
 {
 	if (stageString == "vertex")
 	{
@@ -139,7 +139,7 @@ static cr3d::ShaderStage::T ParseShaderStage(const CrString& stageString)
 	return cr3d::ShaderStage::Count;
 }
 
-static cr::Platform::T ParsePlatform(const CrString& platformString)
+static cr::Platform::T ParsePlatform(const crstl::string& platformString)
 {
 	if (platformString == "windows")
 	{
@@ -151,7 +151,7 @@ static cr::Platform::T ParsePlatform(const CrString& platformString)
 	}
 }
 
-static cr3d::GraphicsApi::T ParseGraphicsApi(const CrString& graphicsApiString)
+static cr3d::GraphicsApi::T ParseGraphicsApi(const crstl::string& graphicsApiString)
 {
 	if (graphicsApiString.comparei("vulkan") == 0)
 	{
@@ -195,23 +195,23 @@ int main(int argc, char* argv[])
 
 	CrFixedPath inputFilePath              = commandLine("-input").c_str();
 	CrFixedPath outputFilePath             = commandLine("-output").c_str();
-	bool buildMetadata                = commandLine["-metadata"];
-	bool buildBuiltinShaders          = commandLine["-builtin"];
-	bool buildBuiltinHeaders          = commandLine["-builtin-headers"];
-	const CrString& entryPoint        = commandLine("-entrypoint");
-	const CrString& shaderStageString = commandLine("-stage");
-	const CrString& platformString    = commandLine("-platform");
+	bool buildMetadata                     = commandLine["-metadata"];
+	bool buildBuiltinShaders               = commandLine["-builtin"];
+	bool buildBuiltinHeaders               = commandLine["-builtin-headers"];
+	const crstl::string& entryPoint        = commandLine("-entrypoint");
+	const crstl::string& shaderStageString = commandLine("-stage");
+	const crstl::string& platformString    = commandLine("-platform");
 
 	CrShaderCompiler::PDBDirectory    = commandLine("-pdb").c_str();
 
-	CrVector<CrString> graphicsApiStrings;
-	commandLine.for_each("-graphicsapi", [&graphicsApiStrings](const CrString& value)
+	CrVector<crstl::string> graphicsApiStrings;
+	commandLine.for_each("-graphicsapi", [&graphicsApiStrings](const crstl::string& value)
 	{
 		graphicsApiStrings.push_back(value);
 	});
 
-	CrVector<CrString> defines;
-	commandLine.for_each("-D",[&defines](const CrString& value)
+	CrVector<crstl::string> defines;
+	commandLine.for_each("-D",[&defines](const crstl::string& value)
 	{
 		defines.push_back(value);
 	});
@@ -222,8 +222,8 @@ int main(int argc, char* argv[])
 		CrShaderCompiler::PDBDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Shader PDBs";
 	}
 
-	CrString inputPath = inputFilePath.c_str();
-	CrString outputPath = outputFilePath.c_str();
+	crstl::string inputPath = inputFilePath.c_str();
+	crstl::string outputPath = outputFilePath.c_str();
 
 	if (inputPath.empty())
 	{
@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
 
 	if (!CrShaderCompiler::PDBDirectory.empty())
 	{
-		for (const CrString& graphicsApiString : graphicsApiStrings)
+		for (const crstl::string& graphicsApiString : graphicsApiStrings)
 		{
 			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
 			CrFixedPath& pdbPath = CrShaderCompiler::PDBDirectories[platform][graphicsApi];
@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
 		// Make sure resources aren't stripped out
 		compilationDescriptor.optimization = OptimizationLevel::None;
 
-		CrString compilationStatus;
+		crstl::string compilationStatus;
 		bool success = CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor, compilationStatus);
 
 		if (!success)
@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
 
 		crstl::create_directories(outputFilePath.c_str());
 
-		for (const CrString& graphicsApiString : graphicsApiStrings)
+		for (const crstl::string& graphicsApiString : graphicsApiStrings)
 		{
 			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
 
@@ -351,7 +351,7 @@ int main(int argc, char* argv[])
 		compilationDescriptor.graphicsApi     = graphicsApi;
 		compilationDescriptor.shaderStage     = shaderStage;
 
-		CrString compilationStatus;
+		crstl::string compilationStatus;
 		bool success = CrShaderCompiler::Compile(compilationDescriptor, compilationStatus);
 
 		if (!success)

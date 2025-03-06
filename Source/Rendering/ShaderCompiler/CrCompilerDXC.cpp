@@ -109,21 +109,21 @@ public:
 
 	HRESULT STDMETHODCALLTYPE LoadSource(LPCWSTR pFilename, IDxcBlob** ppIncludeSource) override
 	{
-		auto includeFileIter = m_includeFiles.find(CrWString(pFilename));
+		auto includeFileIter = m_includeFiles.find(crstl::wstring(pFilename));
 		if (includeFileIter == m_includeFiles.end())
 		{
-			CrString filename;
+			crstl::string filename;
 			filename.append_convert<wchar_t>(pFilename);
 
 			if (crstl::file file = crstl::file(filename.c_str(), crstl::file_flags::read))
 			{
-				CrString includeString;
+				crstl::string includeString;
 				includeString.resize(file.get_size());
 				file.read(includeString.data(), (uint32_t)includeString.size());
 
 				CComPtr<IDxcBlobEncoding> dxcIncludeBlob;
 				m_dxcUtils->CreateBlob(includeString.data(), (uint32_t)includeString.size(), 0, &dxcIncludeBlob);
-				m_includeFiles.insert(CrWString(pFilename), dxcIncludeBlob);
+				m_includeFiles.insert(crstl::wstring(pFilename), dxcIncludeBlob);
 
 				*ppIncludeSource = dxcIncludeBlob;
 				(*ppIncludeSource)->AddRef();
@@ -144,7 +144,7 @@ public:
 
 private:
 
-	CrHashMap<CrWString, CComPtr<IDxcBlobEncoding>> m_includeFiles;
+	CrHashMap<crstl::wstring, CComPtr<IDxcBlobEncoding>> m_includeFiles;
 
 	CComPtr<IDxcUtils> m_dxcUtils;
 
@@ -271,9 +271,9 @@ HRESULT CrDXCCompileShader
 		DxcBuffer sourceCodeBuffer = { sourceCode.data(), (uint32_t)sourceCode.size(), 0 };
 
 		// Add command line parameters. These are the same as the ones DXC uses
-		CrWString wInputPath;
+		crstl::wstring wInputPath;
 		wInputPath.append_convert(compilationDescriptor.inputPath.c_str());
-		CrWString wEntryPoint;
+		crstl::wstring wEntryPoint;
 		wEntryPoint.append_convert(compilationDescriptor.entryPoint.c_str());
 
 		CrVector<const wchar_t*> arguments =
@@ -311,7 +311,7 @@ HRESULT CrDXCCompileShader
 		}
 
 		// Include defines here
-		CrVector<CrWString> wDefines;
+		CrVector<crstl::wstring> wDefines;
 		wDefines.resize(compilationDescriptor.defines.size());
 
 		for (uint32_t i = 0; i < compilationDescriptor.defines.size(); ++i)
@@ -413,7 +413,7 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 	}
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrVector<uint32_t>& bytecode, CrString& compilationStatus)
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrVector<uint32_t>& bytecode, crstl::string& compilationStatus)
 {
 	CComPtr<IDxcUtils> dxcUtils;
 	DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
@@ -457,7 +457,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	}
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus)
 {
 	CrVector<uint32_t> spirvBytecode;
 	if (CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus))
@@ -542,7 +542,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		// association at module load time
 		{
 			CrFixedPath pdbFilePath = CrShaderCompiler::GetPDBDirectory(compilationDescriptor.platform, compilationDescriptor.graphicsApi);
-			pdbFilePath /= CrString(shaderHash.GetHash()).c_str();
+			pdbFilePath /= crstl::string(shaderHash.GetHash()).c_str();
 			pdbFilePath.replace_extension(".pdb");
 
 			if (crstl::file pdbFile = crstl::file(pdbFilePath.c_str(), crstl::file_flags::force_create | crstl::file_flags::write))
@@ -626,7 +626,7 @@ cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE
 	}
 }
 
-bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, CrString& compilationStatus)
+bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus)
 {
 	CComPtr<IDxcUtils> dxcUtils;
 	DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));

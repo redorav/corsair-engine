@@ -852,7 +852,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	return vkResult;
 }
 
-bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const CrString& extension)
+bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const crstl::string& extension)
 {
 	return m_supportedDeviceExtensions.count(extension) > 0;
 }

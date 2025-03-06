@@ -2,8 +2,9 @@
 
 #include "CrFrameTime.h"
 
-#include "Core/String/CrString.h"
 #include "Core/Logging/ICrDebug.h"
+
+#include "crstl/string.h"
 
 uint64_t CrFrameTime::m_frameCount = 0;
 crstl::time CrFrameTime::m_frameDelta;

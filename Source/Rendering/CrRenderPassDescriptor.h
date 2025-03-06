@@ -6,7 +6,7 @@
 
 #include "crstl/fixed_vector.h"
 
-using CrRenderPassNameString = CrFixedString32;
+using CrRenderPassNameString = crstl::fixed_string32;
 
 // For render target descriptors, the usage is implicit to some extent. Color render targets always
 // have a single state (RenderTarget) and depth targets may have a combination of stencil, depth, or both.

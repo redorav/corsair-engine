@@ -184,12 +184,12 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	}
 }
 
-bool CrRenderSystemVulkan::IsVkInstanceExtensionSupported(const CrString& extension)
+bool CrRenderSystemVulkan::IsVkInstanceExtensionSupported(const crstl::string& extension)
 {
 	return m_supportedInstanceExtensions.count(extension) > 0;
 }
 
-bool CrRenderSystemVulkan::IsVkInstanceLayerSupported(const CrString& layer)
+bool CrRenderSystemVulkan::IsVkInstanceLayerSupported(const crstl::string& layer)
 {
 	return m_supportedInstanceLayers.count(layer) > 0;
 }

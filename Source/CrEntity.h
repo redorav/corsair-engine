@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Core/Containers/CrVector.h"
-#include "Core/String/CrString.h"
 #include "Math/CrHlslppVectorFloatType.h"
 #include "Math/CrHlslppQuaternionType.h"
+
+#include "crstl/string.h"
 
 class CrTransform;
 
@@ -21,7 +22,7 @@ public:
 	CrVector<CrEntity*> gameObjects;
 
 	CrEntity();
-	CrEntity(const CrString& name);
+	CrEntity(const crstl::string& name);
 
 	const float3& GetPosition() const { return m_position; }
 
@@ -35,7 +36,7 @@ public:
 
 private:
 
-	CrString m_name;
+	crstl::string m_name;
 
 	CrEntity* m_parent;
 	//CrTransform* m_worldTransform;

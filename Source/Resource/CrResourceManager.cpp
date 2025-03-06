@@ -26,19 +26,19 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 
 	if (file)
 	{
-		CrUniquePtr<ICrModelDecoder> modelDecoder;
+		crstl::unique_ptr<ICrModelDecoder> modelDecoder;
 		CrFixedPath extension = fullPath.extension();
 		if (extension.comparei(".gltf") == 0 || extension.comparei(".glb") == 0)
 		{
-			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderCGLTF());
+			modelDecoder = crstl::unique_ptr<ICrModelDecoder>(new CrModelDecoderCGLTF());
 		}
 		else if (extension.comparei(".fbx") == 0 || extension.comparei(".obj") == 0)
 		{
-			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderUFBX());
+			modelDecoder = crstl::unique_ptr<ICrModelDecoder>(new CrModelDecoderUFBX());
 		}
 		else
 		{
-			modelDecoder = CrUniquePtr<ICrModelDecoder>(new CrModelDecoderASSIMP());
+			modelDecoder = crstl::unique_ptr<ICrModelDecoder>(new CrModelDecoderASSIMP());
 		}
 
 		CrRenderModelHandle model = modelDecoder->Decode(file);
@@ -53,7 +53,7 @@ CrRenderModelHandle CrResourceManager::LoadModel(const CrFixedPath& fullPath)
 
 CrFixedPath CrResourceManager::GetFullResourcePath(const CrFixedPath& relativePath)
 {
-	CrString dataPath = crcore::CommandLine("-root").c_str();
+	crstl::string dataPath = crcore::CommandLine("-root").c_str();
 	return CrFixedPath(dataPath.c_str()) / relativePath;
 }
 
@@ -63,13 +63,13 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrFixedPath& fullPath)
 
 	crstl::file file(fullPath.c_str(), crstl::file_flags::read);
 
-	CrUniquePtr<ICrImageDecoder> imageDecoder;
+	crstl::unique_ptr<ICrImageDecoder> imageDecoder;
 
 	if (file)
 	{
 		if (extension.comparei(".dds") == 0)
 		{
-			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderDDS());
+			imageDecoder = crstl::unique_ptr<ICrImageDecoder>(new CrImageDecoderDDS());
 		}
 		else if
 		(
@@ -83,11 +83,11 @@ CrImageHandle CrResourceManager::LoadImageFromDisk(const CrFixedPath& fullPath)
 			extension.comparei(".nie") == 0
 		)
 		{
-			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderWuffs());
+			imageDecoder = crstl::unique_ptr<ICrImageDecoder>(new CrImageDecoderWuffs());
 		}
 		else
 		{
-			imageDecoder = CrUniquePtr<ICrImageDecoder>(new CrImageDecoderSTB());
+			imageDecoder = crstl::unique_ptr<ICrImageDecoder>(new CrImageDecoderSTB());
 		}
 	}
 
@@ -109,31 +109,31 @@ void CrResourceManager::SaveImageToDisk(const CrImageHandle& image, const CrFixe
 
 	if (fileStream.GetFile())
 	{
-		CrUniquePtr<ICrImageEncoder> imageEncoder;
+		crstl::unique_ptr<ICrImageEncoder> imageEncoder;
 
 		if (extension.comparei(".dds") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderDDS());
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderDDS());
 		}
 		else if(extension.comparei(".png") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::PNG));
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::PNG));
 		}
 		else if (extension.comparei(".jpg") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::JPG));
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::JPG));
 		}
 		else if (extension.comparei(".hdr") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::HDR));
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::HDR));
 		}
 		else if (extension.comparei(".tga") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::TGA));
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::TGA));
 		}
 		else if (extension.comparei(".bmp") == 0)
 		{
-			imageEncoder = CrUniquePtr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::BMP));
+			imageEncoder = crstl::unique_ptr<ICrImageEncoder>(new CrImageEncoderSTB(CrImageContainerFormat::BMP));
 		}
 
 		if (imageEncoder && imageEncoder->IsImageFormatSupported(image->GetFormat()))

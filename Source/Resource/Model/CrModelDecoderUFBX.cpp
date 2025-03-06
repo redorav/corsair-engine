@@ -144,7 +144,7 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 	{
 		const ufbx_prop& ufbxProp = ufbxMaterial->props.props[p];
 
-		CrFixedString128 ufbxPropName(ufbxProp.name.data, ufbxProp.name.length);
+		crstl::fixed_string128 ufbxPropName(ufbxProp.name.data, ufbxProp.name.length);
 
 		// Colors in the FBX format are assumed to come in as sRGB, so we convert to linear directly
 		if (ufbxPropName.compare("DiffuseColor") == 0)
@@ -153,7 +153,7 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 		}
 	}
 
-	CrString materialName(ufbxMaterial->name.data, ufbxMaterial->name.length);
+	crstl::string materialName(ufbxMaterial->name.data, ufbxMaterial->name.length);
 
 	FBXTextureTranslation textureTypes[] =
 	{

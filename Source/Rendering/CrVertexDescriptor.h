@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Core/CrHash.h"
-#include "Core/String/CrString.h"
 
 #include "crstl/array.h"
 #include "crstl/bitset.h"
+#include "crstl/string.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
@@ -33,7 +33,7 @@ namespace CrVertexSemantic
 		Data(CrVertexSemantic::T semantic, const char* name);
 
 		CrVertexSemantic::T semantic;
-		CrString semanticName;
+		crstl::string semanticName;
 		
 		uint32_t index; // Which index this semantic has
 		uint32_t indexOffset; // Where in the string the first digit is

@@ -154,7 +154,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 	D3D12_INPUT_LAYOUT_DESC& inputLayoutDescriptor = d3d12PipelineStateDescriptor.InputLayout;
 
 	crstl::array<D3D12_INPUT_ELEMENT_DESC, cr3d::MaxVertexAttributes> inputElementDescriptors;
-	crstl::array<CrFixedString16, cr3d::MaxVertexAttributes> renamedAttributes;
+	crstl::array<crstl::fixed_string16, cr3d::MaxVertexAttributes> renamedAttributes;
 
 	for (uint32_t i = 0; i < vertexDescriptor.GetAttributeCount(); ++i)
 	{
@@ -172,7 +172,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 		}
 		else
 		{
-			CrFixedString16& semanticNameCopy = renamedAttributes[i];
+			crstl::fixed_string16& semanticNameCopy = renamedAttributes[i];
 			semanticNameCopy = semanticData.semanticName.c_str();
 			semanticNameCopy[semanticData.indexOffset] = 0;
 			inputElementDescriptor.SemanticName = semanticNameCopy.c_str();

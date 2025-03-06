@@ -158,7 +158,7 @@ void CrSwapchainD3D12::CreateSwapchainTextures()
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		CrFixedString128 swapchainName(m_name);
+		crstl::fixed_string128 swapchainName(m_name);
 		swapchainName.append_sprintf(" Texture %i", i);
 		swapchainTextureParams.name = swapchainName.c_str();
 

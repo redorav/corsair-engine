@@ -15,14 +15,14 @@
 
 // TODO Normalize paths properly
 
-CrString CrGlobalPaths::AppDataDirectory;
-CrString CrGlobalPaths::CurrentExecutableDirectory;
-CrString CrGlobalPaths::CurrentWorkingDirectory;
-CrString CrGlobalPaths::DataRootDirectory;
-CrString CrGlobalPaths::ShaderCompilerPath;
-CrString CrGlobalPaths::ShaderSourceDirectory;
-CrString CrGlobalPaths::TempEngineDirectory;
-CrString CrGlobalPaths::TempDirectory;
+crstl::string CrGlobalPaths::AppDataDirectory;
+crstl::string CrGlobalPaths::CurrentExecutableDirectory;
+crstl::string CrGlobalPaths::CurrentWorkingDirectory;
+crstl::string CrGlobalPaths::DataRootDirectory;
+crstl::string CrGlobalPaths::ShaderCompilerPath;
+crstl::string CrGlobalPaths::ShaderSourceDirectory;
+crstl::string CrGlobalPaths::TempEngineDirectory;
+crstl::string CrGlobalPaths::TempDirectory;
 
 // We initialize paths that don't depend on anything in the constructor. The rest of the paths
 // we need to initialize
@@ -32,7 +32,7 @@ CrGlobalPaths::CrGlobalPaths()
 {
 #if defined(_WIN32)
 
-	CrWString wstringTemp;
+	crstl::wstring wstringTemp;
 
 	PWSTR appDataPath;
 
@@ -93,42 +93,42 @@ void CrGlobalPaths::SetupGlobalPaths
 	}
 }
 
-const CrString& CrGlobalPaths::GetTempDirectory()
+const crstl::string& CrGlobalPaths::GetTempDirectory()
 {
 	return TempDirectory;
 }
 
-const CrString& CrGlobalPaths::GetCurrentExecutableDirectory()
+const crstl::string& CrGlobalPaths::GetCurrentExecutableDirectory()
 {
 	return CurrentExecutableDirectory;
 }
 
-const CrString& CrGlobalPaths::GetCurrentWorkingDirectory()
+const crstl::string& CrGlobalPaths::GetCurrentWorkingDirectory()
 {
 	return CurrentWorkingDirectory;
 }
 
-const CrString& CrGlobalPaths::GetAppDataDirectory()
+const crstl::string& CrGlobalPaths::GetAppDataDirectory()
 {
 	return AppDataDirectory;
 }
 
-const CrString& CrGlobalPaths::GetShaderCompilerPath()
+const crstl::string& CrGlobalPaths::GetShaderCompilerPath()
 {
 	return ShaderCompilerPath;
 }
 
-const CrString& CrGlobalPaths::GetShaderSourceDirectory()
+const crstl::string& CrGlobalPaths::GetShaderSourceDirectory()
 {
 	return ShaderSourceDirectory;
 }
 
-const CrString& CrGlobalPaths::GetTempEngineDirectory()
+const crstl::string& CrGlobalPaths::GetTempEngineDirectory()
 {
 	return TempEngineDirectory;
 }
 
-const CrString& CrGlobalPaths::GetDataRootDirectory()
+const crstl::string& CrGlobalPaths::GetDataRootDirectory()
 {
 	return DataRootDirectory;
 }

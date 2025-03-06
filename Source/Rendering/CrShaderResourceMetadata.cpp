@@ -3,7 +3,7 @@
 #include "CrShaderResourceMetadata.h"
 #include "GeneratedShaders/ShaderMetadata.h"
 
-const ConstantBufferMetadata& CrShaderMetadata::GetConstantBuffer(const CrString& name)
+const ConstantBufferMetadata& CrShaderMetadata::GetConstantBuffer(const crstl::string& name)
 {
 	auto cBuffer = ConstantBufferTable.find(name);
 
@@ -20,7 +20,7 @@ const ConstantBufferMetadata& CrShaderMetadata::GetConstantBuffer(ConstantBuffer
 	return ConstantBufferMetaTable[id];
 }
 
-const SamplerMetadata& CrShaderMetadata::GetSampler(const CrString& name)
+const SamplerMetadata& CrShaderMetadata::GetSampler(const crstl::string& name)
 {
 	auto samplerMetadata = SamplerTable.find(name);
 
@@ -37,7 +37,7 @@ const SamplerMetadata& CrShaderMetadata::GetSampler(Samplers::T id)
 	return SamplerMetaTable[id];
 }
 
-const TextureMetadata& CrShaderMetadata::GetTexture(const CrString& name)
+const TextureMetadata& CrShaderMetadata::GetTexture(const crstl::string& name)
 {
 	auto textureMetadata = TextureTable.find(name);
 
@@ -54,7 +54,7 @@ const TextureMetadata& CrShaderMetadata::GetTexture(Textures::T id)
 	return TextureMetaTable[id];
 }
 
-const RWTextureMetadata& CrShaderMetadata::GetRWTexture(const CrString& name)
+const RWTextureMetadata& CrShaderMetadata::GetRWTexture(const crstl::string& name)
 {
 	auto rwTextureMetadata = RWTextureTable.find(name);
 
@@ -71,7 +71,7 @@ const RWTextureMetadata& CrShaderMetadata::GetRWTexture(RWTextures::T id)
 	return RWTextureMetaTable[id];
 }
 
-const StorageBufferMetadata& CrShaderMetadata::GetStorageBuffer(const CrString& name)
+const StorageBufferMetadata& CrShaderMetadata::GetStorageBuffer(const crstl::string& name)
 {
 	auto storageBufferMetadata = StorageBufferTable.find(name);
 
@@ -88,7 +88,7 @@ const StorageBufferMetadata& CrShaderMetadata::GetStorageBuffer(StorageBuffers::
 	return StorageBufferMetaTable[id];
 }
 
-const RWStorageBufferMetadata& CrShaderMetadata::GetRWStorageBuffer(const CrString& name)
+const RWStorageBufferMetadata& CrShaderMetadata::GetRWStorageBuffer(const crstl::string& name)
 {
 	auto rwStorageBufferMetadata = RWStorageBufferTable.find(name);
 
@@ -105,7 +105,7 @@ const RWStorageBufferMetadata& CrShaderMetadata::GetRWStorageBuffer(RWStorageBuf
 	return RWStorageBufferMetaTable[id];
 }
 
-const RWTypedBufferMetadata& CrShaderMetadata::GetRWTypedBuffer(const CrString& name)
+const RWTypedBufferMetadata& CrShaderMetadata::GetRWTypedBuffer(const crstl::string& name)
 {
 	auto rwTypedBufferMetadata = RWTypedBufferTable.find(name);
 

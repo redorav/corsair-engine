@@ -78,7 +78,7 @@ public:
 		return *this;
 	}
 
-	virtual CrFileStream& operator << (CrString& value) override
+	virtual CrFileStream& operator << (crstl::string& value) override
 	{
 		if (IsReading())
 		{

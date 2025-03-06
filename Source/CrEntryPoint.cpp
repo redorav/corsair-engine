@@ -26,9 +26,9 @@ int main(int argc, char* argv[])
 {
 	crcore::CommandLine = CrCommandLineParser(argc, argv);
 
-	const CrString& dataPath             = crcore::CommandLine("-root");
-	const CrString& graphicsApiString    = crcore::CommandLine("-graphicsApi");
-	const CrString& graphicsVendorString = crcore::CommandLine("-graphicsVendor");
+	const crstl::string& dataPath             = crcore::CommandLine("-root");
+	const crstl::string& graphicsApiString    = crcore::CommandLine("-graphicsApi");
+	const crstl::string& graphicsVendorString = crcore::CommandLine("-graphicsVendor");
 	bool enableGraphicsValidation        = crcore::CommandLine["-debugGraphics"];
 	bool enableRenderDoc                 = crcore::CommandLine["-renderdoc"];
 	bool enablePIX                       = crcore::CommandLine["-pix"];
@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
 		GetDebug()->WaitForDebugger();
 	}
 
-	CrString resolution = crcore::CommandLine("-resolution").c_str();
+	crstl::string resolution = crcore::CommandLine("-resolution").c_str();
 	if (!resolution.empty())
 	{
 		size_t pos = resolution.find('x');
-		if(pos != CrString::npos)
+		if(pos != crstl::string::npos)
 		{
 			screenWidth = atoi(resolution.substr(0, pos).c_str());
 			screenHeight = atoi(resolution.substr(pos + 1).c_str());

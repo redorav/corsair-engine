@@ -366,7 +366,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
-		CrFixedString128 swapchainTextureName(m_name);
+		crstl::fixed_string128 swapchainTextureName(m_name);
 		swapchainTextureName.append_sprintf(" Texture %i", i);
 		swapchainTextureParams.name = swapchainTextureName.c_str();
 		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture

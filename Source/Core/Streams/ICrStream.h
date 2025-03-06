@@ -48,7 +48,7 @@ public:
 	virtual ICrStream& operator << (float& value) = 0;
 	virtual ICrStream& operator << (double& value) = 0;
 
-	virtual ICrStream& operator << (CrString& value) = 0;
+	virtual ICrStream& operator << (crstl::string& value) = 0;
 
 	virtual ICrStream& operator << (CrStreamDataBlob& dataBlob) = 0;
 

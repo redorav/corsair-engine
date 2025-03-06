@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/String/CrString.h"
+#include "crstl/string.h"
 
 class CrGlobalPaths
 {
@@ -14,47 +14,47 @@ public:
 		const char* dataRootDirectory
 	);
 	
-	static const CrString& GetAppDataDirectory();
+	static const crstl::string& GetAppDataDirectory();
 	
-	static const CrString& GetCurrentExecutableDirectory();
+	static const crstl::string& GetCurrentExecutableDirectory();
 
-	static const CrString& GetCurrentWorkingDirectory();
+	static const crstl::string& GetCurrentWorkingDirectory();
 
-	static const CrString& GetDataRootDirectory();
+	static const crstl::string& GetDataRootDirectory();
 
-	static const CrString& GetShaderCompilerPath();
+	static const crstl::string& GetShaderCompilerPath();
 
-	static const CrString& GetShaderSourceDirectory();
+	static const crstl::string& GetShaderSourceDirectory();
 
-	static const CrString& GetTempEngineDirectory();
+	static const crstl::string& GetTempEngineDirectory();
 
-	static const CrString& GetTempDirectory();
+	static const crstl::string& GetTempDirectory();
 	
 private:
 	
 	// App Data directory. Use for savegames, preferences, etc
-	static CrString AppDataDirectory;
+	static crstl::string AppDataDirectory;
 
 	// Directory where executable is running
-	static CrString CurrentExecutableDirectory;
+	static crstl::string CurrentExecutableDirectory;
 	
 	// Current working directory (not necessarily the same as the executable)
-	static CrString CurrentWorkingDirectory;
+	static crstl::string CurrentWorkingDirectory;
 
 	// Path to root of data
-	static CrString DataRootDirectory;
+	static crstl::string DataRootDirectory;
 
 	// Path to shader compiler
-	static CrString ShaderCompilerPath;
+	static crstl::string ShaderCompilerPath;
 
 	// Directory where shader source lives
-	static CrString ShaderSourceDirectory;
+	static crstl::string ShaderSourceDirectory;
 
 	// Temporary directory for engine (i.e. subfolder called Corsair Engine)
 	// The data here needs to be deletable, i.e. if the OS or someone nukes
 	// the folder the engine must be able to ignore or recreate it
-	static CrString TempEngineDirectory;
+	static crstl::string TempEngineDirectory;
 
 	// Generic temporary directory
-	static CrString TempDirectory;
+	static crstl::string TempDirectory;
 };

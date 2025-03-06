@@ -3,10 +3,11 @@
 #include "ICrGPUSynchronization.h"
 
 #include "Core/Containers/CrVector.h"
-#include "Core/String/CrFixedString.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/ICrTexture.h"
+
+#include "crstl/fixed_string.h"
 
 class CrOSWindow;
 
@@ -64,11 +65,11 @@ protected:
 
 	CrVector<CrTextureHandle> m_textures;
 
-	CrFixedString32      m_name;
+	crstl::fixed_string32 m_name;
 
-	uint32_t             m_imageCount;
+	uint32_t m_imageCount;
 
-	cr3d::DataFormat::T  m_format;
+	cr3d::DataFormat::T m_format;
 
 	uint32_t m_width;
 

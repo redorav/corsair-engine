@@ -5,11 +5,11 @@
 
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/Containers/CrFixedHashMap.h"
-#include "Core/String/CrFixedString.h"
 #include "Core/CrHash.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 
+#include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
 
 // Objectives
@@ -48,7 +48,7 @@ struct CrRenderGraphPass2;
 
 using CrRenderGraphSetupFunction = CrFixedFunction<32, void(CrRenderGraph& renderGraph)>;
 using CrRenderGraphExecutionFunction = CrFixedFunction<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
-using CrRenderGraphString = CrFixedString32;
+using CrRenderGraphString = crstl::fixed_string32;
 
 namespace CrRenderGraphPassType
 {

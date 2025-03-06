@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/String/CrFixedString.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "CrGPUDeletable.h"
+
+#include "crstl/fixed_string.h"
 
 struct CrSamplerDescriptor
 {
@@ -26,7 +27,7 @@ struct CrSamplerDescriptor
 	float minLod;
 	float maxLod;
 
-	CrFixedString128 name;
+	crstl::fixed_string128 name;
 };
 
 class ICrSampler : public CrGPUAutoDeletable

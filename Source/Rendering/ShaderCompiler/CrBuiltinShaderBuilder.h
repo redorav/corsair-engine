@@ -26,12 +26,12 @@ struct CompilationDescriptor;
 
 struct CrShaderInfo
 {
-	CrString name;
+	crstl::string name;
 };
 
 struct CrShaderCompilationJob
 {
-	CrString name;
+	crstl::string name;
 	CompilationDescriptor compilationDescriptor;
 };
 

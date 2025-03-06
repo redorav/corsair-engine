@@ -136,7 +136,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 	
 	CrFixedPath outputPath = CrFixedPath(CrGlobalPaths::GetTempEngineDirectory()) / "Bultin Shaders Runtime";
 	
-	CrFixedString2048 commandLine;
+	crstl::fixed_string2048 commandLine;
 	
 	commandLine += " -builtin";
 	
@@ -238,7 +238,7 @@ void CrBuiltinPipelines::RecompileComputePipelines()
 		}
 		else
 		{
-			CrString processOutput;
+			crstl::string processOutput;
 			processOutput.resize_uninitialized(2048);
 			//process.ReadStdOut(processOutput.data(), processOutput.size());
 			process.read_stdout(processOutput.data(), processOutput.size());

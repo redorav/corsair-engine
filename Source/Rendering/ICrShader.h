@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/String/CrFixedString.h"
 #include "Core/FileSystem/CrFixedPath.h"
 
 #include "Core/CrHash.h"
@@ -12,6 +11,7 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
 #include "crstl/unique_ptr.h"
 
@@ -272,7 +272,7 @@ public:
 		return m_bytecode;
 	}
 
-	const CrString& GetEntryPoint() const
+	const crstl::string& GetEntryPoint() const
 	{
 		return m_reflection.entryPoint;
 	}
@@ -319,7 +319,7 @@ StreamT& operator << (StreamT& stream, CrShaderBytecode& bytecode)
 	return stream;
 }
 
-typedef CrFixedString64 CrShaderDebugString;
+typedef crstl::fixed_string64 CrShaderDebugString;
 
 struct CrGraphicsShaderDescriptor
 {
@@ -419,11 +419,11 @@ private:
 struct CrShaderBytecodeCompilationDescriptor
 {
 	CrShaderBytecodeCompilationDescriptor
-	(const CrFixedPath& path, const CrFixedString128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
+	(const CrFixedPath& path, const crstl::fixed_string128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
 		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
 	const CrFixedPath               path;
-	const CrFixedString128          entryPoint;
+	const crstl::fixed_string128    entryPoint;
 	const cr3d::ShaderStage::T      stage;
 	const cr3d::GraphicsApi::T      graphicsApi;
 	const cr::Platform::T           platform;
@@ -432,12 +432,12 @@ struct CrShaderBytecodeCompilationDescriptor
 // Add defines to a shader compilation
 struct CrShaderCompilerDefines
 {
-	void AddDefine(const CrString& define)
+	void AddDefine(const crstl::string& define)
 	{
 		defines.push_back(define);
 	}
 
-	const CrVector<CrString>& GetDefines() const
+	const CrVector<crstl::string>& GetDefines() const
 	{
 		return defines;
 	}
@@ -446,7 +446,7 @@ struct CrShaderCompilerDefines
 
 private:
 
-	CrVector<CrString> defines;
+	CrVector<crstl::string> defines;
 };
 
 struct CrShaderCompilationDescriptor
@@ -456,7 +456,7 @@ struct CrShaderCompilationDescriptor
 		m_stageBytecodeDescriptors.push_back(bytecodeDescriptor);
 	}
 
-	void AddDefine(const CrString& define)
+	void AddDefine(const crstl::string& define)
 	{
 		m_defines.AddDefine(define);
 	}

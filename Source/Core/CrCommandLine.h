@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core/Containers/CrHashMap.h"
-#include "Core/String/CrString.h"
+
+#include "crstl/string.h"
 
 class CrCommandLineParser
 {
@@ -12,7 +13,7 @@ public:
 	CrCommandLineParser(int argc, char* argv[]);
 
 	// Get first value using key
-	const CrString& operator()(const CrString& key)
+	const crstl::string& operator()(const crstl::string& key)
 	{
 		auto it = commandLineArgs.find(key);
 		if (it != commandLineArgs.end())
@@ -26,24 +27,24 @@ public:
 	}
 
 	// Get whether key is present
-	bool operator[](const CrString& key)
+	bool operator[](const crstl::string& key)
 	{
 		return commandLineArgs.find(key) != commandLineArgs.end();
 	}
 
 	// Iterate through the different values of options
 	template<typename FunctionT>
-	void for_each(const CrString& key, const FunctionT& function)
+	void for_each(const crstl::string& key, const FunctionT& function)
 	{
 		commandLineArgs.for_each(key, function);
 	}
 
 private:
 
-	CrString invalid;
+	crstl::string invalid;
 
 	// It is unordered with respect to keys, but ordered values for each key
-	CrHashMultiMap<CrString, CrString> commandLineArgs;
+	CrHashMultiMap<crstl::string, crstl::string> commandLineArgs;
 };
 
 namespace crcore

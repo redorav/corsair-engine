@@ -185,7 +185,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 		const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 		// Add entry point names
-		CrFixedString128 entryPoints("(");
+		crstl::fixed_string128 entryPoints("(");
 		entryPoints.append(bytecodes[0]->GetEntryPoint().c_str());
 
 		if (bytecodes.size() > 1)
@@ -230,7 +230,7 @@ CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeSh
 
 #if defined(RENDER_DEVICE_LOGS)
 
-		CrFixedString128 entryPoint("(");
+		crstl::fixed_string128 entryPoint("(");
 		entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
 		entryPoint.append(")");
 
@@ -370,7 +370,7 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 {
 	if (m_isValidPipelineCache)
 	{
-		CrString pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
+		crstl::string pipelineCachePath = m_pipelineCacheDirectory + m_pipelineCacheFilename;
 
 		if (crstl::create_directories(m_pipelineCacheDirectory.c_str()))
 		{

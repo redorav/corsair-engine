@@ -28,7 +28,7 @@ struct CrOSWindowDescriptor
 	uint32_t width;
 	uint32_t height;
 	CrOSWindow* parentWindow;
-	CrFixedString128 name;
+	crstl::fixed_string128 name;
 	cr3d::DataFormat::T swapchainFormat;
 	uint32_t decoration : 1;
 	uint32_t topMost : 1;

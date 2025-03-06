@@ -1232,7 +1232,7 @@ void CrFrame::RecreateRenderTargets()
 		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(descriptor);
 	}
 
-	m_timingQueryTracker = CrUniquePtr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
+	m_timingQueryTracker = crstl::unique_ptr<CrGPUTimingQueryTracker>(new CrGPUTimingQueryTracker());
 	m_timingQueryTracker->Initialize(renderDevice.get(), m_swapchain->GetImageCount());
 
 	// Make sure all of this work is finished

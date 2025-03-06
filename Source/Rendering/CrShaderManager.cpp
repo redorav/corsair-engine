@@ -61,7 +61,7 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
 {
 	CrFixedPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "Compiled Shaders/";
-	CrString folderName = CrString(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
+	crstl::string folderName = crstl::string(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
 	shaderCachePath /= folderName.c_str();
 	return shaderCachePath;
 }
@@ -94,7 +94,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 
 	crstl::create_directories(ShaderCacheDirectory.c_str());
 
-	CrFixedString512 commandLine;
+	crstl::fixed_string512 commandLine;
 
 	commandLine += " -input \"";
 	commandLine += bytecodeDescriptor.path.c_str();
@@ -121,7 +121,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	filename += bytecodeDescriptor.entryPoint.c_str();
 	filename += GetShaderBytecodeExtension(bytecodeDescriptor.graphicsApi);
 
-	CrFixedString512 outputPath(ShaderCacheDirectory.c_str());
+	crstl::fixed_string512 outputPath(ShaderCacheDirectory.c_str());
 	outputPath += filename.c_str();
 
 	commandLine += "-output \"";
@@ -171,7 +171,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 		}
 		else
 		{
-			CrString processOutput;
+			crstl::string processOutput;
 			processOutput.resize_uninitialized(2048);
 			process.read_stdout(processOutput.data(), processOutput.size());
 			CrAssertMsg(false, "%s", processOutput.data());

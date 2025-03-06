@@ -38,29 +38,6 @@ CrGlobalPaths::CrGlobalPaths()
 
 	WCHAR tempPath[MaxPathSize];
 
-	DWORD cwdLength = GetCurrentDirectory(MaxPathSize, tempPath);
-
-	if (cwdLength > 0)
-	{
-		wstringTemp = tempPath;
-		CurrentWorkingDirectory.assign_convert(wstringTemp);
-		CurrentWorkingDirectory += "/";
-	}
-
-	// https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppatha
-	// https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getlongpathnamea
-	DWORD shortTempPathLength = GetTempPath(MaxPathSize, tempPath);
-	if (shortTempPathLength > 0)
-	{
-		// From the docs: "You can use the same buffer you used for the lpszShortPath parameter"
-		DWORD longTempPathLength = GetLongPathName(tempPath, tempPath, MaxPathSize);
-		if (longTempPathLength > 0)
-		{
-			wstringTemp = tempPath;
-			TempDirectory.assign_convert(wstringTemp);
-		}
-	}
-
 	PWSTR appDataPath;
 
 	// https://stackoverflow.com/questions/5920853/how-to-open-a-folder-in-appdata-with-c
@@ -79,6 +56,10 @@ CrGlobalPaths::CrGlobalPaths()
 	CoTaskMemFree(appDataPath);
 
 #endif
+
+	CurrentWorkingDirectory = crstl::current_directory_path().c_str();
+
+	TempDirectory = crstl::temp_directory_path().c_str();
 
 	TempEngineDirectory = TempDirectory + "Corsair Engine/";
 }

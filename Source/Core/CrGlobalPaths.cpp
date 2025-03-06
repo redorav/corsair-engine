@@ -32,11 +32,7 @@ CrGlobalPaths::CrGlobalPaths()
 {
 #if defined(_WIN32)
 
-	const uint32_t MaxPathSize = MAX_PATH + 1;
-
 	CrWString wstringTemp;
-
-	WCHAR tempPath[MaxPathSize];
 
 	PWSTR appDataPath;
 

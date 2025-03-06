@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/Containers/CrBitSet.h"
 #include "Core/CrHash.h"
 #include "Core/String/CrString.h"
 
 #include "crstl/array.h"
+#include "crstl/bitset.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
@@ -206,10 +206,10 @@ private:
 	crstl::array<CrVertexAttribute, cr3d::MaxVertexAttributes> m_attributes;
 
 	// Indicates which streams are being used
-	CrBitset<cr3d::MaxVertexStreams, uint16_t> m_streamMask;
+	crstl::bitset<cr3d::MaxVertexStreams, uint16_t> m_streamMask;
 	
 	// Indicate which input rates are used (0 - vertex, 1 - instance)
-	CrBitset<cr3d::MaxVertexStreams, uint16_t> m_inputRates;
+	crstl::bitset<cr3d::MaxVertexStreams, uint16_t> m_inputRates;
 
 	// Total number of attributes
 	uint16_t m_attributeCount = 0;

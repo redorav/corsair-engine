@@ -16,9 +16,6 @@ namespace eastl
 
 // Containers
 
-template<size_t N, typename WordType = size_t>
-using CrBitset = crstl::bitset<N, WordType>;
-
 template<typename T>
 using CrDeque = crstl::deque<T, crstl::allocator, 16>;
 

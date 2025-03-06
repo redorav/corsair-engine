@@ -2,9 +2,8 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Core/Containers/CrBitSet.h"
-
 #include "crstl/array.h"
+#include "crstl/bitset.h"
 
 namespace KeyboardKey
 {
@@ -116,13 +115,13 @@ namespace crinput
 struct MouseState
 {
 	// Whether mouse button was clicked (held and lifted)
-	CrBitset<MouseButton::Count, uint8_t> buttonClicked;
+	crstl::bitset<MouseButton::Count, uint8_t> buttonClicked;
 
 	// Whether mouse button was pressed this tick (started to hold)
-	CrBitset<MouseButton::Count, uint8_t> buttonPressed;
+	crstl::bitset<MouseButton::Count, uint8_t> buttonPressed;
 
 	// Whether mouse button is held down
-	CrBitset<MouseButton::Count, uint8_t> buttonHeld;
+	crstl::bitset<MouseButton::Count, uint8_t> buttonHeld;
 
 	// Absolute position of mouse, in screen pixels
 	crinput::int2 position;
@@ -136,20 +135,20 @@ struct MouseState
 struct KeyboardState
 {
 	// Whether key was 'clicked' (held and raised)
-	CrBitset<KeyboardKey::Count> keyClicked;
+	crstl::bitset<KeyboardKey::Count> keyClicked;
 
 	// Whether key was pressed this tick (started to hold)
-	CrBitset<KeyboardKey::Count> keyPressed;
+	crstl::bitset<KeyboardKey::Count> keyPressed;
 
 	// Whether key is held down
-	CrBitset<KeyboardKey::Count> keyHeld;
+	crstl::bitset<KeyboardKey::Count> keyHeld;
 };
 
 struct GamepadState
 {
 	bool connected = false;
 
-	CrBitset<GamepadButton::Count, uint8_t> buttonPressed;
+	crstl::bitset<GamepadButton::Count, uint8_t> buttonPressed;
 
 	crstl::array<float, GamepadAxis::Count> axes;
 };

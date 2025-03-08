@@ -2,9 +2,8 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "Core/Function/CrFixedFunction.h"
-
 #include "crstl/deque.h"
+#include "crstl/fixed_function.h"
 #include "crstl/fixed_vector.h"
 
 struct CrGPUDownloadCallback

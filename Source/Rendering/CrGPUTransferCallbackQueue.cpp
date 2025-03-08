@@ -1,15 +1,11 @@
 #include "Rendering/CrRendering_pch.h"
 
 #include "Rendering/ICrRenderDevice.h"
-
 #include "Rendering/ICrGPUSynchronization.h"
-
 #include "Rendering/CrGPUBuffer.h"
-
 #include "Rendering/CrGPUTransferCallbackQueue.h"
 
 #include "Core/Logging/ICrDebug.h"
-
 #include "Core/CrFrameTime.h"
 
 CrGPUDownloadCallback::~CrGPUDownloadCallback() {}

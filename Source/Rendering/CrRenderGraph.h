@@ -3,12 +3,12 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
 
-#include "Core/Function/CrFixedFunction.h"
 #include "Core/Containers/CrFixedHashMap.h"
 #include "Core/CrHash.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 
+#include "crstl/fixed_function.h"
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
 
@@ -46,8 +46,8 @@
 class CrRenderGraph;
 struct CrRenderGraphPass2;
 
-using CrRenderGraphSetupFunction = CrFixedFunction<32, void(CrRenderGraph& renderGraph)>;
-using CrRenderGraphExecutionFunction = CrFixedFunction<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
+using CrRenderGraphSetupFunction = crstl::fixed_function<32, void(CrRenderGraph& renderGraph)>;
+using CrRenderGraphExecutionFunction = crstl::fixed_function<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
 using CrRenderGraphString = crstl::fixed_string32;
 
 namespace CrRenderGraphPassType

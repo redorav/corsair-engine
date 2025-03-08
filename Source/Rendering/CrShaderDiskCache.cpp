@@ -7,7 +7,6 @@
 
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
-#include "Core/Function/CrFixedFunction.h"
 
 CrShaderDiskCache::CrShaderDiskCache(const CrFixedPath& cachePath, const char* hashFilename, CrHash currentHash)
 	: m_cachePath(cachePath)

@@ -5,7 +5,6 @@
 #include "CrShaderCompilerUtilities.h"
 
 #include "Core/Containers/CrHashMap.h"
-#include "Core/Function/CrFixedFunction.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "crstl/filesystem.h"

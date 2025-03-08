@@ -42,8 +42,6 @@
 #include "Math/CrMath.h"
 #include "Math/CrHalf.h"
 
-#include <Math/CrHlslppDataPacking.h>
-
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"
 

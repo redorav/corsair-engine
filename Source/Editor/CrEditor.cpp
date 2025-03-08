@@ -22,7 +22,7 @@
 
 CrEditor* Editor;
 
-void CrEditor::Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow)
+void CrEditor::Initialize(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 {
 	CrAssert(Editor == nullptr);
 	Editor = new CrEditor(mainWindow);
@@ -35,7 +35,7 @@ void CrEditor::Deinitialize()
 	Editor = nullptr;
 }
 
-CrEditor::CrEditor(const CrIntrusivePtr<CrOSWindow>& mainWindow)
+CrEditor::CrEditor(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 {
 	CrImGuiViewports::Initialize(mainWindow);
 

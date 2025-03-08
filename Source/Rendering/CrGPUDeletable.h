@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
+#include "crstl/intrusive_ptr.h"
 
 class ICrRenderDevice;
 
@@ -17,7 +17,7 @@ public:
 	ICrRenderDevice* m_renderDevice = nullptr;
 };
 
-class CrGPUAutoDeletable : public CrIntrusivePtrInterfaceBase, public CrGPUDeletable
+class CrGPUAutoDeletable : public crstl::intrusive_ptr_interface_delete, public CrGPUDeletable
 {
 public:
 

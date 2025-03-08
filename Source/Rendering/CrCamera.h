@@ -4,10 +4,10 @@
 
 #include "Math/CrHlslppMatrixFloatType.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
+#include "crstl/intrusive_ptr.h"
 
 // TODO Remove the CrEntity hierarchy. This is the engine object
-class CrCamera final : public CrEntity, public CrIntrusivePtrInterface
+class CrCamera final : public CrEntity, public crstl::intrusive_ptr_interface_delete
 {
 public:
 

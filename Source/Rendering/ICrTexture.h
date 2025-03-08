@@ -2,7 +2,6 @@
 
 #include "stdint.h"
 
-#include "Core/String/CrFixedString.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Rendering/CrRendering.h"

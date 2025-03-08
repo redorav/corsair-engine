@@ -2,7 +2,6 @@
 
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/ICrPipeline.h"
 #include "Rendering/ICrTexture.h"
@@ -10,6 +9,7 @@
 
 #include "Math/CrHlslppVectorFloatType.h"
 
+#include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
 
 namespace CrMaterialBlendMode
@@ -136,7 +136,7 @@ struct CrMaterialShaderDescriptor
 
 static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescriptor size mismatch");
 
-class CrMaterial final : public CrIntrusivePtrInterface
+class CrMaterial final : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

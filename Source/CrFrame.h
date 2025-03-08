@@ -22,7 +22,7 @@ public:
 
 	~CrFrame();
 
-	void Initialize(CrIntrusivePtr<CrOSWindow> mainWindow);
+	void Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow);
 
 	void Deinitialize();
 
@@ -93,7 +93,7 @@ private:
 
 	CrGPUBufferHandle m_indirectDispatchArguments;
 
-	CrIntrusivePtr<CrOSWindow> m_mainWindow;
+	crstl::intrusive_ptr<CrOSWindow> m_mainWindow;
 
 	// We use these two variables to trigger render target resizing after a window resize
 	uint32_t m_currentWindowWidth;
@@ -111,7 +111,7 @@ private:
 	crstl::unique_ptr<CrGPUTimingQueryTracker> m_timingQueryTracker;
 
 	// This would need to be buffered to account for multiple threads
-	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;
+	crstl::intrusive_ptr<CrCPUStackAllocator> m_renderingStream;
 
 #if !defined(CR_CONFIG_FINAL)
 	GBufferDebugMode::T m_gbufferDebugMode = (GBufferDebugMode::T)0;

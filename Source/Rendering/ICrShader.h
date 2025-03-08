@@ -13,6 +13,7 @@
 
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
+#include "crstl/intrusive_ptr.h"
 #include "crstl/unique_ptr.h"
 
 using bindpoint_t = uint8_t;
@@ -261,7 +262,7 @@ struct CrInputSignature
 };
 
 // Bytecode represents a shader code, e.g. vertex, pixel, etc
-class CrShaderBytecode : public CrIntrusivePtrInterface
+class CrShaderBytecode : public crstl::intrusive_ptr_interface_delete
 {
 public:
 
@@ -328,7 +329,7 @@ struct CrGraphicsShaderDescriptor
 	crstl::vector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
-class ICrShader : public CrIntrusivePtrInterface
+class ICrShader : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrBuiltinPipeline.h"
 #include "Rendering/ICrTexture.h"
+
+#include "crstl/intrusive_ptr.h"
 
 struct ImDrawData;
 
@@ -24,7 +24,7 @@ public:
 
 	static void Deinitialize();
 
-	void NewFrame(const CrIntrusivePtr<CrOSWindow>& mainWindow);
+	void NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindow);
 
 	void AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
 

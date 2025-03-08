@@ -194,7 +194,7 @@ static bool ImGuiViewportsGetWindowMinimized(ImGuiViewport* viewport)
 	return viewportData->osWindow->GetIsMinimized();
 }
 
-void CrImGuiViewports::Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow)
+void CrImGuiViewports::Initialize(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 {
 	unused_parameter(mainWindow);
 	CrAssertMsg(ImGui::GetCurrentContext() != nullptr, "Imgui must have been created");

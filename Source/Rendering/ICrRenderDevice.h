@@ -6,9 +6,9 @@
 
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "crstl/fixed_string.h"
+#include "crstl/intrusive_ptr.h"
 #include "crstl/string.h"
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
@@ -102,7 +102,7 @@ struct CrRenderDeviceDescriptor
 	bool enableNVAPI = true;
 };
 
-class ICrRenderDevice : public CrIntrusivePtrInterfaceBase
+class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
 {
 public:
 

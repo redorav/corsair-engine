@@ -31,11 +31,6 @@ using CrHashSet = crstl::open_hashset<Key, crstl::hash<Key>, crstl::allocator>;
 template<typename Key>
 using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
-// Smart Pointers
-
-template<typename T>
-using CrIntrusivePtr = crstl::intrusive_ptr<T>;
-
 // Functional
 template<int SIZE_IN_BYTES, typename R>
 using CrFixedFunction = crstl::fixed_function<SIZE_IN_BYTES, R>;

@@ -6,10 +6,10 @@
 #include "Rendering/CrGPUDeletable.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/CrHash.h"
 
 #include "crstl/array.h"
+#include "crstl/intrusive_ptr.h"
 
 struct CrRasterizerStateDescriptor
 {

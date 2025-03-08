@@ -7,8 +7,7 @@
 #include "Rendering/FrameCapture/CrRenderDoc.h"
 #include "Rendering/FrameCapture/CrPIX.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
-
+#include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
 
 struct CrRenderSystemDescriptor 

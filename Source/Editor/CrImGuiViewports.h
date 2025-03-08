@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
+#include "crstl/intrusive_ptr.h"
 
 class CrOSWindow;
 
@@ -21,5 +21,5 @@ class CrImGuiViewports
 {
 public:
 
-	static void Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow);
+	static void Initialize(const crstl::intrusive_ptr<CrOSWindow>& mainWindow);
 };

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
+#include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
 
 namespace CrImageContainerFormat
@@ -37,7 +36,7 @@ struct CrImageDescriptor
 	cr3d::TextureType type;
 };
 
-class CrImage final : public CrIntrusivePtrInterface
+class CrImage final : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

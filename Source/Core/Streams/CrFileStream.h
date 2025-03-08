@@ -3,7 +3,6 @@
 #include "ICrStream.h"
 
 #include "Core/Logging/ICrDebug.h"
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "crstl/filesystem.h"
 

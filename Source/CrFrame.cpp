@@ -185,7 +185,7 @@ struct CrRenderPacketBatcher
 	crstl::array<float4x4*, sizeof_array(Instance::local2World)> m_matrices;
 };
 
-void CrFrame::Initialize(CrIntrusivePtr<CrOSWindow> mainWindow)
+void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 {
 	HashingAssert();
 
@@ -204,7 +204,7 @@ void CrFrame::Initialize(CrIntrusivePtr<CrOSWindow> mainWindow)
 	}
 
 	// Create the rendering scratch. Start with 10MB
-	m_renderingStream = CrIntrusivePtr<CrCPUStackAllocator>(new CrCPUStackAllocator());
+	m_renderingStream = crstl::intrusive_ptr<CrCPUStackAllocator>(new CrCPUStackAllocator());
 	m_renderingStream->Initialize(10 * 1024 * 1024);
 
 	m_camera = CrCameraHandle(new CrCamera());

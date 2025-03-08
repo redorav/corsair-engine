@@ -137,7 +137,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 	io.DisplaySize = ImVec2(1920.0f, 1080.0f);
 }
 
-void CrImGuiRenderer::NewFrame(const CrIntrusivePtr<CrOSWindow>& mainWindow)
+void CrImGuiRenderer::NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 {
 	ImGuiIO& io = ImGui::GetIO();
 

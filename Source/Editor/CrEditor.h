@@ -9,9 +9,9 @@
 #include "Math/CrHlslppVectorIntType.h"
 
 #include "Core/Input/CrInputManager.h"
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrHashMap.h"
 
+#include "crstl/intrusive_ptr.h"
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
 
@@ -86,7 +86,7 @@ class CrEditor
 {
 public:
 
-	static void Initialize(const CrIntrusivePtr<CrOSWindow>& mainWindow);
+	static void Initialize(const crstl::intrusive_ptr<CrOSWindow>& mainWindow);
 
 	static void Deinitialize();
 
@@ -98,7 +98,7 @@ public:
 
 private:
 
-	CrEditor(const CrIntrusivePtr<CrOSWindow>& mainWindow);
+	CrEditor(const crstl::intrusive_ptr<CrOSWindow>& mainWindow);
 
 	void SpawnManipulator(const float4x4& initialTransform);
 

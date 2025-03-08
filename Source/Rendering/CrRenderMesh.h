@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
-
 #include "Rendering/CrVisibility.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrVertexDescriptor.h"
 
+#include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
 
-class CrRenderMesh final : public CrIntrusivePtrInterface
+class CrRenderMesh final : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	osWindowDescriptor.width = screenWidth;
 	osWindowDescriptor.height = screenHeight;
 	osWindowDescriptor.name = "Main Window";
-	CrIntrusivePtr<CrOSWindow> mainWindow = CrIntrusivePtr<CrOSWindow>(new CrOSWindow(osWindowDescriptor));
+	crstl::intrusive_ptr<CrOSWindow> mainWindow = crstl::intrusive_ptr<CrOSWindow>(new CrOSWindow(osWindowDescriptor));
 
 	CrFrame frame;
 	frame.Initialize(mainWindow);

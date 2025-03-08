@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Core/CrAlignment.h"
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/CrStackAllocator.h"
 
+#include "crstl/intrusive_ptr.h"
+
 // Manages transient memory allocated per frame for CPU resources
-class CrCPUStackAllocator final : public CrStackAllocator, public CrIntrusivePtrInterface
+class CrCPUStackAllocator final : public CrStackAllocator, public crstl::intrusive_ptr_interface_delete
 {
 public:
 

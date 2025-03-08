@@ -4,9 +4,9 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrDataFormats.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
-
 #include "Math/CrMath.h"
+
+#include "crstl/intrusive_ptr.h"
 
 struct CrOSWindowDescriptor
 {
@@ -52,7 +52,7 @@ namespace CursorType
 	};
 }
 
-class CrOSWindow : public CrIntrusivePtrInterface
+class CrOSWindow : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

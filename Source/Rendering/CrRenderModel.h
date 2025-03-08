@@ -5,11 +5,11 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderMesh.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrHashMap.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_vector.h"
+#include "crstl/intrusive_ptr.h"
 #include "crstl/pair.h"
 #include "crstl/vector.h"
 
@@ -38,7 +38,7 @@ private:
 	crstl::fixed_vector<CrMaterialHandle, 256> m_materials;
 };
 
-class CrRenderModel final : public CrIntrusivePtrInterface
+class CrRenderModel final : public crstl::intrusive_ptr_interface_delete
 {
 public:
 

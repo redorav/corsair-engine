@@ -347,7 +347,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 	}
 }
 
-void CrRenderWorld::BeginRendering(const CrIntrusivePtr<CrCPUStackAllocator>& renderingStream)
+void CrRenderWorld::BeginRendering(const crstl::intrusive_ptr<CrCPUStackAllocator>& renderingStream)
 {
 	m_renderingStream = renderingStream;
 }

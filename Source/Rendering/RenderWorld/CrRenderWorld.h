@@ -3,7 +3,6 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/Containers/CrHashMap.h"
 
-#include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Logging/ICrDebug.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
@@ -11,6 +10,8 @@
 #include "Rendering/RenderWorld/CrRenderModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
+
+#include "crstl/intrusive_ptr.h"
 
 class CrModelInstanceIndexDummy;
 using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
@@ -107,7 +108,7 @@ struct CrEditorProperties
 // The render world also computes visibility and creates rendering packets that encapsulate
 // everything that is needed to render an object. After visibility, there is a list of
 // visible packets with their state all ready to be translated into drawcalls.
-class CrRenderWorld final : public CrIntrusivePtrInterface
+class CrRenderWorld final : public crstl::intrusive_ptr_interface_delete
 {
 public:
 
@@ -171,7 +172,7 @@ public:
 		}
 	}
 
-	void BeginRendering(const CrIntrusivePtr<CrCPUStackAllocator>& renderingStream);
+	void BeginRendering(const crstl::intrusive_ptr<CrCPUStackAllocator>& renderingStream);
 
 	void EndRendering();
 
@@ -208,7 +209,7 @@ private:
 
 	// TODO light ids
 
-	CrIntrusivePtr<CrCPUStackAllocator> m_renderingStream;
+	crstl::intrusive_ptr<CrCPUStackAllocator> m_renderingStream;
 
 	// Camera data. We aren't doing data driven design for cameras as there won't be many
 	// and it's easier to manage this way

@@ -4,7 +4,6 @@
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/Logging/ICrDebug.h"
-#include "Core/String/CrStringUtilities.h"
 
 #include "crstl/filesystem.h"
 #include "crstl/vector.h"
@@ -63,8 +62,14 @@ CrShaderSources::CrShaderSources()
 				// add anything meaningful to the final binary, such as whitespace, 
 				// tabs, lines, and comments
 
+				// Reserve an initial number of lines
 				crstl::vector<crstl::string> lines;
-				CrStringUtilities::SplitLines(lines, shaderSource);
+				lines.reserve(200);
+
+				shaderSource.split('\n', [&lines](const crstl::string_view& view)
+				{
+					lines.push_back(crstl::string(view));
+				});
 
 				// TODO Add a competent preprocessor here, instead of manually parsing
 				crstl::vector<crstl::string> preprocessedLines;

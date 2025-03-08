@@ -28,9 +28,6 @@ using CrHashMultiMap = crstl::open_multi_hashmap<Key, Value, crstl::hash<Key>, c
 template<typename Key>
 using CrHashSet = crstl::open_hashset<Key, crstl::hash<Key>, crstl::allocator>;
 
-template<typename Key>
-using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
-
 class CrHash;
 
 using CrFixedPath = crstl::fixed_path512;

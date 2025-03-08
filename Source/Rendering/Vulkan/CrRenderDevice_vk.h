@@ -2,7 +2,6 @@
 
 #include "Rendering/ICrRenderDevice.h"
 
-#include "Core/Containers/CrSet.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "crstl/string.h"
@@ -128,13 +127,13 @@ private:
 
 	VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
-	CrSet<crstl::string> m_supportedDeviceExtensions;
+	crstl::open_hashset<crstl::string> m_supportedDeviceExtensions;
 
 	// TODO Make this platform-independent
-	CrSet<VkFormat> m_supportedRenderTargetFormats;
-	CrSet<VkFormat> m_supportedTextureFormats;
-	CrSet<VkFormat> m_supportedDepthStencilFormats;
-	CrSet<VkFormat> m_supportedVertexBufferFormats;
+	crstl::vector<VkFormat> m_supportedRenderTargetFormats;
+	crstl::vector<VkFormat> m_supportedTextureFormats;
+	crstl::vector<VkFormat> m_supportedDepthStencilFormats;
+	crstl::vector<VkFormat> m_supportedVertexBufferFormats;
 
 	// Stores all available memory (type) properties for the physical device
 

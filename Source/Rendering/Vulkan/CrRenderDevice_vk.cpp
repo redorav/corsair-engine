@@ -647,22 +647,22 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		// Format must support depth stencil attachment for optimal tiling
 		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
 		{
-			m_supportedDepthStencilFormats.insert(format);
+			m_supportedDepthStencilFormats.push_back(format);
 		}
 
 		if (formatProperties.bufferFeatures & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)
 		{
-			m_supportedVertexBufferFormats.insert(format);
+			m_supportedVertexBufferFormats.push_back(format);
 		}
 
 		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
 		{
-			m_supportedTextureFormats.insert(format);
+			m_supportedTextureFormats.push_back(format);
 		}
 
 		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT)
 		{
-			m_supportedRenderTargetFormats.insert(format);
+			m_supportedRenderTargetFormats.push_back(format);
 		}
 	}
 
@@ -854,7 +854,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 
 bool CrRenderDeviceVulkan::IsVkDeviceExtensionSupported(const crstl::string& extension)
 {
-	return m_supportedDeviceExtensions.count(extension) > 0;
+	return m_supportedDeviceExtensions.find(extension) != m_supportedDeviceExtensions.end();
 }
 
 uint32_t CrRenderDeviceVulkan::GetVkMemoryType(uint32_t typeBits, VkFlags properties) const

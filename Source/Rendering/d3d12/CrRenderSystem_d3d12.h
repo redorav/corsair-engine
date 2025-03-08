@@ -2,8 +2,6 @@
 
 #include "Rendering/ICrRenderSystem.h"
 
-#include "Core/Containers/CrSet.h"
-
 class CrRenderSystemD3D12 final : public ICrRenderSystem
 {
 public:

@@ -4,16 +4,6 @@
 
 #include "crstl/forward_declarations.h"
 
-// EASTL
-
-namespace eastl
-{
-	class allocator;
-
-	template <typename T> struct less;
-	template <typename Key, typename Compare, typename Allocator> class set;
-};
-
 // Containers
 
 template<typename Key, typename Value>

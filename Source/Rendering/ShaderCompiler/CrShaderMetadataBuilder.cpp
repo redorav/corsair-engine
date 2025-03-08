@@ -60,7 +60,7 @@ static const crstl::string RWTypedBufferSection =
 
 bool CrShaderMetadataBuilder::BuildMetadata(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus)
 {
-	CrVector<uint32_t> spirvBytecode;
+	crstl::vector<uint32_t> spirvBytecode;
 	bool compiled = CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus);
 
 	if (!compiled)
@@ -152,26 +152,26 @@ struct HLSLResources
 		}
 	}
 
-	CrVector<SpvReflectDescriptorBinding> constantBuffers;
-	CrVector<SpvReflectDescriptorBinding> samplers;
-	CrVector<SpvReflectDescriptorBinding> textures;
-	CrVector<SpvReflectDescriptorBinding> rwTextures;
-	CrVector<SpvReflectDescriptorBinding> storageBuffers;
-	CrVector<SpvReflectDescriptorBinding> rwStorageBuffers;
-	CrVector<SpvReflectDescriptorBinding> typedBuffers;
-	CrVector<SpvReflectDescriptorBinding> rwTypedBuffers;
+	crstl::vector<SpvReflectDescriptorBinding> constantBuffers;
+	crstl::vector<SpvReflectDescriptorBinding> samplers;
+	crstl::vector<SpvReflectDescriptorBinding> textures;
+	crstl::vector<SpvReflectDescriptorBinding> rwTextures;
+	crstl::vector<SpvReflectDescriptorBinding> storageBuffers;
+	crstl::vector<SpvReflectDescriptorBinding> rwStorageBuffers;
+	crstl::vector<SpvReflectDescriptorBinding> typedBuffers;
+	crstl::vector<SpvReflectDescriptorBinding> rwTypedBuffers;
 
-	//std::vector<SpvReflectDescriptorBinding> stageInputs;
-	//std::vector<SpvReflectDescriptorBinding> stageOutputs;
-	//std::vector<SpvReflectDescriptorBinding> subpassInputs;
-	//std::vector<SpvReflectDescriptorBinding> atomicCounters;
-	//std::vector<SpvReflectDescriptorBinding> accelerationStructures;
-	//std::vector<SpvReflectDescriptorBinding> pushConstantBuffers;
+	//std::crstl::vector<SpvReflectDescriptorBinding> stageInputs;
+	//std::crstl::vector<SpvReflectDescriptorBinding> stageOutputs;
+	//std::crstl::vector<SpvReflectDescriptorBinding> subpassInputs;
+	//std::crstl::vector<SpvReflectDescriptorBinding> atomicCounters;
+	//std::crstl::vector<SpvReflectDescriptorBinding> accelerationStructures;
+	//std::crstl::vector<SpvReflectDescriptorBinding> pushConstantBuffers;
 };
 
 bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 (
-	const CrVector<uint32_t>& spirvBytecode,
+	const crstl::vector<uint32_t>& spirvBytecode,
 	crstl::string& metadataHeader, crstl::string& metadataCpp,
 	crstl::string& compilationStatus
 )
@@ -201,7 +201,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 	// structure of the code which can change
 	metadataHeader += "#include \"crstl/array.h\"\n";
 	metadataHeader += "#include \"Core/Containers/CrHashMap.h\"\n";
-	metadataHeader += "#include \"Core/Containers/CrVector.h\"\n";
+	metadataHeader += "#include \"crstl/vector.h\"\n";
 	metadataHeader += "#include \"crstl/string.h\"\n";
 	metadataHeader += "#include \"Rendering/CrRenderingVector.h\"\n";
 	metadataHeader += "\n";

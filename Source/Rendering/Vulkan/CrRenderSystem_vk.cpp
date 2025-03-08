@@ -65,7 +65,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	{
 		uint32_t numInstanceExtensions;
 		vkEnumerateInstanceExtensionProperties(nullptr, &numInstanceExtensions, nullptr);
-		CrVector<VkExtensionProperties> instanceExtensions(numInstanceExtensions);
+		crstl::vector<VkExtensionProperties> instanceExtensions(numInstanceExtensions);
 		vkEnumerateInstanceExtensionProperties(nullptr, &numInstanceExtensions, instanceExtensions.data());
 
 		for (const VkExtensionProperties& extension : instanceExtensions)
@@ -78,7 +78,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	{
 		uint32_t numInstanceLayers;
 		vkEnumerateInstanceLayerProperties(&numInstanceLayers, nullptr);
-		CrVector<VkLayerProperties> instanceLayers(numInstanceLayers);
+		crstl::vector<VkLayerProperties> instanceLayers(numInstanceLayers);
 		vkEnumerateInstanceLayerProperties(&numInstanceLayers, instanceLayers.data());
 
 		for (const VkLayerProperties& layer : instanceLayers)
@@ -87,7 +87,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 		}
 	}
 
-	CrVector<const char*> enabledExtensions;
+	crstl::vector<const char*> enabledExtensions;
 	if (IsVkInstanceExtensionSupported(VK_KHR_SURFACE_EXTENSION_NAME))
 	{
 		enabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);

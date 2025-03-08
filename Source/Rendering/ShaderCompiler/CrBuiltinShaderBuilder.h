@@ -13,7 +13,7 @@ struct CrBuiltinShadersDescriptor
 
 	// We can build builtin shaders for multiple APIs for certain platforms such as Windows
 	// which builds Vulkan and D3D12
-	CrVector<cr3d::GraphicsApi::T> graphicsApis;
+	crstl::vector<cr3d::GraphicsApi::T> graphicsApis;
 
 	cr::Platform::T platform;
 
@@ -46,7 +46,7 @@ private:
 	static void BuildBuiltinShaderMetadataAndHeaderFiles
 	(
 		const CrBuiltinShadersDescriptor& builtinShadersDescriptor, 
-		const CrVector<CrShaderInfo>& shaderInfos,
-		const CrVector<CrVector<CrShaderCompilationJob>>& compilationJobs
+		const crstl::vector<CrShaderInfo>& shaderInfos,
+		const crstl::vector<crstl::vector<CrShaderCompilationJob>>& compilationJobs
 	);
 };

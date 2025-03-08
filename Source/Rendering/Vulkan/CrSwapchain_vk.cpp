@@ -70,7 +70,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	// We make an assumption here that Graphics queues can always present. The reason is that
 	// in Vulkan it's awkward to query whether a queue can present without creating a surface first.
 	// https://vulkan.gpuinfo.org/ seems to validate this assumption, but the validation layers will complain if we don't call this.
-	CrVector<VkBool32> supportsPresent(queueFamilyCount);
+	crstl::vector<VkBool32> supportsPresent(queueFamilyCount);
 	for (uint32_t i = 0; i < queueFamilyCount; i++)
 	{
 		vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, m_vkSurface, supportsPresent.data());
@@ -82,7 +82,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
 		CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface formats");
 
-		CrVector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
+		crstl::vector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
 		vkResult = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, m_vkSurface, &formatCount, surfaceFormats.data());
 		CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface formats");
 
@@ -116,7 +116,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	vkResult = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, nullptr);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve present modes count");
 
-	CrVector<VkPresentModeKHR> presentModes(presentModeCount);
+	crstl::vector<VkPresentModeKHR> presentModes(presentModeCount);
 	vkResult = vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, m_vkSurface, &presentModeCount, presentModes.data());
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve surface present modes");
 
@@ -354,7 +354,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 
 	vkWaitForFences(vkDevice, 1, &m_swapchainRecreationFence, VK_TRUE, UINT64_MAX);
 
-	m_textures = CrVector<CrTextureHandle>(m_imageCount);
+	m_textures = crstl::vector<CrTextureHandle>(m_imageCount);
 
 	CrTextureDescriptor swapchainTextureParams;
 	swapchainTextureParams.width = m_width;

@@ -34,9 +34,6 @@ using CrPair = crstl::pair<T, S>;
 template<typename Key>
 using CrSet = eastl::set<Key, eastl::less<Key>, eastl::allocator>;
 
-template<typename T>
-using CrVector = crstl::vector<T, crstl::allocator>;
-
 // Smart Pointers
 
 template<typename T>

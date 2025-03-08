@@ -26,7 +26,7 @@ private:
 
 	HANDLE m_fenceEvent;
 
-	CrVector<UINT64> m_fenceValues;
+	crstl::vector<UINT64> m_fenceValues;
 
 	DXGI_SWAP_CHAIN_FLAG m_d3d12SwapchainFlags;
 

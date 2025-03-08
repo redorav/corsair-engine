@@ -3,6 +3,7 @@
 #include "CrOSWindow.h"
 
 #include "Core/Logging/ICrDebug.h"
+#include "Core/CrMacros.h"
 
 #include "Rendering/CrRendererConfig.h"
 

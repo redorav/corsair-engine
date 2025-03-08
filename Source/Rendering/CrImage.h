@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Core/Containers/CrVector.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
+
+#include "crstl/vector.h"
 
 namespace CrImageContainerFormat
 {
@@ -69,7 +70,7 @@ public: // TODO remove
 	uint32_t m_depth;
 	uint32_t m_mipmapCount;
 
-	CrVector<uint8_t> m_data;
+	crstl::vector<uint8_t> m_data;
 	cr3d::DataFormat::T m_format;
 	cr3d::TextureType m_type;
 };

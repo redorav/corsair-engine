@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Containers/CrVector.h"
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
@@ -10,6 +9,8 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
+
+#include "crstl/vector.h"
 
 namespace CrMaterialBlendMode
 {
@@ -155,7 +156,7 @@ public:
 		Textures::T semantic;
 	};
 
-	CrVector<TextureBinding> m_textures;
+	crstl::vector<TextureBinding> m_textures;
 
 	CrGraphicsShaderHandle m_shaders[CrMaterialShaderVariant::Count];
 

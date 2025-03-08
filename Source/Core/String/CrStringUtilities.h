@@ -5,5 +5,5 @@
 struct CrStringUtilities
 {
 	// Split input string into lines
-	static void SplitLines(CrVector<crstl::string>& lines, const crstl::string& input);
+	static void SplitLines(crstl::vector<crstl::string>& lines, const crstl::string& input);
 };

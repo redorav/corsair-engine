@@ -25,7 +25,7 @@ cr3d::DataFormat::T WuffFormatToDataFormat(uint32_t wuffsFormat)
 CrImageHandle CrImageDecoderWuffs::Decode(crstl::file& file) const
 {
 	// Read file into memory
-	CrVector<unsigned char> fileData;
+	crstl::vector<unsigned char> fileData;
 	fileData.resize_uninitialized(file.get_size());
 	file.read(fileData.data(), fileData.size());
 
@@ -39,7 +39,7 @@ CrImageHandle CrImageDecoderWuffs::Decode(void* data, uint64_t dataSize) const
 	wuffs_base__io_buffer wpngIOBuffer = wuffs_base__ptr_u8__reader((uint8_t*)data, dataSize, true);
 
 	// Reserve memory for the decoder when we figure out which fourcc we have
-	CrVector<uint8_t> wuffsDecoderMemory;
+	crstl::vector<uint8_t> wuffsDecoderMemory;
 	int wuffsFourcc = wuffs_base__magic_number_guess_fourcc(wpngIOBuffer.reader_slice(), wpngIOBuffer.meta.closed); (void)wuffsFourcc;
 
 	wuffs_base__image_decoder* wuffsImageDecoder = nullptr;
@@ -144,7 +144,7 @@ CrImageHandle CrImageDecoderWuffs::Decode(void* data, uint64_t dataSize) const
 	wuffs_base__decode_frame_options wpngFrameOptions {};
 
 	// Create temporary buffer depending on what the decoder needs
-	CrVector<uint8_t> workBuffer; workBuffer.resize_uninitialized(wuffsImageDecoder->workbuf_len().max_incl);
+	crstl::vector<uint8_t> workBuffer; workBuffer.resize_uninitialized(wuffsImageDecoder->workbuf_len().max_incl);
 	wuffs_base__slice_u8 wpngWorkBuffer { (uint8_t*)workBuffer.data(), wuffsImageDecoder->workbuf_len().max_incl};
 
 	// Decode a frame. TODO Support multiple frames for gif

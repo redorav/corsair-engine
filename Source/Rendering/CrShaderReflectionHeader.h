@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Core/Containers/CrVector.h"
-
 #include "crstl/string.h"
+#include "crstl/vector.h"
 
 namespace CrShaderReflectionVersion
 {
@@ -92,16 +91,16 @@ struct CrShaderReflectionHeader
 	cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
 	uint64_t bytecodeHash = (uint64_t)-1;
 	
-	CrVector<CrShaderReflectionResource> constantBuffers;
-	CrVector<CrShaderReflectionResource> samplers;
-	CrVector<CrShaderReflectionResource> textures;
-	CrVector<CrShaderReflectionResource> rwTextures;
-	CrVector<CrShaderReflectionResource> storageBuffers;
-	CrVector<CrShaderReflectionResource> rwStorageBuffers;
-	CrVector<CrShaderReflectionResource> rwTypedBuffers;
+	crstl::vector<CrShaderReflectionResource> constantBuffers;
+	crstl::vector<CrShaderReflectionResource> samplers;
+	crstl::vector<CrShaderReflectionResource> textures;
+	crstl::vector<CrShaderReflectionResource> rwTextures;
+	crstl::vector<CrShaderReflectionResource> storageBuffers;
+	crstl::vector<CrShaderReflectionResource> rwStorageBuffers;
+	crstl::vector<CrShaderReflectionResource> rwTypedBuffers;
 
-	CrVector<CrShaderInterfaceVariable> stageInputs;
-	CrVector<CrShaderInterfaceVariable> stageOutputs;
+	crstl::vector<CrShaderInterfaceVariable> stageInputs;
+	crstl::vector<CrShaderInterfaceVariable> stageOutputs;
 
 	uint32_t threadGroupSizeX = 0;
 	uint32_t threadGroupSizeY = 0;

@@ -13,7 +13,7 @@ public:
 
 	~CrGraphicsShaderVulkan();
 
-	const CrVector<VkShaderModule>& GetVkShaderModules() const { return m_vkShaderModules; }
+	const crstl::vector<VkShaderModule>& GetVkShaderModules() const { return m_vkShaderModules; }
 
 	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 
@@ -21,7 +21,7 @@ private:
 
 	VkDevice m_vkDevice;
 
-	CrVector<VkShaderModule> m_vkShaderModules;
+	crstl::vector<VkShaderModule> m_vkShaderModules;
 
 	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
 	// The layout is also needed when allocating descriptor sets from a pool.

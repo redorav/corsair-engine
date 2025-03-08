@@ -6,12 +6,12 @@
 #include "Rendering/CrRenderMesh.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Containers/CrPair.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_vector.h"
+#include "crstl/vector.h"
 
 struct CrRenderModelDescriptor
 {
@@ -85,11 +85,11 @@ private:
 	// be. A merging of a material + a render mesh produces a pipeline state. The pipeline
 	// state knows everything about where it's going to be rendered (it needs to)
 
-	CrVector<CrRenderMeshHandle> m_renderMeshes;
+	crstl::vector<CrRenderMeshHandle> m_renderMeshes;
 
-	CrVector<uint8_t> m_renderMeshMaterialIndex;
+	crstl::vector<uint8_t> m_renderMeshMaterialIndex;
 
-	CrVector<CrMaterialHandle> m_materials;
+	crstl::vector<CrMaterialHandle> m_materials;
 
-	CrVector<crstl::array<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
+	crstl::vector<crstl::array<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
 };

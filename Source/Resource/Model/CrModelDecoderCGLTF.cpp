@@ -39,7 +39,7 @@ cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 }
 
 template<typename T>
-void LoadAttribute(CrVector<T>& targetBuffer, const unsigned char* sourceBuffer, size_t numComponents, int32_t componentSize, size_t componentStride)
+void LoadAttribute(crstl::vector<T>& targetBuffer, const unsigned char* sourceBuffer, size_t numComponents, int32_t componentSize, size_t componentStride)
 {
 	if (componentStride == 0)
 	{
@@ -94,10 +94,10 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 			float x, y;
 		};
 
-		CrVector<GLTFFloat3> positions;
-		CrVector<GLTFFloat3> normals;
-		CrVector<GLTFFloat3> colors;
-		CrVector<GLTFFloat2> texCoords;
+		crstl::vector<GLTFFloat3> positions;
+		crstl::vector<GLTFFloat3> normals;
+		crstl::vector<GLTFFloat3> colors;
+		crstl::vector<GLTFFloat2> texCoords;
 
 		for (uint32_t i = 0; i < gltfPrimitive.attributes_count; ++i)
 		{

@@ -204,13 +204,13 @@ int main(int argc, char* argv[])
 
 	CrShaderCompiler::PDBDirectory    = commandLine("-pdb").c_str();
 
-	CrVector<crstl::string> graphicsApiStrings;
+	crstl::vector<crstl::string> graphicsApiStrings;
 	commandLine.for_each("-graphicsapi", [&graphicsApiStrings](const crstl::string& value)
 	{
 		graphicsApiStrings.push_back(value);
 	});
 
-	CrVector<crstl::string> defines;
+	crstl::vector<crstl::string> defines;
 	commandLine.for_each("-D",[&defines](const crstl::string& value)
 	{
 		defines.push_back(value);

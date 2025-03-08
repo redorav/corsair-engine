@@ -8,7 +8,8 @@
 #include "Rendering/FrameCapture/CrPIX.h"
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
-#include "Core/Containers/CrVector.h"
+
+#include "crstl/vector.h"
 
 struct CrRenderSystemDescriptor 
 {
@@ -48,7 +49,7 @@ public:
 
 protected:
 
-	CrVector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
+	crstl::vector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
 
 	CrRenderDeviceHandle m_mainDevice;
 

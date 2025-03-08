@@ -128,7 +128,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+	const crstl::vector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 	d3d12PipelineStateDescriptor.VS = {};
 	d3d12PipelineStateDescriptor.PS = {};

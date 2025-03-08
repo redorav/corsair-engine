@@ -82,7 +82,7 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(ICrRenderSystem* renderSystem, const 
 	CrAssert(vkResult == VK_SUCCESS);
 
 	// Load serialized pipeline cache from disk. This pipeline cache is invalid if the uuid doesn't match
-	CrVector<char> pipelineCacheData;
+	crstl::vector<char> pipelineCacheData;
 	LoadPipelineCache(pipelineCacheData);
 
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
@@ -133,7 +133,7 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 	size_t pipelineCacheSize = 0;
 	vkGetPipelineCacheData(m_vkDevice, m_vkPipelineCache, &pipelineCacheSize, nullptr);
 
-	CrVector<char> pipelineCacheData(pipelineCacheSize);
+	crstl::vector<char> pipelineCacheData(pipelineCacheSize);
 	vkGetPipelineCacheData(m_vkDevice, m_vkPipelineCache, &pipelineCacheSize, pipelineCacheData.data());
 
 	StorePipelineCache(pipelineCacheData.data(), pipelineCacheSize);
@@ -445,7 +445,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, nullptr);
 	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
-	CrVector<VkPhysicalDevice> physicalDevices(gpuCount);
+	crstl::vector<VkPhysicalDevice> physicalDevices(gpuCount);
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, physicalDevices.data());
 	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
@@ -518,7 +518,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, nullptr);
-		CrVector<VkExtensionProperties> extensions(extensionCount);
+		crstl::vector<VkExtensionProperties> extensions(extensionCount);
 		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, extensions.data());
 
 		for (const VkExtensionProperties& extension : extensions)
@@ -751,10 +751,10 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 	uint32_t queueFamilyCount;
 	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
 
-	CrVector<VkQueueFamilyProperties> vkQueueProperties(queueFamilyCount);
+	crstl::vector<VkQueueFamilyProperties> vkQueueProperties(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, vkQueueProperties.data());
 
-	CrVector<QueueProperties> queueProperties(queueFamilyCount);
+	crstl::vector<QueueProperties> queueProperties(queueFamilyCount);
 
 	for (uint32_t i = 0; i < queueFamilyCount; ++i)
 	{
@@ -786,7 +786,7 @@ void CrRenderDeviceVulkan::RetrieveQueueFamilies()
 
 VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 {
-	CrVector<const char*> enabledDeviceExtensions;
+	crstl::vector<const char*> enabledDeviceExtensions;
 
 	if (IsVkDeviceExtensionSupported(VK_KHR_SWAPCHAIN_EXTENSION_NAME))
 	{
@@ -812,7 +812,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 
 	// We allocate queues up front, which are later retrieved. We don't really allocate command queues
 	// on demand, we have them cached within the device at creation time
-	CrVector<float> queuePriorities(m_maxCommandQueues);
+	crstl::vector<float> queuePriorities(m_maxCommandQueues);
 	VkDeviceQueueCreateInfo queueCreateInfo = {};
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	queueCreateInfo.queueFamilyIndex = m_commandQueueFamilyIndex;

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
-#include "Core/Containers/CrVector.h"
 
 #include "Rendering/CrVisibility.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrVertexDescriptor.h"
+
+#include "crstl/vector.h"
 
 class CrRenderMesh final : public CrIntrusivePtrInterface
 {
@@ -39,7 +40,7 @@ private:
 
 	bool m_isDoubleSided = false;
 
-	CrVector<CrVertexBufferHandle> m_vertexBuffers;
+	crstl::vector<CrVertexBufferHandle> m_vertexBuffers;
 
 	CrVertexDescriptor m_vertexDescriptor;
 

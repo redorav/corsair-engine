@@ -12,7 +12,7 @@ class CrGPUDeletable;
 struct CrDeletionList
 {
 	CrGPUFenceHandle fence;
-	CrVector<CrGPUDeletable*> deletables;
+	crstl::vector<CrGPUDeletable*> deletables;
 };
 
 // A queue that manages deletion of GPU objects. Anything added to this queue

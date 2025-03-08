@@ -77,7 +77,7 @@ public:
 // downside is having to expose the Read/Write family of functions
 
 template<typename StreamT, typename T>
-StreamT& operator << (StreamT& stream, CrVector<T>& value)
+StreamT& operator << (StreamT& stream, crstl::vector<T>& value)
 {
 	uint32_t size = (uint32_t)value.size();
 	stream << size;

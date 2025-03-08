@@ -1,7 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
 #include "CrShaderSources.h"
 
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/Function/CrFixedFunction.h"
 #include "Core/CrGlobalPaths.h"
@@ -9,6 +8,7 @@
 #include "Core/String/CrStringUtilities.h"
 
 #include "crstl/filesystem.h"
+#include "crstl/vector.h"
 
 CrShaderSources* ShaderSources;
 
@@ -64,11 +64,11 @@ CrShaderSources::CrShaderSources()
 				// add anything meaningful to the final binary, such as whitespace, 
 				// tabs, lines, and comments
 
-				CrVector<crstl::string> lines;
+				crstl::vector<crstl::string> lines;
 				CrStringUtilities::SplitLines(lines, shaderSource);
 
 				// TODO Add a competent preprocessor here, instead of manually parsing
-				CrVector<crstl::string> preprocessedLines;
+				crstl::vector<crstl::string> preprocessedLines;
 				for (crstl::string& line : lines)
 				{
 					if (!line.empty())

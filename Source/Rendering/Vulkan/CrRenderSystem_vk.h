@@ -2,10 +2,10 @@
 
 #include "Rendering/ICrRenderSystem.h"
 
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 
 #include "crstl/string.h"
+#include "crstl/vector.h"
 
 class CrRenderSystemVulkan final : public ICrRenderSystem
 {
@@ -32,5 +32,5 @@ private:
 
 	CrHashSet<crstl::string> m_supportedInstanceLayers;
 
-	CrVector<const char*> m_instanceLayers;
+	crstl::vector<const char*> m_instanceLayers;
 };

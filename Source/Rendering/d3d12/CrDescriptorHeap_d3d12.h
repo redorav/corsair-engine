@@ -57,7 +57,7 @@ private:
 
 	CrDescriptorHeapD3D12 m_descriptorHeap;
 
-	CrVector<crd3d::DescriptorD3D12> m_availableDescriptors;
+	crstl::vector<crd3d::DescriptorD3D12> m_availableDescriptors;
 };
 
 // Stream of descriptors that one never returns descriptors to. This is meant to be used throughout the frame, and it's where

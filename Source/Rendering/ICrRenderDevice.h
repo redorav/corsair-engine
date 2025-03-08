@@ -4,7 +4,6 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
@@ -12,6 +11,7 @@
 #include "crstl/fixed_string.h"
 #include "crstl/string.h"
 #include "crstl/unique_ptr.h"
+#include "crstl/vector.h"
 
 struct CrDriverVersion
 {
@@ -271,7 +271,7 @@ protected:
 
 	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 
-	void LoadPipelineCache(CrVector<char>& pipelineCacheData);
+	void LoadPipelineCache(crstl::vector<char>& pipelineCacheData);
 
 	crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
@@ -307,7 +307,7 @@ private:
 	// they queue work onto the auxiliary command buffer (via the getter)
 	CrCommandBufferHandle m_auxiliaryCommandBuffer;
 
-	CrVector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
+	crstl::vector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
 
 	uint32_t m_auxiliaryCommandBufferIndex = 0;
 

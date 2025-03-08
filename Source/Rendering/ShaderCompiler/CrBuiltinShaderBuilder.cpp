@@ -16,10 +16,10 @@
 
 void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescriptor& builtinShadersDescriptor)
 {
-	CrVector<CrVector<CrShaderCompilationJob>> compilationJobs;
+	crstl::vector<crstl::vector<CrShaderCompilationJob>> compilationJobs;
 	compilationJobs.resize(builtinShadersDescriptor.graphicsApis.size());
 
-	CrVector<CrShaderInfo> shaderInfos;
+	crstl::vector<CrShaderInfo> shaderInfos;
 
 	// Find every .shaders file in the specified directory
 	crstl::for_each_directory_entry(builtinShadersDescriptor.inputPath.c_str(), true, [&compilationJobs, &builtinShadersDescriptor, &shaderInfos](const crstl::directory_entry& entry)
@@ -212,8 +212,8 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 (
 	const CrBuiltinShadersDescriptor& builtinShadersDescriptor, 
-	const CrVector<CrShaderInfo>& shaderInfos,
-	const CrVector<CrVector<CrShaderCompilationJob>>& compilationJobs
+	const crstl::vector<CrShaderInfo>& shaderInfos,
+	const crstl::vector<crstl::vector<CrShaderCompilationJob>>& compilationJobs
 )
 {
 	crstl::string builtinShadersGenericHeader;
@@ -262,7 +262,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	{
 		const char* graphicsApiString = cr3d::GraphicsApi::ToString(graphicsApi);
 
-		const CrVector<CrShaderCompilationJob>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
+		const crstl::vector<CrShaderCompilationJob>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
 
 		builtinShadersGenericHeaderGetFunction += "\tif(graphicsApi == cr3d::GraphicsApi::";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
@@ -290,7 +290,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			{
 				uint64_t codeSize = file.get_size();
 
-				CrVector<uint8_t> shaderBinaryData;
+				crstl::vector<uint8_t> shaderBinaryData;
 				shaderBinaryData.resize(codeSize);
 				file.read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
 

@@ -2,9 +2,6 @@
 
 #include "CrModelDecoderUFBX.h"
 
-#include "Core/Containers/CrVector.h"
-#include "crstl/filesystem.h"
-
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrRenderModel.h"
@@ -14,6 +11,9 @@
 #include "Rendering/CrCommonVertexLayouts.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
+
+#include "crstl/filesystem.h"
+#include "crstl/vector.h"
 
 warnings_off
 // Make sure to compile the static library with this define as well
@@ -50,11 +50,11 @@ struct CrImportTriangle
 // An importer-independent view of a mesh
 struct CrImportMesh
 {
-	CrVector<CrImportVertex> vertices;
+	crstl::vector<CrImportVertex> vertices;
 
-	CrVector<CrImportTriangle> triangles;
+	crstl::vector<CrImportTriangle> triangles;
 
-	CrVector<uint32_t> indices;
+	crstl::vector<uint32_t> indices;
 };
 
 static Textures::T GetTextureSemantic(const FBXTextureTranslation& textureType)
@@ -225,7 +225,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 	// Read the raw data
 	uint64_t fileSize = file.get_size();
 
-	CrVector<uint8_t> fileRawData;
+	crstl::vector<uint8_t> fileRawData;
 	fileRawData.resize_uninitialized(fileSize);
 
 	if (file.read(fileRawData.data(), fileSize) != fileSize)
@@ -407,7 +407,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 
 				// 1. Remove duplicated vertices
 				{
-					CrVector<uint32_t> remappingTable;
+					crstl::vector<uint32_t> remappingTable;
 					size_t indexCount = importMesh.triangles.size() * 3;
 					size_t unindexedVertexCount = importMesh.vertices.size();
 					remappingTable.resize_uninitialized(indexCount);

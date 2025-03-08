@@ -5,7 +5,7 @@
 struct SpvReflectDescriptorBinding;
 struct SpvReflectTypeDescription;
 
-typedef CrVector<SpvReflectDescriptorBinding> ResourceVector;
+typedef crstl::vector<SpvReflectDescriptorBinding> ResourceVector;
 
 struct CompilationDescriptor;
 struct HLSLResources;
@@ -19,7 +19,7 @@ public:
 private:
 
 	// Takes SPIRV as input and creates two text files, one for the header and one for the cpp
-	static bool BuildSPIRVMetadata(const CrVector<uint32_t>& spirvBytecode, crstl::string& metadataHeader, crstl::string& metadataCpp, crstl::string& compilationStatus);
+	static bool BuildSPIRVMetadata(const crstl::vector<uint32_t>& spirvBytecode, crstl::string& metadataHeader, crstl::string& metadataCpp, crstl::string& compilationStatus);
 
 	static crstl::string PrintResourceMetadataInstanceDeclaration(const crstl::string& resourceType, const ResourceVector& uniformBuffers);
 

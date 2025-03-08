@@ -81,7 +81,7 @@ private:
 
 	CrRenderList(const CrRenderList& other) = delete;
 
-	CrVector<CrRenderPacket> m_renderPackets;
+	crstl::vector<CrRenderPacket> m_renderPackets;
 };
 
 // Properties that only the editor is allowed to modify and won't be available in-game
@@ -185,15 +185,15 @@ private:
 
 	// Model Instance Data
 
-	CrVector<float4x4>                  m_modelInstanceTransforms;
+	crstl::vector<float4x4>                  m_modelInstanceTransforms;
 
-	CrVector<CrRenderModelHandle>       m_renderModels;
+	crstl::vector<CrRenderModelHandle>       m_renderModels;
 
-	CrVector<CrBoundingBox>             m_modelInstanceObbs;
+	crstl::vector<CrBoundingBox>             m_modelInstanceObbs;
 
-	CrVector<CrModelInstanceIndex>      m_modelInstanceIdToIndex;
+	crstl::vector<CrModelInstanceIndex>      m_modelInstanceIdToIndex;
 
-	CrVector<CrModelInstanceId>         m_modelInstanceIndexToId;
+	crstl::vector<CrModelInstanceId>         m_modelInstanceIndexToId;
 
 	CrModelInstanceId                   m_maxModelInstanceId;
 
@@ -202,9 +202,9 @@ private:
 	CrModelInstanceId                   m_lastAvailableId;
 
 	// Lights Data
-	CrVector<float4x4> m_lightTransforms;
+	crstl::vector<float4x4> m_lightTransforms;
 
-	CrVector<CrBoundingBox> m_lightObbs;
+	crstl::vector<CrBoundingBox> m_lightObbs;
 
 	// TODO light ids
 
@@ -212,7 +212,7 @@ private:
 
 	// Camera data. We aren't doing data driven design for cameras as there won't be many
 	// and it's easier to manage this way
-	//CrVector<CrCamera> m_cameras;
+	//crstl::vector<CrCamera> m_cameras;
 
 	// TODO Fix single camera
 	CrCameraHandle m_camera;
@@ -222,7 +222,7 @@ private:
 	CrRenderList m_renderLists[CrRenderListUsage::Count];
 
 	// Visible model instances
-	CrVector<CrModelInstanceIndex> m_visibleModelInstances;
+	crstl::vector<CrModelInstanceIndex> m_visibleModelInstances;
 
 #if defined(CR_EDITOR)
 
@@ -256,7 +256,7 @@ private:
 	// such as selection highlight
 	CrHashSet<CrModelInstanceId::type> m_editorInstances;
 
-	CrVector<CrEditorProperties>       m_editorProperties;
+	crstl::vector<CrEditorProperties>       m_editorProperties;
 
 	bool m_computeMouseSelection = false;
 

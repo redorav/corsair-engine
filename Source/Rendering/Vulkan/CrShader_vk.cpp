@@ -47,7 +47,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
-	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
+	crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;
 
 	// Create the shader modules and parse reflection information
@@ -58,7 +58,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 
 		// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
-		const CrVector<uint8_t>& bytecode = shaderBytecode->GetBytecode();
+		const crstl::vector<uint8_t>& bytecode = shaderBytecode->GetBytecode();
 
 		// Create shader modules from the modified bytecode
 		VkShaderModuleCreateInfo moduleCreateInfo;
@@ -138,7 +138,7 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, cons
 
 	SetVulkanPDBPath(m_vkDevice, m_vkShaderModule, reflectionHeader);
 
-	CrVector<VkDescriptorSetLayoutBinding> layoutBindings;
+	crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;
 
 	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderReflectionResource& resource)

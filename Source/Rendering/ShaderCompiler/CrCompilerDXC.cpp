@@ -153,7 +153,7 @@ private:
 
 // This code was adapted from spirv_reflect utils/stripper.cpp
 // Removes the PDB instructions
-bool SpvStripDebugData(CrVector<uint32_t>& spirvData)
+bool SpvStripDebugData(crstl::vector<uint32_t>& spirvData)
 {
 	// https://www.khronos.org/registry/SPIR-V/specs/unified1/SPIRV.pdf
 	const uint32_t kHeaderLength = 5;
@@ -180,7 +180,7 @@ bool SpvStripDebugData(CrVector<uint32_t>& spirvData)
 		return false;
 	}
 
-	CrVector<uint32_t> intermediateSpirv;
+	crstl::vector<uint32_t> intermediateSpirv;
 	intermediateSpirv.reserve(length);
 
 	for (uint32_t i = 0; i < kHeaderLength; ++i)
@@ -263,7 +263,7 @@ HRESULT CrDXCCompileShader
 	if (crstl::file sourceCodeFile = crstl::file(compilationDescriptor.inputPath.c_str(), crstl::file_flags::read))
 	{
 		// Read in source code
-		CrVector<uint8_t> sourceCode;
+		crstl::vector<uint8_t> sourceCode;
 
 		sourceCode.resize(sourceCodeFile.get_size());
 		sourceCodeFile.read(sourceCode.data(), sourceCode.size());
@@ -276,7 +276,7 @@ HRESULT CrDXCCompileShader
 		crstl::wstring wEntryPoint;
 		wEntryPoint.append_convert(compilationDescriptor.entryPoint.c_str());
 
-		CrVector<const wchar_t*> arguments =
+		crstl::vector<const wchar_t*> arguments =
 		{
 			DXCArgumentWarningsAsErrors, // Warnings as errors
 			DXCArgumentEnableDebug, // Add debug data (for PDBs)
@@ -311,7 +311,7 @@ HRESULT CrDXCCompileShader
 		}
 
 		// Include defines here
-		CrVector<crstl::wstring> wDefines;
+		crstl::vector<crstl::wstring> wDefines;
 		wDefines.resize(compilationDescriptor.defines.size());
 
 		for (uint32_t i = 0; i < compilationDescriptor.defines.size(); ++i)
@@ -413,7 +413,7 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 	}
 }
 
-bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, CrVector<uint32_t>& bytecode, crstl::string& compilationStatus)
+bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, crstl::vector<uint32_t>& bytecode, crstl::string& compilationStatus)
 {
 	CComPtr<IDxcUtils> dxcUtils;
 	DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
@@ -447,7 +447,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		CComPtr<IDxcBlob> compilationResultBlob;
 		dxcCompilationResult->GetResult(&compilationResultBlob);
 
-		bytecode = CrVector<uint32_t>
+		bytecode = crstl::vector<uint32_t>
 		(
 			(uint32_t*)compilationResultBlob->GetBufferPointer(),
 			(uint32_t*)compilationResultBlob->GetBufferPointer() + compilationResultBlob->GetBufferSize() / 4
@@ -459,7 +459,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus)
 {
-	CrVector<uint32_t> spirvBytecode;
+	crstl::vector<uint32_t> spirvBytecode;
 	if (CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, spirvBytecode, compilationStatus))
 	{
 		CrHash shaderHash = CrHash(spirvBytecode.data(), spirvBytecode.size_bytes());
@@ -509,7 +509,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		(
 			uint32_t variableCount,
 			SpvReflectInterfaceVariable** variables,
-			CrVector<CrShaderInterfaceVariable>& interfaceVariables)
+			crstl::vector<CrShaderInterfaceVariable>& interfaceVariables)
 		{
 			for (uint32_t i = 0; i < variableCount; ++i)
 			{
@@ -559,7 +559,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		writeFileStream << reflectionHeader;
 
 		// Reinterpret our current vector as a uint8_t vector to serialize back in
-		CrVector<uint8_t> uint8Bytecode(crstl_move(spirvBytecode));
+		crstl::vector<uint8_t> uint8Bytecode(crstl_move(spirvBytecode));
 		writeFileStream << uint8Bytecode;
 
 		return true;
@@ -660,7 +660,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 		CComPtr<IDxcBlobUtf16> shaderName = nullptr;
 		dxcCompilationResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), &shaderName);
 
-		CrVector<uint8_t> bytecode
+		crstl::vector<uint8_t> bytecode
 		(
 			(uint8_t*)shaderBlob->GetBufferPointer(),
 			(uint8_t*)shaderBlob->GetBufferPointer() + shaderBlob->GetBufferSize()
@@ -720,7 +720,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				InsertResourceIntoHeader(reflectionHeader, resource);
 			}
 
-			const auto ProcessInterfaceVariable = [](const D3D12_SIGNATURE_PARAMETER_DESC& parameterDescriptor, CrVector<CrShaderInterfaceVariable>& interfaceVariables)
+			const auto ProcessInterfaceVariable = [](const D3D12_SIGNATURE_PARAMETER_DESC& parameterDescriptor, crstl::vector<CrShaderInterfaceVariable>& interfaceVariables)
 			{
 				if (parameterDescriptor.ReadWriteMask)
 				{

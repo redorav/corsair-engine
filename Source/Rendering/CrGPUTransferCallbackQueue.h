@@ -20,7 +20,7 @@ struct CrDownloadCallbackList
 	~CrDownloadCallbackList();
 
 	CrGPUFenceHandle fence;
-	CrVector<CrGPUDownloadCallback> callbacks;
+	crstl::vector<CrGPUDownloadCallback> callbacks;
 };
 
 class CrGPUTransferCallbackQueue

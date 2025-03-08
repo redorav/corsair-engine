@@ -182,7 +182,7 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 #if defined(RENDER_DEVICE_LOGS)
 
 		// Print out a message that includes meaningful information
-		const CrVector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+		const crstl::vector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 		// Add entry point names
 		crstl::fixed_string128 entryPoints("(");
@@ -384,7 +384,7 @@ void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelin
 	}
 }
 
-void ICrRenderDevice::LoadPipelineCache(CrVector<char>& pipelineCacheData)
+void ICrRenderDevice::LoadPipelineCache(crstl::vector<char>& pipelineCacheData)
 {
 	if (m_isValidPipelineCache)
 	{

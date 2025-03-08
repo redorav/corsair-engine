@@ -10,10 +10,10 @@
 
 #include "Core/Input/CrInputManager.h"
 #include "Core/SmartPointers/CrIntrusivePtr.h"
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 
 #include "crstl/unique_ptr.h"
+#include "crstl/vector.h"
 
 // Stores state when we selected or clicked something so that we're able to
 // determine the appropriate action from that
@@ -136,7 +136,7 @@ private:
 	
 	// Manipulator and selection related variables
 
-	CrVector<SelectionState> m_selectionStateQueue;
+	crstl::vector<SelectionState> m_selectionStateQueue;
 
 	CrHashMap<CrModelInstanceId::type, SelectedInstanceState> m_selectedInstances;
 

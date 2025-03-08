@@ -416,7 +416,7 @@ CrTextureD3D12::~CrTextureD3D12()
 	{
 		for (size_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
-			const CrVector<crd3d::DescriptorD3D12>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
+			const crstl::vector<crd3d::DescriptorD3D12>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
 
 			for (const auto& descriptor : sliceArray)
 			{

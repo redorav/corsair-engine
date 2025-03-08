@@ -7,9 +7,8 @@
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
-#include "Core/Containers/CrVector.h"
-
 #include "crstl/unique_ptr.h"
+#include "crstl/vector.h"
 
 namespace GBufferDebugMode { enum T : uint32_t; }
 
@@ -37,7 +36,7 @@ private:
 
 	uint32_t m_currentCommandBuffer = 0;
 
-	CrVector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
+	crstl::vector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	
 	CrComputePipelineHandle m_exampleComputePipeline;
 

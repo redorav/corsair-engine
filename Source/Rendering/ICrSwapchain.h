@@ -2,12 +2,11 @@
 
 #include "ICrGPUSynchronization.h"
 
-#include "Core/Containers/CrVector.h"
-
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/ICrTexture.h"
 
 #include "crstl/fixed_string.h"
+#include "crstl/vector.h"
 
 class CrOSWindow;
 
@@ -63,7 +62,7 @@ protected:
 
 	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 
-	CrVector<CrTextureHandle> m_textures;
+	crstl::vector<CrTextureHandle> m_textures;
 
 	crstl::fixed_string32 m_name;
 

@@ -168,9 +168,9 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 
 	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader.get());
 
-	const CrVector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
+	const crstl::vector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
-	const CrVector<CrShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
+	const crstl::vector<CrShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
 
 	uint32_t usedShaderStages = 0;
 

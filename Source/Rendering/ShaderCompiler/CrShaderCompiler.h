@@ -3,9 +3,9 @@
 #include "Rendering/CrRendering.h"
 #include "Core/CrPlatform.h"
 #include "Core/FileSystem/CrFixedPath.h"
-#include "Core/Containers/CrVector.h"
 
 #include "crstl/string.h"
+#include "crstl/vector.h"
 
 namespace OptimizationLevel
 {
@@ -37,7 +37,7 @@ struct CompilationDescriptor
 	CrFixedPath tempPath; // Filename compiler can use to dump intermediate data
 	crstl::string entryPoint;
 	crstl::string uniqueBinaryName;
-	mutable CrVector<crstl::string> defines;
+	mutable crstl::vector<crstl::string> defines;
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;

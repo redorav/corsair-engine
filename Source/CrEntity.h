@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/Containers/CrVector.h"
 #include "Math/CrHlslppVectorFloatType.h"
 #include "Math/CrHlslppQuaternionType.h"
 
 #include "crstl/string.h"
+#include "crstl/vector.h"
 
 class CrTransform;
 
@@ -19,7 +19,7 @@ public:
 	float3 m_scale;
 	quaternion m_qrotation;
 
-	CrVector<CrEntity*> gameObjects;
+	crstl::vector<CrEntity*> gameObjects;
 
 	CrEntity();
 	CrEntity(const crstl::string& name);

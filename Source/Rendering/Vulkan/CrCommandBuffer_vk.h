@@ -82,9 +82,9 @@ private:
 
 	VkAllocationCallbacks m_renderPassAllocationCallbacks = {};
 
-	CrVector<VkRenderPass> m_usedRenderPasses;
+	crstl::vector<VkRenderPass> m_usedRenderPasses;
 
-	CrVector<VkFramebuffer> m_usedFramebuffers;
+	crstl::vector<VkFramebuffer> m_usedFramebuffers;
 
 	VkCommandBuffer m_vkCommandBuffer;
 

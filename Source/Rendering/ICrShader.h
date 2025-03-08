@@ -267,7 +267,7 @@ public:
 
 	CrShaderBytecode() {}
 
-	const CrVector<uint8_t>& GetBytecode() const
+	const crstl::vector<uint8_t>& GetBytecode() const
 	{
 		return m_bytecode;
 	}
@@ -302,7 +302,7 @@ public:
 
 private:
 
-	CrVector<uint8_t> m_bytecode;
+	crstl::vector<uint8_t> m_bytecode;
 	CrShaderReflectionHeader m_reflection;
 	CrHash m_hash; // A hash of the entire bytecode
 };
@@ -325,7 +325,7 @@ struct CrGraphicsShaderDescriptor
 {
 	CrShaderDebugString m_debugName;
 
-	CrVector<CrShaderBytecodeHandle> m_bytecodes;
+	crstl::vector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
 class ICrShader : public CrIntrusivePtrInterface
@@ -369,7 +369,7 @@ public:
 
 	virtual ~ICrGraphicsShader() {}
 
-	const CrVector<CrShaderBytecodeHandle>& GetBytecodes() const
+	const crstl::vector<CrShaderBytecodeHandle>& GetBytecodes() const
 	{
 		return m_bytecodes;
 	}
@@ -383,7 +383,7 @@ protected:
 
 	CrInputSignature m_inputSignature;
 
-	CrVector<CrShaderBytecodeHandle> m_bytecodes;
+	crstl::vector<CrShaderBytecodeHandle> m_bytecodes;
 };
 
 struct CrComputeShaderDescriptor
@@ -437,7 +437,7 @@ struct CrShaderCompilerDefines
 		defines.push_back(define);
 	}
 
-	const CrVector<crstl::string>& GetDefines() const
+	const crstl::vector<crstl::string>& GetDefines() const
 	{
 		return defines;
 	}
@@ -446,7 +446,7 @@ struct CrShaderCompilerDefines
 
 private:
 
-	CrVector<crstl::string> defines;
+	crstl::vector<crstl::string> defines;
 };
 
 struct CrShaderCompilationDescriptor
@@ -461,7 +461,7 @@ struct CrShaderCompilationDescriptor
 		m_defines.AddDefine(define);
 	}
 
-	const CrVector<CrShaderBytecodeCompilationDescriptor>& GetBytecodeDescriptors() const
+	const crstl::vector<CrShaderBytecodeCompilationDescriptor>& GetBytecodeDescriptors() const
 	{
 		return m_stageBytecodeDescriptors;
 	}
@@ -473,6 +473,6 @@ struct CrShaderCompilationDescriptor
 
 private:
 
-	CrVector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
+	crstl::vector<CrShaderBytecodeCompilationDescriptor> m_stageBytecodeDescriptors;
 	CrShaderCompilerDefines m_defines;
 };

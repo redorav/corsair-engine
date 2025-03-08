@@ -3,9 +3,10 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/ICrGPUQueryPool.h"
 
-#include "Core/Containers/CrVector.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
+
+#include "crstl/vector.h"
 
 struct CrGPUTimingRequest
 {
@@ -55,14 +56,14 @@ private:
 	CrGPUTimingRequest m_frameTimingRequest;
 
 	// Collection of query pools, ideally one per frame
-	CrVector<CrGPUQueryPoolHandle> m_queryPools;
+	crstl::vector<CrGPUQueryPoolHandle> m_queryPools;
 
 	// There is a hashmap per frame as the query ids change every frame
-	CrVector<CrHashMap<CrHash, CrGPUTimingRequest>> m_timingRequests;
+	crstl::vector<CrHashMap<CrHash, CrGPUTimingRequest>> m_timingRequests;
 
 	// Data for timings that were resolved this frame. They'll get stomped next frame
 	// This is the raw data for the timestamps
-	CrVector<CrGPUTimestamp> m_timestampData;
+	crstl::vector<CrGPUTimestamp> m_timestampData;
 
 	// Intervals resolved for the current raw data. Starting time is with respect to the
 	// query inserted by the tracker on Begin()

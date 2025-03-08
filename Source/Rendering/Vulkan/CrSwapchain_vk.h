@@ -24,9 +24,9 @@ private:
 	void CreateSwapchainTextures();
 
 	// Semaphores are signaled when present completes
-	CrVector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
+	crstl::vector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
 
-	CrVector<CrGPUFenceHandle> m_imageReadyFences;
+	crstl::vector<CrGPUFenceHandle> m_imageReadyFences;
 
 	// We need to have another index for the semaphore because we don't really know
 	// the buffer index until we have acquired the image, but we need to signal the

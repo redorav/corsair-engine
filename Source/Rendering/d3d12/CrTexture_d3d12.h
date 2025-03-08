@@ -4,16 +4,15 @@
 
 #include "CrD3D12.h"
 
-#include "Core/Containers/CrVector.h"
-
 #include "crstl/array.h"
+#include "crstl/vector.h"
 
 class ICrRenderDevice;
 
 struct CrD3D12AdditionalTextureViews
 {
 	// RTVs
-	crstl::array<CrVector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
+	crstl::array<crstl::vector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
 	crstl::array<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
 
 	// DSVs

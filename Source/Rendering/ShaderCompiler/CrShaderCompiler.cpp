@@ -6,7 +6,6 @@
 #include "CrShaderCompilerUtilities.h"
 
 #include "Core/CrPlatform.h"
-#include "Core/Containers/CrPair.h"
 #include "Core/Containers/CrHashMap.h"
 #include "Core/CrCommandLine.h"
 #include "Core/FileSystem/CrFixedPath.h"

@@ -2,10 +2,8 @@
 
 #include "CrModelDecoderASSIMP.h"
 
-#include "Core/Containers/CrPair.h"
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/CrMacros.h"
-#include "crstl/filesystem.h"
 
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
@@ -17,6 +15,8 @@
 #include "Rendering/CrRenderMesh.h"
 #include "Rendering/CrImage.h"
 #include "Rendering/CrCommonVertexLayouts.h"
+
+#include "crstl/filesystem.h"
 
 warnings_off
 #include <assimp/Importer.hpp>

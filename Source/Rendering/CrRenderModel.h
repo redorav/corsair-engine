@@ -7,10 +7,10 @@
 
 #include "Core/SmartPointers/CrIntrusivePtr.h"
 #include "Core/Containers/CrHashMap.h"
-#include "Core/Containers/CrPair.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_vector.h"
+#include "crstl/pair.h"
 #include "crstl/vector.h"
 
 struct CrRenderModelDescriptor
@@ -48,13 +48,13 @@ public:
 
 	const CrBoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
-	const CrPair<const CrRenderMeshHandle&, const CrMaterialHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
+	const crstl::pair<const CrRenderMeshHandle&, const CrMaterialHandle&> GetRenderMeshMaterial(uint32_t meshIndex) const
 	{
 		const CrRenderMeshHandle& renderMesh = m_renderMeshes[meshIndex];
 		uint32_t materialIndex = m_renderMeshMaterialIndex[meshIndex];
 		const CrMaterialHandle& material = m_materials[materialIndex];
 
-		return CrPair<const CrRenderMeshHandle&, const CrMaterialHandle&>(renderMesh, material);
+		return crstl::pair<const CrRenderMeshHandle&, const CrMaterialHandle&>(renderMesh, material);
 	}
 
 	const CrMaterialHandle& GetMaterial(uint32_t meshIndex) const

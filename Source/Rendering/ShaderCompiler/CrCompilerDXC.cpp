@@ -20,13 +20,13 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrShaderReflectionHeader.h"
 
-#include "Core/Containers/CrHashMap.h"
 #include "Core/Streams/CrFileStream.h"
 #include "Core/CrHash.h"
 
 #include "CrShaderCompilerUtilities.h"
 
-#include <atomic>
+#include "crstl/atomic.h"
+#include "crstl/open_hashmap.h"
 
 // DXC Argument handling
 static const wchar_t* DXCArgumentWarningsAsErrors  = L"-WX";
@@ -144,11 +144,11 @@ public:
 
 private:
 
-	CrHashMap<crstl::wstring, CComPtr<IDxcBlobEncoding>> m_includeFiles;
+	crstl::open_hashmap<crstl::wstring, CComPtr<IDxcBlobEncoding>> m_includeFiles;
 
 	CComPtr<IDxcUtils> m_dxcUtils;
 
-	volatile std::atomic<uint32_t> m_dwRef = 0;
+	crstl::atomic<uint32_t> m_dwRef = 0;
 };
 
 // This code was adapted from spirv_reflect utils/stripper.cpp

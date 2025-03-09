@@ -3,12 +3,12 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
 
-#include "Core/Containers/CrFixedHashMap.h"
 #include "Core/CrHash.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 
 #include "crstl/fixed_function.h"
+#include "crstl/fixed_open_hashmap.h"
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
 
@@ -162,9 +162,9 @@ struct CrRenderGraphPass2
 
 	crstl::fixed_vector<CrRenderGraphBufferUsage2, 16> bufferUsages;
 
-	CrFixedHashMap<uint64_t, CrRenderGraphTextureTransitionInfo2, 16> textureTransitionInfos;
+	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphTextureTransitionInfo2, 16> textureTransitionInfos;
 
-	CrFixedHashMap<uint64_t, CrRenderGraphBufferTransitionInfo2, 16> bufferTransitionInfos;
+	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphBufferTransitionInfo2, 16> bufferTransitionInfos;
 
 	ICrTexture* depthTexture;
 
@@ -279,9 +279,9 @@ private:
 
 	uint32_t m_bufferIdCounter;
 
-	CrFixedHashMap<CrHash, uint32_t, 256> m_textureSubresourceIds;
+	crstl::fixed_open_hashmap<CrHash, uint32_t, 256> m_textureSubresourceIds;
 
-	CrFixedHashMap<CrHash, uint32_t, 256> m_bufferIds;
+	crstl::fixed_open_hashmap<CrHash, uint32_t, 256> m_bufferIds;
 
 	// Last render pass a certain subresource was used in. Null if it wasn't used yet
 	crstl::fixed_vector<CrRenderGraphPass2*, 256> m_textureLastUsedPass;

@@ -4,7 +4,7 @@
 #include "Rendering/ICrPipeline.h"
 #include "Rendering/CrVertexDescriptor.h"
 
-#include "Core/Containers/CrHashMap.h"
+#include "crstl/open_hashmap.h"
 
 namespace CrBuiltinShaders { enum T : uint32_t; }
 
@@ -41,9 +41,9 @@ private:
 
 	CrBuiltinPipelines();
 
-	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
+	crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
 
-	CrHashMap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
+	crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
 };
 
 extern CrBuiltinPipelines* BuiltinPipelines;

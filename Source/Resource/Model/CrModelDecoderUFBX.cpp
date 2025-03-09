@@ -13,6 +13,7 @@
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "crstl/filesystem.h"
+#include "crstl/open_hashmap.h"
 #include "crstl/vector.h"
 
 warnings_off
@@ -255,7 +256,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 
 	CrRenderModelDescriptor modelDescriptor;
 
-	CrHashMap<ufbx_material*, uint32_t> materialMap;
+	crstl::open_hashmap<ufbx_material*, uint32_t> materialMap;
 
 	// Load all materials contained in the mesh. The loading of materials will trigger loading of associated resources too
 	// TODO Rework using path_view

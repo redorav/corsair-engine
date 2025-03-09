@@ -4,11 +4,11 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
-#include "Core/Containers/CrHashMap.h"
 #include "Core/CrHash.h"
 
 #include "crstl/fixed_string.h"
 #include "crstl/intrusive_ptr.h"
+#include "crstl/open_hashmap.h"
 #include "crstl/string.h"
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
@@ -280,10 +280,10 @@ protected:
 	CrRenderDeviceProperties m_renderDeviceProperties;
 
 	// Texture uploads that have started but haven't been committed yet
-	CrHashMap<CrHash, CrTextureUpload> m_openTextureUploads;
+	crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;
 
 	// Buffer uploads that have started but haven't been committed yet
-	CrHashMap<CrHash, CrBufferUpload> m_openBufferUploads;
+	crstl::open_hashmap<CrHash, CrBufferUpload> m_openBufferUploads;
 
 	//--------------------------
 	// Pipeline State Management
@@ -297,9 +297,9 @@ protected:
 
 	crstl::string m_pipelineCacheFilename;
 
-	CrHashMap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
+	crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
 
-	CrHashMap<uint64_t, CrComputePipelineHandle> m_computePipelines;
+	crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_computePipelines;
 
 private:
 

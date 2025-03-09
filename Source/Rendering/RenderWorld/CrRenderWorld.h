@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Core/Containers/CrHashMap.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -255,7 +254,7 @@ private:
 
 	// Make sure we can exclude editor entities from all the standard behavior
 	// such as selection highlight
-	CrHashSet<CrModelInstanceId::type> m_editorInstances;
+	crstl::open_hashset<CrModelInstanceId::type> m_editorInstances;
 
 	crstl::vector<CrEditorProperties>       m_editorProperties;
 

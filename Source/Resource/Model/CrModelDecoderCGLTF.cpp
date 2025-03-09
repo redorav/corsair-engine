@@ -2,10 +2,6 @@
 
 #include "CrModelDecoderCGLTF.h"
 
-#include "Core/FileSystem/CrFixedPath.h"
-#include "Core/Containers/CrHashMap.h"
-#include "crstl/filesystem.h"
-
 #include "Rendering/ICrRenderSystem.h"
 #include "Rendering/ICrRenderDevice.h"
 #include "Rendering/CrMaterialCompiler.h"
@@ -18,6 +14,10 @@
 #include "Rendering/CrRenderingForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
+
+#include "Core/FileSystem/CrFixedPath.h"
+#include "crstl/open_hashmap.h"
+#include "crstl/filesystem.h"
 
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
@@ -300,7 +300,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 
 		CrRenderModelDescriptor modelDescriptor;
 
-		CrHashMap<void*, CrTextureHandle> textureMap;
+		crstl::open_hashmap<void*, CrTextureHandle> textureMap;
 
 		for (uint32_t t = 0; t < gltfData->textures_count; ++t)
 		{
@@ -339,7 +339,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 			}
 		};
 
-		CrHashMap<void*, uint32_t> materialMap;
+		crstl::open_hashmap<void*, uint32_t> materialMap;
 
 		// Load materials. Store materials in table to meshes can index into them
 		for (uint32_t m = 0; m < gltfData->materials_count; ++m)

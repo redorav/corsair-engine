@@ -9,9 +9,9 @@
 #include "Math/CrHlslppVectorIntType.h"
 
 #include "Core/Input/CrInputManager.h"
-#include "Core/Containers/CrHashMap.h"
 
 #include "crstl/intrusive_ptr.h"
+#include "crstl/open_hashmap.h"
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
 
@@ -138,7 +138,7 @@ private:
 
 	crstl::vector<SelectionState> m_selectionStateQueue;
 
-	CrHashMap<CrModelInstanceId::type, SelectedInstanceState> m_selectedInstances;
+	crstl::open_hashmap<CrModelInstanceId::type, SelectedInstanceState> m_selectedInstances;
 
 	// Pointer to a currently spawned manipulator
 	crstl::unique_ptr<CrManipulator> m_manipulator;

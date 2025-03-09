@@ -1,7 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
 #include "CrShaderSources.h"
 
-#include "Core/Containers/CrHashMap.h"
 #include "Core/CrGlobalPaths.h"
 #include "Core/Logging/ICrDebug.h"
 
@@ -35,7 +34,7 @@ CrShaderSources::CrShaderSources()
 
 	// Files that contribute to ubershader building
 	// Perhaps more flexible in a text file
-	static const CrHashSet<crstl::string> UbershaderFiles =
+	static const crstl::open_hashset<crstl::string> UbershaderFiles =
 	{
 		"BSDF.hlsl",
 		"Common.hlsl",

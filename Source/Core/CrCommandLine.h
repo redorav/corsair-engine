@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Core/Containers/CrHashMap.h"
-
+#include "crstl/open_hashmap.h"
 #include "crstl/string.h"
 
 class CrCommandLineParser
@@ -44,7 +43,7 @@ private:
 	crstl::string invalid;
 
 	// It is unordered with respect to keys, but ordered values for each key
-	CrHashMultiMap<crstl::string, crstl::string> commandLineArgs;
+	crstl::open_multi_hashmap<crstl::string, crstl::string> commandLineArgs;
 };
 
 namespace crcore

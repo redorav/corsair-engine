@@ -5,11 +5,10 @@
 #include "Rendering/CrMaterial.h"
 #include "Rendering/CrRenderMesh.h"
 
-#include "Core/Containers/CrHashMap.h"
-
 #include "crstl/array.h"
 #include "crstl/fixed_vector.h"
 #include "crstl/intrusive_ptr.h"
+#include "crstl/open_hashmap.h"
 #include "crstl/pair.h"
 #include "crstl/vector.h"
 
@@ -78,7 +77,7 @@ private:
 
 	CrBoundingBox m_boundingBox;
 
-	CrHashMap<CrRenderMesh*, uint8_t> m_pipelineMap;
+	crstl::open_hashmap<CrRenderMesh*, uint8_t> m_pipelineMap;
 
 	// A model has access to a collection of render meshes, each with a material attached.
 	// To start with we'll make all of these arrays of equal size, but they don't have to

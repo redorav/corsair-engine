@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/Containers/CrHashMap.h"
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/CrHash.h"
 
+#include "crstl/open_hashmap.h"
 #include "crstl/string.h"
 
 // Stores all the sources for our shaders (on a desktop development build)
@@ -32,11 +32,11 @@ private:
 
 	CrShaderSources();
 
-	CrHashMap<crstl::string, CrFixedPath> m_shaderPaths;
+	crstl::open_hashmap<crstl::string, CrFixedPath> m_shaderPaths;
 
-	CrHashMap<crstl::string, crstl::string> m_shaderSources;
+	crstl::open_hashmap<crstl::string, crstl::string> m_shaderSources;
 
-	CrHashMap<crstl::string, crstl::string> m_ubershaderSources;
+	crstl::open_hashmap<crstl::string, crstl::string> m_ubershaderSources;
 
 	// Path to the temp folder for built ubershaders
 	CrFixedPath m_ubershaderTempDirectory;

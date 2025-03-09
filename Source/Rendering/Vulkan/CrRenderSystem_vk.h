@@ -2,8 +2,7 @@
 
 #include "Rendering/ICrRenderSystem.h"
 
-#include "Core/Containers/CrHashMap.h"
-
+#include "crstl/open_hashmap.h"
 #include "crstl/string.h"
 #include "crstl/vector.h"
 
@@ -28,9 +27,9 @@ private:
 
 	VkDebugUtilsMessengerEXT m_vkDebugMessenger;
 
-	CrHashSet<crstl::string> m_supportedInstanceExtensions;
+	crstl::open_hashset<crstl::string> m_supportedInstanceExtensions;
 
-	CrHashSet<crstl::string> m_supportedInstanceLayers;
+	crstl::open_hashset<crstl::string> m_supportedInstanceLayers;
 
 	crstl::vector<const char*> m_instanceLayers;
 };

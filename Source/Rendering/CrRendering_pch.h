@@ -14,6 +14,6 @@
 #include <dxgi1_6.h>
 #endif
 
-#include "Core/PCH/CrEASTLPch.h"
+#include "Core/PCH/CrCRSTLPch.h"
 #include "Core/CrHash.h"
 #include "Math/CrMathPch.h"

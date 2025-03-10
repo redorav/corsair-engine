@@ -157,7 +157,6 @@ CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphic
 {
 	CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 	CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
-	CrAssertMsg(pipelineDescriptor.rasterizerState.fillMode == cr3d::PolygonFillMode::Rect ? SupportsRectangleRasterization() : true, "Must support rectangle rasterization");
 
 	const CrHash pipelineHash = pipelineDescriptor.ComputeHash();
 	const CrHash graphicsShaderHash = graphicsShader->GetHash();

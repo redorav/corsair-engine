@@ -276,6 +276,7 @@ void CrEditor::Update()
 				if (selectionState.modelInstanceId != 65535) // TODO Why this double check?
 				{
 					CrModelInstanceId instanceId = CrModelInstanceId(selectionState.modelInstanceId);
+					const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
 
 					bool isEditorInstance = m_renderWorld->GetIsEditorInstance(instanceId);
 
@@ -285,27 +286,27 @@ void CrEditor::Update()
 						{
 							m_manipulatorSelected = true;
 
-							if (instanceId == m_manipulator->xAxis.GetId())
+							if (instanceId == m_manipulator->xAxis)
 							{
 								m_selectedAxis = CrEditorAxis::AxisX;
 							}
-							else if (instanceId == m_manipulator->yAxis.GetId())
+							else if (instanceId == m_manipulator->yAxis)
 							{
 								m_selectedAxis = CrEditorAxis::AxisY;
 							}
-							else if (instanceId == m_manipulator->zAxis.GetId())
+							else if (instanceId == m_manipulator->zAxis)
 							{
 								m_selectedAxis = CrEditorAxis::AxisZ;
 							}
-							else if (instanceId == m_manipulator->xzPlane.GetId())
+							else if (instanceId == m_manipulator->xzPlane)
 							{
 								m_selectedAxis = CrEditorAxis::PlaneXZ;
 							}
-							else if (instanceId == m_manipulator->xyPlane.GetId())
+							else if (instanceId == m_manipulator->xyPlane)
 							{
 								m_selectedAxis = CrEditorAxis::PlaneXY;
 							}
-							else if (instanceId == m_manipulator->yzPlane.GetId())
+							else if (instanceId == m_manipulator->yzPlane)
 							{
 								m_selectedAxis = CrEditorAxis::PlaneYZ;
 							}
@@ -323,13 +324,13 @@ void CrEditor::Update()
 								ToggleSelected(instanceId);
 
 								// TODO when deselecting, don't spawn the manipulator there
-								SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+								SpawnManipulator(modelInstance.GetTransform());
 							}
 							else
 							{
 								SetSelected(CrModelInstanceId(selectionState.modelInstanceId));
 
-								SpawnManipulator(m_renderWorld->GetTransform(instanceId));
+								SpawnManipulator(modelInstance.GetTransform());
 							}
 						}
 					}
@@ -359,7 +360,8 @@ void CrEditor::Update()
 			for (auto& selectedInstanceData : m_selectedInstances)
 			{
 				SelectedInstanceState& selectionData = selectedInstanceData.second;
-				selectionData.initialTransform = m_renderWorld->GetTransform(selectionData.modelInstanceId);
+				const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(selectionData.modelInstanceId);
+				selectionData.initialTransform = modelInstance.GetTransform();
 			}
 
 			m_manipulatorSelected = false;
@@ -497,28 +499,35 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		m_manipulator->xyPlane = m_renderWorld->CreateModelInstance();
 		m_manipulator->yzPlane = m_renderWorld->CreateModelInstance();
 
-		m_renderWorld->SetRenderModel(m_manipulator->xAxis.GetId(), xAxisRenderModel);
-		m_renderWorld->SetRenderModel(m_manipulator->yAxis.GetId(), yAxisRenderModel);
-		m_renderWorld->SetRenderModel(m_manipulator->zAxis.GetId(), zAxisRenderModel);
-		m_renderWorld->SetRenderModel(m_manipulator->xzPlane.GetId(), xzPlaneRenderModel);
-		m_renderWorld->SetRenderModel(m_manipulator->xyPlane.GetId(), xyPlaneRenderModel);
-		m_renderWorld->SetRenderModel(m_manipulator->yzPlane.GetId(), yzPlaneRenderModel);
+		CrModelInstance& xAxisModel  = m_renderWorld->GetModelInstance(m_manipulator->xAxis);
+		CrModelInstance& yAxisModel  = m_renderWorld->GetModelInstance(m_manipulator->yAxis);
+		CrModelInstance& zAxisModel  = m_renderWorld->GetModelInstance(m_manipulator->zAxis);
+		CrModelInstance& xzAxisModel = m_renderWorld->GetModelInstance(m_manipulator->xzPlane);
+		CrModelInstance& xyAxisModel = m_renderWorld->GetModelInstance(m_manipulator->xyPlane);
+		CrModelInstance& yzAxisModel = m_renderWorld->GetModelInstance(m_manipulator->yzPlane);
+
+		xAxisModel.SetRenderModel(xAxisRenderModel);
+		yAxisModel.SetRenderModel(yAxisRenderModel);
+		zAxisModel.SetRenderModel(zAxisRenderModel);
+		xzAxisModel.SetRenderModel(xzPlaneRenderModel);
+		xyAxisModel.SetRenderModel(xyPlaneRenderModel);
+		yzAxisModel.SetRenderModel(yzPlaneRenderModel);
 
 		//m_renderWorld->SetMaterial();
 
-		m_renderWorld->SetConstantSize(m_manipulator->xAxis.GetId(), true);
-		m_renderWorld->SetConstantSize(m_manipulator->yAxis.GetId(), true);
-		m_renderWorld->SetConstantSize(m_manipulator->zAxis.GetId(), true);
-		m_renderWorld->SetConstantSize(m_manipulator->xzPlane.GetId(), true);
-		m_renderWorld->SetConstantSize(m_manipulator->xyPlane.GetId(), true);
-		m_renderWorld->SetConstantSize(m_manipulator->yzPlane.GetId(), true);
+		m_renderWorld->SetConstantSize(m_manipulator->xAxis, true);
+		m_renderWorld->SetConstantSize(m_manipulator->yAxis, true);
+		m_renderWorld->SetConstantSize(m_manipulator->zAxis, true);
+		m_renderWorld->SetConstantSize(m_manipulator->xzPlane, true);
+		m_renderWorld->SetConstantSize(m_manipulator->xyPlane, true);
+		m_renderWorld->SetConstantSize(m_manipulator->yzPlane, true);
 
-		m_renderWorld->SetEditorInstance(m_manipulator->xAxis.GetId());
-		m_renderWorld->SetEditorInstance(m_manipulator->yAxis.GetId());
-		m_renderWorld->SetEditorInstance(m_manipulator->zAxis.GetId());
-		m_renderWorld->SetEditorInstance(m_manipulator->xzPlane.GetId());
-		m_renderWorld->SetEditorInstance(m_manipulator->xyPlane.GetId());
-		m_renderWorld->SetEditorInstance(m_manipulator->yzPlane.GetId());
+		m_renderWorld->SetEditorInstance(m_manipulator->xAxis);
+		m_renderWorld->SetEditorInstance(m_manipulator->yAxis);
+		m_renderWorld->SetEditorInstance(m_manipulator->zAxis);
+		m_renderWorld->SetEditorInstance(m_manipulator->xzPlane);
+		m_renderWorld->SetEditorInstance(m_manipulator->xyPlane);
+		m_renderWorld->SetEditorInstance(m_manipulator->yzPlane);
 	}
 
 	float4x4 transform = mul(float4x4::scale(0.2f), initialTransform);
@@ -530,12 +539,12 @@ void CrEditor::RemoveManipulator()
 {
 	if (m_manipulator)
 	{
-		m_renderWorld->DestroyModelInstance(m_manipulator->xAxis.GetId());
-		m_renderWorld->DestroyModelInstance(m_manipulator->yAxis.GetId());
-		m_renderWorld->DestroyModelInstance(m_manipulator->zAxis.GetId());
-		m_renderWorld->DestroyModelInstance(m_manipulator->xzPlane.GetId());
-		m_renderWorld->DestroyModelInstance(m_manipulator->xyPlane.GetId());
-		m_renderWorld->DestroyModelInstance(m_manipulator->yzPlane.GetId());
+		m_renderWorld->DestroyModelInstance(m_manipulator->xAxis);
+		m_renderWorld->DestroyModelInstance(m_manipulator->yAxis);
+		m_renderWorld->DestroyModelInstance(m_manipulator->zAxis);
+		m_renderWorld->DestroyModelInstance(m_manipulator->xzPlane);
+		m_renderWorld->DestroyModelInstance(m_manipulator->xyPlane);
+		m_renderWorld->DestroyModelInstance(m_manipulator->yzPlane);
 		m_manipulator = nullptr;
 	}
 }
@@ -589,20 +598,29 @@ void CrEditor::TranslateManipulator(const MouseState& mouseState)
 	for (const auto& selectedInstanceData : m_selectedInstances)
 	{
 		const SelectedInstanceState& selectionData = selectedInstanceData.second;
+		CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(selectionData.modelInstanceId);
 		float3 newPosition = selectionData.initialTransform[3].xyz + translationDelta;
-		m_renderWorld->SetPosition(selectionData.modelInstanceId, newPosition);
+		modelInstance.SetPosition(newPosition);
 	}
 }
 
 void CrEditor::SetManipulatorTransform(const float4x4& transform)
 {
 	m_manipulator->transformMtx = transform;
-	m_renderWorld->SetTransform(m_manipulator->xAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->yAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->zAxis.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->xzPlane.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->xyPlane.GetId(), transform);
-	m_renderWorld->SetTransform(m_manipulator->yzPlane.GetId(), transform);
+
+	CrModelInstance& xAxisModelInstance = m_renderWorld->GetModelInstance(m_manipulator->xAxis);
+	CrModelInstance& yAxisModelInstance = m_renderWorld->GetModelInstance(m_manipulator->yAxis);
+	CrModelInstance& zAxisModelInstance = m_renderWorld->GetModelInstance(m_manipulator->zAxis);
+	CrModelInstance& xzPlaneModelInstance = m_renderWorld->GetModelInstance(m_manipulator->xzPlane);
+	CrModelInstance& xyPlaneModelInstance = m_renderWorld->GetModelInstance(m_manipulator->xyPlane);
+	CrModelInstance& yzPlaneModelInstance = m_renderWorld->GetModelInstance(m_manipulator->yzPlane);
+
+	xAxisModelInstance.SetTransform(transform);
+	yAxisModelInstance.SetTransform(transform);
+	zAxisModelInstance.SetTransform(transform);
+	xzPlaneModelInstance.SetTransform(transform);
+	xyPlaneModelInstance.SetTransform(transform);
+	yzPlaneModelInstance.SetTransform(transform);
 }
 
 void CrEditor::SetSelected(CrModelInstanceId instanceId)
@@ -634,9 +652,12 @@ bool CrEditor::GetIsSelected(CrModelInstanceId instanceId)
 void CrEditor::AddSelected(CrModelInstanceId instanceId)
 {
 	m_renderWorld->SetIsEditorEdgeHighlight(instanceId, true);
+
+	const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
+
 	SelectedInstanceState state;
 	state.modelInstanceId = instanceId;
-	state.initialTransform = m_renderWorld->GetTransform(instanceId);
+	state.initialTransform = modelInstance.GetTransform();
 	m_selectedInstances.insert(instanceId.id, state);
 }
 

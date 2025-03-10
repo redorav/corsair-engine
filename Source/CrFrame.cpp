@@ -23,7 +23,7 @@
 #include "Rendering/CrCPUStackAllocator.h"
 
 #include "Rendering/RenderWorld/CrRenderWorld.h"
-#include "Rendering/RenderWorld/CrRenderModelInstance.h"
+#include "Rendering/RenderWorld/CrModelInstance.h"
 
 #include "Rendering/CrRendererConfig.h"
 #include "Rendering/CrRenderingResources.h"
@@ -224,7 +224,8 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 		for (uint32_t i = 0; i < numModels; ++i)
 		{
-			CrRenderModelInstance modelInstance = m_renderWorld->CreateModelInstance();
+			CrModelInstanceId modelInstanceId = m_renderWorld->CreateModelInstance();
+			CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(modelInstanceId);
 
 			float angle = 2.39996322f * i;
 			float radius = 30.0f * i / numModels;
@@ -234,7 +235,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 			float4x4 transformMatrix = float4x4::translation(x, 0.0f, z);
 
-			m_renderWorld->SetTransform(modelInstance.GetId(), transformMatrix);
+			modelInstance.SetTransform(transformMatrix);
 
 			int r = rand();
 			CrRenderModelHandle renderModel;
@@ -250,8 +251,8 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 			{
 				renderModel = damagedHelmet;
 			}
-
-			m_renderWorld->SetRenderModel(modelInstance.GetId(), renderModel);
+		
+			modelInstance.SetRenderModel(renderModel);
 		}
 	}
 

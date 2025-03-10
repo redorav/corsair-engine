@@ -2,7 +2,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
-#include "Rendering/RenderWorld/CrRenderModelInstance.h"
+#include "Rendering/RenderWorld/CrModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
 #include "Math/CrHlslppVectorFloatType.h"
@@ -40,12 +40,12 @@ struct CrManipulator
 {
 	float4x4 transformMtx;
 
-	CrRenderModelInstance xAxis;
-	CrRenderModelInstance yAxis;
-	CrRenderModelInstance zAxis;
-	CrRenderModelInstance xzPlane;
-	CrRenderModelInstance xyPlane;
-	CrRenderModelInstance yzPlane;
+	CrModelInstanceId xAxis;
+	CrModelInstanceId yAxis;
+	CrModelInstanceId zAxis;
+	CrModelInstanceId xzPlane;
+	CrModelInstanceId xyPlane;
+	CrModelInstanceId yzPlane;
 };
 
 // Properties of instances that are currently selected. We use this to be able to transform

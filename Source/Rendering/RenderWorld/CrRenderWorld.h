@@ -6,7 +6,8 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRenderModel.h"
-#include "Rendering/RenderWorld/CrRenderModelInstance.h"
+#include "Rendering/CrLight.h"
+#include "Rendering/RenderWorld/CrModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
 
@@ -116,30 +117,14 @@ public:
 	~CrRenderWorld();
 
 	// Allocate model instance in the world
-	CrRenderModelInstance CreateModelInstance();
+	CrModelInstanceId CreateModelInstance();
 
 	// Frees model instance from the world, with all its resources
 	// Only the ModelInstance class can call this (when it goes out of scope)
 	void DestroyModelInstance(CrModelInstanceId instanceId);
 
-	// Set properties on the model instance, either through the instance id or the instance index
-	void SetTransform(CrModelInstanceIndex instanceIndex, const float4x4& transform) { m_modelInstanceTransforms[instanceIndex.id] = transform; }
-	void SetTransform(CrModelInstanceId instanceId, const float4x4& transform) { SetTransform(GetModelInstanceIndex(instanceId), transform); }
-	float4x4 GetTransform(CrModelInstanceIndex instanceIndex) const { return m_modelInstanceTransforms[instanceIndex.id]; }
-	float4x4 GetTransform(CrModelInstanceId instanceId) const { return GetTransform(GetModelInstanceIndex(instanceId)); }
-
-	void SetPosition(CrModelInstanceId instanceId, float3 position) { m_modelInstanceTransforms[GetModelInstanceIndex(instanceId).id][3].xyz = position; }
-	float3 GetPosition(CrModelInstanceId instanceId) { return m_modelInstanceTransforms[GetModelInstanceIndex(instanceId).id][3].xyz; }
-
-	void SetRenderModel(CrModelInstanceIndex instanceIndex, const CrRenderModelHandle& renderModel)
-	{
-		CrAssertMsg(renderModel != nullptr, "Render model cannot be null");
-		m_renderModels[instanceIndex.id] = renderModel;
-	}
-
-	void SetRenderModel(CrModelInstanceId instanceId, const CrRenderModelHandle& renderModel) { SetRenderModel(GetModelInstanceIndex(instanceId), renderModel); }
-	const CrRenderModelHandle& GetRenderModel(CrModelInstanceIndex instanceIndex) const { return m_renderModels[instanceIndex.id]; }
-	const CrRenderModelHandle& GetRenderModel(CrModelInstanceId instanceId) const { return GetRenderModel(GetModelInstanceIndex(instanceId)); }
+	CrModelInstance& GetModelInstance(CrModelInstanceId instanceId) { return m_modelInstances[instanceId.id]; }
+	CrModelInstance& GetModelInstance(CrModelInstanceIndex instanceIndex) { return m_modelInstances[instanceIndex.id]; }
 
 	void SetCamera(const CrCameraHandle& camera);
 	const CrCameraHandle& GetCamera() const { return m_camera; }
@@ -185,11 +170,7 @@ private:
 
 	// Model Instance Data
 
-	crstl::vector<float4x4>                  m_modelInstanceTransforms;
-
-	crstl::vector<CrRenderModelHandle>       m_renderModels;
-
-	crstl::vector<CrBoundingBox>             m_modelInstanceObbs;
+	crstl::vector<CrModelInstance>           m_modelInstances;
 
 	crstl::vector<CrModelInstanceIndex>      m_modelInstanceIdToIndex;
 
@@ -202,9 +183,7 @@ private:
 	CrModelInstanceId                   m_lastAvailableId;
 
 	// Lights Data
-	crstl::vector<float4x4> m_lightTransforms;
-
-	crstl::vector<CrBoundingBox> m_lightObbs;
+	crstl::vector<CrLight> m_lights;
 
 	// TODO light ids
 
@@ -229,31 +208,25 @@ private:
 public:
 
 	void SetIsEditorEdgeHighlight(CrModelInstanceId instanceId, bool value);
-
 	bool GetIsEditorEdgeHighlight(CrModelInstanceId instanceId) const;
 
 	// By default all entities are selectable in the editor, so we need to exclude
 	// manipulators, icons and other editor entities
 	void SetEditorInstance(CrModelInstanceId instanceId);
-
 	bool GetIsEditorInstance(CrModelInstanceId instanceId) const;
 
 	void SetConstantSize(CrModelInstanceIndex instanceIndex, bool constantSize) { m_editorProperties[instanceIndex.id].isConstantSizeOnScreen = constantSize; }
-
 	void SetConstantSize(CrModelInstanceId instanceId, bool constantSize) { SetConstantSize(GetModelInstanceIndex(instanceId), constantSize); }
 
 	bool GetConstantSize(CrModelInstanceIndex instanceIndex) const { return m_editorProperties[instanceIndex.id].isConstantSizeOnScreen; }
-
 	bool GetConstantSize(CrModelInstanceId instanceId) const { return GetConstantSize(GetModelInstanceIndex(instanceId)); }
 
 	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
-
 	bool GetMouseSelectionEnabled() const;
 
 private:
 
-	// Make sure we can exclude editor entities from all the standard behavior
-	// such as selection highlight
+	// Make sure we can exclude editor entities from all the standard behavior such as selection highlight
 	crstl::open_hashset<CrModelInstanceId::type> m_editorInstances;
 
 	crstl::vector<CrEditorProperties>       m_editorProperties;

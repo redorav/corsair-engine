@@ -61,14 +61,12 @@ static CrSortKey CreateTransparencySortKey(uint32_t depthUint, const ICrGraphics
 CrRenderWorld::CrRenderWorld()
 {
 	// TODO Make sure when we create a model instance all of these are updated
-	m_modelInstanceTransforms.resize(1000);
-	m_renderModels.resize(1000);
-	m_modelInstanceObbs.resize(1000);
-	m_editorProperties.resize(1000);
+	m_modelInstances.resize(10000);
+	m_editorProperties.resize(10000);
 
 	// Defaults to invalid id
-	m_modelInstanceIdToIndex.resize(1000);
-	m_modelInstanceIndexToId.resize(1000);
+	m_modelInstanceIdToIndex.resize(10000);
+	m_modelInstanceIndexToId.resize(10000);
 
 	m_maxModelInstanceId = CrModelInstanceId(0);
 	m_numModelInstances = CrModelInstanceIndex(0);
@@ -79,7 +77,7 @@ CrRenderWorld::~CrRenderWorld()
 	//CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
 }
 
-CrRenderModelInstance CrRenderWorld::CreateModelInstance()
+CrModelInstanceId CrRenderWorld::CreateModelInstance()
 {
 	CrModelInstanceId availableId;
 
@@ -95,8 +93,7 @@ CrRenderModelInstance CrRenderWorld::CreateModelInstance()
 		m_maxModelInstanceId.id++;
 	}
 
-	// Initialize some members to sensible defaults
-	m_modelInstanceTransforms[m_numModelInstances.id] = float4x4::identity();
+	m_modelInstances[m_numModelInstances.id] = CrModelInstance(availableId);
 
 	// Initialize remapping tables
 	m_modelInstanceIdToIndex[availableId.id] = CrModelInstanceIndex(m_numModelInstances.id);
@@ -104,7 +101,7 @@ CrRenderModelInstance CrRenderWorld::CreateModelInstance()
 
 	m_numModelInstances.id++;
 
-	return CrRenderModelInstance(availableId);
+	return availableId;
 }
 
 void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
@@ -126,13 +123,8 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 
 	// We want them always well packed. Take the index where the data lived for the destroyed model instance
 	// and copy the data belonging to the last model instance in the array
-	m_modelInstanceTransforms[destroyedInstanceIndex.id]       = m_modelInstanceTransforms[lastInstanceIndex.id];
-	m_renderModels[destroyedInstanceIndex.id]                  = m_renderModels[lastInstanceIndex.id];
-	m_modelInstanceObbs[destroyedInstanceIndex.id]             = m_modelInstanceObbs[lastInstanceIndex.id];
-	m_editorProperties[destroyedInstanceIndex.id]              = m_editorProperties[lastInstanceIndex.id];
-
-	// Free references (no need to zero out data that doesn't have a smart pointer)
-	m_renderModels[lastInstanceIndex.id]   = nullptr;
+	m_modelInstances[destroyedInstanceIndex.id]          = m_modelInstances[lastInstanceIndex.id];
+	m_editorProperties[destroyedInstanceIndex.id]        = m_editorProperties[lastInstanceIndex.id];
 
 	//--------------------------
 	// Update indirection tables
@@ -192,9 +184,11 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 	for (CrModelInstanceIndex instanceIndex(0); instanceIndex < m_numModelInstances; ++instanceIndex)
 	{
-		const CrRenderModelHandle& renderModel = GetRenderModel(instanceIndex);
+		const CrModelInstance& modelInstance = GetModelInstance(instanceIndex);
+		float4x4 transform = modelInstance.GetTransform();
+
+		const CrRenderModelHandle& renderModel = modelInstance.GetRenderModel();
 		const CrBoundingBox& modelBoundingBox = renderModel->GetBoundingBox();
-		float4x4 transform = GetTransform(instanceIndex);
 
 		CrRenderWorldAssertMsg(any(modelBoundingBox.extents != 0.0f), "Invalid bounding box extents");
 

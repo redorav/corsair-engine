@@ -7,7 +7,7 @@
 
 #include "Rendering/CrCPUStackAllocator.h"
 
-#include "Core/CrSort.h"
+#include "crstl/sort.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -372,5 +372,5 @@ void CrRenderList::Clear()
 
 void CrRenderList::Sort()
 {
-	CrQuicksort(m_renderPackets.begin(), m_renderPackets.end());
+	crstl::sort(m_renderPackets.begin(), m_renderPackets.end());
 }

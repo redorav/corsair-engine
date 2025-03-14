@@ -20,11 +20,6 @@
 		<version id="1.8.2407" file="dxc_1.8.2407_clang_cl.7z" repository="github"/>
 	</package>
 	
-	<package name="eastl">
-		<version id="fad5471" file="eastl_2021_01_18_fad5471.zip" repository="github"/>
-		<version id="db16065" file="eastl_2022_11_26_db16065.zip" repository="github"/>
-	</package>
-	
 	<package name="imgui">
 		<version id="docking_d66f4e5" file="imgui_docking_2024_11_20_d66f4e5.7z" repository="github"/>
 		<version id="ec48681" file="imgui_docking_2022_04_24_ec48681.zip" repository="github"/>

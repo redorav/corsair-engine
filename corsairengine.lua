@@ -191,7 +191,6 @@ workspace 'Corsair Engine'
 	
 	AddLibraryIncludes(CRSTLLibrary)
 	AddLibraryIncludes(DdsppLibrary)
-	AddLibraryIncludes(EASTLLibrary)
 	AddLibraryIncludes(HlslppLibrary)
 	AddLibraryIncludes(xxHashLibrary)
 
@@ -232,7 +231,6 @@ workspace 'Corsair Engine'
 		defines
 		{
 			'NDEBUG', -- Disables assert
-			'EASTL_ASSERT_ENABLED=0'
 		}
 		optimize('speed')
 		symbols('on')
@@ -280,8 +278,6 @@ project (ProjectCorsairEngine)
 
 	AddLibraryIncludes(SDL3Library)
 	LinkLibrary(SDL3Library)
-	
-	LinkLibrary(EASTLLibrary)
 	
 	AddLibraryIncludes(ImguiLibrary)
 	LinkLibrary(ImguiLibrary)
@@ -452,8 +448,6 @@ project(ProjectShaderCompiler)
 	AddLibraryIncludes(DxcLibrary)
 	LinkLibrary(DxcLibrary)
 	
-	LinkLibrary(EASTLLibrary)
-	
 	AddLibraryIncludes(RapidYAMLLibrary)
 	LinkLibrary(RapidYAMLLibrary)
 
@@ -505,7 +499,6 @@ project(ProjectCore)
 	}
 
 	AddLibraryNatvis(CRSTLLibrary)
-	AddLibraryNatvis(EASTLLibrary)
 	AddLibraryIncludes(SDL3Library)
 	AddLibraryIncludes(ImguiLibrary)
 

@@ -11,7 +11,6 @@ LibCGLTF              = DependenciesDirectory..'/cgltf'
 LibCRSTL              = DependenciesDirectory..'/crstl'
 LibDdspp              = DependenciesDirectory..'/ddspp'
 LibDxc                = DependenciesDirectory..'/dxc'
-LibEASTL              = DependenciesDirectory..'/eastl'
 LibHlslpp             = DependenciesDirectory..'/hlslpp'
 LibImGui              = DependenciesDirectory..'/imgui'
 LibMeshOptimizer      = DependenciesDirectory..'/meshoptimizer'
@@ -75,25 +74,6 @@ DxcLibrary =
 	libDirs     = LibDxc..BinaryDirectory,
 	libNames    = { 'dxcompiler' },
 	dlls        = { LibDxc..BinaryDirectory..'dxcompiler.dll', LibDxc..BinaryDirectory..'dxil.dll' }
-}
-
-EASTLLibrary =
-{
-	includeDirs =
-	{ 
-		LibEASTL..IncludeDirectory..'include',
-		LibEASTL..IncludeDirectory..'test/packages/EAStdC/include', 
-		LibEASTL..IncludeDirectory..'test/packages/EAAssert/include',
-		LibEASTL..IncludeDirectory..'test/packages/EABase/include/Common'
-	},
-	defines =
-	{
-		"EASTL_ASSERT_ENABLED=1",
-		"CHAR8_T_DEFINED" -- We don't want EASTL to define char8_t regardless of compiler options
-	},
-	natvis      = LibEASTL..IncludeDirectory..'doc/**.natvis',
-	libDirs     = LibEASTL..BinaryDirectory,
-	libNames    = 'EASTL.vs2019.release'
 }
 
 HlslppLibrary =

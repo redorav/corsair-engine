@@ -45,7 +45,7 @@
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"
 
-#include "Rendering/Shaders/DeferredLightingShared.hlsl"
+#include "Rendering/Shaders/DirectLightingShared.hlsl"
 
 #include <imgui.h>
 

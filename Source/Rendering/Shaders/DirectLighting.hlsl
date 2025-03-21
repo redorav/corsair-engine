@@ -1,11 +1,11 @@
-#ifndef DEFERRED_LIGHTING_HLSL
-#define DEFERRED_LIGHTING_HLSL
+#ifndef DIRECT_LIGHTING_HLSL
+#define DIRECT_LIGHTING_HLSL
 
 #include "GBuffer.hlsl"
 #include "Common.hlsl"
 #include "Lighting.hlsl"
 #include "BSDF.hlsl"
-#include "DeferredLightingShared.hlsl"
+#include "DirectLightingShared.hlsl"
 
 struct DynamicLight
 {

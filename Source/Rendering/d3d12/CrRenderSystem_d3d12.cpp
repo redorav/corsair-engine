@@ -10,6 +10,21 @@
 
 CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
+	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
+	if (renderSystemDescriptor.enableNVAPI)
+	{
+		InitializeNVAPI();
+	}
+
+	if (renderSystemDescriptor.enableRenderDoc)
+	{
+		InitializeRenderdoc();
+	}
+	else if (renderSystemDescriptor.enablePIX)
+	{
+		/*m_pixEnabled = */InitializePIX();
+	}
+
 	UINT createFactoryFlags = 0;
 	HRESULT hResult = S_OK;
 
@@ -39,21 +54,6 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderS
 	if (m_dxgiFactory4->QueryInterface(IID_PPV_ARGS(&m_dxgiFactory7)) == S_OK)
 	{
 
-	}
-
-	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
-	if (renderSystemDescriptor.enableNVAPI)
-	{
-		InitializeNVAPI();
-	}
-
-	if (renderSystemDescriptor.enableRenderDoc)
-	{
-		InitializeRenderdoc();
-	}
-	else if (renderSystemDescriptor.enablePIX)
-	{
-		/*m_pixEnabled = */InitializePIX();
 	}
 }
 

@@ -329,7 +329,7 @@ crstl::string CrShaderMetadataBuilder::PrintResourceHashmap(const crstl::string&
 	crstl::string result;
 	result += "crstl::open_hashmap<crstl::string, " + resourceTypeName + "Metadata&> " + resourceTypeName + "Table =\n{";
 
-	for (const auto& resource : resources)
+	for (const SpvReflectDescriptorBinding& resource : resources)
 	{
 		crstl::string resourceName = crstl::string(resource.name) == "" ? resource.type_description->type_name : resource.name;
 		result += "\n\t{ \"" + resourceName + "\", " + resourceName + "MetaInstance },";
@@ -338,7 +338,7 @@ crstl::string CrShaderMetadataBuilder::PrintResourceHashmap(const crstl::string&
 
 	result += "crstl::array<" + resourceTypeName + "Metadata, " + crstl::string(resources.size()) + "> " + resourceTypeName + "MetaTable =\n{";
 
-	for (const auto& resource : resources)
+	for (const SpvReflectDescriptorBinding& resource : resources)
 	{
 		crstl::string resourceName = crstl::string(resource.name) == "" ? resource.type_description->type_name : resource.name;
 		result += "\n\t" + resourceName + "MetaInstance,";
@@ -560,7 +560,7 @@ crstl::string CrShaderMetadataBuilder::PrintTextureMetadataStructDeclaration()
 crstl::string CrShaderMetadataBuilder::PrintTextureMetadataInstanceDefinition(const ResourceVector& textures)
 {
 	crstl::string result;
-	for (const auto& texture : textures)
+	for (const SpvReflectDescriptorBinding& texture : textures)
 	{
 		result += "TextureMetadata " + crstl::string(texture.name) + "MetaInstance(" + "Textures::" + crstl::string(texture.name) + ");\n";
 	}
@@ -613,7 +613,7 @@ crstl::string CrShaderMetadataBuilder::PrintSamplerMetadataStructDeclaration()
 crstl::string CrShaderMetadataBuilder::PrintSamplerMetadataInstanceDefinition(const ResourceVector& samplers)
 {
 	crstl::string result;
-	for (const auto& sampler : samplers) { result += "SamplerMetadata " + crstl::string(sampler.name) + "MetaInstance(" + "Samplers::" + crstl::string(sampler.name) + ");\n"; }
+	for (const SpvReflectDescriptorBinding& sampler : samplers) { result += "SamplerMetadata " + crstl::string(sampler.name) + "MetaInstance(" + "Samplers::" + crstl::string(sampler.name) + ");\n"; }
 	result += "SamplerMetadata InvalidSamplerMetaInstance(UINT32_MAX);\n";
 	return result + "\n";
 }
@@ -653,7 +653,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWTextureMetadataCpp(const HLSLResou
 crstl::string CrShaderMetadataBuilder::PrintRWTextureMetadataInstanceDefinition(const ResourceVector& rwTextures)
 {
 	crstl::string result;
-	for (const auto& rwTexture : rwTextures)
+	for (const SpvReflectDescriptorBinding& rwTexture : rwTextures)
 	{
 		result += "RWTextureMetadata " + crstl::string(rwTexture.name) + "MetaInstance(" + "RWTextures::" + crstl::string(rwTexture.name) + ");\n";
 	}
@@ -693,19 +693,22 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const cr
 	if (isMemberStruct)
 	{
 		result += " : public " + bufferName + "Data\n{\n";
-		result += "\tusing Data = " + bufferName + "Data;\n";
-		result += "\tenum { stride = sizeof(" + bufferName + "Data) };\n";
 	}
 	else
 	{
 		crstl::string typeString = GetBuiltinTypeString(member);
 		result += "\n{\n";
 		result += "\tusing Data = " + typeString + ";\n";
-		result += "\tenum { stride = sizeof(" + typeString + ") };\n";
 	}
 
+	result += "\tenum { stride = " + crstl::string(member.traits.array.stride) + "};\n";
 	result += "\tenum { index = " + crstl::string(index) + " };\n";
 	result += "}; typedef " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + "> " + bufferName + ";\n\n";
+
+	if (isMemberStruct)
+	{
+		result += "static_assert(sizeof(" + bufferName + ") == " + bufferName + "::stride, \"Stride mismatch. Check struct member alignment\"); \n\n";
+	}
 
 	return result;
 }
@@ -754,7 +757,7 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataCpp(const HLSLR
 crstl::string CrShaderMetadataBuilder::PrintStorageBufferMetadataInstanceDefinition(const ResourceVector& storageBuffers)
 {
 	crstl::string result;
-	for (const auto& storageBuffer : storageBuffers)
+	for (const SpvReflectDescriptorBinding& storageBuffer : storageBuffers)
 	{
 		crstl::string name = crstl::string(storageBuffer.name);
 		auto scopedMeta = [&](const crstl::string& member) { return name + "::" + member; }; // Convenience lambda
@@ -819,7 +822,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataCpp(const HLS
 crstl::string CrShaderMetadataBuilder::PrintRWStorageBufferMetadataInstanceDefinition(const ResourceVector& rwStorageBuffers)
 {
 	crstl::string result;
-	for (const auto& rwStorageBuffer : rwStorageBuffers)
+	for (const SpvReflectDescriptorBinding& rwStorageBuffer : rwStorageBuffers)
 	{
 		crstl::string name = crstl::string(rwStorageBuffer.name);
 		auto scopedMeta = [&](const crstl::string& member) { return name + "::" + member; }; // Convenience lambda
@@ -875,7 +878,7 @@ crstl::string CrShaderMetadataBuilder::BuildTypedBufferMetadataCpp(const HLSLRes
 crstl::string CrShaderMetadataBuilder::PrintTypedBufferMetadataInstanceDefinition(const ResourceVector& typedBuffers)
 {
 	crstl::string result;
-	for (const auto& typedBuffer : typedBuffers)
+	for (const SpvReflectDescriptorBinding& typedBuffer : typedBuffers)
 	{
 		result += "TypedBufferMetadata " + crstl::string(typedBuffer.name) + "MetaInstance(" + "TypedBuffers::" + crstl::string(typedBuffer.name) + ");\n";
 	}
@@ -928,7 +931,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWTypedBufferMetadataCpp(const HLSLR
 crstl::string CrShaderMetadataBuilder::PrintRWTypedBufferMetadataInstanceDefinition(const ResourceVector& rwTypedBuffers)
 {
 	crstl::string result;
-	for (const auto& rwTypedBuffer : rwTypedBuffers)
+	for (const SpvReflectDescriptorBinding& rwTypedBuffer : rwTypedBuffers)
 	{
 		result += "RWTypedBufferMetadata " + crstl::string(rwTypedBuffer.name) + "MetaInstance(" + "RWTypedBuffers::" + crstl::string(rwTypedBuffer.name) + ");\n";
 	}

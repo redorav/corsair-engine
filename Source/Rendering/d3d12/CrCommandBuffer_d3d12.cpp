@@ -507,17 +507,18 @@ void CrCommandBufferD3D12::WriteStorageBufferSRV(const CrStorageBufferBinding& b
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDescriptor = {};
 	srvDescriptor.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDescriptor.Buffer.NumElements = binding.numElements;
+	srvDescriptor.Buffer.FirstElement = binding.offsetBytes / binding.strideBytes;
 
 	if (d3d12GPUBuffer->HasUsage(cr3d::BufferUsage::Byte))
 	{
 		srvDescriptor.Format = DXGI_FORMAT_R32_TYPELESS;
 		srvDescriptor.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
-		srvDescriptor.Buffer.FirstElement = 0;
 	}
 	else
 	{
 		srvDescriptor.Format = DXGI_FORMAT_UNKNOWN;
-		srvDescriptor.Buffer.FirstElement = binding.offsetBytes / binding.strideBytes;
 		srvDescriptor.Buffer.StructureByteStride = binding.strideBytes;
 	}
 

@@ -389,27 +389,6 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 	UpdateResourceTableVulkan(computeShader->GetBindingLayout(), VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputeShader->GetVkDescriptorSetLayout(), vulkanComputePipeline->GetVkPipelineLayout());
 }
 
-static VkAttachmentDescription GetVkAttachmentDescription(const CrRenderTargetDescriptor& renderTargetDescriptor)
-{
-	VkAttachmentDescription attachmentDescription;
-
-	attachmentDescription.flags          = 0;
-	attachmentDescription.format         = crvk::GetVkFormat(renderTargetDescriptor.texture->GetFormat());
-	attachmentDescription.samples        = crvk::GetVkSampleCount(renderTargetDescriptor.texture->GetSampleCount());
-	attachmentDescription.loadOp         = crvk::GetVkAttachmentLoadOp(renderTargetDescriptor.loadOp);
-	attachmentDescription.storeOp        = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.storeOp);
-	attachmentDescription.stencilLoadOp  = crvk::GetVkAttachmentLoadOp(renderTargetDescriptor.stencilLoadOp);
-	attachmentDescription.stencilStoreOp = crvk::GetVkAttachmentStoreOp(renderTargetDescriptor.stencilStoreOp);
-
-	// We don't let the Vulkan render pass try to do transitions as it will do them incorrectly unless there's some subpass
-	// magic going on. Instead, we take care of transitions manually and ignore the layouts here. For more information read
-	// https://themaister.net/blog/2019/08/14/yet-another-blog-explaining-vulkan-synchronization/
-	attachmentDescription.initialLayout  = crvk::GetVkImageStateInfo(renderTargetDescriptor.texture->GetFormat(), renderTargetDescriptor.initialState.layout).imageLayout;
-	attachmentDescription.finalLayout    = attachmentDescription.initialLayout;
-
-	return attachmentDescription;
-}
-
 void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	const CrRenderPassBufferDescriptor& bufferDescriptor, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
 {
@@ -458,118 +437,91 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 
 void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
-
 	// Always process buffers and textures
 	GatherImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
 
 	if(renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
 	{
-		// Attachment are up to number of render targets, plus depth
-		crstl::fixed_vector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
-		crstl::fixed_vector<VkImageView, cr3d::MaxRenderTargets + 1> attachmentImageViews;
-		crstl::fixed_vector<VkClearValue, cr3d::MaxRenderTargets + 1> clearValues;
-
-		// Attachment references are set in subpasses
-		crstl::fixed_vector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
-		VkAttachmentReference depthReference;
-
 		uint32_t numColorAttachments = (uint32_t)renderPassDescriptor.color.size();
-		uint32_t numDepthAttachments = 0;
 
-		for (uint32_t i = 0; i < numColorAttachments; ++i)
+		crstl::fixed_vector<VkRenderingAttachmentInfo, cr3d::MaxRenderTargets> vkColorAttachments;
+		VkRenderingAttachmentInfo vkDepthAttachment = {};
+		VkRenderingAttachmentInfo vkStencilAttachment = {};
+
+		VkRenderingInfo vkRenderingInfo = {};
+		vkRenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR;
+		vkRenderingInfo.layerCount = 1; // TODO Number of layers (e.g. for array textures)
+
+		uint32_t renderWidth  = 16384;
+		uint32_t renderHeight = 16384;
+
+		if (numColorAttachments > 0)
 		{
-			const CrRenderTargetDescriptor& colorAttachment = renderPassDescriptor.color[i];
-			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-			attachmentImageViews.push_back(static_cast<const CrTextureVulkan*>(colorAttachment.texture)->GetVkImageViewSingleMipSlice(colorAttachment.mipmap, colorAttachment.slice));
-			attachments.push_back(GetVkAttachmentDescription(colorAttachment));
-
-			if (colorAttachment.initialState.layout != colorAttachment.usageState.layout)
+			for (size_t i = 0; i < numColorAttachments; ++i)
 			{
-				QueueVkImageBarrier(colorAttachment.texture, colorAttachment.mipmap, 1, colorAttachment.slice, 1, colorAttachment.initialState, colorAttachment.usageState);
+				const CrRenderTargetDescriptor& colorAttachment = renderPassDescriptor.color[i];
+				const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(colorAttachment.texture);
+
+				VkRenderingAttachmentInfo& colorAttachmentInfo = vkColorAttachments.push_back();
+				colorAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
+				colorAttachmentInfo.imageView = vulkanTexture->GetVkImageViewSingleMipSlice(colorAttachment.mipmap, colorAttachment.slice);
+				colorAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				colorAttachmentInfo.loadOp = crvk::GetVkAttachmentLoadOp(colorAttachment.loadOp);
+				colorAttachmentInfo.storeOp = crvk::GetVkAttachmentStoreOp(colorAttachment.storeOp);
+
+				if (colorAttachment.initialState.layout != colorAttachment.usageState.layout)
+				{
+					QueueVkImageBarrier(colorAttachment.texture, colorAttachment.mipmap, 1, colorAttachment.slice, 1, colorAttachment.initialState, colorAttachment.usageState);
+				}
+
+				hlslpp::store(colorAttachment.clearColor, colorAttachmentInfo.clearValue.color.float32);
+
+				renderWidth  = vulkanTexture->GetWidth();
+				renderHeight = vulkanTexture->GetHeight();
 			}
 
-			VkClearValue& colorClearValue = clearValues.push_back();
-			hlslpp::store(colorAttachment.clearColor, colorClearValue.color.float32);
+			vkRenderingInfo.colorAttachmentCount = (uint32_t)vkColorAttachments.size();
+			vkRenderingInfo.pColorAttachments = vkColorAttachments.data();
 		}
 
 		if (renderPassDescriptor.depth.texture)
 		{
 			const CrRenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
 			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(depthAttachment.texture);
-			VkAttachmentDescription attachmentDescription = GetVkAttachmentDescription(depthAttachment);
 
-			depthReference = { numColorAttachments, attachmentDescription.initialLayout };
-			attachmentImageViews.push_back(vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice));
-			attachments.push_back(attachmentDescription);
+			vkDepthAttachment.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
+			vkDepthAttachment.imageView   = vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice);
+			vkDepthAttachment.imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+			vkDepthAttachment.loadOp      = crvk::GetVkAttachmentLoadOp(depthAttachment.loadOp);
+			vkDepthAttachment.storeOp     = crvk::GetVkAttachmentStoreOp(depthAttachment.storeOp);
+			vkDepthAttachment.clearValue.depthStencil.depth = depthAttachment.depthClearValue;
+
+			vkRenderingInfo.pDepthAttachment = &vkDepthAttachment;
+
+			renderWidth = vulkanTexture->GetWidth();
+			renderHeight = vulkanTexture->GetHeight();
 
 			if (depthAttachment.initialState.layout != depthAttachment.usageState.layout)
 			{
 				QueueVkImageBarrier(depthAttachment.texture, depthAttachment.mipmap, 1, depthAttachment.slice, 1, depthAttachment.initialState, depthAttachment.usageState);
 			}
 
-			VkClearValue& depthClearValue = clearValues.push_back();
-			depthClearValue.depthStencil.depth = depthAttachment.depthClearValue;
-			depthClearValue.depthStencil.stencil = depthAttachment.stencilClearValue;
-			numDepthAttachments = 1;
+			if (cr3d::IsDepthStencilFormat(renderPassDescriptor.depth.texture->GetFormat()))
+			{
+				vkStencilAttachment.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
+				vkStencilAttachment.imageView   = vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice);
+				vkStencilAttachment.imageLayout = VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL;
+				vkStencilAttachment.loadOp      = crvk::GetVkAttachmentLoadOp(depthAttachment.stencilLoadOp);
+				vkStencilAttachment.storeOp     = crvk::GetVkAttachmentStoreOp(depthAttachment.stencilStoreOp);
+				vkStencilAttachment.clearValue.depthStencil.stencil = depthAttachment.stencilClearValue;
+
+				vkRenderingInfo.pStencilAttachment = &vkStencilAttachment;
+			}
 		}
 
-		// All render passes need at least one subpass to work
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags                   = 0;
-		subpassDescription.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount    = 0;
-		subpassDescription.pInputAttachments       = nullptr;
-		subpassDescription.colorAttachmentCount    = (uint32_t)colorReferences.size();
-		subpassDescription.pColorAttachments       = colorReferences.data();
-		subpassDescription.pResolveAttachments     = nullptr;
-		subpassDescription.pDepthStencilAttachment = numDepthAttachments > 0 ? &depthReference : nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments    = nullptr;
+		vkRenderingInfo.renderArea = { { 0, 0 }, { renderWidth, renderHeight } };
 
-		// Create the renderpass
-		VkRenderPassCreateInfo renderPassInfo;
-		renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.pNext           = nullptr;
-		renderPassInfo.flags           = 0;
-		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
-		renderPassInfo.pAttachments    = attachments.data();
-		renderPassInfo.subpassCount    = 1;
-		renderPassInfo.pSubpasses      = &subpassDescription;
-		renderPassInfo.dependencyCount = 0;
-		renderPassInfo.pDependencies   = nullptr;
-
-		VkRenderPass& vkRenderPass = m_usedRenderPasses.push_back();
-		VkResult vkResult = vkCreateRenderPass(vkDevice, &renderPassInfo, &m_renderPassAllocationCallbacks, &vkRenderPass);
-		CrAssert(vkResult == VK_SUCCESS);
-
-		uint32_t width = !renderPassDescriptor.color.empty() ? renderPassDescriptor.color[0].texture->GetWidth() : renderPassDescriptor.depth.texture->GetWidth();
-		uint32_t height = !renderPassDescriptor.color.empty() ? renderPassDescriptor.color[0].texture->GetHeight() : renderPassDescriptor.depth.texture->GetHeight();
-
-		VkFramebufferCreateInfo frameBufferCreateInfo =
-		{
-			VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-			nullptr, 0, vkRenderPass, (uint32_t)attachmentImageViews.size(),
-			attachmentImageViews.data(), width, height, 1
-		};
-
-		VkFramebuffer vkFramebuffer;
-		vkResult = vkCreateFramebuffer(vkDevice, &frameBufferCreateInfo, &m_renderPassAllocationCallbacks, &vkFramebuffer);
-		CrAssert(vkResult == VK_SUCCESS);
-
-		// Create render pass begin parameters
-		VkRenderPassBeginInfo renderPassBeginInfo;
-		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.pNext = nullptr;
-		renderPassBeginInfo.renderPass = vkRenderPass;
-		renderPassBeginInfo.renderArea.offset.x = 0;
-		renderPassBeginInfo.renderArea.offset.y = 0;
-		renderPassBeginInfo.renderArea.extent.width = width;
-		renderPassBeginInfo.renderArea.extent.height = height;
-		renderPassBeginInfo.framebuffer = vkFramebuffer;
-		renderPassBeginInfo.clearValueCount = (uint32_t)clearValues.size();
-		renderPassBeginInfo.pClearValues = clearValues.data();
-		vkCmdBeginRenderPass(m_vkCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBeginRendering(m_vkCommandBuffer, &vkRenderingInfo);
 	}
 	else
 	{
@@ -603,7 +555,7 @@ void CrCommandBufferVulkan::EndRenderPassPS()
 			}
 		}
 
-		vkCmdEndRenderPass(m_vkCommandBuffer);
+		vkCmdEndRendering(m_vkCommandBuffer);
 	}
 
 	GatherImageAndBufferBarriers(m_currentState.m_currentRenderPass.endBuffers, m_currentState.m_currentRenderPass.endTextures);

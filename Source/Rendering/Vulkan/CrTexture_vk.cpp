@@ -244,14 +244,22 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 			m_additionalViews->m_vkImageSingleMipSlice[mip].resize(m_arraySize);
 
-			for (uint32_t slice = 0; slice < m_depth; ++slice)
+			// Only create more view if array size is > 1, otherwise we can just point to the view that allows all slices which is the common case
+			if (m_arraySize > 1)
 			{
-				imageViewInfo.subresourceRange.baseMipLevel = mip;
-				imageViewInfo.subresourceRange.levelCount = 1;
-				imageViewInfo.subresourceRange.baseArrayLayer = slice;
-				imageViewInfo.subresourceRange.layerCount = 1;
-				vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageSingleMipSlice[mip][slice]);
-				CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
+				for (uint32_t slice = 0; slice < m_arraySize; ++slice)
+				{
+					imageViewInfo.subresourceRange.baseMipLevel = mip;
+					imageViewInfo.subresourceRange.levelCount = 1;
+					imageViewInfo.subresourceRange.baseArrayLayer = slice;
+					imageViewInfo.subresourceRange.layerCount = 1;
+					vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageSingleMipSlice[mip][slice]);
+					CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
+				}
+			}
+			else
+			{
+				m_additionalViews->m_vkImageSingleMipSlice[mip][0] = m_additionalViews->m_vkImageViewSingleMipAllSlices[mip];
 			}
 		}
 
@@ -338,9 +346,13 @@ CrTextureVulkan::~CrTextureVulkan()
 
 		for (uint32_t mip = 0; mip < m_additionalViews->m_vkImageSingleMipSlice.size(); ++mip)
 		{
-			for (uint32_t slice = 0; slice < m_additionalViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
+			// We reuse the view for the common case, so don't try to destroy it twice
+			if (m_arraySize > 1)
 			{
-				vkDestroyImageView(vkDevice, m_additionalViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
+				for (uint32_t slice = 0; slice < m_additionalViews->m_vkImageSingleMipSlice[mip].size(); ++slice)
+				{
+					vkDestroyImageView(vkDevice, m_additionalViews->m_vkImageSingleMipSlice[mip][slice], nullptr);
+				}
 			}
 		}
 	}

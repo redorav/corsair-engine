@@ -57,7 +57,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 	appInfo.pApplicationName = "Corsair Engine";		// TODO Come from application settings
 	appInfo.pEngineName = "Corsair Engine";				// TODO Come from engine settings
 
-	uint32_t vulkanApiVersion = VK_VERSION_1_0;
+	uint32_t vulkanApiVersion = VK_VERSION_1_3;
 
 	if(vkEnumerateInstanceVersion != nullptr)
 	{

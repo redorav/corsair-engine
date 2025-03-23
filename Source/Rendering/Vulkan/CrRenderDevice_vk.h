@@ -145,6 +145,8 @@ private:
 
 	VkPhysicalDeviceVulkan12Properties m_vk12PhysicalDeviceProperties;
 
+	VkPhysicalDeviceVulkan13Properties m_vk13PhysicalDeviceProperties;
+
 	VkPhysicalDeviceProperties2 m_vkPhysicalDeviceProperties2;
 
 	// Stores device features such as supported compression, geometry shaders, etc
@@ -152,6 +154,8 @@ private:
 	VkPhysicalDeviceVulkan11Features m_vk11DeviceSupportedFeatures;
 
 	VkPhysicalDeviceVulkan12Features m_vk12DeviceSupportedFeatures;
+
+	VkPhysicalDeviceVulkan13Features m_vk13DeviceSupportedFeatures;
 
 	VkPhysicalDeviceFeatures2 m_vkDeviceSupportedFeatures2;
 

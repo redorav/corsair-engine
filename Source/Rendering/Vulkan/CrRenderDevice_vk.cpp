@@ -542,11 +542,17 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	m_vk12PhysicalDeviceProperties = {};
 	m_vk12PhysicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
 
+	m_vk13PhysicalDeviceProperties = {};
+	m_vk13PhysicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
+
 	m_vk11DeviceSupportedFeatures = {};
 	m_vk11DeviceSupportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
 
 	m_vk12DeviceSupportedFeatures = {};
 	m_vk12DeviceSupportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+
+	m_vk13DeviceSupportedFeatures = {};
+	m_vk13DeviceSupportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
 
 	VkDriverId driverId = VK_DRIVER_ID_MAX_ENUM;
 
@@ -577,6 +583,12 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		{
 			m_vk11PhysicalDeviceProperties.pNext = &m_vk12PhysicalDeviceProperties;
 			m_vk11DeviceSupportedFeatures.pNext = &m_vk12DeviceSupportedFeatures;
+		}
+
+		if (m_vkVersion >= VK_VERSION_1_3)
+		{
+			m_vk12PhysicalDeviceProperties.pNext = &m_vk13PhysicalDeviceProperties;
+			m_vk12DeviceSupportedFeatures.pNext = &m_vk13DeviceSupportedFeatures;
 		}
 
 		vkGetPhysicalDeviceProperties2(m_vkPhysicalDevice, &m_vkPhysicalDeviceProperties2);
@@ -788,9 +800,16 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		enabledDeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
+	// To use D3D-compatible viewports
 	if (IsVkDeviceExtensionSupported(VK_KHR_MAINTENANCE1_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
+	}
+
+	// Avoid the awful renderpass API
+	if (IsVkDeviceExtensionSupported(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
+	{
+		enabledDeviceExtensions.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 	}
 
 	// To use instance id inside a shader
@@ -799,6 +818,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		enabledDeviceExtensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
 	}
 
+	// Allow conservative rasterization
 	if (IsVkDeviceExtensionSupported(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME))
 	{
 		enabledDeviceExtensions.push_back(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME);
@@ -820,6 +840,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
 	// Enable all available features
+	// TODO Enable what we actually need, and assert on essential features that the device doesn't support
 	if (m_vkVersion >= VK_VERSION_1_1)
 	{
 		deviceCreateInfo.pNext = &m_vkDeviceSupportedFeatures2;

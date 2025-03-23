@@ -245,87 +245,37 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	vertexInputState.vertexAttributeDescriptionCount = attributeCount;
 	vertexInputState.pVertexAttributeDescriptions = attributeDescriptions.data();
 
-	// We don't need the real renderpass here to create pipeline state objects, a compatible one is enough
-	// to make it work. I suspect the only thing it really needs is the description of how we're going to
-	// be using the render pass. In D3D12 this is actually part of the pipeline descriptor (RTVFormats, DSVFormat)
-	// TODO This should probably be optimized either by having another function that passes an actual render pass
-	// or by having a cache of render pass descriptors. The reason for using a dummy render pass is so that
-	// pipelines can be precreated without needing access to the actual draw commands. Another alternative is
-	// to create the render pass on the stack by using a custom allocator.
-	VkRenderPass vkCompatibleRenderPass;
+	// Remove all the hacks from the renderpass API and set what we know the renderpass really wanted
+	// which is only the format of the texture
+
+	crstl::fixed_vector<VkFormat, cr3d::MaxRenderTargets> colorAttachmentFormats;
+
+	VkPipelineRenderingCreateInfoKHR vkPipelineRenderingInfo = {};
+	vkPipelineRenderingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
+	vkPipelineRenderingInfo.viewMask = 0; // TODO Multi-viewport rendering
+
+	for (size_t i = 0; i < colorBlendState.attachmentCount; ++i)
 	{
-		crstl::fixed_vector<VkAttachmentDescription, cr3d::MaxRenderTargets + 1> attachments;
-		crstl::fixed_vector<VkAttachmentReference, cr3d::MaxRenderTargets> colorReferences;
-		VkAttachmentReference depthReference;
+		colorAttachmentFormats.push_back(crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]));
+	}
 
-		uint32_t numColorAttachments = colorBlendState.attachmentCount;
-		uint32_t numDepthAttachments = 0;
+	vkPipelineRenderingInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
+	vkPipelineRenderingInfo.colorAttachmentCount = (uint32_t)colorAttachmentFormats.size();
 
-		for (uint32_t i = 0; i < numColorAttachments; ++i)
-		{
-			colorReferences.push_back({ i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-			VkAttachmentDescription attachmentDescription = {};
-			attachmentDescription.flags = 0;
-			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.colorFormats[i]);
-			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
-			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
-			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachments.push_back(attachmentDescription);
-		}
-
-		if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
-		{
-			depthReference = { numColorAttachments, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
-			VkAttachmentDescription attachmentDescription = {};
-			attachmentDescription.flags = 0;
-			attachmentDescription.format = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
-			attachmentDescription.samples = crvk::GetVkSampleCount(pipelineDescriptor.renderTargets.sampleCount);
-			attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
-			attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachments.push_back(attachmentDescription);
-			numDepthAttachments = 1;
-		}
-
-		// All render passes need at least one subpass to work.
-		// By defining a subpass dependency as external on both sides, we get the simplest render pass
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = 0;
-		subpassDescription.pInputAttachments = nullptr;
-		subpassDescription.colorAttachmentCount = numColorAttachments;
-		subpassDescription.pColorAttachments = colorReferences.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = numDepthAttachments > 0 ? &depthReference : nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		// Create the renderpass
-		VkRenderPassCreateInfo renderPassInfo;
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.pNext = nullptr;
-		renderPassInfo.flags = 0;
-		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
-		renderPassInfo.pAttachments = attachments.data();
-		renderPassInfo.subpassCount = 1;
-		renderPassInfo.pSubpasses = &subpassDescription;
-		renderPassInfo.dependencyCount = 0;
-		renderPassInfo.pDependencies = nullptr;
-
-		vkResult = vkCreateRenderPass(vulkanRenderDevice->GetVkDevice(), &renderPassInfo, nullptr, &vkCompatibleRenderPass);
-		CrAssert(vkResult == VK_SUCCESS);
+	if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
+	{
+		vkPipelineRenderingInfo.depthAttachmentFormat = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
+		vkPipelineRenderingInfo.stencilAttachmentFormat = vkPipelineRenderingInfo.depthAttachmentFormat;
 	}
 
 	VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 	graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	graphicsPipelineCreateInfo.pNext = &vkPipelineRenderingInfo;
 	graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShader->GetBytecodes().size();
 	graphicsPipelineCreateInfo.pStages = shaderStages;
 
 	graphicsPipelineCreateInfo.layout = m_vkPipelineLayout;
 	graphicsPipelineCreateInfo.pVertexInputState = &vertexInputState;
-	graphicsPipelineCreateInfo.renderPass = vkCompatibleRenderPass;
 
 	graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 	graphicsPipelineCreateInfo.pRasterizationState = &rasterizerState;
@@ -339,8 +289,6 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShader->GetDebugName());
-
-	vkDestroyRenderPass(vulkanRenderDevice->GetVkDevice(), vkCompatibleRenderPass, nullptr);
 }
 
 CrGraphicsPipelineVulkan::~CrGraphicsPipelineVulkan()

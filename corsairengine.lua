@@ -498,7 +498,9 @@ project(ProjectCore)
 		xxHashLibrary.includeDirs..'/xxhash.h'
 	}
 
+	AddLibraryFiles(CRSTLLibrary)
 	AddLibraryNatvis(CRSTLLibrary)
+
 	AddLibraryIncludes(SDL3Library)
 	AddLibraryIncludes(ImguiLibrary)
 

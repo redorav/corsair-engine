@@ -97,9 +97,6 @@ class CrGPUDeletable;
 struct CrRenderDeviceDescriptor
 {
 	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
-	bool enableRenderDoc = false;
-	bool enablePIX = false;
-	bool enableNVAPI = true;
 };
 
 class ICrRenderDevice : public crstl::intrusive_ptr_interface_base

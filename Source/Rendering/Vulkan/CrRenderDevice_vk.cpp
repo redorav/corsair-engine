@@ -118,11 +118,6 @@ CrRenderDeviceVulkan::CrRenderDeviceVulkan(ICrRenderSystem* renderSystem, const 
 	CrAssert(result == VK_SUCCESS);
 
 	SetVkObjectName((uint64_t)m_vkSwapchainCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "Swapchain Command Buffer");
-
-	if (descriptor.enableRenderDoc)
-	{
-		RenderSystem->InitializeRenderdoc();
-	}
 }
 
 CrRenderDeviceVulkan::~CrRenderDeviceVulkan()

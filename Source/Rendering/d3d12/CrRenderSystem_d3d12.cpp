@@ -40,6 +40,21 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderS
 	{
 
 	}
+
+	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
+	if (renderSystemDescriptor.enableNVAPI)
+	{
+		InitializeNVAPI();
+	}
+
+	if (renderSystemDescriptor.enableRenderDoc)
+	{
+		InitializeRenderdoc();
+	}
+	else if (renderSystemDescriptor.enablePIX)
+	{
+		/*m_pixEnabled = */InitializePIX();
+	}
 }
 
 ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor)

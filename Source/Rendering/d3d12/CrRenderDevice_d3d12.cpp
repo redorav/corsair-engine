@@ -357,22 +357,6 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	}
 
 	m_waitIdleFence = CreateGPUFence();
-
-	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
-	if (descriptor.enableNVAPI && m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::NVIDIA)
-	{
-		m_nvapiEnabled = d3d12RenderSystem->InitializeNVAPI();
-	}
-
-	if (descriptor.enableRenderDoc)
-	{
-		d3d12RenderSystem->InitializeRenderdoc();
-	}
-
-	if (descriptor.enablePIX)
-	{
-		m_pixEnabled = d3d12RenderSystem->InitializePIX();
-	}
 }
 
 CrRenderDeviceD3D12::~CrRenderDeviceD3D12()

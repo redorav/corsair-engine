@@ -53,8 +53,6 @@ public:
 
 	bool GetIsEnhancedBarriersSupported() const { return m_enhancedBarriersSupported; }
 
-	bool GetIsNVAPIEnabled() const { return m_nvapiEnabled; }
-
 private:
 
 	//------------------
@@ -173,10 +171,6 @@ private:
 	ID3D12Device14* m_d3d12Device14 = nullptr;
 
 	bool m_enhancedBarriersSupported = false;
-
-	bool m_nvapiEnabled = false;
-
-	bool m_pixEnabled = false;
 };
 
 inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()

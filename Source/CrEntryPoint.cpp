@@ -74,13 +74,13 @@ int main(int argc, char* argv[])
 	}
 
 	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
+	renderSystemDescriptor.enableRenderDoc = enableRenderDoc;
+	renderSystemDescriptor.enablePIX = enablePIX;
 
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
 
 	CrRenderDeviceDescriptor renderDeviceDescriptor;
 	renderDeviceDescriptor.preferredVendor = cr3d::GraphicsVendor::FromString(graphicsVendorString.c_str());
-	renderDeviceDescriptor.enableRenderDoc = enableRenderDoc;
-	renderDeviceDescriptor.enablePIX       = enablePIX;
 	RenderSystem->CreateRenderDevice(renderDeviceDescriptor);
 
 	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();

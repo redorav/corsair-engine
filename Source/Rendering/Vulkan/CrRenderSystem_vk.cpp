@@ -47,6 +47,11 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 
 CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
+	if (renderSystemDescriptor.enableRenderDoc)
+	{
+		InitializeRenderdoc();
+	}
+
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Corsair Engine";		// TODO Come from application settings

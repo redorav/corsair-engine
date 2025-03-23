@@ -16,6 +16,12 @@ struct CrRenderSystemDescriptor
 
 	// e.g. Vulkan layers, D3D debug layer
 	bool enableValidation = false;
+
+	bool enableRenderDoc = false;
+
+	bool enablePIX = false;
+
+	bool enableNVAPI = true;
 };
 
 namespace CrBuiltinShaders { enum T : uint32_t; };

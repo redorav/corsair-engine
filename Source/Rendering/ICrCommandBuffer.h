@@ -193,6 +193,12 @@ public:
 
 	void DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
 
+	void DispatchTexture1D(uint32_t textureWidth);
+
+	void DispatchTexture2D(uint32_t textureWidth, uint32_t textureHeight);
+
+	void DispatchTexture3D(uint32_t textureWidth, uint32_t textureHeight, uint32_t textureDepth);
+
 	void DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
 
 	void DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset);
@@ -486,6 +492,30 @@ inline void ICrCommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectB
 
 	CrRenderingStatistics::AddDrawcall();
 	// We cannot add the vertices here because we don't know them
+}
+
+inline void ICrCommandBuffer::DispatchTexture1D(uint32_t textureWidth)
+{
+	uint dispatchThreadX = m_currentState.m_computePipeline->GetGroupSizeX();
+
+	Dispatch((textureWidth + dispatchThreadX - 1) / dispatchThreadX, 1, 1);
+}
+
+inline void ICrCommandBuffer::DispatchTexture2D(uint32_t textureWidth, uint32_t textureHeight)
+{
+	uint dispatchThreadX = m_currentState.m_computePipeline->GetGroupSizeX();
+	uint dispatchThreadY = m_currentState.m_computePipeline->GetGroupSizeY();
+
+	Dispatch((textureWidth + dispatchThreadX - 1) / dispatchThreadX, (textureHeight + dispatchThreadY - 1) / dispatchThreadY, 1);
+}
+
+inline void ICrCommandBuffer::DispatchTexture3D(uint32_t textureWidth, uint32_t textureHeight, uint32_t textureDepth)
+{
+	uint dispatchThreadX = m_currentState.m_computePipeline->GetGroupSizeX();
+	uint dispatchThreadY = m_currentState.m_computePipeline->GetGroupSizeY();
+	uint dispatchThreadZ = m_currentState.m_computePipeline->GetGroupSizeZ();
+
+	Dispatch((textureWidth + dispatchThreadX - 1) / dispatchThreadX, (textureHeight + dispatchThreadY - 1) / dispatchThreadY, (textureDepth + dispatchThreadZ - 1) / dispatchThreadZ);
 }
 
 inline void ICrCommandBuffer::DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)

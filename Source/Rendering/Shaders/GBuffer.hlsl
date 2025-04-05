@@ -49,7 +49,7 @@ Surface DecodeGBufferSurface(uint2 screenPixel, float4 screenUVClip)
 
 	Surface surface = CreateDefaultSurface();
 	
-	float linearDepth = LinearizeDepth(gBuffer.rawDepth, cb_Camera.linearization);
+	float linearDepth = LinearizeDepth(gBuffer.rawDepth, CameraCB.linearization);
 
 	surface.rawDepth            = gBuffer.rawDepth;
 	surface.linearDepth         = linearDepth;
@@ -58,7 +58,7 @@ Surface DecodeGBufferSurface(uint2 screenPixel, float4 screenUVClip)
 	surface.screenUV            = screenUVClip.xy;
 	
 	surface.positionView        = BackprojectView(screenUVClip.zw, linearDepth);
-	surface.positionCameraWorld = mul(surface.positionView, (float3x3) cb_Camera.view2WorldRotation);
+	surface.positionCameraWorld = mul(surface.positionView, (float3x3) CameraCB.view2WorldRotation);
 	surface.viewView            = normalize(surface.positionView);
 	surface.viewWorld           = -normalize(surface.positionCameraWorld);
 	

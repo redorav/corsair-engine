@@ -34,7 +34,7 @@ struct VSOutputFullscreen
 	float4 screenUVClip : TEXCOORD0; // Screen position in UV space, position in [-1, 1]
 };
 
-struct Camera
+struct CameraData
 {
 	row_major float4x4 view2Projection;
 	row_major float4x4 world2View;
@@ -45,9 +45,9 @@ struct Camera
 	float4 worldPosition; // .xyz Position of the camera in world space, .w Near Plane
 };
 
-cbuffer Camera
+cbuffer CameraCB
 {
-	Camera cb_Camera;
+	CameraData CameraCB;
 };
 
 struct Material

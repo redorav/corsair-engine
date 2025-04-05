@@ -45,7 +45,7 @@ void DepthDownsampleLinearizeMinMaxCS(CSInput csInput)
 	float4 rawDepths = RawDepthTexture.GatherRed(AllPointClampSampler, centerUV);
 	uint stencil = StencilTexture.Load(uint3(0, 0, 0));
 
-	float4 linearDepths = LinearizeDepth(rawDepths, cb_Camera.linearization);
+	float4 linearDepths = LinearizeDepth(rawDepths, CameraCB.linearization);
 
 	float minDepth = min4(linearDepths.x, linearDepths.y, linearDepths.z, linearDepths.w);
 	float maxDepth = max4(linearDepths.x, linearDepths.y, linearDepths.z, linearDepths.w);

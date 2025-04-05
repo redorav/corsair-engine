@@ -29,7 +29,7 @@ VSOutputFullscreen CopyTextureVS(VSInputFullscreen input)
 	}
 
 	// Convert from clip space to view space
-	vsOutput.screenUVClip.zw = vsOutput.screenUVClip.zw * cb_Camera.backprojection.xy + cb_Camera.backprojection.zw;
+	vsOutput.screenUVClip.zw = vsOutput.screenUVClip.zw * CameraCB.backprojection.xy + CameraCB.backprojection.zw;
 
 	return vsOutput;
 }

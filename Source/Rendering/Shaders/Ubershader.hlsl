@@ -32,9 +32,9 @@ VSOutput UbershaderVS(VSInput vsInput)
 
 	float4 positionWorld = mul(positionLocal, local2WorldMatrix);
 
-	float4 positionView = mul(positionWorld, cb_Camera.world2View);
+	float4 positionView = mul(positionWorld, CameraCB.world2View);
 
-	vsOutput.hwPosition = mul(positionView, cb_Camera.view2Projection);
+	vsOutput.hwPosition = mul(positionView, CameraCB.view2Projection);
 	#endif
 	
 	// Careful with this code and non-uniform scaling

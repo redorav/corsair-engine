@@ -99,9 +99,9 @@ VSOutputEditorGrid EditorGridVS(uint vertexId : SV_VertexID)
 	
 	float4 positionWorld = float4(positionLocal.xyz * cb_EditorGrid.gridParams.x, 1);
 
-	float4 positionView = mul(positionWorld, cb_Camera.world2View);
+	float4 positionView = mul(positionWorld, CameraCB.world2View);
 	
-	float4 positionHomogeneous = mul(positionView, cb_Camera.view2Projection);
+	float4 positionHomogeneous = mul(positionView, CameraCB.view2Projection);
 
 	vsOutput.hwPosition = positionHomogeneous;
 	vsOutput.worldPosition = positionWorld;
@@ -124,7 +124,7 @@ float4 EditorGridPS(VSOutputEditorGrid psInput) : SV_Target0
 	
 	float3 worldPosition = psInput.worldPosition.xyz;
 	
-	float horizontalDistanceToCamera = length(cb_Camera.worldPosition.xz - worldPosition.xz);
+	float horizontalDistanceToCamera = length(CameraCB.worldPosition.xz - worldPosition.xz);
 	
 	float2 grid = abs(frac(coord - 0.5) - 0.5) / fwidth(coord);
 	

@@ -5,11 +5,11 @@
 
 const ConstantBufferMetadata& CrShaderMetadata::GetConstantBuffer(const crstl::string& name)
 {
-	auto cBuffer = ConstantBufferTable.find(name);
+	auto constantBuffer = ConstantBufferTable.find(name);
 
-	if (cBuffer != ConstantBufferTable.end())
+	if (constantBuffer != ConstantBufferTable.end())
 	{
-		return (*cBuffer).second;
+		return (*constantBuffer).second;
 	}
 
 	return InvalidConstantBufferMetaInstance;

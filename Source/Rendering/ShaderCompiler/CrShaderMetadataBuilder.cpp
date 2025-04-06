@@ -201,7 +201,7 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 	// Maybe there is a better way of not writing these headers directly. They depend on the physical
 	// structure of the code which can change
 	metadataHeader += "#include \"crstl/array.h\"\n";
-	metadataHeader += "#include \"crstl/open_hashmap.h\"\n";
+	metadataHeader += "#include \"crstl/fixed_open_hashmap.h\"\n";
 	metadataHeader += "#include \"crstl/vector.h\"\n";
 	metadataHeader += "#include \"crstl/string.h\"\n";
 	metadataHeader += "#include \"Rendering/CrRenderingVector.h\"\n";
@@ -294,14 +294,14 @@ crstl::string CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const H
 		result += "\tenum { index = " + crstl::string(uniformBufferIndex) + " };\n";
 		result += "};\n\n";
 
-		result += "static_assert(sizeof(" + constantBufferName + ") == " + constantBufferName + "::size, \"Size mismatch. Check struct member alignment\"); \n\n";
+		result += "static_assert(sizeof(" + constantBufferName + ") == " + constantBufferName + "::size, \"Size mismatch. Check struct member alignment\");\n\n";
 	}
 
 	result += PrintConstantBufferMetadataStructDeclaration();
 
 	result += PrintResourceMetadataInstanceDeclaration("ConstantBuffer", resources.constantBuffers);
 
-	result += "extern crstl::open_hashmap<crstl::string, ConstantBufferMetadata&> ConstantBufferTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, ConstantBufferMetadata&, " + crstl::string(resources.constantBuffers.size()) + "> ConstantBufferTable;\n\n";
 
 	result += "extern crstl::array<ConstantBufferMetadata, " + crstl::string(resources.constantBuffers.size()) + crstl::string("> ConstantBufferMetaTable;\n\n");
 
@@ -340,7 +340,7 @@ crstl::string CrShaderMetadataBuilder::PrintResourceEnum(const crstl::string& re
 crstl::string CrShaderMetadataBuilder::PrintResourceHashmap(const crstl::string& resourceTypeName, const ResourceVector& resources)
 {
 	crstl::string result;
-	result += "crstl::open_hashmap<crstl::string, " + resourceTypeName + "Metadata&> " + resourceTypeName + "Table =\n{";
+	result += "crstl::fixed_open_hashmap<crstl::string, " + resourceTypeName + "Metadata&, " + crstl::string(resources.size()) + "> " + resourceTypeName + "Table = \n{";
 
 	for (const SpvReflectDescriptorBinding& resource : resources)
 	{
@@ -574,7 +574,7 @@ crstl::string CrShaderMetadataBuilder::BuildTextureMetadataHeader(const HLSLReso
 
 	result += PrintResourceMetadataInstanceDeclaration("Texture", resources.textures);
 
-	result += "extern crstl::open_hashmap<crstl::string, TextureMetadata&> TextureTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, TextureMetadata&, " + crstl::string(resources.textures.size()) + "> TextureTable;\n\n";
 
 	result += "extern crstl::array<TextureMetadata, " + crstl::string(resources.textures.size()) + "> TextureMetaTable;\n\n";
 
@@ -627,7 +627,7 @@ crstl::string CrShaderMetadataBuilder::BuildSamplerMetadataHeader(const HLSLReso
 
 	result += PrintResourceMetadataInstanceDeclaration("Sampler", resources.samplers);
 
-	result += "extern crstl::open_hashmap<crstl::string, SamplerMetadata&> SamplerTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, SamplerMetadata&, " + crstl::string(resources.samplers.size()) + "> SamplerTable;\n\n";
 
 	result += "extern crstl::array<SamplerMetadata, " + crstl::string(resources.samplers.size()) + "> SamplerMetaTable;\n\n";
 
@@ -677,7 +677,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWTextureMetadataHeader(const HLSLRe
 
 	result += PrintResourceMetadataInstanceDeclaration("RWTexture", resources.rwTextures);
 
-	result += "extern crstl::open_hashmap<crstl::string, RWTextureMetadata&> RWTextureTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, RWTextureMetadata&, " + crstl::string(resources.rwTextures.size()) + "> RWTextureTable;\n\n";
 
 	result += "extern crstl::array<RWTextureMetadata, " + crstl::string(resources.rwTextures.size()) + "> RWTextureMetaTable;\n\n";
 
@@ -754,7 +754,7 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const cr
 
 	if (isMemberStruct)
 	{
-		result += "static_assert(sizeof(" + bufferName + ") == " + bufferName + "::stride, \"Stride mismatch. Check struct member alignment\"); \n\n";
+		result += "static_assert(sizeof(" + bufferName + ") == " + bufferName + "::stride, \"Stride mismatch. Check struct member alignment\");\n\n";
 	}
 
 	return result;
@@ -781,7 +781,7 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HL
 
 	result += PrintResourceMetadataInstanceDeclaration("StorageBuffer", resources.storageBuffers);
 
-	result += "extern crstl::open_hashmap<crstl::string, StorageBufferMetadata&> StorageBufferTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, StorageBufferMetadata&, " + crstl::string(resources.storageBuffers.size()) + "> StorageBufferTable;\n\n";
 
 	result += "extern crstl::array<StorageBufferMetadata, " + crstl::string(resources.storageBuffers.size()) + "> StorageBufferMetaTable;\n\n";
 
@@ -846,7 +846,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const 
 
 	result += PrintResourceMetadataInstanceDeclaration("RWStorageBuffer", resources.rwStorageBuffers);
 
-	result += "extern crstl::open_hashmap<crstl::string, RWStorageBufferMetadata&> RWStorageBufferTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, RWStorageBufferMetadata&, " + crstl::string(resources.rwStorageBuffers.size()) + "> RWStorageBufferTable;\n\n";
 
 	result += "extern crstl::array<RWStorageBufferMetadata, " + crstl::string(resources.rwStorageBuffers.size()) + "> RWStorageBufferMetaTable;\n\n";
 
@@ -902,7 +902,7 @@ crstl::string CrShaderMetadataBuilder::BuildTypedBufferMetadataHeader(const HLSL
 
 	result += PrintResourceMetadataInstanceDeclaration("TypedBuffer", resources.typedBuffers);
 
-	result += "extern crstl::open_hashmap<crstl::string, TypedBufferMetadata&> TypedBufferTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, TypedBufferMetadata&, " + crstl::string(resources.typedBuffers.size()) + "> TypedBufferTable;\n\n";
 
 	result += "extern crstl::array<TypedBufferMetadata, " + crstl::string(resources.typedBuffers.size()) + "> TypedBufferMetaTable;\n\n";
 
@@ -955,7 +955,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWTypedBufferMetadataHeader(const HL
 
 	result += PrintResourceMetadataInstanceDeclaration("RWTypedBuffer", resources.rwTypedBuffers);
 
-	result += "extern crstl::open_hashmap<crstl::string, RWTypedBufferMetadata&> RWTypedBufferTable;\n\n";
+	result += "extern crstl::fixed_open_hashmap<crstl::string, RWTypedBufferMetadata&, " + crstl::string(resources.rwTypedBuffers.size()) + "> RWTypedBufferTable;\n\n";
 
 	result += "extern crstl::array<RWTypedBufferMetadata, " + crstl::string(resources.rwTypedBuffers.size()) + "> RWTypedBufferMetaTable;\n\n";
 

@@ -506,8 +506,8 @@ void CrFrame::Process()
 	);
 	m_cameraConstantData.worldPosition = float4(m_camera->GetPosition(), m_camera->GetNearPlane());
 
-	CrGPUBufferViewT<Camera> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<Camera>();
-	Camera* cameraData = cameraDataBuffer.GetData();
+	CrGPUBufferViewT<CameraCB> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<CameraCB>();
+	CameraCB* cameraData = cameraDataBuffer.GetData();
 	{
 		*cameraData = m_cameraConstantData;
 	}
@@ -584,8 +584,8 @@ void CrFrame::Process()
 	[this]
 	(const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
-		CrGPUBufferViewT<DynamicLight> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLight>();
-		DynamicLight* lightData = lightConstantBuffer.GetData();
+		CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
+		DynamicLightCB* lightData = lightConstantBuffer.GetData();
 		{
 			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
 			lightData->colorIntensity = float4(1.0f, 1.0f, 1.0f, 1.0f);

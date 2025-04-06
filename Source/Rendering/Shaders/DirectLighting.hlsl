@@ -13,9 +13,9 @@ struct DynamicLight
 	float4 colorIntensity;
 };
 
-cbuffer DynamicLight
+cbuffer DynamicLightCB
 {
-	DynamicLight cb_DynamicLight;
+	DynamicLight DynamicLightCB;
 };
 
 struct LightComponents
@@ -51,8 +51,8 @@ float4 DeferredLightingPS(VSOutputFullscreen psInput) : SV_Target0
 	
 	Surface surface = DecodeGBufferSurface(screenPixel, psInput.screenUVClip);
 	
-	Light light = ReadLight(cb_DynamicLight);
-	
+	Light light = ReadLight(DynamicLightCB);
+
 	light.directionPosition.xyz = normalize(float3(1, 1, 1));
 
 	float3 lighting = DirectionalLighting(surface, light);

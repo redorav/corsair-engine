@@ -102,7 +102,7 @@ private:
 
 	CrCameraHandle m_camera;
 
-	Camera m_cameraConstantData;
+	CameraCB m_cameraConstantData;
 
 	CrRenderWorldHandle m_renderWorld;
 

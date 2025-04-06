@@ -99,7 +99,7 @@ struct CrRenderGraphTextureUsage
 };
 
 // A transition structure that describes the intended state, the state before and the intended state after
-struct CrRenderGraphTextureTransitionInfo2
+struct CrRenderGraphTextureTransitionInfo
 {
 	uint32_t mipmapStart = 0;
 	uint32_t mipmapCount = 1;
@@ -113,7 +113,7 @@ struct CrRenderGraphTextureTransitionInfo2
 };
 
 // How this buffer is intended to be used in this pass
-struct CrRenderGraphBufferUsage2
+struct CrRenderGraphBufferUsage
 {
 	const ICrHardwareGPUBuffer* buffer = nullptr;
 
@@ -136,7 +136,7 @@ struct CrRenderGraphBufferUsage2
 };
 
 // A transition structure that describes the intended state, the state before and the intended state after
-struct CrRenderGraphBufferTransitionInfo2
+struct CrRenderGraphBufferTransitionInfo
 {
 	uint32_t offset = 0;
 	uint32_t size = 0;
@@ -160,11 +160,11 @@ struct CrRenderGraphPass
 
 	crstl::fixed_vector<CrRenderGraphTextureUsage, 16> textureUsages;
 
-	crstl::fixed_vector<CrRenderGraphBufferUsage2, 16> bufferUsages;
+	crstl::fixed_vector<CrRenderGraphBufferUsage, 16> bufferUsages;
 
-	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphTextureTransitionInfo2, 16> textureTransitionInfos;
+	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphTextureTransitionInfo, 16> textureTransitionInfos;
 
-	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphBufferTransitionInfo2, 16> bufferTransitionInfos;
+	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphBufferTransitionInfo, 16> bufferTransitionInfos;
 
 	ICrTexture* depthTexture;
 

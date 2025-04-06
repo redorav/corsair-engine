@@ -263,7 +263,7 @@ void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHa
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
 
-	CrRenderGraphBufferUsage2 bufferUsage;
+	CrRenderGraphBufferUsage bufferUsage;
 	bufferUsage.buffer = buffer;
 	bufferUsage.usageState = cr3d::BufferState::ShaderInput;
 	bufferUsage.shaderStages = shaderStages;
@@ -288,7 +288,7 @@ void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const I
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
 
-	CrRenderGraphBufferUsage2 bufferUsage;
+	CrRenderGraphBufferUsage bufferUsage;
 	bufferUsage.buffer               = buffer;
 	bufferUsage.usageState           = cr3d::BufferState::ReadWrite;
 	bufferUsage.shaderStages         = shaderStages;
@@ -313,7 +313,7 @@ void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwa
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
 
-	CrRenderGraphBufferUsage2 bufferUsage;
+	CrRenderGraphBufferUsage bufferUsage;
 	bufferUsage.buffer           = buffer;
 	bufferUsage.usageState       = cr3d::BufferState::ShaderInput;
 	bufferUsage.shaderStages     = shaderStages;
@@ -338,7 +338,7 @@ void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHa
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
 
-	CrRenderGraphBufferUsage2 bufferUsage;
+	CrRenderGraphBufferUsage bufferUsage;
 	bufferUsage.buffer             = buffer;
 	bufferUsage.usageState         = cr3d::BufferState::ReadWrite;
 	bufferUsage.shaderStages       = shaderStages;
@@ -383,7 +383,7 @@ void CrRenderGraph::Execute()
 		{
 			const CrRenderGraphTextureUsage& textureUsage = renderGraphPass->textureUsages[textureIndex];
 
-			CrRenderGraphTextureTransitionInfo2 transitionInfo;
+			CrRenderGraphTextureTransitionInfo transitionInfo;
 			transitionInfo.usageState = textureUsage.state;
 
 			// Initialize final state to default state until we have more information
@@ -398,7 +398,7 @@ void CrRenderGraph::Execute()
 			if (lastUsedRenderPass)
 			{
 				// By definition the pass that references it has a transition info set up
-				CrRenderGraphTextureTransitionInfo2& lastUsedTransitionInfo = lastUsedRenderPass->textureTransitionInfos.find(textureUsage.subresourceId)->second;
+				CrRenderGraphTextureTransitionInfo& lastUsedTransitionInfo = lastUsedRenderPass->textureTransitionInfos.find(textureUsage.subresourceId)->second;
 				lastUsedTransitionInfo.finalState = textureUsage.state;
 				transitionInfo.initialState = textureUsage.state;
 			}
@@ -417,9 +417,9 @@ void CrRenderGraph::Execute()
 		// Process buffers within a pass
 		for (uint32_t bufferIndex = 0; bufferIndex < renderGraphPass->bufferUsages.size(); ++bufferIndex)
 		{
-			const CrRenderGraphBufferUsage2& bufferUsage = renderGraphPass->bufferUsages[bufferIndex];
+			const CrRenderGraphBufferUsage& bufferUsage = renderGraphPass->bufferUsages[bufferIndex];
 
-			CrRenderGraphBufferTransitionInfo2 transitionInfo;
+			CrRenderGraphBufferTransitionInfo transitionInfo;
 			transitionInfo.usageState = bufferUsage.usageState;
 			transitionInfo.finalState = bufferUsage.usageState; // Initialize final state to current state until we have more information
 			transitionInfo.usageShaderStages = bufferUsage.shaderStages;
@@ -430,7 +430,7 @@ void CrRenderGraph::Execute()
 			if (lastUsedRenderPass)
 			{
 				// Inject the final and initial states with usage states
-				CrRenderGraphBufferTransitionInfo2& lastUsedTransitionInfo = lastUsedRenderPass->bufferTransitionInfos.find(bufferUsage.bufferId)->second;
+				CrRenderGraphBufferTransitionInfo& lastUsedTransitionInfo = lastUsedRenderPass->bufferTransitionInfos.find(bufferUsage.bufferId)->second;
 				lastUsedTransitionInfo.finalState = bufferUsage.usageState;
 				lastUsedTransitionInfo.finalShaderStages = bufferUsage.shaderStages;
 
@@ -475,7 +475,7 @@ void CrRenderGraph::Execute()
 			for (uint32_t i = 0; i < renderGraphPass.textureUsages.size(); ++i)
 			{
 				const CrRenderGraphTextureUsage& textureUsage = renderGraphPass.textureUsages[i];
-				const CrRenderGraphTextureTransitionInfo2& transitionInfo = renderGraphPass.textureTransitionInfos.find(textureUsage.subresourceId)->second;
+				const CrRenderGraphTextureTransitionInfo& transitionInfo = renderGraphPass.textureTransitionInfos.find(textureUsage.subresourceId)->second;
 
 				switch (textureUsage.state.layout)
 				{
@@ -581,8 +581,8 @@ void CrRenderGraph::Execute()
 
 			for (uint32_t i = 0; i < renderGraphPass.bufferUsages.size(); ++i)
 			{
-				const CrRenderGraphBufferUsage2& bufferUsage = renderGraphPass.bufferUsages[i];
-				const CrRenderGraphBufferTransitionInfo2& transitionInfo = renderGraphPass.bufferTransitionInfos.find(bufferUsage.bufferId)->second;
+				const CrRenderGraphBufferUsage& bufferUsage = renderGraphPass.bufferUsages[i];
+				const CrRenderGraphBufferTransitionInfo& transitionInfo = renderGraphPass.bufferTransitionInfos.find(bufferUsage.bufferId)->second;
 					
 				if (transitionInfo.initialState != transitionInfo.usageState)
 				{

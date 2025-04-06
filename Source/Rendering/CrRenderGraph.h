@@ -44,7 +44,7 @@
 // independent execution timeline from the one where the lambda was created
 
 class CrRenderGraph;
-struct CrRenderGraphPass2;
+struct CrRenderGraphPass;
 
 using CrRenderGraphSetupFunction = crstl::fixed_function<32, void(CrRenderGraph& renderGraph)>;
 using CrRenderGraphExecutionFunction = crstl::fixed_function<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
@@ -61,9 +61,9 @@ namespace CrRenderGraphPassType
 };
 
 // How the texture is intended to be used by a given pass
-struct CrRenderGraphTextureUsage2
+struct CrRenderGraphTextureUsage
 {
-	CrRenderGraphTextureUsage2() 
+	CrRenderGraphTextureUsage() 
 		: textureIndex((Textures::T)-1)
 	{}
 
@@ -150,7 +150,7 @@ struct CrRenderGraphBufferTransitionInfo2
 	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
 };
 
-struct CrRenderGraphPass2
+struct CrRenderGraphPass
 {
 	CrRenderGraphString name;
 
@@ -158,7 +158,7 @@ struct CrRenderGraphPass2
 
 	CrRenderGraphPassType::T type;
 
-	crstl::fixed_vector<CrRenderGraphTextureUsage2, 16> textureUsages;
+	crstl::fixed_vector<CrRenderGraphTextureUsage, 16> textureUsages;
 
 	crstl::fixed_vector<CrRenderGraphBufferUsage2, 16> bufferUsages;
 
@@ -269,11 +269,11 @@ public:
 
 private:
 
-	CrRenderGraphPass2& GetWorkingRenderPass() { return m_workingPasses[m_workingPassIndex]; }
+	CrRenderGraphPass& GetWorkingRenderPass() { return m_workingPasses[m_workingPassIndex]; }
 
 	size_t m_workingPassIndex;
 
-	crstl::fixed_vector<CrRenderGraphPass2, 128> m_workingPasses;
+	crstl::fixed_vector<CrRenderGraphPass, 128> m_workingPasses;
 
 	uint32_t m_subresourceIdCounter;
 
@@ -284,10 +284,10 @@ private:
 	crstl::fixed_open_hashmap<CrHash, uint32_t, 256> m_bufferIds;
 
 	// Last render pass a certain subresource was used in. Null if it wasn't used yet
-	crstl::fixed_vector<CrRenderGraphPass2*, 256> m_textureLastUsedPass;
+	crstl::fixed_vector<CrRenderGraphPass*, 256> m_textureLastUsedPass;
 
 	// Last render pass a certain buffer was used in. Null if it wasn't used yet
-	crstl::fixed_vector<CrRenderGraphPass2*, 256> m_bufferLastUsedPass;
+	crstl::fixed_vector<CrRenderGraphPass*, 256> m_bufferLastUsedPass;
 
 	CrRenderGraphFrameParams m_frameParams;
 };

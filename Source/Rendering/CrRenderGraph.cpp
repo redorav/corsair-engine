@@ -10,18 +10,18 @@
 //#define RENDER_GRAPH_LOGS
 
 #if defined(RENDER_GRAPH_LOGS)
-#define CrRenderGraphLog2(format, ...) CrLog(format, __VA_ARGS__)
+#define CrRenderGraphLog(format, ...) CrLog(format, __VA_ARGS__)
 #else
-#define CrRenderGraphLog2(format, ...)
+#define CrRenderGraphLog(format, ...)
 #endif
 
 void CrRenderGraph::AddRenderPass
 (
-	const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type, 
+	const CrRenderGraphString& name, const float4& color, CrRenderGraphPassType::T type,
 	const CrRenderGraphSetupFunction& setupFunction, const CrRenderGraphExecutionFunction& executionFunction
 )
 {
-	CrRenderGraphPass2& workingPass = m_workingPasses.push_back();
+	CrRenderGraphPass& workingPass = m_workingPasses.push_back();
 	workingPass.name = name;
 	workingPass.color = color;
 	workingPass.type = type;
@@ -54,12 +54,12 @@ void CrRenderGraph::BindTexture
 (
 	Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash subresourceHash;
 	subresourceHash << (uintptr_t)texture;
 
-	CrRenderGraphTextureUsage2 textureUsage;
+	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = 0;
 	textureUsage.mipmapCount = texture->GetMipmapCount();
@@ -70,17 +70,17 @@ void CrRenderGraph::BindTexture
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
-	CrRenderGraphLog2("Added Texture %s", texture->GetDebugName());
+	CrRenderGraphLog("Added Texture %s", texture->GetDebugName());
 }
 
 void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmap, uint32_t sliceStart, uint32_t sliceCount)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash subresourceHash;
 	subresourceHash << (uintptr_t)texture;
 
-	CrRenderGraphTextureUsage2 textureUsage;
+	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = mipmap;
 	textureUsage.mipmapCount = 1;
@@ -93,7 +93,7 @@ void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* text
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
-	CrRenderGraphLog2("Added RWTexture %s", texture->GetDebugName());
+	CrRenderGraphLog("Added RWTexture %s", texture->GetDebugName());
 }
 
 void CrRenderGraph::BindRenderTarget
@@ -105,12 +105,12 @@ void CrRenderGraph::BindRenderTarget
 	uint32_t mipmap, uint32_t slice
 )
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash subresourceHash;
 	subresourceHash << (uintptr_t)texture;
 
-	CrRenderGraphTextureUsage2 textureUsage;
+	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = mipmap;
 	textureUsage.mipmapCount = 1;
@@ -123,7 +123,7 @@ void CrRenderGraph::BindRenderTarget
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
-	CrRenderGraphLog2("Added Render Target %s", texture->GetDebugName());
+	CrRenderGraphLog("Added Render Target %s", texture->GetDebugName());
 }
 
 void CrRenderGraph::BindDepthStencilTarget
@@ -139,7 +139,7 @@ void CrRenderGraph::BindDepthStencilTarget
 	bool readOnlyDepth, bool readOnlyStencil
 )
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrAssertMsg(workingPass.type == CrRenderGraphPassType::Graphics, "Render pass must be graphics");
 	CrAssertMsg(workingPass.depthTexture == nullptr, "Cannot bind multiple depth targets");
@@ -147,7 +147,7 @@ void CrRenderGraph::BindDepthStencilTarget
 	CrHash subresourceHash;
 	subresourceHash << (uintptr_t)texture;
 
-	CrRenderGraphTextureUsage2 textureUsage;
+	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = mipmap;
 	textureUsage.mipmapCount = 1;
@@ -217,17 +217,17 @@ void CrRenderGraph::BindDepthStencilTarget
 
 	workingPass.textureUsages.push_back(textureUsage);
 
-	CrRenderGraphLog2("Added Depth Stencil Target %s", texture->GetDebugName());
+	CrRenderGraphLog("Added Depth Stencil Target %s", texture->GetDebugName());
 }
 
 void CrRenderGraph::BindSwapchain(ICrTexture* texture, uint32_t mipmap, uint32_t slice)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash subresourceHash;
 	subresourceHash << (uintptr_t)texture;
 
-	CrRenderGraphTextureUsage2 textureUsage;
+	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
 	textureUsage.mipmapStart = mipmap;
 	textureUsage.sliceStart = slice;
@@ -235,7 +235,7 @@ void CrRenderGraph::BindSwapchain(ICrTexture* texture, uint32_t mipmap, uint32_t
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
 
-	CrRenderGraphLog2("Added Swapchain %s", texture->GetDebugName());
+	CrRenderGraphLog("Added Swapchain %s", texture->GetDebugName());
 }
 
 uint32_t CrRenderGraph::GetUniqueBufferId(CrHash bufferHash)
@@ -258,7 +258,7 @@ uint32_t CrRenderGraph::GetUniqueBufferId(CrHash bufferHash)
 
 void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
@@ -283,7 +283,7 @@ void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHa
 
 void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
@@ -308,7 +308,7 @@ void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const I
 
 void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
@@ -333,7 +333,7 @@ void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwa
 
 void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
-	CrRenderGraphPass2& workingPass = GetWorkingRenderPass();
+	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
 	CrHash bufferHash;
 	bufferHash << (uintptr_t)buffer;
@@ -364,7 +364,7 @@ void CrRenderGraph::Begin(const CrRenderGraphFrameParams& frameParams)
 	m_subresourceIdCounter = 0;
 	m_bufferIdCounter = 0;
 
-	CrRenderGraphLog2("Beginning render pass for frame %ld", m_frameParams.frameIndex);
+	CrRenderGraphLog("Beginning render pass for frame %ld", m_frameParams.frameIndex);
 }
 
 void CrRenderGraph::Execute()
@@ -376,12 +376,12 @@ void CrRenderGraph::Execute()
 
 	for (size_t renderGraphPassIndex = 0; renderGraphPassIndex < m_workingPasses.size(); ++renderGraphPassIndex)
 	{
-		CrRenderGraphPass2* renderGraphPass = &m_workingPasses[renderGraphPassIndex];
+		CrRenderGraphPass* renderGraphPass = &m_workingPasses[renderGraphPassIndex];
 
 		// Process textures within a pass
 		for (uint32_t textureIndex = 0; textureIndex < renderGraphPass->textureUsages.size(); ++textureIndex)
 		{
-			const CrRenderGraphTextureUsage2& textureUsage = renderGraphPass->textureUsages[textureIndex];
+			const CrRenderGraphTextureUsage& textureUsage = renderGraphPass->textureUsages[textureIndex];
 
 			CrRenderGraphTextureTransitionInfo2 transitionInfo;
 			transitionInfo.usageState = textureUsage.state;
@@ -393,7 +393,7 @@ void CrRenderGraph::Execute()
 
 			// Figure out what pass this subresource was last used in
 			// TODO Iterate over all subresources
-			CrRenderGraphPass2* lastUsedRenderPass = m_textureLastUsedPass[textureUsage.subresourceId];
+			CrRenderGraphPass* lastUsedRenderPass = m_textureLastUsedPass[textureUsage.subresourceId];
 
 			if (lastUsedRenderPass)
 			{
@@ -425,7 +425,7 @@ void CrRenderGraph::Execute()
 			transitionInfo.usageShaderStages = bufferUsage.shaderStages;
 			transitionInfo.finalShaderStages = bufferUsage.shaderStages;
 
-			CrRenderGraphPass2* lastUsedRenderPass = m_bufferLastUsedPass[bufferUsage.bufferId];
+			CrRenderGraphPass* lastUsedRenderPass = m_bufferLastUsedPass[bufferUsage.bufferId];
 
 			if (lastUsedRenderPass)
 			{
@@ -453,9 +453,9 @@ void CrRenderGraph::Execute()
 
 	for (size_t renderGraphPassIndex = 0; renderGraphPassIndex < m_workingPasses.size(); ++renderGraphPassIndex)
 	{
-		const CrRenderGraphPass2& renderGraphPass = m_workingPasses[renderGraphPassIndex];
+		const CrRenderGraphPass& renderGraphPass = m_workingPasses[renderGraphPassIndex];
 
-		CrRenderGraphLog2("Executing Render Pass %s", renderGraphPass.name.c_str());
+		CrRenderGraphLog("Executing Render Pass %s", renderGraphPass.name.c_str());
 
 		if (renderGraphPass.type != CrRenderGraphPassType::Behavior)
 		{
@@ -474,7 +474,7 @@ void CrRenderGraph::Execute()
 
 			for (uint32_t i = 0; i < renderGraphPass.textureUsages.size(); ++i)
 			{
-				const CrRenderGraphTextureUsage2& textureUsage = renderGraphPass.textureUsages[i];
+				const CrRenderGraphTextureUsage& textureUsage = renderGraphPass.textureUsages[i];
 				const CrRenderGraphTextureTransitionInfo2& transitionInfo = renderGraphPass.textureTransitionInfos.find(textureUsage.subresourceId)->second;
 
 				switch (textureUsage.state.layout)
@@ -492,7 +492,7 @@ void CrRenderGraph::Execute()
 						renderTargetDescriptor.usageState   = transitionInfo.usageState;
 						renderTargetDescriptor.finalState   = transitionInfo.finalState;
 
-						CrRenderGraphLog2("  Render Target %s [%s -> %s -> %s]",
+						CrRenderGraphLog("  Render Target %s [%s -> %s -> %s]",
 							textureUsage.texture->GetDebugName(),
 							cr3d::TextureLayout::ToString(renderTargetDescriptor.initialState.layout),
 							cr3d::TextureLayout::ToString(renderTargetDescriptor.usageState.layout),
@@ -522,7 +522,7 @@ void CrRenderGraph::Execute()
 						depthDescriptor.usageState        = transitionInfo.usageState;
 						depthDescriptor.finalState        = transitionInfo.finalState;
 
-						CrRenderGraphLog2("  Depth Stencil %s [%s -> %s -> %s]", textureUsage.texture->GetDebugName(),
+						CrRenderGraphLog("  Depth Stencil %s [%s -> %s -> %s]", textureUsage.texture->GetDebugName(),
 							cr3d::TextureLayout::ToString(depthDescriptor.initialState.layout),
 							cr3d::TextureLayout::ToString(depthDescriptor.usageState.layout),
 							cr3d::TextureLayout::ToString(depthDescriptor.finalState.layout));
@@ -542,7 +542,7 @@ void CrRenderGraph::Execute()
 								transitionInfo.initialState, transitionInfo.usageState
 							);
 
-							CrRenderGraphLog2("  Texture %s [%s -> %s]", textureUsage.texture->GetDebugName(),
+							CrRenderGraphLog("  Texture %s [%s -> %s]", textureUsage.texture->GetDebugName(),
 								cr3d::TextureLayout::ToString(transitionInfo.initialState.layout),
 								cr3d::TextureLayout::ToString(transitionInfo.usageState.layout));
 						}
@@ -556,7 +556,7 @@ void CrRenderGraph::Execute()
 								transitionInfo.usageState, transitionInfo.finalState
 							);
 
-							CrRenderGraphLog2("  Texture %s [%s -> %s]", textureUsage.texture->GetDebugName(),
+							CrRenderGraphLog("  Texture %s [%s -> %s]", textureUsage.texture->GetDebugName(),
 								cr3d::TextureLayout::ToString(transitionInfo.usageState.layout),
 								cr3d::TextureLayout::ToString(transitionInfo.finalState.layout));
 						}
@@ -591,7 +591,7 @@ void CrRenderGraph::Execute()
 						transitionInfo.initialState, transitionInfo.initialShaderStages,
 						transitionInfo.usageState, transitionInfo.usageShaderStages);
 
-					CrRenderGraphLog2("  Buffer %s [%s -> %s]", bufferUsage.buffer->GetDebugName(),
+					CrRenderGraphLog("  Buffer %s [%s -> %s]", bufferUsage.buffer->GetDebugName(),
 						cr3d::BufferState::ToString(transitionInfo.initialState),
 						cr3d::BufferState::ToString(transitionInfo.usageState));
 				}
@@ -603,7 +603,7 @@ void CrRenderGraph::Execute()
 						transitionInfo.usageState, transitionInfo.usageShaderStages,
 						transitionInfo.finalState, transitionInfo.finalShaderStages);
 
-					CrRenderGraphLog2("  Buffer %s [%s -> %s]", bufferUsage.buffer->GetDebugName(),
+					CrRenderGraphLog("  Buffer %s [%s -> %s]", bufferUsage.buffer->GetDebugName(),
 						cr3d::BufferState::ToString(transitionInfo.usageState),
 						cr3d::BufferState::ToString(transitionInfo.finalState));
 				}

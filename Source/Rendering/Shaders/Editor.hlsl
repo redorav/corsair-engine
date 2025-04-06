@@ -36,14 +36,14 @@ float4 EditorEdgeSelectionPS(VSOutputFullscreen psInput) : SV_Target0
 	}
 }
 
-struct EditorGridCB
+struct EditorGrid
 {
 	float4 gridParams; // .x scale .y subdivisions
 };
 
 cbuffer EditorGridCB
 {
-	EditorGridCB EditorGridCB;
+	EditorGrid EditorGridCB;
 };
 
 struct VSOutputEditorGrid

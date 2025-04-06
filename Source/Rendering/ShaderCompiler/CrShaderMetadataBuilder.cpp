@@ -827,9 +827,6 @@ crstl::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const 
 
 	result += PrintResourceEnum("RWStorageBuffer", resources.rwStorageBuffers);
 
-	// Print the template
-	result += "template<enum RWStorageBuffers::T index>\nstruct RWStorageBufferDataStruct {};\n\n";
-
 	for (uint32_t rwStorageBufferIndex = 0; rwStorageBufferIndex < resources.rwStorageBuffers.size(); ++rwStorageBufferIndex)
 	{
 		const SpvReflectDescriptorBinding& rwStorageBuffer = resources.rwStorageBuffers[rwStorageBufferIndex];

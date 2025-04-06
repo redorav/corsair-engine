@@ -718,11 +718,9 @@ crstl::string CrShaderMetadataBuilder::PrintRWTextureMetadataStructDeclaration()
 	return result;
 }
 
-crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool readWrite)
+crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member)
 {
 	crstl::string result;
-
-	const crstl::string rwString = readWrite ? "RW" : "";
 
 	bool isMemberStruct = member.type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT;
 
@@ -734,8 +732,7 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const cr
 	}
 
 	// Print the struct that contains the metadata and is actually used in engine
-	result += "template<>\n";
-	result += "struct " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + ">";
+	result += "struct " + bufferName;
 
 	if (isMemberStruct)
 	{
@@ -750,7 +747,7 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const cr
 
 	result += "\tenum { stride = " + crstl::string(member.traits.array.stride) + "};\n";
 	result += "\tenum { index = " + crstl::string(index) + " };\n";
-	result += "}; typedef " + rwString + "StorageBufferDataStruct<" + rwString + "StorageBuffers::" + bufferName + "> " + bufferName + ";\n\n";
+	result += "};\n\n";
 
 	if (isMemberStruct)
 	{
@@ -768,13 +765,10 @@ crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataHeader(const HL
 
 	result += PrintResourceEnum("StorageBuffer", resources.storageBuffers);
 
-	// Print the template
-	result += "template<enum StorageBuffers::T index>\nstruct StorageBufferDataStruct {};\n\n";
-
 	for (uint32_t storageBufferIndex = 0; storageBufferIndex < resources.storageBuffers.size(); ++storageBufferIndex)
 	{
 		const SpvReflectDescriptorBinding& storageBuffer = resources.storageBuffers[storageBufferIndex];
-		result += BuildStorageBufferMetadataStruct(storageBuffer.name, storageBufferIndex, storageBuffer.type_description->members[0], false);
+		result += BuildStorageBufferMetadataStruct(storageBuffer.name, storageBufferIndex, storageBuffer.type_description->members[0]);
 	}
 
 	result += PrintStorageBufferMetadataStructDeclaration();
@@ -839,7 +833,7 @@ crstl::string CrShaderMetadataBuilder::BuildRWStorageBufferMetadataHeader(const 
 	for (uint32_t rwStorageBufferIndex = 0; rwStorageBufferIndex < resources.rwStorageBuffers.size(); ++rwStorageBufferIndex)
 	{
 		const SpvReflectDescriptorBinding& rwStorageBuffer = resources.rwStorageBuffers[rwStorageBufferIndex];
-		result += BuildStorageBufferMetadataStruct(rwStorageBuffer.name, rwStorageBufferIndex, rwStorageBuffer.type_description->members[0], true);
+		result += BuildStorageBufferMetadataStruct(rwStorageBuffer.name, rwStorageBufferIndex, rwStorageBuffer.type_description->members[0]);
 	}
 
 	result += PrintRWStorageBufferMetadataStructDeclaration();

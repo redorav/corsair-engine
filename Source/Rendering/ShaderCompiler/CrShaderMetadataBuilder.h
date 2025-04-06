@@ -73,7 +73,7 @@ private:
 	// Buffers
 	//--------
 
-	static crstl::string BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool rw);
+	static crstl::string BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member);
 
 	static crstl::string BuildStorageBufferMetadataHeader(const HLSLResources& resources);
 	static crstl::string BuildStorageBufferMetadataCpp(const HLSLResources& resources);

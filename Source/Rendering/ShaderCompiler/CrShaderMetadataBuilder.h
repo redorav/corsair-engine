@@ -28,7 +28,8 @@ private:
 	static crstl::string PrintResourceHashmap(const crstl::string& resourceTypeName, const ResourceVector& resources);
 
 	// Prints out the struct or built-in as it comes from the reflection information
-	static crstl::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const crstl::string& memberName, const crstl::string& indentation);
+	static crstl::string PrintStructMembers(const SpvReflectTypeDescription& type, uint32_t parentIndentation);
+	static crstl::string PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const crstl::string& memberName, uint32_t indentationLevel);
 	static crstl::string PrintMemberStruct(const SpvReflectTypeDescription& type, const crstl::string& structTypeName, const crstl::string& structName, uint32_t indentationLevel);
 
 	//-----------------

@@ -7,6 +7,7 @@
 #include "CrCompilerDXC.h"
 
 #include "Core/FileSystem/CrFixedPath.h"
+#include "Core/Logging/ICrDebug.h"
 
 #include "Rendering/CrRendering.h"
 
@@ -273,20 +274,32 @@ crstl::string CrShaderMetadataBuilder::BuildConstantBufferMetadataHeader(const H
 
 		crstl::string constantBufferName = crstl::string(uniformBuffer.name) != "" ? uniformBuffer.name : uniformBuffer.type_description->type_name;
 
-		for (uint32_t memberIndex = 0; memberIndex < uniformBuffer.type_description->member_count; ++memberIndex)
+		// Create a struct with the same name as the constant buffer
+		result += "struct " + constantBufferName + "\n{\n";
+
+		// When the type consists of a single struct, we print out the members as they come. When the type consists of more we print them all out
+		// The single struct happens when using the cbuffer syntax and declaring a single struct as member. The ConstantBuffer<> syntax provides
+		// all the members separately
+		SpvReflectTypeDescription* parentType = uniformBuffer.type_description;
+
+		if (uniformBuffer.type_description->member_count == 1 && uniformBuffer.type_description->members[0].op == SpvOpTypeStruct)
 		{
-			const SpvReflectTypeDescription& member = uniformBuffer.type_description->members[memberIndex];
-			result += PrintMemberStruct(member, constantBufferName + "Data", "", indentationLevel);
+			parentType = &uniformBuffer.type_description->members[0];
 		}
 
-		result += PrintConstantBufferStructMetadata(constantBufferName, uniformBufferIndex);
+		result += PrintStructMembers(*parentType, indentationLevel);
+
+		result += "\n";
+		result += "\tenum { size = " + crstl::string(uniformBuffer.block.size) + " };\n";
+		result += "\tenum { index = " + crstl::string(uniformBufferIndex) + " };\n";
+		result += "};\n\n";
+
+		result += "static_assert(sizeof(" + constantBufferName + ") == " + constantBufferName + "::size, \"Size mismatch. Check struct member alignment\"); \n\n";
 	}
 
 	result += PrintConstantBufferMetadataStructDeclaration();
 
 	result += PrintResourceMetadataInstanceDeclaration("ConstantBuffer", resources.constantBuffers);
-
-	//result += PrintConstantBufferGlobalGroupDeclaration(resources.constantBuffers);
 
 	result += "extern crstl::open_hashmap<crstl::string, ConstantBufferMetadata&> ConstantBufferTable;\n\n";
 
@@ -404,11 +417,14 @@ crstl::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 	return result;
 }
 
-crstl::string CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const crstl::string& memberName, const crstl::string& indentation)
+crstl::string CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDescription& type, const crstl::string& memberName, uint32_t indentationLevel)
 {
 	crstl::string result;
 
-	result += indentation;
+	for (size_t i = 0; i < indentationLevel; ++i)
+	{
+		result += "\t";
+	}
 
 	result += GetBuiltinTypeString(type);
 
@@ -424,8 +440,41 @@ crstl::string CrShaderMetadataBuilder::PrintMemberBuiltIn(const SpvReflectTypeDe
 	return result;
 }
 
+crstl::string CrShaderMetadataBuilder::PrintStructMembers(const SpvReflectTypeDescription& type, uint32_t parentIndentation)
+{
+	crstl::string result;
+
+	for (uint32_t i = 0; i < type.member_count; ++i)
+	{
+		const SpvReflectTypeDescription& member = type.members[i];
+
+		switch (member.op)
+		{
+			case SpvOpTypeStruct:
+			{
+				result += PrintMemberStruct(member, member.type_name, member.struct_member_name, parentIndentation + 1);
+				break;
+			}
+			default:
+			{
+				result += PrintMemberBuiltIn(member, member.struct_member_name, parentIndentation + 1);
+				break;
+			}
+		}
+	}
+
+	return result;
+}
+
 crstl::string CrShaderMetadataBuilder::PrintMemberStruct(const SpvReflectTypeDescription& type, const crstl::string& structTypeName, const crstl::string& structName, uint32_t indentationLevel)
 {
+	if ((type.type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT) == 0)
+	{
+		crstl::string errorMessage;
+		errorMessage.append_sprintf("Type %s must be a struct\n", structTypeName.c_str());
+		CrShaderCompilerUtilities::QuitWithMessage(errorMessage.c_str());
+	}
+
 	crstl::string result;
 	crstl::string structIndentation;
 
@@ -435,8 +484,6 @@ crstl::string CrShaderMetadataBuilder::PrintMemberStruct(const SpvReflectTypeDes
 	}
 
 	result += structIndentation + "struct " + structTypeName + "\n" + structIndentation + "{\n"; // Open the struct
-
-	crstl::string memberIndentation = structIndentation + "\t";
 
 	for (uint32_t i = 0; i < type.member_count; ++i)
 	{
@@ -451,7 +498,7 @@ crstl::string CrShaderMetadataBuilder::PrintMemberStruct(const SpvReflectTypeDes
 			}
 			default:
 			{
-				result += PrintMemberBuiltIn(member, member.struct_member_name, memberIndentation);
+				result += PrintMemberBuiltIn(member, member.struct_member_name, indentationLevel + 1);
 				break;
 			}
 		}
@@ -671,11 +718,11 @@ crstl::string CrShaderMetadataBuilder::PrintRWTextureMetadataStructDeclaration()
 	return result;
 }
 
-crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool rw)
+crstl::string CrShaderMetadataBuilder::BuildStorageBufferMetadataStruct(const crstl::string bufferName, uint32_t index, const SpvReflectTypeDescription& member, bool readWrite)
 {
 	crstl::string result;
 
-	const crstl::string rwString = rw ? "RW" : "";
+	const crstl::string rwString = readWrite ? "RW" : "";
 
 	bool isMemberStruct = member.type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT;
 

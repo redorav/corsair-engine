@@ -16,11 +16,6 @@
 
 #include "CrCompilerDXC.h"
 
-#if defined(_WIN32)
-#include <windows.h>
-#include <shellapi.h>
-#endif
-
 void CompilationDescriptor::Process() const
 {
 	if (!processed)

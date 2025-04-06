@@ -43,7 +43,7 @@ struct EditorGridCB
 
 cbuffer EditorGridCB
 {
-	EditorGridCB cb_EditorGrid;
+	EditorGridCB EditorGridCB;
 };
 
 struct VSOutputEditorGrid
@@ -97,7 +97,7 @@ VSOutputEditorGrid EditorGridVS(uint vertexId : SV_VertexID)
 			break;
 	}
 	
-	float4 positionWorld = float4(positionLocal.xyz * cb_EditorGrid.gridParams.x, 1);
+	float4 positionWorld = float4(positionLocal.xyz * EditorGridCB.gridParams.x, 1);
 
 	float4 positionView = mul(positionWorld, CameraCB.world2View);
 	
@@ -120,7 +120,7 @@ static const float3 WidgetRed   = float3(255.0, 100.0, 100.0) / 255.0;
 // A wonderful explanation on how to create a procedural grid: https://madebyevan.com/shaders/grid/
 float4 EditorGridPS(VSOutputEditorGrid psInput) : SV_Target0
 {
-	float2 coord = psInput.worldPosition.xz / cb_EditorGrid.gridParams.y;
+	float2 coord = psInput.worldPosition.xz / EditorGridCB.gridParams.y;
 	
 	float3 worldPosition = psInput.worldPosition.xyz;
 	
@@ -172,15 +172,15 @@ struct MouseSelection
 	int4 mouseCoordinates; // .xy mouse coordinates
 };
 
-cbuffer MouseSelection
+cbuffer MouseSelectionCB
 {
-	MouseSelection cb_MouseSelection;
+	MouseSelection MouseSelectionCB;
 };
 
 [numthreads(1, 1, 1)]
 void EditorMouseSelectionResolveCS(CSInput csInput)
 {
-	int2 mouseCoordinates = cb_MouseSelection.mouseCoordinates.xy;
+	int2 mouseCoordinates = MouseSelectionCB.mouseCoordinates.xy;
 
 	float instanceID = EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x * 65535.0 + 0.5;
 	

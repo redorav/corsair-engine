@@ -22,7 +22,7 @@ VSOutput UbershaderVS(VSInput vsInput)
 {
 	VSOutput vsOutput;
 	
-	float4x4 local2WorldMatrix = cb_Instance.local2World[vsInput.instanceID];
+	float4x4 local2WorldMatrix = InstanceCB.local2World[vsInput.instanceID];
 	
 	#if defined(NO_TRANSFORM)
 	output.hwPosition = float4(vsInput.pos.xyz, 1);
@@ -73,7 +73,7 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 	float4 diffuseAlbedoAlpha = psInput.color;
 	
 	// Multiply by color (in linear space)
-	diffuseAlbedoAlpha *= cb_Material.color;
+	diffuseAlbedoAlpha *= MaterialCB.color;
 
 #if defined(TEXTURED)
 
@@ -98,14 +98,14 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 
 	float4 finalColor = float4(LinearToSRGB(diffuseAlbedoAlpha.rgb), diffuseAlbedoAlpha.a);
 
-	float debugShaderMode = cb_DebugShader.debugProperties.x;
+	float debugShaderMode = DebugShaderCB.debugProperties.x;
 
 	const float DebugShaderModeInstanceID = 0;
 	const float DebugShaderModeFlatColor = 1;
 
 	if (debugShaderMode == DebugShaderModeInstanceID)
 	{
-		float normalizedInstanceId = cb_DebugShader.debugProperties.y / 65535.0;
+		float normalizedInstanceId = DebugShaderCB.debugProperties.y / 65535.0;
 		finalColor = float4(normalizedInstanceId, normalizedInstanceId, normalizedInstanceId, 1.0);
 	}
 	else if (debugShaderMode == DebugShaderModeFlatColor)

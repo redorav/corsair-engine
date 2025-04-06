@@ -127,7 +127,7 @@ struct CrRenderPacketBatcher
 		if (m_numInstances > 0)
 		{
 			// Allocate constant buffer with all transforms and copy them across
-			CrGPUBufferViewT<Instance> transformBuffer = m_commandBuffer->AllocateConstantBuffer<Instance>(sizeof(Instance::local2World[0]) * m_numInstances);
+			CrGPUBufferViewT<InstanceCB> transformBuffer = m_commandBuffer->AllocateConstantBuffer<InstanceCB>(sizeof(InstanceCB::local2World[0]) * m_numInstances);
 			cr3d::float4x4* transforms = (cr3d::float4x4*)transformBuffer.GetData();
 			{
 				for (uint32_t i = 0; i < m_numInstances; ++i)
@@ -145,8 +145,8 @@ struct CrRenderPacketBatcher
 				m_commandBuffer->BindTexture(binding.semantic, binding.texture.get());
 			}
 
-			CrGPUBufferViewT<Material> materialBuffer = m_commandBuffer->AllocateConstantBuffer<Material>();
-			Material* materialData = materialBuffer.GetData();
+			CrGPUBufferViewT<MaterialCB> materialBuffer = m_commandBuffer->AllocateConstantBuffer<MaterialCB>();
+			MaterialCB* materialData = materialBuffer.GetData();
 			{
 				materialData->color = m_material->m_color;
 				materialData->emissive = m_material->m_emissive;
@@ -482,8 +482,8 @@ void CrFrame::Process()
 
 	// Set up default values for common constant buffers
 
-	CrGPUBufferViewT<Material> materialBuffer = drawCommandBuffer->AllocateConstantBuffer<Material>();
-	Material* materialData = materialBuffer.GetData();
+	CrGPUBufferViewT<MaterialCB> materialBuffer = drawCommandBuffer->AllocateConstantBuffer<MaterialCB>();
+	MaterialCB* materialData = materialBuffer.GetData();
 	{
 		materialData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		materialData->emissive = float4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -513,8 +513,8 @@ void CrFrame::Process()
 	}
 	drawCommandBuffer->BindConstantBuffer(cameraDataBuffer);
 
-	CrGPUBufferViewT<Instance> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<Instance>();
-	Instance* identityTransformData = identityConstantBuffer.GetData();
+	CrGPUBufferViewT<InstanceCB> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<InstanceCB>();
+	InstanceCB* identityTransformData = identityConstantBuffer.GetData();
 	{
 		identityTransformData->local2World[0] = float4x4::identity();
 	}
@@ -687,8 +687,8 @@ void CrFrame::Process()
 
 			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
 
-			CrGPUBufferViewT<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-			DebugShader* debugShaderData = debugShaderBuffer.GetData();
+			CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
+			DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 			{
 				debugShaderData->debugProperties = float4(1.0f, 0.0f, 0.0f, 0.0f);
 			}
@@ -730,8 +730,8 @@ void CrFrame::Process()
 		},
 		[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
-			CrGPUBufferViewT<GBufferDebug> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebug>();
-			GBufferDebug* gbufferDebugData = gbufferDebug.GetData();
+			CrGPUBufferViewT<GBufferDebugCB> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebugCB>();
+			GBufferDebugCB* gbufferDebugData = gbufferDebug.GetData();
 			{
 				gbufferDebugData->decodeOptions = uint4((uint32_t)m_gbufferDebugMode, 0.0f, 0.0f, 0.0f);
 			}
@@ -839,8 +839,8 @@ void CrFrame::Process()
 			{
 				renderPacketBatcher.FlushBatch();
 
-				CrGPUBufferViewT<DebugShader> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShader>();
-				DebugShader* debugShaderData = debugShaderBuffer.GetData();
+				CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
+				DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 				{
 					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
 					debugShaderData->debugProperties = float4(0.0f, instanceId, 0.0f, 0.0f);
@@ -869,8 +869,8 @@ void CrFrame::Process()
 		},
 		[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
-			CrGPUBufferViewT<MouseSelection> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelection>(1);
-			MouseSelection* mouseSelectionData = mouseSelectionBuffer.GetData();
+			CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>(1);
+			MouseSelectionCB* mouseSelectionData = mouseSelectionBuffer.GetData();
 			{
 				mouseSelectionData->mouseCoordinates.x = mouseX;
 				mouseSelectionData->mouseCoordinates.y = mouseY;

@@ -20,9 +20,9 @@ struct UIData
 	float4x4 projection;
 };
 
-cbuffer UIData
+cbuffer UIDataCB
 {
-	UIData cbData;
+	UIData DataCB;
 }
 
 Texture2D UITexture;
@@ -33,7 +33,7 @@ VSOutputUI ImguiVS(VSInputUI vsInput)
 	VSOutputUI output = (VSOutputUI)0;
 	output.uv = vsInput.uv;
 	output.color = vsInput.color;
-	output.hwPosition = mul(cbData.projection, float4(vsInput.position, 0.0, 1.0));
+	output.hwPosition = mul(DataCB.projection, float4(vsInput.position, 0.0, 1.0));
 	return output;
 }
 

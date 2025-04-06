@@ -243,8 +243,8 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 			commandBuffer->SetViewport(CrViewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 
 			// Projection matrix. TODO: this could be cached.
-			CrGPUBufferViewT<UIData> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIData>();
-			UIData* uiData = uiDataBuffer.GetData();
+			CrGPUBufferViewT<UIDataCB> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIDataCB>();
+			UIDataCB* uiData = uiDataBuffer.GetData();
 			{
 				uiData->projection = ComputeProjectionMatrix(data);
 			}

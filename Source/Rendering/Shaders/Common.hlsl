@@ -56,9 +56,9 @@ struct Material
 	float4 emissive;
 };
 
-cbuffer Material
+cbuffer MaterialCB
 {
-	Material cb_Material;
+	Material MaterialCB;
 };
 
 struct Instance
@@ -66,9 +66,9 @@ struct Instance
 	row_major float4x4 local2World[128];
 };
 
-cbuffer Instance
+cbuffer InstanceCB
 {
-	Instance cb_Instance;
+	Instance InstanceCB;
 };
 
 struct DebugShader
@@ -77,9 +77,9 @@ struct DebugShader
 	float4 debugColor;
 };
 
-cbuffer DebugShader
+cbuffer DebugShaderCB
 {
-	DebugShader cb_DebugShader;
+	DebugShader DebugShaderCB;
 };
 
 SamplerState AllPointClampSampler;

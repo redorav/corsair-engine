@@ -15,7 +15,7 @@
 CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
 	: ICrCommandBuffer(renderDevice, descriptor)
 	, m_primitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
-	, m_CBV_SRV_UAV_DescriptorHeap(nullptr)
+	, m_shaderResourceDescriptorHeap(nullptr)
 	, m_samplerDescriptorHeap(nullptr)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
@@ -39,7 +39,7 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 		cbv_SRV_UAV_DescriptorHeapDescriptor.name = "CBV SRV UAV Streaming Heap";
 		cbv_SRV_UAV_DescriptorHeapDescriptor.numDescriptors = 32 * 1024;
 		cbv_SRV_UAV_DescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		m_CBV_SRV_UAV_DescriptorStream.Initialize(d3d12RenderDevice, cbv_SRV_UAV_DescriptorHeapDescriptor);
+		m_shaderResourceDescriptorStream.Initialize(d3d12RenderDevice, cbv_SRV_UAV_DescriptorHeapDescriptor);
 	}
 
 	{
@@ -48,7 +48,7 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 		cbv_SRV_UAV_ShaderVisibleDescriptorHeapDescriptor.numDescriptors = 32 * 1024;
 		cbv_SRV_UAV_ShaderVisibleDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		cbv_SRV_UAV_ShaderVisibleDescriptorHeapDescriptor.flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.Initialize(d3d12RenderDevice, cbv_SRV_UAV_ShaderVisibleDescriptorHeapDescriptor);
+		m_shaderResourceShaderVisibleDescriptorStream.Initialize(d3d12RenderDevice, cbv_SRV_UAV_ShaderVisibleDescriptorHeapDescriptor);
 	}
 
 	{
@@ -650,13 +650,13 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	uint32_t totalSamplerCount = bindingLayout.GetSamplerCount();
 
 	// Allocate the necessary number of descriptors and take note of the start of the tables to start offsetting based on the binding number
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_TableStart = m_CBV_SRV_UAV_DescriptorStream.Allocate(srv_CBV_UAVCount);
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleTableStart = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.Allocate(srv_CBV_UAVCount);
+	crd3d::DescriptorD3D12 cbv_SRV_UAV_TableStart = m_shaderResourceDescriptorStream.Allocate(srv_CBV_UAVCount);
+	crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleTableStart = m_shaderResourceShaderVisibleDescriptorStream.Allocate(srv_CBV_UAVCount);
 
 	crd3d::DescriptorD3D12 samplerTableStart = m_samplerDescriptorStream.Allocate(totalSamplerCount);
 	crd3d::DescriptorD3D12 samplerShaderVisibleTableStart = m_samplerShaderVisibleDescriptorStream.Allocate(totalSamplerCount);
 
-	uint32_t cbv_SRV_UAV_DescriptorSize = m_CBV_SRV_UAV_DescriptorStream.GetDescriptorHeap().GetDescriptorStride();
+	uint32_t shaderResourceDescriptorSize = m_shaderResourceDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 	uint32_t samplerDescriptorSize      = m_samplerDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 
 	uint32_t cbvCount[cr3d::ShaderStage::GraphicsStageCount] = {};
@@ -680,13 +680,13 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	crd3d::DescriptorD3D12 samplerTables[cr3d::ShaderStage::GraphicsStageCount] = {};
 
 	crd3d::DescriptorD3D12 cbv_SRV_UAV_Offset = cbv_SRV_UAV_TableStart;
-	cbvTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += cbvCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
-	srvTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += srvCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
-	uavTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += uavCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
+	cbvTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += cbvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	srvTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += srvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	uavTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += uavCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
 
-	cbvTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += cbvCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
-	srvTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += srvCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
-	uavTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += uavCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
+	cbvTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += cbvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	srvTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += srvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	uavTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += uavCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
 
 	crd3d::DescriptorD3D12 samplerOffset = samplerTableStart;
 	samplerTables[cr3d::ShaderStage::Vertex] = samplerOffset; samplerOffset += samplerCount[cr3d::ShaderStage::Vertex];
@@ -694,7 +694,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	bindingLayout.ForEachConstantBuffer([=](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteCBV(m_currentState.m_constantBuffers[id], cbvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteCBV(m_currentState.m_constantBuffers[id], cbvTables[stage] + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachSampler([=](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
@@ -704,35 +704,35 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	bindingLayout.ForEachTexture([=](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[id], srvTables[stage] + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([=](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTables[stage] + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachStorageBuffer([=](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTables[stage] + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachRWStorageBuffer([=](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTables[stage] + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTables[stage] + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	// Bind shader visible heaps to the command buffer
-	ID3D12DescriptorHeap* cbv_SRV_UAV_ShaderVisibleDescriptorHeap = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
+	ID3D12DescriptorHeap* shaderResourceShaderVisibleDescriptorHeap = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
 	ID3D12DescriptorHeap* samplerShaderVisibleDescriptorHeap = m_samplerShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
 
-	if (m_CBV_SRV_UAV_DescriptorHeap != cbv_SRV_UAV_ShaderVisibleDescriptorHeap || m_samplerDescriptorHeap != samplerShaderVisibleDescriptorHeap)
+	if (m_shaderResourceDescriptorHeap != shaderResourceShaderVisibleDescriptorHeap || m_samplerDescriptorHeap != samplerShaderVisibleDescriptorHeap)
 	{
 		// One of CBV_SRV_UAV and one of samplers
-		ID3D12DescriptorHeap* descriptorHeaps[] = { cbv_SRV_UAV_ShaderVisibleDescriptorHeap, samplerShaderVisibleDescriptorHeap };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { shaderResourceShaderVisibleDescriptorHeap, samplerShaderVisibleDescriptorHeap };
 		m_d3d12GraphicsCommandList->SetDescriptorHeaps(2, descriptorHeaps);
 
-		m_CBV_SRV_UAV_DescriptorHeap = cbv_SRV_UAV_ShaderVisibleDescriptorHeap;
+		m_shaderResourceDescriptorHeap = shaderResourceShaderVisibleDescriptorHeap;
 		m_samplerDescriptorHeap = samplerShaderVisibleDescriptorHeap;
 	}
 
@@ -742,14 +742,14 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	crd3d::DescriptorD3D12 uavShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
 	crd3d::DescriptorD3D12 samplerShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
 
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleOffset = cbv_SRV_UAV_ShaderVisibleTableStart;
-	cbvShaderVisibleTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
-	srvShaderVisibleTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += srvCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
-	uavShaderVisibleTables[cr3d::ShaderStage::Vertex] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += uavCount[cr3d::ShaderStage::Vertex] * cbv_SRV_UAV_DescriptorSize;
+	crd3d::DescriptorD3D12 shaderResourceShaderVisibleOffset = cbv_SRV_UAV_ShaderVisibleTableStart;
+	cbvShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	srvShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	uavShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
 
-	cbvShaderVisibleTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
-	srvShaderVisibleTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += srvCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
-	uavShaderVisibleTables[cr3d::ShaderStage::Pixel] = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += uavCount[cr3d::ShaderStage::Pixel] * cbv_SRV_UAV_DescriptorSize;
+	cbvShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	srvShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	uavShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
 
 	crd3d::DescriptorD3D12 samplerShaderVisibleOffset = samplerShaderVisibleTableStart;
 	samplerShaderVisibleTables[cr3d::ShaderStage::Vertex] = samplerShaderVisibleOffset; samplerShaderVisibleOffset += samplerCount[cr3d::ShaderStage::Vertex] * samplerDescriptorSize;
@@ -822,25 +822,25 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 	uint32_t textureCount        = bindingLayout.GetTextureCount();
 
 	// Allocate the necessary number of descriptors and take note of the start of the tables to start offsetting based on the binding number
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_TableStart = m_CBV_SRV_UAV_DescriptorStream.Allocate(srv_CBV_UAVCount);
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleTableStart = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.Allocate(srv_CBV_UAVCount);
+	crd3d::DescriptorD3D12 shaderResourceTableStart = m_shaderResourceDescriptorStream.Allocate(srv_CBV_UAVCount);
+	crd3d::DescriptorD3D12 shaderResourceShaderVisibleTableStart = m_shaderResourceShaderVisibleDescriptorStream.Allocate(srv_CBV_UAVCount);
 
 	crd3d::DescriptorD3D12 samplerTableStart = m_samplerDescriptorStream.Allocate(samplerCount);
 	crd3d::DescriptorD3D12 samplerShaderVisibleTableStart = m_samplerShaderVisibleDescriptorStream.Allocate(samplerCount);
 
-	uint32_t cbv_SRV_UAV_DescriptorSize = m_CBV_SRV_UAV_DescriptorStream.GetDescriptorHeap().GetDescriptorStride();
+	uint32_t shaderResourceDescriptorSize = m_shaderResourceDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 	uint32_t samplerDescriptorSize = m_samplerDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 
 	// Handle non-shader-visible tables
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_Offset = cbv_SRV_UAV_TableStart;
-	crd3d::DescriptorD3D12 cbvTable     = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += constantBufferCount * cbv_SRV_UAV_DescriptorSize;
-	crd3d::DescriptorD3D12 srvTable     = cbv_SRV_UAV_Offset; cbv_SRV_UAV_Offset += (textureCount + storageBufferCount) * cbv_SRV_UAV_DescriptorSize;
-	crd3d::DescriptorD3D12 uavTable     = cbv_SRV_UAV_Offset;
+	crd3d::DescriptorD3D12 shaderResourceOffset = shaderResourceTableStart;
+	crd3d::DescriptorD3D12 cbvTable     = shaderResourceOffset; shaderResourceOffset += constantBufferCount * shaderResourceDescriptorSize;
+	crd3d::DescriptorD3D12 srvTable     = shaderResourceOffset; shaderResourceOffset += (textureCount + storageBufferCount) * shaderResourceDescriptorSize;
+	crd3d::DescriptorD3D12 uavTable     = shaderResourceOffset;
 	crd3d::DescriptorD3D12 samplerTable = samplerTableStart;
 
 	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteCBV(m_currentState.m_constantBuffers[id], cbvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteCBV(m_currentState.m_constantBuffers[id], cbvTable + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
@@ -850,43 +850,43 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 
 	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
-		WriteTextureSRV(m_currentState.m_textures[id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteTextureSRV(m_currentState.m_textures[id], srvTable + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
-		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWTextureUAV(m_currentState.m_rwTextures[id], uavTable + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], srvTable + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
-		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTable + bindPoint * cbv_SRV_UAV_DescriptorSize);
+		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], uavTable + bindPoint * shaderResourceDescriptorSize);
 	});
 
 	// Bind shader visible heaps to the command buffer
-	ID3D12DescriptorHeap* cbv_SRV_UAV_ShaderVisibleDescriptorHeap = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
+	ID3D12DescriptorHeap* shaderResourceShaderVisibleDescriptorHeap = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
 	ID3D12DescriptorHeap* samplerShaderVisibleDescriptorHeap = m_samplerShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();
 
-	if (m_CBV_SRV_UAV_DescriptorHeap != cbv_SRV_UAV_ShaderVisibleDescriptorHeap || m_samplerDescriptorHeap != samplerShaderVisibleDescriptorHeap)
+	if (m_shaderResourceDescriptorHeap != shaderResourceShaderVisibleDescriptorHeap || m_samplerDescriptorHeap != samplerShaderVisibleDescriptorHeap)
 	{
 		// One of CBV_SRV_UAV and one of samplers
-		ID3D12DescriptorHeap* descriptorHeaps[] = { cbv_SRV_UAV_ShaderVisibleDescriptorHeap, samplerShaderVisibleDescriptorHeap };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { shaderResourceShaderVisibleDescriptorHeap, samplerShaderVisibleDescriptorHeap };
 		m_d3d12GraphicsCommandList->SetDescriptorHeaps(2, descriptorHeaps);
 
-		m_CBV_SRV_UAV_DescriptorHeap = cbv_SRV_UAV_ShaderVisibleDescriptorHeap;
+		m_shaderResourceDescriptorHeap = shaderResourceShaderVisibleDescriptorHeap;
 		m_samplerDescriptorHeap = samplerShaderVisibleDescriptorHeap;
 	}
 
 	// Handle shader-visible tables
-	crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleOffset = cbv_SRV_UAV_ShaderVisibleTableStart;
-	crd3d::DescriptorD3D12 cbvShaderVisibleTable = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += constantBufferCount * cbv_SRV_UAV_DescriptorSize;
-	crd3d::DescriptorD3D12 srvShaderVisibleTable = cbv_SRV_UAV_ShaderVisibleOffset; cbv_SRV_UAV_ShaderVisibleOffset += (textureCount + storageBufferCount) * cbv_SRV_UAV_DescriptorSize;
-	crd3d::DescriptorD3D12 uavShaderVisibleTable = cbv_SRV_UAV_ShaderVisibleOffset;
+	crd3d::DescriptorD3D12 shaderResourceShaderVisibleOffset = shaderResourceShaderVisibleTableStart;
+	crd3d::DescriptorD3D12 cbvShaderVisibleTable = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += constantBufferCount * shaderResourceDescriptorSize;
+	crd3d::DescriptorD3D12 srvShaderVisibleTable = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += (textureCount + storageBufferCount) * shaderResourceDescriptorSize;
+	crd3d::DescriptorD3D12 uavShaderVisibleTable = shaderResourceShaderVisibleOffset;
 	crd3d::DescriptorD3D12 samplerShaderVisibleTable = samplerShaderVisibleTableStart;
 
 	// Compute shader resources
@@ -901,13 +901,13 @@ void CrCommandBufferD3D12::BeginPS()
 	m_d3d12CommandAllocator->Reset();
 	m_d3d12GraphicsCommandList->Reset(m_d3d12CommandAllocator, nullptr);
 
-	m_CBV_SRV_UAV_DescriptorStream.Reset();
-	m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.Reset();
+	m_shaderResourceDescriptorStream.Reset();
+	m_shaderResourceShaderVisibleDescriptorStream.Reset();
 
 	m_samplerDescriptorStream.Reset();
 	m_samplerShaderVisibleDescriptorStream.Reset();
 
-	m_CBV_SRV_UAV_DescriptorHeap = nullptr;
+	m_shaderResourceDescriptorHeap = nullptr;
 	m_samplerDescriptorHeap = nullptr;
 
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
@@ -977,10 +977,10 @@ void CrCommandBufferD3D12::EndPS()
 
 	// Copy CBV, SRV and UAV descriptors
 	{
-		crd3d::DescriptorD3D12 cbv_SRV_UAV_Heap = m_CBV_SRV_UAV_DescriptorStream.GetDescriptorHeap().GetHeapStart();
-		crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleHeap = m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetDescriptorHeap().GetHeapStart();
-		CrCommandBufferAssertMsg(m_CBV_SRV_UAV_DescriptorStream.GetNumDescriptors() == m_CBV_SRV_UAV_ShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
-		d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(m_CBV_SRV_UAV_DescriptorStream.GetNumDescriptors(),
+		crd3d::DescriptorD3D12 cbv_SRV_UAV_Heap = m_shaderResourceDescriptorStream.GetDescriptorHeap().GetHeapStart();
+		crd3d::DescriptorD3D12 cbv_SRV_UAV_ShaderVisibleHeap = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetHeapStart();
+		CrCommandBufferAssertMsg(m_shaderResourceDescriptorStream.GetNumDescriptors() == m_shaderResourceShaderVisibleDescriptorStream.GetNumDescriptors(), "Didn't allocate same descriptors");
+		d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(m_shaderResourceDescriptorStream.GetNumDescriptors(),
 			cbv_SRV_UAV_ShaderVisibleHeap.cpuHandle, cbv_SRV_UAV_Heap.cpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 	

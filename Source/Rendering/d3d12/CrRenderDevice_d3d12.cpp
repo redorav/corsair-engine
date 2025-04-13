@@ -264,6 +264,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 			{
 				D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE, // https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
 			};
+
 			D3D12_INFO_QUEUE_FILTER filter = {};
 			filter.DenyList.pIDList = blockedIds;
 			filter.DenyList.NumIDs = sizeof_array(blockedIds);

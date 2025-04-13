@@ -108,15 +108,15 @@ private:
 
 	D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 
-	CrDescriptorStreamD3D12 m_CBV_SRV_UAV_ShaderVisibleDescriptorStream;
+	CrDescriptorStreamD3D12 m_shaderResourceShaderVisibleDescriptorStream;
 
-	CrDescriptorStreamD3D12 m_CBV_SRV_UAV_DescriptorStream;
+	CrDescriptorStreamD3D12 m_shaderResourceDescriptorStream;
 
 	CrDescriptorStreamD3D12 m_samplerShaderVisibleDescriptorStream;
 
 	CrDescriptorStreamD3D12 m_samplerDescriptorStream;
 
-	ID3D12DescriptorHeap* m_CBV_SRV_UAV_DescriptorHeap;
+	ID3D12DescriptorHeap* m_shaderResourceDescriptorHeap;
 
 	ID3D12DescriptorHeap* m_samplerDescriptorHeap;
 

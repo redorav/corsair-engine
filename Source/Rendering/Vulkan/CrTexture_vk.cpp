@@ -59,12 +59,11 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	VkImageType vkImageType;
 	VkImageViewType vkImageViewType;
 	VkImageCreateFlags vkCreateFlags = 0;
-	uint32_t arrayLayers = descriptor.arraySize;
 
 	if (IsCubemap())
 	{
 		vkImageType = VK_IMAGE_TYPE_2D;
-		if (arrayLayers > 1)
+		if (m_arraySize > 1)
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
 		}
@@ -83,7 +82,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	{
 		vkImageType = VK_IMAGE_TYPE_1D;
 
-		if (arrayLayers > 1)
+		if (m_arraySize > 1)
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
 		}
@@ -96,7 +95,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	{
 		vkImageType = VK_IMAGE_TYPE_2D;
 
-		if (arrayLayers > 1)
+		if (m_arraySize > 1)
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 		}
@@ -127,7 +126,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageCreateInfo.format = vkFormat;
 		imageCreateInfo.extent = { m_width, m_height, m_depth };
 		imageCreateInfo.mipLevels = m_mipmapCount;
-		imageCreateInfo.arrayLayers = arrayLayers;
+		imageCreateInfo.arrayLayers = m_arraySize;
 		imageCreateInfo.samples = vkSamples;
 		imageCreateInfo.usage = vkImageUsageFlags;
 		imageCreateInfo.flags = vkCreateFlags;
@@ -210,7 +209,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
 		imageViewInfo.subresourceRange.levelCount = m_mipmapCount;
 		imageViewInfo.subresourceRange.baseArrayLayer = 0;
-		imageViewInfo.subresourceRange.layerCount = arrayLayers;
+		imageViewInfo.subresourceRange.layerCount = m_arraySize;
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
 		imageViewInfo.subresourceRange.aspectMask = viewAspectMask;
@@ -276,7 +275,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			stencilImageViewInfo.subresourceRange.baseMipLevel   = 0;
 			stencilImageViewInfo.subresourceRange.levelCount     = m_mipmapCount;
 			stencilImageViewInfo.subresourceRange.baseArrayLayer = 0;
-			stencilImageViewInfo.subresourceRange.layerCount     = arrayLayers;
+			stencilImageViewInfo.subresourceRange.layerCount     = m_arraySize;
 			stencilImageViewInfo.viewType                        = vkImageViewType;
 			stencilImageViewInfo.image                           = m_vkImage;
 			stencilImageViewInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_STENCIL_BIT;

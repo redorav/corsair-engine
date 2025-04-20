@@ -12,7 +12,7 @@ class ICrRenderDevice;
 
 struct CrVkAdditionalTextureViews
 {
-	crstl::array<crstl::vector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices.
+	crstl::array<crstl::vector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices
 	crstl::array<VkImageView, cr3d::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
 
 	VkImageView m_vkImageViewStencil;
@@ -47,7 +47,7 @@ private:
 
 	// This is optional as only render targets and RW textures need them, but can take up
 	// some memory per texture (almost 512 bytes)
-	crstl::unique_ptr<CrVkAdditionalTextureViews>	m_additionalViews;
+	crstl::unique_ptr<CrVkAdditionalTextureViews> m_additionalViews;
 
 	// Allocation handle through the VMA allocator
 	VmaAllocation						m_vmaAllocation;

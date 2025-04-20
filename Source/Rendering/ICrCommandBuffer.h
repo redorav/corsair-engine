@@ -38,7 +38,7 @@ struct CrCommandBufferDescriptor
 	uint32_t dynamicVertexBufferSizeVertices = 0;
 
 	// Use this to stream per-frame constant buffer data
-	uint32_t dynamicConstantBufferSizeBytes = 0;
+	uint32_t dynamicBufferSizeBytes = 0;
 };
 
 // TODO Do all platforms support binding a buffer and an offset inside?
@@ -163,6 +163,8 @@ public:
 
 	void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer);
 
+	void BindStorageBuffer(const CrGPUBufferView& storageBufferView);
+
 	// RW Storage Buffers
 
 	void BindRWStorageBuffer(RWStorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
@@ -236,6 +238,9 @@ public:
 	CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t sizeBytes);
 
 	CrGPUBufferView AllocateConstantBuffer(uint32_t sizeBytes);
+
+	template<typename MetaType>
+	inline CrGPUBufferViewT<MetaType> AllocateStorageBuffer(uint32_t instanceCount);
 
 	CrGPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
@@ -333,7 +338,7 @@ protected:
 
 	CurrentState					m_currentState;
 
-	crstl::unique_ptr<CrGPUStackAllocator> m_constantBufferGPUStack;
+	crstl::unique_ptr<CrGPUStackAllocator> m_bufferGPUStack;
 
 	crstl::unique_ptr<CrGPUStackAllocator> m_vertexBufferGPUStack;
 
@@ -627,6 +632,11 @@ inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferI
 	BindStorageBuffer(storageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
+inline void ICrCommandBuffer::BindStorageBuffer(const CrGPUBufferView& structuredBufferView)
+{
+	BindStorageBuffer((StorageBuffers::T)structuredBufferView.GetBindingIndex(), structuredBufferView.GetHardwareBuffer(), structuredBufferView.GetNumElements(), structuredBufferView.GetStride(), structuredBufferView.GetByteOffset());
+}
+
 inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
@@ -664,11 +674,11 @@ inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferI
 template<typename MetaType>
 inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 {
-	CrStackAllocation<void> allocation = m_constantBufferGPUStack->AllocateAligned(sizeBytes, 256);
+	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(sizeBytes, 256);
 
 	CrGPUBufferViewT<MetaType> constantBufferView
 	(
-		m_constantBufferGPUStack->GetHardwareGPUBuffer(),
+		m_bufferGPUStack->GetHardwareGPUBuffer(),
 		1,
 		sizeBytes,
 		allocation.offset,
@@ -682,4 +692,21 @@ template<typename MetaType>
 inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
 	return AllocateConstantBuffer<MetaType>(sizeof(MetaType));
+}
+
+template<typename MetaType>
+inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateStorageBuffer(uint32_t instanceCount)
+{
+	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(instanceCount * sizeof(MetaType), 256);
+
+	CrGPUBufferViewT<MetaType> structuredBufferView
+	(
+		m_bufferGPUStack->GetHardwareGPUBuffer(),
+		instanceCount,
+		sizeof(MetaType),
+		allocation.offset,
+		allocation.memory
+	);
+
+	return structuredBufferView;
 }

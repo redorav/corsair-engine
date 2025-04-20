@@ -16,15 +16,15 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 	, m_recording(false)
 {
 	// Initialize GPU buffer stack allocators - for streaming
-	// TODO it is possible to create these lazily on allocation instead
-	// to avoid having every command buffer allocate these if they
-	// aren't going to be used
+	// TODO it is possible to create these lazily on allocation instead to avoid having every command buffer allocate these if they aren't going to be used
+	// TODO Create a single buffer that supports vertex, index and GPU buffer data. We don't really care where things come from, just need a buffer
+	// Investigate whether it's actually possible to do that if certain buffers need to be in certain states via transitions
 	{
-		if (descriptor.dynamicConstantBufferSizeBytes > 0)
+		if (descriptor.dynamicBufferSizeBytes > 0)
 		{
-			CrHardwareGPUBufferDescriptor constantBufferStack(cr3d::BufferUsage::Constant, cr3d::MemoryAccess::CPUStreamToGPU, descriptor.dynamicConstantBufferSizeBytes);
-			constantBufferStack.name = "Constant Buffer Stack";
-			m_constantBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, constantBufferStack));
+			CrHardwareGPUBufferDescriptor gpuBufferStack(cr3d::BufferUsage::Constant | cr3d::BufferUsage::Structured, cr3d::MemoryAccess::CPUStreamToGPU, descriptor.dynamicBufferSizeBytes);
+			gpuBufferStack.name = "GPU Buffer Stack";
+			m_bufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, gpuBufferStack));
 		}
 
 		// Allocate memory for transient vertex and index data. This is just an approximation as it depends on the size of each vertex and index
@@ -63,9 +63,9 @@ void ICrCommandBuffer::Begin()
 	// any bound state is also reset, and our tracking must match
 	m_currentState = CurrentState();
 
-	if (m_constantBufferGPUStack)
+	if (m_bufferGPUStack)
 	{
-		m_constantBufferGPUStack->Begin();
+		m_bufferGPUStack->Begin();
 	}
 
 	if (m_vertexBufferGPUStack)
@@ -89,9 +89,9 @@ void ICrCommandBuffer::Begin()
 
 void ICrCommandBuffer::End()
 {
-	if (m_constantBufferGPUStack)
+	if (m_bufferGPUStack)
 	{
-		m_constantBufferGPUStack->End();
+		m_bufferGPUStack->End();
 	}
 
 	if (m_vertexBufferGPUStack)
@@ -136,11 +136,11 @@ void ICrCommandBuffer::ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint3
 
 CrGPUBufferView ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 {
-	CrStackAllocation<void> allocation = m_constantBufferGPUStack->AllocateAligned(sizeBytes, 256);
+	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(sizeBytes, 256);
 
 	CrGPUBufferView constantBufferView
 	(
-		m_constantBufferGPUStack->GetHardwareGPUBuffer(),
+		m_bufferGPUStack->GetHardwareGPUBuffer(),
 		1,
 		sizeBytes,
 		allocation.offset,

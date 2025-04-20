@@ -1225,7 +1225,7 @@ void CrFrame::RecreateRenderTargets()
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{
 		CrCommandBufferDescriptor descriptor;
-		descriptor.dynamicConstantBufferSizeBytes = 8 * 1024 * 1024; // 8 MB
+		descriptor.dynamicBufferSizeBytes = 8 * 1024 * 1024; // 8 MB
 		descriptor.dynamicVertexBufferSizeVertices = 1024 * 1024; // 1 million vertices
 		descriptor.name.append_sprintf("Draw Command Buffer %i", i);
 		m_drawCmdBuffers[i] = renderDevice->CreateCommandBuffer(descriptor);

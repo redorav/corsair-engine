@@ -112,7 +112,5 @@ private:
 
 	uint64_t m_exStyle = 0;
 
-	bool m_resized = false;
-
 	CrSwapchainHandle m_swapchain;
 };

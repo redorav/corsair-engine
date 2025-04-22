@@ -172,6 +172,5 @@ private:
 	VkCommandPool m_vkGraphicsCommandPool;
 
 	// Swapchain command list
-	VkCommandPool m_vkSwapchainCommandPool;
 	VkCommandBuffer m_vkSwapchainCommandBuffer;
 };

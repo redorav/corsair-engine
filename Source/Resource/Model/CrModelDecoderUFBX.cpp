@@ -216,9 +216,9 @@ static bool IsRightHandedCoordinateSystem(ufbx_coordinate_axes axes)
 			return
 			(axes.right == UFBX_COORDINATE_AXIS_POSITIVE_Y && axes.front == UFBX_COORDINATE_AXIS_NEGATIVE_Z) ||
 			(axes.right == UFBX_COORDINATE_AXIS_NEGATIVE_Y && axes.front == UFBX_COORDINATE_AXIS_POSITIVE_Z);
+		default:
+			return false;
 	}
-
-	return false;
 }
 
 CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)

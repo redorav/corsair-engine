@@ -87,7 +87,7 @@ void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescrip
 
 	if (m_renderDocModule)
 	{
-		pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress((HMODULE)m_renderDocModule, "RENDERDOC_GetAPI");
+		pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)((void*)(GetProcAddress((HMODULE)m_renderDocModule, "RENDERDOC_GetAPI")));
 		RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_5_0, (void**)&m_renderDocApi);
 
 		RENDERDOC_InputButton captureButtons[] = { eRENDERDOC_Key_F10, eRENDERDOC_Key_F12 };

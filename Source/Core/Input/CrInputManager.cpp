@@ -198,6 +198,7 @@ void CrInputManager::OnMouseButtonDown(MouseButton::Code code)
 		case MouseButton::Left: imguiMouseButton = 0; break;
 		case MouseButton::Right: imguiMouseButton = 1; break;
 		case MouseButton::Middle: imguiMouseButton = 2; break;
+		default: break;
 	}
 
 	io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
@@ -222,6 +223,7 @@ void CrInputManager::OnMouseButtonUp(MouseButton::Code code)
 		case MouseButton::Left: imguiMouseButton = 0; break;
 		case MouseButton::Right: imguiMouseButton = 1; break;
 		case MouseButton::Middle: imguiMouseButton = 2; break;
+		default: break;
 	}
 
 	io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);

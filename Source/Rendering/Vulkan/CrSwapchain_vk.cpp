@@ -220,8 +220,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(ICrRenderDevice* renderDevice, const CrSwap
 	vkResult = vkGetSwapchainImagesKHR(vkDevice, m_vkSwapchain, &m_imageCount, nullptr);
 	CrAssertMsg(vkResult == VK_SUCCESS, "Could not retrieve swapchain images");
 
-	VkFenceCreateInfo vkSwapchainRecreateFenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-	vkSwapchainRecreateFenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	VkFenceCreateInfo vkSwapchainRecreateFenceInfo { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr, VK_FENCE_CREATE_SIGNALED_BIT };
 	vkCreateFence(vkDevice, &vkSwapchainRecreateFenceInfo, nullptr, &m_swapchainRecreationFence);
 
 	m_presentCompleteSemaphores.resize(m_imageCount);
@@ -393,7 +392,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	// We use a special command buffer to queue only these transitions
 	VkCommandBuffer swapchainCommandBuffer = vulkanDevice->GetVkSwapchainCommandBuffer();
 
-	VkCommandBufferBeginInfo commandBufferInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+	VkCommandBufferBeginInfo commandBufferInfo { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, nullptr, 0, nullptr };
 	vkBeginCommandBuffer(swapchainCommandBuffer, &commandBufferInfo);
 	vkCmdPipelineBarrier(swapchainCommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, (uint32_t)imageMemoryBarriers.size(), imageMemoryBarriers.data());
 	vkEndCommandBuffer(swapchainCommandBuffer);
@@ -401,7 +400,8 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	vkResetFences(vkDevice, 1, &m_swapchainRecreationFence);
 
 	// Submit to the queue immediately
-	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+	VkSubmitInfo submitInfo {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &swapchainCommandBuffer;
 	VkResult result = vkQueueSubmit(vulkanDevice->GetVkGraphicsQueue(), 1, &submitInfo, m_swapchainRecreationFence);

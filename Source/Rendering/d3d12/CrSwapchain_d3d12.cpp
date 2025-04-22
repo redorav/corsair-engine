@@ -136,7 +136,7 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 
 	HRESULT hResult = m_d3d12Swapchain->ResizeBuffers(0, width, height, crd3d::GetDXGIFormat(m_format), 0);
 
-	if (hResult == 0x887A0001)
+	if (hResult == (HRESULT)0x887A0001)
 	{
 		CrAssertMsg(false, "Swapchain resources still in use");
 	}

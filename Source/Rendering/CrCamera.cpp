@@ -18,9 +18,9 @@ CrCamera::CrCamera() : CrEntity()
 	, m_reverseDepth(true)
 	, m_resolutionWidth(1)
 	, m_resolutionHeight(1)
-	, m_view2WorldMatrix(float4x4::identity())
 	, m_world2ViewMatrix(float4x4::identity())
 	, m_view2ProjectionMatrix(float4x4::identity())
+	, m_view2WorldMatrix(float4x4::identity())
 {
 	m_forwardWorldSpace = float3(0, 0, 1);
 	m_upWorldSpace     = float3(0, 1, 0);

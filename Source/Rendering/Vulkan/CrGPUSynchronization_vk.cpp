@@ -7,12 +7,9 @@ CrGPUFenceVulkan::CrGPUFenceVulkan(ICrRenderDevice* renderDevice, bool signaled)
 {
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
-	VkFenceCreateInfo vkFenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-
-	if (signaled)
-	{
-		vkFenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-	}
+	VkFenceCreateInfo vkFenceCreateInfo {};
+	vkFenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	vkFenceCreateInfo.flags = (signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0);
 
 	vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_vkFence);
 }

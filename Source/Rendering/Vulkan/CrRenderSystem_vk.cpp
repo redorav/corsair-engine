@@ -52,18 +52,13 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 		InitializeRenderdoc();
 	}
 
+	uint32_t vulkanApiVersion = VK_VERSION_1_3;
+	vkEnumerateInstanceVersion(&vulkanApiVersion);
+
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Corsair Engine";		// TODO Come from application settings
 	appInfo.pEngineName = "Corsair Engine";				// TODO Come from engine settings
-
-	uint32_t vulkanApiVersion = VK_VERSION_1_3;
-
-	if(vkEnumerateInstanceVersion != nullptr)
-	{
-		vkEnumerateInstanceVersion(&vulkanApiVersion);
-	}
-
 	appInfo.apiVersion = vulkanApiVersion;
 
 	// Enumerate instance extensions

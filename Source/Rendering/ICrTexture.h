@@ -7,9 +7,58 @@
 #include "Rendering/CrRendering.h"
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrGPUDeletable.h"
+#include "Rendering/CrDataFormats.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_string.h"
+// Descriptor of a view. This can be used to both create a texture and during binding. Note that this is not an API object, the ownership of
+// that lies with the texture. This is to simplify the management of API resources, once a texture is destroyed, all the views it used to
+// manage are destroyed too, preventing issues like binding a view whose resource no longer exists
+struct CrTextureView
+{
+	explicit CrTextureView
+	(
+		uint8_t mipmapStart = 0,
+		uint8_t mipmapCount = 0xff, // 0xff means all mips are visible
+		uint16_t sliceStart = 0,
+		uint16_t sliceCount = 0xffff, // 0xffff means all slices are visible
+		cr3d::DataFormat::T format = cr3d::DataFormat::Invalid, cr3d::TexturePlane::T plane = cr3d::TexturePlane::Plane0
+	)
+		: mipmapStart(mipmapStart)
+		, mipmapCount(mipmapCount)
+		, sliceStart(sliceStart)
+		, sliceCount(sliceCount)
+		, plane(plane)
+		, format(format)
+	{}
+
+	explicit CrTextureView(cr3d::TexturePlane::T plane) : CrTextureView()
+	{
+		this->plane = plane;
+	}
+
+	bool operator == (const CrTextureView& other) const
+	{
+		return key == other.key;
+	}
+
+	union
+	{
+		struct
+		{
+			uint32_t mipmapStart : 8;
+			uint32_t mipmapCount : 8;
+			uint32_t sliceStart : 16;
+			uint32_t sliceCount : 16;
+			cr3d::TexturePlane::T plane : 8;
+			cr3d::DataFormat::T format : 8;
+		};
+
+		uint64_t key;
+	};
+};
+
+static_assert(sizeof(CrTextureView) == 8);
 
 struct CrTextureDescriptor
 {

@@ -524,7 +524,9 @@ void CrFrame::Process()
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("GBuffer Pass"), float4(160, 180, 150, 255) / 255.0f, CrRenderGraphPassType::Graphics,
 	[&](CrRenderGraph& renderGraph)
 	{
-		renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f);
+		renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(),
+			CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0.0f,
+			CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, 0);
 		renderGraph.BindRenderTarget(m_gbufferAlbedoAOTexture.get(), CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
 		renderGraph.BindRenderTarget(m_gbufferNormalsTexture.get(), CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
 		renderGraph.BindRenderTarget(m_gbufferMaterialTexture.get(), CrRenderTargetLoadOp::Clear, CrRenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -558,8 +560,8 @@ void CrFrame::Process()
 	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize.get());
-		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), cr3d::TexturePlane::Depth);
-		commandBuffer->BindTexture(Textures::StencilTexture, m_depthStencilTexture.get(), cr3d::TexturePlane::Stencil);
+		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), CrTextureView(cr3d::TexturePlane::Depth));
+		commandBuffer->BindTexture(Textures::StencilTexture, m_depthStencilTexture.get(), CrTextureView(cr3d::TexturePlane::Stencil));
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepth16MinMaxMipChain.get(), 0);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepth16MinMaxMipChain.get(), 1);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepth16MinMaxMipChain.get(), 2);
@@ -591,6 +593,7 @@ void CrFrame::Process()
 			lightData->colorIntensity = float4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 
+		commandBuffer->SetViewport(CrViewport(0, 0, m_lightingTexture->GetWidth(), m_lightingTexture->GetHeight()));
 		commandBuffer->BindConstantBuffer(lightConstantBuffer);
 		commandBuffer->BindTexture(Textures::GBufferDepthTexture, m_depthStencilTexture.get());
 		commandBuffer->BindTexture(Textures::GBufferAlbedoAOTexture, m_gbufferAlbedoAOTexture.get());

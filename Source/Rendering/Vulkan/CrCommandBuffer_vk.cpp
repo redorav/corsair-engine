@@ -183,13 +183,17 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 
-		if (textureBinding.plane == cr3d::TexturePlane::Stencil)
+		if (textureBinding.view == CrTextureView())
+		{
+			imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
+		}
+		else if (textureBinding.view == CrTextureView(cr3d::TexturePlane::Stencil))
 		{
 			imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
 		}
 		else
 		{
-			imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
+			CrAssertMsg(false, "Invalid image view");
 		}
 
 		// TODO Handle when image is bound to depth stencil and also as shader input
@@ -428,9 +432,9 @@ void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrT
 	imageMemoryBarrier.image                           = vulkanTexture->GetVkImage();
 	imageMemoryBarrier.subresourceRange.aspectMask     = crvk::GetVkImageAspectFlags(texture->GetFormat());
 	imageMemoryBarrier.subresourceRange.baseMipLevel   = mipmapStart;
-	imageMemoryBarrier.subresourceRange.levelCount     = mipmapCount;
+	imageMemoryBarrier.subresourceRange.levelCount     = min(mipmapCount, texture->GetMipmapCount());
 	imageMemoryBarrier.subresourceRange.baseArrayLayer = sliceStart;
-	imageMemoryBarrier.subresourceRange.layerCount     = sliceCount;
+	imageMemoryBarrier.subresourceRange.layerCount     = min(sliceCount, texture->GetSliceCount());
 	imageMemoryBarrier.srcAccessMask                   = resourceStateInfoSource.accessMask;
 	imageMemoryBarrier.dstAccessMask                   = resourceStateInfoDestination.accessMask;
 }

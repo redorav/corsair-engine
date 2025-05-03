@@ -126,9 +126,9 @@ void CrCommandBufferD3D12::ProcessTextureBarriers
 		d3d12TextureBarrier.LayoutAfter                       = crd3d::GetD3D12BarrierTextureLayout(descriptor.destinationState.layout);
 		d3d12TextureBarrier.pResource                         = d3d12Texture->GetD3D12Resource();
 		d3d12TextureBarrier.Subresources.IndexOrFirstMipLevel = descriptor.mipmapStart;
-		d3d12TextureBarrier.Subresources.NumMipLevels         = descriptor.mipmapCount;
+		d3d12TextureBarrier.Subresources.NumMipLevels         = min(descriptor.mipmapCount, descriptor.texture->GetMipmapCount());
 		d3d12TextureBarrier.Subresources.FirstArraySlice      = descriptor.sliceStart;
-		d3d12TextureBarrier.Subresources.NumArraySlices       = descriptor.sliceCount;
+		d3d12TextureBarrier.Subresources.NumArraySlices       = min(descriptor.sliceCount, descriptor.texture->GetSliceCount());
 		d3d12TextureBarrier.Subresources.FirstPlane           = descriptor.texturePlane;
 		d3d12TextureBarrier.Subresources.NumPlanes            = 1;
 		d3d12TextureBarrier.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
@@ -474,11 +474,19 @@ void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBindin
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
 	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(textureBinding.texture);
-	const D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescriptor = &d3d12Texture->GetD3D12SRVDescriptor();
-
-	if (textureBinding.plane == cr3d::TexturePlane::Stencil)
+	const D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescriptor = nullptr;
+	
+	if (textureBinding.view == CrTextureView())
+	{
+		srvDescriptor = &d3d12Texture->GetD3D12SRVDescriptor();
+	}
+	else if (textureBinding.view == CrTextureView(cr3d::TexturePlane::Stencil))
 	{
 		srvDescriptor = &d3d12Texture->GetD3D12StencilSRVDescriptor();
+	}
+	else
+	{
+		CrAssertMsg(false, "Invalid image view");
 	}
 
 	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(d3d12Texture->GetD3D12Resource(), srvDescriptor, srvHandle.cpuHandle);

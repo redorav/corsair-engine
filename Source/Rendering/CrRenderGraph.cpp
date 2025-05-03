@@ -52,7 +52,7 @@ uint32_t CrRenderGraph::GetSubresourceId(CrHash subresourceHash)
 
 void CrRenderGraph::BindTexture
 (
-	Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages)
+	Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, CrTextureView view)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -61,10 +61,7 @@ void CrRenderGraph::BindTexture
 
 	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
-	textureUsage.mipmapStart = 0;
-	textureUsage.mipmapCount = texture->GetMipmapCount();
-	textureUsage.sliceStart = 0;
-	textureUsage.sliceCount = texture->GetSliceCount();
+	textureUsage.view = view;
 	textureUsage.textureIndex = textureIndex;
 	textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::ShaderInput, shaderStages);
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
@@ -82,12 +79,10 @@ void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* text
 
 	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
-	textureUsage.mipmapStart = mipmap;
-	textureUsage.mipmapCount = 1;
-	unused_parameter(sliceStart);
-	unused_parameter(sliceCount);
-	textureUsage.sliceStart = 0;
-	textureUsage.sliceCount = texture->GetSliceCount();
+	textureUsage.view.mipmapStart = mipmap;
+	textureUsage.view.mipmapCount = 1;
+	textureUsage.view.sliceStart = sliceStart;
+	textureUsage.view.sliceCount = sliceCount;
 	textureUsage.rwTextureIndex = rwTextureIndex;
 	textureUsage.state = cr3d::TextureState(cr3d::TextureLayout::RWTexture, shaderStages);
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
@@ -112,10 +107,10 @@ void CrRenderGraph::BindRenderTarget
 
 	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
-	textureUsage.mipmapStart = mipmap;
-	textureUsage.mipmapCount = 1;
-	textureUsage.sliceStart = slice;
-	textureUsage.sliceCount = 1;
+	textureUsage.view.mipmapStart = mipmap;
+	textureUsage.view.mipmapCount = 1;
+	textureUsage.view.sliceStart = slice;
+	textureUsage.view.sliceCount = 1;
 	textureUsage.clearColor = clearColor;
 	textureUsage.storeOp = storeOp;
 	textureUsage.loadOp = loadOp;
@@ -149,10 +144,10 @@ void CrRenderGraph::BindDepthStencilTarget
 
 	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
-	textureUsage.mipmapStart = mipmap;
-	textureUsage.mipmapCount = 1;
-	textureUsage.sliceStart = slice;
-	textureUsage.sliceCount = 1;
+	textureUsage.view.mipmapStart = mipmap;
+	textureUsage.view.mipmapCount = 1;
+	textureUsage.view.sliceStart = slice;
+	textureUsage.view.sliceCount = 1;
 	textureUsage.depthClearValue = depthClearValue;
 	textureUsage.stencilClearValue = stencilClearValue;
 	textureUsage.stencilLoadOp = stencilLoadOp;
@@ -229,8 +224,10 @@ void CrRenderGraph::BindSwapchain(ICrTexture* texture, uint32_t mipmap, uint32_t
 
 	CrRenderGraphTextureUsage textureUsage;
 	textureUsage.texture = texture;
-	textureUsage.mipmapStart = mipmap;
-	textureUsage.sliceStart = slice;
+	textureUsage.view.mipmapStart = mipmap;
+	textureUsage.view.mipmapCount = 1;
+	textureUsage.view.sliceStart = slice;
+	textureUsage.view.sliceCount = 1;
 	textureUsage.state = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Unused };
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 	workingPass.textureUsages.push_back(textureUsage);
@@ -483,8 +480,8 @@ void CrRenderGraph::Execute()
 					{
 						CrRenderTargetDescriptor renderTargetDescriptor;
 						renderTargetDescriptor.texture      = textureUsage.texture;
-						renderTargetDescriptor.mipmap       = textureUsage.mipmapStart;
-						renderTargetDescriptor.slice        = textureUsage.sliceStart;
+						renderTargetDescriptor.mipmap       = textureUsage.view.mipmapStart;
+						renderTargetDescriptor.slice        = textureUsage.view.sliceStart;
 						renderTargetDescriptor.clearColor   = textureUsage.clearColor;
 						renderTargetDescriptor.loadOp       = textureUsage.loadOp;
 						renderTargetDescriptor.storeOp      = textureUsage.storeOp;
@@ -510,8 +507,8 @@ void CrRenderGraph::Execute()
 					{
 						CrRenderTargetDescriptor depthDescriptor;
 						depthDescriptor.texture           = textureUsage.texture;
-						depthDescriptor.mipmap            = textureUsage.mipmapStart;
-						depthDescriptor.slice             = textureUsage.sliceStart;
+						depthDescriptor.mipmap            = textureUsage.view.mipmapStart;
+						depthDescriptor.slice             = textureUsage.view.sliceStart;
 						depthDescriptor.depthClearValue   = textureUsage.depthClearValue;
 						depthDescriptor.stencilClearValue = textureUsage.stencilClearValue;
 						depthDescriptor.loadOp            = textureUsage.loadOp;
@@ -537,8 +534,8 @@ void CrRenderGraph::Execute()
 						{
 							renderPassDescriptor.beginTextures.emplace_back
 							(
-								textureUsage.texture, textureUsage.mipmapStart, textureUsage.mipmapCount,
-								textureUsage.sliceStart, textureUsage.sliceCount, textureUsage.texturePlane,
+								textureUsage.texture, textureUsage.view.mipmapStart, textureUsage.view.mipmapCount,
+								textureUsage.view.sliceStart, textureUsage.view.sliceCount, textureUsage.view.plane,
 								transitionInfo.initialState, transitionInfo.usageState
 							);
 
@@ -551,8 +548,8 @@ void CrRenderGraph::Execute()
 						{
 							renderPassDescriptor.endTextures.emplace_back
 							(
-								textureUsage.texture, textureUsage.mipmapStart, textureUsage.mipmapCount,
-								textureUsage.sliceStart, textureUsage.sliceCount, textureUsage.texturePlane,
+								textureUsage.texture, textureUsage.view.mipmapStart, textureUsage.view.mipmapCount,
+								textureUsage.view.sliceStart, textureUsage.view.sliceCount, textureUsage.view.plane,
 								transitionInfo.usageState, transitionInfo.finalState
 							);
 
@@ -571,10 +568,12 @@ void CrRenderGraph::Execute()
 				switch (textureUsage.state.layout)
 				{
 					case cr3d::TextureLayout::RWTexture:
-						m_frameParams.commandBuffer->BindRWTexture(textureUsage.rwTextureIndex, textureUsage.texture, textureUsage.mipmapStart);
+						m_frameParams.commandBuffer->BindRWTexture(textureUsage.rwTextureIndex, textureUsage.texture, textureUsage.view.mipmapStart);
 						break;
 					case cr3d::TextureLayout::ShaderInput:
-						m_frameParams.commandBuffer->BindTexture(textureUsage.textureIndex, textureUsage.texture, textureUsage.texturePlane);
+						m_frameParams.commandBuffer->BindTexture(textureUsage.textureIndex, textureUsage.texture, textureUsage.view);
+						break;
+					default:
 						break;
 				}
 			}

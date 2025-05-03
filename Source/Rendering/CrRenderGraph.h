@@ -2,6 +2,7 @@
 
 #include "Rendering/CrRenderingForwardDeclarations.h"
 #include "Rendering/CrRendering.h"
+#include "Rendering/ICrTexture.h"
 
 #include "Core/CrHash.h"
 
@@ -69,13 +70,7 @@ struct CrRenderGraphTextureUsage
 
 	ICrTexture* texture = nullptr;
 
-	uint32_t mipmapStart = 0;
-	uint32_t mipmapCount = 1;
-
-	uint32_t sliceStart = 0;
-	uint32_t sliceCount = 1;
-
-	cr3d::TexturePlane::T texturePlane = cr3d::TexturePlane::Color;
+	CrTextureView view;
 
 	// TODO Move to subresource
 	uint64_t subresourceId = 0xffffffff;
@@ -202,7 +197,7 @@ public:
 
 	uint32_t GetSubresourceId(CrHash subresourceHash);
 
-	void BindTexture(Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages);
+	void BindTexture(Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, CrTextureView view = CrTextureView());
 
 	void BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
 

@@ -757,7 +757,7 @@ void CrFrame::Process()
 		renderGraph.BindTexture(Textures::CopyTexture, m_preSwapchainTexture.get(), cr3d::ShaderStageFlags::Pixel);
 		renderGraph.BindRenderTarget(swapchainTexture.get(), CrRenderTargetLoadOp::DontCare, CrRenderTargetStoreOp::Store, float4(0.0f));
 	},
-	[this, &swapchainTexture](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(Textures::CopyTexture, m_preSwapchainTexture.get());
 		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline.get());
@@ -1054,7 +1054,7 @@ void CrFrame::DrawDebugUI()
 
 				CrGPUInterval totalFrameDuration = m_timingQueryTracker->GetFrameDuration();
 
-				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition, totalFrameDuration](const CrRenderGraphPass2& pass)
+				m_mainRenderGraph.ForEachPass([this, drawList, timebarSize, &initialTimebarPosition, totalFrameDuration](const CrRenderGraphPass& pass)
 				{
 					CrGPUInterval interval = m_timingQueryTracker->GetResultForFrame(CrHash(pass.name.c_str(), pass.name.length()));
 

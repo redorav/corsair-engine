@@ -73,9 +73,9 @@ struct GBufferDebug
 	uint4 decodeOptions; // .x decode target
 };
 
-cbuffer GBufferDebug
+cbuffer GBufferDebugCB
 {
-	GBufferDebug cb_GBufferDebug;
+	GBufferDebug GBufferDebugCB;
 };
 
 float4 GBufferDebugPS(VSOutputFullscreen psInput) : SV_Target0
@@ -84,7 +84,7 @@ float4 GBufferDebugPS(VSOutputFullscreen psInput) : SV_Target0
 
 	Surface surface = DecodeGBufferSurface(screenPixel, psInput.screenUVClip);
 
-	uint gbufferDebugMode = cb_GBufferDebug.decodeOptions.x;
+	uint gbufferDebugMode = GBufferDebugCB.decodeOptions.x;
 
 	float3 debugColor = 0.0;
 

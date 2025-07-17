@@ -204,7 +204,10 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 	metadataHeader += "#include \"crstl/fixed_open_hashmap.h\"\n";
 	metadataHeader += "#include \"crstl/vector.h\"\n";
 	metadataHeader += "#include \"crstl/string.h\"\n";
-	metadataHeader += "#include \"Rendering/CrRenderingVector.h\"\n";
+	metadataHeader += "#include \"hlsl++/vector_float.h\"\n";
+	metadataHeader += "#include \"hlsl++/vector_int.h\"\n";
+	metadataHeader += "#include \"hlsl++/matrix_float.h\"\n";
+	metadataHeader += "#include \"hlsl++/dependent.h\"\n";
 	metadataHeader += "\n";
 
 	metadataHeader += BuildConstantBufferMetadataHeader(resources);
@@ -371,7 +374,7 @@ crstl::string GetBuiltinTypeString(const SpvReflectTypeDescription& type)
 
 	if (isComplexType)
 	{
-		result += "cr3d::";
+		result += "hlslpp::interop::";
 	}
 
 	if (type.type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)

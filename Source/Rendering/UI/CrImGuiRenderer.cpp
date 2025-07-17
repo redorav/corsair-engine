@@ -155,8 +155,6 @@ void CrImGuiRenderer::NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindo
 
 	if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
 	{
-		static CursorType::T prevCursorType = CursorType::Count;
-
 		ImGuiMouseCursor imguiMouseCursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
 
 		CursorType::T cursorType = CursorType::Count;
@@ -187,7 +185,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 	[&](CrRenderGraph&)
 	{
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer*)
+	[](const CrRenderGraph&, ICrCommandBuffer*)
 	{
 		ImGui::Render();
 	});
@@ -209,7 +207,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 		{
 			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get());
 		},
-		[this, imguiViewport, osWindow, swapchain](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this, imguiViewport, swapchain](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
 			// Query the draw data for this frame:
 			ImDrawData* data = imguiViewport->DrawData;

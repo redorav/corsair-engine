@@ -315,7 +315,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 			// Render Target Load Operation
 			renderTargetDesc.BeginningAccess.Type = crd3d::GetD3D12BeginningAccessType(renderTargetDescriptor.loadOp);
 			renderTargetDesc.BeginningAccess.Clear.ClearValue.Format = crd3d::GetDXGIFormat(d3d12Texture->GetFormat());
-			store(renderTargetDescriptor.clearColor, renderTargetDesc.BeginningAccess.Clear.ClearValue.Color);
+			store(renderTargetDesc.BeginningAccess.Clear.ClearValue.Color, renderTargetDescriptor.clearColor);
 
 			// Render Target Store Operation
 			renderTargetDesc.EndingAccess.Type = crd3d::GetD3D12EndingAccessType(renderTargetDescriptor.storeOp);

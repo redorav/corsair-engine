@@ -132,7 +132,7 @@ inline void CrCommandBufferVulkan::BeginDebugEventPS(const char* eventName, cons
 	{
 		VkDebugUtilsLabelEXT debugUtilsLabel = {};
 		debugUtilsLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
-		store(color, debugUtilsLabel.color);
+		store(debugUtilsLabel.color, color);
 		debugUtilsLabel.pLabelName = eventName;
 		vkCmdBeginDebugUtilsLabel(m_vkCommandBuffer, &debugUtilsLabel);
 	}
@@ -152,7 +152,7 @@ inline void CrCommandBufferVulkan::InsertDebugMarkerPS(const char* markerName, c
 	{
 		VkDebugUtilsLabelEXT debugUtilsLabel = {};
 		debugUtilsLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
-		store(color, debugUtilsLabel.color);
+		store(debugUtilsLabel.color, color);
 		debugUtilsLabel.pLabelName = markerName;
 		vkCmdInsertDebugUtilsLabel(m_vkCommandBuffer, &debugUtilsLabel);
 	}

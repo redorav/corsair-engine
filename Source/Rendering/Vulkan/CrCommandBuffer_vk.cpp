@@ -478,7 +478,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 					QueueVkImageBarrier(colorAttachment.texture, colorAttachment.mipmap, 1, colorAttachment.slice, 1, colorAttachment.initialState, colorAttachment.usageState);
 				}
 
-				hlslpp::store(colorAttachment.clearColor, colorAttachmentInfo.clearValue.color.float32);
+				hlslpp::store(colorAttachmentInfo.clearValue.color.float32, colorAttachment.clearColor);
 
 				renderWidth  = vulkanTexture->GetWidth();
 				renderHeight = vulkanTexture->GetHeight();
@@ -669,7 +669,7 @@ void CrCommandBufferVulkan::BeginPS()
 void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	VkClearColorValue clearColor;
-	store(color, clearColor.float32);
+	store(clearColor.float32, color);
 
 	VkImageSubresourceRange imageSubResourceRange = {};
 	imageSubResourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

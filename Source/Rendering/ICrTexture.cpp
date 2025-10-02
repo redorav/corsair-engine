@@ -109,7 +109,7 @@ namespace crd3d
 	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
 }
 
-cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
+cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
 {
 	cr3d::MipmapLayout mipmapLayout;
 
@@ -120,6 +120,7 @@ cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, 
 	ddsDescriptor.format = dxgiFormat;
 	ddsDescriptor.width = width;
 	ddsDescriptor.height = height;
+	ddsDescriptor.depth = depth;
 	ddsDescriptor.numMips = numMipmaps;
 	ddsDescriptor.type = isVolume ? ddspp::Texture3D : ddspp::Texture2D;
 	ddsDescriptor.bitsPerPixelOrBlock = ddspp::get_bits_per_pixel_or_block(ddsDescriptor.format);
@@ -134,7 +135,7 @@ cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, 
 
 cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const
 {
-	return GetDDSMipSliceLayout(m_format, m_width, m_height, m_mipmapCount, IsVolumeTexture(), mip, slice);
+	return GetDDSMipSliceLayout(m_format, m_width, m_height, m_depth, m_mipmapCount, IsVolumeTexture(), mip, slice);
 }
 
 cr3d::MipmapLayout ICrTexture::GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const
@@ -149,7 +150,7 @@ void ICrTexture::CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* 
 	cr3d::MipmapLayout sourceMipLayout = GetDDSMipSliceLayout(mip, slice);
 	cr3d::MipmapLayout destinationMipLayout = GetHardwareMipSliceLayout(mip, slice);
 
-	uint32_t depth = GetDepth();
+	uint32_t mipDepth = CrMax(1u, GetDepth() >> mip);
 
 	// Mipmaps are considered to include depth. Slice in this context only refers to arrays of textures
 	// If the mip size is equal, we can copy the entire mipmap in one memcpy
@@ -159,20 +160,20 @@ void ICrTexture::CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* 
 		(
 			destinationData + destinationMipLayout.offsetBytes,
 			sourceData + sourceMipLayout.offsetBytes,
-			sourceMipLayout.GetMipSize() * depth
+			sourceMipLayout.GetMipSize() * mipDepth
 		);
 	}
 	else
 	{
 		// If the depth pitch is not equal, we process every depth slice
-		for (uint32_t z = 0; z < depth; ++z)
+		for (uint32_t d = 0; d < mipDepth; ++d)
 		{
 			if (sourceMipLayout.rowPitchBytes == destinationMipLayout.rowPitchBytes)
 			{
 				memcpy
 				(
-					destinationData + destinationMipLayout.offsetBytes + destinationMipLayout.GetMipSize() * z,
-					sourceData + sourceMipLayout.offsetBytes + sourceMipLayout.GetMipSize() * z, 
+					destinationData + destinationMipLayout.offsetBytes + destinationMipLayout.GetMipSize() * d,
+					sourceData + sourceMipLayout.offsetBytes + sourceMipLayout.GetMipSize() * d, 
 					sourceMipLayout.GetMipSize()
 				);
 			}
@@ -183,8 +184,8 @@ void ICrTexture::CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* 
 				{
 					memcpy
 					(
-						destinationData + destinationMipLayout.offsetBytes + destinationMipLayout.GetMipSize() * z + row * destinationMipLayout.rowPitchBytes,
-						sourceData + sourceMipLayout.offsetBytes + sourceMipLayout.GetMipSize() * z + row * sourceMipLayout.rowPitchBytes,
+						destinationData + destinationMipLayout.offsetBytes + destinationMipLayout.GetMipSize() * d + row * destinationMipLayout.rowPitchBytes,
+						sourceData + sourceMipLayout.offsetBytes + sourceMipLayout.GetMipSize() * d + row * sourceMipLayout.rowPitchBytes,
 						sourceMipLayout.rowPitchBytes // Always copy unpadded size as it's smaller
 					);
 				}

@@ -22,6 +22,8 @@ static cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 			return cr3d::DataFormat::BC3_Unorm;
 		case ddspp::BC4_UNORM: 
 			return cr3d::DataFormat::BC4_Unorm;
+		case ddspp::BC5_UNORM:
+			return cr3d::DataFormat::BC5_Unorm;
 		case ddspp::BC7_UNORM: 
 			return cr3d::DataFormat::BC7_Unorm;
 		default:

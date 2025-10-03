@@ -8,10 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO Use file
-//#include <fstream>
-//#include <sstream>
-
 void CrShaderCompilerUtilities::WriteToFile(const crstl::string& filename, const crstl::string& text)
 {
 	crstl::file file(filename.c_str(), crstl::file_flags::write | crstl::file_flags::force_create);

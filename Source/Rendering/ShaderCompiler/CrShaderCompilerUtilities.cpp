@@ -2,29 +2,32 @@
 
 #include "CrShaderCompilerUtilities.h"
 
+#include "crstl/filesystem.h"
 #include "crstl/string.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 // TODO Use file
-#include <fstream>
-#include <sstream>
+//#include <fstream>
+//#include <sstream>
 
 void CrShaderCompilerUtilities::WriteToFile(const crstl::string& filename, const crstl::string& text)
 {
-	std::ofstream fileStream;
-	fileStream.open(filename.c_str(), std::ios::out);
-	fileStream.write(text.c_str(), text.size());
-	fileStream.close();
+	crstl::file file(filename.c_str(), crstl::file_flags::write | crstl::file_flags::force_create);
+	file.write(text.c_str(), text.size());
+	file.close();
 	printf("Wrote contents of file to %s\n", filename.c_str());
 }
 
 void CrShaderCompilerUtilities::WriteToFileIfChanged(const crstl::string& filename, const crstl::string& text)
 {
-	std::ifstream originalFile(filename.c_str());
-	std::stringstream originalFileStream;
-	originalFileStream << originalFile.rdbuf();
-	originalFile.close();
+	crstl::file file(filename.c_str(), crstl::file_flags::read);
 
-	const crstl::string& originalContents = originalFileStream.str().c_str();
+	crstl::string originalContents;
+	originalContents.resize_uninitialized(file.get_size());
+	file.read((void*)originalContents.c_str(), file.get_size());
+	file.close();
 
 	if (originalContents != text)
 	{

@@ -52,7 +52,7 @@ end
 -- Utility Functions
 
 function ExcludePlatformSpecificCode(rootPath)
-	excludes { rootPath..'**/platform/**' }
+	removefiles { rootPath..'**/platform/**' }
 end
 
 function CopyFileCommand(filePath, destinationPath)
@@ -110,7 +110,7 @@ workspace 'Corsair Engine'
 	
 	-- For best configuration, see https://blogs.msdn.microsoft.com/vcblog/2017/07/13/precompiled-header-pch-issues-and-recommendations/
 	
-	flags { 'fatalcompilewarnings' }
+	fatalwarnings('all')
 	vectorextensions('sse4.1')
 	
 	filter('platforms:'..MSVCWin64)
@@ -235,7 +235,7 @@ workspace 'Corsair Engine'
 		optimize('speed')
 		symbols('on')
 		inlining('auto')
-		flags { 'linktimeoptimization' }
+		linktimeoptimization('on')
 		runtime('release')
 
 	filter { 'configurations:Profiling' }

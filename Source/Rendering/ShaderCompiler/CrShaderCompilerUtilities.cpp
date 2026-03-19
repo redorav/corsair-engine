@@ -21,9 +21,13 @@ void CrShaderCompilerUtilities::WriteToFileIfChanged(const crstl::string& filena
 	crstl::file file(filename.c_str(), crstl::file_flags::read);
 
 	crstl::string originalContents;
-	originalContents.resize_uninitialized(file.get_size());
-	file.read((void*)originalContents.c_str(), file.get_size());
-	file.close();
+
+	if (file)
+	{
+		originalContents.resize_uninitialized(file.get_size());
+		file.read((void*)originalContents.c_str(), file.get_size());
+		file.close();
+	}
 
 	if (originalContents != text)
 	{

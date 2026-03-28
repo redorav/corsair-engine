@@ -50,6 +50,8 @@ public:
 
 	cr3d::GraphicsApi::T GetGraphicsApi() const;
 
+	bool GetIsNVAPIInitialized() const { return m_nvapiInitialized; }
+
 	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const;
 
 protected:
@@ -63,6 +65,8 @@ protected:
 	CrRenderDoc m_renderDoc;
 
 	CrPIX m_pix;
+
+	bool m_nvapiInitialized;
 
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) = 0;
 };

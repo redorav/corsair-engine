@@ -25,6 +25,7 @@ crstl::unique_ptr<ICrRenderSystem> RenderSystem = nullptr;
 
 ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)
+	, m_nvapiInitialized(false)
 {
 	// Load builtin shaders here. The render system is only instantiated once and knows
 	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the

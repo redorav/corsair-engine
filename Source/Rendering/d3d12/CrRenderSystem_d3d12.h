@@ -30,7 +30,5 @@ private:
 
 	IDXGIFactory7* m_dxgiFactory7 = nullptr;
 
-	bool m_nvapiInitialized = false;
-
 	bool m_pixInitialized = false;
 };

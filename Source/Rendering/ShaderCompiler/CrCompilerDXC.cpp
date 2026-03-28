@@ -48,12 +48,12 @@ const wchar_t* GetDXCShaderProfile(cr3d::ShaderStage::T shaderStage)
 {
 	switch (shaderStage)
 	{
-		case cr3d::ShaderStage::Vertex:   return L"vs_6_0";
-		case cr3d::ShaderStage::Geometry: return L"gs_6_0";
-		case cr3d::ShaderStage::Hull:     return L"hs_6_0";
-		case cr3d::ShaderStage::Domain:   return L"ds_6_0";
-		case cr3d::ShaderStage::Pixel:    return L"ps_6_0";
-		case cr3d::ShaderStage::Compute:  return L"cs_6_0";
+		case cr3d::ShaderStage::Vertex:   return L"vs_6_6";
+		case cr3d::ShaderStage::Geometry: return L"gs_6_6";
+		case cr3d::ShaderStage::Hull:     return L"hs_6_6";
+		case cr3d::ShaderStage::Domain:   return L"ds_6_6";
+		case cr3d::ShaderStage::Pixel:    return L"ps_6_6";
+		case cr3d::ShaderStage::Compute:  return L"cs_6_6";
 		case cr3d::ShaderStage::RootSignature:  return L"rootsig_1_0";
 		default: return L"";
 	}

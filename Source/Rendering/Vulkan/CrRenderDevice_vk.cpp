@@ -825,6 +825,12 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 		m_renderDeviceProperties.features.conservativeRasterization = true;
 	}
 
+	if(IsVkDeviceExtensionSupported(VK_NV_FILL_RECTANGLE_EXTENSION_NAME))
+	{
+		enabledDeviceExtensions.push_back(VK_NV_FILL_RECTANGLE_EXTENSION_NAME);
+		m_renderDeviceProperties.features.rectangleRasterization = true;
+	}
+
 	// We allocate queues up front, which are later retrieved. We don't really allocate command queues
 	// on demand, we have them cached within the device at creation time
 	crstl::vector<float> queuePriorities(m_maxCommandQueues);

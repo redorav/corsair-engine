@@ -62,7 +62,6 @@ struct CrRenderDeviceProperties
 		bool compressionETC = false;
 		bool compressionASTC = false;
 		bool conservativeRasterization = false;
-		bool rectangleRasterization = false;
 	} features;
 };
 
@@ -199,8 +198,6 @@ public:
 	const CrRenderDeviceProperties& GetProperties() const;
 
 	bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
-
-	bool SupportsRectangleRasterization() const { return m_renderDeviceProperties.features.rectangleRasterization; }
 
 	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 

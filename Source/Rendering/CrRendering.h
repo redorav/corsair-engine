@@ -357,7 +357,6 @@ namespace cr3d
 	{
 		Fill = 0, // Fill the triangle
 		Line = 1, // Fill the line
-		Rect = 2, // Fills triangle as a screen-aligned rectangle. Make sure it is supported by the platform
 	};
 	enum class FrontFace : uint32_t { Clockwise, CounterClockwise };
 	enum class BlendOp : uint32_t { Add, Subtract, ReverseSubtract, Min, Max, };

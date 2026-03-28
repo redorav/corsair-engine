@@ -518,8 +518,6 @@ VkPolygonMode crvk::GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode)
 			return VK_POLYGON_MODE_FILL;
 		case cr3d::PolygonFillMode::Line:
 			return VK_POLYGON_MODE_LINE;
-		case cr3d::PolygonFillMode::Rect:
-			return VK_POLYGON_MODE_FILL_RECTANGLE_NV;
 		default:
 			return VK_POLYGON_MODE_MAX_ENUM;
 	}

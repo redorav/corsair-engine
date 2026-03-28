@@ -195,40 +195,8 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 	// Get root signature from the global root signature repository
 	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12GraphicsRootSignature();
 
-#if defined(CR_NVAPI_SUPPORTED)
-
-	bool needsNVAPI = false;
-
-	if (RenderSystem->GetIsNVAPIInitialized())
-	{
-		if (pipelineDescriptor.rasterizerState.fillMode == cr3d::PolygonFillMode::Rect)
-		{
-			needsNVAPI = true;
-		}
-	}
-
-	if (needsNVAPI)
-	{
-		NVAPI_D3D12_PSO_RASTERIZER_STATE_DESC_V1 nvapiRasterizerState = {};
-		nvapiRasterizerState.baseVersion = NV_PSO_EXTENSION_DESC_VER;
-		nvapiRasterizerState.psoExtension = NV_PSO_RASTER_EXTENSION;
-		nvapiRasterizerState.version = NV_RASTERIZER_PSO_EXTENSION_DESC_VER;
-
-		if (pipelineDescriptor.rasterizerState.fillMode == cr3d::PolygonFillMode::Rect)
-		{
-			nvapiRasterizerState.QuadFillMode = NVAPI_QUAD_FILLMODE_BBOX;
-		}
-
-		const NVAPI_D3D12_PSO_EXTENSION_DESC* psoExtensions[] = { &nvapiRasterizerState };
-
-		NvAPI_D3D12_CreateGraphicsPipelineState(d3d12RenderDevice->GetD3D12Device(), &d3d12PipelineStateDescriptor, (NvU32)crstl::array_size(psoExtensions), psoExtensions, &m_d3d12PipelineState);
-	}
-	else
-#endif
-	{
-		HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
-		CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
-	}
+	HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
+	CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
 }
 
 CrGraphicsPipelineD3D12::~CrGraphicsPipelineD3D12()

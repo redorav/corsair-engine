@@ -21,11 +21,11 @@ public:
 
 private:
 
-	void* m_renderDocModule;
+	void* m_renderDocModule = nullptr;
 
-	void* m_currentDevice;
+	void* m_currentDevice = nullptr;
 
-	void* m_currentWindow;
+	void* m_currentWindow = nullptr;
 
-	RENDERDOC_API_1_5_0* m_renderDocApi;
+	RENDERDOC_API_1_5_0* m_renderDocApi = nullptr;
 };

@@ -20,5 +20,5 @@ public:
 
 private:
 
-	void* m_pixHandle;
+	void* m_pixHandle = nullptr;
 };

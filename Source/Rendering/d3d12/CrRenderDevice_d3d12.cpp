@@ -239,6 +239,11 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 		m_renderDeviceProperties.features.meshShaders = d3d12Options7.MeshShaderTier >= D3D12_MESH_SHADER_TIER_1;
 	}
 
+	if (RenderSystem->GetIsNVAPIInitialized())
+	{
+		m_renderDeviceProperties.features.rectangleRasterization = true;
+	}
+
 	D3D12_FEATURE_DATA_D3D12_OPTIONS12 d3d12Options12 = {};
 	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS12, &d3d12Options12, sizeof(d3d12Options12)) == S_OK)
 	{

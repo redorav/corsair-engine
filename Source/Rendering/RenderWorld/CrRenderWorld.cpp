@@ -62,7 +62,6 @@ CrRenderWorld::CrRenderWorld()
 {
 	// TODO Make sure when we create a model instance all of these are updated
 	m_modelInstances.resize(10000);
-	m_editorProperties.resize(10000);
 
 	// Defaults to invalid id
 	m_modelInstanceIdToIndex.resize(10000);
@@ -82,24 +81,27 @@ CrModelInstanceId CrRenderWorld::CreateModelInstance()
 	CrModelInstanceId availableId;
 
 	// If we have an available id (from a previously deleted instance) reuse that
-	if (m_lastAvailableId != CrModelInstanceId())
+	if (m_lastAvailableModelInstanceId != CrModelInstanceId())
 	{
-		availableId = m_lastAvailableId;
-		m_lastAvailableId.id = m_modelInstanceIdToIndex[m_lastAvailableId.id].id;
+		availableId = m_lastAvailableModelInstanceId;
+		m_lastAvailableModelInstanceId.id = m_modelInstanceIdToIndex[m_lastAvailableModelInstanceId.id].id;
 	}
 	else // Otherwise create a new id
 	{
 		availableId = m_maxModelInstanceId;
-		m_maxModelInstanceId.id++;
+		m_maxModelInstanceId++;
 	}
 
-	m_modelInstances[m_numModelInstances.id] = CrModelInstance(availableId);
+	m_modelInstances[m_numModelInstances.id] = CrModelInstance();
 
 	// Initialize remapping tables
 	m_modelInstanceIdToIndex[availableId.id] = CrModelInstanceIndex(m_numModelInstances.id);
 	m_modelInstanceIndexToId[m_numModelInstances.id] = CrModelInstanceId(availableId.id);
 
-	m_numModelInstances.id++;
+	m_numModelInstances++;
+
+	return availableId;
+}
 
 	return availableId;
 }
@@ -124,7 +126,6 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	// We want them always well packed. Take the index where the data lived for the destroyed model instance
 	// and copy the data belonging to the last model instance in the array
 	m_modelInstances[destroyedInstanceIndex.id]          = m_modelInstances[lastInstanceIndex.id];
-	m_editorProperties[destroyedInstanceIndex.id]        = m_editorProperties[lastInstanceIndex.id];
 
 	//--------------------------
 	// Update indirection tables
@@ -135,10 +136,10 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 
 	// Store the last available id in the destroyed instance id's slot
 	// Cast the data here even though it's not correct (storing instance index in place of instance id)
-	m_modelInstanceIdToIndex[destroyedInstanceId.id] = CrModelInstanceIndex(m_lastAvailableId.id);
+	m_modelInstanceIdToIndex[destroyedInstanceId.id] = CrModelInstanceIndex(m_lastAvailableModelInstanceId.id);
 
 	// Update last available id (in a linked list fashion)
-	m_lastAvailableId = destroyedInstanceId;
+	m_lastAvailableModelInstanceId = destroyedInstanceId;
 
 	// Point destroyed instance index (where the last model instance now lives) to its model index
 	m_modelInstanceIndexToId[destroyedInstanceIndex.id] = lastInstanceId;
@@ -148,29 +149,6 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	
 	// Decrement number of model instances
 	m_numModelInstances.id--;
-}
-
-void CrRenderWorld::SetIsEditorEdgeHighlight(CrModelInstanceId instanceId, bool value)
-{
-	if (!GetIsEditorInstance(instanceId))
-	{
-		m_editorProperties[GetModelInstanceIndex(instanceId).id].isEdgeHighlight = value;
-	}
-}
-
-bool CrRenderWorld::GetIsEditorEdgeHighlight(CrModelInstanceId instanceId) const
-{
-	return m_editorProperties[GetModelInstanceIndex(instanceId).id].isEdgeHighlight;
-}
-
-void CrRenderWorld::SetEditorInstance(CrModelInstanceId instanceId)
-{
-	m_editorInstances.insert(instanceId.id);
-}
-
-bool CrRenderWorld::GetIsEditorInstance(CrModelInstanceId instanceId) const
-{
-	return m_editorInstances.find(instanceId.id) != m_editorInstances.end();
 }
 
 void CrRenderWorld::SetCamera(const CrCameraHandle& camera)
@@ -195,7 +173,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 		uint32_t meshCount = renderModel->GetRenderMeshCount();
 
 		// If this mesh is set to do constant size (like for manipulators) we need to scale by the distance in Z to the camera
-		if (GetConstantSize(instanceIndex))
+		if (modelInstance.GetIsConstantSizeOnScreen())
 		{
 			float4 position = transform[3];
 			float3 cameraToPosition = position.xyz - m_camera->GetPosition();
@@ -225,9 +203,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
 
-		const CrEditorProperties& editorProperties = m_editorProperties[instanceIndex.id];
-
-		bool isEditorEdgeHighlight = editorProperties.isEdgeHighlight;
+		bool isEditorEdgeHighlight = modelInstance.GetIsEdgeHighlight();
 
 		bool computeMouseSelection = GetMouseSelectionEnabled();
 

@@ -278,11 +278,11 @@ void CrEditor::Update()
 					CrModelInstanceId instanceId = CrModelInstanceId(selectionState.modelInstanceId);
 					const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
 
-					bool isEditorInstance = m_renderWorld->GetIsEditorInstance(instanceId);
+					bool isEditorBuiltin = modelInstance.GetIsEditorBuiltin();
 
 					if (selectionState.mouseState.buttonPressed[MouseButton::Left])
 					{
-						if (isEditorInstance)
+						if (isEditorBuiltin)
 						{
 							m_manipulatorSelected = true;
 
@@ -515,19 +515,19 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 
 		//m_renderWorld->SetMaterial();
 
-		m_renderWorld->SetConstantSize(m_manipulator->xAxis, true);
-		m_renderWorld->SetConstantSize(m_manipulator->yAxis, true);
-		m_renderWorld->SetConstantSize(m_manipulator->zAxis, true);
-		m_renderWorld->SetConstantSize(m_manipulator->xzPlane, true);
-		m_renderWorld->SetConstantSize(m_manipulator->xyPlane, true);
-		m_renderWorld->SetConstantSize(m_manipulator->yzPlane, true);
+		xAxisModel.SetIsConstantSizeOnScreen(true);
+		yAxisModel.SetIsConstantSizeOnScreen(true);
+		zAxisModel.SetIsConstantSizeOnScreen(true);
+		xzAxisModel.SetIsConstantSizeOnScreen(true);
+		xyAxisModel.SetIsConstantSizeOnScreen(true);
+		yzAxisModel.SetIsConstantSizeOnScreen(true);
 
-		m_renderWorld->SetEditorInstance(m_manipulator->xAxis);
-		m_renderWorld->SetEditorInstance(m_manipulator->yAxis);
-		m_renderWorld->SetEditorInstance(m_manipulator->zAxis);
-		m_renderWorld->SetEditorInstance(m_manipulator->xzPlane);
-		m_renderWorld->SetEditorInstance(m_manipulator->xyPlane);
-		m_renderWorld->SetEditorInstance(m_manipulator->yzPlane);
+		xAxisModel.SetIsEditorBuiltin(true);
+		yAxisModel.SetIsEditorBuiltin(true);
+		zAxisModel.SetIsEditorBuiltin(true);
+		xzAxisModel.SetIsEditorBuiltin(true);
+		xyAxisModel.SetIsEditorBuiltin(true);
+		yzAxisModel.SetIsEditorBuiltin(true);
 	}
 
 	float4x4 transform = mul(float4x4::scale(0.2f), initialTransform);
@@ -631,7 +631,9 @@ void CrEditor::SetSelected(CrModelInstanceId instanceId)
 
 void CrEditor::ToggleSelected(CrModelInstanceId instanceId)
 {
-	if (!m_renderWorld->GetIsEditorInstance(instanceId))
+	const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
+
+	if (!modelInstance.GetIsEditorBuiltin())
 	{
 		if (GetIsSelected(instanceId))
 		{
@@ -651,9 +653,9 @@ bool CrEditor::GetIsSelected(CrModelInstanceId instanceId)
 
 void CrEditor::AddSelected(CrModelInstanceId instanceId)
 {
-	m_renderWorld->SetIsEditorEdgeHighlight(instanceId, true);
+	CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
 
-	const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
+	modelInstance.SetIsEdgeHighlight(true);
 
 	SelectedInstanceState state;
 	state.modelInstanceId = instanceId;
@@ -663,15 +665,16 @@ void CrEditor::AddSelected(CrModelInstanceId instanceId)
 
 void CrEditor::RemoveSelected(CrModelInstanceId instanceId)
 {
-	m_renderWorld->SetIsEditorEdgeHighlight(instanceId, false);
+	m_renderWorld->GetModelInstance(instanceId).SetIsEdgeHighlight(false);
 	m_selectedInstances.erase(instanceId.id);
 }
 
 void CrEditor::ClearSelectedInstances()
 {
-	for (const auto& selectedInstance : m_selectedInstances)
+	for (auto& selectedInstance : m_selectedInstances)
 	{
-		m_renderWorld->SetIsEditorEdgeHighlight(selectedInstance.second.modelInstanceId, false);
+		CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(selectedInstance.second.modelInstanceId);
+		modelInstance.SetIsEdgeHighlight(false);
 	}
 
 	m_selectedInstances.clear();

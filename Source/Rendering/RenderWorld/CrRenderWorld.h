@@ -85,16 +85,6 @@ private:
 	crstl::vector<CrRenderPacket> m_renderPackets;
 };
 
-// Properties that only the editor is allowed to modify and won't be available in-game
-struct CrEditorProperties
-{
-	// Mesh has a constant size on screen
-	bool isConstantSizeOnScreen = false;
-
-	// Mesh needs to go through the editor edge highlight
-	bool isEdgeHighlight = false;
-};
-
 // CrRenderWorld is where all rendering primitives live, e.g. model instances,
 // cameras, lights and other entities that contribute to the way the frame is rendered
 // such as post effects, etc. The render world is able to create and manage the members
@@ -170,17 +160,17 @@ private:
 
 	// Model Instance Data
 
-	crstl::vector<CrModelInstance>           m_modelInstances;
+	crstl::vector<CrModelInstance>      m_modelInstances;
 
-	crstl::vector<CrModelInstanceIndex>      m_modelInstanceIdToIndex;
+	crstl::vector<CrModelInstanceIndex> m_modelInstanceIdToIndex;
 
-	crstl::vector<CrModelInstanceId>         m_modelInstanceIndexToId;
+	crstl::vector<CrModelInstanceId>    m_modelInstanceIndexToId;
 
 	CrModelInstanceId                   m_maxModelInstanceId;
 
 	CrModelInstanceIndex                m_numModelInstances;
 
-	CrModelInstanceId                   m_lastAvailableId;
+	CrModelInstanceId                   m_lastAvailableModelInstanceId;
 
 	// Lights Data
 	crstl::vector<CrLight> m_lights;
@@ -207,29 +197,10 @@ private:
 
 public:
 
-	void SetIsEditorEdgeHighlight(CrModelInstanceId instanceId, bool value);
-	bool GetIsEditorEdgeHighlight(CrModelInstanceId instanceId) const;
-
-	// By default all entities are selectable in the editor, so we need to exclude
-	// manipulators, icons and other editor entities
-	void SetEditorInstance(CrModelInstanceId instanceId);
-	bool GetIsEditorInstance(CrModelInstanceId instanceId) const;
-
-	void SetConstantSize(CrModelInstanceIndex instanceIndex, bool constantSize) { m_editorProperties[instanceIndex.id].isConstantSizeOnScreen = constantSize; }
-	void SetConstantSize(CrModelInstanceId instanceId, bool constantSize) { SetConstantSize(GetModelInstanceIndex(instanceId), constantSize); }
-
-	bool GetConstantSize(CrModelInstanceIndex instanceIndex) const { return m_editorProperties[instanceIndex.id].isConstantSizeOnScreen; }
-	bool GetConstantSize(CrModelInstanceId instanceId) const { return GetConstantSize(GetModelInstanceIndex(instanceId)); }
-
 	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
 	bool GetMouseSelectionEnabled() const;
 
 private:
-
-	// Make sure we can exclude editor entities from all the standard behavior such as selection highlight
-	crstl::open_hashset<CrModelInstanceId::type> m_editorInstances;
-
-	crstl::vector<CrEditorProperties>       m_editorProperties;
 
 	bool m_computeMouseSelection = false;
 

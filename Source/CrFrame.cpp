@@ -552,24 +552,24 @@ void CrFrame::Process()
 	[=](CrRenderGraph& renderGraph)
 	{
 		renderGraph.BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), cr3d::ShaderStageFlags::Compute);
-		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepth16MinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 0);
-		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepth16MinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 1);
-		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepth16MinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 2);
-		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepth16MinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 3);
+		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepthMinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 0);
+		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepthMinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 1);
+		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepthMinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 2);
+		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepthMinMaxMipChain.get(), cr3d::ShaderStageFlags::Compute, 3);
 	},
 	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize.get());
 		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), CrTextureView(cr3d::TexturePlane::Depth));
 		commandBuffer->BindTexture(Textures::StencilTexture, m_depthStencilTexture.get(), CrTextureView(cr3d::TexturePlane::Stencil));
-		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepth16MinMaxMipChain.get(), 0);
-		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepth16MinMaxMipChain.get(), 1);
-		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepth16MinMaxMipChain.get(), 2);
-		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepth16MinMaxMipChain.get(), 3);
+		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepthMinMaxMipChain.get(), 0);
+		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepthMinMaxMipChain.get(), 1);
+		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepthMinMaxMipChain.get(), 2);
+		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepthMinMaxMipChain.get(), 3);
 		commandBuffer->Dispatch
 		(
-			(m_linearDepth16MinMaxMipChain->GetWidth() + 7) / 8,
-			(m_linearDepth16MinMaxMipChain->GetHeight() + 7) / 8,
+			(m_linearDepthMinMaxMipChain->GetWidth() + 7) / 8,
+			(m_linearDepthMinMaxMipChain->GetHeight() + 7) / 8,
 			1
 		);
 	});
@@ -1160,7 +1160,7 @@ void CrFrame::RecreateRenderTargets()
 	linearDepth16MinMaxMipChainTextureDescriptor.name = "Linear Depth 16 Min Max Mip Chain";
 	linearDepth16MinMaxMipChainTextureDescriptor.mipmapCount = 4;
 
-	m_linearDepth16MinMaxMipChain = renderDevice->CreateTexture(linearDepth16MinMaxMipChainTextureDescriptor);
+	m_linearDepthMinMaxMipChain = renderDevice->CreateTexture(linearDepthMinMaxMipChainTextureDescriptor);
 
 	// Recreate render targets
 	{

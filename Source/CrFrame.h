@@ -68,8 +68,8 @@ private:
 
 	CrTextureHandle m_depthStencilTexture;
 
-	// 16-bit linear depth with a min max mip chain
-	CrTextureHandle m_linearDepth16MinMaxMipChain;
+	// Linear depth with a min max mip chain
+	CrTextureHandle m_linearDepthMinMaxMipChain;
 
 	CrTextureHandle m_preSwapchainTexture;
 

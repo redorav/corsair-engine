@@ -1,8 +1,8 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrRenderSystem_vk.h"
+#include "CrRenderSystemVulkan.h"
 
-#include "CrRenderDevice_vk.h"
+#include "CrRenderDeviceVulkan.h"
 
 #include "Core/CrMacros.h"
 

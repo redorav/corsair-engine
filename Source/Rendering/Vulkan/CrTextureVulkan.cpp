@@ -1,8 +1,8 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrCommandBuffer_vk.h"
-#include "CrTexture_vk.h"
-#include "CrRenderDevice_vk.h"
+#include "CrCommandBufferVulkan.h"
+#include "CrTextureVulkan.h"
+#include "CrRenderDeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"
@@ -171,7 +171,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	//-----------------------
 
 	// TODO This needs reworking. Only create if mips or slices are > 1
-	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
+	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain() || descriptor.customViews.size() > 0)
 	{
 		m_additionalViews = crstl::unique_ptr<CrVkAdditionalTextureViews>(new CrVkAdditionalTextureViews());
 	}
@@ -281,6 +281,32 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			stencilImageViewInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_STENCIL_BIT;
 			vkResult = vkCreateImageView(vkDevice, &stencilImageViewInfo, nullptr, &m_additionalViews->m_vkImageViewStencil);
 			CrAssert(vkResult == VK_SUCCESS);
+		}
+
+		// Create custom views
+		for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+		{
+			const CrTextureView& textureView              = descriptor.customViews[i];
+			
+			if(textureView.format != cr3d::DataFormat::Invalid)
+			{
+				imageViewInfo.format = crvk::GetVkFormat(textureView.format);
+			}
+			else
+			{
+				imageViewInfo.format = vkFormat;
+			}
+
+			imageViewInfo.subresourceRange.baseMipLevel   = textureView.mipmapStart;
+			imageViewInfo.subresourceRange.levelCount     = textureView.mipmapCount < m_mipmapCount ? textureView.mipmapCount : m_mipmapCount;
+			imageViewInfo.subresourceRange.baseArrayLayer = textureView.sliceStart;
+			imageViewInfo.subresourceRange.layerCount     = textureView.sliceCount < m_arraySize ? textureView.sliceCount : m_arraySize;
+		
+			VkImageView vkCustomView;
+			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &vkCustomView);
+			CrAssert(vkResult == VK_SUCCESS);
+
+			m_additionalViews->m_vkCustomViews.push_back(vkCustomView);
 		}
 	}
 

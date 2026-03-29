@@ -1,7 +1,7 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrGPUSynchronization_vk.h"
-#include "CrRenderDevice_vk.h"
+#include "CrGPUSynchronizationVulkan.h"
+#include "CrRenderDeviceVulkan.h"
 
 CrGPUFenceVulkan::CrGPUFenceVulkan(ICrRenderDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
 {

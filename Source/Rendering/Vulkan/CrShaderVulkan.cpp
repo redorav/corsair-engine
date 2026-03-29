@@ -1,6 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
-#include "CrShader_vk.h"
-#include "CrRenderDevice_vk.h"
+#include "CrShaderVulkan.h"
+#include "CrRenderDeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "renderdoc_app.h"

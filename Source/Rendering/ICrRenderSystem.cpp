@@ -7,7 +7,7 @@
 // Include all the necessary platforms here
 
 #if defined(VULKAN_API)
-#include "Vulkan/CrRenderSystem_vk.h"
+#include "Vulkan/CrRenderSystemVulkan.h"
 #endif
 
 #if defined(D3D12_API)

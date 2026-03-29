@@ -1,9 +1,9 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrSwapchain_vk.h"
-#include "CrTexture_vk.h"
-#include "CrRenderDevice_vk.h"
-#include "CrGPUSynchronization_vk.h"
+#include "CrSwapchainVulkan.h"
+#include "CrTextureVulkan.h"
+#include "CrRenderDeviceVulkan.h"
+#include "CrGPUSynchronizationVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"

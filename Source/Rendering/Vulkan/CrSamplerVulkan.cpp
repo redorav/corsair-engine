@@ -1,6 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
-#include "CrSampler_vk.h"
-#include "CrRenderDevice_vk.h"
+#include "CrSamplerVulkan.h"
+#include "CrRenderDeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Math/CrMath.h"

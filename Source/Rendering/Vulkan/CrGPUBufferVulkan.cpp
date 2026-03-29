@@ -1,7 +1,7 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrGPUBuffer_vk.h"
-#include "CrRenderDevice_vk.h"
+#include "CrGPUBufferVulkan.h"
+#include "CrRenderDeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"

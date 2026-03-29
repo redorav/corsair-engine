@@ -2,9 +2,9 @@
 
 #include "Rendering/ICrCommandBuffer.h"
 
-#include "CrPipeline_vk.h"
+#include "CrPipelineVulkan.h"
 
-#include "CrGPUQueryPool_vk.h"
+#include "CrGPUQueryPoolVulkan.h"
 
 #include "CrVulkan.h"
 

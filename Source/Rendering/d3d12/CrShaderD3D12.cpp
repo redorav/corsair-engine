@@ -1,6 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
-#include "CrShader_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
+#include "CrShaderD3D12.h"
+#include "CrRenderDeviceD3D12.h"
 
 #include "Rendering/CrShaderResourceMetadata.h"
 #include "Rendering/ICrShader.inl"

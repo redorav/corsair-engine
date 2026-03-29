@@ -1,6 +1,6 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrRenderDevice_d3d12.h"
+#include "CrRenderDeviceD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrAlignment.h"

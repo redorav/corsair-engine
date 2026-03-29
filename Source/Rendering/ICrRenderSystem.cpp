@@ -11,7 +11,7 @@
 #endif
 
 #if defined(D3D12_API)
-#include "D3D12/CrRenderSystem_d3d12.h"
+#include "D3D12/CrRenderSystemD3D12.h"
 #endif
 
 #include "Core/Streams/CrMemoryStream.h"

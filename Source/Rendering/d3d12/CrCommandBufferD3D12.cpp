@@ -1,11 +1,11 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrCommandBuffer_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
-#include "CrPipeline_d3d12.h"
-#include "CrTexture_d3d12.h"
-#include "CrSampler_d3d12.h"
-#include "CrShader_d3d12.h"
+#include "CrCommandBufferD3D12.h"
+#include "CrRenderDeviceD3D12.h"
+#include "CrPipelineD3D12.h"
+#include "CrTextureD3D12.h"
+#include "CrSamplerD3D12.h"
+#include "CrShaderD3D12.h"
 
 #include "Rendering/Extensions/CrPIXHeader.h"
 

@@ -1,8 +1,8 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrCommandBuffer_d3d12.h"
-#include "CrTexture_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
+#include "CrCommandBufferD3D12.h"
+#include "CrTextureD3D12.h"
+#include "CrRenderDeviceD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrAlignment.h"

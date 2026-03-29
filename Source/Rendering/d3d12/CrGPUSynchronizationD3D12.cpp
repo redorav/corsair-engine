@@ -1,7 +1,7 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrGPUSynchronization_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
+#include "CrGPUSynchronizationD3D12.h"
+#include "CrRenderDeviceD3D12.h"
 
 #include "Core/CrMacros.h"
 

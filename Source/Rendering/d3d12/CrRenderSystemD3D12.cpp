@@ -1,7 +1,7 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrRenderSystem_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
+#include "CrRenderSystemD3D12.h"
+#include "CrRenderDeviceD3D12.h"
 
 #include "Rendering/Extensions/CrNVAPIHeader.h"
 

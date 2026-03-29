@@ -1,8 +1,8 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrRenderDevice_d3d12.h"
-#include "CrGPUQueryPool_d3d12.h"
-#include "CrGPUBuffer_d3d12.h"
+#include "CrRenderDeviceD3D12.h"
+#include "CrGPUQueryPoolD3D12.h"
+#include "CrGPUBufferD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
 

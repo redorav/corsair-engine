@@ -1,10 +1,10 @@
 #include "Rendering/CrRendering_pch.h"
 
-#include "CrRenderSystem_d3d12.h"
-#include "CrSwapchain_d3d12.h"
-#include "CrTexture_d3d12.h"
-#include "CrRenderDevice_d3d12.h"
-#include "CrGPUSynchronization_d3d12.h"
+#include "CrRenderSystemD3D12.h"
+#include "CrSwapchainD3D12.h"
+#include "CrTextureD3D12.h"
+#include "CrRenderDeviceD3D12.h"
+#include "CrGPUSynchronizationD3D12.h"
 #include "CrD3D12.h"
 
 #include "CrOSWindow.h"

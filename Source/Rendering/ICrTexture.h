@@ -58,7 +58,7 @@ struct CrTextureView
 	};
 };
 
-static_assert(sizeof(CrTextureView) == 8);
+static_assert(sizeof(CrTextureView) == sizeof(uint64_t));
 
 struct CrTextureDescriptor
 {

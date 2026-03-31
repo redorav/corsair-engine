@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hlsl++_vector_float.h>
-#include <hlsl++_vector_int.h>
-#include <hlsl++_matrix_float.h>
-#include <hlsl++_dependent.h>
+#include <hlsl++/vector_float.h>
+#include <hlsl++/vector_int.h>
+#include <hlsl++/matrix_float.h>
+#include <hlsl++/dependent.h>

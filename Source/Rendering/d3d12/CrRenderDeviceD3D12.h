@@ -37,21 +37,21 @@ public:
 
 	ID3D12CommandSignature* GetD3D12DispatchIndirectCommandSignature() const { return m_d3d12DispatchIndirectCommandSignature; }
 
-	crd3d::DescriptorD3D12 AllocateRTVDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE AllocateRTVDescriptor();
 
-	void FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor);
+	void FreeRTVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
-	crd3d::DescriptorD3D12 AllocateDSVDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE AllocateDSVDescriptor();
 
-	void FreeDSVDescriptor(crd3d::DescriptorD3D12 descriptor);
+	void FreeDSVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
-	crd3d::DescriptorD3D12 AllocateSamplerDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE AllocateSamplerDescriptor();
 
-	void FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor);
+	void FreeSamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
-	crd3d::DescriptorD3D12 AllocateShaderResourceDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE AllocateShaderResourceDescriptor();
 
-	void FreeShaderResourceDescriptor(crd3d::DescriptorD3D12 descriptor);
+	void FreeShaderResourceDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
 	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
 
@@ -120,16 +120,16 @@ private:
 	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
 
 	// Heap for Render Target Views
-	CrDescriptorPoolD3D12 m_rtvPool;
+	CrCPUDescriptorPoolD3D12 m_rtvPool;
 
 	// Heap for Depth Stencil Views
-	CrDescriptorPoolD3D12 m_dsvPool;
+	CrCPUDescriptorPoolD3D12 m_dsvPool;
 
 	// Heap for Samplers
-	CrDescriptorPoolD3D12 m_samplerPool;
+	CrCPUDescriptorPoolD3D12 m_samplerPool;
 
 	// Heap for SRVs, CBVs, UAVs
-	CrDescriptorPoolD3D12 m_shaderResourcePool;
+	CrCPUDescriptorPoolD3D12 m_shaderResourcePool;
 
 	CrGPUFenceHandle m_waitIdleFence;
 
@@ -180,44 +180,44 @@ private:
 	bool m_enhancedBarriersSupported = false;
 };
 
-inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateRTVDescriptor()
+inline D3D12_CPU_DESCRIPTOR_HANDLE CrRenderDeviceD3D12::AllocateRTVDescriptor()
 {
 	return m_rtvPool.Allocate();
 }
 
-inline void CrRenderDeviceD3D12::FreeRTVDescriptor(crd3d::DescriptorD3D12 descriptor)
+inline void CrRenderDeviceD3D12::FreeRTVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 {
-	CrAssertMsg(descriptor.cpuHandle.ptr != 0 && descriptor.gpuHandle.ptr != 0, "Invalid handle being returned to pool");
+	CrAssertMsg(descriptor.ptr != 0, "Invalid handle being returned to pool");
 	m_rtvPool.Free(descriptor);
 }
 
-inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateDSVDescriptor()
+inline D3D12_CPU_DESCRIPTOR_HANDLE CrRenderDeviceD3D12::AllocateDSVDescriptor()
 {
 	return m_dsvPool.Allocate();
 }
 
-inline void CrRenderDeviceD3D12::FreeDSVDescriptor(crd3d::DescriptorD3D12 descriptor)
+inline void CrRenderDeviceD3D12::FreeDSVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 {
-	CrAssertMsg(descriptor.cpuHandle.ptr != 0 && descriptor.gpuHandle.ptr != 0, "Invalid handle being returned to pool");
+	CrAssertMsg(descriptor.ptr != 0, "Invalid handle being returned to pool");
 	m_dsvPool.Free(descriptor);
 }
 
-inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateSamplerDescriptor()
+inline D3D12_CPU_DESCRIPTOR_HANDLE CrRenderDeviceD3D12::AllocateSamplerDescriptor()
 {
 	return m_samplerPool.Allocate();
 }
 
-inline void CrRenderDeviceD3D12::FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor)
+inline void CrRenderDeviceD3D12::FreeSamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 {
 	m_samplerPool.Free(descriptor);
 }
 
-inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateShaderResourceDescriptor()
+inline D3D12_CPU_DESCRIPTOR_HANDLE CrRenderDeviceD3D12::AllocateShaderResourceDescriptor()
 {
 	return m_shaderResourcePool.Allocate();
 }
 
-inline void CrRenderDeviceD3D12::FreeShaderResourceDescriptor(crd3d::DescriptorD3D12 descriptor)
+inline void CrRenderDeviceD3D12::FreeShaderResourceDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 {
 	m_shaderResourcePool.Free(descriptor);
 }

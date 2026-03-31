@@ -169,7 +169,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 				rtvDescriptor.Texture2DArray.FirstArraySlice = slice;
 				rtvDescriptor.Texture2DArray.ArraySize = 1;
 				m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice] = d3d12RenderDevice->AllocateRTVDescriptor();
-				d3d12Device->CreateRenderTargetView(m_d3d12Resource, &rtvDescriptor, m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice].cpuHandle);
+				d3d12Device->CreateRenderTargetView(m_d3d12Resource, &rtvDescriptor, m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice]);
 			}
 		}
 	}
@@ -207,17 +207,17 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 
 		m_additionalViews->m_d3d12DSVSingleMipSlice = d3d12RenderDevice->AllocateDSVDescriptor();
-		d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSlice.cpuHandle);
+		d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSlice);
 
 		if (cr3d::IsDepthStencilFormat(descriptor.format))
 		{
 			dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
 			m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth = d3d12RenderDevice->AllocateDSVDescriptor();
-			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth.cpuHandle);
+			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
 
 			dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
 			m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil = d3d12RenderDevice->AllocateDSVDescriptor();
-			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil.cpuHandle);
+			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
 		}
 	}
 
@@ -273,7 +273,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 			}
 
 			m_additionalViews->m_d3d12UAVSingleMipAllSlices[i] = d3d12RenderDevice->AllocateShaderResourceDescriptor();
-			d3d12Device->CreateUnorderedAccessView(m_d3d12Resource, nullptr, &uavDescriptor, m_additionalViews->m_d3d12UAVSingleMipAllSlices[i].cpuHandle);
+			d3d12Device->CreateUnorderedAccessView(m_d3d12Resource, nullptr, &uavDescriptor, m_additionalViews->m_d3d12UAVSingleMipAllSlices[i]);
 		}
 	}
 
@@ -352,7 +352,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	}
 
 	m_d3d12SRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
-	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, m_d3d12SRVDescriptor.cpuHandle);
+	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, m_d3d12SRVDescriptor);
 
 	if (IsDepthStencil())
 	{
@@ -368,7 +368,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		}
 
 		m_additionalViews->m_d3d12StencilSRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
-		d3d12Device->CreateShaderResourceView(m_d3d12Resource, &d3d12StencilSRVDescriptor, m_additionalViews->m_d3d12StencilSRVDescriptor.cpuHandle);
+		d3d12Device->CreateShaderResourceView(m_d3d12Resource, &d3d12StencilSRVDescriptor, m_additionalViews->m_d3d12StencilSRVDescriptor);
 	}
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
@@ -425,7 +425,7 @@ CrTextureD3D12::~CrTextureD3D12()
 	{
 		for (size_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
-			const crstl::vector<crd3d::DescriptorD3D12>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
+			const crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
 
 			for (const auto& descriptor : sliceArray)
 			{

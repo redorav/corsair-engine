@@ -53,15 +53,15 @@ private:
 // Pool of descriptors that can be reused. Putting a descriptor back in the pool implicitly assumes that the descriptor can
 // be reused, which is often the case for non-shader-visible descriptors. Therefore this caters well for the resource view
 // use case, e.g. we create a render target view associated to a resource, and its lifetime is the same as that of the resource
-class CrDescriptorPoolD3D12
+class CrCPUDescriptorPoolD3D12
 {
 public:
 
 	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
-	crd3d::DescriptorD3D12 Allocate();
+	D3D12_CPU_DESCRIPTOR_HANDLE Allocate();
 
-	void Free(crd3d::DescriptorD3D12 descriptor);
+	void Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
 	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
 
@@ -70,8 +70,6 @@ private:
 	CrDescriptorHeapD3D12 m_descriptorHeap;
 
 	crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_availableCPUDescriptors;
-
-	crstl::vector<D3D12_GPU_DESCRIPTOR_HANDLE> m_availableGPUDescriptors;
 };
 
 // A vector of CPU descriptors that we'll copy into from different sources. At the end we do the entire copy from CPU-visible to shader visible descriptors

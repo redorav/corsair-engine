@@ -15,13 +15,9 @@ public:
 
 	~CrSamplerD3D12();
 
-	const D3D12_SAMPLER_DESC& GetD3D12Sampler() const { return m_d3d12Sampler; }
-
-	crd3d::DescriptorD3D12 GetD3D12Descriptor() const { return m_d3d12Descriptor; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12Descriptor() const { return m_d3d12Descriptor; }
 
 private:
 
-	crd3d::DescriptorD3D12 m_d3d12Descriptor;
-
-	D3D12_SAMPLER_DESC m_d3d12Sampler;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12Descriptor;
 };

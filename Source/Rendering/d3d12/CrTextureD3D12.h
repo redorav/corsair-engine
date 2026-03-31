@@ -12,20 +12,20 @@ class ICrRenderDevice;
 struct CrD3D12AdditionalTextureViews
 {
 	// RTVs
-	crstl::array<crstl::vector<crd3d::DescriptorD3D12>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
-	crstl::array<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
+	crstl::array<crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
+	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
 
 	// DSVs
-	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSlice;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12DSVSingleMipSlice;
 
-	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSliceReadOnlyDepth;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12DSVSingleMipSliceReadOnlyDepth;
 
-	crd3d::DescriptorD3D12 m_d3d12DSVSingleMipSliceReadOnlyStencil;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12DSVSingleMipSliceReadOnlyStencil;
 
 	// UAVs
-	crstl::array<crd3d::DescriptorD3D12, cr3d::MaxMipmaps> m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
+	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, cr3d::MaxMipmaps> m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 
-	crd3d::DescriptorD3D12 m_d3d12StencilSRVDescriptor;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12StencilSRVDescriptor;
 };
 
 class CrTextureD3D12 final : public ICrTexture
@@ -36,12 +36,12 @@ public:
 
 	~CrTextureD3D12();
 
-	crd3d::DescriptorD3D12 GetD3D12RenderTargetView(uint32_t mip, uint32_t slice) const
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12RenderTargetView(uint32_t mip, uint32_t slice) const
 	{
 		return m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice];
 	}
 
-	crd3d::DescriptorD3D12 GetD3D12DepthStencilView() const
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12DepthStencilView() const
 	{
 		return m_additionalViews->m_d3d12DSVSingleMipSlice;
 	}
@@ -52,18 +52,18 @@ public:
 
 	D3D12_BARRIER_LAYOUT GetD3D12DefaultTextureLayout() const { return m_d3d12InitialLayout; }
 
-	crd3d::DescriptorD3D12 GetD3D12SRVDescriptor() const { return m_d3d12SRVDescriptor; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12SRVDescriptor() const { return m_d3d12SRVDescriptor; }
 	
-	crd3d::DescriptorD3D12 GetD3D12StencilSRVDescriptor() const { return m_additionalViews->m_d3d12StencilSRVDescriptor; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12StencilSRVDescriptor() const { return m_additionalViews->m_d3d12StencilSRVDescriptor; }
 
-	crd3d::DescriptorD3D12 GetD3D12UAVDescriptor(uint32_t mip) const { return m_additionalViews->m_d3d12UAVSingleMipAllSlices[mip]; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12UAVDescriptor(uint32_t mip) const { return m_additionalViews->m_d3d12UAVSingleMipAllSlices[mip]; }
 
 	uint32_t GetD3D12SubresourceCount() const { return m_d3d12SubresourceCount; }
 
 private:
 
 	// Main resource view, can access all mips and slices
-	crd3d::DescriptorD3D12 m_d3d12SRVDescriptor;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12SRVDescriptor;
 
 	crstl::unique_ptr<CrD3D12AdditionalTextureViews> m_additionalViews;
 

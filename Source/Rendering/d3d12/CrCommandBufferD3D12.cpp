@@ -306,7 +306,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 			const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
 			D3D12_RENDER_PASS_RENDER_TARGET_DESC& renderTargetDesc = d3d12RenderTargets[i];
 			const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
-			renderTargetDesc.cpuDescriptor = d3d12Texture->GetD3D12RenderTargetView(renderTargetDescriptor.mipmap, renderTargetDescriptor.slice).cpuHandle;
+			renderTargetDesc.cpuDescriptor = d3d12Texture->GetD3D12RenderTargetView(renderTargetDescriptor.mipmap, renderTargetDescriptor.slice);
 			
 			// Render Target Load Operation
 			renderTargetDesc.BeginningAccess.Type = crd3d::GetD3D12BeginningAccessType(renderTargetDescriptor.loadOp);
@@ -320,7 +320,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 		if (depthDescriptor.texture)
 		{
 			const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(depthDescriptor.texture);
-			d3d12DepthStencil.cpuDescriptor = d3d12Texture->GetD3D12DepthStencilView().cpuHandle;
+			d3d12DepthStencil.cpuDescriptor = d3d12Texture->GetD3D12DepthStencilView();
 			
 			// Depth Load Operation
 			d3d12DepthStencil.DepthBeginningAccess.Type = crd3d::GetD3D12BeginningAccessType(depthDescriptor.loadOp);
@@ -473,7 +473,7 @@ void CrCommandBufferD3D12::WriteCBV(const CrConstantBufferBinding& binding, D3D1
 void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle)
 {
 	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(textureBinding.texture);
-	crd3d::DescriptorD3D12 srvDescriptor {};
+	D3D12_CPU_DESCRIPTOR_HANDLE srvDescriptor {};
 
 	if (textureBinding.view == CrTextureView())
 	{
@@ -488,19 +488,19 @@ void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBindin
 		CrAssertMsg(false, "Invalid image view");
 	}
 
-	srvHandle = srvDescriptor.cpuHandle;
+	srvHandle = srvDescriptor;
 }
 
 void CrCommandBufferD3D12::WriteSamplerView(const ICrSampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle)
 {
 	const CrSamplerD3D12* d3d12Sampler = static_cast<const CrSamplerD3D12*>(sampler);
-	samplerHandle = d3d12Sampler->GetD3D12Descriptor().cpuHandle;
+	samplerHandle = d3d12Sampler->GetD3D12Descriptor();
 }
 
 void CrCommandBufferD3D12::WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle)
 {
 	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(rwTextureBinding.texture);
-	uavHandle = d3d12Texture->GetD3D12UAVDescriptor(rwTextureBinding.mip).cpuHandle;
+	uavHandle = d3d12Texture->GetD3D12UAVDescriptor(rwTextureBinding.mip);
 }
 
 void CrCommandBufferD3D12::WriteStorageBufferSRV(const CrStorageBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle)

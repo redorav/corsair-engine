@@ -59,7 +59,7 @@ void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, c
 	}
 }
 
-void CrDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
+void CrCPUDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
 {
 	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
@@ -73,45 +73,25 @@ void CrDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, c
 	m_descriptorHeap.Initialize(d3d12RenderDevice, heapDescriptor);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE heapStartCPU = m_descriptorHeap.GetHeapStartCPU();
-	D3D12_GPU_DESCRIPTOR_HANDLE heapStartGPU = m_descriptorHeap.GetHeapStartGPU();
 
 	m_availableCPUDescriptors.resize(maxDescriptors);
-	m_availableGPUDescriptors.resize(maxDescriptors);
 
-	if (descriptor.flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+	for (uint32_t j = 0; j < maxDescriptors; ++j)
 	{
-		for (uint32_t j = 0; j < maxDescriptors; ++j)
-		{
-			m_availableCPUDescriptors[j].ptr = heapStartCPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
-			m_availableGPUDescriptors[j].ptr = heapStartGPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
-		}
-	}
-	else
-	{
-		for (uint32_t j = 0; j < maxDescriptors; ++j)
-		{
-			m_availableCPUDescriptors[j].ptr = heapStartCPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
-			m_availableGPUDescriptors[j].ptr = heapStartGPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
-		}
+		m_availableCPUDescriptors[j].ptr = heapStartCPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
 	}
 }
 
-crd3d::DescriptorD3D12 CrDescriptorPoolD3D12::Allocate()
+D3D12_CPU_DESCRIPTOR_HANDLE CrCPUDescriptorPoolD3D12::Allocate()
 {
-	crd3d::DescriptorD3D12 descriptor;
-	descriptor.cpuHandle = m_availableCPUDescriptors.back();
-	descriptor.gpuHandle = m_availableGPUDescriptors.back();
-
+	D3D12_CPU_DESCRIPTOR_HANDLE descriptor = m_availableCPUDescriptors.back();
 	m_availableCPUDescriptors.pop_back();
-	m_availableGPUDescriptors.pop_back();
-
 	return descriptor;
 }
 
-void CrDescriptorPoolD3D12::Free(crd3d::DescriptorD3D12 descriptor)
+void CrCPUDescriptorPoolD3D12::Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 {
-	m_availableCPUDescriptors.push_back(descriptor.cpuHandle);
-	m_availableGPUDescriptors.push_back(descriptor.gpuHandle);
+	m_availableCPUDescriptors.push_back(descriptor);
 }
 
 void CrCPUDescriptorScratchD3D12::Initialize(size_t count)

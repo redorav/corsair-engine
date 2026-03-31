@@ -75,9 +75,10 @@ namespace crd3d
 
 	// A shader-visible heap will have two handles, CPU and GPU. The CPU handle is what we use to update
 	// the data in the descriptor, the GPU handle is what we use to bind it to the command buffer
+
 	struct DescriptorD3D12
 	{
-		DescriptorD3D12 operator + (uint32_t offset) const
+		DescriptorD3D12 operator + (size_t offset) const
 		{
 			DescriptorD3D12 descriptor = *this;
 			descriptor.cpuHandle.ptr += offset;
@@ -85,7 +86,7 @@ namespace crd3d
 			return descriptor;
 		}
 
-		DescriptorD3D12& operator += (uint32_t offset)
+		DescriptorD3D12& operator += (size_t offset)
 		{
 			*this = *this + offset;
 			return *this;

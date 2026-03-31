@@ -301,6 +301,15 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 		m_samplerPool.Initialize(this, samplerDescriptorHeapDescriptor);
 	}
 
+	// Descriptor pool for shader resources
+	{
+		CrDescriptorHeapDescriptor shaderResourceDescriptorHeapDescriptor;
+		shaderResourceDescriptorHeapDescriptor.name = "Shader Resource Heap";
+		shaderResourceDescriptorHeapDescriptor.numDescriptors = 16384;
+		shaderResourceDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		m_shaderResourcePool.Initialize(this, shaderResourceDescriptorHeapDescriptor);
+	}
+
 	// Create root signatures
 
  	const CrShaderBytecodeHandle& graphicsRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);

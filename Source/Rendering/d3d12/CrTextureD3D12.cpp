@@ -224,9 +224,9 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	// Create unordered access views
 	if (IsUnorderedAccess())
 	{
-		for (uint32_t i = 0; i < m_additionalViews->m_d3d12UAVSingleMipAllSlices.size(); ++i)
+		for (uint32_t i = 0; i < m_mipmapCount; ++i)
 		{
-			D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDescriptor = m_additionalViews->m_d3d12UAVSingleMipAllSlices[i];
+			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDescriptor;
 			uavDescriptor.Format = dxgiFormat;
 			uavDescriptor.Texture2DArray.MipSlice = i;
 
@@ -271,6 +271,9 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 					uavDescriptor.Texture2D.PlaneSlice = 0;
 				}
 			}
+
+			m_additionalViews->m_d3d12UAVSingleMipAllSlices[i] = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+			d3d12Device->CreateUnorderedAccessView(m_d3d12Resource, nullptr, &uavDescriptor, m_additionalViews->m_d3d12UAVSingleMipAllSlices[i].cpuHandle);
 		}
 	}
 
@@ -287,79 +290,85 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		default: break;
 	}
 
-	m_d3d12SRVDescriptor = {};
-	m_d3d12SRVDescriptor.Format = srvFormat;
-	m_d3d12SRVDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	D3D12_SHADER_RESOURCE_VIEW_DESC d3d12SRVDescriptor = {};
+	d3d12SRVDescriptor.Format = srvFormat;
+	d3d12SRVDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	if (IsCubemap())
 	{
-		m_d3d12SRVDescriptor.TextureCube.MostDetailedMip = 0;
-		m_d3d12SRVDescriptor.TextureCube.MipLevels = m_mipmapCount;
+		d3d12SRVDescriptor.TextureCube.MostDetailedMip = 0;
+		d3d12SRVDescriptor.TextureCube.MipLevels = m_mipmapCount;
 
 		if (m_arraySize > 1)
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
-			m_d3d12SRVDescriptor.TextureCubeArray.First2DArrayFace = 0;
-			m_d3d12SRVDescriptor.TextureCubeArray.NumCubes = m_arraySize;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+			d3d12SRVDescriptor.TextureCubeArray.First2DArrayFace = 0;
+			d3d12SRVDescriptor.TextureCubeArray.NumCubes = m_arraySize;
 		}
 		else
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		}
 	}
 	else if (IsVolumeTexture())
 	{
-		m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
-		m_d3d12SRVDescriptor.Texture3D.MostDetailedMip = 0;
-		m_d3d12SRVDescriptor.Texture3D.MipLevels = m_mipmapCount;
+		d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+		d3d12SRVDescriptor.Texture3D.MostDetailedMip = 0;
+		d3d12SRVDescriptor.Texture3D.MipLevels = m_mipmapCount;
 	}
 	else if (Is1DTexture())
 	{
-		m_d3d12SRVDescriptor.Texture1D.MostDetailedMip = 0;
-		m_d3d12SRVDescriptor.Texture1D.MipLevels = m_mipmapCount;
+		d3d12SRVDescriptor.Texture1D.MostDetailedMip = 0;
+		d3d12SRVDescriptor.Texture1D.MipLevels = m_mipmapCount;
 
 		if (m_arraySize > 1)
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
-			m_d3d12SRVDescriptor.Texture1DArray.FirstArraySlice = 0;
-			m_d3d12SRVDescriptor.Texture1DArray.ArraySize = m_arraySize;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
+			d3d12SRVDescriptor.Texture1DArray.FirstArraySlice = 0;
+			d3d12SRVDescriptor.Texture1DArray.ArraySize = m_arraySize;
 		}
 		else
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
 		}
 	}
 	else
 	{
-		m_d3d12SRVDescriptor.Texture2D.MostDetailedMip = 0;
-		m_d3d12SRVDescriptor.Texture2D.MipLevels = m_mipmapCount;
+		d3d12SRVDescriptor.Texture2D.MostDetailedMip = 0;
+		d3d12SRVDescriptor.Texture2D.MipLevels = m_mipmapCount;
 
 		if (m_arraySize > 1)
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-			m_d3d12SRVDescriptor.Texture2DArray.FirstArraySlice = 0;
-			m_d3d12SRVDescriptor.Texture2DArray.ArraySize = m_arraySize;
-			m_d3d12SRVDescriptor.Texture2DArray.PlaneSlice = 0;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+			d3d12SRVDescriptor.Texture2DArray.FirstArraySlice = 0;
+			d3d12SRVDescriptor.Texture2DArray.ArraySize = m_arraySize;
+			d3d12SRVDescriptor.Texture2DArray.PlaneSlice = 0;
 		}
 		else
 		{
-			m_d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			m_d3d12SRVDescriptor.Texture2D.PlaneSlice = 0;
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			d3d12SRVDescriptor.Texture2D.PlaneSlice = 0;
 		}
 	}
 
+	m_d3d12SRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, m_d3d12SRVDescriptor.cpuHandle);
+
 	if (IsDepthStencil())
 	{
-		m_additionalViews->m_d3d12StencilSRVDescriptor = m_d3d12SRVDescriptor;
-		m_additionalViews->m_d3d12StencilSRVDescriptor.Format = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3d12StencilSRVDescriptor = d3d12SRVDescriptor;
+		d3d12StencilSRVDescriptor.Format = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
 		if (m_arraySize > 1)
 		{
-			m_additionalViews->m_d3d12StencilSRVDescriptor.Texture2DArray.PlaneSlice = 1;
+			d3d12StencilSRVDescriptor.Texture2DArray.PlaneSlice = 1;
 		}
 		else
 		{
-			m_additionalViews->m_d3d12StencilSRVDescriptor.Texture2D.PlaneSlice = 1;
+			d3d12StencilSRVDescriptor.Texture2D.PlaneSlice = 1;
 		}
+
+		m_additionalViews->m_d3d12StencilSRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+		d3d12Device->CreateShaderResourceView(m_d3d12Resource, &d3d12StencilSRVDescriptor, m_additionalViews->m_d3d12StencilSRVDescriptor.cpuHandle);
 	}
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
@@ -410,7 +419,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 CrTextureD3D12::~CrTextureD3D12()
 {
-	CrRenderDeviceD3D12* renderDeviceD3D12 = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
 
 	if (IsRenderTarget() || IsSwapchain())
 	{
@@ -420,24 +429,23 @@ CrTextureD3D12::~CrTextureD3D12()
 
 			for (const auto& descriptor : sliceArray)
 			{
-				renderDeviceD3D12->FreeRTVDescriptor(descriptor);
+				d3d12RenderDevice->FreeRTVDescriptor(descriptor);
 			}
-
-			//const auto& singleMipDescriptor = m_additionalViews->m_d3d12RTVSingleMipAllSlices[mip];
-			//renderDeviceD3D12->FreeRTVDescriptor(singleMipDescriptor);
 		}
 	}
 
 	if (IsDepthStencil())
 	{
-		renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSlice);
+		d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSlice);
 
 		if (cr3d::IsDepthStencilFormat(m_format))
 		{
-			renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
-			renderDeviceD3D12->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
+			d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
+			d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
 		}
 	}
+
+	d3d12RenderDevice->FreeShaderResourceDescriptor(m_d3d12SRVDescriptor);
 
 	// Don't release the swapchain texture in the destructor, as we'll destroy it manually in the swapchain class
 	// This simplifies our model greatly as we don't need to go through the deletion queue

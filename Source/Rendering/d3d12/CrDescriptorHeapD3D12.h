@@ -2,6 +2,8 @@
 
 #include "CrD3D12.h"
 
+#include "crstl/vector.h"
+
 class CrRenderDeviceD3D12;
 
 struct CrDescriptorHeapDescriptor
@@ -18,9 +20,17 @@ public:
 
 	static uint32_t GetMaxDescriptorsPerHeap(const CrDescriptorHeapDescriptor& descriptor);
 
-	void Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
-	crd3d::DescriptorD3D12 GetHeapStart() const { return m_heapStart; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetHeapStartCPU() const
+	{
+		return m_heapStartCPU;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE GetHeapStartGPU() const
+	{
+		return m_heapStartGPU;
+	}
 
 	uint32_t GetDescriptorStride() const { return m_descriptorStride; }
 
@@ -33,7 +43,9 @@ private:
 	// Size of each descriptor
 	uint32_t m_descriptorStride;
 
-	crd3d::DescriptorD3D12 m_heapStart;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_heapStartCPU;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE m_heapStartGPU;
 
 	ID3D12DescriptorHeap* m_descriptorHeap;
 };
@@ -45,7 +57,7 @@ class CrDescriptorPoolD3D12
 {
 public:
 
-	void Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
 	crd3d::DescriptorD3D12 Allocate();
 
@@ -57,7 +69,38 @@ private:
 
 	CrDescriptorHeapD3D12 m_descriptorHeap;
 
-	crstl::vector<crd3d::DescriptorD3D12> m_availableDescriptors;
+	crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_availableCPUDescriptors;
+
+	crstl::vector<D3D12_GPU_DESCRIPTOR_HANDLE> m_availableGPUDescriptors;
+};
+
+// A vector of CPU descriptors that we'll copy into from different sources. At the end we do the entire copy from CPU-visible to shader visible descriptors
+// This is faster than trying to copy them in place as we create them
+class CrCPUDescriptorScratchD3D12
+{
+public:
+
+	void Initialize(size_t count);
+
+	size_t Allocate(size_t count);
+
+	void Reset();
+
+	size_t Size()
+	{
+		return m_currentOffset;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE& operator [] (size_t i)
+	{
+		return m_descriptors[i];
+	}
+
+private:
+
+	size_t m_currentOffset;
+
+	crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_descriptors;
 };
 
 // Stream of descriptors that one never returns descriptors to. This is meant to be used throughout the frame, and it's where
@@ -66,7 +109,7 @@ class CrDescriptorStreamD3D12
 {
 public:
 
-	void Initialize(CrRenderDeviceD3D12* renderDeviceD3D12, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
 	CrDescriptorStreamD3D12();
 

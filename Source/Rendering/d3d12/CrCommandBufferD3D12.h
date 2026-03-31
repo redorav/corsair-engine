@@ -94,27 +94,32 @@ private:
 		CrTextureBarrierVectorD3D12& textureBarriers
 	);
 
-	void WriteCBV(const CrConstantBufferBinding& binding, crd3d::DescriptorD3D12 cbvHandle);
+	void WriteCBV(const CrConstantBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& cpuDescriptorHandle);
 
-	void WriteTextureSRV(const CrTextureBinding& textureBinding, crd3d::DescriptorD3D12 srvHandle);
+	void WriteTextureSRV(const CrTextureBinding& textureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle);
 
-	void WriteSamplerView(const ICrSampler* sampler, crd3d::DescriptorD3D12 samplerHandle);
+	void WriteSamplerView(const ICrSampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle);
 
-	void WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, crd3d::DescriptorD3D12 uavHandle);
+	void WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle);
 
-	void WriteStorageBufferSRV(const CrStorageBufferBinding& binding, crd3d::DescriptorD3D12 srvHandle);
+	void WriteStorageBufferSRV(const CrStorageBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle);
 
-	void WriteRWStorageBufferUAV(const CrStorageBufferBinding& binding, crd3d::DescriptorD3D12 uavHandle);
+	void WriteRWStorageBufferUAV(const CrStorageBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle);
 
 	D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 
 	CrDescriptorStreamD3D12 m_shaderResourceShaderVisibleDescriptorStream;
 
-	CrDescriptorStreamD3D12 m_shaderResourceDescriptorStream;
-
 	CrDescriptorStreamD3D12 m_samplerShaderVisibleDescriptorStream;
 
-	CrDescriptorStreamD3D12 m_samplerDescriptorStream;
+	// Allocate dynamic descriptors from here. This typically applies to buffers
+	CrDescriptorStreamD3D12 m_dynamicDescriptorStream;
+
+	// Descriptors used for this command buffer before submitting. They are a copy of either the static descriptor coming from a resource (samplers, textures, RW textures)
+	// or a dynamic descriptor generated for buffers via an offset
+	CrCPUDescriptorScratchD3D12 m_shaderResourceCPUDescriptors;
+
+	CrCPUDescriptorScratchD3D12 m_samplerCPUDescriptors;
 
 	ID3D12DescriptorHeap* m_shaderResourceDescriptorHeap;
 

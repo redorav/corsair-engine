@@ -49,6 +49,10 @@ public:
 
 	void FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor);
 
+	crd3d::DescriptorD3D12 AllocateShaderResourceDescriptor();
+
+	void FreeShaderResourceDescriptor(crd3d::DescriptorD3D12 descriptor);
+
 	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
 
 	bool GetIsEnhancedBarriersSupported() const { return m_enhancedBarriersSupported; }
@@ -123,6 +127,9 @@ private:
 
 	// Heap for Samplers
 	CrDescriptorPoolD3D12 m_samplerPool;
+
+	// Heap for SRVs, CBVs, UAVs
+	CrDescriptorPoolD3D12 m_shaderResourcePool;
 
 	CrGPUFenceHandle m_waitIdleFence;
 
@@ -203,4 +210,14 @@ inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateSamplerDescriptor()
 inline void CrRenderDeviceD3D12::FreeSamplerDescriptor(crd3d::DescriptorD3D12 descriptor)
 {
 	m_samplerPool.Free(descriptor);
+}
+
+inline crd3d::DescriptorD3D12 CrRenderDeviceD3D12::AllocateShaderResourceDescriptor()
+{
+	return m_shaderResourcePool.Allocate();
+}
+
+inline void CrRenderDeviceD3D12::FreeShaderResourceDescriptor(crd3d::DescriptorD3D12 descriptor)
+{
+	m_shaderResourcePool.Free(descriptor);
 }

@@ -3,6 +3,7 @@
 #include "Rendering/ICrSampler.h"
 
 #include "CrD3D12.h"
+#include "CrDescriptorHeapD3D12.h"
 
 class ICrRenderDevice;
 
@@ -16,7 +17,11 @@ public:
 
 	const D3D12_SAMPLER_DESC& GetD3D12Sampler() const { return m_d3d12Sampler; }
 
+	crd3d::DescriptorD3D12 GetD3D12Descriptor() const { return m_d3d12Descriptor; }
+
 private:
+
+	crd3d::DescriptorD3D12 m_d3d12Descriptor;
 
 	D3D12_SAMPLER_DESC m_d3d12Sampler;
 };

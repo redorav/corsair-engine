@@ -73,6 +73,7 @@ struct CrTextureDescriptor
 	cr3d::SampleCount sampleCount;
 	cr3d::TextureType type;
 	cr3d::TextureUsageFlags usage;
+	crstl::fixed_vector<CrTextureView, cr3d::MaxCustomTextureViews> customViews;
 
 	// Defaults to zero
 	union

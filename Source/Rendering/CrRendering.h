@@ -8,6 +8,10 @@ namespace cr3d
 	static constexpr uint32_t MaxVertexStreams = 8; // Maximum vertex streams per vertex shader
 	static constexpr uint32_t MaxVertexAttributes = 8; // Maximum vertex attributes per vertex shader
 	static constexpr uint32_t MaxMipmaps = 14; // Maximum mipmaps per texture (16384x16384)
+	
+	// Maximum number of custom resource views for a particular texture. This isn't a hard cap, just a limit. We manage views
+	// inside the texture object and not externally, so anything custom is managed separately to the common cases
+	static const uint32_t MaxCustomTextureViews = 8;
 
 	namespace GraphicsApi
 	{

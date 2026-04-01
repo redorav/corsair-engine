@@ -243,6 +243,8 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS12, &d3d12Options12, sizeof(d3d12Options12)) == S_OK)
 	{
 		m_enhancedBarriersSupported = d3d12Options12.EnhancedBarriersSupported;
+
+		m_renderDeviceProperties.features.textureFormatCasting = d3d12Options12.RelaxedFormatCastingSupported;
 	}
 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};

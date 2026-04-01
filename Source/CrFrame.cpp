@@ -127,7 +127,7 @@ struct CrRenderPacketBatcher
 		if (m_numInstances > 0)
 		{
 			// Allocate constant buffer with all transforms and copy them across
-			CrGPUBufferViewT<InstanceCB> transformBuffer = m_commandBuffer->AllocateConstantBuffer<InstanceCB>(sizeof(InstanceCB::local2World[0]) * m_numInstances);
+			CrGPUBufferViewT<InstanceCB> transformBuffer = m_commandBuffer->AllocateConstantBuffer<InstanceCB>(m_numInstances, sizeof(InstanceCB::local2World[0]));
 			hlslpp::interop::float4x4* transforms = (hlslpp::interop::float4x4*)transformBuffer.GetData();
 			{
 				for (uint32_t i = 0; i < m_numInstances; ++i)

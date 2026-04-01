@@ -235,7 +235,10 @@ public:
 	// treat the memory as the MetaType, even though there are fewer entries than declared in HLSL.
 	// However this is useful when you know the constant buffer is an array of entries in HLSL
 	template<typename MetaType>
-	CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t sizeBytes);
+	CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t instanceCount);
+
+	template<typename MetaType>
+	CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t instanceSizeBytes, uint32_t instanceCount);
 
 	CrGPUBufferView AllocateConstantBuffer(uint32_t sizeBytes);
 
@@ -672,15 +675,34 @@ inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferI
 }
 
 template<typename MetaType>
-inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
+inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t instanceCount)
 {
-	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(sizeBytes, 256);
+	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(instanceCount * sizeof(MetaType), 256);
 
 	CrGPUBufferViewT<MetaType> constantBufferView
 	(
 		m_bufferGPUStack->GetHardwareGPUBuffer(),
-		1,
-		sizeBytes,
+		instanceCount,
+		sizeof(MetaType),
+		allocation.offset,
+		allocation.memory
+	);
+
+	return constantBufferView;
+}
+
+template<typename MetaType>
+inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint32_t instanceCount, uint32_t instanceSizeBytes)
+{
+	CrAssertMsg(((sizeof(MetaType) / instanceSizeBytes) * instanceSizeBytes) == sizeof(MetaType), "Instance size must be a multiple of the size of MetaType");
+
+	CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(instanceCount * instanceSizeBytes, 256);
+
+	CrGPUBufferViewT<MetaType> constantBufferView
+	(
+		m_bufferGPUStack->GetHardwareGPUBuffer(),
+		instanceCount,
+		instanceSizeBytes,
 		allocation.offset,
 		allocation.memory
 	);
@@ -691,7 +713,7 @@ inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer(uint3
 template<typename MetaType>
 inline CrGPUBufferViewT<MetaType> ICrCommandBuffer::AllocateConstantBuffer()
 {
-	return AllocateConstantBuffer<MetaType>(sizeof(MetaType));
+	return AllocateConstantBuffer<MetaType>(1, sizeof(MetaType));
 }
 
 template<typename MetaType>

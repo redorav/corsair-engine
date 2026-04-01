@@ -58,7 +58,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	VkImageType vkImageType;
 	VkImageViewType vkImageViewType;
-	VkImageCreateFlags vkCreateFlags = 0;
 
 	if (IsCubemap())
 	{
@@ -71,7 +70,6 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		{
 			vkImageViewType = VK_IMAGE_VIEW_TYPE_CUBE;
 		}
-		vkCreateFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 	}
 	else if (IsVolumeTexture())
 	{
@@ -120,6 +118,23 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	}
 	else
 	{
+		VkImageCreateFlags vkImageCreateFlags = 0;
+
+		if (IsCubemap())
+		{
+			vkImageCreateFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+		}
+
+		// See if we have a view with a different format. If we do, set the mutable bit
+		for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+		{
+			if (descriptor.customViews[i].format != m_format)
+			{
+				vkImageCreateFlags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
+				break;
+			}
+		}
+
 		VkImageCreateInfo imageCreateInfo;
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageCreateInfo.pNext = nullptr;
@@ -129,7 +144,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageCreateInfo.arrayLayers = m_arraySize;
 		imageCreateInfo.samples = vkSamples;
 		imageCreateInfo.usage = vkImageUsageFlags;
-		imageCreateInfo.flags = vkCreateFlags;
+		imageCreateInfo.flags = vkImageCreateFlags;
 		imageCreateInfo.imageType = vkImageType;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		imageCreateInfo.pQueueFamilyIndices = nullptr;
@@ -197,6 +212,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		viewAspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	}
 
+	VkImageViewCreateFlags vkImageViewCreateFlags = 0;
+
 	// Shader input image view
 	// This image view can see all mips and slices.
 	{
@@ -204,7 +221,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = vkFormat;
-		imageViewInfo.flags = vkCreateFlags;
+		imageViewInfo.flags = vkImageViewCreateFlags;
 		imageViewInfo.components = {};
 		imageViewInfo.subresourceRange.baseMipLevel = 0;
 		imageViewInfo.subresourceRange.levelCount = m_mipmapCount;
@@ -226,7 +243,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.pNext = nullptr;
 		imageViewInfo.format = vkFormat;
-		imageViewInfo.flags = vkCreateFlags;
+		imageViewInfo.flags = vkImageViewCreateFlags;
 		imageViewInfo.components = {};
 		imageViewInfo.viewType = vkImageViewType;
 		imageViewInfo.image = m_vkImage;
@@ -237,7 +254,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			imageViewInfo.subresourceRange.baseMipLevel = mip;
 			imageViewInfo.subresourceRange.levelCount = 1;
 			imageViewInfo.subresourceRange.baseArrayLayer = 0;
-			imageViewInfo.subresourceRange.layerCount = m_depth;
+			imageViewInfo.subresourceRange.layerCount = m_arraySize;
 			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &m_additionalViews->m_vkImageViewSingleMipAllSlices[mip]);
 			CrAssertMsg(vkResult == VK_SUCCESS, "Failed creating VkImageView");
 
@@ -270,7 +287,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			stencilImageViewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			stencilImageViewInfo.pNext                           = nullptr;
 			stencilImageViewInfo.format                          = vkFormat;
-			stencilImageViewInfo.flags                           = vkCreateFlags;
+			stencilImageViewInfo.flags                           = vkImageViewCreateFlags;
 			stencilImageViewInfo.components = {};
 			stencilImageViewInfo.subresourceRange.baseMipLevel   = 0;
 			stencilImageViewInfo.subresourceRange.levelCount     = m_mipmapCount;
@@ -286,7 +303,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		// Create custom views
 		for (size_t i = 0; i < descriptor.customViews.size(); ++i)
 		{
-			const CrTextureView& textureView              = descriptor.customViews[i];
+			const CrTextureView& textureView = descriptor.customViews[i];
 			
 			if(textureView.format != cr3d::DataFormat::Invalid)
 			{
@@ -306,7 +323,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			vkResult = vkCreateImageView(vkDevice, &imageViewInfo, nullptr, &vkCustomView);
 			CrAssert(vkResult == VK_SUCCESS);
 
-			m_additionalViews->m_vkCustomViews.push_back(vkCustomView);
+			m_additionalViews->m_vkCustomViews.push_back({ textureView, vkCustomView });
 		}
 	}
 

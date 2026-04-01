@@ -78,14 +78,6 @@ private:
 
 	void UpdateResourceTableVulkan(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout);
 
-	CrCPUStackAllocator m_renderPassAllocator;
-
-	VkAllocationCallbacks m_renderPassAllocationCallbacks = {};
-
-	crstl::vector<VkRenderPass> m_usedRenderPasses;
-
-	crstl::vector<VkFramebuffer> m_usedFramebuffers;
-
 	VkCommandBuffer m_vkCommandBuffer;
 
 	VkDescriptorPool m_vkDescriptorPool;

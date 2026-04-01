@@ -64,34 +64,6 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 	CrAssert(result == VK_SUCCESS);
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, descriptor.name.c_str());
-
-	// Set up render pass allocation resources. Each command buffer manages their own render passes
-
-	m_renderPassAllocator.Initialize(2 * 1024 * 1024); // 2 MB
-	
-	m_usedRenderPasses.reserve(128);
-
-	static auto renderPassAllocationFn = [](void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
-	{
-		CrCommandBufferVulkan* vulkanCommandBuffer = (CrCommandBufferVulkan*)pUserData;
-		return vulkanCommandBuffer->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
-	};
-
-	// We don't free because we reuse the memory every time the command buffer is reset
-	static auto renderPassFreeFn = [](void* /*pUserData*/, void* /*pMemory*/) {};
-
-	static auto renderPassReallocationFn = [](void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope /*allocationScope*/) -> void*
-	{
-		CrCommandBufferVulkan* vulkanCommandBuffer = (CrCommandBufferVulkan*)pUserData;
-		void* memory = vulkanCommandBuffer->m_renderPassAllocator.AllocateAligned(size, alignment).memory;
-		memcpy(memory, pOriginal, size);
-		return memory;
-	};
-
-	m_renderPassAllocationCallbacks.pUserData = this;
-	m_renderPassAllocationCallbacks.pfnAllocation = renderPassAllocationFn;
-	m_renderPassAllocationCallbacks.pfnFree = renderPassFreeFn;
-	m_renderPassAllocationCallbacks.pfnReallocation = renderPassReallocationFn;
 }
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
@@ -644,23 +616,6 @@ void CrCommandBufferVulkan::BeginPS()
 	commandBufferInfo.pNext = nullptr;
 	commandBufferInfo.flags = 0;
 	commandBufferInfo.pInheritanceInfo = nullptr;
-
-	// Is this really needed or can I ignore if no validation layers?
-	{
-		for (VkRenderPass pass : m_usedRenderPasses)
-		{
-			vkDestroyRenderPass(vkDevice, pass, &m_renderPassAllocationCallbacks);
-		}
-
-		for (VkFramebuffer framebuffer : m_usedFramebuffers)
-		{
-			vkDestroyFramebuffer(vkDevice, framebuffer, &m_renderPassAllocationCallbacks);
-		}
-	}
-
-	m_usedRenderPasses.clear();
-	m_usedFramebuffers.clear();
-	m_renderPassAllocator.Reset();
 
 	VkResult result = vkBeginCommandBuffer(m_vkCommandBuffer, &commandBufferInfo);
 	CrAssert(result == VK_SUCCESS);

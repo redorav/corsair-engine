@@ -199,7 +199,6 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	// TODO Push constants? Need to be part of the psoDescriptor?
 
 	vkResult = vkCreatePipelineLayout(vulkanRenderDevice->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &m_vkPipelineLayout);
-
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
 	uint32_t vertexStreamCount = vertexDescriptor.GetStreamCount();
@@ -265,7 +264,15 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
 	{
 		vkPipelineRenderingInfo.depthAttachmentFormat = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
-		vkPipelineRenderingInfo.stencilAttachmentFormat = vkPipelineRenderingInfo.depthAttachmentFormat;
+
+		if (cr3d::IsDepthStencilFormat(pipelineDescriptor.renderTargets.depthFormat))
+		{
+			vkPipelineRenderingInfo.stencilAttachmentFormat = vkPipelineRenderingInfo.depthAttachmentFormat;
+		}
+		else
+		{
+			vkPipelineRenderingInfo.stencilAttachmentFormat = VK_FORMAT_UNDEFINED;
+		}
 	}
 
 	VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};

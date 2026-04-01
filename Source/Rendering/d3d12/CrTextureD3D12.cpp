@@ -127,7 +127,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		CrAssertMsg(SUCCEEDED(hResult), "Failed to create texture");
 	}
 
-	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain())
+	if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain() || descriptor.customViews.size() > 0)
 	{
 		m_additionalViews = crstl::unique_ptr<CrD3D12AdditionalTextureViews>(new CrD3D12AdditionalTextureViews());
 	}

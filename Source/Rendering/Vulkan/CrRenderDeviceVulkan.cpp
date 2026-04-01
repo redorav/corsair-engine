@@ -813,9 +813,12 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 	}
 
 	// To use instance id inside a shader
-	if (IsVkDeviceExtensionSupported(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME))
+	if (m_vkVersion < VK_API_VERSION_1_1)
 	{
-		enabledDeviceExtensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
+		if (IsVkDeviceExtensionSupported(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME))
+		{
+			enabledDeviceExtensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
+		}
 	}
 
 	// Allow conservative rasterization

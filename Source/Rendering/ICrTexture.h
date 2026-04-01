@@ -11,6 +11,8 @@
 
 #include "crstl/array.h"
 #include "crstl/fixed_string.h"
+#include "crstl/fixed_vector.h"
+
 // Descriptor of a view. This can be used to both create a texture and during binding. Note that this is not an API object, the ownership of
 // that lies with the texture. This is to simplify the management of API resources, once a texture is destroyed, all the views it used to
 // manage are destroyed too, preventing issues like binding a view whose resource no longer exists

@@ -20,19 +20,22 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	// We need to tell the API the number of max. requested descriptors per type
-	crstl::array<VkDescriptorPoolSize, 4> typeCounts;
+	crstl::array<VkDescriptorPoolSize, 5> typeCounts;
 
-	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	typeCounts[0].descriptorCount = 64;
+	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	typeCounts[0].descriptorCount = 6400;
 
-	typeCounts[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	typeCounts[1].type = VK_DESCRIPTOR_TYPE_SAMPLER;
 	typeCounts[1].descriptorCount = 6400;
 
-	typeCounts[2].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-	typeCounts[2].descriptorCount = 64;
+	typeCounts[2].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+	typeCounts[2].descriptorCount = 6400;
 
-	typeCounts[3].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-	typeCounts[3].descriptorCount = 64;
+	typeCounts[3].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+	typeCounts[3].descriptorCount = 6400;
+
+	typeCounts[4].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	typeCounts[4].descriptorCount = 6400;
 
 	// Create the global descriptor pool
 	// All descriptors used in this example are allocated from this pool

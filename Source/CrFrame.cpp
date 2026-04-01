@@ -872,7 +872,7 @@ void CrFrame::Process()
 		},
 		[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
-			CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>(1);
+			CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>();
 			MouseSelectionCB* mouseSelectionData = mouseSelectionBuffer.GetData();
 			{
 				mouseSelectionData->mouseCoordinates.x = mouseX;

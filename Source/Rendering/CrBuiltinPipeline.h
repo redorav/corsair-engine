@@ -27,7 +27,7 @@ public:
 
 	CrComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
 
-	void RecompileComputePipelines();
+	void RecompileBuiltinPipelines();
 
 	// Ubershader builtin pipelines
 

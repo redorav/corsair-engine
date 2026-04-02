@@ -126,7 +126,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinShaders:
 	}
 }
 
-void CrBuiltinPipelines::RecompileComputePipelines()
+void CrBuiltinPipelines::RecompileBuiltinPipelines()
 {
 #if !defined(CR_CONFIG_FINAL)
 

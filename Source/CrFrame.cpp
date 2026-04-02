@@ -439,7 +439,7 @@ void CrFrame::Process()
 		keyboardState.keyHeld[KeyboardKey::LeftShift] &&
 		keyboardState.keyPressed[KeyboardKey::F5])
 	{
-		BuiltinPipelines->RecompileComputePipelines();
+		BuiltinPipelines->RecompileBuiltinPipelines();
 	}
 
 	ImGuiRenderer->NewFrame(m_mainWindow);

@@ -361,7 +361,9 @@ void CrRenderGraph::Begin(const CrRenderGraphFrameParams& frameParams)
 	m_subresourceIdCounter = 0;
 	m_bufferIdCounter = 0;
 
-	CrRenderGraphLog("Beginning render pass for frame %ld", m_frameParams.frameIndex);
+	CrRenderGraphLog("------------------------------------");
+	CrRenderGraphLog("Beginning Render Graph For Frame %ld", m_frameParams.frameIndex);
+	CrRenderGraphLog("------------------------------------");
 }
 
 void CrRenderGraph::Execute()
@@ -636,4 +638,8 @@ void CrRenderGraph::End()
 	m_textureSubresourceIds.clear();
 
 	m_bufferIds.clear();
+
+	CrRenderGraphLog("------------------------------------");
+	CrRenderGraphLog("Ending Render Graph For Frame %ld", m_frameParams.frameIndex);
+	CrRenderGraphLog("------------------------------------");
 }

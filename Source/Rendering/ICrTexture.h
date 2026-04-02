@@ -16,6 +16,19 @@
 // Descriptor of a view. This can be used to both create a texture and during binding. Note that this is not an API object, the ownership of
 // that lies with the texture. This is to simplify the management of API resources, once a texture is destroyed, all the views it used to
 // manage are destroyed too, preventing issues like binding a view whose resource no longer exists
+
+namespace cr3d
+{
+	namespace TextureViewType
+	{
+		enum T : uint32_t
+		{
+			Read, // Shader Resource View
+			Write, // Unordered Access View
+		};
+	};
+}
+
 struct CrTextureView
 {
 	explicit CrTextureView
@@ -24,14 +37,17 @@ struct CrTextureView
 		uint8_t mipmapCount = 0xff, // 0xff means all mips are visible
 		uint16_t sliceStart = 0,
 		uint16_t sliceCount = 0xffff, // 0xffff means all slices are visible
-		cr3d::DataFormat::T format = cr3d::DataFormat::Invalid, cr3d::TexturePlane::T plane = cr3d::TexturePlane::Plane0
+		cr3d::DataFormat::T format = cr3d::DataFormat::Invalid,
+		cr3d::TextureViewType::T type = cr3d::TextureViewType::Read,
+		cr3d::TexturePlane::T plane = cr3d::TexturePlane::Plane0
 	)
 		: mipmapStart(mipmapStart)
 		, mipmapCount(mipmapCount)
 		, sliceStart(sliceStart)
 		, sliceCount(sliceCount)
-		, plane(plane)
 		, format(format)
+		, type(type)
+		, plane(plane)
 	{}
 
 	explicit CrTextureView(cr3d::TexturePlane::T plane) : CrTextureView()
@@ -52,8 +68,9 @@ struct CrTextureView
 			uint32_t mipmapCount : 8;
 			uint32_t sliceStart : 16;
 			uint32_t sliceCount : 16;
-			cr3d::TexturePlane::T plane : 8;
 			cr3d::DataFormat::T format : 8;
+			cr3d::TextureViewType::T type : 6;
+			cr3d::TexturePlane::T plane : 2;
 		};
 
 		uint64_t key;

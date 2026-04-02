@@ -32,13 +32,20 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderS
 	{
 		createFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 
+		// Enable standard validation layers
 		hResult = D3D12GetDebugInterface(IID_PPV_ARGS(&m_d3d12DebugController));
 		if (SUCCEEDED(hResult))
 		{
 			m_d3d12DebugController->EnableDebugLayer();
 
-			//ID3D12Debug1* d3d12DebugController1 = nullptr;
-			//hr = m_d3d12DebugController->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3d12DebugController1));
+			hResult = m_d3d12DebugController->QueryInterface(IID_PPV_ARGS(&m_d3d12DebugController1));
+
+			// Enable GPU based validation
+			if (SUCCEEDED(hResult))
+			{
+				m_d3d12DebugController1->SetEnableGPUBasedValidation(true);
+				m_d3d12DebugController1->SetEnableSynchronizedCommandQueueValidation(true);
+			}
 		}
 	}
 

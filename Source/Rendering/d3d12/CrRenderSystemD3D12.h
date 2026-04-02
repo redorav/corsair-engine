@@ -24,6 +24,8 @@ private:
 
 	ID3D12Debug* m_d3d12DebugController;
 
+	ID3D12Debug1* m_d3d12DebugController1;
+
 	IDXGIFactory4* m_dxgiFactory4 = nullptr;
 
 	IDXGIFactory6* m_dxgiFactory6 = nullptr;

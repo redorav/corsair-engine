@@ -11,7 +11,6 @@
 
 class CrTextureD3D12;
 
-typedef crstl::fixed_vector<D3D12_RESOURCE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrBarrierVectorD3D12;
 typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrTextureBarrierVectorD3D12;
 typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, CrRenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
 
@@ -67,24 +66,9 @@ private:
 
 	virtual void EndRenderPassPS() override;
 
-	void ProcessLegacyTextureAndBufferBarriers
-	(
-		const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
-		const CrRenderPassDescriptor::TextureTransitionVector& textures,
-		CrBarrierVectorD3D12& transitions
-	);
-
 	void ProcessTextureBarriers(const CrRenderPassDescriptor::TextureTransitionVector& textures, CrTextureBarrierVectorD3D12& d3d12TextureBarriers);
 
 	void ProcessBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers);
-
-	void ProcessLegacyRenderTargetBarrier
-	(
-		const CrRenderTargetDescriptor& renderTargetDescriptor, 
-		const cr3d::TextureState& initialState,
-		const cr3d::TextureState& finalState,
-		CrBarrierVectorD3D12& resourceBarriers
-	);
 
 	void ProcessRenderTargetBarrier
 	(

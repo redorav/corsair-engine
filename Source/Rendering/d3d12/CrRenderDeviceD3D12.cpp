@@ -242,7 +242,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	D3D12_FEATURE_DATA_D3D12_OPTIONS12 d3d12Options12 = {};
 	if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS12, &d3d12Options12, sizeof(d3d12Options12)) == S_OK)
 	{
-		m_enhancedBarriersSupported = d3d12Options12.EnhancedBarriersSupported;
+		CrAssertMsg(d3d12Options12.EnhancedBarriersSupported, "Enhanced barriers are a requirement for D3D12");
 
 		m_renderDeviceProperties.features.textureFormatCasting = d3d12Options12.RelaxedFormatCastingSupported;
 	}
@@ -573,40 +573,30 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 
 	CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 	{
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = d3d12DestinationTexture->GetD3D12Resource();
-		barrier.Transition.StateBefore = d3d12DestinationTexture->GetD3D12DefaultLegacyResourceState();
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
 		D3D12_TEXTURE_BARRIER d3d12TextureBarrier;
-		d3d12TextureBarrier.SyncBefore                        = D3D12_BARRIER_SYNC_NONE;
-		d3d12TextureBarrier.SyncAfter                         = D3D12_BARRIER_SYNC_COPY;
-		d3d12TextureBarrier.AccessBefore                      = D3D12_BARRIER_ACCESS_NO_ACCESS;
-		d3d12TextureBarrier.AccessAfter                       = D3D12_BARRIER_ACCESS_COPY_DEST;
-		d3d12TextureBarrier.LayoutBefore                      = D3D12_BARRIER_LAYOUT_UNDEFINED;
-		d3d12TextureBarrier.LayoutAfter                       = D3D12_BARRIER_LAYOUT_COPY_DEST;
-		d3d12TextureBarrier.pResource                         = d3d12DestinationTexture->GetD3D12Resource();
+		d3d12TextureBarrier.pResource = d3d12DestinationTexture->GetD3D12Resource();
 		d3d12TextureBarrier.Subresources.IndexOrFirstMipLevel = 0;
-		d3d12TextureBarrier.Subresources.NumMipLevels         = d3d12DestinationTexture->GetMipmapCount();
-		d3d12TextureBarrier.Subresources.FirstArraySlice      = 0;
-		d3d12TextureBarrier.Subresources.NumArraySlices       = d3d12DestinationTexture->GetSliceCount();
-		d3d12TextureBarrier.Subresources.FirstPlane           = 0;
-		d3d12TextureBarrier.Subresources.NumPlanes            = 1;
-		d3d12TextureBarrier.Flags                             = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
+		d3d12TextureBarrier.Subresources.NumMipLevels = d3d12DestinationTexture->GetMipmapCount();
+		d3d12TextureBarrier.Subresources.FirstArraySlice = 0;
+		d3d12TextureBarrier.Subresources.NumArraySlices = d3d12DestinationTexture->GetSliceCount();
+		d3d12TextureBarrier.Subresources.FirstPlane = 0;
+		d3d12TextureBarrier.Subresources.NumPlanes = 1;
+		d3d12TextureBarrier.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE; // TODO Handle discard when we have transient resources
 
-		if (m_enhancedBarriersSupported)
 		{
+			
+			d3d12TextureBarrier.SyncBefore = D3D12_BARRIER_SYNC_NONE;
+			d3d12TextureBarrier.SyncAfter = D3D12_BARRIER_SYNC_COPY;
+			d3d12TextureBarrier.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS;
+			d3d12TextureBarrier.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST;
+			d3d12TextureBarrier.LayoutBefore = D3D12_BARRIER_LAYOUT_UNDEFINED;
+			d3d12TextureBarrier.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_DEST;
+
 			D3D12_BARRIER_GROUP textureBarrierGroup;
 			textureBarrierGroup.Type = D3D12_BARRIER_TYPE_TEXTURE;
 			textureBarrierGroup.NumBarriers = 1;
 			textureBarrierGroup.pTextureBarriers = &d3d12TextureBarrier;
 			d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &textureBarrierGroup);
-		}
-		else
-		{
-			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 		}
 
 		cr3d::DataFormat::T format = destinationTexture->GetFormat();
@@ -639,7 +629,6 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 			}
 		}
 
-		if (m_enhancedBarriersSupported)
 		{
 			d3d12TextureBarrier.SyncBefore   = D3D12_BARRIER_SYNC_COPY;
 			d3d12TextureBarrier.SyncAfter    = D3D12_BARRIER_SYNC_ALL;
@@ -654,12 +643,6 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 			textureBarrierGroup.pTextureBarriers = &d3d12TextureBarrier;
 
 			d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &textureBarrierGroup);
-		}
-		else
-		{
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			barrier.Transition.StateAfter = d3d12DestinationTexture->GetD3D12DefaultLegacyResourceState();
-			d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
 		}
 	}
 
@@ -734,16 +717,22 @@ CrHardwareGPUBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwar
 	CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 	{
 		// We assume the staging buffer is in the copy destination state, as we've created it in here
-		CrAssertMsg(d3d12StagingBuffer->GetDefaultResourceState() == D3D12_RESOURCE_STATE_COPY_DEST, "Staging buffer in incorrect resource state");
 
-		D3D12_RESOURCE_BARRIER barrier = {};
+		D3D12_BUFFER_BARRIER barrier;
+		barrier.pResource = d3d12SourceBuffer->GetD3D12Resource();
+		barrier.Offset = 0;
+		barrier.Size = stagingBufferSizeBytes;
 
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = d3d12SourceBuffer->GetD3D12Resource();
-		barrier.Transition.StateBefore = d3d12SourceBuffer->GetDefaultResourceState();
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-
-		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+		D3D12_BARRIER_GROUP barrierGroup;
+		barrierGroup.Type = D3D12_BARRIER_TYPE_BUFFER;
+		barrierGroup.NumBarriers = 1;
+		barrierGroup.pBufferBarriers = &barrier;
+		
+		barrier.SyncBefore = D3D12_BARRIER_SYNC_NONE;
+		barrier.SyncAfter = D3D12_BARRIER_SYNC_COPY;
+		barrier.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS;
+		barrier.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST;
+		d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &barrierGroup);
 
 		d3d12CommandBuffer->GetD3D12CommandList()->CopyBufferRegion
 		(
@@ -752,10 +741,11 @@ CrHardwareGPUBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwar
 			stagingBufferSizeBytes
 		);
 
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-		barrier.Transition.StateAfter = d3d12SourceBuffer->GetDefaultResourceState();
-
-		d3d12CommandBuffer->GetD3D12CommandList()->ResourceBarrier(1, &barrier);
+		barrier.SyncBefore = D3D12_BARRIER_SYNC_COPY;
+		barrier.SyncAfter = D3D12_BARRIER_SYNC_NONE;
+		barrier.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST;
+		barrier.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS;
+		d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &barrierGroup);
 	}
 
 	return stagingBuffer;

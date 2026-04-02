@@ -17,8 +17,6 @@ public:
 
 	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
 
-	D3D12_RESOURCE_STATES GetDefaultResourceState() const { return m_d3d12InitialState; }
-
 	virtual void* LockPS() override;
 
 	virtual void UnlockPS() override;
@@ -26,6 +24,4 @@ public:
 private:
 
 	ID3D12Resource* m_d3d12Resource;
-
-	D3D12_RESOURCE_STATES m_d3d12InitialState;
 };

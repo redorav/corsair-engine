@@ -50,8 +50,6 @@ namespace crd3d
 
 	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
 
-	D3D12_RESOURCE_STATES GetD3D12LegacyResourceState(const cr3d::TextureState& textureState);
-
 	TextureBarrierInfoD3D12 GetD3D12TextureBarrierInfo(const cr3d::TextureState& textureState);
 
 	BufferBarrierInfoD3D12 GetD3D12BufferBarrierInfo(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);

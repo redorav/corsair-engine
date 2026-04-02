@@ -55,8 +55,6 @@ public:
 
 	void SetD3D12ObjectName(ID3D12Object* object, const char* name);
 
-	bool GetIsEnhancedBarriersSupported() const { return m_enhancedBarriersSupported; }
-
 private:
 
 	//------------------
@@ -176,8 +174,6 @@ private:
 	ID3D12Device13* m_d3d12Device13 = nullptr;
 
 	ID3D12Device14* m_d3d12Device14 = nullptr;
-
-	bool m_enhancedBarriersSupported = false;
 };
 
 inline D3D12_CPU_DESCRIPTOR_HANDLE CrRenderDeviceD3D12::AllocateRTVDescriptor()

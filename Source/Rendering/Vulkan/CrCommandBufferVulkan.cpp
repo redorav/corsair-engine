@@ -168,8 +168,10 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		}
 		else
 		{
-			CrAssertMsg(false, "Invalid image view");
+			imageInfo.imageView = vulkanTexture->GetCustomVkImageView(textureBinding.view);
 		}
+
+		CrAssertMsg(imageInfo.imageView != VK_NULL_HANDLE, "Invalid image view");
 
 		// TODO Handle when image is bound to depth stencil and also as shader input
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

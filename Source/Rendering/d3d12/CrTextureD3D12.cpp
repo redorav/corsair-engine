@@ -17,7 +17,6 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
 	ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
 
-	m_d3d12LegacyInitialState = crd3d::GetD3D12LegacyResourceState(m_defaultState);
 	m_d3d12InitialLayout = crd3d::GetD3D12BarrierTextureLayout(m_defaultState.layout);
 
 	DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
@@ -66,6 +65,16 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
 	}
 
+	crstl::fixed_vector<DXGI_FORMAT, cr3d::MaxCustomTextureViews> castableFormats;
+
+	for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+	{
+		if (descriptor.customViews[i].format != cr3d::DataFormat::Invalid && descriptor.customViews[i].format != m_format)
+		{
+			castableFormats.push_back(crd3d::GetDXGIFormat(descriptor.customViews[i].format));
+		}
+	}
+
 	if (IsSwapchain())
 	{
 		m_d3d12Resource = (ID3D12Resource*)descriptor.extraDataPtr;
@@ -96,33 +105,18 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 		HRESULT hResult = S_FALSE;
 
-		if (d3d12RenderDevice->GetIsEnhancedBarriersSupported())
-		{
-			hResult = d3d12Device10->CreateCommittedResource3
-			(
-				&heapProperties,
-				D3D12_HEAP_FLAG_NONE,
-				&d3d12ResourceDescriptor,
-				m_d3d12InitialLayout,
-				useOptimizedClearValue ? &clearValue : nullptr,
-				nullptr,
-				0,
-				nullptr,
-				IID_PPV_ARGS(&m_d3d12Resource)
-			);
-		}
-		else
-		{
-			hResult = d3d12Device->CreateCommittedResource
-			(
-				&heapProperties,
-				D3D12_HEAP_FLAG_NONE,
-				(D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor,
-				m_d3d12LegacyInitialState,
-				useOptimizedClearValue ? &clearValue : nullptr,
-				IID_PPV_ARGS(&m_d3d12Resource)
-			);
-		}
+		hResult = d3d12Device10->CreateCommittedResource3
+		(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&d3d12ResourceDescriptor,
+			m_d3d12InitialLayout,
+			useOptimizedClearValue ? &clearValue : nullptr,
+			nullptr,
+			(UINT32)castableFormats.size(),
+			castableFormats.size() ? castableFormats.data() : nullptr,
+			IID_PPV_ARGS(&m_d3d12Resource)
+		);
 
 		CrAssertMsg(SUCCEEDED(hResult), "Failed to create texture");
 	}
@@ -290,85 +284,27 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		default: break;
 	}
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC d3d12SRVDescriptor = {};
-	d3d12SRVDescriptor.Format = srvFormat;
-	d3d12SRVDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	if (IsCubemap())
-	{
-		d3d12SRVDescriptor.TextureCube.MostDetailedMip = 0;
-		d3d12SRVDescriptor.TextureCube.MipLevels = m_mipmapCount;
-
-		if (m_arraySize > 1)
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
-			d3d12SRVDescriptor.TextureCubeArray.First2DArrayFace = 0;
-			d3d12SRVDescriptor.TextureCubeArray.NumCubes = m_arraySize;
-		}
-		else
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-		}
-	}
-	else if (IsVolumeTexture())
-	{
-		d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
-		d3d12SRVDescriptor.Texture3D.MostDetailedMip = 0;
-		d3d12SRVDescriptor.Texture3D.MipLevels = m_mipmapCount;
-	}
-	else if (Is1DTexture())
-	{
-		d3d12SRVDescriptor.Texture1D.MostDetailedMip = 0;
-		d3d12SRVDescriptor.Texture1D.MipLevels = m_mipmapCount;
-
-		if (m_arraySize > 1)
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
-			d3d12SRVDescriptor.Texture1DArray.FirstArraySlice = 0;
-			d3d12SRVDescriptor.Texture1DArray.ArraySize = m_arraySize;
-		}
-		else
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
-		}
-	}
-	else
-	{
-		d3d12SRVDescriptor.Texture2D.MostDetailedMip = 0;
-		d3d12SRVDescriptor.Texture2D.MipLevels = m_mipmapCount;
-
-		if (m_arraySize > 1)
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-			d3d12SRVDescriptor.Texture2DArray.FirstArraySlice = 0;
-			d3d12SRVDescriptor.Texture2DArray.ArraySize = m_arraySize;
-			d3d12SRVDescriptor.Texture2DArray.PlaneSlice = 0;
-		}
-		else
-		{
-			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			d3d12SRVDescriptor.Texture2D.PlaneSlice = 0;
-		}
-	}
-
-	m_d3d12SRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
-	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, m_d3d12SRVDescriptor);
+	m_d3d12SRVDescriptor = CreateShaderResourceView(srvFormat, m_type, 0, m_mipmapCount, 0, m_arraySize, 0);
 
 	if (IsDepthStencil())
 	{
-		D3D12_SHADER_RESOURCE_VIEW_DESC d3d12StencilSRVDescriptor = d3d12SRVDescriptor;
-		d3d12StencilSRVDescriptor.Format = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
-		if (m_arraySize > 1)
-		{
-			d3d12StencilSRVDescriptor.Texture2DArray.PlaneSlice = 1;
-		}
-		else
-		{
-			d3d12StencilSRVDescriptor.Texture2D.PlaneSlice = 1;
-		}
+		m_additionalViews->m_d3d12StencilSRVDescriptor = CreateShaderResourceView(DXGI_FORMAT_X32_TYPELESS_G8X24_UINT, m_type, 0, m_mipmapCount, 0, m_arraySize, 1);
+	}
 
-		m_additionalViews->m_d3d12StencilSRVDescriptor = d3d12RenderDevice->AllocateShaderResourceDescriptor();
-		d3d12Device->CreateShaderResourceView(m_d3d12Resource, &d3d12StencilSRVDescriptor, m_additionalViews->m_d3d12StencilSRVDescriptor);
+	for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+	{
+		CrTextureView textureView = descriptor.customViews[i];
+	
+		DXGI_FORMAT customFormat = textureView.format == cr3d::DataFormat::Invalid ? srvFormat : crd3d::GetDXGIFormat(textureView.format);
+	
+		if (textureView.type == cr3d::TextureViewType::Read)
+		{
+			m_additionalViews->m_d3d12CustomViews.push_back({ textureView, CreateShaderResourceView(customFormat, m_type, textureView.mipmapStart, textureView.mipmapCount, textureView.sliceStart, textureView.sliceCount, textureView.plane) });
+		}
+		else if(textureView.type == cr3d::TextureViewType::Write)
+		{
+			CrAssertMsg(false, "Not implemented!");
+		}
 	}
 
 	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
@@ -453,4 +389,85 @@ CrTextureD3D12::~CrTextureD3D12()
 	{
 		m_d3d12Resource->Release();
 	}
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE CrTextureD3D12::CreateShaderResourceView
+(
+	DXGI_FORMAT srvFormat,
+	cr3d::TextureType type,
+	uint32_t mipmapStart,
+	uint32_t mipmapCount,
+	uint32_t arrayStart,
+	uint32_t arraySize,
+	uint32_t planeSlice
+)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC d3d12SRVDescriptor = {};
+	d3d12SRVDescriptor.Format = srvFormat;
+	d3d12SRVDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	mipmapCount = min(mipmapCount, m_mipmapCount);
+	arraySize = min(arraySize, m_arraySize);
+
+	if (type == cr3d::TextureType::Cubemap)
+	{
+		d3d12SRVDescriptor.TextureCube.MostDetailedMip = mipmapStart;
+		d3d12SRVDescriptor.TextureCube.MipLevels = mipmapCount;
+
+		if (arraySize > 1)
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+			d3d12SRVDescriptor.TextureCubeArray.First2DArrayFace = arrayStart;
+			d3d12SRVDescriptor.TextureCubeArray.NumCubes = arraySize;
+		}
+		else
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		}
+	}
+	else if (type == cr3d::TextureType::Volume)
+	{
+		d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+		d3d12SRVDescriptor.Texture3D.MostDetailedMip = mipmapStart;
+		d3d12SRVDescriptor.Texture3D.MipLevels = mipmapCount;
+	}
+	else if (type == cr3d::TextureType::Tex1D)
+	{
+		d3d12SRVDescriptor.Texture1D.MostDetailedMip = mipmapStart;
+		d3d12SRVDescriptor.Texture1D.MipLevels = mipmapCount;
+
+		if (arraySize > 1)
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
+			d3d12SRVDescriptor.Texture1DArray.FirstArraySlice = arrayStart;
+			d3d12SRVDescriptor.Texture1DArray.ArraySize = m_arraySize;
+		}
+		else
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+		}
+	}
+	else
+	{
+		d3d12SRVDescriptor.Texture2D.MostDetailedMip = mipmapStart;
+		d3d12SRVDescriptor.Texture2D.MipLevels = mipmapCount;
+
+		if (arraySize > 1)
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+			d3d12SRVDescriptor.Texture2DArray.FirstArraySlice = arrayStart;
+			d3d12SRVDescriptor.Texture2DArray.ArraySize = arraySize;
+			d3d12SRVDescriptor.Texture2DArray.PlaneSlice = planeSlice;
+		}
+		else
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			d3d12SRVDescriptor.Texture2D.PlaneSlice = planeSlice;
+		}
+	}
+
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	D3D12_CPU_DESCRIPTOR_HANDLE d3d12SRVDescriptorHandle = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, d3d12SRVDescriptorHandle);
+	return d3d12SRVDescriptorHandle;
 }

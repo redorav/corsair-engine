@@ -427,33 +427,6 @@ D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(CrRenderTar
 	}
 }
 
-D3D12_RESOURCE_STATES crd3d::GetD3D12LegacyResourceState(const cr3d::TextureState& textureState)
-{
-	switch (textureState.layout)
-	{
-		case cr3d::TextureLayout::Undefined:         return D3D12_RESOURCE_STATE_COMMON;
-		case cr3d::TextureLayout::ShaderInput:
-		{
-			// Simplify upstream rendergraph code by always specifying both. We'll deprecate this eventually so it's not that important
-			return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		}
-		case cr3d::TextureLayout::RenderTarget:          return D3D12_RESOURCE_STATE_RENDER_TARGET;
-		case cr3d::TextureLayout::RWTexture:             return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		case cr3d::TextureLayout::Present:               return D3D12_RESOURCE_STATE_PRESENT;
-		case cr3d::TextureLayout::CopySource:            return D3D12_RESOURCE_STATE_COPY_SOURCE;
-		case cr3d::TextureLayout::CopyDestination:       return D3D12_RESOURCE_STATE_COPY_DEST;
-
-		case cr3d::TextureLayout::DepthStencilReadWrite: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureLayout::DepthStencilWrite:     return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureLayout::StencilWriteDepthReadOnly: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureLayout::DepthWriteStencilReadOnly: return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		case cr3d::TextureLayout::DepthStencilReadOnly:      return D3D12_RESOURCE_STATE_DEPTH_READ;
-		default:
-			CrAssertMsg(false, "Unhandled texture layout");
-			return D3D12_RESOURCE_STATE_COMMON;
-	}
-}
-
 D3D12_BARRIER_SYNC GetD3D12BarrierShaderSyncFlags(cr3d::ShaderStageFlags::T stages)
 {
 	D3D12_BARRIER_SYNC barrierSync = D3D12_BARRIER_SYNC_NONE;

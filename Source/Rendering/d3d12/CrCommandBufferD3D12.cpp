@@ -65,41 +65,6 @@ CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const 
 	m_samplerCPUDescriptors.Initialize(2048);
 }
 
-void CrCommandBufferD3D12::ProcessLegacyTextureAndBufferBarriers
-(
-	const CrRenderPassDescriptor::BufferTransitionVector& buffers, 
-	const CrRenderPassDescriptor::TextureTransitionVector& textures, 
-	CrBarrierVectorD3D12& resourceBarriers
-)
-{
-	for (const CrRenderPassTextureDescriptor& descriptor : textures)
-	{
-		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(descriptor.texture);
-
-		D3D12_RESOURCE_BARRIER textureBarrier;
-		textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-		textureBarrier.Transition.StateBefore = crd3d::GetD3D12LegacyResourceState(descriptor.sourceState);
-		textureBarrier.Transition.StateAfter  = crd3d::GetD3D12LegacyResourceState(descriptor.destinationState);
-		CrAssertMsg(textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter, "States cannot be the same");
-
-		// TODO Handle subresource transitions
-		unsigned int planeSlice = descriptor.texturePlane == cr3d::TexturePlane::Stencil ? 1 : 0;
-
-		textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-		(
-			descriptor.mipmapStart, descriptor.sliceStart, planeSlice,
-			d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
-		);
-
-		resourceBarriers.push_back(textureBarrier);
-	}
-
-	// TODO Handle buffer transitions
-	unused_parameter(buffers);
-}
-
 void CrCommandBufferD3D12::ProcessTextureBarriers
 (
 	const CrRenderPassDescriptor::TextureTransitionVector& textures,
@@ -152,41 +117,6 @@ void CrCommandBufferD3D12::ProcessBufferBarriers(const CrRenderPassDescriptor::B
 	}
 }
 
-void CrCommandBufferD3D12::ProcessLegacyRenderTargetBarrier(
-	const CrRenderTargetDescriptor& renderTargetDescriptor, 
-	const cr3d::TextureState& initialState,
-	const cr3d::TextureState& finalState,
-	CrBarrierVectorD3D12& resourceBarriers)
-{
-	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
-
-	// Don't use the texture states from the render target descriptor. The reason is that the render target descriptor
-	// contains information about the initial, usage and final states. Non-render target transitions already come split
-	D3D12_RESOURCE_BARRIER textureBarrier;
-	textureBarrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	textureBarrier.Flags                  = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	textureBarrier.Transition.pResource   = d3d12Texture->GetD3D12Resource();
-	textureBarrier.Transition.StateBefore = crd3d::GetD3D12LegacyResourceState(initialState);
-	textureBarrier.Transition.StateAfter  = crd3d::GetD3D12LegacyResourceState(finalState);
-
-#if defined(COMMAND_BUFFER_VALIDATION)
-	if (finalState.layout != cr3d::TextureLayout::Present)
-	{
-		CrAssertMsg(textureBarrier.Transition.StateAfter != D3D12_RESOURCE_STATE_COMMON, "Invalid transition state");
-	}
-#endif
-
-	CrAssertMsg(textureBarrier.Transition.StateBefore != textureBarrier.Transition.StateAfter, "States cannot be the same");
-
-	textureBarrier.Transition.Subresource = crd3d::CalculateSubresource
-	(
-		renderTargetDescriptor.mipmap, renderTargetDescriptor.slice, 0,
-		d3d12Texture->GetMipmapCount(), d3d12Texture->GetSliceCount()
-	);
-
-	resourceBarriers.push_back(textureBarrier);
-}
-
 void CrCommandBufferD3D12::ProcessRenderTargetBarrier
 (
 	const CrRenderTargetDescriptor& renderTargetDescriptor,
@@ -222,78 +152,50 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier
 
 void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
 {
-	CrBarrierVectorD3D12 resourceBarriers;
 	CrTextureBarrierVectorD3D12 textureBarriers;
 	CrBufferBarrierVectorD3D12 bufferBarriers;
 
-	bool enhancedBarriersSupported = static_cast<CrRenderDeviceD3D12*>(m_renderDevice)->GetIsEnhancedBarriersSupported();
-
 	const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
-	if (enhancedBarriersSupported)
+	ProcessTextureBarriers(renderPassDescriptor.beginTextures, textureBarriers);
+
+	ProcessBufferBarriers(renderPassDescriptor.beginBuffers, bufferBarriers);
+
+	for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
 	{
-		ProcessTextureBarriers(renderPassDescriptor.beginTextures, textureBarriers);
-
-		ProcessBufferBarriers(renderPassDescriptor.beginBuffers, bufferBarriers);
-
-		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+		if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
 		{
-			if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
-			{
-				ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, textureBarriers);
-			}
-		}
-
-		if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
-		{
-			ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, textureBarriers);
-		}
-
-		crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
-		size_t barrierGroupCount = 0;
-
-		if (textureBarriers.size() > 0)
-		{
-			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
-			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
-			barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
-			barrierGroupCount++;
-		}
-
-		if (bufferBarriers.size() > 0)
-		{
-			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
-			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
-			barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
-			barrierGroupCount++;
-		}
-
-		if (barrierGroupCount)
-		{
-			m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
+			ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, textureBarriers);
 		}
 	}
-	else
+
+	if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
 	{
-		ProcessLegacyTextureAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures, resourceBarriers);
+		ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, textureBarriers);
+	}
 
-		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
-		{
-			if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
-			{
-				ProcessLegacyRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.initialState, renderTargetDescriptor.usageState, resourceBarriers);
-			}
-		}
+	crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
+	size_t barrierGroupCount = 0;
 
-		if (depthDescriptor.texture && (depthDescriptor.initialState != depthDescriptor.usageState))
-		{
-			ProcessLegacyRenderTargetBarrier(depthDescriptor, depthDescriptor.initialState, depthDescriptor.usageState, resourceBarriers);
-		}
+	if (textureBarriers.size() > 0)
+	{
+		barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
+		barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
+		barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
+		barrierGroupCount++;
+	}
 
-		if (resourceBarriers.size() > 0)
-		{
-			m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
-		}
+	if (bufferBarriers.size() > 0)
+	{
+		barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
+		barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
+		barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
+		barrierGroupCount++;
+	}
+
+	if (barrierGroupCount)
+	{
+		m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
 	}
 
 	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
@@ -353,12 +255,9 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 
 void CrCommandBufferD3D12::EndRenderPassPS()
 {
-	CrBarrierVectorD3D12 resourceBarriers;
 	CrTextureBarrierVectorD3D12 textureBarriers;
 	CrBufferBarrierVectorD3D12 bufferBarriers;
 	const CrRenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
-
-	bool enhancedBarriersEnabled = static_cast<CrRenderDeviceD3D12*>(m_renderDevice)->GetIsEnhancedBarriersSupported();
 
 	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
 	{
@@ -366,76 +265,46 @@ void CrCommandBufferD3D12::EndRenderPassPS()
 
 		const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
-		if (enhancedBarriersEnabled)
+		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
 		{
-			for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+			if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
 			{
-				if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
-				{
-					ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, textureBarriers);
-				}
-			}
-
-			if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
-			{
-				ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, textureBarriers);
+				ProcessRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, textureBarriers);
 			}
 		}
-		else
-		{
-			for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
-			{
-				if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
-				{
-					ProcessLegacyRenderTargetBarrier(renderTargetDescriptor, renderTargetDescriptor.usageState, renderTargetDescriptor.finalState, resourceBarriers);
-				}
-			}
 
-			if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
-			{
-				ProcessLegacyRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, resourceBarriers);
-			}
+		if (depthDescriptor.texture && (depthDescriptor.usageState != depthDescriptor.finalState))
+		{
+			ProcessRenderTargetBarrier(depthDescriptor, depthDescriptor.usageState, depthDescriptor.finalState, textureBarriers);
 		}
 	}
 
-	if (enhancedBarriersEnabled)
+	ProcessTextureBarriers(renderPassDescriptor.endTextures, textureBarriers);
+
+	ProcessBufferBarriers(renderPassDescriptor.endBuffers, bufferBarriers);
+
+	crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
+	size_t barrierGroupCount = 0;
+
+	if (textureBarriers.size() > 0)
 	{
-		ProcessTextureBarriers(renderPassDescriptor.endTextures, textureBarriers);
-
-		ProcessBufferBarriers(renderPassDescriptor.endBuffers, bufferBarriers);
-
-		crstl::array<D3D12_BARRIER_GROUP, 3> barrierGroups = {};
-		size_t barrierGroupCount = 0;
-
-		if (textureBarriers.size() > 0)
-		{
-			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
-			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
-			barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
-			barrierGroupCount++;
-		}
-
-		if (bufferBarriers.size() > 0)
-		{
-			barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
-			barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
-			barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
-			barrierGroupCount++;
-		}
-
-		if (barrierGroupCount)
-		{
-			m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
-		}
+		barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_TEXTURE;
+		barrierGroups[barrierGroupCount].NumBarriers = (UINT32)textureBarriers.size();
+		barrierGroups[barrierGroupCount].pTextureBarriers = textureBarriers.data();
+		barrierGroupCount++;
 	}
-	else
-	{
-		ProcessLegacyTextureAndBufferBarriers(renderPassDescriptor.endBuffers, renderPassDescriptor.endTextures, resourceBarriers);
 
-		if (resourceBarriers.size() > 0)
-		{
-			m_d3d12GraphicsCommandList->ResourceBarrier((UINT)resourceBarriers.size(), resourceBarriers.data());
-		}
+	if (bufferBarriers.size() > 0)
+	{
+		barrierGroups[barrierGroupCount].Type = D3D12_BARRIER_TYPE_BUFFER;
+		barrierGroups[barrierGroupCount].NumBarriers = (UINT32)bufferBarriers.size();
+		barrierGroups[barrierGroupCount].pBufferBarriers = bufferBarriers.data();
+		barrierGroupCount++;
+	}
+
+	if (barrierGroupCount)
+	{
+		m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
 	}
 }
 
@@ -485,8 +354,10 @@ void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBindin
 	}
 	else
 	{
-		CrAssertMsg(false, "Invalid image view");
+		srvDescriptor = d3d12Texture->GetCustomD3D12View(textureBinding.view);
 	}
+
+	CrAssertMsg(srvDescriptor.ptr != (SIZE_T)-1, "Invalid image view");
 
 	srvHandle = srvDescriptor;
 }

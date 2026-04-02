@@ -10,11 +10,17 @@
 
 class ICrRenderDevice;
 
+struct CrVkCustomView
+{
+	CrTextureView view;
+	VkImageView vkImageView;
+};
+
 struct CrVkAdditionalTextureViews
 {
 	crstl::array<crstl::vector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices
 	crstl::array<VkImageView, cr3d::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
-	crstl::fixed_vector<VkImageView, cr3d::MaxCustomTextureViews> m_vkCustomViews;
+	crstl::fixed_vector<CrVkCustomView, cr3d::MaxCustomTextureViews> m_vkCustomViews;
 
 	VkImageView m_vkImageViewStencil;
 };
@@ -38,6 +44,19 @@ public:
 	VkImageView GetVkImageViewSingleMipSlice(uint32_t mip, uint32_t slice) const { return m_additionalViews->m_vkImageSingleMipSlice[mip][slice]; }
 
 	VkImageView GetVkImageViewSingleMipAllSlices(uint32_t mip) const { return m_additionalViews->m_vkImageViewSingleMipAllSlices[mip]; }
+
+	VkImageView GetCustomVkImageView(CrTextureView view) const
+	{
+		for (const CrVkCustomView& customView : m_additionalViews->m_vkCustomViews)
+		{
+			if (customView.view == view)
+			{
+				return customView.vkImageView;
+			}
+		}
+		
+		return VK_NULL_HANDLE;
+	}
 
 private:
 

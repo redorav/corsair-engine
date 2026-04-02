@@ -9,6 +9,12 @@
 
 class ICrRenderDevice;
 
+struct CrD3D12CustomView
+{
+	CrTextureView view;
+	D3D12_CPU_DESCRIPTOR_HANDLE handle;
+};
+
 struct CrD3D12AdditionalTextureViews
 {
 	// RTVs
@@ -26,6 +32,9 @@ struct CrD3D12AdditionalTextureViews
 	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, cr3d::MaxMipmaps> m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 
 	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12StencilSRVDescriptor;
+
+	// Custom views
+	crstl::fixed_vector<CrD3D12CustomView, cr3d::MaxCustomTextureViews> m_d3d12CustomViews;
 };
 
 class CrTextureD3D12 final : public ICrTexture
@@ -35,6 +44,17 @@ public:
 	CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureD3D12();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CreateShaderResourceView
+	(
+		DXGI_FORMAT srvFormat,
+		cr3d::TextureType type,
+		uint32_t mipmapStart,
+		uint32_t mipmapCount,
+		uint32_t arrayStart,
+		uint32_t arraySize,
+		uint32_t planeSlice
+	);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12RenderTargetView(uint32_t mip, uint32_t slice) const
 	{
@@ -48,8 +68,6 @@ public:
 
 	ID3D12Resource* GetD3D12Resource() const { return m_d3d12Resource; }
 
-	D3D12_RESOURCE_STATES GetD3D12DefaultLegacyResourceState() const { return m_d3d12LegacyInitialState; }
-
 	D3D12_BARRIER_LAYOUT GetD3D12DefaultTextureLayout() const { return m_d3d12InitialLayout; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12SRVDescriptor() const { return m_d3d12SRVDescriptor; }
@@ -57,6 +75,22 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12StencilSRVDescriptor() const { return m_additionalViews->m_d3d12StencilSRVDescriptor; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetD3D12UAVDescriptor(uint32_t mip) const { return m_additionalViews->m_d3d12UAVSingleMipAllSlices[mip]; }
+
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCustomD3D12View(CrTextureView view) const
+	{
+		for (const CrD3D12CustomView& customView : m_additionalViews->m_d3d12CustomViews)
+		{
+			if (customView.view == view)
+			{
+				return customView.handle;
+			}
+		}
+
+		D3D12_CPU_DESCRIPTOR_HANDLE invalid;
+		invalid.ptr = (SIZE_T)-1;
+	
+		return invalid;
+	}
 
 	uint32_t GetD3D12SubresourceCount() const { return m_d3d12SubresourceCount; }
 
@@ -69,7 +103,6 @@ private:
 
 	uint32_t m_d3d12SubresourceCount;
 
-	D3D12_RESOURCE_STATES m_d3d12LegacyInitialState;
 	D3D12_BARRIER_LAYOUT m_d3d12InitialLayout;
 
 	ID3D12Resource* m_d3d12Resource = nullptr;

@@ -570,7 +570,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	}
 
 	// Starting from Vulkan 1.1 we have this alternative available. There is also an extension that basically no one supports
-	if (m_vkVersion >= VK_VERSION_1_1)
+	if (m_vkVersion >= VK_API_VERSION_1_1)
 	{
 		m_vkPhysicalDeviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 		m_vkPhysicalDeviceProperties2.pNext = &m_vk11PhysicalDeviceProperties;
@@ -579,13 +579,13 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		m_vkDeviceSupportedFeatures2.pNext = &m_vk11DeviceSupportedFeatures;
 
 		// Starting from 1.2 we get even more properties
-		if (m_vkVersion >= VK_VERSION_1_2)
+		if (m_vkVersion >= VK_API_VERSION_1_2)
 		{
 			m_vk11PhysicalDeviceProperties.pNext = &m_vk12PhysicalDeviceProperties;
 			m_vk11DeviceSupportedFeatures.pNext = &m_vk12DeviceSupportedFeatures;
 		}
 
-		if (m_vkVersion >= VK_VERSION_1_3)
+		if (m_vkVersion >= VK_API_VERSION_1_3)
 		{
 			m_vk12PhysicalDeviceProperties.pNext = &m_vk13PhysicalDeviceProperties;
 			m_vk12DeviceSupportedFeatures.pNext = &m_vk13DeviceSupportedFeatures;
@@ -596,7 +596,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		vkGetPhysicalDeviceFeatures2(m_vkPhysicalDevice, &m_vkDeviceSupportedFeatures2);
 
 		// We check for the Vulkan version to avoid overriding the previously derived driverId
-		if (m_vkVersion >= VK_VERSION_1_2)
+		if (m_vkVersion >= VK_API_VERSION_1_2)
 		{
 			driverId = m_vk12PhysicalDeviceProperties.driverID;
 		}

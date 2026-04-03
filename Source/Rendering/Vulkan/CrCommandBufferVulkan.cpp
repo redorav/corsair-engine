@@ -500,6 +500,8 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			}
 		}
 
+		FlushImageAndBufferBarriers();
+
 		vkRenderingInfo.renderArea = { { 0, 0 }, { renderWidth, renderHeight } };
 
 		vkCmdBeginRendering(m_vkCommandBuffer, &vkRenderingInfo);
@@ -540,6 +542,7 @@ void CrCommandBufferVulkan::EndRenderPassPS()
 	}
 
 	GatherImageAndBufferBarriers(m_currentState.m_currentRenderPass.endBuffers, m_currentState.m_currentRenderPass.endTextures);
+
 	FlushImageAndBufferBarriers();
 }
 

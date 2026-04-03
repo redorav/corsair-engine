@@ -844,7 +844,7 @@ VkResult CrRenderDeviceVulkan::CreateLogicalDevice()
 
 	// Enable all available features
 	// TODO Enable what we actually need, and assert on essential features that the device doesn't support
-	if (m_vkVersion >= VK_VERSION_1_1)
+	if (m_vkVersion >= VK_API_VERSION_1_1)
 	{
 		deviceCreateInfo.pNext = &m_vkDeviceSupportedFeatures2;
 	}

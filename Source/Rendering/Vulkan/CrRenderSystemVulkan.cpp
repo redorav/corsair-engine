@@ -52,7 +52,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const CrRenderSystemDescriptor& rende
 		InitializeRenderdoc();
 	}
 
-	uint32_t vulkanApiVersion = VK_API_VERSION_1_3;
+	uint32_t vulkanApiVersion = 0;
 	vkEnumerateInstanceVersion(&vulkanApiVersion);
 
 	VkApplicationInfo appInfo = {};

@@ -308,6 +308,16 @@ HRESULT CrDXCCompileShader
 		if (compilationDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
 		{
 			arguments.push_back(L"-spirv");
+
+			// Simplify our lives by assuming an unknown format for storage images. Revisit if we come across hardware that doesn't support or benefits greatly from specifying these formats manually
+			arguments.push_back(L"-fspv-use-unknown-image-format");
+
+			// Sometimes DXC decides that a resource declaration is malformed and drops all resources from the compiled shader. What's worse, it doesn't error out or produce any meaningful message, but
+			// now we cannot extract metadata from it, and the build fails due to it. This prevents all that and produces useful metadata, so only an actual compilation error can fail
+			if (compilationDescriptor.metadata)
+			{
+				arguments.push_back(L"-fspv-preserve-bindings");
+			}
 		}
 
 		// Include defines here

@@ -25,7 +25,7 @@ struct CompilationDescriptor
 	: platform(cr::Platform::Count)
 	, graphicsApi(cr3d::GraphicsApi::Count)
 	, shaderStage(cr3d::ShaderStage::Count)
-	, buildReflection(true)
+	, metadata(false)
 	, optimization(OptimizationLevel::O3)
 	, processed(false)
 	{}
@@ -41,8 +41,8 @@ struct CompilationDescriptor
 	cr::Platform::T platform;
 	cr3d::GraphicsApi::T graphicsApi;
 	cr3d::ShaderStage::T shaderStage;
-	bool buildReflection;
 	OptimizationLevel::T optimization;
+	bool metadata; // If we are building metadata.hlsl
 
 private:
 

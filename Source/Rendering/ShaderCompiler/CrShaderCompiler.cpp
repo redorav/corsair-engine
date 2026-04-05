@@ -264,6 +264,7 @@ int main(int argc, char* argv[])
 
 		// Make sure resources aren't stripped out
 		compilationDescriptor.optimization = OptimizationLevel::None;
+		compilationDescriptor.metadata = true;
 
 		crstl::string compilationStatus;
 		bool success = CrShaderMetadataBuilder::BuildMetadata(compilationDescriptor, compilationStatus);

@@ -508,6 +508,12 @@ crd3d::TextureBarrierInfoD3D12 crd3d::GetD3D12TextureBarrierInfo(const cr3d::Tex
 			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_COMMON;
 			break;
 		}
+		case cr3d::TextureLayout::Undefined:
+		{
+			textureBarrierInfo.sync = D3D12_BARRIER_SYNC_NONE;
+			textureBarrierInfo.access = D3D12_BARRIER_ACCESS_NO_ACCESS;
+			break;
+		}
 		default:
 			CrAssertMsg(false, "Unhandled texture state");
 			break;
@@ -573,6 +579,8 @@ D3D12_BARRIER_LAYOUT crd3d::GetD3D12BarrierTextureLayout(const cr3d::TextureLayo
 		case cr3d::TextureLayout::DepthStencilReadWrite:
 		case cr3d::TextureLayout::DepthStencilWrite:
 			return D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE;
+		case cr3d::TextureLayout::Undefined:
+			return D3D12_BARRIER_LAYOUT_UNDEFINED;
 		default:
 			CrAssertMsg(false, "Unhandled texture layout");
 			return D3D12_BARRIER_LAYOUT_COMMON;

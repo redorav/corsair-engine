@@ -369,6 +369,9 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	}
 
 	m_waitIdleFence = CreateGPUFence();
+
+	// Get the frequency for the timestamp queries
+	m_d3d12GraphicsCommandQueue->GetTimestampFrequency(&m_d3d12TimestampFrequency);
 }
 
 CrRenderDeviceD3D12::~CrRenderDeviceD3D12()

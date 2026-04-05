@@ -95,7 +95,7 @@ protected:
 
 	uint32_t m_currentQuery;
 
-	// Not all platforms work the same way, so this is just a multiplier that takes from
-	// raw ticks to nanoseconds. In many common cases it will just be 1.0
+	// Not all platforms work the same way, so this is the multiplier that takes us from raw ticks to nanoseconds. In common cases it will just be 1.0, but it could be 10.0 depending on
+	// the timer resolution of the current device we're working with
 	double m_timestampPeriod;
 };

@@ -27,19 +27,18 @@ ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDes
 	: m_descriptor(renderSystemDescriptor)
 	, m_nvapiInitialized(false)
 {
-	// Load builtin shaders here. The render system is only instantiated once and knows
-	// which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
-	// rest of the engine interacts with them and not the raw data that was passed in, 
-	// as the metadata needs to be serialized, etc.
+	// Load builtin shaders here. The render system is only instantiated once and knows which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
+	// rest of the engine interacts with them and not the raw data that was passed in, as the metadata needs to be serialized, etc.
 
 	m_builtinShaderBytecodes.resize(CrBuiltinShaders::Count);
 
+	m_builtinComputeBytecodes.resize(CrBuiltinCompute::Count);
+
 	for (uint32_t i = 0; i < CrBuiltinShaders::Count; ++i)
 	{
-		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetBuiltinShaderMetadata((CrBuiltinShaders::T)i, m_descriptor.graphicsApi);
+		const CrBuiltinShaderMetadata& metadata = CrBuiltinShaders::GetMetadata((CrBuiltinShaders::T)i, m_descriptor.graphicsApi);
 
-		// Builtin shaders without code are not an error. Sometimes we need shader code 
-		// that is specific to an API and we leave the entry blank. This only happens
+		// Builtin shaders without code are not an error. Sometimes we need shader code that is specific to an API and we leave the entry blank. This only happens
 		// on multi-API platforms which is quite rare
 		if (metadata.shaderCode)
 		{
@@ -47,6 +46,19 @@ ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDes
 			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
 			shaderBytecodeStream << *bytecode.get();
 			m_builtinShaderBytecodes[i] = bytecode;
+		}
+	}
+
+	for (uint32_t i = 0; i < CrBuiltinCompute::Count; ++i)
+	{
+		const CrBuiltinComputeMetadata& metadata = CrBuiltinCompute::GetMetadata((CrBuiltinCompute::T)i, m_descriptor.graphicsApi);
+
+		if (metadata.shaderCode)
+		{
+			CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
+			const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+			shaderBytecodeStream << *bytecode.get();
+			m_builtinComputeBytecodes[i] = bytecode;
 		}
 	}
 }
@@ -109,4 +121,9 @@ cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
 const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
 {
 	return m_builtinShaderBytecodes[builtinShader];
+}
+
+const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const
+{
+	return m_builtinComputeBytecodes[builtinCompute];
 }

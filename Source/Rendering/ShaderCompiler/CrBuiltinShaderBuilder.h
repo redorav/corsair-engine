@@ -24,9 +24,19 @@ struct CrBuiltinShadersDescriptor
 
 struct CompilationDescriptor;
 
+namespace CrPipelineType
+{
+	enum T
+	{
+		Graphics,
+		Compute
+	};
+};
+
 struct CrShaderInfo
 {
 	crstl::string name;
+	CrPipelineType::T pipelineType;
 };
 
 struct CrShaderCompilationJob

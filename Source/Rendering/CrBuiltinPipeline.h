@@ -7,6 +7,7 @@
 #include "crstl/open_hashmap.h"
 
 namespace CrBuiltinShaders { enum T : uint32_t; }
+namespace CrBuiltinCompute { enum T : uint32_t; }
 
 // A collection of all builtin pipelines compiled on boot. They are available to any program that wants them
 class CrBuiltinPipelines
@@ -25,7 +26,7 @@ public:
 		CrBuiltinShaders::T pixelShader
 	);
 
-	CrComputePipelineHandle GetComputePipeline(CrBuiltinShaders::T computeShader);
+	CrComputePipelineHandle GetComputePipeline(CrBuiltinCompute::T computeShader);
 
 	void RecompileBuiltinPipelines();
 

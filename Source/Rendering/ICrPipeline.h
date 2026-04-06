@@ -208,10 +208,9 @@ struct CrGraphicsPipelineDescriptor
 
 static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-namespace CrBuiltinShaders
-{
-	enum T : uint32_t;
-}
+namespace CrBuiltinShaders { enum T : uint32_t; }
+
+namespace CrBuiltinCompute { enum T : uint32_t; }
 
 class ICrGraphicsPipeline : public CrGPUAutoDeletable
 {
@@ -296,13 +295,13 @@ public:
 
 	virtual void RecompilePS(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
 
-	CrBuiltinShaders::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
+	CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 	
-	void SetComputeShaderIndex(CrBuiltinShaders::T computeShaderIndex) { m_computeShaderIndex = computeShaderIndex; }
+	void SetComputeShaderIndex(CrBuiltinCompute::T computeShaderIndex) { m_computeShaderIndex = computeShaderIndex; }
 
 private:
 
-	CrBuiltinShaders::T m_computeShaderIndex = (CrBuiltinShaders::T)-1;
+	CrBuiltinCompute::T m_computeShaderIndex = (CrBuiltinCompute::T)-1;
 
 #endif
 };

@@ -137,6 +137,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 				CrShaderInfo shaderInfo;
 				shaderInfo.name = shaderName;
+				shaderInfo.pipelineType = shaderStage == cr3d::ShaderStage::Compute ? CrPipelineType::Compute : CrPipelineType::Graphics;
 				shaderInfos.push_back(shaderInfo);
 				compilationJob.name = shaderName;
 
@@ -215,18 +216,34 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 )
 {
 	crstl::string builtinShadersGenericHeader;
-	crstl::string builtinShadersGenericHeaderGetFunction;
 	crstl::string builtinShadersGenericCpp;
 
+	crstl::string builtinShadersGenericHeaderGetFunction;
+	crstl::string builtinComputeGenericHeaderGetFunction;
+
 	crstl::string builtinShadersEnum = "namespace CrBuiltinShaders\n{\n\tenum T : uint32_t\n\t{";
+	crstl::string builtinComputeShadersEnum = "namespace CrBuiltinCompute\n{\n\tenum T : uint32_t\n\t{";
+
+	uint32_t graphicShaderCount = 0;
+	uint32_t computeShaderCount = 0;
 
 	// Add shader entry to enum
 	for (const CrShaderInfo& shaderInfo : shaderInfos)
 	{
-		builtinShadersEnum += "\n\t\t" + shaderInfo.name + ",";
+		if (shaderInfo.pipelineType == CrPipelineType::Graphics)
+		{
+			builtinShadersEnum += "\n\t\t" + shaderInfo.name + ",";
+			graphicShaderCount++;
+		}
+		else
+		{
+			builtinComputeShadersEnum += "\n\t\t" + shaderInfo.name + ",";
+			computeShaderCount++;
+		}
 	}
 
 	builtinShadersEnum += "\n\t\tCount\n\t};\n};";
+	builtinComputeShadersEnum += "\n\t\tCount\n\t};\n};";
 
 	builtinShadersGenericHeader += "#pragma once\n\n";
 	builtinShadersGenericHeader += "#include \"Core/CrCoreForwardDeclarations.h\"\n";
@@ -235,8 +252,11 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "\n";
 	builtinShadersGenericHeader += builtinShadersEnum;
 	builtinShadersGenericHeader += "\n\n";
+	builtinShadersGenericHeader += builtinComputeShadersEnum;
+	builtinShadersGenericHeader += "\n\n";
+
 	builtinShadersGenericHeader += "struct CrBuiltinShaderMetadata\n"
-	"{\n"
+		"{\n"
 		"\tCrBuiltinShaderMetadata(const crstl::string& name, const crstl::string& entryPoint, const crstl::string& uniqueBinaryName, cr3d::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
 		"\t: name(name), entryPoint(entryPoint), uniqueBinaryName(uniqueBinaryName), shaderStage(shaderStage), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
 		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", \"\", cr3d::ShaderStage::Count, nullptr, 0) {}\n\n"
@@ -246,12 +266,28 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		"\tcr3d::ShaderStage::T shaderStage;\n"
 		"\tuint8_t* shaderCode;\n"
 		"\tuint32_t shaderCodeSize;\n"
+		"};\n\n";
+
+	builtinShadersGenericHeader += "struct CrBuiltinComputeMetadata\n"
+	"{\n"
+		"\tCrBuiltinComputeMetadata(const crstl::string& name, const crstl::string& entryPoint, const crstl::string& uniqueBinaryName, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
+		"\t: name(name), entryPoint(entryPoint), uniqueBinaryName(uniqueBinaryName), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
+		"\tCrBuiltinComputeMetadata() : CrBuiltinComputeMetadata(\"\", \"\", \"\", nullptr, 0) {}\n\n"
+		"\tcrstl::string name;\n"
+		"\tcrstl::string entryPoint;\n"
+		"\tcrstl::string uniqueBinaryName;\n"
+		"\tuint8_t* shaderCode;\n"
+		"\tuint32_t shaderCodeSize;\n"
 	"};\n\n";
 
 	builtinShadersGenericHeader += "const CrBuiltinShaderMetadata InvalidBuiltinShaderMetadata;\n\n";
+	builtinShadersGenericHeader += "const CrBuiltinComputeMetadata InvalidBuiltinComputeMetadata;\n\n";
 
 	builtinShadersGenericHeaderGetFunction += "namespace CrBuiltinShaders\n{\n";
-	builtinShadersGenericHeaderGetFunction += "inline const CrBuiltinShaderMetadata& GetBuiltinShaderMetadata(CrBuiltinShaders::T builtinShader, cr3d::GraphicsApi::T graphicsApi)\n{\n";
+	builtinShadersGenericHeaderGetFunction += "\tinline const CrBuiltinShaderMetadata& GetMetadata(CrBuiltinShaders::T builtinShader, cr3d::GraphicsApi::T graphicsApi)\n\t{\n";
+
+	builtinComputeGenericHeaderGetFunction += "namespace CrBuiltinCompute\n{\n";
+	builtinComputeGenericHeaderGetFunction += "\tinline const CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute, cr3d::GraphicsApi::T graphicsApi)\n\t{\n";
 	
 	builtinShadersGenericCpp += "#include \"Rendering/CrRendering_pch.h\"\n";
 	builtinShadersGenericCpp += "\n";
@@ -262,16 +298,25 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 
 		const crstl::vector<CrShaderCompilationJob>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
 
-		builtinShadersGenericHeaderGetFunction += "\tif(graphicsApi == cr3d::GraphicsApi::";
+		builtinShadersGenericHeaderGetFunction += "\t\tif(graphicsApi == cr3d::GraphicsApi::";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
-		builtinShadersGenericHeaderGetFunction += ")\n\t{\n";
-		builtinShadersGenericHeaderGetFunction += "\t\treturn ";
+		builtinShadersGenericHeaderGetFunction += ")\n\t\t{\n";
+		builtinShadersGenericHeaderGetFunction += "\t\t\treturn ";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
-		builtinShadersGenericHeaderGetFunction += "::GetBuiltinShaderMetadata(builtinShader);\n\t}\n\n";
+		builtinShadersGenericHeaderGetFunction += "::GetMetadata(builtinShader);\n\t\t}\n\n";
 
-		crstl::string builtinShadersMetadataTable = "crstl::array<CrBuiltinShaderMetadata, " + crstl::string(graphicsApiCompilationJobs.size()) + "> BuiltinShaderMetadataTable =\n{\n";
+		builtinComputeGenericHeaderGetFunction += "\t\tif(graphicsApi == cr3d::GraphicsApi::";
+		builtinComputeGenericHeaderGetFunction += graphicsApiString;
+		builtinComputeGenericHeaderGetFunction += ")\n\t\t{\n";
+		builtinComputeGenericHeaderGetFunction += "\t\t\treturn ";
+		builtinComputeGenericHeaderGetFunction += graphicsApiString;
+		builtinComputeGenericHeaderGetFunction += "::GetMetadata(builtinCompute);\n\t\t}\n\n";
+
+		crstl::string builtinShadersMetadataTable = "\t\tcrstl::array<CrBuiltinShaderMetadata, " + crstl::string(graphicShaderCount) + "> BuiltinShaderMetadataTable =\n\t\t{\n";
+		crstl::string builtinComputeMetadataTable = "\t\tcrstl::array<CrBuiltinComputeMetadata, " + crstl::string(computeShaderCount) + "> BuiltinComputeMetadataTable =\n\t\t{\n";
 
 		crstl::string builtinShaderDataCpp;
+		crstl::string builtinComputeDataCpp;
 
 		// Load every file we produced and turn it into metadata (unique shader name, length, shaders source file) plus a C array that contains the binary
 		// We need to include all the necessary metadata to be able to recompile it on demand
@@ -292,61 +337,113 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 				shaderBinaryData.resize(codeSize);
 				file.read(shaderBinaryData.data(), (uint32_t)shaderBinaryData.size());
 
-				crstl::string shaderBinaryName = "uint8_t " + shaderName + "ShaderCode[" + crstl::string(codeSize) + "]";
-				builtinShaderDataCpp += shaderBinaryName + " =\n{";
-				builtinShadersMetadataTable += 
-					"\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", \"" + compilationDescriptor.uniqueBinaryName + "\", " + 
-					shaderStageString.c_str() + ", " + shaderName + "ShaderCode, " + crstl::string(codeSize) + "),\n";
+				crstl::string shaderBinaryName = "\t\tuint8_t " + shaderName + "ShaderCode[" + crstl::string(codeSize) + "]";
 
-				for (uint32_t i = 0; i < codeSize; ++i)
+				const auto CopyBytecodeData = [codeSize, &shaderBinaryData](crstl::string& destination)
 				{
-					// Every 48 bytes, jump to a new line
-					if (i % 48 == 0)
+					for (uint32_t i = 0; i < codeSize; ++i)
 					{
-						builtinShaderDataCpp += "\n\t";
+						// Every 48 bytes, jump to a new line
+						if (i % 48 == 0)
+						{
+							destination += "\n\t\t\t";
+						}
+
+						// Convert byte to text. Don't add spaces or convert to hex, it just bloats the file
+						destination += crstl::string(shaderBinaryData[i]) + ",";
 					}
+				};
 
-					// Convert byte to text. Don't add spaces or convert to hex, it just bloats the file
-					builtinShaderDataCpp += crstl::string(shaderBinaryData[i]) + ",";
+				if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+				{
+					builtinComputeDataCpp += shaderBinaryName + " =\n\t\t{";
+					builtinComputeMetadataTable +=
+						"\t\t\tCrBuiltinComputeMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", \"" + compilationDescriptor.uniqueBinaryName + "\", " +
+						shaderName + "ShaderCode, " + crstl::string(codeSize) + "),\n";
+
+					CopyBytecodeData(builtinComputeDataCpp);
+
+					builtinComputeDataCpp += "\n\t\t};\n\n";
 				}
+				else
+				{
+					builtinShaderDataCpp += shaderBinaryName + " =\n\t\t{";
+					builtinShadersMetadataTable +=
+						"\t\t\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"" + compilationDescriptor.entryPoint + "\", \"" + compilationDescriptor.uniqueBinaryName + "\", " +
+						shaderStageString.c_str() + ", " + shaderName + "ShaderCode, " + crstl::string(codeSize) + "),\n";
 
-				builtinShaderDataCpp += "\n};\n\n";
+					CopyBytecodeData(builtinShaderDataCpp);
+
+					builtinShaderDataCpp += "\n\t\t\t};\n\n";
+				}
 			}
 			else
 			{
-				builtinShadersMetadataTable += "\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", \"" + compilationDescriptor.uniqueBinaryName + "\", " + 
-					shaderStageString.c_str() + ", nullptr, " + crstl::string(0) + "), \n";
+				if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+				{
+					builtinComputeMetadataTable += "\t\t\tCrBuiltinComputeMetadata(\"" + shaderName + "\", \"\", \"" + compilationDescriptor.uniqueBinaryName + "\", nullptr, " + crstl::string(0) + "), \n";
+				}
+				else
+				{
+					builtinShadersMetadataTable += "\t\t\tCrBuiltinShaderMetadata(\"" + shaderName + "\", \"\", \"" + compilationDescriptor.uniqueBinaryName + "\", " + 
+						shaderStageString.c_str() + ", nullptr, " + crstl::string(0) + "), \n";
+				}
 			}
 		}
 
-		builtinShadersMetadataTable += "};\n\n";
+		builtinShadersMetadataTable += "\t\t};\n\n";
+		builtinComputeMetadataTable += "\t\t};\n\n";
 
-		crstl::string namespaceDeclarationBegin;
-		namespaceDeclarationBegin += "namespace CrBuiltinShaders\n{\nnamespace ";
-		namespaceDeclarationBegin += graphicsApiString;
-		namespaceDeclarationBegin += "\n{\n";
+		crstl::string graphicsNamespaceDeclarationBegin;
+		graphicsNamespaceDeclarationBegin += "namespace CrBuiltinShaders\n{\n\tnamespace ";
+		graphicsNamespaceDeclarationBegin += graphicsApiString;
+		graphicsNamespaceDeclarationBegin += "\n\t{\n";
+
+		crstl::string computeNamespaceDeclarationBegin;
+		computeNamespaceDeclarationBegin += "namespace CrBuiltinCompute\n{\n\tnamespace ";
+		computeNamespaceDeclarationBegin += graphicsApiString;
+		computeNamespaceDeclarationBegin += "\n\t{\n";
 
 		crstl::string namespaceDeclarationEnd;
-		namespaceDeclarationEnd += "}\n}\n";
+		namespaceDeclarationEnd += "\t}\n}\n";
 
 		crstl::string builtinShadersHeader;
 		builtinShadersHeader += "#pragma once\n";
 		builtinShadersHeader += "\n";
-		builtinShadersHeader += namespaceDeclarationBegin;
-		builtinShadersHeader += "const CrBuiltinShaderMetadata& GetBuiltinShaderMetadata(CrBuiltinShaders::T builtinShader);\n";
+
+		builtinShadersHeader += graphicsNamespaceDeclarationBegin;
+		builtinShadersHeader += "\t\tconst CrBuiltinShaderMetadata& GetMetadata(CrBuiltinShaders::T builtinShader);\n";
+		builtinShadersHeader += namespaceDeclarationEnd;
+
+		builtinShadersHeader += "\n";
+
+		builtinShadersHeader += computeNamespaceDeclarationBegin;
+		builtinShadersHeader += "\t\tconst CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute);\n";
 		builtinShadersHeader += namespaceDeclarationEnd;
 
 		crstl::string builtinShadersCpp;
 		builtinShadersCpp += "#include \"BuiltinShaders.h\"\n";
 		builtinShadersCpp += "#include \"crstl/array.h\"\n";
 		builtinShadersCpp += "\n";
-		builtinShadersCpp += namespaceDeclarationBegin;
+
+		builtinShadersCpp += graphicsNamespaceDeclarationBegin;
 		builtinShadersCpp += builtinShaderDataCpp;
 		builtinShadersCpp += builtinShadersMetadataTable;
-		builtinShadersCpp += "const CrBuiltinShaderMetadata& GetBuiltinShaderMetadata(CrBuiltinShaders::T builtinShader)\n"
-		"{\n"
-			"\treturn BuiltinShaderMetadataTable[builtinShader];\n"
-		"}\n";
+		builtinShadersCpp += "\t\tconst CrBuiltinShaderMetadata& GetMetadata(CrBuiltinShaders::T builtinShader)\n"
+		"\t\t{\n"
+			"\t\t\treturn BuiltinShaderMetadataTable[builtinShader];\n"
+		"\t\t}\n";
+		builtinShadersCpp += namespaceDeclarationEnd;
+
+		builtinShadersCpp += "\n";
+
+		builtinShadersCpp += computeNamespaceDeclarationBegin;
+		builtinShadersCpp += builtinComputeDataCpp;
+		builtinShadersCpp += builtinComputeMetadataTable;
+		builtinShadersCpp += "\t\tconst CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute)\n"
+		"\t\t{\n"
+			"\t\t\treturn BuiltinComputeMetadataTable[builtinCompute];\n"
+		"\t\t}\n";
 		builtinShadersCpp += namespaceDeclarationEnd;
 
 		// Create header and cpp filenames
@@ -367,10 +464,13 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersGenericCpp += "\"\n";
 	}
 
-	builtinShadersGenericHeaderGetFunction += "\treturn InvalidBuiltinShaderMetadata;\n}\n}\n";
+	builtinShadersGenericHeaderGetFunction += "\t\treturn InvalidBuiltinShaderMetadata;\n\t}\n}\n";
+	builtinShadersGenericHeaderGetFunction += "\n";
+	builtinComputeGenericHeaderGetFunction += "\t\treturn InvalidBuiltinComputeMetadata;\n\t}\n}\n";
 
 	builtinShadersGenericHeader += "\n";
 	builtinShadersGenericHeader += builtinShadersGenericHeaderGetFunction;
+	builtinShadersGenericHeader += builtinComputeGenericHeaderGetFunction;
 
 	// Create header and cpp filenames
 	CrFixedPath headerPath = builtinShadersDescriptor.outputPath.c_str();

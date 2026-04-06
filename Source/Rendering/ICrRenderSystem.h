@@ -26,6 +26,8 @@ struct CrRenderSystemDescriptor
 
 namespace CrBuiltinShaders { enum T : uint32_t; };
 
+namespace CrBuiltinCompute { enum T : uint32_t; };
+
 struct CrRenderDeviceDescriptor;
 
 class ICrRenderSystem
@@ -54,9 +56,13 @@ public:
 
 	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const;
 
+	const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const;
+
 protected:
 
 	crstl::vector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
+
+	crstl::vector<CrShaderBytecodeHandle> m_builtinComputeBytecodes;
 
 	CrRenderDeviceHandle m_mainDevice;
 

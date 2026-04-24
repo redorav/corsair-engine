@@ -267,9 +267,9 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	m_colorsRWTexture = renderDevice->CreateTexture(rwTextureParams);
 
 	m_colorsRWTypedBuffer = renderDevice->CreateTypedBuffer(cr3d::MemoryAccess::GPUOnlyWrite, cr3d::DataFormat::RGBA8_Unorm, 128);
-	m_exampleComputePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::ExampleCompute);
-	m_depthDownsampleLinearize = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::DepthDownsampleLinearizeMinMax);
-	m_mouseSelectionResolvePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::EditorMouseSelectionResolveCS);
+	m_exampleComputePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::ExampleCompute);
+	m_depthDownsampleLinearize = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::DepthDownsampleLinearizeMinMax);
+	m_mouseSelectionResolvePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::EditorMouseSelectionResolveCS);
 
 	{
 		CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
@@ -278,9 +278,9 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 		m_copyTexturePipeline = BuiltinPipelines->GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
 	}
 
-	m_createIndirectArguments = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::CreateIndirectArguments);
+	m_createIndirectArguments = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::CreateIndirectArguments);
 
-	m_postProcessing = BuiltinPipelines->GetComputePipeline(CrBuiltinShaders::PostProcessingCS);
+	m_postProcessing = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::PostProcessingCS);
 
 	{
 		CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
@@ -566,6 +566,7 @@ void CrFrame::Process()
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepthMinMaxMipChain.get(), 1);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepthMinMaxMipChain.get(), 2);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepthMinMaxMipChain.get(), 3);
+		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip5, m_linearDepthMinMaxMipChain.get(), 4);
 		commandBuffer->Dispatch
 		(
 			(m_linearDepthMinMaxMipChain->GetWidth() + 7) / 8,

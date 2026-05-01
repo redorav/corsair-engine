@@ -121,11 +121,8 @@ workspace 'Corsair Engine'
 		--toolset('msc-llvm') -- Older versions of Clang in VS
 
 	filter('toolset:msc*')
-		flags
-		{
-			'multiprocessorcompile', -- /MP
-		}
-		
+		multiprocessorcompile('on')
+
 		buildoptions
 		{
 			'/permissive-'

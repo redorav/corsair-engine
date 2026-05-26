@@ -252,7 +252,7 @@ bool SpvStripDebugData(crstl::vector<uint32_t>& spirvData)
 }
 
 // Compile a given shader using the dxcompiler API
-HRESULT CrDXCCompileShader
+HRESULT CompileShaderDXC
 (
 	const CompilationDescriptor& compilationDescriptor,
 	const CComPtr<IDxcCompiler3>& dxcCompiler,
@@ -435,7 +435,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 	CComPtr<IDxcResult> dxcCompilationResult;
 	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = cr3d::GraphicsApi::Vulkan;
-	HRESULT compilationHResult = CrDXCCompileShader(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
+	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
 
 	HRESULT hResult;
 	dxcCompilationResult->GetStatus(&hResult);
@@ -647,7 +647,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 	CComPtr<CrDxcIncludeHandler> dxcIncludeHandler = new CrDxcIncludeHandler(dxcUtils);
 	
 	CComPtr<IDxcResult> dxcCompilationResult;
-	HRESULT compilationHResult = CrDXCCompileShader(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
+	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
 
 	HRESULT hResult;
 	dxcCompilationResult->GetStatus(&hResult);

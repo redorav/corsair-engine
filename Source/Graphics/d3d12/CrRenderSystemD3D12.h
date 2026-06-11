@@ -6,7 +6,7 @@ class CrRenderSystemD3D12 final : public ICrRenderSystem
 {
 public:
 
-	CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor);
+	CrRenderSystemD3D12(const crgfx::RenderSystemDescriptor& renderSystemDescriptor);
 
 	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) override;
 

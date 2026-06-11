@@ -23,7 +23,7 @@
 
 crstl::unique_ptr<ICrRenderSystem> RenderSystem = nullptr;
 
-ICrRenderSystem::ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor)
+ICrRenderSystem::ICrRenderSystem(const crgfx::RenderSystemDescriptor& renderSystemDescriptor)
 	: m_descriptor(renderSystemDescriptor)
 	, m_nvapiInitialized(false)
 {
@@ -68,7 +68,7 @@ ICrRenderSystem::~ICrRenderSystem()
 
 }
 
-void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
+void crgfx::Initialize(const crgfx::RenderSystemDescriptor& renderSystemDescriptor)
 {
 	ICrRenderSystem* renderSystem = nullptr;
 

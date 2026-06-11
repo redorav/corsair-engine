@@ -8,7 +8,7 @@
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrRenderSystemD3D12::CrRenderSystemD3D12(const CrRenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
+CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::RenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
 {
 	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
 	if (renderSystemDescriptor.enableNVAPI)

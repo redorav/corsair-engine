@@ -10,35 +10,40 @@
 #include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
 
-struct CrRenderSystemDescriptor 
-{
-	crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
-
-	// e.g. Vulkan layers, D3D debug layer
-	bool enableValidation = false;
-
-	bool enableRenderDoc = false;
-
-	bool enablePIX = false;
-
-	bool enableNVAPI = true;
-};
-
 namespace CrBuiltinShaders { enum T : uint32_t; };
 
 namespace CrBuiltinCompute { enum T : uint32_t; };
 
 struct CrRenderDeviceDescriptor;
 
+namespace crgfx
+{
+	struct RenderSystemDescriptor
+	{
+		crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
+
+		// e.g. Vulkan layers, D3D debug layer
+		bool enableValidation = false;
+
+		bool enableRenderDoc = false;
+
+		bool enablePIX = false;
+
+		bool enableNVAPI = true;
+	};
+
+	void Initialize(const RenderSystemDescriptor& renderSystemDescriptor);
+};
+
 class ICrRenderSystem
 {
 public:
 
-	ICrRenderSystem(const CrRenderSystemDescriptor& renderSystemDescriptor);
+	ICrRenderSystem(const crgfx::RenderSystemDescriptor& renderSystemDescriptor);
 
 	virtual ~ICrRenderSystem();
 
-	static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
+	//static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
 	// Only the render device calls these functions, as it knows what device we are using
 
@@ -66,7 +71,7 @@ protected:
 
 	CrRenderDeviceHandle m_mainDevice;
 
-	CrRenderSystemDescriptor m_descriptor;
+	crgfx::RenderSystemDescriptor m_descriptor;
 
 	CrRenderDoc m_renderDoc;
 

@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
 	CrPrintProcessMemory("Before Render Device");
 
-	CrRenderSystemDescriptor renderSystemDescriptor;
+	crgfx::RenderSystemDescriptor renderSystemDescriptor;
 	renderSystemDescriptor.graphicsApi      = crgfx::GraphicsApi::FromString(graphicsApiString.c_str());
 
 	// Default API is Vulkan
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	renderSystemDescriptor.enableRenderDoc = enableRenderDoc;
 	renderSystemDescriptor.enablePIX = enablePIX;
 
-	ICrRenderSystem::Initialize(renderSystemDescriptor);
+	crgfx::Initialize(renderSystemDescriptor);
 
 	CrRenderDeviceDescriptor renderDeviceDescriptor;
 	renderDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());

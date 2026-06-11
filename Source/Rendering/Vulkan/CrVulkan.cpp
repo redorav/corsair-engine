@@ -765,6 +765,7 @@ VkPipelineStageFlags crvk::GetVkPipelineStageFlags(const cr3d::TextureState& tex
 			break;
 		}
 		case cr3d::TextureLayout::Present:
+		case cr3d::TextureLayout::Undefined:
 			break;
 		default:
 			CrAssertMsg(false, "Unhandled case");

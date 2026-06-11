@@ -204,7 +204,7 @@ public:
 	void BindRenderTarget
 	(
 		ICrTexture* texture,
-		CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load,
+		CrRenderTargetLoadOp loadOp,
 		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
 		float4 clearColor = float4(),
 		uint32_t mipmap = 0, uint32_t slice = 0
@@ -213,7 +213,7 @@ public:
 	void BindDepthStencilTarget
 	(
 		ICrTexture* texture,
-		CrRenderTargetLoadOp loadOp = CrRenderTargetLoadOp::Load,
+		CrRenderTargetLoadOp loadOp,
 		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
 		float depthClearValue = 0.0f,
 		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare,

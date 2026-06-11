@@ -320,6 +320,8 @@ HRESULT CompileShaderDXC
 			}
 		}
 
+		arguments.push_back(L"-Wno-effects-syntax");
+
 		// Include defines here
 		crstl::vector<crstl::wstring> wDefines;
 		wDefines.resize(compilationDescriptor.defines.size());
@@ -437,17 +439,20 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = cr3d::GraphicsApi::Vulkan;
 	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
 
-	HRESULT hResult;
-	dxcCompilationResult->GetStatus(&hResult);
-
-	if (compilationHResult != S_OK || hResult != S_OK)
+	if (compilationHResult != S_OK)
 	{
-		IDxcBlobUtf8* errorMessage = nullptr;
-		dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
+		HRESULT hResult;
+		dxcCompilationResult->GetStatus(&hResult);
 
-		if (errorMessage)
+		if (hResult != S_OK)
 		{
-			compilationStatus += errorMessage->GetStringPointer();
+			IDxcBlobUtf8* errorMessage = nullptr;
+			dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
+
+			if (errorMessage)
+			{
+				compilationStatus += errorMessage->GetStringPointer();
+			}
 		}
 
 		return false;
@@ -772,5 +777,42 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 		writeFileStream << bytecode;
 
 		return true;
+	}
+}
+
+bool CrCompilerDXC::PreprocessHLSL(const crstl::string& shaderSource, const crstl::fixed_path512& shadeSourcePath, crstl::string& preprocessedSource)
+{
+	CComPtr<IDxcUtils> dxcUtils;
+	DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+
+	CComPtr<IDxcCompiler3> dxcCompiler;
+	DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+
+	CComPtr<CrDxcIncludeHandler> dxcIncludeHandler = new CrDxcIncludeHandler(dxcUtils);
+
+	DxcBuffer sourceCodeBuffer = { shaderSource.data(), (uint32_t)shaderSource.size(), 0 };
+	
+	crstl::wstring wInputPath;
+	wInputPath.append_convert(shadeSourcePath.c_str());
+
+	crstl::vector<const wchar_t*> arguments =
+	{
+		wInputPath.c_str(),
+		L"-P"
+	};
+
+	CComPtr<IDxcResult> dxcCompilationResult;
+	HRESULT hResult = dxcCompiler->Compile(&sourceCodeBuffer, arguments.data(), (uint32_t)arguments.size(), dxcIncludeHandler, IID_PPV_ARGS(&dxcCompilationResult));
+
+	if (hResult == S_OK)
+	{
+		CComPtr<IDxcBlobUtf8> preprocessedShaderBlob = nullptr;
+		dxcCompilationResult->GetOutput(DXC_OUT_HLSL, IID_PPV_ARGS(&preprocessedShaderBlob), nullptr);
+		preprocessedSource = (const char*)preprocessedShaderBlob->GetBufferPointer();
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }

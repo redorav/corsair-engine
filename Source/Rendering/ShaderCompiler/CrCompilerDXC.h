@@ -13,4 +13,6 @@ public:
 	static bool HLSLtoSPIRV(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus);
 
 	static bool HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus);
+
+	static bool PreprocessHLSL(const crstl::string& shaderSource, const crstl::string& rootPath, crstl::string& preprocessedSource);
 };

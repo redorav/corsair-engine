@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrGPUSynchronization.h"
+#include "Graphics/ICrGPUSynchronization.h"
 #include "d3d12.h"
 
 class ICrRenderDevice;

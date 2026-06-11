@@ -2,7 +2,7 @@
 
 #include "Core/CrTypedId.h"
 
-#include "Rendering/CrVisibility.h"
+#include "Graphics/CrVisibility.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
 

@@ -1,6 +1,6 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrCommonVertexLayouts.h"
+#include "Graphics/CrCommonVertexLayouts.h"
 
 CrVertexDescriptor SimpleVertexDescriptor
 ({

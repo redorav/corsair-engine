@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 struct CrRendererConfig
 {

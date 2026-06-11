@@ -2,7 +2,7 @@
 
 #include "d3d12.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 namespace CrCommandQueueType { enum T : uint32_t; }
 

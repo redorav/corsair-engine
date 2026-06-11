@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrCommandBuffer.h"
+#include "Graphics/ICrCommandBuffer.h"
 
 #include "CrPipelineVulkan.h"
 
@@ -8,9 +8,9 @@
 
 #include "CrVulkan.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
-#include "Rendering/CrCPUStackAllocator.h"
+#include "Graphics/CrCPUStackAllocator.h"
 
 class CrTextureVulkan;
 class ICrShaderBindingLayout;

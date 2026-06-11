@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrShader.h"
+#include "Graphics/ICrShader.h"
 #include <d3d12.h>
 
 class ICrRenderDevice;

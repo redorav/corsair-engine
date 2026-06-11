@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrGPUSynchronization.h"
+#include "Graphics/ICrGPUSynchronization.h"
 #include <vulkan/vulkan.h>
 
 class ICrRenderDevice;

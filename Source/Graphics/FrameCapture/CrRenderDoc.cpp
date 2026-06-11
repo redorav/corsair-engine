@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "CrRenderDoc.h"
 #include "renderdoc_app.h"
 
-#include "Rendering/ICrRenderSystem.h"
+#include "Graphics/ICrRenderSystem.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrFixedPath.h"

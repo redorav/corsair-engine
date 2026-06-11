@@ -1,8 +1,8 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrGPUTimingQueryTracker.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrCommandBuffer.h"
+#include "Graphics/CrGPUTimingQueryTracker.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/ICrCommandBuffer.h"
 
 void CrGPUTimingQueryTracker::Initialize(ICrRenderDevice* renderDevice, uint32_t maxFrames)
 {

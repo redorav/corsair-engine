@@ -1,7 +1,7 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrImage.h"
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrRendering.h"
 
 CrImageDescriptor::CrImageDescriptor()
 	: width(1)

@@ -2,7 +2,7 @@
 
 #include "CrRenderingForwardDeclarations.h"
 
-#include "Rendering/ICrGPUSynchronization.h"
+#include "Graphics/ICrGPUSynchronization.h"
 
 #include "crstl/deque.h"
 #include "crstl/fixed_vector.h"

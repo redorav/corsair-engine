@@ -1,11 +1,11 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrRenderMesh.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/ICrPipeline.h"
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrRenderMesh.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/ICrPipeline.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
 
 uint32_t CrRenderModelDescriptor::AddMaterial(const CrMaterialHandle& material)
 {

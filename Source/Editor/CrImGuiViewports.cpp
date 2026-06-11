@@ -5,7 +5,7 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
 
-#include "Rendering/CrRendererConfig.h"
+#include "Graphics/CrRendererConfig.h"
 
 #include <imgui.h>
 

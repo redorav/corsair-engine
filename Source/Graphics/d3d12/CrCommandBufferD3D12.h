@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/ICrCommandBuffer.h"
-#include "Rendering/CrRendering.h"
+#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/CrRendering.h"
 #include "CrGPUBufferD3D12.h"
 #include "CrGPUQueryPoolD3D12.h"
 #include "CrDescriptorHeapD3D12.h"

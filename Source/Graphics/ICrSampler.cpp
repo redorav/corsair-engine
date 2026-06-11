@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 #include "ICrSampler.h"
 
 #include "Core/CrMacros.h"
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 
 CrSamplerDescriptor::CrSamplerDescriptor() 
 	: minFilter(cr3d::Filter::Linear)

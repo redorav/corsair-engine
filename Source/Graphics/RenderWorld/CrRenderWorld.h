@@ -4,10 +4,10 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrLight.h"
-#include "Rendering/RenderWorld/CrModelInstance.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrLight.h"
+#include "Graphics/RenderWorld/CrModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
 

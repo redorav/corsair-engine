@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrCamera.h"
+#include "Graphics/CrCamera.h"
 
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrRendererConfig.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrRendererConfig.h"
 
 #include "Math/CrMath.h"
 #include "Math/CrHlslppVectorFloat.h"

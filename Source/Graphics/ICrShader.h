@@ -5,11 +5,11 @@
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
 
-#include "Rendering/CrVertexDescriptor.h"
-#include "Rendering/CrShaderReflectionHeader.h"
+#include "Graphics/CrVertexDescriptor.h"
+#include "Graphics/CrShaderReflectionHeader.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"

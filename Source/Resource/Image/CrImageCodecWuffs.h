@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ICrImageCodec.h"
-#include "Rendering/CrImage.h"
+#include "Graphics/CrImage.h"
 
 class CrImageDecoderWuffs final : public ICrImageDecoder
 {

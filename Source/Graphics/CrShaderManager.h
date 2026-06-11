@@ -2,7 +2,7 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 class ICrRenderDevice;
 

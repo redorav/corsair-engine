@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Rendering/CrVisibility.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/CrRenderMesh.h"
+#include "Graphics/CrVisibility.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/CrRenderMesh.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_vector.h"

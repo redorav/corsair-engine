@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "CrPIX.h"
 #include "Core/CrMacros.h"
 
-#include "Rendering/Extensions/CrPIXHeader.h"
+#include "Graphics/Extensions/CrPIXHeader.h"
 
 bool CrPIX::Initialize()
 {

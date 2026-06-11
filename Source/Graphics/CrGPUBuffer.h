@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrGPUDeletable.h"
-#include "Rendering/CrVertexDescriptor.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/CrVertexDescriptor.h"
 
 #include "Core/CrHash.h"
 #include "Core/CrCoreForwardDeclarations.h"

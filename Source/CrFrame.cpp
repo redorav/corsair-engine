@@ -2,33 +2,34 @@
 
 #include "Editor/CrEditor.h"
 
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrSwapchain.h"
-#include "Rendering/CrShaderManager.h"
-#include "Rendering/ICrShader.h"
-#include "Rendering/ICrTexture.h"
-#include "Rendering/ICrCommandBuffer.h"
-#include "Rendering/CrGPUBuffer.h"
-#include "Rendering/UI/CrImGuiRenderer.h"
-#include "Rendering/CrGPUTimingQueryTracker.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/ICrSwapchain.h"
+#include "Graphics/CrShaderManager.h"
+#include "Graphics/ICrShader.h"
+#include "Graphics/ICrTexture.h"
+#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/UI/CrImGuiRenderer.h"
+#include "Graphics/CrGPUTimingQueryTracker.h"
 
-#include "Rendering/CrCamera.h"
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrRenderMesh.h"
-#include "Rendering/CrMaterialCompiler.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/CrShaderSources.h"
-#include "Rendering/CrVisibility.h"
-#include "Rendering/CrCPUStackAllocator.h"
+#include "Graphics/CrCamera.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrRenderMesh.h"
+#include "Graphics/CrMaterialCompiler.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/CrShaderSources.h"
+#include "Graphics/CrVisibility.h"
+#include "Graphics/CrCPUStackAllocator.h"
+#include "Graphics/CrImage.h"
 
-#include "Rendering/RenderWorld/CrRenderWorld.h"
-#include "Rendering/RenderWorld/CrModelInstance.h"
+#include "Graphics/RenderWorld/CrRenderWorld.h"
+#include "Graphics/RenderWorld/CrModelInstance.h"
 
-#include "Rendering/CrRendererConfig.h"
-#include "Rendering/CrRenderingResources.h"
+#include "Graphics/CrRendererConfig.h"
+#include "Graphics/CrRenderingResources.h"
 
-#include "Rendering/CrCommonVertexLayouts.h"
+#include "Graphics/CrCommonVertexLayouts.h"
 
 #include "Core/Input/CrInputManager.h"
 #include "Core/CrPlatform.h"
@@ -45,7 +46,7 @@
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"
 
-#include "Rendering/Shaders/DirectLightingShared.hlsl"
+#include "Graphics/Shaders/DirectLightingShared.hlsl"
 
 #include <imgui.h>
 

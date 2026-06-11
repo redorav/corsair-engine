@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "CrImGuiRenderer.h"
 
@@ -6,18 +6,18 @@
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 
-#include "Rendering/CrGPUBuffer.h"
-#include "Rendering/ICrShader.h"
-#include "Rendering/CrShaderManager.h"
-#include "Rendering/ICrTexture.h"
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrCommandBuffer.h"
-#include "Rendering/ICrSampler.h"
-#include "Rendering/CrRenderPassDescriptor.h"
-#include "Rendering/CrRenderGraph.h"
-#include "Rendering/CrRenderingResources.h"
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/ICrShader.h"
+#include "Graphics/CrShaderManager.h"
+#include "Graphics/ICrTexture.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICrSampler.h"
+#include "Graphics/CrRenderPassDescriptor.h"
+#include "Graphics/CrRenderGraph.h"
+#include "Graphics/CrRenderingResources.h"
+#include "Graphics/CrRendering.h"
 
 #include "CrOSWindow.h"
 

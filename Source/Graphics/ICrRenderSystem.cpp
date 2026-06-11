@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "ICrRenderSystem.h"
 
@@ -15,7 +15,7 @@
 #endif
 
 #include "Core/Streams/CrMemoryStream.h"
-#include "Rendering/ICrShader.h"
+#include "Graphics/ICrShader.h"
 
 #include "GeneratedShaders/BuiltinShaders.h"
 

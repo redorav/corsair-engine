@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrSwapchain.h"
+#include "Graphics/ICrSwapchain.h"
 
 #include "d3d12.h"
 

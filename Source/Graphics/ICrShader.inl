@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/CrShaderResourceMetadata.h"
+#include "Graphics/CrShaderResourceMetadata.h"
 #include "GeneratedShaders/ShaderMetadata.h"
 
 template<typename FunctionT>

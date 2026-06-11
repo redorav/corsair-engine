@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "ICrRenderSystem.h"
 #include "ICrRenderDevice.h"
@@ -16,8 +16,8 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"
 
-#include "Rendering/CrGPUDeletionQueue.h"
-#include "Rendering/CrGPUTransferCallbackQueue.h"
+#include "Graphics/CrGPUDeletionQueue.h"
+#include "Graphics/CrGPUTransferCallbackQueue.h"
 
 #include "crstl/timer.h"
 

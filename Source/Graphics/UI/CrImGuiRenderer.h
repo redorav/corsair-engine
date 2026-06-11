@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrBuiltinPipeline.h"
-#include "Rendering/ICrTexture.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/ICrTexture.h"
 
 #include "crstl/intrusive_ptr.h"
 

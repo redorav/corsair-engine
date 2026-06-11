@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrGPUQueryPool.h"
+#include "Graphics/ICrGPUQueryPool.h"
 #include <vulkan/vulkan.h>
 
 class ICrRenderDevice;

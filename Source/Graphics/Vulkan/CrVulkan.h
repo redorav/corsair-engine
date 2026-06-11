@@ -2,8 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrDataFormats.h"
 
 extern PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName;
 extern PFN_vkSetDebugUtilsObjectTagEXT     vkSetDebugUtilsObjectTag;

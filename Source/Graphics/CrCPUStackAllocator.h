@@ -2,7 +2,7 @@
 
 #include "Core/CrAlignment.h"
 
-#include "Rendering/CrStackAllocator.h"
+#include "Graphics/CrStackAllocator.h"
 
 #include "crstl/intrusive_ptr.h"
 

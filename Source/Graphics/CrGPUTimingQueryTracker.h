@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/ICrGPUQueryPool.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/ICrGPUQueryPool.h"
 
 #include "Core/CrHash.h"
 

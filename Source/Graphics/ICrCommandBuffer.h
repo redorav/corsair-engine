@@ -1,24 +1,24 @@
 #pragma once
 
-#include "Rendering/ICrPipeline.h"
+#include "Graphics/ICrPipeline.h"
 
-#include "Rendering/CrGPUBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
 
-#include "Rendering/ICrTexture.h"
+#include "Graphics/ICrTexture.h"
 
-#include "Rendering/CrGPUDeletable.h"
+#include "Graphics/CrGPUDeletable.h"
 
-#include "Rendering/CrRenderingStatistics.h"
+#include "Graphics/CrRenderingStatistics.h"
 
-#include "Rendering/CrRenderPassDescriptor.h"
+#include "Graphics/CrRenderPassDescriptor.h"
 
-#include "Rendering/CrGPUStackAllocator.h"
+#include "Graphics/CrGPUStackAllocator.h"
 
-#include "Rendering/ICrGPUSynchronization.h"
+#include "Graphics/ICrGPUSynchronization.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #define COMMAND_BUFFER_VALIDATION
 

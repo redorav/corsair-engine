@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 #include "CrShaderD3D12.h"
 #include "CrRenderDeviceD3D12.h"
 
-#include "Rendering/CrShaderResourceMetadata.h"
-#include "Rendering/ICrShader.inl"
+#include "Graphics/CrShaderResourceMetadata.h"
+#include "Graphics/ICrShader.inl"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"

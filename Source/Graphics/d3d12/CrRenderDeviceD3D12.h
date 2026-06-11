@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/ICrRenderDevice.h"
+#include "Graphics/ICrRenderDevice.h"
 
-#include "Rendering/ICrGPUSynchronization.h"
+#include "Graphics/ICrGPUSynchronization.h"
 
 #include "CrDescriptorHeapD3D12.h"
 

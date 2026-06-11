@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrPipeline.h"
+#include "Graphics/ICrPipeline.h"
 
 class CrRenderDeviceD3D12;
 

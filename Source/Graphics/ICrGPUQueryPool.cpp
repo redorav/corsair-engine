@@ -1,7 +1,7 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/ICrGPUQueryPool.h"
-#include "Rendering/ICrCommandBuffer.h"
+#include "Graphics/ICrGPUQueryPool.h"
+#include "Graphics/ICrCommandBuffer.h"
 
 #include "Math/CrMath.h"
 

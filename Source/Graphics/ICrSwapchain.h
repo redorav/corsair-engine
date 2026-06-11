@@ -2,8 +2,8 @@
 
 #include "ICrGPUSynchronization.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/ICrTexture.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/ICrTexture.h"
 
 #include "crstl/fixed_string.h"
 #include "crstl/vector.h"

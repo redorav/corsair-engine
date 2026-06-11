@@ -1,6 +1,6 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrGPUBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
 #include "CrRenderMesh.h"
 
 CrRenderMesh::~CrRenderMesh()

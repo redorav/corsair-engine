@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrGPUDeletable.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGPUDeletable.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrSampler.h"
+#include "Graphics/ICrSampler.h"
 
 #include "CrD3D12.h"
 #include "CrDescriptorHeapD3D12.h"

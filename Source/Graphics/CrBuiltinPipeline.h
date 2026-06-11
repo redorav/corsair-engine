@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/ICrPipeline.h"
-#include "Rendering/CrVertexDescriptor.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/ICrPipeline.h"
+#include "Graphics/CrVertexDescriptor.h"
 
 #include "crstl/open_hashmap.h"
 

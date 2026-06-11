@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #define VMA_IMPLEMENTATION
 #include "CrVMA.h"
@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 
 VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 {

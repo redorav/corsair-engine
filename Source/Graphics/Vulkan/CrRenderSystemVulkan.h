@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrRenderSystem.h"
+#include "Graphics/ICrRenderSystem.h"
 
 #include "crstl/open_hashmap.h"
 #include "crstl/string.h"

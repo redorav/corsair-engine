@@ -1,11 +1,11 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrBuiltinPipeline.h"
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrShader.h"
-#include "Rendering/CrRendererConfig.h"
-#include "Rendering/CrCommonVertexLayouts.h"
+#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/ICrShader.h"
+#include "Graphics/CrRendererConfig.h"
+#include "Graphics/CrCommonVertexLayouts.h"
 
 #include "Core/CrGlobalPaths.h"
 #include "crstl/process.h"

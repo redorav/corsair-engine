@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrRenderSystem.h"
+#include "Graphics/ICrRenderSystem.h"
 
 class CrRenderSystemD3D12 final : public ICrRenderSystem
 {

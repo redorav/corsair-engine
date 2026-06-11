@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrShaderDiskCache.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrShaderDiskCache.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/CrVisibility.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrVertexDescriptor.h"
+#include "Graphics/CrVisibility.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrVertexDescriptor.h"
 
 #include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"

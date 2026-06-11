@@ -5,12 +5,12 @@
 #include "Core/Input/CrInputManager.h"
 #include "Core/CrFrameTime.h"
 
-#include "Rendering/RenderWorld/CrRenderWorld.h"
-#include "Rendering/CrCamera.h"
-#include "Rendering/CrBuiltinPipeline.h"
-#include "Rendering/CrShapeBuilder.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/ICrShader.h"
+#include "Graphics/RenderWorld/CrRenderWorld.h"
+#include "Graphics/CrCamera.h"
+#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrShapeBuilder.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/ICrShader.h"
 
 #include "Math/CrHlslppQuaternion.h"
 #include "Math/CrHlslppMatrixFloat.h"

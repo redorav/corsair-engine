@@ -2,13 +2,13 @@
 
 #include "CrModelDecoderUFBX.h"
 
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/CrImage.h"
-#include "Rendering/CrMaterialCompiler.h"
-#include "Rendering/CrCommonVertexLayouts.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrMaterialCompiler.h"
+#include "Graphics/CrCommonVertexLayouts.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

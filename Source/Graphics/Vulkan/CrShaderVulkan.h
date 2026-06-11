@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrShader.h"
+#include "Graphics/ICrShader.h"
 #include <vulkan/vulkan.h>
 
 class ICrRenderDevice;

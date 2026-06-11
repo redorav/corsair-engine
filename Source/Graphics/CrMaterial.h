@@ -3,9 +3,9 @@
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
 
-#include "Rendering/ICrPipeline.h"
-#include "Rendering/ICrTexture.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/ICrPipeline.h"
+#include "Graphics/ICrTexture.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 

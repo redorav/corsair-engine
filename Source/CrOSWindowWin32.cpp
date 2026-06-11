@@ -4,8 +4,8 @@
 #include "Core/Input/CrInputManager.h"
 #include "Core/Input/CrPlatformInput.h"
 
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
 
 #include <windows.h>
 

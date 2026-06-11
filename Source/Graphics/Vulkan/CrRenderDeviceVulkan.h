@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrRenderDevice.h"
+#include "Graphics/ICrRenderDevice.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
 

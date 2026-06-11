@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/CrGPUBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
 #include "d3d12.h"
 
 #include "Core/Logging/ICrDebug.h"

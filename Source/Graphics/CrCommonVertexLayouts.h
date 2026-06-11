@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/CrGPUBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
 
 struct SimpleVertex
 {

@@ -6,9 +6,9 @@
 #include "Core/Streams/CrFileStream.h"
 #include "Core/CrMacros.h"
 
-#include "Rendering/CrImage.h"
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrDataFormats.h"
 
 #include "ddspp.h"
 

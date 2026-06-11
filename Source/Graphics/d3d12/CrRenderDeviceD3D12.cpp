@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "CrRenderSystemD3D12.h"
 #include "CrRenderDeviceD3D12.h"

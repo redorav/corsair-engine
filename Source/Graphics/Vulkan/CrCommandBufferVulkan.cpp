@@ -1,4 +1,4 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
 #include "CrCommandBufferVulkan.h"
 #include "CrRenderDeviceVulkan.h"
@@ -6,9 +6,9 @@
 #include "CrSamplerVulkan.h"
 #include "CrShaderVulkan.h"
 #include "CrGPUBufferVulkan.h"
-#include "Rendering/CrRenderPassDescriptor.h"
-#include "Rendering/CrShaderResourceMetadata.h"
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRenderPassDescriptor.h"
+#include "Graphics/CrShaderResourceMetadata.h"
+#include "Graphics/CrRendering.h"
 
 #include "Core/Logging/ICrDebug.h"
 

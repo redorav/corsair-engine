@@ -1,13 +1,11 @@
 #pragma once
 
-#include "stdint.h"
-
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrGPUDeletable.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/CrDataFormats.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_string.h"

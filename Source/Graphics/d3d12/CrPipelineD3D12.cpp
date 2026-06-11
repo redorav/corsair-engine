@@ -1,13 +1,13 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/ICrRenderSystem.h"
+#include "Graphics/ICrRenderSystem.h"
 
 #include "CrPipelineD3D12.h"
 #include "CrRenderDeviceD3D12.h"
 #include "CrShaderD3D12.h"
 #include "CrD3D12.h"
 
-#include "Rendering/Extensions/CrNVAPIHeader.h"
+#include "Graphics/Extensions/CrNVAPIHeader.h"
 
 CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 (

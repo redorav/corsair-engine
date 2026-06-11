@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 #include "Core/CrPlatform.h"
 #include "Core/FileSystem/CrFixedPath.h"
 

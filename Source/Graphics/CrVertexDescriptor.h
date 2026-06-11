@@ -6,9 +6,9 @@
 #include "crstl/bitset.h"
 #include "crstl/string.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrDataFormats.h"
 
 #include "Math/CrVectorT.h"
 

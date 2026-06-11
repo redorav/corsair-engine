@@ -2,7 +2,7 @@
 
 #include "ICrModelDecoder.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 struct aiScene;
 struct aiMesh;

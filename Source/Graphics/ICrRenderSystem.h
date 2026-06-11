@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
-#include "Rendering/FrameCapture/CrRenderDoc.h"
-#include "Rendering/FrameCapture/CrPIX.h"
+#include "Graphics/FrameCapture/CrRenderDoc.h"
+#include "Graphics/FrameCapture/CrPIX.h"
 
 #include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"

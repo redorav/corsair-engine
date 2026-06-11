@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrRenderGraph.h"
-#include "Rendering/CrBuiltinPipeline.h"
-#include "Rendering/RenderWorld/CrRenderWorld.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderGraph.h"
+#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/RenderWorld/CrRenderWorld.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

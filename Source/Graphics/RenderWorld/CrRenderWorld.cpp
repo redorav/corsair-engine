@@ -1,11 +1,11 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/RenderWorld/CrRenderWorld.h"
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrRenderMesh.h"
-#include "Rendering/CrCamera.h"
+#include "Graphics/RenderWorld/CrRenderWorld.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrRenderMesh.h"
+#include "Graphics/CrCamera.h"
 
-#include "Rendering/CrCPUStackAllocator.h"
+#include "Graphics/CrCPUStackAllocator.h"
 
 #include "crstl/sort.h"
 

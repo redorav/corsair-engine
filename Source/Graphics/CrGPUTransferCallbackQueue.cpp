@@ -1,9 +1,9 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/ICrGPUSynchronization.h"
-#include "Rendering/CrGPUBuffer.h"
-#include "Rendering/CrGPUTransferCallbackQueue.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/CrGPUTransferCallbackQueue.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrFrameTime.h"

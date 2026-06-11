@@ -1,4 +1,4 @@
-#include "Rendering/ShaderCompiler/CrShaderCompiler_pch.h"
+#include "Graphics/ShaderCompiler/CrShaderCompiler_pch.h"
 
 #include "CrCompilerDXC.h"
 
@@ -17,8 +17,8 @@
 
 #include "CrShaderCompiler.h"
 
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrShaderReflectionHeader.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrShaderReflectionHeader.h"
 
 #include "Core/Streams/CrFileStream.h"
 #include "Core/CrHash.h"

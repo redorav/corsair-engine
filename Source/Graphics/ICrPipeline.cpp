@@ -1,8 +1,8 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/ICrPipeline.h"
-#include "Rendering/ICrShader.h"
-#include "Rendering/CrVertexDescriptor.h"
+#include "Graphics/ICrPipeline.h"
+#include "Graphics/ICrShader.h"
+#include "Graphics/CrVertexDescriptor.h"
 
 CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 {

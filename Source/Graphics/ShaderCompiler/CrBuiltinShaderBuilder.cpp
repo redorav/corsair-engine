@@ -1,4 +1,4 @@
-#include "Rendering/ShaderCompiler/CrShaderCompiler_pch.h"
+#include "Graphics/ShaderCompiler/CrShaderCompiler_pch.h"
 
 #include "CrShaderCompiler.h"
 #include "CrBuiltinShaderBuilder.h"
@@ -248,7 +248,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "#pragma once\n\n";
 	builtinShadersGenericHeader += "#include \"Core/CrCoreForwardDeclarations.h\"\n";
 	builtinShadersGenericHeader += "#include \"crstl/string.h\"\n";
-	builtinShadersGenericHeader += "#include \"Rendering/CrRendering.h\"\n";
+	builtinShadersGenericHeader += "#include \"Graphics/CrRendering.h\"\n";
 	builtinShadersGenericHeader += "\n";
 	builtinShadersGenericHeader += builtinShadersEnum;
 	builtinShadersGenericHeader += "\n\n";
@@ -289,7 +289,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinComputeGenericHeaderGetFunction += "namespace CrBuiltinCompute\n{\n";
 	builtinComputeGenericHeaderGetFunction += "\tinline const CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute, cr3d::GraphicsApi::T graphicsApi)\n\t{\n";
 	
-	builtinShadersGenericCpp += "#include \"Rendering/CrRendering_pch.h\"\n";
+	builtinShadersGenericCpp += "#include \"Graphics/CrRendering_pch.h\"\n";
 	builtinShadersGenericCpp += "\n";
 
 	for(cr3d::GraphicsApi::T graphicsApi : builtinShadersDescriptor.graphicsApis)

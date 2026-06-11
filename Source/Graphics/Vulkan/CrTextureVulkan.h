@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrTexture.h"
+#include "Graphics/ICrTexture.h"
 
 #include <vulkan/vulkan.h>
 #include "CrVMA.h"

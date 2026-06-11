@@ -2,10 +2,10 @@
 
 #include "CrResourceManager.h"
 
-#include "Rendering/CrImage.h"
-#include "Rendering/ICrTexture.h"
-#include "Rendering/CrGPUBuffer.h"
-#include "Rendering/CrRenderModel.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/ICrTexture.h"
+#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"
 #include "Core/Logging/ICrDebug.h"

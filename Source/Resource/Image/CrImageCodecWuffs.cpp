@@ -2,9 +2,9 @@
 
 #include "CrImageCodecWuffs.h"
 
-#include "Rendering/CrImage.h"
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrDataFormats.h"
 
 #pragma warning(push, 0)
 #include <wuffs-unsupported-snapshot.c>

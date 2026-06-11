@@ -1,4 +1,4 @@
-#include "Rendering/ShaderCompiler/CrShaderCompiler_pch.h"
+#include "Graphics/ShaderCompiler/CrShaderCompiler_pch.h"
 
 #include "CrShaderMetadataBuilder.h"
 #include "CrShaderCompilerUtilities.h"
@@ -9,7 +9,7 @@
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 
 #include "spirv_reflect.h"
 

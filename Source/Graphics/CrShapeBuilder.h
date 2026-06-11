@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrRenderMesh.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderMesh.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 

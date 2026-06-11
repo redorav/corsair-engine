@@ -2,16 +2,16 @@
 
 #include "CrModelDecoderCGLTF.h"
 
-#include "Rendering/ICrRenderSystem.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/CrMaterialCompiler.h"
-#include "Rendering/CrMaterial.h"
-#include "Rendering/CrRenderModel.h"
-#include "Rendering/CrRenderMesh.h"
-#include "Rendering/ICrTexture.h"
-#include "Rendering/CrImage.h"
-#include "Rendering/CrCommonVertexLayouts.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/CrMaterialCompiler.h"
+#include "Graphics/CrMaterial.h"
+#include "Graphics/CrRenderModel.h"
+#include "Graphics/CrRenderMesh.h"
+#include "Graphics/ICrTexture.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrCommonVertexLayouts.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

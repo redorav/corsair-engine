@@ -1,12 +1,12 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 #include "CrShaderVulkan.h"
 #include "CrRenderDeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "renderdoc_app.h"
 
-#include "Rendering/CrShaderResourceMetadata.h"
-#include "Rendering/ICrShader.inl"
+#include "Graphics/CrShaderResourceMetadata.h"
+#include "Graphics/ICrShader.inl"
 
 #include "Core/Logging/ICrDebug.h"
 

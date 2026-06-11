@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/ICrSwapchain.h"
-#include "Rendering/CrRenderingForwardDeclarations.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/ICrSwapchain.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrDataFormats.h"
 
 #include "Math/CrMath.h"
 

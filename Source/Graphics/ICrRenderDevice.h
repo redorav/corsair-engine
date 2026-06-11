@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/CrRendering.h"
+#include "Graphics/CrRendering.h"
 
-#include "Rendering/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "Core/CrHash.h"
 

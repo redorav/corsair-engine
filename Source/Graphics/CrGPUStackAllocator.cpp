@@ -1,8 +1,8 @@
-#include "Rendering/CrRendering_pch.h"
+#include "Graphics/CrRendering_pch.h"
 
-#include "Rendering/CrGPUStackAllocator.h"
-#include "Rendering/ICrRenderDevice.h"
-#include "Rendering/CrGPUBuffer.h"
+#include "Graphics/CrGPUStackAllocator.h"
+#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/CrGPUBuffer.h"
 
 #include "Core/CrAlignment.h"
 

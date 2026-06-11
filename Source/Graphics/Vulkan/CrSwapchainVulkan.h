@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/ICrSwapchain.h"
+#include "Graphics/ICrSwapchain.h"
 #include <vulkan/vulkan.h>
 
 class CrSwapchainVulkan final : public ICrSwapchain

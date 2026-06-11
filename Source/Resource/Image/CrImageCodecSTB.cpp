@@ -2,9 +2,9 @@
 
 #include "CrImageCodecSTB.h"
 
-#include "Rendering/CrImage.h"
-#include "Rendering/CrRendering.h"
-#include "Rendering/CrDataFormats.h"
+#include "Graphics/CrImage.h"
+#include "Graphics/CrRendering.h"
+#include "Graphics/CrDataFormats.h"
 
 #pragma warning(push, 0)
 #define STBI_NO_STDIO

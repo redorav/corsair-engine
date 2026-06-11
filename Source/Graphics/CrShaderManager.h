@@ -14,7 +14,7 @@ class CrShaderManager
 {
 public:
 
-	static const char* GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi);
+	static const char* GetShaderBytecodeExtension(crgfx::GraphicsApi::T graphicsApi);
 
 	static void Initialize(ICrRenderDevice* renderDevice);
 
@@ -30,7 +30,7 @@ public:
 
 	CrComputeShaderHandle CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
-	CrFixedPath GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const;
+	CrFixedPath GetCompiledShadersPath(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi) const;
 
 protected:
 

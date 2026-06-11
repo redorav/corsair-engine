@@ -76,7 +76,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 
 		m_vkShaderModules.push_back(vkShaderModule);
 
-		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderReflectionResource& resource)
+		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](crgfx::ShaderStage::T stage, const CrShaderReflectionResource& resource)
 		{
 			VkDescriptorSetLayoutBinding layoutBinding;
 			layoutBinding.binding = resource.bindPoint;
@@ -88,14 +88,14 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, co
 			layoutBindings.push_back(layoutBinding);
 		});
 
-		if (reflectionHeader.shaderStage == cr3d::ShaderStage::Vertex)
+		if (reflectionHeader.shaderStage == crgfx::ShaderStage::Vertex)
 		{
 			for (uint32_t i = 0; i < reflectionHeader.stageInputs.size(); ++i)
 			{
 				const CrShaderInterfaceVariable& interfaceVariable = reflectionHeader.stageInputs[i];
 
 				// We don't want to register built-ins
-				if (interfaceVariable.type == cr3d::ShaderInterfaceBuiltinType::None)
+				if (interfaceVariable.type == crgfx::ShaderInterfaceBuiltinType::None)
 				{
 					CrVertexInput& input = m_inputSignature.inputs.push_back();
 					input.semantic = CrVertexSemantic::FromString(interfaceVariable.name.c_str());
@@ -141,7 +141,7 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(ICrRenderDevice* renderDevice, cons
 	crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;
 
-	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](cr3d::ShaderStage::T stage, const CrShaderReflectionResource& resource)
+	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](crgfx::ShaderStage::T stage, const CrShaderReflectionResource& resource)
 	{
 		VkDescriptorSetLayoutBinding layoutBinding;
 		layoutBinding.binding = resource.bindPoint;

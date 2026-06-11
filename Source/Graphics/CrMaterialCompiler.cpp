@@ -105,7 +105,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 {
 	unused_parameter(descriptor); // TODO
 
-	cr3d::GraphicsApi::T graphicsApi = RenderSystem->GetGraphicsApi();
+	crgfx::GraphicsApi::T graphicsApi = RenderSystem->GetGraphicsApi();
 	cr::Platform::T platform = cr::Platform::Windows;
 
 	// Generate header with defines
@@ -138,7 +138,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	baseShaderDescriptor.platform = platform;
 	baseShaderDescriptor.graphicsApi = graphicsApi;
 
-	crstl::string entryPoints[cr3d::ShaderStage::GraphicsStageCount] =
+	crstl::string entryPoints[crgfx::ShaderStage::GraphicsStageCount] =
 	{
 		"UbershaderVS",
 		"UbershaderPS",
@@ -154,7 +154,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 		CrMaterialShaderDescriptor materialShaderDescriptor = baseShaderDescriptor;
 		materialShaderDescriptor.shaderVariant = variant;
 
-		for (cr3d::ShaderStage::T stage = cr3d::ShaderStage::Vertex; stage <= cr3d::ShaderStage::Pixel; ++stage)
+		for (crgfx::ShaderStage::T stage = crgfx::ShaderStage::Vertex; stage <= crgfx::ShaderStage::Pixel; ++stage)
 		{
 			materialShaderDescriptor.shaderStage = stage;
 

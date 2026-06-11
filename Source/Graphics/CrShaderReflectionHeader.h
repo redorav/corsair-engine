@@ -15,7 +15,7 @@ namespace CrShaderReflectionVersion
 struct CrShaderReflectionResource
 {
 	uint8_t bindPoint;
-	cr3d::ShaderResourceType::T type;
+	crgfx::ShaderResourceType::T type;
 	crstl::string name;
 };
 
@@ -31,7 +31,7 @@ StreamT& operator << (StreamT& stream, CrShaderReflectionResource& resource)
 struct CrShaderInterfaceVariable
 {
 	uint8_t bindPoint;
-	cr3d::ShaderInterfaceBuiltinType::T type;
+	crgfx::ShaderInterfaceBuiltinType::T type;
 	crstl::string name;
 };
 
@@ -88,7 +88,7 @@ struct CrShaderReflectionHeader
 	CrShaderReflectionVersion::T version = CrShaderReflectionVersion::CurrentVersion;
 
 	crstl::string entryPoint;
-	cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
+	crgfx::ShaderStage::T shaderStage = crgfx::ShaderStage::Count;
 	uint64_t bytecodeHash = (uint64_t)-1;
 	
 	crstl::vector<CrShaderReflectionResource> constantBuffers;

@@ -9,7 +9,7 @@
 
 #include "Graphics/CrRendering.h"
 
-VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
+VkFormat crvk::GetVkFormat(crgfx::DataFormat::T format)
 {
 	switch (format)
 	{
@@ -18,154 +18,154 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 		//-------------
 
 		// 8-bit formats
-		case cr3d::DataFormat::R8_Unorm:          return VK_FORMAT_R8_UNORM;
-		case cr3d::DataFormat::R8_Snorm:          return VK_FORMAT_R8_SNORM;
-		case cr3d::DataFormat::R8_Uint:           return VK_FORMAT_R8_UINT;
-		case cr3d::DataFormat::R8_Sint:           return VK_FORMAT_R8_SINT;
+		case crgfx::DataFormat::R8_Unorm:          return VK_FORMAT_R8_UNORM;
+		case crgfx::DataFormat::R8_Snorm:          return VK_FORMAT_R8_SNORM;
+		case crgfx::DataFormat::R8_Uint:           return VK_FORMAT_R8_UINT;
+		case crgfx::DataFormat::R8_Sint:           return VK_FORMAT_R8_SINT;
 
-		case cr3d::DataFormat::RG8_Unorm:         return VK_FORMAT_R8G8_UNORM;
-		case cr3d::DataFormat::RG8_Snorm:         return VK_FORMAT_R8G8_SNORM;
-		case cr3d::DataFormat::RG8_Uint:          return VK_FORMAT_R8G8_UINT;
-		case cr3d::DataFormat::RG8_Sint:          return VK_FORMAT_R8G8_SINT;
+		case crgfx::DataFormat::RG8_Unorm:         return VK_FORMAT_R8G8_UNORM;
+		case crgfx::DataFormat::RG8_Snorm:         return VK_FORMAT_R8G8_SNORM;
+		case crgfx::DataFormat::RG8_Uint:          return VK_FORMAT_R8G8_UINT;
+		case crgfx::DataFormat::RG8_Sint:          return VK_FORMAT_R8G8_SINT;
 
-		case cr3d::DataFormat::RGBA8_Unorm:       return VK_FORMAT_R8G8B8A8_UNORM;
-		case cr3d::DataFormat::RGBA8_Snorm:       return VK_FORMAT_R8G8B8A8_SNORM;
-		case cr3d::DataFormat::RGBA8_Uint:        return VK_FORMAT_R8G8B8A8_UINT;
-		case cr3d::DataFormat::RGBA8_Sint:        return VK_FORMAT_R8G8B8A8_SINT;
-		case cr3d::DataFormat::RGBA8_SRGB:        return VK_FORMAT_R8G8B8A8_SRGB;
+		case crgfx::DataFormat::RGBA8_Unorm:       return VK_FORMAT_R8G8B8A8_UNORM;
+		case crgfx::DataFormat::RGBA8_Snorm:       return VK_FORMAT_R8G8B8A8_SNORM;
+		case crgfx::DataFormat::RGBA8_Uint:        return VK_FORMAT_R8G8B8A8_UINT;
+		case crgfx::DataFormat::RGBA8_Sint:        return VK_FORMAT_R8G8B8A8_SINT;
+		case crgfx::DataFormat::RGBA8_SRGB:        return VK_FORMAT_R8G8B8A8_SRGB;
 
-		case cr3d::DataFormat::BGRA8_Unorm:       return VK_FORMAT_B8G8R8A8_UNORM;
-		case cr3d::DataFormat::BGRA8_SRGB:        return VK_FORMAT_B8G8R8A8_SRGB;
+		case crgfx::DataFormat::BGRA8_Unorm:       return VK_FORMAT_B8G8R8A8_UNORM;
+		case crgfx::DataFormat::BGRA8_SRGB:        return VK_FORMAT_B8G8R8A8_SRGB;
 
 		// 16-bit integer formats
-		case cr3d::DataFormat::R16_Unorm:         return VK_FORMAT_R16_UNORM;
-		case cr3d::DataFormat::R16_Snorm:         return VK_FORMAT_R16_SNORM;
-		case cr3d::DataFormat::R16_Uint:          return VK_FORMAT_R16_UINT;
-		case cr3d::DataFormat::R16_Sint:          return VK_FORMAT_R16_SINT;
+		case crgfx::DataFormat::R16_Unorm:         return VK_FORMAT_R16_UNORM;
+		case crgfx::DataFormat::R16_Snorm:         return VK_FORMAT_R16_SNORM;
+		case crgfx::DataFormat::R16_Uint:          return VK_FORMAT_R16_UINT;
+		case crgfx::DataFormat::R16_Sint:          return VK_FORMAT_R16_SINT;
 
-		case cr3d::DataFormat::RG16_Unorm:        return VK_FORMAT_R16G16_UNORM;
-		case cr3d::DataFormat::RG16_Snorm:        return VK_FORMAT_R16G16_SNORM;
-		case cr3d::DataFormat::RG16_Uint:         return VK_FORMAT_R16G16_UINT;
-		case cr3d::DataFormat::RG16_Sint:         return VK_FORMAT_R16G16_SINT;
+		case crgfx::DataFormat::RG16_Unorm:        return VK_FORMAT_R16G16_UNORM;
+		case crgfx::DataFormat::RG16_Snorm:        return VK_FORMAT_R16G16_SNORM;
+		case crgfx::DataFormat::RG16_Uint:         return VK_FORMAT_R16G16_UINT;
+		case crgfx::DataFormat::RG16_Sint:         return VK_FORMAT_R16G16_SINT;
 
-		case cr3d::DataFormat::RGBA16_Unorm:      return VK_FORMAT_R16G16B16A16_UNORM;
-		case cr3d::DataFormat::RGBA16_Snorm:      return VK_FORMAT_R16G16B16A16_SNORM;
-		case cr3d::DataFormat::RGBA16_Uint:       return VK_FORMAT_R16G16B16A16_UINT;
-		case cr3d::DataFormat::RGBA16_Sint:       return VK_FORMAT_R16G16B16A16_SINT;
+		case crgfx::DataFormat::RGBA16_Unorm:      return VK_FORMAT_R16G16B16A16_UNORM;
+		case crgfx::DataFormat::RGBA16_Snorm:      return VK_FORMAT_R16G16B16A16_SNORM;
+		case crgfx::DataFormat::RGBA16_Uint:       return VK_FORMAT_R16G16B16A16_UINT;
+		case crgfx::DataFormat::RGBA16_Sint:       return VK_FORMAT_R16G16B16A16_SINT;
 
 		// 16-bit float formats
-		case cr3d::DataFormat::R16_Float:         return VK_FORMAT_R16_SFLOAT;
-		case cr3d::DataFormat::RG16_Float:        return VK_FORMAT_R16G16_SFLOAT;
-		case cr3d::DataFormat::RGBA16_Float:      return VK_FORMAT_R16G16B16A16_SFLOAT;
+		case crgfx::DataFormat::R16_Float:         return VK_FORMAT_R16_SFLOAT;
+		case crgfx::DataFormat::RG16_Float:        return VK_FORMAT_R16G16_SFLOAT;
+		case crgfx::DataFormat::RGBA16_Float:      return VK_FORMAT_R16G16B16A16_SFLOAT;
 
-		case cr3d::DataFormat::R32_Uint:          return VK_FORMAT_R32_UINT;
-		case cr3d::DataFormat::R32_Sint:          return VK_FORMAT_R32_SINT;
-		case cr3d::DataFormat::RG32_Uint:         return VK_FORMAT_R32G32_UINT;
-		case cr3d::DataFormat::RG32_Sint:         return VK_FORMAT_R32G32_SINT;
-		case cr3d::DataFormat::RGB32_Uint:        return VK_FORMAT_R32G32B32_UINT;
-		case cr3d::DataFormat::RGB32_Sint:        return VK_FORMAT_R32G32B32_SINT;
-		case cr3d::DataFormat::RGBA32_Uint:       return VK_FORMAT_R32G32B32A32_UINT;
-		case cr3d::DataFormat::RGBA32_Sint:       return VK_FORMAT_R32G32B32A32_SINT;
+		case crgfx::DataFormat::R32_Uint:          return VK_FORMAT_R32_UINT;
+		case crgfx::DataFormat::R32_Sint:          return VK_FORMAT_R32_SINT;
+		case crgfx::DataFormat::RG32_Uint:         return VK_FORMAT_R32G32_UINT;
+		case crgfx::DataFormat::RG32_Sint:         return VK_FORMAT_R32G32_SINT;
+		case crgfx::DataFormat::RGB32_Uint:        return VK_FORMAT_R32G32B32_UINT;
+		case crgfx::DataFormat::RGB32_Sint:        return VK_FORMAT_R32G32B32_SINT;
+		case crgfx::DataFormat::RGBA32_Uint:       return VK_FORMAT_R32G32B32A32_UINT;
+		case crgfx::DataFormat::RGBA32_Sint:       return VK_FORMAT_R32G32B32A32_SINT;
 
 		// 32-bit float formats
-		case cr3d::DataFormat::R32_Float:         return VK_FORMAT_R32_SFLOAT;
-		case cr3d::DataFormat::RG32_Float:        return VK_FORMAT_R32G32_SFLOAT;
-		case cr3d::DataFormat::RGB32_Float:       return VK_FORMAT_R32G32B32_SFLOAT;
-		case cr3d::DataFormat::RGBA32_Float:      return VK_FORMAT_R32G32B32A32_SFLOAT;
+		case crgfx::DataFormat::R32_Float:         return VK_FORMAT_R32_SFLOAT;
+		case crgfx::DataFormat::RG32_Float:        return VK_FORMAT_R32G32_SFLOAT;
+		case crgfx::DataFormat::RGB32_Float:       return VK_FORMAT_R32G32B32_SFLOAT;
+		case crgfx::DataFormat::RGBA32_Float:      return VK_FORMAT_R32G32B32A32_SFLOAT;
 
 		// Compressed formats
-		case cr3d::DataFormat::BC1_RGB_Unorm:     return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
-		case cr3d::DataFormat::BC1_RGB_SRGB:      return VK_FORMAT_BC1_RGB_SRGB_BLOCK;
-		case cr3d::DataFormat::BC1_RGBA_Unorm:    return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
-		case cr3d::DataFormat::BC1_RGBA_SRGB:     return VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+		case crgfx::DataFormat::BC1_RGB_Unorm:     return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
+		case crgfx::DataFormat::BC1_RGB_SRGB:      return VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+		case crgfx::DataFormat::BC1_RGBA_Unorm:    return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+		case crgfx::DataFormat::BC1_RGBA_SRGB:     return VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
 
-		case cr3d::DataFormat::BC2_Unorm:         return VK_FORMAT_BC2_UNORM_BLOCK;
-		case cr3d::DataFormat::BC2_SRGB:          return VK_FORMAT_BC2_SRGB_BLOCK;
+		case crgfx::DataFormat::BC2_Unorm:         return VK_FORMAT_BC2_UNORM_BLOCK;
+		case crgfx::DataFormat::BC2_SRGB:          return VK_FORMAT_BC2_SRGB_BLOCK;
 
-		case cr3d::DataFormat::BC3_Unorm:         return VK_FORMAT_BC3_UNORM_BLOCK;
-		case cr3d::DataFormat::BC3_SRGB:          return VK_FORMAT_BC3_SRGB_BLOCK;
+		case crgfx::DataFormat::BC3_Unorm:         return VK_FORMAT_BC3_UNORM_BLOCK;
+		case crgfx::DataFormat::BC3_SRGB:          return VK_FORMAT_BC3_SRGB_BLOCK;
 
-		case cr3d::DataFormat::BC4_Unorm:         return VK_FORMAT_BC4_UNORM_BLOCK;
-		case cr3d::DataFormat::BC4_Snorm:         return VK_FORMAT_BC4_SNORM_BLOCK;
+		case crgfx::DataFormat::BC4_Unorm:         return VK_FORMAT_BC4_UNORM_BLOCK;
+		case crgfx::DataFormat::BC4_Snorm:         return VK_FORMAT_BC4_SNORM_BLOCK;
 
-		case cr3d::DataFormat::BC5_Unorm:         return VK_FORMAT_BC5_UNORM_BLOCK;
-		case cr3d::DataFormat::BC5_Snorm:         return VK_FORMAT_BC5_SNORM_BLOCK;
+		case crgfx::DataFormat::BC5_Unorm:         return VK_FORMAT_BC5_UNORM_BLOCK;
+		case crgfx::DataFormat::BC5_Snorm:         return VK_FORMAT_BC5_SNORM_BLOCK;
 
-		case cr3d::DataFormat::BC6H_UFloat:       return VK_FORMAT_BC6H_UFLOAT_BLOCK;
-		case cr3d::DataFormat::BC6H_SFloat:       return VK_FORMAT_BC6H_SFLOAT_BLOCK;
+		case crgfx::DataFormat::BC6H_UFloat:       return VK_FORMAT_BC6H_UFLOAT_BLOCK;
+		case crgfx::DataFormat::BC6H_SFloat:       return VK_FORMAT_BC6H_SFLOAT_BLOCK;
 
-		case cr3d::DataFormat::BC7_Unorm:         return VK_FORMAT_BC7_UNORM_BLOCK;
-		case cr3d::DataFormat::BC7_SRGB:          return VK_FORMAT_BC7_SRGB_BLOCK;
+		case crgfx::DataFormat::BC7_Unorm:         return VK_FORMAT_BC7_UNORM_BLOCK;
+		case crgfx::DataFormat::BC7_SRGB:          return VK_FORMAT_BC7_SRGB_BLOCK;
 
-		case cr3d::DataFormat::ETC2_RGB8_Unorm:   return VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
-		case cr3d::DataFormat::ETC2_RGB8_SRGB:    return VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK;
+		case crgfx::DataFormat::ETC2_RGB8_Unorm:   return VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
+		case crgfx::DataFormat::ETC2_RGB8_SRGB:    return VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK;
 
-		case cr3d::DataFormat::ETC2_RGB8A1_Unorm: return VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK;
-		case cr3d::DataFormat::ETC2_RGB8A1_SRGB:  return VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK;
+		case crgfx::DataFormat::ETC2_RGB8A1_Unorm: return VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK;
+		case crgfx::DataFormat::ETC2_RGB8A1_SRGB:  return VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK;
 
-		case cr3d::DataFormat::ETC2_RGBA8_Unorm:  return VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
-		case cr3d::DataFormat::ETC2_RGBA8_SRGB:   return VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK;
+		case crgfx::DataFormat::ETC2_RGBA8_Unorm:  return VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
+		case crgfx::DataFormat::ETC2_RGBA8_SRGB:   return VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK;
 
-		case cr3d::DataFormat::EAC_R11_Unorm:     return VK_FORMAT_EAC_R11_UNORM_BLOCK;
-		case cr3d::DataFormat::EAC_R11_Snorm:     return VK_FORMAT_EAC_R11_SNORM_BLOCK;
-		case cr3d::DataFormat::EAC_R11G11_Unorm:  return VK_FORMAT_EAC_R11G11_UNORM_BLOCK;
-		case cr3d::DataFormat::EAC_R11G11_Snorm:  return VK_FORMAT_EAC_R11G11_SNORM_BLOCK;
+		case crgfx::DataFormat::EAC_R11_Unorm:     return VK_FORMAT_EAC_R11_UNORM_BLOCK;
+		case crgfx::DataFormat::EAC_R11_Snorm:     return VK_FORMAT_EAC_R11_SNORM_BLOCK;
+		case crgfx::DataFormat::EAC_R11G11_Unorm:  return VK_FORMAT_EAC_R11G11_UNORM_BLOCK;
+		case crgfx::DataFormat::EAC_R11G11_Snorm:  return VK_FORMAT_EAC_R11G11_SNORM_BLOCK;
 
 		// ASTC
-		case cr3d::DataFormat::ASTC_4x4_Unorm:    return VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_4x4_SRGB:     return VK_FORMAT_ASTC_4x4_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_5x4_Unorm:    return VK_FORMAT_ASTC_5x4_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_5x4_SRGB:     return VK_FORMAT_ASTC_5x4_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_5x5_Unorm:    return VK_FORMAT_ASTC_5x5_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_5x5_SRGB:     return VK_FORMAT_ASTC_5x5_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_6x5_Unorm:    return VK_FORMAT_ASTC_6x5_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_6x5_SRGB:     return VK_FORMAT_ASTC_6x5_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_6x6_Unorm:    return VK_FORMAT_ASTC_6x6_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_6x6_SRGB:     return VK_FORMAT_ASTC_6x6_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_8x5_Unorm:    return VK_FORMAT_ASTC_8x5_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_8x5_SRGB:     return VK_FORMAT_ASTC_8x5_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_8x6_Unorm:    return VK_FORMAT_ASTC_8x6_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_8x6_SRGB:     return VK_FORMAT_ASTC_8x6_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_8x8_Unorm:    return VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_8x8_SRGB:     return VK_FORMAT_ASTC_8x8_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_10x5_Unorm:   return VK_FORMAT_ASTC_10x5_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_10x5_SRGB:    return VK_FORMAT_ASTC_10x5_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_10x6_Unorm:   return VK_FORMAT_ASTC_10x6_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_10x6_SRGB:    return VK_FORMAT_ASTC_10x6_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_10x8_Unorm:   return VK_FORMAT_ASTC_10x8_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_10x8_SRGB:    return VK_FORMAT_ASTC_10x8_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_10x10_Unorm:  return VK_FORMAT_ASTC_10x10_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_10x10_SRGB:   return VK_FORMAT_ASTC_10x10_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_12x10_Unorm:  return VK_FORMAT_ASTC_12x10_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_12x10_SRGB:   return VK_FORMAT_ASTC_12x10_SRGB_BLOCK;
-		case cr3d::DataFormat::ASTC_12x12_Unorm:  return VK_FORMAT_ASTC_12x12_UNORM_BLOCK;
-		case cr3d::DataFormat::ASTC_12x12_SRGB:   return VK_FORMAT_ASTC_12x12_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_4x4_Unorm:    return VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_4x4_SRGB:     return VK_FORMAT_ASTC_4x4_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_5x4_Unorm:    return VK_FORMAT_ASTC_5x4_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_5x4_SRGB:     return VK_FORMAT_ASTC_5x4_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_5x5_Unorm:    return VK_FORMAT_ASTC_5x5_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_5x5_SRGB:     return VK_FORMAT_ASTC_5x5_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_6x5_Unorm:    return VK_FORMAT_ASTC_6x5_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_6x5_SRGB:     return VK_FORMAT_ASTC_6x5_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_6x6_Unorm:    return VK_FORMAT_ASTC_6x6_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_6x6_SRGB:     return VK_FORMAT_ASTC_6x6_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_8x5_Unorm:    return VK_FORMAT_ASTC_8x5_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_8x5_SRGB:     return VK_FORMAT_ASTC_8x5_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_8x6_Unorm:    return VK_FORMAT_ASTC_8x6_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_8x6_SRGB:     return VK_FORMAT_ASTC_8x6_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_8x8_Unorm:    return VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_8x8_SRGB:     return VK_FORMAT_ASTC_8x8_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_10x5_Unorm:   return VK_FORMAT_ASTC_10x5_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_10x5_SRGB:    return VK_FORMAT_ASTC_10x5_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_10x6_Unorm:   return VK_FORMAT_ASTC_10x6_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_10x6_SRGB:    return VK_FORMAT_ASTC_10x6_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_10x8_Unorm:   return VK_FORMAT_ASTC_10x8_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_10x8_SRGB:    return VK_FORMAT_ASTC_10x8_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_10x10_Unorm:  return VK_FORMAT_ASTC_10x10_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_10x10_SRGB:   return VK_FORMAT_ASTC_10x10_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_12x10_Unorm:  return VK_FORMAT_ASTC_12x10_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_12x10_SRGB:   return VK_FORMAT_ASTC_12x10_SRGB_BLOCK;
+		case crgfx::DataFormat::ASTC_12x12_Unorm:  return VK_FORMAT_ASTC_12x12_UNORM_BLOCK;
+		case crgfx::DataFormat::ASTC_12x12_SRGB:   return VK_FORMAT_ASTC_12x12_SRGB_BLOCK;
 
 		// PVRTC
-		case cr3d::DataFormat::PVRTC1_2BPP_Unorm: return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC1_2BPP_SRGB:  return VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC1_4BPP_Unorm: return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC1_4BPP_SRGB:  return VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC2_2BPP_Unorm: return VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC2_2BPP_SRGB:  return VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC2_4BPP_Unorm: return VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG;
-		case cr3d::DataFormat::PVRTC2_4BPP_SRGB:  return VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC1_2BPP_Unorm: return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC1_2BPP_SRGB:  return VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC1_4BPP_Unorm: return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC1_4BPP_SRGB:  return VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC2_2BPP_Unorm: return VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC2_2BPP_SRGB:  return VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC2_4BPP_Unorm: return VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG;
+		case crgfx::DataFormat::PVRTC2_4BPP_SRGB:  return VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG;
 
 		// Depth-stencil formats
-		case cr3d::DataFormat::D16_Unorm:         return VK_FORMAT_D16_UNORM;
-		case cr3d::DataFormat::D24_Unorm_S8_Uint: return VK_FORMAT_D24_UNORM_S8_UINT;
-		case cr3d::DataFormat::D24_Unorm_X8:      return VK_FORMAT_X8_D24_UNORM_PACK32;
-		case cr3d::DataFormat::D32_Float:         return VK_FORMAT_D32_SFLOAT;
-		case cr3d::DataFormat::D32_Float_S8_Uint: return VK_FORMAT_D32_SFLOAT_S8_UINT;
+		case crgfx::DataFormat::D16_Unorm:         return VK_FORMAT_D16_UNORM;
+		case crgfx::DataFormat::D24_Unorm_S8_Uint: return VK_FORMAT_D24_UNORM_S8_UINT;
+		case crgfx::DataFormat::D24_Unorm_X8:      return VK_FORMAT_X8_D24_UNORM_PACK32;
+		case crgfx::DataFormat::D32_Float:         return VK_FORMAT_D32_SFLOAT;
+		case crgfx::DataFormat::D32_Float_S8_Uint: return VK_FORMAT_D32_SFLOAT_S8_UINT;
 
 		// Packed Formats
-		case cr3d::DataFormat::RG11B10_Float:  return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
-		case cr3d::DataFormat::RGB10A2_Unorm:  return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
-		case cr3d::DataFormat::RGB10A2_Uint:   return VK_FORMAT_A2B10G10R10_UINT_PACK32;
-		case cr3d::DataFormat::B5G6R5_Unorm:   return VK_FORMAT_B5G6R5_UNORM_PACK16;
-		case cr3d::DataFormat::B5G5R5A1_Unorm: return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
-		case cr3d::DataFormat::BGRA4_Unorm:    return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
-		case cr3d::DataFormat::RGB9E5_Float:   return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
+		case crgfx::DataFormat::RG11B10_Float:  return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+		case crgfx::DataFormat::RGB10A2_Unorm:  return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+		case crgfx::DataFormat::RGB10A2_Uint:   return VK_FORMAT_A2B10G10R10_UINT_PACK32;
+		case crgfx::DataFormat::B5G6R5_Unorm:   return VK_FORMAT_B5G6R5_UNORM_PACK16;
+		case crgfx::DataFormat::B5G5R5A1_Unorm: return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
+		case crgfx::DataFormat::BGRA4_Unorm:    return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
+		case crgfx::DataFormat::RGB9E5_Float:   return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
 
 		default:
 			CrAssertMsg(false, "Format not found");
@@ -173,7 +173,7 @@ VkFormat crvk::GetVkFormat(cr3d::DataFormat::T format)
 	}
 }
 
-cr3d::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
+crgfx::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
 {
 	switch (vkFormat)
 	{
@@ -182,393 +182,393 @@ cr3d::DataFormat::T crvk::GetDataFormat(VkFormat vkFormat)
 		//-------------
 
 		// 8-bit formats
-		case VK_FORMAT_R8_UNORM:          return cr3d::DataFormat::R8_Unorm;
-		case VK_FORMAT_R8_SNORM:          return cr3d::DataFormat::R8_Snorm;
-		case VK_FORMAT_R8_UINT:           return cr3d::DataFormat::R8_Uint;
-		case VK_FORMAT_R8_SINT:           return cr3d::DataFormat::R8_Sint;
+		case VK_FORMAT_R8_UNORM:          return crgfx::DataFormat::R8_Unorm;
+		case VK_FORMAT_R8_SNORM:          return crgfx::DataFormat::R8_Snorm;
+		case VK_FORMAT_R8_UINT:           return crgfx::DataFormat::R8_Uint;
+		case VK_FORMAT_R8_SINT:           return crgfx::DataFormat::R8_Sint;
 
-		case VK_FORMAT_R8G8_UNORM:        return cr3d::DataFormat::RG8_Unorm;
-		case VK_FORMAT_R8G8_SNORM:        return cr3d::DataFormat::RG8_Snorm;
-		case VK_FORMAT_R8G8_UINT:         return cr3d::DataFormat::RG8_Uint;
-		case VK_FORMAT_R8G8_SINT:         return cr3d::DataFormat::RG8_Sint;
+		case VK_FORMAT_R8G8_UNORM:        return crgfx::DataFormat::RG8_Unorm;
+		case VK_FORMAT_R8G8_SNORM:        return crgfx::DataFormat::RG8_Snorm;
+		case VK_FORMAT_R8G8_UINT:         return crgfx::DataFormat::RG8_Uint;
+		case VK_FORMAT_R8G8_SINT:         return crgfx::DataFormat::RG8_Sint;
 
-		case VK_FORMAT_R8G8B8A8_UNORM:    return cr3d::DataFormat::RGBA8_Unorm;
-		case VK_FORMAT_R8G8B8A8_SNORM:    return cr3d::DataFormat::RGBA8_Snorm;
-		case VK_FORMAT_R8G8B8A8_UINT:     return cr3d::DataFormat::RGBA8_Uint;
-		case VK_FORMAT_R8G8B8A8_SINT:     return cr3d::DataFormat::RGBA8_Sint;
-		case VK_FORMAT_R8G8B8A8_SRGB:     return cr3d::DataFormat::RGBA8_SRGB;
+		case VK_FORMAT_R8G8B8A8_UNORM:    return crgfx::DataFormat::RGBA8_Unorm;
+		case VK_FORMAT_R8G8B8A8_SNORM:    return crgfx::DataFormat::RGBA8_Snorm;
+		case VK_FORMAT_R8G8B8A8_UINT:     return crgfx::DataFormat::RGBA8_Uint;
+		case VK_FORMAT_R8G8B8A8_SINT:     return crgfx::DataFormat::RGBA8_Sint;
+		case VK_FORMAT_R8G8B8A8_SRGB:     return crgfx::DataFormat::RGBA8_SRGB;
 
-		case VK_FORMAT_B8G8R8A8_UNORM:    return cr3d::DataFormat::BGRA8_Unorm;
-		case VK_FORMAT_B8G8R8A8_SRGB:     return cr3d::DataFormat::BGRA8_SRGB;
+		case VK_FORMAT_B8G8R8A8_UNORM:    return crgfx::DataFormat::BGRA8_Unorm;
+		case VK_FORMAT_B8G8R8A8_SRGB:     return crgfx::DataFormat::BGRA8_SRGB;
 
 		// 16-bit integer formats
-		case VK_FORMAT_R16_UNORM:         return cr3d::DataFormat::R16_Unorm;
-		case VK_FORMAT_R16_SNORM:         return cr3d::DataFormat::R16_Snorm;
-		case VK_FORMAT_R16_UINT:          return cr3d::DataFormat::R16_Uint;
-		case VK_FORMAT_R16_SINT:          return cr3d::DataFormat::R16_Sint;
+		case VK_FORMAT_R16_UNORM:         return crgfx::DataFormat::R16_Unorm;
+		case VK_FORMAT_R16_SNORM:         return crgfx::DataFormat::R16_Snorm;
+		case VK_FORMAT_R16_UINT:          return crgfx::DataFormat::R16_Uint;
+		case VK_FORMAT_R16_SINT:          return crgfx::DataFormat::R16_Sint;
 
-		case VK_FORMAT_R16G16_UNORM:      return cr3d::DataFormat::RG16_Unorm;
-		case VK_FORMAT_R16G16_SNORM:      return cr3d::DataFormat::RG16_Snorm;
-		case VK_FORMAT_R16G16_UINT:       return cr3d::DataFormat::RG16_Uint;
-		case VK_FORMAT_R16G16_SINT:       return cr3d::DataFormat::RG16_Sint;
+		case VK_FORMAT_R16G16_UNORM:      return crgfx::DataFormat::RG16_Unorm;
+		case VK_FORMAT_R16G16_SNORM:      return crgfx::DataFormat::RG16_Snorm;
+		case VK_FORMAT_R16G16_UINT:       return crgfx::DataFormat::RG16_Uint;
+		case VK_FORMAT_R16G16_SINT:       return crgfx::DataFormat::RG16_Sint;
 
-		case VK_FORMAT_R16G16B16A16_UNORM: return cr3d::DataFormat::RGBA16_Unorm;
-		case VK_FORMAT_R16G16B16A16_SNORM: return cr3d::DataFormat::RGBA16_Snorm;
-		case VK_FORMAT_R16G16B16A16_UINT:  return cr3d::DataFormat::RGBA16_Uint;
-		case VK_FORMAT_R16G16B16A16_SINT:  return cr3d::DataFormat::RGBA16_Sint;
+		case VK_FORMAT_R16G16B16A16_UNORM: return crgfx::DataFormat::RGBA16_Unorm;
+		case VK_FORMAT_R16G16B16A16_SNORM: return crgfx::DataFormat::RGBA16_Snorm;
+		case VK_FORMAT_R16G16B16A16_UINT:  return crgfx::DataFormat::RGBA16_Uint;
+		case VK_FORMAT_R16G16B16A16_SINT:  return crgfx::DataFormat::RGBA16_Sint;
 
 		// 16-bit float formats
-		case VK_FORMAT_R16_SFLOAT:          return cr3d::DataFormat::R16_Float;
-		case VK_FORMAT_R16G16_SFLOAT:       return cr3d::DataFormat::RG16_Float;
-		case VK_FORMAT_R16G16B16A16_SFLOAT: return cr3d::DataFormat::RGBA16_Float;
+		case VK_FORMAT_R16_SFLOAT:          return crgfx::DataFormat::R16_Float;
+		case VK_FORMAT_R16G16_SFLOAT:       return crgfx::DataFormat::RG16_Float;
+		case VK_FORMAT_R16G16B16A16_SFLOAT: return crgfx::DataFormat::RGBA16_Float;
 
-		case VK_FORMAT_R32_UINT:            return cr3d::DataFormat::R32_Uint;
-		case VK_FORMAT_R32_SINT:            return cr3d::DataFormat::R32_Sint;
-		case VK_FORMAT_R32G32_UINT:         return cr3d::DataFormat::RG32_Uint;
-		case VK_FORMAT_R32G32_SINT:         return cr3d::DataFormat::RG32_Sint;
-		case VK_FORMAT_R32G32B32_UINT:      return cr3d::DataFormat::RGB32_Uint;
-		case VK_FORMAT_R32G32B32_SINT:      return cr3d::DataFormat::RGB32_Sint;
-		case VK_FORMAT_R32G32B32A32_UINT:   return cr3d::DataFormat::RGBA32_Uint;
-		case VK_FORMAT_R32G32B32A32_SINT:   return cr3d::DataFormat::RGBA32_Sint;
+		case VK_FORMAT_R32_UINT:            return crgfx::DataFormat::R32_Uint;
+		case VK_FORMAT_R32_SINT:            return crgfx::DataFormat::R32_Sint;
+		case VK_FORMAT_R32G32_UINT:         return crgfx::DataFormat::RG32_Uint;
+		case VK_FORMAT_R32G32_SINT:         return crgfx::DataFormat::RG32_Sint;
+		case VK_FORMAT_R32G32B32_UINT:      return crgfx::DataFormat::RGB32_Uint;
+		case VK_FORMAT_R32G32B32_SINT:      return crgfx::DataFormat::RGB32_Sint;
+		case VK_FORMAT_R32G32B32A32_UINT:   return crgfx::DataFormat::RGBA32_Uint;
+		case VK_FORMAT_R32G32B32A32_SINT:   return crgfx::DataFormat::RGBA32_Sint;
 
 		// 32-bit float formats
-		case VK_FORMAT_R32_SFLOAT:          return cr3d::DataFormat::R32_Float;
-		case VK_FORMAT_R32G32_SFLOAT:       return cr3d::DataFormat::RG32_Float;
-		case VK_FORMAT_R32G32B32_SFLOAT:    return cr3d::DataFormat::RGB32_Float;
-		case VK_FORMAT_R32G32B32A32_SFLOAT: return cr3d::DataFormat::RGBA32_Float;
+		case VK_FORMAT_R32_SFLOAT:          return crgfx::DataFormat::R32_Float;
+		case VK_FORMAT_R32G32_SFLOAT:       return crgfx::DataFormat::RG32_Float;
+		case VK_FORMAT_R32G32B32_SFLOAT:    return crgfx::DataFormat::RGB32_Float;
+		case VK_FORMAT_R32G32B32A32_SFLOAT: return crgfx::DataFormat::RGBA32_Float;
 
 		// Depth-stencil formats
-		case VK_FORMAT_D16_UNORM:           return cr3d::DataFormat::D16_Unorm;
-		case VK_FORMAT_D24_UNORM_S8_UINT:   return cr3d::DataFormat::D24_Unorm_S8_Uint;
-		case VK_FORMAT_X8_D24_UNORM_PACK32: return cr3d::DataFormat::D24_Unorm_X8;
-		case VK_FORMAT_D32_SFLOAT:          return cr3d::DataFormat::D32_Float;
-		case VK_FORMAT_D32_SFLOAT_S8_UINT:  return cr3d::DataFormat::D32_Float_S8_Uint;
+		case VK_FORMAT_D16_UNORM:           return crgfx::DataFormat::D16_Unorm;
+		case VK_FORMAT_D24_UNORM_S8_UINT:   return crgfx::DataFormat::D24_Unorm_S8_Uint;
+		case VK_FORMAT_X8_D24_UNORM_PACK32: return crgfx::DataFormat::D24_Unorm_X8;
+		case VK_FORMAT_D32_SFLOAT:          return crgfx::DataFormat::D32_Float;
+		case VK_FORMAT_D32_SFLOAT_S8_UINT:  return crgfx::DataFormat::D32_Float_S8_Uint;
 
 		// Packed Formats
-		case VK_FORMAT_B10G11R11_UFLOAT_PACK32:   return cr3d::DataFormat::RG11B10_Float;
-		case VK_FORMAT_A2B10G10R10_UNORM_PACK32:  return cr3d::DataFormat::RGB10A2_Unorm;
-		case VK_FORMAT_A2B10G10R10_UINT_PACK32:   return cr3d::DataFormat::RGB10A2_Uint;
-		case VK_FORMAT_B5G6R5_UNORM_PACK16:       return cr3d::DataFormat::B5G6R5_Unorm;
-		case VK_FORMAT_B5G5R5A1_UNORM_PACK16:     return cr3d::DataFormat::B5G5R5A1_Unorm;
-		case VK_FORMAT_B4G4R4A4_UNORM_PACK16:     return cr3d::DataFormat::BGRA4_Unorm;
-		case VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:    return cr3d::DataFormat::RGB9E5_Float;
+		case VK_FORMAT_B10G11R11_UFLOAT_PACK32:   return crgfx::DataFormat::RG11B10_Float;
+		case VK_FORMAT_A2B10G10R10_UNORM_PACK32:  return crgfx::DataFormat::RGB10A2_Unorm;
+		case VK_FORMAT_A2B10G10R10_UINT_PACK32:   return crgfx::DataFormat::RGB10A2_Uint;
+		case VK_FORMAT_B5G6R5_UNORM_PACK16:       return crgfx::DataFormat::B5G6R5_Unorm;
+		case VK_FORMAT_B5G5R5A1_UNORM_PACK16:     return crgfx::DataFormat::B5G5R5A1_Unorm;
+		case VK_FORMAT_B4G4R4A4_UNORM_PACK16:     return crgfx::DataFormat::BGRA4_Unorm;
+		case VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:    return crgfx::DataFormat::RGB9E5_Float;
 
 		default:
 			CrAssertMsg(false, "Format not found");
-			return cr3d::DataFormat::Invalid;
+			return crgfx::DataFormat::Invalid;
 	}
 }
 
-VkSamplerAddressMode crvk::GetVkAddressMode(cr3d::AddressMode addressMode)
+VkSamplerAddressMode crvk::GetVkAddressMode(crgfx::AddressMode addressMode)
 {
 	switch (addressMode)
 	{
-		case cr3d::AddressMode::ClampToEdge:
+		case crgfx::AddressMode::ClampToEdge:
 			return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		case cr3d::AddressMode::ClampToBorder:
+		case crgfx::AddressMode::ClampToBorder:
 			return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-		case cr3d::AddressMode::Wrap:
+		case crgfx::AddressMode::Wrap:
 			return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		case cr3d::AddressMode::Mirror:
+		case crgfx::AddressMode::Mirror:
 			return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
-		case cr3d::AddressMode::MirrorOnce:
+		case crgfx::AddressMode::MirrorOnce:
 			return VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
 	}
 
 	return VK_SAMPLER_ADDRESS_MODE_MAX_ENUM;
 }
 
-VkFilter crvk::GetVkFilter(cr3d::Filter filter)
+VkFilter crvk::GetVkFilter(crgfx::Filter filter)
 {
 	switch (filter)
 	{
-		case cr3d::Filter::Point:
+		case crgfx::Filter::Point:
 			return VK_FILTER_NEAREST;
-		case cr3d::Filter::Linear:
+		case crgfx::Filter::Linear:
 			return VK_FILTER_LINEAR;
 	}
 
 	return VK_FILTER_MAX_ENUM;
 }
 
-VkSamplerMipmapMode crvk::GetVkMipmapMode(cr3d::Filter filter)
+VkSamplerMipmapMode crvk::GetVkMipmapMode(crgfx::Filter filter)
 {
 	switch (filter)
 	{
-		case cr3d::Filter::Point:
+		case crgfx::Filter::Point:
 			return VK_SAMPLER_MIPMAP_MODE_NEAREST;
-		case cr3d::Filter::Linear:
+		case crgfx::Filter::Linear:
 			return VK_SAMPLER_MIPMAP_MODE_LINEAR;
 	}
 
 	return VK_SAMPLER_MIPMAP_MODE_MAX_ENUM;
 }
 
-VkBorderColor crvk::GetVkBorderColor(cr3d::BorderColor borderColor)
+VkBorderColor crvk::GetVkBorderColor(crgfx::BorderColor borderColor)
 {
 	switch (borderColor)
 	{
-		case cr3d::BorderColor::OpaqueBlack:
+		case crgfx::BorderColor::OpaqueBlack:
 			return VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
-		case cr3d::BorderColor::TransparentBlack:
+		case crgfx::BorderColor::TransparentBlack:
 			return VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-		case cr3d::BorderColor::OpaqueWhite:
+		case crgfx::BorderColor::OpaqueWhite:
 			return VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	}
 
 	return VK_BORDER_COLOR_MAX_ENUM;
 }
 
-VkBlendOp crvk::GetVkBlendOp(cr3d::BlendOp blendOp)
+VkBlendOp crvk::GetVkBlendOp(crgfx::BlendOp blendOp)
 {
 	switch (blendOp)
 	{
-		case cr3d::BlendOp::Add:
+		case crgfx::BlendOp::Add:
 			return VK_BLEND_OP_ADD;
-		case cr3d::BlendOp::Subtract:
+		case crgfx::BlendOp::Subtract:
 			return VK_BLEND_OP_SUBTRACT;
-		case cr3d::BlendOp::ReverseSubtract:
+		case crgfx::BlendOp::ReverseSubtract:
 			return VK_BLEND_OP_REVERSE_SUBTRACT;
-		case cr3d::BlendOp::Min:
+		case crgfx::BlendOp::Min:
 			return VK_BLEND_OP_MIN;
-		case cr3d::BlendOp::Max:
+		case crgfx::BlendOp::Max:
 			return VK_BLEND_OP_MAX;
 	}
 	return VK_BLEND_OP_MAX_ENUM;
 }
 
-VkBlendFactor crvk::GetVkBlendFactor(cr3d::BlendFactor blendFactor)
+VkBlendFactor crvk::GetVkBlendFactor(crgfx::BlendFactor blendFactor)
 {
 	switch (blendFactor)
 	{
-		case cr3d::BlendFactor::Zero:
+		case crgfx::BlendFactor::Zero:
 			return VK_BLEND_FACTOR_ZERO;
-		case cr3d::BlendFactor::One:
+		case crgfx::BlendFactor::One:
 			return VK_BLEND_FACTOR_ONE;
-		case cr3d::BlendFactor::SrcColor:
+		case crgfx::BlendFactor::SrcColor:
 			return VK_BLEND_FACTOR_SRC_COLOR;
-		case cr3d::BlendFactor::OneMinusSrcColor:
+		case crgfx::BlendFactor::OneMinusSrcColor:
 			return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
-		case cr3d::BlendFactor::DstColor:
+		case crgfx::BlendFactor::DstColor:
 			return VK_BLEND_FACTOR_DST_COLOR;
-		case cr3d::BlendFactor::OneMinusDstColor:
+		case crgfx::BlendFactor::OneMinusDstColor:
 			return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
-		case cr3d::BlendFactor::SrcAlpha:
+		case crgfx::BlendFactor::SrcAlpha:
 			return VK_BLEND_FACTOR_SRC_ALPHA;
-		case cr3d::BlendFactor::OneMinusSrcAlpha:
+		case crgfx::BlendFactor::OneMinusSrcAlpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		case cr3d::BlendFactor::DstAlpha:
+		case crgfx::BlendFactor::DstAlpha:
 			return VK_BLEND_FACTOR_DST_ALPHA;
-		case cr3d::BlendFactor::OneMinusDstAlpha:
+		case crgfx::BlendFactor::OneMinusDstAlpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
-		case cr3d::BlendFactor::Constant:
+		case crgfx::BlendFactor::Constant:
 			return VK_BLEND_FACTOR_CONSTANT_COLOR;
-		case cr3d::BlendFactor::OneMinusConstant:
+		case crgfx::BlendFactor::OneMinusConstant:
 			return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
-		case cr3d::BlendFactor::SrcAlphaSaturate:
+		case crgfx::BlendFactor::SrcAlphaSaturate:
 			return VK_BLEND_FACTOR_SRC_ALPHA_SATURATE;
-		case cr3d::BlendFactor::Src1Color:
+		case crgfx::BlendFactor::Src1Color:
 			return VK_BLEND_FACTOR_SRC1_COLOR;
-		case cr3d::BlendFactor::OneMinusSrc1Color:
+		case crgfx::BlendFactor::OneMinusSrc1Color:
 			return VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
-		case cr3d::BlendFactor::Src1Alpha:
+		case crgfx::BlendFactor::Src1Alpha:
 			return VK_BLEND_FACTOR_SRC1_ALPHA;
-		case cr3d::BlendFactor::OneMinusSrc1Alpha:
+		case crgfx::BlendFactor::OneMinusSrc1Alpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
 	}
 	return VK_BLEND_FACTOR_MAX_ENUM;
 }
 
-VkCompareOp crvk::GetVkCompareOp(cr3d::CompareOp compareOp)
+VkCompareOp crvk::GetVkCompareOp(crgfx::CompareOp compareOp)
 {
 	switch (compareOp)
 	{
-		case cr3d::CompareOp::Never:
+		case crgfx::CompareOp::Never:
 			return VK_COMPARE_OP_NEVER;
-		case cr3d::CompareOp::Less:
+		case crgfx::CompareOp::Less:
 			return VK_COMPARE_OP_LESS;
-		case cr3d::CompareOp::Equal:
+		case crgfx::CompareOp::Equal:
 			return VK_COMPARE_OP_EQUAL;
-		case cr3d::CompareOp::LessOrEqual:
+		case crgfx::CompareOp::LessOrEqual:
 			return VK_COMPARE_OP_LESS_OR_EQUAL;
-		case cr3d::CompareOp::Greater:
+		case crgfx::CompareOp::Greater:
 			return VK_COMPARE_OP_GREATER;
-		case cr3d::CompareOp::NotEqual:
+		case crgfx::CompareOp::NotEqual:
 			return VK_COMPARE_OP_NOT_EQUAL;
-		case cr3d::CompareOp::GreaterOrEqual:
+		case crgfx::CompareOp::GreaterOrEqual:
 			return VK_COMPARE_OP_GREATER_OR_EQUAL;
-		case cr3d::CompareOp::Always:
+		case crgfx::CompareOp::Always:
 			return VK_COMPARE_OP_ALWAYS;
 	}
 	return VK_COMPARE_OP_MAX_ENUM;
 }
 
-VkStencilOp crvk::GetVkStencilOp(cr3d::StencilOp stencilOp)
+VkStencilOp crvk::GetVkStencilOp(crgfx::StencilOp stencilOp)
 {
 	switch (stencilOp)
 	{
-		case cr3d::StencilOp::Keep:
+		case crgfx::StencilOp::Keep:
 			return VK_STENCIL_OP_KEEP;
-		case cr3d::StencilOp::Zero:
+		case crgfx::StencilOp::Zero:
 			return VK_STENCIL_OP_ZERO;
-		case cr3d::StencilOp::Replace:
+		case crgfx::StencilOp::Replace:
 			return VK_STENCIL_OP_REPLACE;
-		case cr3d::StencilOp::IncrementSaturate:
+		case crgfx::StencilOp::IncrementSaturate:
 			return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
-		case cr3d::StencilOp::DecrementSaturate:
+		case crgfx::StencilOp::DecrementSaturate:
 			return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
-		case cr3d::StencilOp::Invert:
+		case crgfx::StencilOp::Invert:
 			return VK_STENCIL_OP_INVERT;
-		case cr3d::StencilOp::IncrementAndWrap:
+		case crgfx::StencilOp::IncrementAndWrap:
 			return VK_STENCIL_OP_INCREMENT_AND_WRAP;
-		case cr3d::StencilOp::DecrementAndWrap:
+		case crgfx::StencilOp::DecrementAndWrap:
 			return VK_STENCIL_OP_DECREMENT_AND_WRAP;
 	}
 	return VK_STENCIL_OP_MAX_ENUM;
 }
 
-VkSampleCountFlagBits crvk::GetVkSampleCount(cr3d::SampleCount sampleCount)
+VkSampleCountFlagBits crvk::GetVkSampleCount(crgfx::SampleCount sampleCount)
 {
 	switch (sampleCount)
 	{
-		case cr3d::SampleCount::S1:
+		case crgfx::SampleCount::S1:
 			return VK_SAMPLE_COUNT_1_BIT;
-		case cr3d::SampleCount::S2:
+		case crgfx::SampleCount::S2:
 			return VK_SAMPLE_COUNT_2_BIT;
-		case cr3d::SampleCount::S4:
+		case crgfx::SampleCount::S4:
 			return VK_SAMPLE_COUNT_4_BIT;
-		case cr3d::SampleCount::S8:
+		case crgfx::SampleCount::S8:
 			return VK_SAMPLE_COUNT_8_BIT;
-		case cr3d::SampleCount::S16:
+		case crgfx::SampleCount::S16:
 			return VK_SAMPLE_COUNT_16_BIT;
-		case cr3d::SampleCount::S32:
+		case crgfx::SampleCount::S32:
 			return VK_SAMPLE_COUNT_32_BIT;
-		case cr3d::SampleCount::S64:
+		case crgfx::SampleCount::S64:
 			return VK_SAMPLE_COUNT_64_BIT;
 	}
 	return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
 }
 
-VkShaderStageFlagBits crvk::GetVkShaderStage(cr3d::ShaderStage::T shaderStage)
+VkShaderStageFlagBits crvk::GetVkShaderStage(crgfx::ShaderStage::T shaderStage)
 {
 	switch (shaderStage)
 	{
-		case cr3d::ShaderStage::Vertex:
+		case crgfx::ShaderStage::Vertex:
 			return VK_SHADER_STAGE_VERTEX_BIT;
-		case cr3d::ShaderStage::Geometry:
+		case crgfx::ShaderStage::Geometry:
 			return VK_SHADER_STAGE_GEOMETRY_BIT;
-		case cr3d::ShaderStage::Hull:
+		case crgfx::ShaderStage::Hull:
 			return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-		case cr3d::ShaderStage::Domain:
+		case crgfx::ShaderStage::Domain:
 			return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-		case cr3d::ShaderStage::Pixel:
+		case crgfx::ShaderStage::Pixel:
 			return VK_SHADER_STAGE_FRAGMENT_BIT;
-		case cr3d::ShaderStage::Compute:
+		case crgfx::ShaderStage::Compute:
 			return VK_SHADER_STAGE_COMPUTE_BIT;
 		default:
 			return VK_SHADER_STAGE_ALL;
 	}
 }
 
-VkPrimitiveTopology crvk::GetVkPrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology)
+VkPrimitiveTopology crvk::GetVkPrimitiveTopology(crgfx::PrimitiveTopology primitiveTopology)
 {
 	switch (primitiveTopology)
 	{
-		case cr3d::PrimitiveTopology::PointList:
+		case crgfx::PrimitiveTopology::PointList:
 			return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
-		case cr3d::PrimitiveTopology::LineList:
+		case crgfx::PrimitiveTopology::LineList:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		case cr3d::PrimitiveTopology::LineStrip:
+		case crgfx::PrimitiveTopology::LineStrip:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-		case cr3d::PrimitiveTopology::TriangleList:
+		case crgfx::PrimitiveTopology::TriangleList:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		case cr3d::PrimitiveTopology::TriangleStrip:
+		case crgfx::PrimitiveTopology::TriangleStrip:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-		case cr3d::PrimitiveTopology::LineListAdjacency:
+		case crgfx::PrimitiveTopology::LineListAdjacency:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
-		case cr3d::PrimitiveTopology::LineStripAdjacency:
+		case crgfx::PrimitiveTopology::LineStripAdjacency:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
-		case cr3d::PrimitiveTopology::TriangleListAdjacency:
+		case crgfx::PrimitiveTopology::TriangleListAdjacency:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
-		case cr3d::PrimitiveTopology::TriangleStripAdjacency:
+		case crgfx::PrimitiveTopology::TriangleStripAdjacency:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
-		case cr3d::PrimitiveTopology::PatchList:
+		case crgfx::PrimitiveTopology::PatchList:
 			return VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
 	}
 
 	return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 }
 
-VkVertexInputRate crvk::GetVkVertexInputRate(cr3d::VertexInputRate vertexInputRate)
+VkVertexInputRate crvk::GetVkVertexInputRate(crgfx::VertexInputRate vertexInputRate)
 {
 	switch (vertexInputRate)
 	{
-		case cr3d::VertexInputRate::Vertex: return VK_VERTEX_INPUT_RATE_VERTEX;
-		case cr3d::VertexInputRate::Instance: return VK_VERTEX_INPUT_RATE_INSTANCE;
+		case crgfx::VertexInputRate::Vertex: return VK_VERTEX_INPUT_RATE_VERTEX;
+		case crgfx::VertexInputRate::Instance: return VK_VERTEX_INPUT_RATE_INSTANCE;
 	}
 
 	return VK_VERTEX_INPUT_RATE_MAX_ENUM;
 }
 
-VkPolygonMode crvk::GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode)
+VkPolygonMode crvk::GetVkPolygonFillMode(crgfx::PolygonFillMode fillMode)
 {
 	switch (fillMode)
 	{
-		case cr3d::PolygonFillMode::Fill:
+		case crgfx::PolygonFillMode::Fill:
 			return VK_POLYGON_MODE_FILL;
-		case cr3d::PolygonFillMode::Line:
+		case crgfx::PolygonFillMode::Line:
 			return VK_POLYGON_MODE_LINE;
 		default:
 			return VK_POLYGON_MODE_MAX_ENUM;
 	}
 }
 
-VkCullModeFlags crvk::GetVkPolygonCullMode(cr3d::PolygonCullMode cullMode)
+VkCullModeFlags crvk::GetVkPolygonCullMode(crgfx::PolygonCullMode cullMode)
 {
 	switch (cullMode)
 	{
-		case cr3d::PolygonCullMode::Back:
+		case crgfx::PolygonCullMode::Back:
 			return VK_CULL_MODE_BACK_BIT;
-		case cr3d::PolygonCullMode::Front:
+		case crgfx::PolygonCullMode::Front:
 			return VK_CULL_MODE_FRONT_BIT;
-		case cr3d::PolygonCullMode::None:
+		case crgfx::PolygonCullMode::None:
 			return VK_CULL_MODE_NONE;
 		default:
 			return VK_CULL_MODE_FLAG_BITS_MAX_ENUM;
 	}
 }
 
-VkFrontFace crvk::GetVkFrontFace(cr3d::FrontFace frontFace)
+VkFrontFace crvk::GetVkFrontFace(crgfx::FrontFace frontFace)
 {
 	switch (frontFace)
 	{
-		case cr3d::FrontFace::Clockwise:
+		case crgfx::FrontFace::Clockwise:
 			return VK_FRONT_FACE_CLOCKWISE;
-		case cr3d::FrontFace::CounterClockwise:
+		case crgfx::FrontFace::CounterClockwise:
 			return VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		default:
 			return VK_FRONT_FACE_MAX_ENUM;
 	}
 }
 
-VkDescriptorType crvk::GetVkDescriptorType(cr3d::ShaderResourceType::T resourceType)
+VkDescriptorType crvk::GetVkDescriptorType(crgfx::ShaderResourceType::T resourceType)
 {
 	switch (resourceType)
 	{
-		case cr3d::ShaderResourceType::ConstantBuffer:
+		case crgfx::ShaderResourceType::ConstantBuffer:
 			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC; // TODO Fix this, we need to be able to tell whether dynamic or not
-		case cr3d::ShaderResourceType::Texture:
+		case crgfx::ShaderResourceType::Texture:
 			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-		case cr3d::ShaderResourceType::RWTexture:
+		case crgfx::ShaderResourceType::RWTexture:
 			return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-		case cr3d::ShaderResourceType::Sampler:
+		case crgfx::ShaderResourceType::Sampler:
 			return VK_DESCRIPTOR_TYPE_SAMPLER;
-		case cr3d::ShaderResourceType::StorageBuffer:
-		case cr3d::ShaderResourceType::RWStorageBuffer:
+		case crgfx::ShaderResourceType::StorageBuffer:
+		case crgfx::ShaderResourceType::RWStorageBuffer:
 			return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		case cr3d::ShaderResourceType::TypedBuffer:
+		case crgfx::ShaderResourceType::TypedBuffer:
 			return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-		case cr3d::ShaderResourceType::RWTypedBuffer:
+		case crgfx::ShaderResourceType::RWTypedBuffer:
 			return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
 		default:
 			return VK_DESCRIPTOR_TYPE_MAX_ENUM;
@@ -608,36 +608,36 @@ VkAttachmentStoreOp crvk::GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp)
 	}
 }
 
-VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderStageFlags::T shaderStages)
+VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(crgfx::ShaderStageFlags::T shaderStages)
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
-	if (shaderStages & cr3d::ShaderStageFlags::Vertex)
+	if (shaderStages & crgfx::ShaderStageFlags::Vertex)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
 	}
 
-	if (shaderStages & cr3d::ShaderStageFlags::Pixel)
+	if (shaderStages & crgfx::ShaderStageFlags::Pixel)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
 
-	if (shaderStages & cr3d::ShaderStageFlags::Hull)
+	if (shaderStages & crgfx::ShaderStageFlags::Hull)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
 	}
 
-	if (shaderStages & cr3d::ShaderStageFlags::Domain)
+	if (shaderStages & crgfx::ShaderStageFlags::Domain)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
 	}
 
-	if (shaderStages & cr3d::ShaderStageFlags::Geometry)
+	if (shaderStages & crgfx::ShaderStageFlags::Geometry)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
 	}
 
-	if (shaderStages & cr3d::ShaderStageFlags::Compute)
+	if (shaderStages & crgfx::ShaderStageFlags::Compute)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 	}
@@ -645,15 +645,15 @@ VkPipelineStageFlags crvk::GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderS
 	return pipelineFlags;
 }
 
-VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat)
+VkImageAspectFlags crvk::GetVkImageAspectFlags(crgfx::DataFormat::T textureFormat)
 {
 	VkImageAspectFlags aspectFlags = 0;
 
-	if (cr3d::IsDepthStencilFormat(textureFormat))
+	if (crgfx::IsDepthStencilFormat(textureFormat))
 	{
 		aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 	}
-	else if (cr3d::IsDepthOnlyFormat(textureFormat))
+	else if (crgfx::IsDepthOnlyFormat(textureFormat))
 	{
 		aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
 	}
@@ -667,28 +667,28 @@ VkImageAspectFlags crvk::GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat
 	return aspectFlags;
 }
 
-crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout)
+crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(crgfx::DataFormat::T textureFormat, crgfx::TextureLayout::T textureLayout)
 {
-	bool depthOnlyFormat = cr3d::IsDepthOnlyFormat(textureFormat);
+	bool depthOnlyFormat = crgfx::IsDepthOnlyFormat(textureFormat);
 
 	switch (textureLayout)
 	{
-		case cr3d::TextureLayout::Undefined:       return { VK_IMAGE_LAYOUT_UNDEFINED,                VK_ACCESS_NONE_KHR };
-		case cr3d::TextureLayout::ShaderInput:     return { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_SHADER_READ_BIT };
-		case cr3d::TextureLayout::RenderTarget:    return { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
-		case cr3d::TextureLayout::RWTexture:       return { VK_IMAGE_LAYOUT_GENERAL,                  VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-		case cr3d::TextureLayout::Present:         return { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,          VK_ACCESS_NONE_KHR };
-		case cr3d::TextureLayout::CopySource:      return { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,     VK_ACCESS_TRANSFER_READ_BIT };
-		case cr3d::TextureLayout::CopyDestination: return { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,     VK_ACCESS_TRANSFER_WRITE_BIT };
-		case cr3d::TextureLayout::DepthStencilReadWrite:
+		case crgfx::TextureLayout::Undefined:       return { VK_IMAGE_LAYOUT_UNDEFINED,                VK_ACCESS_NONE_KHR };
+		case crgfx::TextureLayout::ShaderInput:     return { VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_SHADER_READ_BIT };
+		case crgfx::TextureLayout::RenderTarget:    return { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT };
+		case crgfx::TextureLayout::RWTexture:       return { VK_IMAGE_LAYOUT_GENERAL,                  VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+		case crgfx::TextureLayout::Present:         return { VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,          VK_ACCESS_NONE_KHR };
+		case crgfx::TextureLayout::CopySource:      return { VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,     VK_ACCESS_TRANSFER_READ_BIT };
+		case crgfx::TextureLayout::CopyDestination: return { VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,     VK_ACCESS_TRANSFER_WRITE_BIT };
+		case crgfx::TextureLayout::DepthStencilReadWrite:
 		{
 			return { depthOnlyFormat ? VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
 		}
-		case cr3d::TextureLayout::DepthStencilWrite:
+		case crgfx::TextureLayout::DepthStencilWrite:
 		{
 			return { depthOnlyFormat ? VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
 		}
-		case cr3d::TextureLayout::StencilWriteDepthReadOnly:
+		case crgfx::TextureLayout::StencilWriteDepthReadOnly:
 		{
 			if (depthOnlyFormat)
 			{
@@ -699,7 +699,7 @@ crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textur
 				return { VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
 			}
 		}
-		case cr3d::TextureLayout::DepthWriteStencilReadOnly:
+		case crgfx::TextureLayout::DepthWriteStencilReadOnly:
 		{
 			if (depthOnlyFormat)
 			{
@@ -710,7 +710,7 @@ crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textur
 				return { VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT };
 			}
 		}
-		case cr3d::TextureLayout::DepthStencilReadOnly:
+		case crgfx::TextureLayout::DepthStencilReadOnly:
 		{
 			if (depthOnlyFormat)
 			{
@@ -721,7 +721,7 @@ crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textur
 				return { VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT };
 			}
 		}
-		case cr3d::TextureLayout::DepthStencilReadOnlyShader:
+		case crgfx::TextureLayout::DepthStencilReadOnlyShader:
 		{
 			if (depthOnlyFormat)
 			{
@@ -738,34 +738,34 @@ crvk::VkImageTransitionInfo crvk::GetVkImageStateInfo(cr3d::DataFormat::T textur
 	}
 }
 
-VkPipelineStageFlags crvk::GetVkPipelineStageFlags(const cr3d::TextureState& textureState)
+VkPipelineStageFlags crvk::GetVkPipelineStageFlags(const crgfx::TextureState& textureState)
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
 	switch (textureState.layout)
 	{
-		case cr3d::TextureLayout::RenderTarget:
+		case crgfx::TextureLayout::RenderTarget:
 		{
 			pipelineFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 			break;
 		}
-		case cr3d::TextureLayout::DepthStencilReadWrite:
-		case cr3d::TextureLayout::DepthStencilWrite:
-		case cr3d::TextureLayout::StencilWriteDepthReadOnly:
-		case cr3d::TextureLayout::DepthWriteStencilReadOnly:
-		case cr3d::TextureLayout::DepthStencilReadOnly:
+		case crgfx::TextureLayout::DepthStencilReadWrite:
+		case crgfx::TextureLayout::DepthStencilWrite:
+		case crgfx::TextureLayout::StencilWriteDepthReadOnly:
+		case crgfx::TextureLayout::DepthWriteStencilReadOnly:
+		case crgfx::TextureLayout::DepthStencilReadOnly:
 		{
 			pipelineFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 			break;
 		}
-		case cr3d::TextureLayout::ShaderInput:
-		case cr3d::TextureLayout::RWTexture:
+		case crgfx::TextureLayout::ShaderInput:
+		case crgfx::TextureLayout::RWTexture:
 		{
 			pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(textureState.stages);
 			break;
 		}
-		case cr3d::TextureLayout::Present:
-		case cr3d::TextureLayout::Undefined:
+		case crgfx::TextureLayout::Present:
+		case crgfx::TextureLayout::Undefined:
 			break;
 		default:
 			CrAssertMsg(false, "Unhandled case");

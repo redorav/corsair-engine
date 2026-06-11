@@ -75,7 +75,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				compilationDescriptor.inputPath = hlslFilePath;
 				compilationDescriptor.platform = builtinShadersDescriptor.platform;
 
-				cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
+				crgfx::ShaderStage::T shaderStage = crgfx::ShaderStage::Count;
 
 				ryml::NodeRef entryPointNode = shader["entrypoint"];
 				if (entryPointNode.is_keyval())
@@ -92,13 +92,13 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				if (stageNode.is_keyval())
 				{
 					c4::csubstr stageValue = stageNode.val();
-					if (stageValue == "Vertex")        { shaderStage = cr3d::ShaderStage::Vertex; }
-					else if (stageValue == "Pixel")    { shaderStage = cr3d::ShaderStage::Pixel; }
-					else if (stageValue == "Geometry") { shaderStage = cr3d::ShaderStage::Geometry; }
-					else if (stageValue == "Hull")     { shaderStage = cr3d::ShaderStage::Hull; }
-					else if (stageValue == "Domain")   { shaderStage = cr3d::ShaderStage::Domain; }
-					else if (stageValue == "Compute")  { shaderStage = cr3d::ShaderStage::Compute; }
-					else if (stageValue == "RootSignature") { shaderStage = cr3d::ShaderStage::RootSignature; }
+					if (stageValue == "Vertex")        { shaderStage = crgfx::ShaderStage::Vertex; }
+					else if (stageValue == "Pixel")    { shaderStage = crgfx::ShaderStage::Pixel; }
+					else if (stageValue == "Geometry") { shaderStage = crgfx::ShaderStage::Geometry; }
+					else if (stageValue == "Hull")     { shaderStage = crgfx::ShaderStage::Hull; }
+					else if (stageValue == "Domain")   { shaderStage = crgfx::ShaderStage::Domain; }
+					else if (stageValue == "Compute")  { shaderStage = crgfx::ShaderStage::Compute; }
+					else if (stageValue == "RootSignature") { shaderStage = crgfx::ShaderStage::RootSignature; }
 					else
 					{
 						crstl::string errorMessage;
@@ -109,7 +109,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 					compilationDescriptor.shaderStage = shaderStage;
 
-					stageName = cr3d::ShaderStage::ToString(shaderStage);
+					stageName = crgfx::ShaderStage::ToString(shaderStage);
 				}
 				else
 				{
@@ -137,13 +137,13 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 
 				CrShaderInfo shaderInfo;
 				shaderInfo.name = shaderName;
-				shaderInfo.pipelineType = shaderStage == cr3d::ShaderStage::Compute ? CrPipelineType::Compute : CrPipelineType::Graphics;
+				shaderInfo.pipelineType = shaderStage == crgfx::ShaderStage::Compute ? CrPipelineType::Compute : CrPipelineType::Graphics;
 				shaderInfos.push_back(shaderInfo);
 				compilationJob.name = shaderName;
 
 				for(uint32_t i = 0; i < builtinShadersDescriptor.graphicsApis.size(); ++i)
 				{
-					cr3d::GraphicsApi::T graphicsApi = builtinShadersDescriptor.graphicsApis[i];
+					crgfx::GraphicsApi::T graphicsApi = builtinShadersDescriptor.graphicsApis[i];
 					
 					const char* shaderBinaryExtension = ".bin";
 
@@ -151,7 +151,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 						shaderName + "_" + 
 						compilationDescriptor.entryPoint + "_" + 
 						stageName + "_" + 
-						cr3d::GraphicsApi::ToString(graphicsApi);
+						crgfx::GraphicsApi::ToString(graphicsApi);
 
 					CrFixedPath binaryFilePath = builtinShadersDescriptor.outputPath;
 					binaryFilePath /= uniqueShaderName.c_str();
@@ -186,7 +186,7 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 			// to the builtin shader table. This means e.g. the Vulkan backend has a dummy entry for a root signature
 			// This generally only happens on Desktop, where we support multiple APIs
 			bool excludeCompilationJob =
-				compilationDescriptor.shaderStage == cr3d::ShaderStage::RootSignature && compilationDescriptor.graphicsApi != cr3d::GraphicsApi::D3D12;
+				compilationDescriptor.shaderStage == crgfx::ShaderStage::RootSignature && compilationDescriptor.graphicsApi != crgfx::GraphicsApi::D3D12;
 
 			if (!excludeCompilationJob)
 			{
@@ -257,13 +257,13 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 
 	builtinShadersGenericHeader += "struct CrBuiltinShaderMetadata\n"
 		"{\n"
-		"\tCrBuiltinShaderMetadata(const crstl::string& name, const crstl::string& entryPoint, const crstl::string& uniqueBinaryName, cr3d::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
+		"\tCrBuiltinShaderMetadata(const crstl::string& name, const crstl::string& entryPoint, const crstl::string& uniqueBinaryName, crgfx::ShaderStage::T shaderStage, uint8_t* shaderCode, uint32_t shaderCodeSize)\n"
 		"\t: name(name), entryPoint(entryPoint), uniqueBinaryName(uniqueBinaryName), shaderStage(shaderStage), shaderCode(shaderCode), shaderCodeSize(shaderCodeSize) {}\n\n"
-		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", \"\", cr3d::ShaderStage::Count, nullptr, 0) {}\n\n"
+		"\tCrBuiltinShaderMetadata() : CrBuiltinShaderMetadata(\"\", \"\", \"\", crgfx::ShaderStage::Count, nullptr, 0) {}\n\n"
 		"\tcrstl::string name;\n"
 		"\tcrstl::string entryPoint;\n"
 		"\tcrstl::string uniqueBinaryName;\n"
-		"\tcr3d::ShaderStage::T shaderStage;\n"
+		"\tcrgfx::ShaderStage::T shaderStage;\n"
 		"\tuint8_t* shaderCode;\n"
 		"\tuint32_t shaderCodeSize;\n"
 		"};\n\n";
@@ -284,28 +284,28 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "const CrBuiltinComputeMetadata InvalidBuiltinComputeMetadata;\n\n";
 
 	builtinShadersGenericHeaderGetFunction += "namespace CrBuiltinShaders\n{\n";
-	builtinShadersGenericHeaderGetFunction += "\tinline const CrBuiltinShaderMetadata& GetMetadata(CrBuiltinShaders::T builtinShader, cr3d::GraphicsApi::T graphicsApi)\n\t{\n";
+	builtinShadersGenericHeaderGetFunction += "\tinline const CrBuiltinShaderMetadata& GetMetadata(CrBuiltinShaders::T builtinShader, crgfx::GraphicsApi::T graphicsApi)\n\t{\n";
 
 	builtinComputeGenericHeaderGetFunction += "namespace CrBuiltinCompute\n{\n";
-	builtinComputeGenericHeaderGetFunction += "\tinline const CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute, cr3d::GraphicsApi::T graphicsApi)\n\t{\n";
+	builtinComputeGenericHeaderGetFunction += "\tinline const CrBuiltinComputeMetadata& GetMetadata(CrBuiltinCompute::T builtinCompute, crgfx::GraphicsApi::T graphicsApi)\n\t{\n";
 	
 	builtinShadersGenericCpp += "#include \"Graphics/CrRendering_pch.h\"\n";
 	builtinShadersGenericCpp += "\n";
 
-	for(cr3d::GraphicsApi::T graphicsApi : builtinShadersDescriptor.graphicsApis)
+	for(crgfx::GraphicsApi::T graphicsApi : builtinShadersDescriptor.graphicsApis)
 	{
-		const char* graphicsApiString = cr3d::GraphicsApi::ToString(graphicsApi);
+		const char* graphicsApiString = crgfx::GraphicsApi::ToString(graphicsApi);
 
 		const crstl::vector<CrShaderCompilationJob>& graphicsApiCompilationJobs = compilationJobs[graphicsApi];
 
-		builtinShadersGenericHeaderGetFunction += "\t\tif(graphicsApi == cr3d::GraphicsApi::";
+		builtinShadersGenericHeaderGetFunction += "\t\tif(graphicsApi == crgfx::GraphicsApi::";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
 		builtinShadersGenericHeaderGetFunction += ")\n\t\t{\n";
 		builtinShadersGenericHeaderGetFunction += "\t\t\treturn ";
 		builtinShadersGenericHeaderGetFunction += graphicsApiString;
 		builtinShadersGenericHeaderGetFunction += "::GetMetadata(builtinShader);\n\t\t}\n\n";
 
-		builtinComputeGenericHeaderGetFunction += "\t\tif(graphicsApi == cr3d::GraphicsApi::";
+		builtinComputeGenericHeaderGetFunction += "\t\tif(graphicsApi == crgfx::GraphicsApi::";
 		builtinComputeGenericHeaderGetFunction += graphicsApiString;
 		builtinComputeGenericHeaderGetFunction += ")\n\t\t{\n";
 		builtinComputeGenericHeaderGetFunction += "\t\t\treturn ";
@@ -326,8 +326,8 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			const CompilationDescriptor& compilationDescriptor = shaderJob.compilationDescriptor;
 
 			// Load binary file
-			crstl::string shaderStageString = "cr3d::ShaderStage::";
-			shaderStageString += cr3d::ShaderStage::ToString(compilationDescriptor.shaderStage);
+			crstl::string shaderStageString = "crgfx::ShaderStage::";
+			shaderStageString += crgfx::ShaderStage::ToString(compilationDescriptor.shaderStage);
 
 			if (crstl::file file = crstl::file(compilationDescriptor.outputPath.c_str(), crstl::file_flags::read))
 			{
@@ -354,7 +354,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 					}
 				};
 
-				if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+				if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
 				{
 					builtinComputeDataCpp += shaderBinaryName + " =\n\t\t{";
 					builtinComputeMetadataTable +=
@@ -379,7 +379,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 			}
 			else
 			{
-				if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+				if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
 				{
 					builtinComputeMetadataTable += "\t\t\tCrBuiltinComputeMetadata(\"" + shaderName + "\", \"\", \"" + compilationDescriptor.uniqueBinaryName + "\", nullptr, " + crstl::string(0) + "), \n";
 				}
@@ -447,7 +447,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersCpp += namespaceDeclarationEnd;
 
 		// Create header and cpp filenames
-		CrFixedPath headerPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
+		CrFixedPath headerPath = builtinShadersDescriptor.outputPath + crgfx::GraphicsApi::ToString(graphicsApi);
 		headerPath.replace_extension("h");
 		CrShaderCompilerUtilities::WriteToFileIfChanged(headerPath.c_str(), builtinShadersHeader);
 
@@ -455,7 +455,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 		builtinShadersGenericHeader += headerPath.filename().c_str();
 		builtinShadersGenericHeader += "\"\n";
 
-		CrFixedPath cppPath = builtinShadersDescriptor.outputPath + cr3d::GraphicsApi::ToString(graphicsApi);
+		CrFixedPath cppPath = builtinShadersDescriptor.outputPath + crgfx::GraphicsApi::ToString(graphicsApi);
 		cppPath.replace_extension("cpp");
 		CrShaderCompilerUtilities::WriteToFileIfChanged(cppPath.c_str(), builtinShadersCpp);
 

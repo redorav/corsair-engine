@@ -6,25 +6,25 @@
 
 CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 {
-	cr3d::BlendFactor::One,
-	cr3d::BlendFactor::One,
-	cr3d::BlendFactor::One,
-	cr3d::BlendFactor::One,
-	cr3d::ColorWriteComponent::All,
-	cr3d::BlendOp::Add,
-	cr3d::BlendOp::Add,
+	crgfx::BlendFactor::One,
+	crgfx::BlendFactor::One,
+	crgfx::BlendFactor::One,
+	crgfx::BlendFactor::One,
+	crgfx::ColorWriteComponent::All,
+	crgfx::BlendOp::Add,
+	crgfx::BlendOp::Add,
 	false
 };
 
 CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 {
-	cr3d::BlendFactor::SrcAlpha,
-	cr3d::BlendFactor::OneMinusSrcAlpha,
-	cr3d::BlendFactor::One,
-	cr3d::BlendFactor::Zero,
-	cr3d::ColorWriteComponent::All,
-	cr3d::BlendOp::Add,
-	cr3d::BlendOp::Add,
+	crgfx::BlendFactor::SrcAlpha,
+	crgfx::BlendFactor::OneMinusSrcAlpha,
+	crgfx::BlendFactor::One,
+	crgfx::BlendFactor::Zero,
+	crgfx::ColorWriteComponent::All,
+	crgfx::BlendOp::Add,
+	crgfx::BlendOp::Add,
 	true
 };
 

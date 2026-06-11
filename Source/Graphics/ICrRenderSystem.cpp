@@ -75,14 +75,14 @@ void ICrRenderSystem::Initialize(const CrRenderSystemDescriptor& renderSystemDes
 	// Treat this like a factory (on PC) through the API. That way the rest of the code
 	// doesn't need to know about platform-specific code, only the render device.
 #if defined(VULKAN_API)
-	if (renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
+	if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
 	{
 		renderSystem = new CrRenderSystemVulkan(renderSystemDescriptor);
 	}
 #endif
 
 #if defined(D3D12_API)
-	if (renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::D3D12)
+	if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::D3D12)
 	{
 		renderSystem = new CrRenderSystemD3D12(renderSystemDescriptor);
 	}
@@ -113,7 +113,7 @@ bool ICrRenderSystem::GetIsValidationEnabled() const
 	return m_descriptor.enableValidation;
 }
 
-cr3d::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
+crgfx::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
 {
 	return m_descriptor.graphicsApi;
 }

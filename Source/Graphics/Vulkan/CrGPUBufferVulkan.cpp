@@ -27,20 +27,20 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	switch (descriptor.access)
 	{
-		case cr3d::MemoryAccess::GPUOnlyWrite:
-		case cr3d::MemoryAccess::GPUOnlyRead:
+		case crgfx::MemoryAccess::GPUOnlyWrite:
+		case crgfx::MemoryAccess::GPUOnlyRead:
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 			break;
-		case cr3d::MemoryAccess::GPUWriteCPURead:
+		case crgfx::MemoryAccess::GPUWriteCPURead:
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
 			break;
-		case cr3d::MemoryAccess::StagingUpload:
-		case cr3d::MemoryAccess::StagingDownload:
+		case crgfx::MemoryAccess::StagingUpload:
+		case crgfx::MemoryAccess::StagingDownload:
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
 			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
 			break;
-		case cr3d::MemoryAccess::CPUStreamToGPU:
+		case crgfx::MemoryAccess::CPUStreamToGPU:
 		{
 			vmaAllocationCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 			vmaAllocationCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
@@ -63,9 +63,9 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 	vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkBuffer, VK_OBJECT_TYPE_BUFFER, descriptor.name);
 
-	if (descriptor.usage & cr3d::BufferUsage::Typed)
+	if (descriptor.usage & crgfx::BufferUsage::Typed)
 	{
-		CrAssert(descriptor.dataFormat != cr3d::DataFormat::Count);
+		CrAssert(descriptor.dataFormat != crgfx::DataFormat::Count);
 
 		VkBufferViewCreateInfo vkBufferViewCreateInfo;
 		vkBufferViewCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
@@ -84,7 +84,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 	{
 		CrAssertMsg(descriptor.initialDataSize <= vmaAllocationInfo.size, "Not enough memory in buffer");
 
-		if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+		if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
 		{
 			uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
 			{
@@ -115,33 +115,33 @@ CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
 	vmaDestroyBuffer(vulkanRenderDevice->GetVmaAllocator(), m_vkBuffer, m_vmaAllocation);
 }
 
-VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access)
+VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access)
 {
 	VkBufferUsageFlags usageFlags = 0;
 
-	if (usage & cr3d::BufferUsage::Constant)
+	if (usage & crgfx::BufferUsage::Constant)
 	{
 		usageFlags |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::Vertex)
+	if (usage & crgfx::BufferUsage::Vertex)
 	{
 		usageFlags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::Index)
+	if (usage & crgfx::BufferUsage::Index)
 	{
 		usageFlags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::Storage)
+	if (usage & crgfx::BufferUsage::Storage)
 	{
 		usageFlags |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::Typed)
+	if (usage & crgfx::BufferUsage::Typed)
 	{
-		if (access & cr3d::MemoryAccess::GPUOnlyWrite)
+		if (access & crgfx::MemoryAccess::GPUOnlyWrite)
 		{
 			usageFlags |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
 		}
@@ -151,17 +151,17 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 		}
 	}
 
-	if (usage & cr3d::BufferUsage::Indirect)
+	if (usage & crgfx::BufferUsage::Indirect)
 	{
 		usageFlags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::TransferDst)
+	if (usage & crgfx::BufferUsage::TransferDst)
 	{
 		usageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	}
 
-	if (usage & cr3d::BufferUsage::TransferSrc)
+	if (usage & crgfx::BufferUsage::TransferSrc)
 	{
 		usageFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	}
@@ -169,13 +169,13 @@ VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(cr3d::Buf
 	return usageFlags;
 }
 
-VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages)
+VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(crgfx::BufferState::T bufferState, crgfx::ShaderStageFlags::T shaderStages)
 {
 	VkPipelineStageFlags pipelineFlags = 0;
 
 	pipelineFlags |= crvk::GetVkPipelineStageFlagsFromShaderStages(shaderStages);
 
-	if (bufferState == cr3d::BufferState::IndirectArgument)
+	if (bufferState == crgfx::BufferState::IndirectArgument)
 	{
 		pipelineFlags |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
 	}
@@ -199,16 +199,16 @@ void CrHardwareGPUBufferVulkan::UnlockPS()
 	vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
 }
 
-crstl::array<CrVkBufferStateInfo, cr3d::BufferState::Count> CrVkBufferResourceStateTable;
+crstl::array<CrVkBufferStateInfo, crgfx::BufferState::Count> CrVkBufferResourceStateTable;
 
 static bool PopulateVkBufferResourceTable()
 {
-	CrVkBufferResourceStateTable[cr3d::BufferState::Undefined]        = { VK_ACCESS_NONE_KHR };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ShaderInput]      = { VK_ACCESS_SHADER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::ReadWrite]        = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopySource]       = { VK_ACCESS_TRANSFER_READ_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::CopyDestination]  = { VK_ACCESS_TRANSFER_WRITE_BIT };
-	CrVkBufferResourceStateTable[cr3d::BufferState::IndirectArgument] = { VK_ACCESS_INDIRECT_COMMAND_READ_BIT } ;
+	CrVkBufferResourceStateTable[crgfx::BufferState::Undefined]        = { VK_ACCESS_NONE_KHR };
+	CrVkBufferResourceStateTable[crgfx::BufferState::ShaderInput]      = { VK_ACCESS_SHADER_READ_BIT };
+	CrVkBufferResourceStateTable[crgfx::BufferState::ReadWrite]        = { VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT };
+	CrVkBufferResourceStateTable[crgfx::BufferState::CopySource]       = { VK_ACCESS_TRANSFER_READ_BIT };
+	CrVkBufferResourceStateTable[crgfx::BufferState::CopyDestination]  = { VK_ACCESS_TRANSFER_WRITE_BIT };
+	CrVkBufferResourceStateTable[crgfx::BufferState::IndirectArgument] = { VK_ACCESS_INDIRECT_COMMAND_READ_BIT } ;
 
 	for (const CrVkBufferStateInfo& resourceInfo : CrVkBufferResourceStateTable)
 	{
@@ -220,7 +220,7 @@ static bool PopulateVkBufferResourceTable()
 
 static bool DummyPopulateVkBufferResourceTable = PopulateVkBufferResourceTable();
 
-const CrVkBufferStateInfo& CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(cr3d::BufferState::T bufferState)
+const CrVkBufferStateInfo& CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(crgfx::BufferState::T bufferState)
 {
 	return CrVkBufferResourceStateTable[bufferState];
 }

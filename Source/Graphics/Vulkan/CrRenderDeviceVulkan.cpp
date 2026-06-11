@@ -134,7 +134,7 @@ CrRenderDeviceVulkan::~CrRenderDeviceVulkan()
 	StorePipelineCache(pipelineCacheData.data(), pipelineCacheSize);
 }
 
-cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+crgfx::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	VkFence vkFence = static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence();
 
@@ -142,21 +142,21 @@ cr3d::GPUFenceResult CrRenderDeviceVulkan::WaitForFencePS(const ICrGPUFence* fen
 
 	switch (result)
 	{
-		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
-		case VK_TIMEOUT: return cr3d::GPUFenceResult::TimeoutOrNotReady;
-		default: return cr3d::GPUFenceResult::Error;
+		case VK_SUCCESS: return crgfx::GPUFenceResult::Success;
+		case VK_TIMEOUT: return crgfx::GPUFenceResult::TimeoutOrNotReady;
+		default: return crgfx::GPUFenceResult::Error;
 	}
 }
 
-cr3d::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* fence) const
+crgfx::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* fence) const
 {
 	VkResult result = vkGetFenceStatus(m_vkDevice, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
 
 	switch (result)
 	{
-		case VK_SUCCESS: return cr3d::GPUFenceResult::Success;
-		case VK_NOT_READY: return cr3d::GPUFenceResult::TimeoutOrNotReady;
-		default: return cr3d::GPUFenceResult::Error;
+		case VK_SUCCESS: return crgfx::GPUFenceResult::Success;
+		case VK_NOT_READY: return crgfx::GPUFenceResult::TimeoutOrNotReady;
+		default: return crgfx::GPUFenceResult::Error;
 	}
 }
 
@@ -190,7 +190,7 @@ uint8_t* CrRenderDeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
 {
 	uint32_t stagingBufferSizeBytes = texture->GetUsedGPUMemory();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
 
 	CrTextureUpload textureUpload;
@@ -253,7 +253,7 @@ void CrRenderDeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
 		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 
 		// Setup buffer copy regions for each mip level
-		crstl::fixed_vector<VkBufferImageCopy, cr3d::MaxMipmaps> bufferCopyRegions;
+		crstl::fixed_vector<VkBufferImageCopy, crgfx::MaxMipmaps> bufferCopyRegions;
 			
 		for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapStart + textureUpload.mipmapCount; mip++)
 		{
@@ -293,7 +293,7 @@ uint8_t* CrRenderDeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* d
 {
 	uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
 
 	CrBufferUpload bufferUpload;
@@ -366,7 +366,7 @@ CrHardwareGPUBufferHandle CrRenderDeviceVulkan::DownloadBufferPS(const ICrHardwa
 {
 	uint32_t stagingBufferSizeBytes = sourceBuffer->GetSizeBytes();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
 	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
@@ -444,11 +444,11 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &gpuCount, physicalDevices.data());
 	CrAssertMsg(result == VK_SUCCESS && gpuCount > 0, "No GPUs found");
 
-	cr3d::GraphicsVendor::T preferredVendor = m_renderDeviceProperties.preferredVendor;
+	crgfx::GraphicsVendor::T preferredVendor = m_renderDeviceProperties.preferredVendor;
 
 	struct SelectedDevice
 	{
-		cr3d::GraphicsVendor::T vendor = cr3d::GraphicsVendor::Unknown;
+		crgfx::GraphicsVendor::T vendor = crgfx::GraphicsVendor::Unknown;
 		uint32_t priority = 0;
 		uint32_t index = 0xffffffff;
 	};
@@ -462,7 +462,7 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 		VkPhysicalDeviceProperties vkPhysicalDeviceProperties;
 		vkGetPhysicalDeviceProperties(physicalDevices[i], &vkPhysicalDeviceProperties);
 
-		cr3d::GraphicsVendor::T graphicsVendor = cr3d::GraphicsVendor::FromVendorID(vkPhysicalDeviceProperties.vendorID);
+		crgfx::GraphicsVendor::T graphicsVendor = crgfx::GraphicsVendor::FromVendorID(vkPhysicalDeviceProperties.vendorID);
 
 		uint32_t priority = 0;
 		priority |= vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? (1 << 31) : 0;
@@ -531,10 +531,10 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	uint32_t vulkanVersionMinor = VK_API_VERSION_MINOR(m_vkVersion);
 	uint32_t vulkanVersionPatch = VK_API_VERSION_PATCH(m_vkVersion);
 
-	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %d.%d.%d", cr3d::GraphicsApi::ToString(cr3d::GraphicsApi::Vulkan), vulkanVersionMajor, vulkanVersionMinor, vulkanVersionPatch);
+	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %d.%d.%d", crgfx::GraphicsApi::ToString(crgfx::GraphicsApi::Vulkan), vulkanVersionMajor, vulkanVersionMinor, vulkanVersionPatch);
 
 	// Populate the render device properties into the platform-independent structure
-	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);
+	m_renderDeviceProperties.vendor = crgfx::GraphicsVendor::FromVendorID(m_vkPhysicalDeviceProperties2.properties.vendorID);
 
 	m_vk11PhysicalDeviceProperties = {};
 	m_vk11PhysicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
@@ -556,15 +556,15 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 
 	VkDriverId driverId = VK_DRIVER_ID_MAX_ENUM;
 
-	if (m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::NVIDIA)
+	if (m_renderDeviceProperties.vendor == crgfx::GraphicsVendor::NVIDIA)
 	{
 		driverId = VK_DRIVER_ID_NVIDIA_PROPRIETARY;
 	}
-	else if (m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::Intel)
+	else if (m_renderDeviceProperties.vendor == crgfx::GraphicsVendor::Intel)
 	{
 		driverId = VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS;
 	}
-	else if(m_renderDeviceProperties.vendor == cr3d::GraphicsVendor::AMD)
+	else if(m_renderDeviceProperties.vendor == crgfx::GraphicsVendor::AMD)
 	{
 		driverId = VK_DRIVER_ID_AMD_PROPRIETARY;
 	}
@@ -646,9 +646,9 @@ VkResult CrRenderDeviceVulkan::SelectPhysicalDevice()
 	// when determining availability and features.
 
 	VkFormatProperties formatProperties;
-	for (cr3d::DataFormat::T dataFormat = (cr3d::DataFormat::T)0; dataFormat < cr3d::DataFormat::Count; ++dataFormat)
+	for (crgfx::DataFormat::T dataFormat = (crgfx::DataFormat::T)0; dataFormat < crgfx::DataFormat::Count; ++dataFormat)
 	{
-		VkFormat format = crvk::GetVkFormat((cr3d::DataFormat::T)dataFormat);
+		VkFormat format = crvk::GetVkFormat((crgfx::DataFormat::T)dataFormat);
 		vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, (VkFormat)format, &formatProperties);
 
 		// Format must support depth stencil attachment for optimal tiling
@@ -933,7 +933,7 @@ VkCommandPool CrRenderDeviceVulkan::GetVkGraphicsCommandPool() const
 }
 
 // Transitions texture to an initial, predictable state
-void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState)
+void CrRenderDeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const crgfx::TextureState& textureState)
 {
 	// Transition all resources to their initial state
 	VkImageSubresourceRange subresourceRange;

@@ -43,7 +43,7 @@ public:
 
 	VkCommandPool GetVkGraphicsCommandPool() const;
 
-	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const cr3d::TextureState& textureState);
+	void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const crgfx::TextureState& textureState);
 
 	void SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const;
 
@@ -81,9 +81,9 @@ private:
 	// GPU Synchronization
 	//--------------------
 
-	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
+	virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
-	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
+	virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
 
 	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
 

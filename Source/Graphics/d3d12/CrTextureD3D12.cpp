@@ -65,11 +65,11 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
 	}
 
-	crstl::fixed_vector<DXGI_FORMAT, cr3d::MaxCustomTextureViews> castableFormats;
+	crstl::fixed_vector<DXGI_FORMAT, crgfx::MaxCustomTextureViews> castableFormats;
 
 	for (size_t i = 0; i < descriptor.customViews.size(); ++i)
 	{
-		if (descriptor.customViews[i].format != cr3d::DataFormat::Invalid && descriptor.customViews[i].format != m_format)
+		if (descriptor.customViews[i].format != crgfx::DataFormat::Invalid && descriptor.customViews[i].format != m_format)
 		{
 			castableFormats.push_back(crd3d::GetDXGIFormat(descriptor.customViews[i].format));
 		}
@@ -90,7 +90,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		D3D12_CLEAR_VALUE clearValue;
 		clearValue.Format = dxgiFormat;
 
-		if (cr3d::IsDepthFormat(descriptor.format))
+		if (crgfx::IsDepthFormat(descriptor.format))
 		{
 			clearValue.DepthStencil.Depth = descriptor.depthClear;
 			clearValue.DepthStencil.Stencil = descriptor.stencilClear;
@@ -179,10 +179,10 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 		switch (descriptor.format)
 		{
-			case cr3d::DataFormat::D16_Unorm: dsvDescriptor.Format = DXGI_FORMAT_D16_UNORM; break;
-			case cr3d::DataFormat::D32_Float: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT; break;
-			case cr3d::DataFormat::D24_Unorm_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
-			case cr3d::DataFormat::D32_Float_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT; break;
+			case crgfx::DataFormat::D16_Unorm: dsvDescriptor.Format = DXGI_FORMAT_D16_UNORM; break;
+			case crgfx::DataFormat::D32_Float: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT; break;
+			case crgfx::DataFormat::D24_Unorm_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
+			case crgfx::DataFormat::D32_Float_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT; break;
 			default: break;
 		}
 
@@ -203,7 +203,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		m_additionalViews->m_d3d12DSVSingleMipSlice = d3d12RenderDevice->AllocateDSVDescriptor();
 		d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSlice);
 
-		if (cr3d::IsDepthStencilFormat(descriptor.format))
+		if (crgfx::IsDepthStencilFormat(descriptor.format))
 		{
 			dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
 			m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth = d3d12RenderDevice->AllocateDSVDescriptor();
@@ -277,10 +277,10 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 
 	switch (descriptor.format)
 	{
-		case cr3d::DataFormat::D16_Unorm: srvFormat = DXGI_FORMAT_R16_UNORM; break;
-		case cr3d::DataFormat::D32_Float: srvFormat = DXGI_FORMAT_R32_FLOAT; break;
-		case cr3d::DataFormat::D24_Unorm_S8_Uint: srvFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
-		case cr3d::DataFormat::D32_Float_S8_Uint: srvFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS; break;
+		case crgfx::DataFormat::D16_Unorm: srvFormat = DXGI_FORMAT_R16_UNORM; break;
+		case crgfx::DataFormat::D32_Float: srvFormat = DXGI_FORMAT_R32_FLOAT; break;
+		case crgfx::DataFormat::D24_Unorm_S8_Uint: srvFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
+		case crgfx::DataFormat::D32_Float_S8_Uint: srvFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS; break;
 		default: break;
 	}
 
@@ -295,13 +295,13 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	{
 		CrTextureView textureView = descriptor.customViews[i];
 	
-		DXGI_FORMAT customFormat = textureView.format == cr3d::DataFormat::Invalid ? srvFormat : crd3d::GetDXGIFormat(textureView.format);
+		DXGI_FORMAT customFormat = textureView.format == crgfx::DataFormat::Invalid ? srvFormat : crd3d::GetDXGIFormat(textureView.format);
 	
-		if (textureView.type == cr3d::TextureViewType::Read)
+		if (textureView.type == crgfx::TextureViewType::Read)
 		{
 			m_additionalViews->m_d3d12CustomViews.push_back({ textureView, CreateShaderResourceView(customFormat, m_type, textureView.mipmapStart, textureView.mipmapCount, textureView.sliceStart, textureView.sliceCount, textureView.plane) });
 		}
-		else if(textureView.type == cr3d::TextureViewType::Write)
+		else if(textureView.type == crgfx::TextureViewType::Write)
 		{
 			CrAssertMsg(false, "Not implemented!");
 		}
@@ -318,7 +318,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 	// Prepare the hardware mipmap layout
 	{
 		// Calculate twice the number of subresources for array textures, so we can calculate the slice pitch
-		const uint32_t MaxSubresources = 2 * cr3d::MaxMipmaps;
+		const uint32_t MaxSubresources = 2 * crgfx::MaxMipmaps;
 		D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
 		UINT numRows[MaxSubresources];
 		d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints((D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
@@ -326,7 +326,7 @@ CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDes
 		for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 		{
 			uint32_t subresourceIndex = crd3d::CalculateSubresource(mip, 0, 0, m_mipmapCount, m_arraySize);
-			cr3d::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
+			crgfx::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
 			mipmapLayout.rowPitchBytes        = subresourceFootprints[subresourceIndex].Footprint.RowPitch;
 			mipmapLayout.offsetBytes          = (uint32_t)subresourceFootprints[subresourceIndex].Offset;
 			mipmapLayout.heightInPixelsBlocks = numRows[subresourceIndex];
@@ -374,7 +374,7 @@ CrTextureD3D12::~CrTextureD3D12()
 	{
 		d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSlice);
 
-		if (cr3d::IsDepthStencilFormat(m_format))
+		if (crgfx::IsDepthStencilFormat(m_format))
 		{
 			d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
 			d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
@@ -394,7 +394,7 @@ CrTextureD3D12::~CrTextureD3D12()
 D3D12_CPU_DESCRIPTOR_HANDLE CrTextureD3D12::CreateShaderResourceView
 (
 	DXGI_FORMAT srvFormat,
-	cr3d::TextureType type,
+	crgfx::TextureType type,
 	uint32_t mipmapStart,
 	uint32_t mipmapCount,
 	uint32_t arrayStart,
@@ -409,7 +409,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE CrTextureD3D12::CreateShaderResourceView
 	mipmapCount = min(mipmapCount, m_mipmapCount);
 	arraySize = min(arraySize, m_arraySize);
 
-	if (type == cr3d::TextureType::Cubemap)
+	if (type == crgfx::TextureType::Cubemap)
 	{
 		d3d12SRVDescriptor.TextureCube.MostDetailedMip = mipmapStart;
 		d3d12SRVDescriptor.TextureCube.MipLevels = mipmapCount;
@@ -425,13 +425,13 @@ D3D12_CPU_DESCRIPTOR_HANDLE CrTextureD3D12::CreateShaderResourceView
 			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		}
 	}
-	else if (type == cr3d::TextureType::Volume)
+	else if (type == crgfx::TextureType::Volume)
 	{
 		d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 		d3d12SRVDescriptor.Texture3D.MostDetailedMip = mipmapStart;
 		d3d12SRVDescriptor.Texture3D.MipLevels = mipmapCount;
 	}
-	else if (type == cr3d::TextureType::Tex1D)
+	else if (type == crgfx::TextureType::Tex1D)
 	{
 		d3d12SRVDescriptor.Texture1D.MostDetailedMip = mipmapStart;
 		d3d12SRVDescriptor.Texture1D.MipLevels = mipmapCount;

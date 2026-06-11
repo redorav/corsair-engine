@@ -122,8 +122,8 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 
 	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
 
-	CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
@@ -209,7 +209,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 
 	renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
@@ -266,7 +266,7 @@ CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial
 			textureParams.initialData = image->GetData();
 			textureParams.initialDataSize = image->GetDataSize();
 			textureParams.mipmapCount = image->m_mipmapCount;
-			textureParams.usage = cr3d::TextureUsage::Default;
+			textureParams.usage = crgfx::TextureUsage::Default;
 
 			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
 

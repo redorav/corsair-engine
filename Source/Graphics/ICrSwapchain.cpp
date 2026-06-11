@@ -12,7 +12,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 	, requestedWidth(0)
 	, requestedHeight(0)
 	, requestedBufferCount(0)
-	, format(cr3d::DataFormat::Invalid)
+	, format(crgfx::DataFormat::Invalid)
 {
 
 }
@@ -20,7 +20,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_name(swapchainDescriptor.name)
 	, m_imageCount(0)
-	, m_format(cr3d::DataFormat::Invalid)
+	, m_format(crgfx::DataFormat::Invalid)
 	, m_width(0)
 	, m_height(0)
 	, m_currentBufferIndex(0)
@@ -29,7 +29,7 @@ ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescr
 
 }
 
-cr3d::DataFormat::T ICrSwapchain::GetFormat() const
+crgfx::DataFormat::T ICrSwapchain::GetFormat() const
 {
 	return m_format;
 }

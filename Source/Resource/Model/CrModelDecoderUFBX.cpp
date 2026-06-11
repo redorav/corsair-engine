@@ -184,7 +184,7 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 			textureParams.initialData = image->GetData();
 			textureParams.initialDataSize = image->GetDataSize();
 			textureParams.mipmapCount = image->m_mipmapCount;
-			textureParams.usage = cr3d::TextureUsage::Default;
+			textureParams.usage = crgfx::TextureUsage::Default;
 
 			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
 
@@ -430,8 +430,8 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 				float3 minVertex = float3(FLT_MAX);
 				float3 maxVertex = float3(-FLT_MAX);
 
-				CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)importMesh.vertices.size());
-				CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(cr3d::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)importMesh.vertices.size());
+				CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)importMesh.vertices.size());
+				CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)importMesh.vertices.size());
 
 				ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 				ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
@@ -516,7 +516,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 
 				renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-				CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(cr3d::MemoryAccess::GPUOnlyRead, cr3d::DataFormat::R16_Uint, (uint32_t)importMesh.triangles.size() * 3);
+				CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)importMesh.triangles.size() * 3);
 
 				uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
 				{

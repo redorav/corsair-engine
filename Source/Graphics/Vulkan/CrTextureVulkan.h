@@ -18,9 +18,9 @@ struct CrVkCustomView
 
 struct CrVkAdditionalTextureViews
 {
-	crstl::array<crstl::vector<VkImageView>, cr3d::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices
-	crstl::array<VkImageView, cr3d::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
-	crstl::fixed_vector<CrVkCustomView, cr3d::MaxCustomTextureViews> m_vkCustomViews;
+	crstl::array<crstl::vector<VkImageView>, crgfx::MaxMipmaps> m_vkImageSingleMipSlice; // Each mipmap can have a variable amount of slices
+	crstl::array<VkImageView, crgfx::MaxMipmaps> m_vkImageViewSingleMipAllSlices; // Each mipmap can see all slices
+	crstl::fixed_vector<CrVkCustomView, crgfx::MaxCustomTextureViews> m_vkCustomViews;
 
 	VkImageView m_vkImageViewStencil;
 };

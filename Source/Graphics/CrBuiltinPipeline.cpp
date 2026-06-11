@@ -151,7 +151,7 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 	commandLine += " -platform windows";
 	
 	commandLine += " -graphicsapi ";
-	commandLine += cr3d::GraphicsApi::ToString(deviceProperties.graphicsApi);
+	commandLine += crgfx::GraphicsApi::ToString(deviceProperties.graphicsApi);
 	
 	crstl::process process
 	(

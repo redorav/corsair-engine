@@ -27,7 +27,7 @@ void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescrip
 		// On Vulkan, try to locate the dll that has been registered by the layers. If we don't manually load this
 		// dll and load a different one, when Vulkan initializes it will load both and capture replay will fail.
 		// Always try to load this one first
-		if (renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
+		if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
 		{
 			HKEY renderdocLayerKey = 0;
 

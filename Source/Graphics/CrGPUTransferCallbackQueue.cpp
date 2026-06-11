@@ -48,7 +48,7 @@ void CrGPUTransferCallbackQueue::Process()
 		// Get the last list we pushed into the active list
 		CrDownloadCallbackList* callbackList = m_activeCallbackLists.front();
 
-		if (m_renderDevice->GetFenceStatus(callbackList->fence.get()) == cr3d::GPUFenceResult::Success)
+		if (m_renderDevice->GetFenceStatus(callbackList->fence.get()) == crgfx::GPUFenceResult::Success)
 		{
 			for (const CrGPUDownloadCallback& callback : callbackList->callbacks)
 			{

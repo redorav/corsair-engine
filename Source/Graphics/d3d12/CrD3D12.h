@@ -20,29 +20,29 @@ namespace crd3d
 		D3D12_BARRIER_ACCESS access = D3D12_BARRIER_ACCESS_COMMON;
 	};
 
-	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
+	DXGI_FORMAT GetDXGIFormat(crgfx::DataFormat::T format);
 
-	D3D12_TEXTURE_ADDRESS_MODE GetD3DAddressMode(cr3d::AddressMode addressMode);
+	D3D12_TEXTURE_ADDRESS_MODE GetD3DAddressMode(crgfx::AddressMode addressMode);
 	
-	D3D12_FILTER GetD3DFilter(cr3d::Filter minFilter, cr3d::Filter magFilter, cr3d::Filter mipFilter, bool anisotropic, bool comparison);
+	D3D12_FILTER GetD3DFilter(crgfx::Filter minFilter, crgfx::Filter magFilter, crgfx::Filter mipFilter, bool anisotropic, bool comparison);
 
-	D3D12_BLEND_OP GetD3DBlendOp(cr3d::BlendOp blendOp);
+	D3D12_BLEND_OP GetD3DBlendOp(crgfx::BlendOp blendOp);
 
-	D3D12_BLEND GetD3DBlendFactor(cr3d::BlendFactor blendFactor);
+	D3D12_BLEND GetD3DBlendFactor(crgfx::BlendFactor blendFactor);
 
-	D3D12_COMPARISON_FUNC GetD3DCompareOp(cr3d::CompareOp compareOp);
+	D3D12_COMPARISON_FUNC GetD3DCompareOp(crgfx::CompareOp compareOp);
 
-	D3D12_STENCIL_OP GetD3DStencilOp(cr3d::StencilOp stencilOp);
+	D3D12_STENCIL_OP GetD3DStencilOp(crgfx::StencilOp stencilOp);
 
-	uint32_t GetD3D12SampleCount(cr3d::SampleCount sampleCount);
+	uint32_t GetD3D12SampleCount(crgfx::SampleCount sampleCount);
 
-	D3D_PRIMITIVE_TOPOLOGY GetD3D12PrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology);
+	D3D_PRIMITIVE_TOPOLOGY GetD3D12PrimitiveTopology(crgfx::PrimitiveTopology primitiveTopology);
 
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE GetD3D12PrimitiveTopologyType(cr3d::PrimitiveTopology primitiveTopology);
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE GetD3D12PrimitiveTopologyType(crgfx::PrimitiveTopology primitiveTopology);
 
-	D3D12_FILL_MODE GetD3D12PolygonFillMode(cr3d::PolygonFillMode fillMode);
+	D3D12_FILL_MODE GetD3D12PolygonFillMode(crgfx::PolygonFillMode fillMode);
 
-	D3D12_CULL_MODE GetD3D12PolygonCullMode(cr3d::PolygonCullMode cullMode);
+	D3D12_CULL_MODE GetD3D12PolygonCullMode(crgfx::PolygonCullMode cullMode);
 
 	D3D12_COMMAND_LIST_TYPE GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType);
 
@@ -50,11 +50,11 @@ namespace crd3d
 
 	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
 
-	TextureBarrierInfoD3D12 GetD3D12TextureBarrierInfo(const cr3d::TextureState& textureState);
+	TextureBarrierInfoD3D12 GetD3D12TextureBarrierInfo(const crgfx::TextureState& textureState);
 
-	BufferBarrierInfoD3D12 GetD3D12BufferBarrierInfo(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);
+	BufferBarrierInfoD3D12 GetD3D12BufferBarrierInfo(crgfx::BufferState::T bufferState, crgfx::ShaderStageFlags::T shaderStages);
 
-	D3D12_BARRIER_LAYOUT GetD3D12BarrierTextureLayout(const cr3d::TextureLayout::T textureLayout);
+	D3D12_BARRIER_LAYOUT GetD3D12BarrierTextureLayout(const crgfx::TextureLayout::T textureLayout);
 
 	// https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/d3dx12.h
 	// Copied from D3D12CalcSubresource

@@ -18,12 +18,12 @@
 
 CrShaderManager* ShaderManager;
 
-const char* CrShaderManager::GetShaderBytecodeExtension(cr3d::GraphicsApi::T graphicsApi)
+const char* CrShaderManager::GetShaderBytecodeExtension(crgfx::GraphicsApi::T graphicsApi)
 {
 	switch (graphicsApi)
 	{
-		case cr3d::GraphicsApi::Vulkan: return ".spv";
-		case cr3d::GraphicsApi::D3D12: return ".bin";
+		case crgfx::GraphicsApi::Vulkan: return ".spv";
+		case crgfx::GraphicsApi::D3D12: return ".bin";
 		default: return "";
 	}
 }
@@ -58,10 +58,10 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	return computeShader;
 }
 
-CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi) const
+CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi) const
 {
 	CrFixedPath shaderCachePath = CrGlobalPaths::GetTempEngineDirectory() + "Compiled Shaders/";
-	crstl::string folderName = crstl::string(cr::Platform::ToString(platform)) + "_" + cr3d::GraphicsApi::ToString(graphicsApi) + "/";
+	crstl::string folderName = crstl::string(cr::Platform::ToString(platform)) + "_" + crgfx::GraphicsApi::ToString(graphicsApi) + "/";
 	shaderCachePath /= folderName.c_str();
 	return shaderCachePath;
 }
@@ -105,7 +105,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	commandLine += " ";
 
 	commandLine += "-stage ";
-	commandLine += cr3d::ShaderStage::ToString(bytecodeDescriptor.stage, true);
+	commandLine += crgfx::ShaderStage::ToString(bytecodeDescriptor.stage, true);
 	commandLine += " ";
 
 	commandLine += "-reflection ";
@@ -133,7 +133,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	commandLine += " ";
 
 	commandLine += "-graphicsapi ";
-	commandLine += cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi, true);
+	commandLine += crgfx::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi, true);
 	commandLine += " ";
 
 	for (uint32_t i = 0; i < defines.GetDefines().size(); ++i)
@@ -164,7 +164,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 				bytecodeDescriptor.entryPoint.c_str(),
 				bytecodeDescriptor.path.c_str(),
 				cr::Platform::ToString(bytecodeDescriptor.platform),
-				cr3d::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
+				crgfx::GraphicsApi::ToString(bytecodeDescriptor.graphicsApi),
 				compilationTime.elapsed().milliseconds());
 
 			return bytecode;

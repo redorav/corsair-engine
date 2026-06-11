@@ -120,8 +120,8 @@ void CrCommandBufferD3D12::ProcessBufferBarriers(const CrRenderPassDescriptor::B
 void CrCommandBufferD3D12::ProcessRenderTargetBarrier
 (
 	const CrRenderTargetDescriptor& renderTargetDescriptor,
-	const cr3d::TextureState& initialState,
-	const cr3d::TextureState& finalState,
+	const crgfx::TextureState& initialState,
+	const crgfx::TextureState& finalState,
 	CrTextureBarrierVectorD3D12& d3d12TextureBarriers
 )
 {
@@ -198,9 +198,9 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 		m_d3d12GraphicsCommandList7->Barrier((UINT)barrierGroupCount, barrierGroups.data());
 	}
 
-	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
+	if (renderPassDescriptor.type == crgfx::RenderPassType::Graphics)
 	{
-		D3D12_RENDER_PASS_RENDER_TARGET_DESC d3d12RenderTargets[cr3d::MaxRenderTargets] = {};
+		D3D12_RENDER_PASS_RENDER_TARGET_DESC d3d12RenderTargets[crgfx::MaxRenderTargets] = {};
 		D3D12_RENDER_PASS_DEPTH_STENCIL_DESC d3d12DepthStencil = {};
 
 		for (uint32_t i = 0, renderTargetCount = (uint32_t)renderPassDescriptor.color.size(); i < renderTargetCount; ++i)
@@ -259,7 +259,7 @@ void CrCommandBufferD3D12::EndRenderPassPS()
 	CrBufferBarrierVectorD3D12 bufferBarriers;
 	const CrRenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
 
-	if (renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
+	if (renderPassDescriptor.type == crgfx::RenderPassType::Graphics)
 	{
 		m_d3d12GraphicsCommandList->EndRenderPass();
 
@@ -348,7 +348,7 @@ void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBindin
 	{
 		srvDescriptor = d3d12Texture->GetD3D12SRVDescriptor();
 	}
-	else if (textureBinding.view == CrTextureView(cr3d::TexturePlane::Stencil))
+	else if (textureBinding.view == CrTextureView(crgfx::TexturePlane::Stencil))
 	{
 		srvDescriptor = d3d12Texture->GetD3D12StencilSRVDescriptor();
 	}
@@ -387,7 +387,7 @@ void CrCommandBufferD3D12::WriteStorageBufferSRV(const CrStorageBufferBinding& b
 	srvDescriptor.Buffer.NumElements = binding.numElements;
 	srvDescriptor.Buffer.FirstElement = binding.offsetBytes / binding.strideBytes;
 
-	if (d3d12GPUBuffer->HasUsage(cr3d::BufferUsage::Byte))
+	if (d3d12GPUBuffer->HasUsage(crgfx::BufferUsage::Byte))
 	{
 		srvDescriptor.Format = DXGI_FORMAT_R32_TYPELESS;
 		srvDescriptor.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
@@ -412,7 +412,7 @@ void CrCommandBufferD3D12::WriteRWStorageBufferUAV(const CrStorageBufferBinding&
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDescriptor = {};
 	uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 
-	if (d3d12GPUBuffer->HasUsage(cr3d::BufferUsage::Byte))
+	if (d3d12GPUBuffer->HasUsage(crgfx::BufferUsage::Byte))
 	{
 		uavDescriptor.Format = DXGI_FORMAT_R32_TYPELESS;
 		uavDescriptor.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
@@ -454,7 +454,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	{
 		if (d3d12GraphicsPipeline->GetVertexStreamCount() > 0)
 		{
-			D3D12_VERTEX_BUFFER_VIEW d3d12Views[cr3d::MaxVertexStreams];
+			D3D12_VERTEX_BUFFER_VIEW d3d12Views[crgfx::MaxVertexStreams];
 
 			uint32_t usedVertexStreamCount = d3d12GraphicsPipeline->GetVertexStreamCount();
 
@@ -536,13 +536,13 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	uint32_t shaderResourceDescriptorSize = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 	uint32_t samplerDescriptorSize = m_samplerShaderVisibleDescriptorStream.GetDescriptorHeap().GetDescriptorStride();
 
-	uint32_t cbvCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint32_t srvCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint32_t uavCount[cr3d::ShaderStage::GraphicsStageCount] = {};
-	uint32_t samplerCount[cr3d::ShaderStage::GraphicsStageCount] = {};
+	uint32_t cbvCount[crgfx::ShaderStage::GraphicsStageCount] = {};
+	uint32_t srvCount[crgfx::ShaderStage::GraphicsStageCount] = {};
+	uint32_t uavCount[crgfx::ShaderStage::GraphicsStageCount] = {};
+	uint32_t samplerCount[crgfx::ShaderStage::GraphicsStageCount] = {};
 
 	// TODO Precompute in some way
-	for (cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Vertex; shaderStage < cr3d::ShaderStage::GraphicsStageCount; ++shaderStage)
+	for (crgfx::ShaderStage::T shaderStage = crgfx::ShaderStage::Vertex; shaderStage < crgfx::ShaderStage::GraphicsStageCount; ++shaderStage)
 	{
 		cbvCount[shaderStage] = bindingLayout.GetConstantBufferCount(shaderStage);
 		srvCount[shaderStage] = bindingLayout.GetTextureCount(shaderStage) + bindingLayout.GetStorageBufferCount(shaderStage);
@@ -551,51 +551,51 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	}
 
 	// Handle non-shader-visible tables
-	size_t cbvOffsets[cr3d::ShaderStage::GraphicsStageCount] = {};
-	size_t srvOffsets[cr3d::ShaderStage::GraphicsStageCount] = {};
-	size_t uavOffsets[cr3d::ShaderStage::GraphicsStageCount] = {};
-	size_t samplerOffsets[cr3d::ShaderStage::GraphicsStageCount] = {};
+	size_t cbvOffsets[crgfx::ShaderStage::GraphicsStageCount] = {};
+	size_t srvOffsets[crgfx::ShaderStage::GraphicsStageCount] = {};
+	size_t uavOffsets[crgfx::ShaderStage::GraphicsStageCount] = {};
+	size_t samplerOffsets[crgfx::ShaderStage::GraphicsStageCount] = {};
 
 	size_t shaderResourceOffset = m_shaderResourceCPUDescriptors.Allocate(totalShaderResourceCount);
 	size_t samplerOffset = m_samplerCPUDescriptors.Allocate(totalSamplerCount);
 
-	cbvOffsets[cr3d::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += cbvCount[cr3d::ShaderStage::Vertex];
-	srvOffsets[cr3d::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += srvCount[cr3d::ShaderStage::Vertex];
-	uavOffsets[cr3d::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += uavCount[cr3d::ShaderStage::Vertex];
+	cbvOffsets[crgfx::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += cbvCount[crgfx::ShaderStage::Vertex];
+	srvOffsets[crgfx::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += srvCount[crgfx::ShaderStage::Vertex];
+	uavOffsets[crgfx::ShaderStage::Vertex] = shaderResourceOffset; shaderResourceOffset += uavCount[crgfx::ShaderStage::Vertex];
 
-	cbvOffsets[cr3d::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += cbvCount[cr3d::ShaderStage::Pixel];
-	srvOffsets[cr3d::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += srvCount[cr3d::ShaderStage::Pixel];
-	uavOffsets[cr3d::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += uavCount[cr3d::ShaderStage::Pixel];
+	cbvOffsets[crgfx::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += cbvCount[crgfx::ShaderStage::Pixel];
+	srvOffsets[crgfx::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += srvCount[crgfx::ShaderStage::Pixel];
+	uavOffsets[crgfx::ShaderStage::Pixel] = shaderResourceOffset; shaderResourceOffset += uavCount[crgfx::ShaderStage::Pixel];
 
-	samplerOffsets[cr3d::ShaderStage::Vertex] = samplerOffset; samplerOffset += samplerCount[cr3d::ShaderStage::Vertex];
-	samplerOffsets[cr3d::ShaderStage::Pixel] = samplerOffset;
+	samplerOffsets[crgfx::ShaderStage::Vertex] = samplerOffset; samplerOffset += samplerCount[crgfx::ShaderStage::Vertex];
+	samplerOffsets[crgfx::ShaderStage::Pixel] = samplerOffset;
 
-	bindingLayout.ForEachConstantBuffer([=](cr3d::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([=](crgfx::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffsets[stage] + bindPoint]);
 	});
 
-	bindingLayout.ForEachSampler([=](cr3d::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([=](crgfx::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
 	{
 		WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffsets[stage] + bindPoint]);
 	});
 
-	bindingLayout.ForEachTexture([=](cr3d::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([=](crgfx::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
 	{
 		WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
 	});
 
-	bindingLayout.ForEachRWTexture([=](cr3d::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([=](crgfx::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
 	{
 		WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
 	});
 
-	bindingLayout.ForEachStorageBuffer([=](cr3d::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([=](crgfx::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
 	});
 
-	bindingLayout.ForEachRWStorageBuffer([=](cr3d::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([=](crgfx::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
 	});
@@ -615,65 +615,65 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 	}
 
 	// Handle shader-visible tables
-	crd3d::DescriptorD3D12 cbvShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
-	crd3d::DescriptorD3D12 srvShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
-	crd3d::DescriptorD3D12 uavShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
-	crd3d::DescriptorD3D12 samplerShaderVisibleTables[cr3d::ShaderStage::GraphicsStageCount] = {};
+	crd3d::DescriptorD3D12 cbvShaderVisibleTables[crgfx::ShaderStage::GraphicsStageCount] = {};
+	crd3d::DescriptorD3D12 srvShaderVisibleTables[crgfx::ShaderStage::GraphicsStageCount] = {};
+	crd3d::DescriptorD3D12 uavShaderVisibleTables[crgfx::ShaderStage::GraphicsStageCount] = {};
+	crd3d::DescriptorD3D12 samplerShaderVisibleTables[crgfx::ShaderStage::GraphicsStageCount] = {};
 
 	crd3d::DescriptorD3D12 shaderResourceShaderVisibleOffset = shaderResourceShaderVisibleTableStart;
-	cbvShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
-	srvShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
-	uavShaderVisibleTables[cr3d::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[cr3d::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	cbvShaderVisibleTables[crgfx::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[crgfx::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	srvShaderVisibleTables[crgfx::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[crgfx::ShaderStage::Vertex] * shaderResourceDescriptorSize;
+	uavShaderVisibleTables[crgfx::ShaderStage::Vertex] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[crgfx::ShaderStage::Vertex] * shaderResourceDescriptorSize;
 
-	cbvShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
-	srvShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
-	uavShaderVisibleTables[cr3d::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[cr3d::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	cbvShaderVisibleTables[crgfx::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += cbvCount[crgfx::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	srvShaderVisibleTables[crgfx::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += srvCount[crgfx::ShaderStage::Pixel] * shaderResourceDescriptorSize;
+	uavShaderVisibleTables[crgfx::ShaderStage::Pixel] = shaderResourceShaderVisibleOffset; shaderResourceShaderVisibleOffset += uavCount[crgfx::ShaderStage::Pixel] * shaderResourceDescriptorSize;
 
 	crd3d::DescriptorD3D12 samplerShaderVisibleOffset = samplerShaderVisibleTableStart;
-	samplerShaderVisibleTables[cr3d::ShaderStage::Vertex] = samplerShaderVisibleOffset; samplerShaderVisibleOffset += samplerCount[cr3d::ShaderStage::Vertex] * samplerDescriptorSize;
-	samplerShaderVisibleTables[cr3d::ShaderStage::Pixel] = samplerShaderVisibleOffset;
+	samplerShaderVisibleTables[crgfx::ShaderStage::Vertex] = samplerShaderVisibleOffset; samplerShaderVisibleOffset += samplerCount[crgfx::ShaderStage::Vertex] * samplerDescriptorSize;
+	samplerShaderVisibleTables[crgfx::ShaderStage::Pixel] = samplerShaderVisibleOffset;
 
 	// Vertex shader resources
-	if (cbvCount[cr3d::ShaderStage::Vertex])
+	if (cbvCount[crgfx::ShaderStage::Vertex])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(0, cbvShaderVisibleTables[cr3d::ShaderStage::Vertex].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(0, cbvShaderVisibleTables[crgfx::ShaderStage::Vertex].gpuHandle);
 	}
 
-	if (srvCount[cr3d::ShaderStage::Vertex])
+	if (srvCount[crgfx::ShaderStage::Vertex])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(1, srvShaderVisibleTables[cr3d::ShaderStage::Vertex].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(1, srvShaderVisibleTables[crgfx::ShaderStage::Vertex].gpuHandle);
 	}
 
-	if (uavCount[cr3d::ShaderStage::Vertex])
+	if (uavCount[crgfx::ShaderStage::Vertex])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(2, uavShaderVisibleTables[cr3d::ShaderStage::Vertex].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(2, uavShaderVisibleTables[crgfx::ShaderStage::Vertex].gpuHandle);
 	}
 
-	if (samplerCount[cr3d::ShaderStage::Vertex])
+	if (samplerCount[crgfx::ShaderStage::Vertex])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(3, samplerShaderVisibleTables[cr3d::ShaderStage::Vertex].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(3, samplerShaderVisibleTables[crgfx::ShaderStage::Vertex].gpuHandle);
 	}
 
 	// Pixel shader resources
 
-	if (cbvCount[cr3d::ShaderStage::Pixel])
+	if (cbvCount[crgfx::ShaderStage::Pixel])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(4, cbvShaderVisibleTables[cr3d::ShaderStage::Pixel].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(4, cbvShaderVisibleTables[crgfx::ShaderStage::Pixel].gpuHandle);
 	}
 
-	if (srvCount[cr3d::ShaderStage::Pixel])
+	if (srvCount[crgfx::ShaderStage::Pixel])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(5, srvShaderVisibleTables[cr3d::ShaderStage::Pixel].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(5, srvShaderVisibleTables[crgfx::ShaderStage::Pixel].gpuHandle);
 	}
 
-	if (uavCount[cr3d::ShaderStage::Pixel])
+	if (uavCount[crgfx::ShaderStage::Pixel])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(6, uavShaderVisibleTables[cr3d::ShaderStage::Pixel].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(6, uavShaderVisibleTables[crgfx::ShaderStage::Pixel].gpuHandle);
 	}
 
-	if (samplerCount[cr3d::ShaderStage::Pixel])
+	if (samplerCount[crgfx::ShaderStage::Pixel])
 	{
-		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(7, samplerShaderVisibleTables[cr3d::ShaderStage::Pixel].gpuHandle);
+		m_d3d12GraphicsCommandList->SetGraphicsRootDescriptorTable(7, samplerShaderVisibleTables[crgfx::ShaderStage::Pixel].gpuHandle);
 	}
 }
 
@@ -712,32 +712,32 @@ void CrCommandBufferD3D12::FlushComputeRenderStatePS()
 	size_t srvOffset = shaderResourceOffset; shaderResourceOffset += (textureCount + storageBufferCount);
 	size_t uavOffset = shaderResourceOffset;
 
-	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([&](crgfx::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffset + bindPoint]);
 	});
 
-	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([&](crgfx::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
 	{
 		WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffset + bindPoint]);
 	});
 
-	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([&](crgfx::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
 		WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
 	});
 
-	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([&](crgfx::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
 		WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
 	});
 
-	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([&](crgfx::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
 	});
 
-	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([&](crgfx::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
 	});

@@ -17,20 +17,20 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 
 	switch (descriptor.access)
 	{
-		case cr3d::MemoryAccess::GPUOnlyWrite:
-		case cr3d::MemoryAccess::GPUOnlyRead:
+		case crgfx::MemoryAccess::GPUOnlyWrite:
+		case crgfx::MemoryAccess::GPUOnlyRead:
 			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 			break;
-		case cr3d::MemoryAccess::GPUWriteCPURead:
+		case crgfx::MemoryAccess::GPUWriteCPURead:
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
 			break;
-		case cr3d::MemoryAccess::StagingUpload:
+		case crgfx::MemoryAccess::StagingUpload:
 			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 			break;
-		case cr3d::MemoryAccess::StagingDownload:
+		case crgfx::MemoryAccess::StagingDownload:
 			heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
 			break;
-		case cr3d::MemoryAccess::CPUStreamToGPU:
+		case crgfx::MemoryAccess::CPUStreamToGPU:
 			heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 			break;
 		default:
@@ -53,7 +53,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	d3d12ResourceDescriptor.SampleDesc = { 1, 0 };
 	d3d12ResourceDescriptor.Width = m_sizeBytes;
 
-	if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+	if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
 	{
 		d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	}
@@ -79,7 +79,7 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12Ren
 	{
 		CrAssertMsg(descriptor.initialDataSize <= m_sizeBytes, "Not enough memory in buffer");
 
-		if (descriptor.access == cr3d::MemoryAccess::GPUOnlyWrite)
+		if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
 		{
 			uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
 			{

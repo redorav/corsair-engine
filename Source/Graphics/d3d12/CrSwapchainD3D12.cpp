@@ -152,7 +152,7 @@ void CrSwapchainD3D12::CreateSwapchainTextures()
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
+	swapchainTextureParams.usage = crgfx::TextureUsage::SwapChain;
 
 	m_textures.reserve(m_imageCount);
 

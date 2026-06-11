@@ -10,15 +10,15 @@
 #include <wuffs-unsupported-snapshot.c>
 #pragma warning(pop)
 
-cr3d::DataFormat::T WuffFormatToDataFormat(uint32_t wuffsFormat)
+crgfx::DataFormat::T WuffFormatToDataFormat(uint32_t wuffsFormat)
 {
 	switch (wuffsFormat)
 	{
 		case WUFFS_BASE__PIXEL_FORMAT__BGRA_NONPREMUL:
-			return cr3d::DataFormat::BGRA8_Unorm;
+			return crgfx::DataFormat::BGRA8_Unorm;
 		default:
 			CrAssertMsg(false, "Unhandled format");
-			return cr3d::DataFormat::Invalid;
+			return crgfx::DataFormat::Invalid;
 	}
 }
 
@@ -166,7 +166,7 @@ CrImageHandle CrImageDecoderWuffs::Decode(void* data, uint64_t dataSize) const
 	image->m_height = wpngDestinationImageConfig.pixcfg.height();
 	image->m_mipmapCount = 1;
 	image->m_format = WuffFormatToDataFormat(wpngDestinationImageConfig.pixcfg.pixel_format().repr);
-	image->m_type = cr3d::TextureType::Tex2D;
+	image->m_type = crgfx::TextureType::Tex2D;
 
 	return image;
 }

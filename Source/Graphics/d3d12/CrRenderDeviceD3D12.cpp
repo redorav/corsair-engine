@@ -72,7 +72,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	SelectedDevice maxPriorityDevice;
 	SelectedDevice maxPriorityPreferredDevice;
 
-	cr3d::GraphicsVendor::T preferredVendor = descriptor.preferredVendor;
+	crgfx::GraphicsVendor::T preferredVendor = descriptor.preferredVendor;
 
 	IDXGIAdapter1* dxgiAdapter1 = nullptr;
 	IDXGIAdapter2* dxgiAdapter2 = nullptr;
@@ -101,7 +101,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 			dxgiAdapter1->GetDesc1(&adapterDescriptor1);
 		}
 
-		cr3d::GraphicsVendor::T graphicsVendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor3.VendorId);
+		crgfx::GraphicsVendor::T graphicsVendor = crgfx::GraphicsVendor::FromVendorID(adapterDescriptor3.VendorId);
 
 		bool isSoftwareRenderer = adapterDescriptor3.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE;
 
@@ -195,8 +195,8 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 #endif
 
 	// Parse render device properties
-	m_renderDeviceProperties.vendor = cr3d::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
-	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", cr3d::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), GetD3DFeatureLevelString(featureLevels.MaxSupportedFeatureLevel));
+	m_renderDeviceProperties.vendor = crgfx::GraphicsVendor::FromVendorID(adapterDescriptor.VendorId);
+	m_renderDeviceProperties.graphicsApiDisplay.append_sprintf("%s %s", crgfx::GraphicsApi::ToString(m_renderDeviceProperties.graphicsApi), GetD3DFeatureLevelString(featureLevels.MaxSupportedFeatureLevel));
 
 #if defined(USE_AGILITY_SDK)
 	if (usingAgility)
@@ -458,7 +458,7 @@ void CrRenderDeviceD3D12::FinalizeDeletionPS()
 	m_waitIdleFence = nullptr;
 }
 
-cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+crgfx::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
 	ID3D12Fence* d3d12Fence = d3dFence->GetD3D12Fence();
@@ -475,25 +475,25 @@ cr3d::GPUFenceResult CrRenderDeviceD3D12::WaitForFencePS(const ICrGPUFence* fenc
 
 	if (waitResult == 0)
 	{
-		return cr3d::GPUFenceResult::Success;
+		return crgfx::GPUFenceResult::Success;
 	}
 	else
 	{
-		return cr3d::GPUFenceResult::TimeoutOrNotReady;
+		return crgfx::GPUFenceResult::TimeoutOrNotReady;
 	}
 }
 
-cr3d::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fence) const
+crgfx::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fence) const
 {
 	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
 
 	if (d3dFence->GetD3D12Fence()->GetCompletedValue() == 1)
 	{
-		return cr3d::GPUFenceResult::Success;
+		return crgfx::GPUFenceResult::Success;
 	}
 	else
 	{
-		return cr3d::GPUFenceResult::TimeoutOrNotReady;
+		return crgfx::GPUFenceResult::TimeoutOrNotReady;
 	}
 }
 
@@ -543,7 +543,7 @@ uint8_t* CrRenderDeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
 	UINT64 stagingBufferSizeBytes;
 	m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, d3d12Texture->GetD3D12SubresourceCount(), 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
 
 	CrTextureUpload textureUpload;
@@ -602,16 +602,16 @@ void CrRenderDeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTextur
 			d3d12CommandBuffer->GetD3D12CommandList7()->Barrier(1, &textureBarrierGroup);
 		}
 
-		cr3d::DataFormat::T format = destinationTexture->GetFormat();
+		crgfx::DataFormat::T format = destinationTexture->GetFormat();
 
-		uint32_t blockWidth = cr3d::DataFormats[format].blockWidth;
-		uint32_t blockHeight = cr3d::DataFormats[format].blockHeight;
+		uint32_t blockWidth = crgfx::DataFormats[format].blockWidth;
+		uint32_t blockHeight = crgfx::DataFormats[format].blockHeight;
 
 		for (uint32_t slice = textureUpload.sliceStart; slice < textureUpload.sliceCount; ++slice)
 		{
 			for (uint32_t mip = textureUpload.mipmapStart; mip < textureUpload.mipmapCount; ++mip)
 			{
-				cr3d::MipmapLayout mipmapLayout = destinationTexture->GetHardwareMipSliceLayout(mip, slice);
+				crgfx::MipmapLayout mipmapLayout = destinationTexture->GetHardwareMipSliceLayout(mip, slice);
 
 				D3D12_TEXTURE_COPY_LOCATION textureCopySource = {};
 				textureCopySource.pResource = d3d12StagingBuffer->GetD3D12Resource();
@@ -656,7 +656,7 @@ uint8_t* CrRenderDeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* de
 {
 	uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferSrc, cr3d::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
 	stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
 
 	CrBufferUpload bufferUpload;
@@ -713,7 +713,7 @@ CrHardwareGPUBufferHandle CrRenderDeviceD3D12::DownloadBufferPS(const ICrHardwar
 	UINT64 stagingBufferSizeBytes;
 	m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, 1, 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
 
-	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
+	CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
 	CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 	CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 

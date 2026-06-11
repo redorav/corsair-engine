@@ -20,11 +20,11 @@ public:
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
 
-	static const CrVkBufferStateInfo& GetVkBufferStateInfo(cr3d::BufferState::T bufferState);
+	static const CrVkBufferStateInfo& GetVkBufferStateInfo(crgfx::BufferState::T bufferState);
 
-	static VkBufferUsageFlags GetVkBufferUsageFlagBits(cr3d::BufferUsage::T usage, cr3d::MemoryAccess::T access);
+	static VkBufferUsageFlags GetVkBufferUsageFlagBits(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access);
 
-	static VkPipelineStageFlags GetVkPipelineStageFlags(cr3d::BufferState::T bufferState, cr3d::ShaderStageFlags::T shaderStages);
+	static VkPipelineStageFlags GetVkPipelineStageFlags(crgfx::BufferState::T bufferState, crgfx::ShaderStageFlags::T shaderStages);
 
 	VkBuffer GetVkBuffer() const;
 

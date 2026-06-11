@@ -18,8 +18,8 @@ struct CrD3D12CustomView
 struct CrD3D12AdditionalTextureViews
 {
 	// RTVs
-	crstl::array<crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE>, cr3d::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
-	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, cr3d::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
+	crstl::array<crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE>, crgfx::MaxMipmaps> m_d3d12RTVSingleMipSlice; // Each mipmap can have a variable amount of slices
+	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, crgfx::MaxMipmaps> m_d3d12RTVSingleMipAllSlices; // Each mipmap can see all slices (via SV_RenderTargetArrayIndex)
 
 	// DSVs
 	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12DSVSingleMipSlice;
@@ -29,12 +29,12 @@ struct CrD3D12AdditionalTextureViews
 	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12DSVSingleMipSliceReadOnlyStencil;
 
 	// UAVs
-	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, cr3d::MaxMipmaps> m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
+	crstl::array<D3D12_CPU_DESCRIPTOR_HANDLE, crgfx::MaxMipmaps> m_d3d12UAVSingleMipAllSlices; // Each mipmap can see all slices
 
 	D3D12_CPU_DESCRIPTOR_HANDLE m_d3d12StencilSRVDescriptor;
 
 	// Custom views
-	crstl::fixed_vector<CrD3D12CustomView, cr3d::MaxCustomTextureViews> m_d3d12CustomViews;
+	crstl::fixed_vector<CrD3D12CustomView, crgfx::MaxCustomTextureViews> m_d3d12CustomViews;
 };
 
 class CrTextureD3D12 final : public ICrTexture
@@ -48,7 +48,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE CreateShaderResourceView
 	(
 		DXGI_FORMAT srvFormat,
-		cr3d::TextureType type,
+		crgfx::TextureType type,
 		uint32_t mipmapStart,
 		uint32_t mipmapCount,
 		uint32_t arrayStart,

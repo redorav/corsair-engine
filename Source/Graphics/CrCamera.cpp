@@ -11,7 +11,7 @@
 #include "Math/CrHlslppMatrixFloat.h"
 
 CrCamera::CrCamera() : CrEntity()
-	, m_projection(cr3d::CameraProjection::Perspective)
+	, m_projection(crgfx::CameraProjection::Perspective)
 	, m_nearPlane(0.1f)
 	, m_farPlane(100.0f)
 	, m_aspectRatio(1.0f)
@@ -43,7 +43,7 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 
 	static float fovY = 60.0f;
 
-	m_projection = cr3d::CameraProjection::Perspective;
+	m_projection = crgfx::CameraProjection::Perspective;
 
 	m_resolutionWidth = resolutionWidth;
 
@@ -96,7 +96,7 @@ float4 CrCamera::ComputeLinearizationParams() const
 		projectionParamsY = (m_farPlane - m_nearPlane) / m_farPlane;
 	}
 
-	float projectionParamsZ = (m_nearPlane - m_farPlane) * (m_projection == cr3d::CameraProjection::Orthographic ? 1.0f : 0.0f); // Orthographic camera
+	float projectionParamsZ = (m_nearPlane - m_farPlane) * (m_projection == crgfx::CameraProjection::Orthographic ? 1.0f : 0.0f); // Orthographic camera
 	float projectionParamsW = 0.0f; // Stereo rendering offset
 
 	return float4(projectionParamsX, projectionParamsY, projectionParamsZ, projectionParamsW);

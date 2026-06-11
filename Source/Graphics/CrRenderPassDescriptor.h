@@ -39,9 +39,9 @@ struct CrRenderTargetDescriptor
 	CrRenderTargetStoreOp storeOp;
 	CrRenderTargetLoadOp stencilLoadOp;
 	CrRenderTargetStoreOp stencilStoreOp;
-	cr3d::TextureState initialState;
-	cr3d::TextureState usageState;
-	cr3d::TextureState finalState;
+	crgfx::TextureState initialState;
+	crgfx::TextureState usageState;
+	crgfx::TextureState finalState;
 };
 
 // For buffers and textures that aren't used as render targets, we split them into two parts. Even if some data is duplicated in some cases,
@@ -52,8 +52,8 @@ struct CrRenderPassBufferDescriptor
 	CrRenderPassBufferDescriptor
 	(
 		const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t offset,
-		cr3d::BufferState::T sourceState, cr3d::ShaderStageFlags::T sourceShaderStages, 
-		cr3d::BufferState::T destinationState, cr3d::ShaderStageFlags::T destinationShaderStages)
+		crgfx::BufferState::T sourceState, crgfx::ShaderStageFlags::T sourceShaderStages, 
+		crgfx::BufferState::T destinationState, crgfx::ShaderStageFlags::T destinationShaderStages)
 		: hardwareBuffer(hardwareBuffer), numElements(numElements), stride(stride), offset(offset), sourceState(sourceState), sourceShaderStages(sourceShaderStages),
 		destinationState(destinationState), destinationShaderStages(destinationShaderStages) {}
 	
@@ -62,16 +62,16 @@ struct CrRenderPassBufferDescriptor
 	uint32_t stride;
 	uint32_t offset;
 
-	cr3d::BufferState::T sourceState;
-	cr3d::ShaderStageFlags::T sourceShaderStages;
-	cr3d::BufferState::T destinationState;
-	cr3d::ShaderStageFlags::T destinationShaderStages;
+	crgfx::BufferState::T sourceState;
+	crgfx::ShaderStageFlags::T sourceShaderStages;
+	crgfx::BufferState::T destinationState;
+	crgfx::ShaderStageFlags::T destinationShaderStages;
 };
 
 struct CrRenderPassTextureDescriptor
 {
 	CrRenderPassTextureDescriptor(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
-		uint32_t sliceStart, uint32_t sliceCount, cr3d::TexturePlane::T texturePlane, const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
+		uint32_t sliceStart, uint32_t sliceCount, crgfx::TexturePlane::T texturePlane, const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState)
 		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount), texturePlane(texturePlane)
 		, sourceState(sourceState), destinationState(destinationState) {}
 
@@ -83,10 +83,10 @@ struct CrRenderPassTextureDescriptor
 	uint32_t sliceStart;
 	uint32_t sliceCount;
 
-	cr3d::TexturePlane::T texturePlane;
+	crgfx::TexturePlane::T texturePlane;
 
-	cr3d::TextureState sourceState;
-	cr3d::TextureState destinationState;
+	crgfx::TextureState sourceState;
+	crgfx::TextureState destinationState;
 };
 
 struct CrRenderPassDescriptor
@@ -96,12 +96,12 @@ struct CrRenderPassDescriptor
 	typedef crstl::fixed_vector<CrRenderPassBufferDescriptor, MaxTransitionCount> BufferTransitionVector;
 	typedef crstl::fixed_vector<CrRenderPassTextureDescriptor, MaxTransitionCount> TextureTransitionVector;
 
-	cr3d::RenderPassType::T type;
+	crgfx::RenderPassType::T type;
 	
 	CrRenderPassNameString debugName;
 	float4 debugColor;
 
-	crstl::fixed_vector<CrRenderTargetDescriptor, cr3d::MaxRenderTargets> color;
+	crstl::fixed_vector<CrRenderTargetDescriptor, crgfx::MaxRenderTargets> color;
 	CrRenderTargetDescriptor depth;
 
 	// Transitions when beginning a pass

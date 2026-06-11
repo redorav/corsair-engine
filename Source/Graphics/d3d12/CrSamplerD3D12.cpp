@@ -20,19 +20,19 @@ CrSamplerD3D12::CrSamplerD3D12(ICrRenderDevice* renderDevice, const CrSamplerDes
 
 	switch (descriptor.borderColor)
 	{
-		case cr3d::BorderColor::TransparentBlack:
+		case crgfx::BorderColor::TransparentBlack:
 			samplerDescriptor.BorderColor[0] = 0.0f;
 			samplerDescriptor.BorderColor[1] = 0.0f;
 			samplerDescriptor.BorderColor[2] = 0.0f;
 			samplerDescriptor.BorderColor[3] = 0.0f;
 			break;
-		case cr3d::BorderColor::OpaqueBlack:
+		case crgfx::BorderColor::OpaqueBlack:
 			samplerDescriptor.BorderColor[0] = 0.0f;
 			samplerDescriptor.BorderColor[1] = 0.0f;
 			samplerDescriptor.BorderColor[2] = 0.0f;
 			samplerDescriptor.BorderColor[3] = 1.0f;
 			break;
-		case cr3d::BorderColor::OpaqueWhite:
+		case crgfx::BorderColor::OpaqueWhite:
 			samplerDescriptor.BorderColor[0] = 1.0f;
 			samplerDescriptor.BorderColor[1] = 1.0f;
 			samplerDescriptor.BorderColor[2] = 1.0f;

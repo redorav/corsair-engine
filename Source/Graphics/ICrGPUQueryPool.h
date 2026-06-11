@@ -22,9 +22,9 @@ struct CrGPUOcclusion
 
 struct CrGPUQueryPoolDescriptor
 {
-	CrGPUQueryPoolDescriptor(cr3d::QueryType type, uint32_t count) : type(type), count(count) {}
+	CrGPUQueryPoolDescriptor(crgfx::QueryType type, uint32_t count) : type(type), count(count) {}
 
-	cr3d::QueryType type;
+	crgfx::QueryType type;
 	uint32_t count;
 };
 
@@ -53,7 +53,7 @@ public:
 		return m_querySize;
 	}
 
-	cr3d::QueryType GetType() const
+	crgfx::QueryType GetType() const
 	{
 		return m_descriptor.type;
 	}

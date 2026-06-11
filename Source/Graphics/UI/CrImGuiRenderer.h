@@ -10,8 +10,8 @@ struct ImDrawData;
 
 struct CrImGuiRendererInitParams
 {
-	cr3d::DataFormat::T m_swapchainFormat;
-	cr3d::SampleCount m_sampleCount;
+	crgfx::DataFormat::T m_swapchainFormat;
+	crgfx::SampleCount m_sampleCount;
 };
 
 class CrOSWindow;

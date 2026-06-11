@@ -21,7 +21,7 @@ void ICrGPUQueryPool::Resolve(ICrCommandBuffer* commandBuffer)
 
 void ICrGPUQueryPool::GetTimestampData(CrGPUTimestamp* timingData, uint32_t timingCount)
 {
-	CrAssertMsg(m_descriptor.type == cr3d::QueryType::Timestamp, "Wrong query type");
+	CrAssertMsg(m_descriptor.type == crgfx::QueryType::Timestamp, "Wrong query type");
 
 	if (m_resolved)
 	{

@@ -359,7 +359,7 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.usage = cr3d::TextureUsage::SwapChain;
+	swapchainTextureParams.usage = crgfx::TextureUsage::SwapChain;
 
 	crstl::fixed_vector<VkImageMemoryBarrier, 8> imageMemoryBarriers(m_imageCount);
 

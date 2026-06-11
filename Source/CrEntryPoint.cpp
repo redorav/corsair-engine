@@ -65,12 +65,12 @@ int main(int argc, char* argv[])
 	CrPrintProcessMemory("Before Render Device");
 
 	CrRenderSystemDescriptor renderSystemDescriptor;
-	renderSystemDescriptor.graphicsApi      = cr3d::GraphicsApi::FromString(graphicsApiString.c_str());
+	renderSystemDescriptor.graphicsApi      = crgfx::GraphicsApi::FromString(graphicsApiString.c_str());
 
 	// Default API is Vulkan
-	if (renderSystemDescriptor.graphicsApi == cr3d::GraphicsApi::Count)
+	if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Count)
 	{
-		renderSystemDescriptor.graphicsApi = cr3d::GraphicsApi::Vulkan;
+		renderSystemDescriptor.graphicsApi = crgfx::GraphicsApi::Vulkan;
 	}
 
 	renderSystemDescriptor.enableValidation = enableGraphicsValidation;
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 	ICrRenderSystem::Initialize(renderSystemDescriptor);
 
 	CrRenderDeviceDescriptor renderDeviceDescriptor;
-	renderDeviceDescriptor.preferredVendor = cr3d::GraphicsVendor::FromString(graphicsVendorString.c_str());
+	renderDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	RenderSystem->CreateRenderDevice(renderDeviceDescriptor);
 
 	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();

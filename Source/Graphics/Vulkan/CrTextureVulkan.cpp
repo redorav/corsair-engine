@@ -152,7 +152,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 		VmaAllocationCreateInfo vmaAllocationCreateInfo = {};
 
-		if (descriptor.usage & cr3d::TextureUsage::CPUReadable)
+		if (descriptor.usage & crgfx::TextureUsage::CPUReadable)
 		{
 			imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED; // TODO Condition on initialData
@@ -203,7 +203,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	VkImageAspectFlags viewAspectMask;
 
-	if (cr3d::IsDepthFormat(m_format))
+	if (crgfx::IsDepthFormat(m_format))
 	{
 		viewAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 	}
@@ -281,7 +281,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 		m_additionalViews->m_vkImageViewStencil = nullptr;
 
-		if (IsDepthStencil() && cr3d::IsDepthStencilFormat(m_format))
+		if (IsDepthStencil() && crgfx::IsDepthStencilFormat(m_format))
 		{
 			VkImageViewCreateInfo stencilImageViewInfo;
 			stencilImageViewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -305,7 +305,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 		{
 			const CrTextureView& textureView = descriptor.customViews[i];
 			
-			if(textureView.format != cr3d::DataFormat::Invalid)
+			if(textureView.format != crgfx::DataFormat::Invalid)
 			{
 				imageViewInfo.format = crvk::GetVkFormat(textureView.format);
 			}
@@ -329,8 +329,8 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 
 	for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 	{
-		cr3d::MipmapLayout genericMipLayout = GetDDSMipSliceLayout(mip, 0);
-		cr3d::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
+		crgfx::MipmapLayout genericMipLayout = GetDDSMipSliceLayout(mip, 0);
+		crgfx::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
 		mipmapLayout.rowPitchBytes        = genericMipLayout.rowPitchBytes;
 		mipmapLayout.offsetBytes          = genericMipLayout.offsetBytes;
 		mipmapLayout.heightInPixelsBlocks = genericMipLayout.heightInPixelsBlocks;
@@ -344,7 +344,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 	// If we have initial data, copy it here
 	if (descriptor.initialData)
 	{
-		if (m_usage & cr3d::TextureUsage::Default)
+		if (m_usage & crgfx::TextureUsage::Default)
 		{
 			uint8_t* textureData = m_renderDevice->BeginTextureUpload(this);
 			{
@@ -352,7 +352,7 @@ CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureD
 			}
 			m_renderDevice->EndTextureUpload(this);
 		}
-		else if (m_usage & cr3d::TextureUsage::CPUReadable)
+		else if (m_usage & crgfx::TextureUsage::CPUReadable)
 		{
 			void* data;
 			vkResult = vmaMapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation, &data);

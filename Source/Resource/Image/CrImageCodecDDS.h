@@ -32,7 +32,7 @@ public:
 
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const override;
 
-	virtual bool IsImageFormatSupported(cr3d::DataFormat::T format) const override;
+	virtual bool IsImageFormatSupported(crgfx::DataFormat::T format) const override;
 
 private:
 

@@ -10,13 +10,13 @@ CrImageDescriptor::CrImageDescriptor()
 	, mipmapCount(1)
 	, data(nullptr)
 	, dataSize(0)
-	, format(cr3d::DataFormat::RGBA8_Unorm)
-	, type(cr3d::TextureType::Tex2D)
+	, format(crgfx::DataFormat::RGBA8_Unorm)
+	, type(crgfx::TextureType::Tex2D)
 {
 
 }
 
-CrImage::CrImage() : m_width(1), m_height(1), m_depth(1), m_format(cr3d::DataFormat::RGBA8_Unorm)
+CrImage::CrImage() : m_width(1), m_height(1), m_depth(1), m_format(crgfx::DataFormat::RGBA8_Unorm)
 {
 
 }

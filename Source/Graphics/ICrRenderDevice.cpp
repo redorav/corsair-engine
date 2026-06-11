@@ -29,7 +29,7 @@ ICrRenderDevice::ICrRenderDevice(ICrRenderSystem* renderSystem, const CrRenderDe
 	: m_isValidPipelineCache(false)
 {
 	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Pipeline Cache/";
-	m_pipelineCacheDirectory += cr3d::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
+	m_pipelineCacheDirectory += crgfx::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
 	m_pipelineCacheDirectory += "/";
 	m_pipelineCacheFilename = "PipelineCache.bin";
 	m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
@@ -253,7 +253,7 @@ ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareG
 	return CreateHardwareGPUBufferPS(descriptor);
 }
 
-CrIndexBuffer* ICrRenderDevice::CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices)
+CrIndexBuffer* ICrRenderDevice::CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
 {
 	return new CrIndexBuffer(this, access, dataFormat, numIndices);
 }
@@ -266,14 +266,14 @@ ICrSampler* ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor
 ICrSwapchain* ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 {
 	CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
-	CrAssertMsg(swapchainDescriptor.format != cr3d::DataFormat::Invalid, "Must set a data format");
+	CrAssertMsg(swapchainDescriptor.format != crgfx::DataFormat::Invalid, "Must set a data format");
 
 	ICrSwapchain* swapchain = CreateSwapchainPS(swapchainDescriptor);
 
 	CrAssertMsg(swapchain->GetWidth() > 0, "Swapchain must have a width");
 	CrAssertMsg(swapchain->GetHeight() > 0, "Swapchain must have a height");
 	CrAssertMsg(swapchain->GetImageCount() > 0, "Swapchain must have at least one image");
-	CrAssertMsg(swapchain->GetFormat() != cr3d::DataFormat::Invalid, "Swapchain must have a texture format");
+	CrAssertMsg(swapchain->GetFormat() != crgfx::DataFormat::Invalid, "Swapchain must have a texture format");
 
 	return swapchain;
 }
@@ -283,22 +283,22 @@ ICrTexture* ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor
 	return CreateTexturePS(descriptor);
 }
 
-CrVertexBuffer* ICrRenderDevice::CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+CrVertexBuffer* ICrRenderDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 {
 	return new CrVertexBuffer(this, access, vertexDescriptor, numVertices);
 }
 
-CrTypedBuffer* ICrRenderDevice::CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements)
+CrTypedBuffer* ICrRenderDevice::CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
 {
 	return new CrTypedBuffer(this, access, dataFormat, numElements);
 }
 
-cr3d::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+crgfx::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 {
 	return WaitForFencePS(fence, timeoutNanoseconds);
 }
 
-cr3d::GPUFenceResult ICrRenderDevice::GetFenceStatus(ICrGPUFence* fence) const
+crgfx::GPUFenceResult ICrRenderDevice::GetFenceStatus(ICrGPUFence* fence) const
 {
 	return GetFenceStatusPS(fence);
 }
@@ -330,7 +330,7 @@ void ICrRenderDevice::EndTextureUpload(const ICrTexture* texture)
 
 uint8_t* ICrRenderDevice::BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
 {
-	CrAssertMsg(destinationBuffer->GetUsage() & cr3d::BufferUsage::TransferDst, "Buffer must have transfer destination usage enabled");
+	CrAssertMsg(destinationBuffer->GetUsage() & crgfx::BufferUsage::TransferDst, "Buffer must have transfer destination usage enabled");
 
 	return BeginBufferUploadPS(destinationBuffer);
 }
@@ -342,7 +342,7 @@ void ICrRenderDevice::EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuf
 
 void ICrRenderDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, const CrGPUTransferCallbackType& callback)
 {
-	CrAssertMsg(sourceBuffer->GetUsage() & cr3d::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
+	CrAssertMsg(sourceBuffer->GetUsage() & crgfx::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
 
 	// Queue the download operation and return the buffer that contains the data for the CPU
 	CrHardwareGPUBufferHandle buffer = DownloadBufferPS(sourceBuffer);

@@ -129,7 +129,7 @@ public:
 
 	// Index Buffer
 
-	void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, cr3d::DataFormat::T indexFormat);
+	void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, crgfx::DataFormat::T indexFormat);
 
 	void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
 
@@ -247,7 +247,7 @@ public:
 
 	CrGPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
-	CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat);
+	CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, crgfx::DataFormat::T indexFormat);
 
 protected:
 
@@ -299,10 +299,10 @@ protected:
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
 		uint32_t                        m_indexBufferSize;
-		cr3d::DataFormat::T             m_indexBufferFormat;
+		crgfx::DataFormat::T             m_indexBufferFormat;
 		bool                            m_indexBufferDirty = false;
 
-		CrVertexBufferBinding           m_vertexBuffers[cr3d::MaxVertexStreams];
+		CrVertexBufferBinding           m_vertexBuffers[crgfx::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = false;
 
 		CrRectangle                     m_scissor;
@@ -385,11 +385,11 @@ inline void ICrCommandBuffer::SetStencilRef(uint32_t stencilRef)
 	}
 }
 
-inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, cr3d::DataFormat::T indexFormat)
+inline void ICrCommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, crgfx::DataFormat::T indexFormat)
 {
 	CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & cr3d::BufferUsage::Index, "Buffer must have index buffer flag");
-	CrCommandBufferAssertMsg(indexFormat == cr3d::DataFormat::R16_Uint || indexFormat == cr3d::DataFormat::R32_Uint, "Only these formats are allowed");
+	CrCommandBufferAssertMsg(indexBuffer->GetUsage() & crgfx::BufferUsage::Index, "Buffer must have index buffer flag");
+	CrCommandBufferAssertMsg(indexFormat == crgfx::DataFormat::R16_Uint || indexFormat == crgfx::DataFormat::R32_Uint, "Only these formats are allowed");
 
 	if (m_currentState.m_indexBuffer != indexBuffer ||
 		m_currentState.m_indexBufferOffset != byteOffset ||
@@ -417,7 +417,7 @@ inline void ICrCommandBuffer::BindIndexBuffer(const CrIndexBuffer* indexBuffer, 
 inline void ICrCommandBuffer::BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride)
 {
 	CrCommandBufferAssertMsg(vertexBuffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & cr3d::BufferUsage::Vertex, "Buffer must have vertex buffer flag");
+	CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & crgfx::BufferUsage::Vertex, "Buffer must have vertex buffer flag");
 	CrCommandBufferAssertMsg(stride < 2048, "Stride is too large");
 
 	if (m_currentState.m_vertexBuffers[streamId].vertexBuffer != vertexBuffer || m_currentState.m_vertexBuffers[streamId].offset != byteOffset ||
@@ -466,7 +466,7 @@ inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, 
 
 inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
-	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Graphics, "Render pass type must be Graphics");
 
 	FlushGraphicsRenderState();
 
@@ -479,7 +479,7 @@ inline void ICrCommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount,
 
 inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance)
 {
-	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Graphics, "Render pass type must be Graphics");
 
 	FlushGraphicsRenderState();
 
@@ -492,7 +492,7 @@ inline void ICrCommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instance
 
 inline void ICrCommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 {
-	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics, "Render pass type must be Graphics");
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Graphics, "Render pass type must be Graphics");
 
 	FlushGraphicsRenderState();
 
@@ -538,7 +538,7 @@ inline void ICrCommandBuffer::DrawIndexedIndirect(const ICrHardwareGPUBuffer* in
 
 inline void ICrCommandBuffer::DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 {
-	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Compute, "Render pass type must be Compute");
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Compute, "Render pass type must be Compute");
 
 	FlushComputeRenderState();
 
@@ -552,7 +552,7 @@ inline void ICrCommandBuffer::FlushGraphicsRenderState()
 
 inline void ICrCommandBuffer::Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ)
 {
-	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Compute, "Render pass type must be Compute");
+	CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Compute, "Render pass type must be Compute");
 
 	FlushComputeRenderState();
 
@@ -582,7 +582,7 @@ inline void ICrCommandBuffer::InsertDebugMarker(const char* markerName, const fl
 inline void ICrCommandBuffer::BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const ICrHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset)
 {
 	CrCommandBufferAssertMsg(constantBuffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(constantBuffer->HasUsage(cr3d::BufferUsage::Constant), "Buffer must have constant buffer flag");
+	CrCommandBufferAssertMsg(constantBuffer->HasUsage(crgfx::BufferUsage::Constant), "Buffer must have constant buffer flag");
 	CrCommandBufferAssertMsg(constantBufferIndex < ConstantBuffers::Count, "Invalid binding index");
 
 	m_currentState.m_constantBuffers[constantBufferIndex] = CrConstantBufferBinding(constantBuffer, size, offset);
@@ -605,7 +605,7 @@ inline void ICrCommandBuffer::BindTexture(Textures::T textureIndex, const ICrTex
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
-	CrCommandBufferAssertMsg((view.plane == cr3d::TexturePlane::Plane0) ? true : cr3d::IsDepthStencilFormat(texture->GetFormat()), "Invalid plane specified");
+	CrCommandBufferAssertMsg((view.plane == crgfx::TexturePlane::Plane0) ? true : crgfx::IsDepthStencilFormat(texture->GetFormat()), "Invalid plane specified");
 
 	m_currentState.m_textures[textureIndex] = CrTextureBinding(texture, view);
 }
@@ -623,7 +623,7 @@ inline void ICrCommandBuffer::BindRWTexture(RWTextures::T rwTextureIndex, const 
 inline void ICrCommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasUsage(crgfx::BufferUsage::Storage), "Buffer must have storage buffer flag");
 	CrCommandBufferAssertMsg(storageBufferIndex < StorageBuffers::Count, "Invalid binding index");
 	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 
@@ -643,8 +643,8 @@ inline void ICrCommandBuffer::BindStorageBuffer(const CrGPUBufferView& structure
 inline void ICrCommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Storage), "Buffer must have storage buffer flag");
-	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
+	CrCommandBufferAssertMsg(buffer->HasUsage(crgfx::BufferUsage::Storage), "Buffer must have storage buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasAccess(crgfx::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(crgfx::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 	CrCommandBufferAssertMsg(rwStorageBufferIndex < RWStorageBuffers::Count, "Invalid binding index");
 	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 
@@ -661,8 +661,8 @@ inline void ICrCommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwBufferIndex,
 	unused_parameter(numElements); unused_parameter(stride); unused_parameter(offset);
 
 	CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
-	CrCommandBufferAssertMsg(buffer->HasUsage(cr3d::BufferUsage::Typed), "Buffer must have typed buffer flag");
-	CrCommandBufferAssertMsg(buffer->HasAccess(cr3d::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(cr3d::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
+	CrCommandBufferAssertMsg(buffer->HasUsage(crgfx::BufferUsage::Typed), "Buffer must have typed buffer flag");
+	CrCommandBufferAssertMsg(buffer->HasAccess(crgfx::MemoryAccess::GPUOnlyWrite) || buffer->HasAccess(crgfx::MemoryAccess::GPUWriteCPURead), "Buffer must be GPU-writable");
 	CrCommandBufferAssertMsg(rwBufferIndex < RWTypedBuffers::Count, "Invalid binding index");
 	CrCommandBufferAssertMsg(numElements * stride <= buffer->GetSizeBytes(), "Bound size too large");
 

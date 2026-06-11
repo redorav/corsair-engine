@@ -35,16 +35,16 @@
 // Based on ImDrawVert
 struct UIVertex
 {
-	CrVertexElement<float, cr3d::DataFormat::RG32_Float> position;
-	CrVertexElement<float, cr3d::DataFormat::RG32_Float> uv;
-	CrVertexElement<uint8_t, cr3d::DataFormat::RGBA8_Unorm> color;
+	CrVertexElement<float, crgfx::DataFormat::RG32_Float> position;
+	CrVertexElement<float, crgfx::DataFormat::RG32_Float> uv;
+	CrVertexElement<uint8_t, crgfx::DataFormat::RGBA8_Unorm> color;
 };
 
 CrVertexDescriptor UIVertexDescriptor =
 {
-	CrVertexAttribute(CrVertexSemantic::Position, cr3d::DataFormat::RG32_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::TexCoord0, cr3d::DataFormat::RG32_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::Color, cr3d::DataFormat::RGBA8_Unorm, 0),
+	CrVertexAttribute(CrVertexSemantic::Position, crgfx::DataFormat::RG32_Float, 0),
+	CrVertexAttribute(CrVertexSemantic::TexCoord0, crgfx::DataFormat::RG32_Float, 0),
+	CrVertexAttribute(CrVertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
 };
 
 float4x4 ComputeProjectionMatrix(ImDrawData* data)
@@ -93,16 +93,16 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 		psoDescriptor.depthStencilState.depthTestEnable = false;
 		psoDescriptor.depthStencilState.depthWriteEnable = false;
 		psoDescriptor.blendState.renderTargetBlends[0].enable = true;
-		psoDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
-		psoDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-		psoDescriptor.blendState.renderTargetBlends[0].colorBlendOp = cr3d::BlendOp::Add;
-		psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-		psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
-		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = cr3d::BlendOp::Add;
+		psoDescriptor.blendState.renderTargetBlends[0].srcColorBlendFactor = crgfx::BlendFactor::SrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].dstColorBlendFactor = crgfx::BlendFactor::OneMinusSrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].colorBlendOp = crgfx::BlendOp::Add;
+		psoDescriptor.blendState.renderTargetBlends[0].srcAlphaBlendFactor = crgfx::BlendFactor::OneMinusSrcAlpha;
+		psoDescriptor.blendState.renderTargetBlends[0].dstAlphaBlendFactor = crgfx::BlendFactor::Zero;
+		psoDescriptor.blendState.renderTargetBlends[0].alphaBlendOp = crgfx::BlendOp::Add;
 
 		psoDescriptor.renderTargets.colorFormats[0] = initParams.m_swapchainFormat;
 
-		psoDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
+		psoDescriptor.rasterizerState.cullMode = crgfx::PolygonCullMode::None;
 
 		m_imguiGraphicsPipeline = BuiltinPipelines->GetGraphicsPipeline(psoDescriptor, UIVertexDescriptor, CrBuiltinShaders::ImguiVS, CrBuiltinShaders::ImguiPS);
 	}
@@ -116,7 +116,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 		CrTextureDescriptor fontParams;
 		fontParams.width = (uint32_t)fontWidth;
 		fontParams.height = (uint32_t)fontHeight;
-		fontParams.format = cr3d::DataFormat::RGBA8_Unorm;
+		fontParams.format = crgfx::DataFormat::RGBA8_Unorm;
 		fontParams.name = "ImGui Font Atlas";
 		fontParams.initialData = fontData;
 		fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
@@ -217,7 +217,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 			}
 
 			// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-			CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, cr3d::DataFormat::R16_Uint);
+			CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, crgfx::DataFormat::R16_Uint);
 			CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
 
 			// Update contents:

@@ -12,7 +12,7 @@
 
 struct CrRenderSystemDescriptor 
 {
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+	crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
 
 	// e.g. Vulkan layers, D3D debug layer
 	bool enableValidation = false;
@@ -50,7 +50,7 @@ public:
 
 	bool GetIsValidationEnabled() const;
 
-	cr3d::GraphicsApi::T GetGraphicsApi() const;
+	crgfx::GraphicsApi::T GetGraphicsApi() const;
 
 	bool GetIsNVAPIInitialized() const { return m_nvapiInitialized; }
 

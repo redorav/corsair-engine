@@ -3,23 +3,23 @@
 
 #include <cstring>
 
-cr3d::GraphicsApi::T cr3d::GraphicsApi::FromString(const char* graphicsApiString)
+crgfx::GraphicsApi::T crgfx::GraphicsApi::FromString(const char* graphicsApiString)
 {
 	if (strcmp(graphicsApiString, "vulkan") == 0)
 	{
-		return cr3d::GraphicsApi::Vulkan;
+		return crgfx::GraphicsApi::Vulkan;
 	}
 	else if (strcmp(graphicsApiString, "d3d12") == 0)
 	{
-		return cr3d::GraphicsApi::D3D12;
+		return crgfx::GraphicsApi::D3D12;
 	}
 	else
 	{
-		return cr3d::GraphicsApi::Count;
+		return crgfx::GraphicsApi::Count;
 	}
 }
 
-cr3d::GraphicsVendor::T cr3d::GraphicsVendor::FromString(const char* graphicsVendorString)
+crgfx::GraphicsVendor::T crgfx::GraphicsVendor::FromString(const char* graphicsVendorString)
 {
 	if (strcmp(graphicsVendorString, "nvidia") == 0)
 	{
@@ -39,7 +39,7 @@ cr3d::GraphicsVendor::T cr3d::GraphicsVendor::FromString(const char* graphicsVen
 	}
 }
 
-cr3d::ShaderStage::T cr3d::ShaderStage::FromString(const char* shaderStageString)
+crgfx::ShaderStage::T crgfx::ShaderStage::FromString(const char* shaderStageString)
 {
 	if (strcmp(shaderStageString, "vertex") == 0)
 	{

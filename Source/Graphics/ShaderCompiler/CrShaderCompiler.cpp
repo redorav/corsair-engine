@@ -22,12 +22,12 @@ void CompilationDescriptor::Process() const
 	{
 		switch (shaderStage)
 		{
-			case cr3d::ShaderStage::Vertex:   defines.push_back("VERTEX_SHADER"); break;
-			case cr3d::ShaderStage::Pixel:    defines.push_back("PIXEL_SHADER"); break;
-			case cr3d::ShaderStage::Hull:     defines.push_back("HULL_SHADER"); break;
-			case cr3d::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
-			case cr3d::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
-			case cr3d::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
+			case crgfx::ShaderStage::Vertex:   defines.push_back("VERTEX_SHADER"); break;
+			case crgfx::ShaderStage::Pixel:    defines.push_back("PIXEL_SHADER"); break;
+			case crgfx::ShaderStage::Hull:     defines.push_back("HULL_SHADER"); break;
+			case crgfx::ShaderStage::Domain:   defines.push_back("DOMAIN_SHADER"); break;
+			case crgfx::ShaderStage::Geometry: defines.push_back("GEOMETRY_SHADER"); break;
+			case crgfx::ShaderStage::Compute:  defines.push_back("COMPUTE_SHADER"); break;
 			default: break;
 		}
 
@@ -39,8 +39,8 @@ void CompilationDescriptor::Process() const
 
 		switch (graphicsApi)
 		{
-			case cr3d::GraphicsApi::Vulkan: defines.push_back("VULKAN_API"); break;
-			case cr3d::GraphicsApi::D3D12: defines.push_back("D3D12_API"); break;
+			case crgfx::GraphicsApi::Vulkan: defines.push_back("VULKAN_API"); break;
+			case crgfx::GraphicsApi::D3D12: defines.push_back("D3D12_API"); break;
 			default: break;
 		}
 
@@ -52,14 +52,14 @@ crstl::string CrShaderCompiler::ExecutableDirectory;
 
 CrFixedPath CrShaderCompiler::PDBDirectory;
 
-CrFixedPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][cr3d::GraphicsApi::Count];
+CrFixedPath CrShaderCompiler::PDBDirectories[cr::Platform::Count][crgfx::GraphicsApi::Count];
 
 const crstl::string& CrShaderCompiler::GetExecutableDirectory()
 {
 	return ExecutableDirectory;
 }
 
-const CrFixedPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, cr3d::GraphicsApi::T graphicsApi)
+const CrFixedPath& CrShaderCompiler::GetPDBDirectory(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi)
 {
 	return PDBDirectories[platform][graphicsApi];
 }
@@ -85,11 +85,11 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	// within (such as what level of support to expect e.g. in Vulkan, etc)
 	switch (compilationDescriptor.graphicsApi)
 	{
-		case cr3d::GraphicsApi::Vulkan:
+		case crgfx::GraphicsApi::Vulkan:
 		{
 			return CrCompilerDXC::HLSLtoSPIRV(compilationDescriptor, compilationStatus);
 		}
-		case cr3d::GraphicsApi::D3D12:
+		case crgfx::GraphicsApi::D3D12:
 		{
 			return CrCompilerDXC::HLSLtoDXIL(compilationDescriptor, compilationStatus);
 		}
@@ -100,34 +100,34 @@ bool CrShaderCompiler::Compile(const CompilationDescriptor& compilationDescripto
 	return false;
 }
 
-static cr3d::ShaderStage::T ParseShaderStage(const crstl::string& stageString)
+static crgfx::ShaderStage::T ParseShaderStage(const crstl::string& stageString)
 {
 	if (stageString == "vertex")
 	{
-		return cr3d::ShaderStage::Vertex;
+		return crgfx::ShaderStage::Vertex;
 	}
 	else if (stageString == "pixel")
 	{
-		return cr3d::ShaderStage::Pixel;
+		return crgfx::ShaderStage::Pixel;
 	}
 	else if (stageString == "hull")
 	{
-		return cr3d::ShaderStage::Hull;
+		return crgfx::ShaderStage::Hull;
 	}
 	else if (stageString == "domain")
 	{
-		return cr3d::ShaderStage::Domain;
+		return crgfx::ShaderStage::Domain;
 	}
 	else if (stageString == "geometry")
 	{
-		return cr3d::ShaderStage::Geometry;
+		return crgfx::ShaderStage::Geometry;
 	}
 	else if (stageString == "compute")
 	{
-		return cr3d::ShaderStage::Compute;
+		return crgfx::ShaderStage::Compute;
 	}
 
-	return cr3d::ShaderStage::Count;
+	return crgfx::ShaderStage::Count;
 }
 
 static cr::Platform::T ParsePlatform(const crstl::string& platformString)
@@ -142,19 +142,19 @@ static cr::Platform::T ParsePlatform(const crstl::string& platformString)
 	}
 }
 
-static cr3d::GraphicsApi::T ParseGraphicsApi(const crstl::string& graphicsApiString)
+static crgfx::GraphicsApi::T ParseGraphicsApi(const crstl::string& graphicsApiString)
 {
 	if (graphicsApiString.comparei("vulkan") == 0)
 	{
-		return cr3d::GraphicsApi::Vulkan;
+		return crgfx::GraphicsApi::Vulkan;
 	}
 	else if (graphicsApiString.comparei("d3d12") == 0)
 	{
-		return cr3d::GraphicsApi::D3D12;
+		return crgfx::GraphicsApi::D3D12;
 	}
 	else
 	{
-		return cr3d::GraphicsApi::Count;
+		return crgfx::GraphicsApi::Count;
 	}
 }
 
@@ -232,12 +232,12 @@ int main(int argc, char* argv[])
 	{
 		for (const crstl::string& graphicsApiString : graphicsApiStrings)
 		{
-			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+			crgfx::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
 			CrFixedPath& pdbPath = CrShaderCompiler::PDBDirectories[platform][graphicsApi];
 			pdbPath = CrShaderCompiler::PDBDirectory;
 			pdbPath /= cr::Platform::ToString(platform);
 			pdbPath += "_";
-			pdbPath += cr3d::GraphicsApi::ToString(graphicsApi);
+			pdbPath += crgfx::GraphicsApi::ToString(graphicsApi);
 
 			if (!crstl::exists(pdbPath.c_str()))
 			{
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 		compilationDescriptor.inputPath = inputPath;
 		compilationDescriptor.outputPath = outputPath;
 		compilationDescriptor.entryPoint = entryPoint;
-		compilationDescriptor.shaderStage = cr3d::ShaderStage::Pixel;
+		compilationDescriptor.shaderStage = crgfx::ShaderStage::Pixel;
 
 		// Make sure resources aren't stripped out
 		compilationDescriptor.optimization = OptimizationLevel::None;
@@ -290,9 +290,9 @@ int main(int argc, char* argv[])
 
 		for (const crstl::string& graphicsApiString : graphicsApiStrings)
 		{
-			cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
+			crgfx::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiString);
 
-			if (graphicsApi == cr3d::GraphicsApi::Count)
+			if (graphicsApi == crgfx::GraphicsApi::Count)
 			{
 				CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified\n");
 			}
@@ -311,9 +311,9 @@ int main(int argc, char* argv[])
 			CrShaderCompilerUtilities::QuitWithMessage("No platform specified\n");
 		}
 
-		cr3d::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiStrings[0]);
+		crgfx::GraphicsApi::T graphicsApi = ParseGraphicsApi(graphicsApiStrings[0]);
 
-		if (graphicsApi == cr3d::GraphicsApi::Count)
+		if (graphicsApi == crgfx::GraphicsApi::Count)
 		{
 			CrShaderCompilerUtilities::QuitWithMessage("No graphics API specified\n");
 		}
@@ -323,9 +323,9 @@ int main(int argc, char* argv[])
 			CrShaderCompilerUtilities::QuitWithMessage("No entry point specified\n");
 		}
 
-		cr3d::ShaderStage::T shaderStage = ParseShaderStage(shaderStageString);
+		crgfx::ShaderStage::T shaderStage = ParseShaderStage(shaderStageString);
 
-		if (shaderStage == cr3d::ShaderStage::Count)
+		if (shaderStage == crgfx::ShaderStage::Count)
 		{
 			CrShaderCompilerUtilities::QuitWithMessage("No shader stage specified\n");
 		}

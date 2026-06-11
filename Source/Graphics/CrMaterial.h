@@ -127,11 +127,11 @@ struct CrMaterialShaderDescriptor
 
 	// Global material properties
 
-	cr3d::ShaderStage::T shaderStage = cr3d::ShaderStage::Count;
+	crgfx::ShaderStage::T shaderStage = crgfx::ShaderStage::Count;
 
 	cr::Platform::T platform = cr::Platform::Count;
 
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+	crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
 };
 
 static_assert(sizeof(CrMaterialShaderDescriptor) == 28, "CrMaterialShaderDescriptor size mismatch");

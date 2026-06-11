@@ -10,7 +10,7 @@ void CrGPUTimingQueryTracker::Initialize(ICrRenderDevice* renderDevice, uint32_t
 
 	m_queryPools.resize(maxFrames);
 
-	CrGPUQueryPoolDescriptor queryPoolDescriptor(cr3d::QueryType::Timestamp, 1024);
+	CrGPUQueryPoolDescriptor queryPoolDescriptor(crgfx::QueryType::Timestamp, 1024);
 	for (uint32_t i = 0; i < maxFrames; ++i)
 	{
 		m_queryPools[i] = renderDevice->CreateGPUQueryPool(queryPoolDescriptor);

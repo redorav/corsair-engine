@@ -22,7 +22,7 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 	{
 		if (descriptor.dynamicBufferSizeBytes > 0)
 		{
-			CrHardwareGPUBufferDescriptor gpuBufferStack(cr3d::BufferUsage::Constant | cr3d::BufferUsage::Structured, cr3d::MemoryAccess::CPUStreamToGPU, descriptor.dynamicBufferSizeBytes);
+			CrHardwareGPUBufferDescriptor gpuBufferStack(crgfx::BufferUsage::Constant | crgfx::BufferUsage::Structured, crgfx::MemoryAccess::CPUStreamToGPU, descriptor.dynamicBufferSizeBytes);
 			gpuBufferStack.name = "GPU Buffer Stack";
 			m_bufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, gpuBufferStack));
 		}
@@ -35,11 +35,11 @@ ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrComman
 			uint32_t maxVertices = descriptor.dynamicVertexBufferSizeVertices;
 			uint32_t maxIndices = maxVertices * 3;
 
-			CrHardwareGPUBufferDescriptor vertexBufferStack(cr3d::BufferUsage::Vertex, cr3d::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
+			CrHardwareGPUBufferDescriptor vertexBufferStack(crgfx::BufferUsage::Vertex, crgfx::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
 			vertexBufferStack.name = "Vertex Buffer Stack";
 			m_vertexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
-			CrHardwareGPUBufferDescriptor indexBufferStack(cr3d::BufferUsage::Index, cr3d::MemoryAccess::CPUStreamToGPU, maxIndices, cr3d::DataFormats[cr3d::DataFormat::R16_Uint].dataOrBlockSize);
+			CrHardwareGPUBufferDescriptor indexBufferStack(crgfx::BufferUsage::Index, crgfx::MemoryAccess::CPUStreamToGPU, maxIndices, crgfx::DataFormats[crgfx::DataFormat::R16_Uint].dataOrBlockSize);
 			indexBufferStack.name = "Index Buffer Stack";
 			m_indexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 		}
@@ -78,8 +78,8 @@ void ICrCommandBuffer::Begin()
 	// for the fence to become signaled before we can start recording
 	if (m_submitted)
 	{
-		cr3d::GPUFenceResult result = m_renderDevice->WaitForFence(m_completionFence.get(), UINT64_MAX);
-		CrAssertMsg(result == cr3d::GPUFenceResult::Success, "Failed waiting for fence");
+		crgfx::GPUFenceResult result = m_renderDevice->WaitForFence(m_completionFence.get(), UINT64_MAX);
+		CrAssertMsg(result == crgfx::GPUFenceResult::Success, "Failed waiting for fence");
 		m_renderDevice->ResetFence(m_completionFence.get());
 		m_submitted = false;
 	}
@@ -169,9 +169,9 @@ CrGPUBufferView ICrCommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uin
 	return vertexBufferView;
 }
 
-CrGPUBufferView ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, cr3d::DataFormat::T indexFormat)
+CrGPUBufferView ICrCommandBuffer::AllocateIndexBuffer(uint32_t indexCount, crgfx::DataFormat::T indexFormat)
 {
-	uint32_t sizeBytes = indexCount * cr3d::DataFormats[indexFormat].dataOrBlockSize;
+	uint32_t sizeBytes = indexCount * crgfx::DataFormats[indexFormat].dataOrBlockSize;
 
 	// TODO Fix alignment
 	CrStackAllocation<void> allocation = m_indexBufferGPUStack->AllocateAligned(sizeBytes, 256);
@@ -204,29 +204,29 @@ void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassD
 	for (uint32_t i = 0; i < renderPassDescriptor.color.size(); ++i)
 	{
 		const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
-		if (renderTargetDescriptor.loadOp == CrRenderTargetLoadOp::Load && renderTargetDescriptor.initialState.layout == cr3d::TextureLayout::Undefined)
+		if (renderTargetDescriptor.loadOp == CrRenderTargetLoadOp::Load && renderTargetDescriptor.initialState.layout == crgfx::TextureLayout::Undefined)
 		{
 			CrCommandBufferAssertMsg(false, "Invalid combination");
 		}
 
-		if (renderTargetDescriptor.initialState.layout != cr3d::TextureLayout::Undefined)
+		if (renderTargetDescriptor.initialState.layout != crgfx::TextureLayout::Undefined)
 		{
-			CrCommandBufferAssertMsg(renderTargetDescriptor.initialState.stages != cr3d::ShaderStageFlags::None, "");
+			CrCommandBufferAssertMsg(renderTargetDescriptor.initialState.stages != crgfx::ShaderStageFlags::None, "");
 		}
 
-		CrCommandBufferAssertMsg(renderTargetDescriptor.usageState.stages != cr3d::ShaderStageFlags::None, "");
-		CrCommandBufferAssertMsg(renderTargetDescriptor.finalState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderTargetDescriptor.usageState.stages != crgfx::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderTargetDescriptor.finalState.stages != crgfx::ShaderStageFlags::None, "");
 	}
 
 	if (renderPassDescriptor.depth.texture)
 	{
-		if (renderPassDescriptor.depth.initialState.layout != cr3d::TextureLayout::Undefined)
+		if (renderPassDescriptor.depth.initialState.layout != crgfx::TextureLayout::Undefined)
 		{
-			CrCommandBufferAssertMsg(renderPassDescriptor.depth.initialState.stages != cr3d::ShaderStageFlags::None, "");
+			CrCommandBufferAssertMsg(renderPassDescriptor.depth.initialState.stages != crgfx::ShaderStageFlags::None, "");
 		}
 
-		CrCommandBufferAssertMsg(renderPassDescriptor.depth.usageState.stages != cr3d::ShaderStageFlags::None, "");
-		CrCommandBufferAssertMsg(renderPassDescriptor.depth.finalState.stages != cr3d::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderPassDescriptor.depth.usageState.stages != crgfx::ShaderStageFlags::None, "");
+		CrCommandBufferAssertMsg(renderPassDescriptor.depth.finalState.stages != crgfx::ShaderStageFlags::None, "");
 	}
 #endif
 

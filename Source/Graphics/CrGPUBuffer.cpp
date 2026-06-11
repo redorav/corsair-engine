@@ -26,17 +26,17 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(ICrRenderDevice* renderDevice, const 
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
 // is not public, and lives here to cater for the two public-facing constructors
-CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, cr3d::DataFormat::T dataFormat)
+CrGPUBuffer::CrGPUBuffer(ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat)
 	: m_usage(descriptor.usage), m_access(descriptor.access)
 {
-	if (descriptor.usage & cr3d::BufferUsage::Index)
+	if (descriptor.usage & crgfx::BufferUsage::Index)
 	{
-		CrAssertMsg((stride == 2 && dataFormat == cr3d::DataFormat::R16_Uint) || (stride == 4 && dataFormat == cr3d::DataFormat::R32_Uint), "Invalid format for index buffer");
+		CrAssertMsg((stride == 2 && dataFormat == crgfx::DataFormat::R16_Uint) || (stride == 4 && dataFormat == crgfx::DataFormat::R32_Uint), "Invalid format for index buffer");
 	}
 
-	if (descriptor.usage & cr3d::BufferUsage::Indirect)
+	if (descriptor.usage & crgfx::BufferUsage::Indirect)
 	{
-		CrAssertMsg(descriptor.usage & (cr3d::BufferUsage::Structured | cr3d::BufferUsage::Byte), "Must specify structured or byte buffer to write to an indirect buffer");
+		CrAssertMsg(descriptor.usage & (crgfx::BufferUsage::Structured | crgfx::BufferUsage::Byte), "Must specify structured or byte buffer to write to an indirect buffer");
 	}
 
 	CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);

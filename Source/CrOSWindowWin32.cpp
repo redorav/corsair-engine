@@ -551,7 +551,7 @@ CrOSWindow::CrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
 
 	::UpdateWindow((HWND)m_hwnd);
 
-	if (windowDescriptor.swapchainFormat != cr3d::DataFormat::Invalid)
+	if (windowDescriptor.swapchainFormat != crgfx::DataFormat::Invalid)
 	{
 		CrSwapchainDescriptor swapchainDescriptor = {};
 		swapchainDescriptor.name = windowDescriptor.name.c_str();

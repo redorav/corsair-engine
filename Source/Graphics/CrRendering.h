@@ -2,7 +2,7 @@
 
 #include "stdint.h"
 
-namespace cr3d
+namespace crgfx
 {
 	static constexpr uint32_t MaxRenderTargets = 8; // Maximum render targets we can bind
 	static constexpr uint32_t MaxVertexStreams = 8; // Maximum vertex streams per vertex shader
@@ -23,18 +23,18 @@ namespace cr3d
 			Count
 		};
 
-		constexpr const char* ToString(cr3d::GraphicsApi::T graphicsApi, bool lowercase = false)
+		constexpr const char* ToString(crgfx::GraphicsApi::T graphicsApi, bool lowercase = false)
 		{
 			switch (graphicsApi)
 			{
-				case cr3d::GraphicsApi::Vulkan: return lowercase ? "vulkan" : "Vulkan";
-				case cr3d::GraphicsApi::D3D12:  return lowercase ? "d3d12"  : "D3D12";
-				case cr3d::GraphicsApi::Metal:  return lowercase ? "metal"  : "Metal";
+				case crgfx::GraphicsApi::Vulkan: return lowercase ? "vulkan" : "Vulkan";
+				case crgfx::GraphicsApi::D3D12:  return lowercase ? "d3d12"  : "D3D12";
+				case crgfx::GraphicsApi::Metal:  return lowercase ? "metal"  : "Metal";
 				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
 
-		cr3d::GraphicsApi::T FromString(const char* graphicsApiString);
+		crgfx::GraphicsApi::T FromString(const char* graphicsApiString);
 	}
 
 	namespace GraphicsVendor
@@ -127,22 +127,22 @@ namespace cr3d
 		inline T& operator--(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return e; }
 		inline T operator--(T& e, int) { T temp = e; e = static_cast<T>(static_cast<uint32_t>(e) - 1u); return temp; }
 
-		constexpr const char* ToString(cr3d::ShaderStage::T stage, bool lowercase = false)
+		constexpr const char* ToString(crgfx::ShaderStage::T stage, bool lowercase = false)
 		{
 			switch (stage)
 			{
-				case cr3d::ShaderStage::Vertex:   return lowercase ? "vertex"   : "Vertex";
-				case cr3d::ShaderStage::Pixel:    return lowercase ? "pixel"    : "Pixel";
-				case cr3d::ShaderStage::Hull:     return lowercase ? "hull"     : "Hull";
-				case cr3d::ShaderStage::Domain:   return lowercase ? "domain"   : "Domain";
-				case cr3d::ShaderStage::Geometry: return lowercase ? "geometry" : "Geometry";
-				case cr3d::ShaderStage::Compute:  return lowercase ? "compute"  : "Compute";
-				case cr3d::ShaderStage::RootSignature:  return lowercase ? "rootsignature" : "RootSignature";
+				case crgfx::ShaderStage::Vertex:   return lowercase ? "vertex"   : "Vertex";
+				case crgfx::ShaderStage::Pixel:    return lowercase ? "pixel"    : "Pixel";
+				case crgfx::ShaderStage::Hull:     return lowercase ? "hull"     : "Hull";
+				case crgfx::ShaderStage::Domain:   return lowercase ? "domain"   : "Domain";
+				case crgfx::ShaderStage::Geometry: return lowercase ? "geometry" : "Geometry";
+				case crgfx::ShaderStage::Compute:  return lowercase ? "compute"  : "Compute";
+				case crgfx::ShaderStage::RootSignature:  return lowercase ? "rootsignature" : "RootSignature";
 				default: return lowercase ? "invalid" : "Invalid";
 			}
 		}
 
-		cr3d::ShaderStage::T FromString(const char* shaderStageString);
+		crgfx::ShaderStage::T FromString(const char* shaderStageString);
 	};
 
 	// This enum exists so we can OR stages together
@@ -198,7 +198,7 @@ namespace cr3d
 			Count
 		};
 
-		inline const char* ToString(cr3d::TextureLayout::T textureLayout)
+		inline const char* ToString(crgfx::TextureLayout::T textureLayout)
 		{
 			switch (textureLayout)
 			{
@@ -249,7 +249,7 @@ namespace cr3d
 			Count
 		};
 
-		inline const char* ToString(cr3d::BufferState::T bufferState)
+		inline const char* ToString(crgfx::BufferState::T bufferState)
 		{
 			switch (bufferState)
 			{

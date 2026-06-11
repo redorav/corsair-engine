@@ -25,7 +25,7 @@ struct CrSwapchainDescriptor
 	uint32_t requestedWidth;
 	uint32_t requestedHeight;
 	uint32_t requestedBufferCount; // How many surfaces to request for this swapchain
-	cr3d::DataFormat::T format;
+	crgfx::DataFormat::T format;
 };
 
 class ICrSwapchain : public CrGPUAutoDeletable
@@ -36,7 +36,7 @@ public:
 
 	virtual ~ICrSwapchain() {}
 
-	cr3d::DataFormat::T GetFormat() const;
+	crgfx::DataFormat::T GetFormat() const;
 
 	uint32_t GetWidth() const;
 
@@ -68,7 +68,7 @@ protected:
 
 	uint32_t m_imageCount;
 
-	cr3d::DataFormat::T m_format;
+	crgfx::DataFormat::T m_format;
 
 	uint32_t m_width;
 

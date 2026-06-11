@@ -11,7 +11,7 @@
 
 class CrTextureD3D12;
 
-typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + cr3d::MaxRenderTargets> CrTextureBarrierVectorD3D12;
+typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> CrTextureBarrierVectorD3D12;
 typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, CrRenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
 
 class CrCommandBufferD3D12 final : public ICrCommandBuffer
@@ -73,8 +73,8 @@ private:
 	void ProcessRenderTargetBarrier
 	(
 		const CrRenderTargetDescriptor& renderTargetDescriptor,
-		const cr3d::TextureState& initialState,
-		const cr3d::TextureState& finalState,
+		const crgfx::TextureState& initialState,
+		const crgfx::TextureState& finalState,
 		CrTextureBarrierVectorD3D12& textureBarriers
 	);
 

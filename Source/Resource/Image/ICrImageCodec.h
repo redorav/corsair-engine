@@ -43,5 +43,5 @@ public:
 	virtual void Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const = 0;
 
 	// Query whether this encoder can encode this data format
-	virtual bool IsImageFormatSupported(cr3d::DataFormat::T format) const = 0;
+	virtual bool IsImageFormatSupported(crgfx::DataFormat::T format) const = 0;
 };

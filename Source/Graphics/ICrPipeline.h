@@ -13,9 +13,9 @@
 
 struct CrRasterizerStateDescriptor
 {
-	cr3d::PolygonFillMode fillMode : 2;
-	cr3d::PolygonCullMode cullMode : 2;
-	cr3d::FrontFace frontFace : 1;
+	crgfx::PolygonFillMode fillMode : 2;
+	crgfx::PolygonCullMode cullMode : 2;
+	crgfx::FrontFace frontFace : 1;
 	uint32_t depthClipEnable : 1;
 	uint32_t multisampleEnable : 1;
 	uint32_t antialiasedLineEnable : 1;
@@ -36,24 +36,24 @@ struct CrRenderTargetBlendDescriptor
 	{
 		// We default to standard alpha blending, where colors are blended and alpha is replaced
 		bits = 0;
-		srcColorBlendFactor = cr3d::BlendFactor::SrcAlpha;
-		dstColorBlendFactor = cr3d::BlendFactor::OneMinusSrcAlpha;
-		srcAlphaBlendFactor = cr3d::BlendFactor::One;
-		dstAlphaBlendFactor = cr3d::BlendFactor::Zero;
-		colorWriteMask      = cr3d::ColorWriteComponent::All;
-		colorBlendOp        = cr3d::BlendOp::Add;
-		alphaBlendOp        = cr3d::BlendOp::Add;
+		srcColorBlendFactor = crgfx::BlendFactor::SrcAlpha;
+		dstColorBlendFactor = crgfx::BlendFactor::OneMinusSrcAlpha;
+		srcAlphaBlendFactor = crgfx::BlendFactor::One;
+		dstAlphaBlendFactor = crgfx::BlendFactor::Zero;
+		colorWriteMask      = crgfx::ColorWriteComponent::All;
+		colorBlendOp        = crgfx::BlendOp::Add;
+		alphaBlendOp        = crgfx::BlendOp::Add;
 	}
 
 	CrRenderTargetBlendDescriptor
 	(
-		cr3d::BlendFactor srcColorBlendFactor,
-		cr3d::BlendFactor dstColorBlendFactor,
-		cr3d::BlendFactor srcAlphaBlendFactor,
-		cr3d::BlendFactor dstAlphaBlendFactor,
-		cr3d::ColorWriteMask colorWriteMask,
-		cr3d::BlendOp colorBlendOp,
-		cr3d::BlendOp alphaBlendOp,
+		crgfx::BlendFactor srcColorBlendFactor,
+		crgfx::BlendFactor dstColorBlendFactor,
+		crgfx::BlendFactor srcAlphaBlendFactor,
+		crgfx::BlendFactor dstAlphaBlendFactor,
+		crgfx::ColorWriteMask colorWriteMask,
+		crgfx::BlendOp colorBlendOp,
+		crgfx::BlendOp alphaBlendOp,
 		uint32_t enable
 	)
 	{
@@ -72,14 +72,14 @@ struct CrRenderTargetBlendDescriptor
 	{
 		struct
 		{
-			cr3d::BlendFactor srcColorBlendFactor : 5;
-			cr3d::BlendFactor dstColorBlendFactor : 5;
+			crgfx::BlendFactor srcColorBlendFactor : 5;
+			crgfx::BlendFactor dstColorBlendFactor : 5;
 
-			cr3d::BlendFactor srcAlphaBlendFactor : 5;
-			cr3d::BlendFactor dstAlphaBlendFactor : 5;
-			cr3d::ColorWriteMask colorWriteMask : 4;
-			cr3d::BlendOp colorBlendOp : 3;
-			cr3d::BlendOp alphaBlendOp : 3;
+			crgfx::BlendFactor srcAlphaBlendFactor : 5;
+			crgfx::BlendFactor dstAlphaBlendFactor : 5;
+			crgfx::ColorWriteMask colorWriteMask : 4;
+			crgfx::BlendOp colorBlendOp : 3;
+			crgfx::BlendOp alphaBlendOp : 3;
 
 			uint32_t enable : 1;
 			uint32_t padding : 1;
@@ -103,12 +103,12 @@ namespace CrStandardPipelineStates
 
 struct CrBlendStateDescriptor
 {
-	crstl::array<CrRenderTargetBlendDescriptor, cr3d::MaxRenderTargets> renderTargetBlends;
+	crstl::array<CrRenderTargetBlendDescriptor, crgfx::MaxRenderTargets> renderTargetBlends;
 
 	// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
 	// in the blend state and not a per render target field.
 	uint32_t logicOpEnable : 1;
-	cr3d::LogicOp logicOp : 4;
+	crgfx::LogicOp logicOp : 4;
 	uint32_t padding : 27;
 	float blendConstants[4];
 };
@@ -117,7 +117,7 @@ static_assert(sizeof(CrBlendStateDescriptor) == 52, "CrBlendStateDescriptor size
 
 struct CrDepthStencilStateDescriptor
 {
-	cr3d::CompareOp       depthCompareOp : 3;
+	crgfx::CompareOp       depthCompareOp : 3;
 	uint32_t              depthTestEnable : 1;
 	uint32_t              depthWriteEnable : 1;
 	uint32_t              depthBoundsTestEnable : 1;
@@ -129,15 +129,15 @@ struct CrDepthStencilStateDescriptor
 
 	uint32_t              padding : 1;
 
-	cr3d::StencilOp       frontStencilFailOp : 3;
-	cr3d::StencilOp       frontDepthFailOp : 3;
-	cr3d::StencilOp       frontStencilPassOp : 3;
-	cr3d::CompareOp       frontStencilCompareOp : 3;
+	crgfx::StencilOp       frontStencilFailOp : 3;
+	crgfx::StencilOp       frontDepthFailOp : 3;
+	crgfx::StencilOp       frontStencilPassOp : 3;
+	crgfx::CompareOp       frontStencilCompareOp : 3;
 
-	cr3d::StencilOp       backStencilFailOp : 3;
-	cr3d::StencilOp       backDepthFailOp : 3;
-	cr3d::StencilOp       backStencilPassOp : 3;
-	cr3d::CompareOp       backStencilCompareOp : 3;
+	crgfx::StencilOp       backStencilFailOp : 3;
+	crgfx::StencilOp       backDepthFailOp : 3;
+	crgfx::StencilOp       backStencilPassOp : 3;
+	crgfx::CompareOp       backStencilCompareOp : 3;
 
 	uint32_t              padding2 : 8;
 
@@ -149,14 +149,14 @@ static_assert(sizeof(CrDepthStencilStateDescriptor) == 16, "CrDepthStencilStateD
 
 struct CrRenderTargetFormatDescriptor
 {
-	crstl::array<cr3d::DataFormat::T, cr3d::MaxRenderTargets> colorFormats =
+	crstl::array<crgfx::DataFormat::T, crgfx::MaxRenderTargets> colorFormats =
 	{
-		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid,
-		cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid, cr3d::DataFormat::Invalid
+		crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid,
+		crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid, crgfx::DataFormat::Invalid
 	};
 
-	cr3d::DataFormat::T depthFormat = cr3d::DataFormat::Invalid;
-	cr3d::SampleCount sampleCount = cr3d::SampleCount::S1;
+	crgfx::DataFormat::T depthFormat = crgfx::DataFormat::Invalid;
+	crgfx::SampleCount sampleCount = crgfx::SampleCount::S1;
 };
 
 static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40, "CrRenderTargetFormatDescriptor size mismatch");
@@ -166,29 +166,29 @@ struct CrGraphicsPipelineDescriptor
 {
 	CrGraphicsPipelineDescriptor()
 	{
-		primitiveTopology         = cr3d::PrimitiveTopology::TriangleList;
-		sampleCount               = cr3d::SampleCount::S1;
+		primitiveTopology         = crgfx::PrimitiveTopology::TriangleList;
+		sampleCount               = crgfx::SampleCount::S1;
 		
-		rasterizerState.fillMode  = cr3d::PolygonFillMode::Fill;
-		rasterizerState.frontFace = cr3d::FrontFace::Clockwise;
-		rasterizerState.cullMode  = cr3d::PolygonCullMode::Back;
+		rasterizerState.fillMode  = crgfx::PolygonFillMode::Fill;
+		rasterizerState.frontFace = crgfx::FrontFace::Clockwise;
+		rasterizerState.cullMode  = crgfx::PolygonCullMode::Back;
 		rasterizerState.depthClipEnable = true;
 		
 		padding                   = 0;
 		
 		// Don't put a loop here to initialize the color write masks
-		blendState.renderTargetBlends[0].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[1].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[2].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[3].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[4].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[5].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[6].colorWriteMask = cr3d::ColorWriteComponent::All;
-		blendState.renderTargetBlends[7].colorWriteMask = cr3d::ColorWriteComponent::All;
+		blendState.renderTargetBlends[0].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[1].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[2].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[3].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[4].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[5].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[6].colorWriteMask = crgfx::ColorWriteComponent::All;
+		blendState.renderTargetBlends[7].colorWriteMask = crgfx::ColorWriteComponent::All;
 		
 		depthStencilState.depthTestEnable  = true;
 		depthStencilState.depthWriteEnable = true;
-		depthStencilState.depthCompareOp   = cr3d::CompareOp::Greater; // Reverse depth by default
+		depthStencilState.depthCompareOp   = crgfx::CompareOp::Greater; // Reverse depth by default
 	}
 
 	CrHash ComputeHash() const
@@ -196,8 +196,8 @@ struct CrGraphicsPipelineDescriptor
 		return CrHash(this, sizeof(*this));
 	}
 
-	cr3d::PrimitiveTopology        primitiveTopology : 4;
-	cr3d::SampleCount              sampleCount       : 4;
+	crgfx::PrimitiveTopology        primitiveTopology : 4;
+	crgfx::SampleCount              sampleCount       : 4;
 	uint32_t                       padding           : 24;
 
 	CrRasterizerStateDescriptor    rasterizerState = {};

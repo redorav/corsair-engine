@@ -44,17 +44,17 @@ static const wchar_t* DXCArgumentShaderProfile     = L"-T";
 static const wchar_t* DXCArgumentDefine            = L"-D";
 static const wchar_t* DXCArgumentAllResourcesBound = L"-all-resources-bound";
 
-const wchar_t* GetDXCShaderProfile(cr3d::ShaderStage::T shaderStage)
+const wchar_t* GetDXCShaderProfile(crgfx::ShaderStage::T shaderStage)
 {
 	switch (shaderStage)
 	{
-		case cr3d::ShaderStage::Vertex:   return L"vs_6_6";
-		case cr3d::ShaderStage::Geometry: return L"gs_6_6";
-		case cr3d::ShaderStage::Hull:     return L"hs_6_6";
-		case cr3d::ShaderStage::Domain:   return L"ds_6_6";
-		case cr3d::ShaderStage::Pixel:    return L"ps_6_6";
-		case cr3d::ShaderStage::Compute:  return L"cs_6_6";
-		case cr3d::ShaderStage::RootSignature:  return L"rootsig_1_0";
+		case crgfx::ShaderStage::Vertex:   return L"vs_6_6";
+		case crgfx::ShaderStage::Geometry: return L"gs_6_6";
+		case crgfx::ShaderStage::Hull:     return L"hs_6_6";
+		case crgfx::ShaderStage::Domain:   return L"ds_6_6";
+		case crgfx::ShaderStage::Pixel:    return L"ps_6_6";
+		case crgfx::ShaderStage::Compute:  return L"cs_6_6";
+		case crgfx::ShaderStage::RootSignature:  return L"rootsig_1_0";
 		default: return L"";
 	}
 }
@@ -62,17 +62,17 @@ const wchar_t* GetDXCShaderProfile(cr3d::ShaderStage::T shaderStage)
 // We assign a number of bind points to each shader stage
 // We do a tight packing later so the values on them don't matter
 // Bindpoints cannot exceed 256 as we store them in 8 bits
-static uint32_t GetShaderStageBindpointNamespace(cr3d::ShaderStage::T shaderStage)
+static uint32_t GetShaderStageBindpointNamespace(crgfx::ShaderStage::T shaderStage)
 {
 	// We can have up to 64 simultaneous resources in each stage
 	switch (shaderStage)
 	{
-		case cr3d::ShaderStage::Vertex:   return 0; // 64
-		case cr3d::ShaderStage::Pixel:    return 64; // 64
-		case cr3d::ShaderStage::Geometry: return 128; // 32
-		case cr3d::ShaderStage::Hull:     return 160; // 32
-		case cr3d::ShaderStage::Domain:   return 192; // 32
-		case cr3d::ShaderStage::Compute:  return 0; // Doesn't clash with any namespace
+		case crgfx::ShaderStage::Vertex:   return 0; // 64
+		case crgfx::ShaderStage::Pixel:    return 64; // 64
+		case crgfx::ShaderStage::Geometry: return 128; // 32
+		case crgfx::ShaderStage::Hull:     return 160; // 32
+		case crgfx::ShaderStage::Domain:   return 192; // 32
+		case crgfx::ShaderStage::Compute:  return 0; // Doesn't clash with any namespace
 		default: return 0;
 	}
 }
@@ -305,7 +305,7 @@ HRESULT CompileShaderDXC
 		}
 
 		// Set Vulkan-specific options here
-		if (compilationDescriptor.graphicsApi == cr3d::GraphicsApi::Vulkan)
+		if (compilationDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
 		{
 			arguments.push_back(L"-spirv");
 
@@ -341,57 +341,57 @@ HRESULT CompileShaderDXC
 	}
 }
 
-cr3d::ShaderResourceType::T GetShaderResourceType(const SpvReflectDescriptorBinding& spvDescriptorBinding)
+crgfx::ShaderResourceType::T GetShaderResourceType(const SpvReflectDescriptorBinding& spvDescriptorBinding)
 {
 	switch (spvDescriptorBinding.descriptor_type)
 	{
 		case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-			return cr3d::ShaderResourceType::ConstantBuffer;
+			return crgfx::ShaderResourceType::ConstantBuffer;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
-			return cr3d::ShaderResourceType::Texture;
+			return crgfx::ShaderResourceType::Texture;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER:
-			return cr3d::ShaderResourceType::Sampler;
+			return crgfx::ShaderResourceType::Sampler;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
 		{
 			if (spvDescriptorBinding.resource_type == SPV_REFLECT_RESOURCE_FLAG_UAV)
 			{
-				return cr3d::ShaderResourceType::RWStorageBuffer;
+				return crgfx::ShaderResourceType::RWStorageBuffer;
 			}
 			else
 			{
-				return cr3d::ShaderResourceType::StorageBuffer;
+				return crgfx::ShaderResourceType::StorageBuffer;
 			}
 		}
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE:
-			return cr3d::ShaderResourceType::RWTexture;
+			return crgfx::ShaderResourceType::RWTexture;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
-			return cr3d::ShaderResourceType::TypedBuffer;
+			return crgfx::ShaderResourceType::TypedBuffer;
 		case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
-			return cr3d::ShaderResourceType::RWTypedBuffer;
+			return crgfx::ShaderResourceType::RWTypedBuffer;
 		default:
-			return cr3d::ShaderResourceType::Count;
+			return crgfx::ShaderResourceType::Count;
 	}
 }
 
-cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const SpvReflectInterfaceVariable& spvInterfaceVariable)
+crgfx::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const SpvReflectInterfaceVariable& spvInterfaceVariable)
 {
 	switch (spvInterfaceVariable.built_in)
 	{
-		case SpvBuiltIn::SpvBuiltInPosition: return cr3d::ShaderInterfaceBuiltinType::Position;
-		case SpvBuiltIn::SpvBuiltInFragCoord: return cr3d::ShaderInterfaceBuiltinType::Position;
-		case SpvBuiltIn::SpvBuiltInBaseInstance: return cr3d::ShaderInterfaceBuiltinType::BaseInstance;
-		case SpvBuiltIn::SpvBuiltInInstanceIndex: return cr3d::ShaderInterfaceBuiltinType::InstanceId;
-		case SpvBuiltIn::SpvBuiltInVertexIndex: return cr3d::ShaderInterfaceBuiltinType::VertexId;
-		case SpvBuiltIn::SpvBuiltInFragDepth: return cr3d::ShaderInterfaceBuiltinType::Depth;
-		case SpvBuiltIn::SpvBuiltInFrontFacing: return cr3d::ShaderInterfaceBuiltinType::IsFrontFace;
+		case SpvBuiltIn::SpvBuiltInPosition: return crgfx::ShaderInterfaceBuiltinType::Position;
+		case SpvBuiltIn::SpvBuiltInFragCoord: return crgfx::ShaderInterfaceBuiltinType::Position;
+		case SpvBuiltIn::SpvBuiltInBaseInstance: return crgfx::ShaderInterfaceBuiltinType::BaseInstance;
+		case SpvBuiltIn::SpvBuiltInInstanceIndex: return crgfx::ShaderInterfaceBuiltinType::InstanceId;
+		case SpvBuiltIn::SpvBuiltInVertexIndex: return crgfx::ShaderInterfaceBuiltinType::VertexId;
+		case SpvBuiltIn::SpvBuiltInFragDepth: return crgfx::ShaderInterfaceBuiltinType::Depth;
+		case SpvBuiltIn::SpvBuiltInFrontFacing: return crgfx::ShaderInterfaceBuiltinType::IsFrontFace;
 
-		case SpvBuiltIn::SpvBuiltInWorkgroupId: return cr3d::ShaderInterfaceBuiltinType::GroupId;
-		case SpvBuiltIn::SpvBuiltInLocalInvocationId: return cr3d::ShaderInterfaceBuiltinType::GroupThreadId;
-		case SpvBuiltIn::SpvBuiltInLocalInvocationIndex: return cr3d::ShaderInterfaceBuiltinType::GroupIndex;
-		case SpvBuiltIn::SpvBuiltInGlobalInvocationId: return cr3d::ShaderInterfaceBuiltinType::DispatchThreadId;
+		case SpvBuiltIn::SpvBuiltInWorkgroupId: return crgfx::ShaderInterfaceBuiltinType::GroupId;
+		case SpvBuiltIn::SpvBuiltInLocalInvocationId: return crgfx::ShaderInterfaceBuiltinType::GroupThreadId;
+		case SpvBuiltIn::SpvBuiltInLocalInvocationIndex: return crgfx::ShaderInterfaceBuiltinType::GroupIndex;
+		case SpvBuiltIn::SpvBuiltInGlobalInvocationId: return crgfx::ShaderInterfaceBuiltinType::DispatchThreadId;
 
 		default:
-			return cr3d::ShaderInterfaceBuiltinType::None;
+			return crgfx::ShaderInterfaceBuiltinType::None;
 	}
 }
 
@@ -399,25 +399,25 @@ void InsertResourceIntoHeader(CrShaderReflectionHeader& reflectionHeader, const 
 {
 	switch (resource.type)
 	{
-		case cr3d::ShaderResourceType::ConstantBuffer:
+		case crgfx::ShaderResourceType::ConstantBuffer:
 			reflectionHeader.constantBuffers.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::Sampler:
+		case crgfx::ShaderResourceType::Sampler:
 			reflectionHeader.samplers.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::Texture:
+		case crgfx::ShaderResourceType::Texture:
 			reflectionHeader.textures.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::RWTexture:
+		case crgfx::ShaderResourceType::RWTexture:
 			reflectionHeader.rwTextures.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::StorageBuffer:
+		case crgfx::ShaderResourceType::StorageBuffer:
 			reflectionHeader.storageBuffers.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::RWStorageBuffer:
+		case crgfx::ShaderResourceType::RWStorageBuffer:
 			reflectionHeader.rwStorageBuffers.push_back(resource);
 			break;
-		case cr3d::ShaderResourceType::RWTypedBuffer:
+		case crgfx::ShaderResourceType::RWTypedBuffer:
 			reflectionHeader.rwTypedBuffers.push_back(resource);
 			break;
 		default: // TODO Handle Data Buffers
@@ -436,7 +436,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	CComPtr<CrDxcIncludeHandler> dxcIncludeHandler = new CrDxcIncludeHandler(dxcUtils);
 
 	CComPtr<IDxcResult> dxcCompilationResult;
-	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = cr3d::GraphicsApi::Vulkan;
+	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = crgfx::GraphicsApi::Vulkan;
 	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
 
 	if (compilationHResult != S_OK)
@@ -545,7 +545,7 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 		ProcessInterfaceVariables(shaderModule.output_variable_count, shaderModule.output_variables, reflectionHeader.stageOutputs);
 
-		if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+		if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
 		{
 			reflectionHeader.threadGroupSizeX = shaderModule.entry_points[0].local_size.x;
 			reflectionHeader.threadGroupSizeY = shaderModule.entry_points[0].local_size.y;
@@ -585,59 +585,59 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 	}
 }
 
-cr3d::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_DESC& resourceBindingDescriptor)
+crgfx::ShaderResourceType::T GetShaderResourceType(const D3D12_SHADER_INPUT_BIND_DESC& resourceBindingDescriptor)
 {
 	switch (resourceBindingDescriptor.Type)
 	{
 		case D3D_SIT_CBUFFER:
-			return cr3d::ShaderResourceType::ConstantBuffer;
+			return crgfx::ShaderResourceType::ConstantBuffer;
 		case D3D_SIT_TEXTURE:
 			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
 			{
-				return cr3d::ShaderResourceType::TypedBuffer;
+				return crgfx::ShaderResourceType::TypedBuffer;
 			}
 			else
 			{
-				return cr3d::ShaderResourceType::Texture;
+				return crgfx::ShaderResourceType::Texture;
 			}
 		case D3D_SIT_SAMPLER:
-			return cr3d::ShaderResourceType::Sampler;
+			return crgfx::ShaderResourceType::Sampler;
 		case D3D_SIT_UAV_RWTYPED:
 			if (resourceBindingDescriptor.Dimension == D3D_SRV_DIMENSION_BUFFER)
 			{
-				return cr3d::ShaderResourceType::RWTypedBuffer;
+				return crgfx::ShaderResourceType::RWTypedBuffer;
 			}
 			else
 			{
-				return cr3d::ShaderResourceType::RWTexture;
+				return crgfx::ShaderResourceType::RWTexture;
 			}
 		case D3D_SIT_STRUCTURED:
 		case D3D_SIT_BYTEADDRESS:
-			return cr3d::ShaderResourceType::StorageBuffer;
+			return crgfx::ShaderResourceType::StorageBuffer;
 		case D3D_SIT_UAV_RWSTRUCTURED:
 		case D3D_SIT_UAV_RWBYTEADDRESS:
 		case D3D_SIT_UAV_APPEND_STRUCTURED:
 		case D3D_SIT_UAV_CONSUME_STRUCTURED:
 		case D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
-			return cr3d::ShaderResourceType::RWStorageBuffer;
+			return crgfx::ShaderResourceType::RWStorageBuffer;
 		default:
-			return cr3d::ShaderResourceType::Count;
+			return crgfx::ShaderResourceType::Count;
 	}
 }
 
-cr3d::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE_PARAMETER_DESC& d3dSignatureParameter)
+crgfx::ShaderInterfaceBuiltinType::T GetShaderInterfaceType(const D3D12_SIGNATURE_PARAMETER_DESC& d3dSignatureParameter)
 {
 	switch (d3dSignatureParameter.SystemValueType)
 	{
-		case D3D_NAME_UNDEFINED: return cr3d::ShaderInterfaceBuiltinType::None;
-		case D3D_NAME_POSITION: return cr3d::ShaderInterfaceBuiltinType::Position;
-		case D3D_NAME_INSTANCE_ID: return cr3d::ShaderInterfaceBuiltinType::InstanceId;
-		case D3D_NAME_VERTEX_ID: return cr3d::ShaderInterfaceBuiltinType::VertexId;
-		case D3D_NAME_DEPTH: return cr3d::ShaderInterfaceBuiltinType::Depth;
-		case D3D_NAME_IS_FRONT_FACE: return cr3d::ShaderInterfaceBuiltinType::IsFrontFace;
+		case D3D_NAME_UNDEFINED: return crgfx::ShaderInterfaceBuiltinType::None;
+		case D3D_NAME_POSITION: return crgfx::ShaderInterfaceBuiltinType::Position;
+		case D3D_NAME_INSTANCE_ID: return crgfx::ShaderInterfaceBuiltinType::InstanceId;
+		case D3D_NAME_VERTEX_ID: return crgfx::ShaderInterfaceBuiltinType::VertexId;
+		case D3D_NAME_DEPTH: return crgfx::ShaderInterfaceBuiltinType::Depth;
+		case D3D_NAME_IS_FRONT_FACE: return crgfx::ShaderInterfaceBuiltinType::IsFrontFace;
 
 		default:
-			return cr3d::ShaderInterfaceBuiltinType::None;
+			return crgfx::ShaderInterfaceBuiltinType::None;
 	}
 }
 
@@ -686,7 +686,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 		reflectionHeader.shaderStage = compilationDescriptor.shaderStage;
 		//reflectionHeader.bytecodeHash = shaderHash.GetHash();
 
-		if (compilationDescriptor.shaderStage != cr3d::ShaderStage::RootSignature)
+		if (compilationDescriptor.shaderStage != crgfx::ShaderStage::RootSignature)
 		{
 			// Store PDB in PDB directory assigned by DXC. It's a hash PIX and renderdoc know how to find
 			CComPtr<IDxcBlob> pdbBlob = nullptr;
@@ -765,7 +765,7 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				ProcessInterfaceVariable(outputParameterDescriptor, reflectionHeader.stageOutputs);
 			}
 
-			if (compilationDescriptor.shaderStage == cr3d::ShaderStage::Compute)
+			if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
 			{
 				pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);
 			}

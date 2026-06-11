@@ -14,10 +14,10 @@ CrTextureDescriptor::CrTextureDescriptor()
 	, depth(1)
 	, mipmapCount(1)
 	, arraySize(1)
-	, format(cr3d::DataFormat::RGBA8_Unorm)
-	, sampleCount(cr3d::SampleCount::S1)
-	, type(cr3d::TextureType::Tex2D)
-	, usage(cr3d::TextureUsage::Default)
+	, format(crgfx::DataFormat::RGBA8_Unorm)
+	, sampleCount(crgfx::SampleCount::S1)
+	, type(crgfx::TextureType::Tex2D)
+	, usage(crgfx::TextureUsage::Default)
 	, initialData(nullptr)
 	, initialDataSize(0)
 	, extraData(0)
@@ -47,24 +47,24 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	
 	switch (descriptor.type)
 	{
-		case cr3d::TextureType::Volume:
+		case crgfx::TextureType::Volume:
 		{
 			CrAssertMsg(m_depth > 1, "Depth must be > 1");
 			CrAssertMsg(m_arraySize == 1, "Cannot create arrays of volumes");
 			break;
 		}
-		case cr3d::TextureType::Cubemap:
+		case crgfx::TextureType::Cubemap:
 		{
 			CrAssertMsg(m_width == m_height, "Width and height must be the same");
 			CrAssertMsg(m_depth == 1, "Depth must be 1");
 			break;
 		}
-		case cr3d::TextureType::Tex2D:
+		case crgfx::TextureType::Tex2D:
 		{
 			CrAssertMsg(m_depth == 1, "Depth must be 1");
 			break;
 		}
-		case cr3d::TextureType::Tex1D:
+		case crgfx::TextureType::Tex1D:
 		{
 			CrAssertMsg(m_height == 1 && m_depth == 1, "Height and depth must be 1");
 			break;
@@ -79,24 +79,24 @@ ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor&
 	// operations if not explicitly declared
 	if (IsRenderTarget())
 	{
-		m_defaultState = { cr3d::TextureLayout::RenderTarget, cr3d::ShaderStageFlags::Unused };
+		m_defaultState = { crgfx::TextureLayout::RenderTarget, crgfx::ShaderStageFlags::Unused };
 	}
 	else if (IsDepthStencil())
 	{
-		m_defaultState = { cr3d::TextureLayout::DepthStencilReadWrite, cr3d::ShaderStageFlags::Unused };
+		m_defaultState = { crgfx::TextureLayout::DepthStencilReadWrite, crgfx::ShaderStageFlags::Unused };
 	}
 	else if (IsUnorderedAccess())
 	{
-		m_defaultState = { cr3d::TextureLayout::RWTexture, cr3d::ShaderStageFlags::Compute };
+		m_defaultState = { crgfx::TextureLayout::RWTexture, crgfx::ShaderStageFlags::Compute };
 	}
 	else if (IsSwapchain())
 	{
-		m_defaultState = { cr3d::TextureLayout::Present, cr3d::ShaderStageFlags::Unused };
+		m_defaultState = { crgfx::TextureLayout::Present, crgfx::ShaderStageFlags::Unused };
 	}
 	else
 	{
 		// If none of the states above, assume we want to sample this texture
-		m_defaultState = { cr3d::TextureLayout::ShaderInput, cr3d::ShaderStageFlags::Pixel };
+		m_defaultState = { crgfx::TextureLayout::ShaderInput, crgfx::ShaderStageFlags::Pixel };
 	}
 
 	m_hardwareMipmapLayouts = {};
@@ -106,12 +106,12 @@ enum DXGI_FORMAT;
 
 namespace crd3d
 {
-	DXGI_FORMAT GetDXGIFormat(cr3d::DataFormat::T format);
+	DXGI_FORMAT GetDXGIFormat(crgfx::DataFormat::T format);
 }
 
-cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
+crgfx::MipmapLayout ICrTexture::GetDDSMipSliceLayout(crgfx::DataFormat::T format, uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice)
 {
-	cr3d::MipmapLayout mipmapLayout;
+	crgfx::MipmapLayout mipmapLayout;
 
 	// TODO Move GetDXGIFormat to an actually generic place
 	ddspp::DXGIFormat dxgiFormat = (ddspp::DXGIFormat)crd3d::GetDXGIFormat(format);
@@ -133,22 +133,22 @@ cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(cr3d::DataFormat::T format, 
 	return mipmapLayout;
 }
 
-cr3d::MipmapLayout ICrTexture::GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const
+crgfx::MipmapLayout ICrTexture::GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const
 {
 	return GetDDSMipSliceLayout(m_format, m_width, m_height, m_depth, m_mipmapCount, IsVolumeTexture(), mip, slice);
 }
 
-cr3d::MipmapLayout ICrTexture::GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const
+crgfx::MipmapLayout ICrTexture::GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const
 {
-	cr3d::MipmapLayout mipmapLayout = m_hardwareMipmapLayouts[mip];
+	crgfx::MipmapLayout mipmapLayout = m_hardwareMipmapLayouts[mip];
 	mipmapLayout.offsetBytes += m_slicePitchBytes * slice;
 	return mipmapLayout;
 }
 
 void ICrTexture::CopyIntoTextureMemory(uint8_t* destinationData, const uint8_t* sourceData, uint32_t mip, uint32_t slice)
 {
-	cr3d::MipmapLayout sourceMipLayout = GetDDSMipSliceLayout(mip, slice);
-	cr3d::MipmapLayout destinationMipLayout = GetHardwareMipSliceLayout(mip, slice);
+	crgfx::MipmapLayout sourceMipLayout = GetDDSMipSliceLayout(mip, slice);
+	crgfx::MipmapLayout destinationMipLayout = GetHardwareMipSliceLayout(mip, slice);
 
 	uint32_t mipDepth = CrMax(1u, GetDepth() >> mip);
 

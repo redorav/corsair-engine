@@ -32,7 +32,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 	D3D12_RASTERIZER_DESC& rasterizerDesc = d3d12PipelineStateDescriptor.RasterizerState;
 	rasterizerDesc.FillMode = crd3d::GetD3D12PolygonFillMode(pipelineDescriptor.rasterizerState.fillMode);
 	rasterizerDesc.CullMode = crd3d::GetD3D12PolygonCullMode(pipelineDescriptor.rasterizerState.cullMode);
-	rasterizerDesc.FrontCounterClockwise = pipelineDescriptor.rasterizerState.frontFace == cr3d::FrontFace::Clockwise ? false : true;
+	rasterizerDesc.FrontCounterClockwise = pipelineDescriptor.rasterizerState.frontFace == crgfx::FrontFace::Clockwise ? false : true;
 	rasterizerDesc.DepthBias = *reinterpret_cast<const INT*>(&pipelineDescriptor.rasterizerState.depthBias);
 	rasterizerDesc.DepthBiasClamp = pipelineDescriptor.rasterizerState.depthBiasClamp;
 	rasterizerDesc.SlopeScaledDepthBias = pipelineDescriptor.rasterizerState.slopeScaledDepthBias;
@@ -51,14 +51,14 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 
 	const CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
-	static_assert(cr3d::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats), "Array not large enough ");
+	static_assert(crgfx::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats), "Array not large enough ");
 
-	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
+	for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 	{
 		const CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
 		D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
-		if (renderTargets.colorFormats[i] != cr3d::DataFormat::Invalid)
+		if (renderTargets.colorFormats[i] != crgfx::DataFormat::Invalid)
 		{
 			const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 
@@ -90,7 +90,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 
 	d3d12PipelineStateDescriptor.NumRenderTargets = numRenderTargets;
 
-	if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
+	if (pipelineDescriptor.renderTargets.depthFormat != crgfx::DataFormat::Invalid)
 	{
 		d3d12PipelineStateDescriptor.DSVFormat = crd3d::GetDXGIFormat(pipelineDescriptor.renderTargets.depthFormat);
 	}
@@ -144,19 +144,19 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 
 		switch (bytecode->GetShaderStage())
 		{
-			case cr3d::ShaderStage::Vertex: d3d12PipelineStateDescriptor.VS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
-			case cr3d::ShaderStage::Pixel: d3d12PipelineStateDescriptor.PS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
-			case cr3d::ShaderStage::Hull: d3d12PipelineStateDescriptor.HS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
-			case cr3d::ShaderStage::Domain: d3d12PipelineStateDescriptor.DS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
-			case cr3d::ShaderStage::Geometry: d3d12PipelineStateDescriptor.GS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			case crgfx::ShaderStage::Vertex: d3d12PipelineStateDescriptor.VS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			case crgfx::ShaderStage::Pixel: d3d12PipelineStateDescriptor.PS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			case crgfx::ShaderStage::Hull: d3d12PipelineStateDescriptor.HS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			case crgfx::ShaderStage::Domain: d3d12PipelineStateDescriptor.DS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
+			case crgfx::ShaderStage::Geometry: d3d12PipelineStateDescriptor.GS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() }; break;
 			default: break;
 		}
 	}
 
 	D3D12_INPUT_LAYOUT_DESC& inputLayoutDescriptor = d3d12PipelineStateDescriptor.InputLayout;
 
-	crstl::array<D3D12_INPUT_ELEMENT_DESC, cr3d::MaxVertexAttributes> inputElementDescriptors;
-	crstl::array<crstl::fixed_string16, cr3d::MaxVertexAttributes> renamedAttributes;
+	crstl::array<D3D12_INPUT_ELEMENT_DESC, crgfx::MaxVertexAttributes> inputElementDescriptors;
+	crstl::array<crstl::fixed_string16, crgfx::MaxVertexAttributes> renamedAttributes;
 
 	for (uint32_t i = 0; i < vertexDescriptor.GetAttributeCount(); ++i)
 	{
@@ -181,7 +181,7 @@ void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice,
 			inputElementDescriptor.SemanticIndex = semanticData.index;
 		}
 
-		cr3d::DataFormat::T semanticFormat = (cr3d::DataFormat::T)vertexAttribute.format;
+		crgfx::DataFormat::T semanticFormat = (crgfx::DataFormat::T)vertexAttribute.format;
 		inputElementDescriptor.Format = crd3d::GetDXGIFormat(semanticFormat);
 		inputElementDescriptor.InputSlot = vertexAttribute.streamId;
 		inputElementDescriptor.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;

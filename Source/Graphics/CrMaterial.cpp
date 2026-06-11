@@ -22,11 +22,11 @@ CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(con
 {
 	CrMaterialPassProperties materialPassProperties;
 
-	cr3d::DataFormat::T mainDepthFormat = CrRendererConfig::DepthBufferFormat;
+	crgfx::DataFormat::T mainDepthFormat = CrRendererConfig::DepthBufferFormat;
 	
 	if (mesh->GetIsDoubleSided())
 	{
-		materialPassProperties.pipelineDescriptor.rasterizerState.cullMode = cr3d::PolygonCullMode::None;
+		materialPassProperties.pipelineDescriptor.rasterizerState.cullMode = crgfx::PolygonCullMode::None;
 	}
 
 	if (pipelineVariant == CrMaterialPipelineVariant::Depth)
@@ -36,7 +36,7 @@ CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(con
 	}
 	else if (pipelineVariant == CrMaterialPipelineVariant::Shadow)
 	{
-		materialPassProperties.pipelineDescriptor.renderTargets.depthFormat = cr3d::DataFormat::D16_Unorm;
+		materialPassProperties.pipelineDescriptor.renderTargets.depthFormat = crgfx::DataFormat::D16_Unorm;
 		materialPassProperties.shaderVariant = CrMaterialShaderVariant::Depth;
 	}
 	else if (pipelineVariant == CrMaterialPipelineVariant::GBuffer)
@@ -68,8 +68,8 @@ CrMaterialPassProperties CrMaterialPassProperties::GetMaterialPassProperties(con
 	}
 
 	CrAssert(
-		materialPassProperties.pipelineDescriptor.renderTargets.colorFormats[0] != cr3d::DataFormat::Invalid ||
-		materialPassProperties.pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid);
+		materialPassProperties.pipelineDescriptor.renderTargets.colorFormats[0] != crgfx::DataFormat::Invalid ||
+		materialPassProperties.pipelineDescriptor.renderTargets.depthFormat != crgfx::DataFormat::Invalid);
 	CrAssert(materialPassProperties.shaderVariant != CrMaterialShaderVariant::Count);
 
 	return materialPassProperties;

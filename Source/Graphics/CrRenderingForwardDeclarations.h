@@ -5,7 +5,7 @@
 
 #include "stdint.h"
 
-namespace cr3d
+namespace crgfx
 {
 	namespace DataFormat { enum T : uint32_t; }
 	struct DataFormatInfo;

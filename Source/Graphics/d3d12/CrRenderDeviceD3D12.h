@@ -93,9 +93,9 @@ private:
 	// GPU Synchronization
 	//--------------------
 
-	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
+	virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
-	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
+	virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
 
 	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
 

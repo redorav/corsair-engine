@@ -22,20 +22,20 @@
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 
-cr3d::DataFormat::T ToDataFormat(cgltf_component_type componentType)
+crgfx::DataFormat::T ToDataFormat(cgltf_component_type componentType)
 {
 	switch (componentType)
 	{
-		case cgltf_component_type_r_8:		return cr3d::DataFormat::R8_Sint;
-		case cgltf_component_type_r_8u:		return cr3d::DataFormat::R8_Uint;
-		case cgltf_component_type_r_16:		return cr3d::DataFormat::R16_Sint;
-		case cgltf_component_type_r_16u:	return cr3d::DataFormat::R16_Uint;
-		case cgltf_component_type_r_32u:	return cr3d::DataFormat::R32_Uint;
-		case cgltf_component_type_r_32f:	return cr3d::DataFormat::R32_Float;
+		case cgltf_component_type_r_8:		return crgfx::DataFormat::R8_Sint;
+		case cgltf_component_type_r_8u:		return crgfx::DataFormat::R8_Uint;
+		case cgltf_component_type_r_16:		return crgfx::DataFormat::R16_Sint;
+		case cgltf_component_type_r_16u:	return crgfx::DataFormat::R16_Uint;
+		case cgltf_component_type_r_32u:	return crgfx::DataFormat::R32_Uint;
+		case cgltf_component_type_r_32f:	return crgfx::DataFormat::R32_Float;
 		default: break;
 	}
 	CrAssertMsg(false, "Failed to convert data format: %i", componentType);
-	return cr3d::DataFormat::R32_Float;
+	return crgfx::DataFormat::R32_Float;
 }
 
 template<typename T>
@@ -65,8 +65,8 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 		const cgltf_accessor* gltfIndexAccessor = gltfPrimitive.indices;
 	
 		// Create the buffer
-		cr3d::DataFormat::T format = ToDataFormat(gltfIndexAccessor->component_type);
-		CrIndexBufferHandle indexBuffer = RenderSystem->GetRenderDevice()->CreateIndexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
+		crgfx::DataFormat::T format = ToDataFormat(gltfIndexAccessor->component_type);
+		CrIndexBufferHandle indexBuffer = RenderSystem->GetRenderDevice()->CreateIndexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
 
 		// Use the buffer view to copy the data
 		const cgltf_buffer_view* gltfBufferView = gltfIndexAccessor->buffer_view;
@@ -143,8 +143,8 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 		float3 maxVertex = float3(-FLT_MAX);
 
 		// Create the vertex buffer
-		CrVertexBufferHandle positionBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
-		CrVertexBufferHandle additionalBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(cr3d::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle positionBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle additionalBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
 
 		ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
 		ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();
@@ -317,7 +317,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 			textureParams.initialData = image->GetData();
 			textureParams.initialDataSize = image->GetDataSize();
 			textureParams.mipmapCount = image->m_mipmapCount;
-			textureParams.usage = cr3d::TextureUsage::Default;
+			textureParams.usage = crgfx::TextureUsage::Default;
 
 			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
 

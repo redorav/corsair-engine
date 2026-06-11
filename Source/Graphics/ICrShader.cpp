@@ -7,12 +7,12 @@
 CrShaderCompilerDefines CrShaderCompilerDefines::Dummy;
 
 template<typename ResourcesT>
-void ICrShaderBindingLayout::ProcessResourceArray(cr3d::ShaderResourceType::T resourceType, const ResourcesT& resources)
+void ICrShaderBindingLayout::ProcessResourceArray(crgfx::ShaderResourceType::T resourceType, const ResourcesT& resources)
 {
 	m_resourceOffsets[resourceType].offset = (uint8_t)m_bindings.size();
 	m_resourceOffsets[resourceType].count = (uint8_t)resources.size();
 
-	cr3d::ShaderStage::T currentStage = cr3d::ShaderStage::Count;
+	crgfx::ShaderStage::T currentStage = crgfx::ShaderStage::Count;
 	uint32_t currentStageIndex = 0;
 	uint32_t currentOffset = m_resourceOffsets[resourceType].offset;
 
@@ -20,7 +20,7 @@ void ICrShaderBindingLayout::ProcessResourceArray(cr3d::ShaderResourceType::T re
 	{
 		if (currentStage != shaderBinding.stage)
 		{
-			currentStage = (cr3d::ShaderStage::T)shaderBinding.stage;
+			currentStage = (crgfx::ShaderStage::T)shaderBinding.stage;
 			currentStageIndex = GetStageIndex(currentStage);
 			m_stageResourceOffsets[resourceType][currentStageIndex].offset = (uint8_t)currentOffset;
 		}
@@ -37,13 +37,13 @@ ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResour
 {
 	// We assume shader stages are sequential at this point. That is, any resources are packed
 	// by shader stage (i.e. all vertex shader constant buffers together)
-	ProcessResourceArray(cr3d::ShaderResourceType::ConstantBuffer, resources.constantBuffers);
-	ProcessResourceArray(cr3d::ShaderResourceType::Sampler, resources.samplers);
-	ProcessResourceArray(cr3d::ShaderResourceType::Texture, resources.textures);
-	ProcessResourceArray(cr3d::ShaderResourceType::RWTexture, resources.rwTextures);
-	ProcessResourceArray(cr3d::ShaderResourceType::StorageBuffer, resources.storageBuffers);
-	ProcessResourceArray(cr3d::ShaderResourceType::RWStorageBuffer, resources.rwStorageBuffers);
-	ProcessResourceArray(cr3d::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
+	ProcessResourceArray(crgfx::ShaderResourceType::ConstantBuffer, resources.constantBuffers);
+	ProcessResourceArray(crgfx::ShaderResourceType::Sampler, resources.samplers);
+	ProcessResourceArray(crgfx::ShaderResourceType::Texture, resources.textures);
+	ProcessResourceArray(crgfx::ShaderResourceType::RWTexture, resources.rwTextures);
+	ProcessResourceArray(crgfx::ShaderResourceType::StorageBuffer, resources.storageBuffers);
+	ProcessResourceArray(crgfx::ShaderResourceType::RWStorageBuffer, resources.rwStorageBuffers);
+	ProcessResourceArray(crgfx::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 }
 
 ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)

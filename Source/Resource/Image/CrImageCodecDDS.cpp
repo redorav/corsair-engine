@@ -12,159 +12,159 @@
 
 #include "ddspp.h"
 
-static cr3d::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
+static crgfx::DataFormat::T DXGItoDataFormat(ddspp::DXGIFormat format)
 {
 	switch (format)
 	{
 		case ddspp::BC1_UNORM: 
-			return cr3d::DataFormat::BC1_RGBA_Unorm;
+			return crgfx::DataFormat::BC1_RGBA_Unorm;
 		case ddspp::BC3_UNORM: 
-			return cr3d::DataFormat::BC3_Unorm;
+			return crgfx::DataFormat::BC3_Unorm;
 		case ddspp::BC4_UNORM: 
-			return cr3d::DataFormat::BC4_Unorm;
+			return crgfx::DataFormat::BC4_Unorm;
 		case ddspp::BC5_UNORM:
-			return cr3d::DataFormat::BC5_Unorm;
+			return crgfx::DataFormat::BC5_Unorm;
 		case ddspp::BC7_UNORM: 
-			return cr3d::DataFormat::BC7_Unorm;
+			return crgfx::DataFormat::BC7_Unorm;
 		default:
-			return cr3d::DataFormat::RGBA8_Unorm;
+			return crgfx::DataFormat::RGBA8_Unorm;
 	}
 }
 
-static ddspp::DXGIFormat DataFormatToDdspp(cr3d::DataFormat::T format)
+static ddspp::DXGIFormat DataFormatToDdspp(crgfx::DataFormat::T format)
 {
 	switch (format)
 	{
 		// 8-bit formats
-		case cr3d::DataFormat::R8_Unorm:          return ddspp::R8_UNORM;
-		case cr3d::DataFormat::R8_Snorm:          return ddspp::R8_SNORM;
-		case cr3d::DataFormat::R8_Uint:           return ddspp::R8_UINT;
-		case cr3d::DataFormat::R8_Sint:           return ddspp::R8_SINT;
+		case crgfx::DataFormat::R8_Unorm:          return ddspp::R8_UNORM;
+		case crgfx::DataFormat::R8_Snorm:          return ddspp::R8_SNORM;
+		case crgfx::DataFormat::R8_Uint:           return ddspp::R8_UINT;
+		case crgfx::DataFormat::R8_Sint:           return ddspp::R8_SINT;
 
-		case cr3d::DataFormat::RG8_Unorm:         return ddspp::R8G8_UNORM;
-		case cr3d::DataFormat::RG8_Snorm:         return ddspp::R8G8_SNORM;
-		case cr3d::DataFormat::RG8_Uint:          return ddspp::R8G8_UINT;
-		case cr3d::DataFormat::RG8_Sint:          return ddspp::R8G8_SINT;
+		case crgfx::DataFormat::RG8_Unorm:         return ddspp::R8G8_UNORM;
+		case crgfx::DataFormat::RG8_Snorm:         return ddspp::R8G8_SNORM;
+		case crgfx::DataFormat::RG8_Uint:          return ddspp::R8G8_UINT;
+		case crgfx::DataFormat::RG8_Sint:          return ddspp::R8G8_SINT;
 
-		case cr3d::DataFormat::RGBA8_Unorm:       return ddspp::R8G8B8A8_UNORM;
-		case cr3d::DataFormat::RGBA8_Snorm:       return ddspp::R8G8B8A8_SNORM;
-		case cr3d::DataFormat::RGBA8_Uint:        return ddspp::R8G8B8A8_UINT;
-		case cr3d::DataFormat::RGBA8_Sint:        return ddspp::R8G8B8A8_SINT;
-		case cr3d::DataFormat::RGBA8_SRGB:        return ddspp::R8G8B8A8_UNORM_SRGB;
+		case crgfx::DataFormat::RGBA8_Unorm:       return ddspp::R8G8B8A8_UNORM;
+		case crgfx::DataFormat::RGBA8_Snorm:       return ddspp::R8G8B8A8_SNORM;
+		case crgfx::DataFormat::RGBA8_Uint:        return ddspp::R8G8B8A8_UINT;
+		case crgfx::DataFormat::RGBA8_Sint:        return ddspp::R8G8B8A8_SINT;
+		case crgfx::DataFormat::RGBA8_SRGB:        return ddspp::R8G8B8A8_UNORM_SRGB;
 
-		case cr3d::DataFormat::BGRA8_Unorm:       return ddspp::B8G8R8A8_UNORM;
-		case cr3d::DataFormat::BGRA8_SRGB:        return ddspp::B8G8R8A8_UNORM_SRGB;
+		case crgfx::DataFormat::BGRA8_Unorm:       return ddspp::B8G8R8A8_UNORM;
+		case crgfx::DataFormat::BGRA8_SRGB:        return ddspp::B8G8R8A8_UNORM_SRGB;
 
 			// 16-bit integer formats
-		case cr3d::DataFormat::R16_Unorm:         return ddspp::R16_UNORM;
-		case cr3d::DataFormat::R16_Snorm:         return ddspp::R16_SNORM;
-		case cr3d::DataFormat::R16_Uint:          return ddspp::R16_UINT;
-		case cr3d::DataFormat::R16_Sint:          return ddspp::R16_SINT;
+		case crgfx::DataFormat::R16_Unorm:         return ddspp::R16_UNORM;
+		case crgfx::DataFormat::R16_Snorm:         return ddspp::R16_SNORM;
+		case crgfx::DataFormat::R16_Uint:          return ddspp::R16_UINT;
+		case crgfx::DataFormat::R16_Sint:          return ddspp::R16_SINT;
 
-		case cr3d::DataFormat::RG16_Unorm:        return ddspp::R16G16_UNORM;
-		case cr3d::DataFormat::RG16_Snorm:        return ddspp::R16G16_SNORM;
-		case cr3d::DataFormat::RG16_Uint:         return ddspp::R16G16_UINT;
-		case cr3d::DataFormat::RG16_Sint:         return ddspp::R16G16_SINT;
+		case crgfx::DataFormat::RG16_Unorm:        return ddspp::R16G16_UNORM;
+		case crgfx::DataFormat::RG16_Snorm:        return ddspp::R16G16_SNORM;
+		case crgfx::DataFormat::RG16_Uint:         return ddspp::R16G16_UINT;
+		case crgfx::DataFormat::RG16_Sint:         return ddspp::R16G16_SINT;
 
-		case cr3d::DataFormat::RGBA16_Unorm:      return ddspp::R16G16B16A16_UNORM;
-		case cr3d::DataFormat::RGBA16_Snorm:      return ddspp::R16G16B16A16_SNORM;
-		case cr3d::DataFormat::RGBA16_Uint:       return ddspp::R16G16B16A16_UINT;
-		case cr3d::DataFormat::RGBA16_Sint:       return ddspp::R16G16B16A16_SINT;
+		case crgfx::DataFormat::RGBA16_Unorm:      return ddspp::R16G16B16A16_UNORM;
+		case crgfx::DataFormat::RGBA16_Snorm:      return ddspp::R16G16B16A16_SNORM;
+		case crgfx::DataFormat::RGBA16_Uint:       return ddspp::R16G16B16A16_UINT;
+		case crgfx::DataFormat::RGBA16_Sint:       return ddspp::R16G16B16A16_SINT;
 
 			// 16-bit float formats
-		case cr3d::DataFormat::R16_Float:         return ddspp::R16_FLOAT;
-		case cr3d::DataFormat::RG16_Float:        return ddspp::R16G16_FLOAT;
-		case cr3d::DataFormat::RGBA16_Float:      return ddspp::R16G16B16A16_FLOAT;
+		case crgfx::DataFormat::R16_Float:         return ddspp::R16_FLOAT;
+		case crgfx::DataFormat::RG16_Float:        return ddspp::R16G16_FLOAT;
+		case crgfx::DataFormat::RGBA16_Float:      return ddspp::R16G16B16A16_FLOAT;
 
-		case cr3d::DataFormat::R32_Uint:          return ddspp::R32_UINT;
-		case cr3d::DataFormat::R32_Sint:          return ddspp::R32_SINT;
-		case cr3d::DataFormat::RG32_Uint:         return ddspp::R32G32_UINT;
-		case cr3d::DataFormat::RG32_Sint:         return ddspp::R32G32_SINT;
-		case cr3d::DataFormat::RGB32_Uint:        return ddspp::R32G32B32_UINT;
-		case cr3d::DataFormat::RGB32_Sint:        return ddspp::R32G32B32_SINT;
-		case cr3d::DataFormat::RGBA32_Uint:       return ddspp::R32G32B32A32_UINT;
-		case cr3d::DataFormat::RGBA32_Sint:       return ddspp::R32G32B32A32_SINT;
+		case crgfx::DataFormat::R32_Uint:          return ddspp::R32_UINT;
+		case crgfx::DataFormat::R32_Sint:          return ddspp::R32_SINT;
+		case crgfx::DataFormat::RG32_Uint:         return ddspp::R32G32_UINT;
+		case crgfx::DataFormat::RG32_Sint:         return ddspp::R32G32_SINT;
+		case crgfx::DataFormat::RGB32_Uint:        return ddspp::R32G32B32_UINT;
+		case crgfx::DataFormat::RGB32_Sint:        return ddspp::R32G32B32_SINT;
+		case crgfx::DataFormat::RGBA32_Uint:       return ddspp::R32G32B32A32_UINT;
+		case crgfx::DataFormat::RGBA32_Sint:       return ddspp::R32G32B32A32_SINT;
 
 			// 32-bit float formats
-		case cr3d::DataFormat::R32_Float:         return ddspp::R32_FLOAT;
-		case cr3d::DataFormat::RG32_Float:        return ddspp::R32G32_FLOAT;
-		case cr3d::DataFormat::RGB32_Float:       return ddspp::R32G32B32_FLOAT;
-		case cr3d::DataFormat::RGBA32_Float:      return ddspp::R32G32B32A32_FLOAT;
+		case crgfx::DataFormat::R32_Float:         return ddspp::R32_FLOAT;
+		case crgfx::DataFormat::RG32_Float:        return ddspp::R32G32_FLOAT;
+		case crgfx::DataFormat::RGB32_Float:       return ddspp::R32G32B32_FLOAT;
+		case crgfx::DataFormat::RGBA32_Float:      return ddspp::R32G32B32A32_FLOAT;
 
 			// Compressed formats
-		case cr3d::DataFormat::BC1_RGB_Unorm:     return ddspp::BC1_UNORM;
-		case cr3d::DataFormat::BC1_RGB_SRGB:      return ddspp::BC1_UNORM_SRGB;
-		case cr3d::DataFormat::BC1_RGBA_Unorm:    return ddspp::BC1_UNORM;
-		case cr3d::DataFormat::BC1_RGBA_SRGB:     return ddspp::BC1_UNORM_SRGB;
+		case crgfx::DataFormat::BC1_RGB_Unorm:     return ddspp::BC1_UNORM;
+		case crgfx::DataFormat::BC1_RGB_SRGB:      return ddspp::BC1_UNORM_SRGB;
+		case crgfx::DataFormat::BC1_RGBA_Unorm:    return ddspp::BC1_UNORM;
+		case crgfx::DataFormat::BC1_RGBA_SRGB:     return ddspp::BC1_UNORM_SRGB;
 
-		case cr3d::DataFormat::BC2_Unorm:         return ddspp::BC2_UNORM;
-		case cr3d::DataFormat::BC2_SRGB:          return ddspp::BC2_UNORM_SRGB;
+		case crgfx::DataFormat::BC2_Unorm:         return ddspp::BC2_UNORM;
+		case crgfx::DataFormat::BC2_SRGB:          return ddspp::BC2_UNORM_SRGB;
 
-		case cr3d::DataFormat::BC3_Unorm:         return ddspp::BC3_UNORM;
-		case cr3d::DataFormat::BC3_SRGB:          return ddspp::BC3_UNORM_SRGB;
+		case crgfx::DataFormat::BC3_Unorm:         return ddspp::BC3_UNORM;
+		case crgfx::DataFormat::BC3_SRGB:          return ddspp::BC3_UNORM_SRGB;
 
-		case cr3d::DataFormat::BC4_Unorm:         return ddspp::BC4_UNORM;
-		case cr3d::DataFormat::BC4_Snorm:         return ddspp::BC4_SNORM;
+		case crgfx::DataFormat::BC4_Unorm:         return ddspp::BC4_UNORM;
+		case crgfx::DataFormat::BC4_Snorm:         return ddspp::BC4_SNORM;
 
-		case cr3d::DataFormat::BC5_Unorm:         return ddspp::BC5_UNORM;
-		case cr3d::DataFormat::BC5_Snorm:         return ddspp::BC5_SNORM;
+		case crgfx::DataFormat::BC5_Unorm:         return ddspp::BC5_UNORM;
+		case crgfx::DataFormat::BC5_Snorm:         return ddspp::BC5_SNORM;
 
-		case cr3d::DataFormat::BC6H_UFloat:       return ddspp::BC6H_UF16;
-		case cr3d::DataFormat::BC6H_SFloat:       return ddspp::BC6H_SF16;
+		case crgfx::DataFormat::BC6H_UFloat:       return ddspp::BC6H_UF16;
+		case crgfx::DataFormat::BC6H_SFloat:       return ddspp::BC6H_SF16;
 
-		case cr3d::DataFormat::BC7_Unorm:         return ddspp::BC7_UNORM;
-		case cr3d::DataFormat::BC7_SRGB:          return ddspp::BC7_UNORM_SRGB;
+		case crgfx::DataFormat::BC7_Unorm:         return ddspp::BC7_UNORM;
+		case crgfx::DataFormat::BC7_SRGB:          return ddspp::BC7_UNORM_SRGB;
 
 			// Depth-stencil formats
-		case cr3d::DataFormat::D16_Unorm:         return ddspp::D16_UNORM;
-		case cr3d::DataFormat::D24_Unorm_S8_Uint: return ddspp::D24_UNORM_S8_UINT;
-		case cr3d::DataFormat::D24_Unorm_X8:      return ddspp::R24_UNORM_X8_TYPELESS;
-		case cr3d::DataFormat::D32_Float:         return ddspp::D32_FLOAT;
-		case cr3d::DataFormat::D32_Float_S8_Uint: return ddspp::D32_FLOAT_S8X24_UINT;
+		case crgfx::DataFormat::D16_Unorm:         return ddspp::D16_UNORM;
+		case crgfx::DataFormat::D24_Unorm_S8_Uint: return ddspp::D24_UNORM_S8_UINT;
+		case crgfx::DataFormat::D24_Unorm_X8:      return ddspp::R24_UNORM_X8_TYPELESS;
+		case crgfx::DataFormat::D32_Float:         return ddspp::D32_FLOAT;
+		case crgfx::DataFormat::D32_Float_S8_Uint: return ddspp::D32_FLOAT_S8X24_UINT;
 
 			// Packed Formats
-		case cr3d::DataFormat::RG11B10_Float:  return ddspp::R11G11B10_FLOAT;
-		case cr3d::DataFormat::RGB10A2_Unorm:  return ddspp::R10G10B10A2_UNORM;
-		case cr3d::DataFormat::RGB10A2_Uint:   return ddspp::R10G10B10A2_UINT;
-		case cr3d::DataFormat::B5G6R5_Unorm:   return ddspp::B5G6R5_UNORM;
-		case cr3d::DataFormat::B5G5R5A1_Unorm: return ddspp::B5G5R5A1_UNORM;
-		case cr3d::DataFormat::BGRA4_Unorm:    return ddspp::B4G4R4A4_UNORM;
-		case cr3d::DataFormat::RGB9E5_Float:   return ddspp::R9G9B9E5_SHAREDEXP;
+		case crgfx::DataFormat::RG11B10_Float:  return ddspp::R11G11B10_FLOAT;
+		case crgfx::DataFormat::RGB10A2_Unorm:  return ddspp::R10G10B10A2_UNORM;
+		case crgfx::DataFormat::RGB10A2_Uint:   return ddspp::R10G10B10A2_UINT;
+		case crgfx::DataFormat::B5G6R5_Unorm:   return ddspp::B5G6R5_UNORM;
+		case crgfx::DataFormat::B5G5R5A1_Unorm: return ddspp::B5G5R5A1_UNORM;
+		case crgfx::DataFormat::BGRA4_Unorm:    return ddspp::B4G4R4A4_UNORM;
+		case crgfx::DataFormat::RGB9E5_Float:   return ddspp::R9G9B9E5_SHAREDEXP;
 		default:
 			return ddspp::R8G8B8A8_UNORM;
 	}
 }
 
-static cr3d::TextureType DdsppToTextureType(ddspp::TextureType type)
+static crgfx::TextureType DdsppToTextureType(ddspp::TextureType type)
 {
 	switch (type)
 	{
-		case ddspp::Texture1D:	return cr3d::TextureType::Tex1D;
-		case ddspp::Texture2D:	return cr3d::TextureType::Tex2D;
-		case ddspp::Texture3D:	return cr3d::TextureType::Volume;
-		case ddspp::Cubemap:	return cr3d::TextureType::Cubemap;
-		default:				return cr3d::TextureType::Tex2D;
+		case ddspp::Texture1D:	return crgfx::TextureType::Tex1D;
+		case ddspp::Texture2D:	return crgfx::TextureType::Tex2D;
+		case ddspp::Texture3D:	return crgfx::TextureType::Volume;
+		case ddspp::Cubemap:	return crgfx::TextureType::Cubemap;
+		default:				return crgfx::TextureType::Tex2D;
 	}
 }
 
-static ddspp::TextureType TextureTypeToDdspp(cr3d::TextureType type)
+static ddspp::TextureType TextureTypeToDdspp(crgfx::TextureType type)
 {
 	switch (type)
 	{
-		case cr3d::TextureType::Tex1D: return ddspp::Texture1D;
-		case cr3d::TextureType::Tex2D: return ddspp::Texture2D;
-		case cr3d::TextureType::Volume: return ddspp::Texture3D;
-		case cr3d::TextureType::Cubemap: return ddspp::Cubemap;
+		case crgfx::TextureType::Tex1D: return ddspp::Texture1D;
+		case crgfx::TextureType::Tex2D: return ddspp::Texture2D;
+		case crgfx::TextureType::Volume: return ddspp::Texture3D;
+		case crgfx::TextureType::Cubemap: return ddspp::Cubemap;
 		default: return ddspp::Texture2D;
 	}
 }
 
-static bool IsImageFormatSupported(cr3d::DataFormat::T format)
+static bool IsImageFormatSupported(crgfx::DataFormat::T format)
 {
 	// DDS Supports all uncompressed formats and all BC formats
 	bool supported = false;
-	supported |= format >= cr3d::DataFormat::FirstUncompressed && format <= cr3d::DataFormat::LastUncompressed;
-	supported |= format >= cr3d::DataFormat::FirstBC && format <= cr3d::DataFormat::LastBC;
+	supported |= format >= crgfx::DataFormat::FirstUncompressed && format <= crgfx::DataFormat::LastUncompressed;
+	supported |= format >= crgfx::DataFormat::FirstBC && format <= crgfx::DataFormat::LastBC;
 	return supported;
 }
 
@@ -279,7 +279,7 @@ void CrImageEncoderDDS::Encode(const CrImageHandle& image, void* data, uint64_t 
 	EncodeInternal(image, memoryStream);
 }
 
-bool CrImageEncoderDDS::IsImageFormatSupported(cr3d::DataFormat::T format) const
+bool CrImageEncoderDDS::IsImageFormatSupported(crgfx::DataFormat::T format) const
 {
 	return ::IsImageFormatSupported(format);
 }

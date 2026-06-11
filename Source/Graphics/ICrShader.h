@@ -22,26 +22,26 @@ struct CrShaderBinding
 {
 	CrShaderBinding() {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, ConstantBuffers::T constantBufferID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::ConstantBuffer), constantBufferID(constantBufferID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, ConstantBuffers::T constantBufferID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::ConstantBuffer), constantBufferID(constantBufferID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Samplers::T samplerID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::Sampler), samplerID(samplerID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, Samplers::T samplerID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::Sampler), samplerID(samplerID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, Textures::T textureID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::Texture), textureID(textureID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, Textures::T textureID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::Texture), textureID(textureID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTextures::T rwTextureID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, RWTextures::T rwTextureID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::RWTexture), rwTextureID(rwTextureID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, StorageBuffers::T storageBufferID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::StorageBuffer), storageBufferID(storageBufferID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, StorageBuffers::T storageBufferID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::StorageBuffer), storageBufferID(storageBufferID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWStorageBuffers::T rwStorageBufferID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, RWStorageBuffers::T rwStorageBufferID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::RWStorageBuffer), rwStorageBufferID(rwStorageBufferID) {}
 
-	CrShaderBinding(bindpoint_t bindPoint, cr3d::ShaderStage::T stage, RWTypedBuffers::T rwTypedBufferID)
-		: bindPoint(bindPoint), stage((uint8_t)stage), type(cr3d::ShaderResourceType::RWTypedBuffer), rwTypedBufferID(rwTypedBufferID) {}
+	CrShaderBinding(bindpoint_t bindPoint, crgfx::ShaderStage::T stage, RWTypedBuffers::T rwTypedBufferID)
+		: bindPoint(bindPoint), stage((uint8_t)stage), type(crgfx::ShaderResourceType::RWTypedBuffer), rwTypedBufferID(rwTypedBufferID) {}
 
 	bindpoint_t bindPoint;
 	uint8_t stage : 4; // cr3d::ShaderStage::T
@@ -59,8 +59,8 @@ struct CrShaderBinding
 	};
 };
 
-static_assert(cr3d::ShaderStage::Count < 16);
-static_assert(cr3d::ShaderResourceType::Count < 16);
+static_assert(crgfx::ShaderStage::Count < 16);
+static_assert(crgfx::ShaderResourceType::Count < 16);
 
 // We use this table to bucket resources before passing
 // them on (sorted) to the shader binding layout.
@@ -95,107 +95,107 @@ public:
 	};
 
 	template<typename FunctionT, typename ResourceID>
-	void ForEachResourceType(cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
+	void ForEachResourceType(crgfx::ShaderResourceType::T resourceType, const FunctionT& function) const
 	{
 		const ShaderResourceOffset& resourceOffset = m_resourceOffsets[resourceType];
 		for (uint8_t i = resourceOffset.offset; i < resourceOffset.offset + resourceOffset.count; ++i)
 		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
+			function((crgfx::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT, typename ResourceID>
-	void ForEachResourceType(cr3d::ShaderStage::T shaderStage, cr3d::ShaderResourceType::T resourceType, const FunctionT& function) const
+	void ForEachResourceType(crgfx::ShaderStage::T shaderStage, crgfx::ShaderResourceType::T resourceType, const FunctionT& function) const
 	{
 		const ShaderResourceOffset& resourceOffset = m_stageResourceOffsets[resourceType][GetStageIndex(shaderStage)];
 		for (uint8_t i = resourceOffset.offset; i < resourceOffset.offset + resourceOffset.count; ++i)
 		{
-			function((cr3d::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
+			function((crgfx::ShaderStage::T)m_bindings[i].stage, (ResourceID)m_bindings[i].id, m_bindings[i].bindPoint);
 		}
 	}
 
 	template<typename FunctionT>
 	void ForEachConstantBuffer(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, ConstantBuffers::T>(cr3d::ShaderResourceType::ConstantBuffer, function);
+		ForEachResourceType<FunctionT, ConstantBuffers::T>(crgfx::ShaderResourceType::ConstantBuffer, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachConstantBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachConstantBuffer(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, ConstantBuffers::T>(shaderStage, cr3d::ShaderResourceType::ConstantBuffer, function);
+		ForEachResourceType<FunctionT, ConstantBuffers::T>(shaderStage, crgfx::ShaderResourceType::ConstantBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachSampler(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, Samplers::T>(cr3d::ShaderResourceType::Sampler, function);
+		ForEachResourceType<FunctionT, Samplers::T>(crgfx::ShaderResourceType::Sampler, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachSampler(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachSampler(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, Samplers::T>(shaderStage, cr3d::ShaderResourceType::Sampler, function);
+		ForEachResourceType<FunctionT, Samplers::T>(shaderStage, crgfx::ShaderResourceType::Sampler, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachTexture(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, Textures::T>(cr3d::ShaderResourceType::Texture, function);
+		ForEachResourceType<FunctionT, Textures::T>(crgfx::ShaderResourceType::Texture, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachTexture(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachTexture(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, Textures::T>(shaderStage, cr3d::ShaderResourceType::Texture, function);
+		ForEachResourceType<FunctionT, Textures::T>(shaderStage, crgfx::ShaderResourceType::Texture, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWTexture(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWTextures::T>(cr3d::ShaderResourceType::RWTexture, function);
+		ForEachResourceType<FunctionT, RWTextures::T>(crgfx::ShaderResourceType::RWTexture, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachRWTexture(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachRWTexture(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWTextures::T>(shaderStage, cr3d::ShaderResourceType::RWTexture, function);
+		ForEachResourceType<FunctionT, RWTextures::T>(shaderStage, crgfx::ShaderResourceType::RWTexture, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachStorageBuffer(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, StorageBuffers::T>(cr3d::ShaderResourceType::StorageBuffer, function);
+		ForEachResourceType<FunctionT, StorageBuffers::T>(crgfx::ShaderResourceType::StorageBuffer, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachStorageBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachStorageBuffer(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, StorageBuffers::T>(shaderStage, cr3d::ShaderResourceType::StorageBuffer, function);
+		ForEachResourceType<FunctionT, StorageBuffers::T>(shaderStage, crgfx::ShaderResourceType::StorageBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWStorageBuffer(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWStorageBuffers::T>(cr3d::ShaderResourceType::RWStorageBuffer, function);
+		ForEachResourceType<FunctionT, RWStorageBuffers::T>(crgfx::ShaderResourceType::RWStorageBuffer, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachRWStorageBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachRWStorageBuffer(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWStorageBuffers::T>(shaderStage, cr3d::ShaderResourceType::RWStorageBuffer, function);
+		ForEachResourceType<FunctionT, RWStorageBuffers::T>(shaderStage, crgfx::ShaderResourceType::RWStorageBuffer, function);
 	}
 
 	template<typename FunctionT>
 	void ForEachRWTypedBuffer(const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWTypedBuffers::T>(cr3d::ShaderResourceType::RWTypedBuffer, function);
+		ForEachResourceType<FunctionT, RWTypedBuffers::T>(crgfx::ShaderResourceType::RWTypedBuffer, function);
 	}
 
 	template<typename FunctionT>
-	void ForEachRWTypedBuffer(cr3d::ShaderStage::T shaderStage, const FunctionT& function) const
+	void ForEachRWTypedBuffer(crgfx::ShaderStage::T shaderStage, const FunctionT& function) const
 	{
-		ForEachResourceType<FunctionT, RWTypedBuffers::T>(shaderStage, cr3d::ShaderResourceType::RWTypedBuffer, function);
+		ForEachResourceType<FunctionT, RWTypedBuffers::T>(shaderStage, crgfx::ShaderResourceType::RWTypedBuffer, function);
 	}
 
 	template<typename FunctionT>
@@ -203,32 +203,32 @@ public:
 
 	uint8_t GetTotalResourceCount() const { return m_totalResourceCount; }
 
-	uint8_t GetConstantBufferCount()  const { return m_resourceOffsets[cr3d::ShaderResourceType::ConstantBuffer].count; }
-	uint8_t GetSamplerCount()         const { return m_resourceOffsets[cr3d::ShaderResourceType::Sampler].count; }
-	uint8_t GetTextureCount()         const { return m_resourceOffsets[cr3d::ShaderResourceType::Texture].count; }
-	uint8_t GetRWTextureCount()       const { return m_resourceOffsets[cr3d::ShaderResourceType::RWTexture].count; }
-	uint8_t GetStorageBufferCount()   const { return m_resourceOffsets[cr3d::ShaderResourceType::StorageBuffer].count; }
-	uint8_t GetRWStorageBufferCount() const { return m_resourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer].count; }
-	uint8_t GetRWTypedBufferCount()   const { return m_resourceOffsets[cr3d::ShaderResourceType::RWTypedBuffer].count; }
+	uint8_t GetConstantBufferCount()  const { return m_resourceOffsets[crgfx::ShaderResourceType::ConstantBuffer].count; }
+	uint8_t GetSamplerCount()         const { return m_resourceOffsets[crgfx::ShaderResourceType::Sampler].count; }
+	uint8_t GetTextureCount()         const { return m_resourceOffsets[crgfx::ShaderResourceType::Texture].count; }
+	uint8_t GetRWTextureCount()       const { return m_resourceOffsets[crgfx::ShaderResourceType::RWTexture].count; }
+	uint8_t GetStorageBufferCount()   const { return m_resourceOffsets[crgfx::ShaderResourceType::StorageBuffer].count; }
+	uint8_t GetRWStorageBufferCount() const { return m_resourceOffsets[crgfx::ShaderResourceType::RWStorageBuffer].count; }
+	uint8_t GetRWTypedBufferCount()   const { return m_resourceOffsets[crgfx::ShaderResourceType::RWTypedBuffer].count; }
 
-	uint8_t GetConstantBufferCount(cr3d::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[cr3d::ShaderResourceType::ConstantBuffer][GetStageIndex(shaderStage)].count; }
-	uint8_t GetSamplerCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Sampler][GetStageIndex(shaderStage)].count; }
-	uint8_t GetTextureCount(cr3d::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[cr3d::ShaderResourceType::Texture][GetStageIndex(shaderStage)].count; }
-	uint8_t GetRWTextureCount(cr3d::ShaderStage::T shaderStage)       const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWTexture][GetStageIndex(shaderStage)].count; }
-	uint8_t GetStorageBufferCount(cr3d::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[cr3d::ShaderResourceType::StorageBuffer][GetStageIndex(shaderStage)].count; }
-	uint8_t GetRWStorageBufferCount(cr3d::ShaderStage::T shaderStage) const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWStorageBuffer][GetStageIndex(shaderStage)].count; }
-	uint8_t GetRWTypedBufferCount(cr3d::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[cr3d::ShaderResourceType::RWTypedBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetConstantBufferCount(crgfx::ShaderStage::T shaderStage)  const { return m_stageResourceOffsets[crgfx::ShaderResourceType::ConstantBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetSamplerCount(crgfx::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[crgfx::ShaderResourceType::Sampler][GetStageIndex(shaderStage)].count; }
+	uint8_t GetTextureCount(crgfx::ShaderStage::T shaderStage)         const { return m_stageResourceOffsets[crgfx::ShaderResourceType::Texture][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWTextureCount(crgfx::ShaderStage::T shaderStage)       const { return m_stageResourceOffsets[crgfx::ShaderResourceType::RWTexture][GetStageIndex(shaderStage)].count; }
+	uint8_t GetStorageBufferCount(crgfx::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[crgfx::ShaderResourceType::StorageBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWStorageBufferCount(crgfx::ShaderStage::T shaderStage) const { return m_stageResourceOffsets[crgfx::ShaderResourceType::RWStorageBuffer][GetStageIndex(shaderStage)].count; }
+	uint8_t GetRWTypedBufferCount(crgfx::ShaderStage::T shaderStage)   const { return m_stageResourceOffsets[crgfx::ShaderResourceType::RWTypedBuffer][GetStageIndex(shaderStage)].count; }
 
 private:
 
 	template<typename ResourcesT>
-	void ProcessResourceArray(cr3d::ShaderResourceType::T resourceType, const ResourcesT& resources);
+	void ProcessResourceArray(crgfx::ShaderResourceType::T resourceType, const ResourcesT& resources);
 
-	static uint32_t GetStageIndex(cr3d::ShaderStage::T stage)
+	static uint32_t GetStageIndex(crgfx::ShaderStage::T stage)
 	{
 		switch (stage)
 		{
-			case cr3d::ShaderStage::Compute: return 0;
+			case crgfx::ShaderStage::Compute: return 0;
 			default: return (uint32_t)stage;
 		}
 	}
@@ -237,13 +237,13 @@ private:
 	uint8_t m_totalResourceCount = 0;
 
 	// Number of resources and offset per resource type
-	crstl::array<ShaderResourceOffset, cr3d::ShaderResourceType::Count> m_resourceOffsets = {};
+	crstl::array<ShaderResourceOffset, crgfx::ShaderResourceType::Count> m_resourceOffsets = {};
 
 	// This might seem a little wasteful but it can address the array below at a much smaller memory cost
 	// than trying to pack resources indexed by stage count directly. There is a size and an offset for 
 	// every resource type, for every stage. Some resource stages overlap, such as compute and graphics, 
 	// so we don't take up unnecessary space
-	crstl::array<crstl::array<ShaderResourceOffset, cr3d::ShaderStage::GraphicsStageCount>, cr3d::ShaderResourceType::Count> m_stageResourceOffsets = {};
+	crstl::array<crstl::array<ShaderResourceOffset, crgfx::ShaderStage::GraphicsStageCount>, crgfx::ShaderResourceType::Count> m_stageResourceOffsets = {};
 
 	crstl::fixed_vector<CrShaderBinding, 64> m_bindings;
 };
@@ -258,7 +258,7 @@ static_assert(sizeof(CrVertexInput) == 2, "CrVertexInput size mismatch");
 
 struct CrInputSignature
 {
-	crstl::fixed_vector<CrVertexInput, cr3d::MaxVertexStreams> inputs;
+	crstl::fixed_vector<CrVertexInput, crgfx::MaxVertexStreams> inputs;
 };
 
 // Bytecode represents a shader code, e.g. vertex, pixel, etc
@@ -278,7 +278,7 @@ public:
 		return m_reflection.entryPoint;
 	}
 
-	cr3d::ShaderStage::T GetShaderStage() const
+	crgfx::ShaderStage::T GetShaderStage() const
 	{
 		return m_reflection.shaderStage;
 	}
@@ -420,13 +420,13 @@ private:
 struct CrShaderBytecodeCompilationDescriptor
 {
 	CrShaderBytecodeCompilationDescriptor
-	(const CrFixedPath& path, const crstl::fixed_string128& entryPoint, cr3d::ShaderStage::T stage, cr3d::GraphicsApi::T graphicsApi, cr::Platform::T platform)
+	(const CrFixedPath& path, const crstl::fixed_string128& entryPoint, crgfx::ShaderStage::T stage, crgfx::GraphicsApi::T graphicsApi, cr::Platform::T platform)
 		: path(path), entryPoint(entryPoint), stage(stage), graphicsApi(graphicsApi), platform(platform) {}
 
 	const CrFixedPath               path;
 	const crstl::fixed_string128    entryPoint;
-	const cr3d::ShaderStage::T      stage;
-	const cr3d::GraphicsApi::T      graphicsApi;
+	const crgfx::ShaderStage::T      stage;
+	const crgfx::GraphicsApi::T      graphicsApi;
 	const cr::Platform::T           platform;
 };
 

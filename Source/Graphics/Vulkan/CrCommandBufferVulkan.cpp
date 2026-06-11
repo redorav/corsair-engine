@@ -113,7 +113,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	uint32_t imageCount = 0;         // Total number of images
 	uint32_t texelBufferCount = 0;   // Total number of texel buffers
 
-	bindingLayout.ForEachConstantBuffer([&](cr3d::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachConstantBuffer([&](crgfx::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -136,7 +136,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachSampler([&](cr3d::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachSampler([&](crgfx::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
 	{
 		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[id]);
 
@@ -151,7 +151,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachTexture([&](cr3d::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachTexture([&](crgfx::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
 		const CrTextureBinding& textureBinding = m_currentState.m_textures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(textureBinding.texture);
@@ -162,7 +162,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		{
 			imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
 		}
-		else if (textureBinding.view == CrTextureView(cr3d::TexturePlane::Stencil))
+		else if (textureBinding.view == CrTextureView(crgfx::TexturePlane::Stencil))
 		{
 			imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
 		}
@@ -184,7 +184,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachRWTexture([&](cr3d::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTexture([&](crgfx::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
 		const CrRWTextureBinding& binding = m_currentState.m_rwTextures[id];
 		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
@@ -201,7 +201,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		imageCount++;
 	});
 
-	bindingLayout.ForEachStorageBuffer([&](cr3d::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachStorageBuffer([&](crgfx::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrStorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -218,7 +218,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachRWStorageBuffer([&](cr3d::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWStorageBuffer([&](crgfx::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrStorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
@@ -235,7 +235,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 		bufferCount++;
 	});
 
-	bindingLayout.ForEachRWTypedBuffer([&](cr3d::ShaderStage::T, RWTypedBuffers::T id, bindpoint_t bindPoint)
+	bindingLayout.ForEachRWTypedBuffer([&](crgfx::ShaderStage::T, RWTypedBuffers::T id, bindpoint_t bindPoint)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
 
@@ -291,8 +291,8 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 	{
 		if (vulkanGraphicsPipeline->GetVertexStreamCount() > 0)
 		{
-			VkDeviceSize vkOffsets[cr3d::MaxVertexStreams];
-			VkBuffer vkBuffers[cr3d::MaxVertexStreams];
+			VkDeviceSize vkOffsets[crgfx::MaxVertexStreams];
+			VkBuffer vkBuffers[crgfx::MaxVertexStreams];
 
 			uint32_t usedVertexStreamCount = vulkanGraphicsPipeline->GetVertexStreamCount();
 
@@ -371,7 +371,7 @@ void CrCommandBufferVulkan::FlushComputeRenderStatePS()
 }
 
 void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
-	const CrRenderPassBufferDescriptor& bufferDescriptor, cr3d::BufferState::T sourceState, cr3d::BufferState::T destinationState)
+	const CrRenderPassBufferDescriptor& bufferDescriptor, crgfx::BufferState::T sourceState, crgfx::BufferState::T destinationState)
 {
 	const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(bufferDescriptor.hardwareBuffer);
 
@@ -391,7 +391,7 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 
 void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture,
 	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
-	cr3d::TextureLayout::T sourceLayout, cr3d::TextureLayout::T destinationLayout)
+	crgfx::TextureLayout::T sourceLayout, crgfx::TextureLayout::T destinationLayout)
 {
 	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
 
@@ -421,11 +421,11 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 	// Always process buffers and textures
 	GatherImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
 
-	if(renderPassDescriptor.type == cr3d::RenderPassType::Graphics)
+	if(renderPassDescriptor.type == crgfx::RenderPassType::Graphics)
 	{
 		uint32_t numColorAttachments = (uint32_t)renderPassDescriptor.color.size();
 
-		crstl::fixed_vector<VkRenderingAttachmentInfo, cr3d::MaxRenderTargets> vkColorAttachments;
+		crstl::fixed_vector<VkRenderingAttachmentInfo, crgfx::MaxRenderTargets> vkColorAttachments;
 		VkRenderingAttachmentInfo vkDepthAttachment = {};
 		VkRenderingAttachmentInfo vkStencilAttachment = {};
 
@@ -487,7 +487,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 				QueueVkImageBarrier(depthAttachment.texture, depthAttachment.mipmap, 1, depthAttachment.slice, 1, depthAttachment.initialState, depthAttachment.usageState);
 			}
 
-			if (cr3d::IsDepthStencilFormat(renderPassDescriptor.depth.texture->GetFormat()))
+			if (crgfx::IsDepthStencilFormat(renderPassDescriptor.depth.texture->GetFormat()))
 			{
 				vkStencilAttachment.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
 				vkStencilAttachment.imageView   = vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice);
@@ -514,7 +514,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 
 void CrCommandBufferVulkan::EndRenderPassPS()
 {
-	if (m_currentState.m_currentRenderPass.type == cr3d::RenderPassType::Graphics)
+	if (m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Graphics)
 	{
 		uint32_t numColorAttachments = (uint32_t)m_currentState.m_currentRenderPass.color.size();
 
@@ -566,7 +566,7 @@ void CrCommandBufferVulkan::GatherImageAndBufferBarriers(const CrRenderPassDescr
 }
 
 void CrCommandBufferVulkan::QueueVkImageBarrier(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
-	const cr3d::TextureState& sourceState, const cr3d::TextureState& destinationState)
+	const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState)
 {
 	VkImageMemoryBarrier& imageMemoryBarrier = m_imageMemoryBarriers.push_back();
 	PopulateVkImageBarrier(imageMemoryBarrier, texture, mipmapStart, mipmapCount, sliceStart, sliceCount, sourceState.layout, destinationState.layout);

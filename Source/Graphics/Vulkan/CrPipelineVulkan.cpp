@@ -54,13 +54,13 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	colorBlendState.logicOpEnable = false;
 	colorBlendState.logicOp = VK_LOGIC_OP_NO_OP;
 
-	crstl::fixed_vector<VkPipelineColorBlendAttachmentState, cr3d::MaxRenderTargets> blendAttachments;
-	for (uint32_t i = 0, end = cr3d::MaxRenderTargets; i < end; ++i)
+	crstl::fixed_vector<VkPipelineColorBlendAttachmentState, crgfx::MaxRenderTargets> blendAttachments;
+	for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 	{
 		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 		const CrRenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
 
-		if (renderTarget.colorFormats[i] != cr3d::DataFormat::Invalid)
+		if (renderTarget.colorFormats[i] != crgfx::DataFormat::Invalid)
 		{
 			VkPipelineColorBlendAttachmentState& blendAttachment = blendAttachments.push_back();
 			blendAttachment.colorWriteMask = renderTargetBlend.colorWriteMask;
@@ -162,7 +162,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	VkResult vkResult;
 
 	// Shader information
-	VkPipelineShaderStageCreateInfo shaderStages[cr3d::ShaderStage::GraphicsStageCount] = {};
+	VkPipelineShaderStageCreateInfo shaderStages[crgfx::ShaderStage::GraphicsStageCount] = {};
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
@@ -202,7 +202,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create pipeline layout");
 
 	uint32_t vertexStreamCount = vertexDescriptor.GetStreamCount();
-	crstl::array<VkVertexInputBindingDescription, cr3d::MaxVertexStreams> bindingDescriptions;
+	crstl::array<VkVertexInputBindingDescription, crgfx::MaxVertexStreams> bindingDescriptions;
 
 	for (uint32_t streamId = 0; streamId < vertexStreamCount; ++streamId)
 	{
@@ -212,17 +212,17 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	}
 
 	uint32_t attributeCount = vertexDescriptor.GetAttributeCount();
-	crstl::array<VkVertexInputAttributeDescription, cr3d::MaxVertexAttributes> attributeDescriptions;
+	crstl::array<VkVertexInputAttributeDescription, crgfx::MaxVertexAttributes> attributeDescriptions;
 
 	uint32_t offset = 0;
 	uint32_t streamId = 0;
 	for (uint32_t i = 0; i < attributeCount; ++i)
 	{
 		const CrVertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
-		const cr3d::DataFormatInfo& vertexFormatInfo = cr3d::DataFormats[vertexAttribute.format];
+		const crgfx::DataFormatInfo& vertexFormatInfo = crgfx::DataFormats[vertexAttribute.format];
 		attributeDescriptions[i].binding = vertexAttribute.streamId;
 		attributeDescriptions[i].location = i; // We assume attributes come in the order the shader expects them
-		attributeDescriptions[i].format = crvk::GetVkFormat((cr3d::DataFormat::T)vertexAttribute.format);
+		attributeDescriptions[i].format = crvk::GetVkFormat((crgfx::DataFormat::T)vertexAttribute.format);
 
 		if (streamId != vertexAttribute.streamId)
 		{
@@ -247,7 +247,7 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	// Remove all the hacks from the renderpass API and set what we know the renderpass really wanted
 	// which is only the format of the texture
 
-	crstl::fixed_vector<VkFormat, cr3d::MaxRenderTargets> colorAttachmentFormats;
+	crstl::fixed_vector<VkFormat, crgfx::MaxRenderTargets> colorAttachmentFormats;
 
 	VkPipelineRenderingCreateInfoKHR vkPipelineRenderingInfo = {};
 	vkPipelineRenderingInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
@@ -261,11 +261,11 @@ void CrGraphicsPipelineVulkan::Initialize(CrRenderDeviceVulkan* vulkanRenderDevi
 	vkPipelineRenderingInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
 	vkPipelineRenderingInfo.colorAttachmentCount = (uint32_t)colorAttachmentFormats.size();
 
-	if (pipelineDescriptor.renderTargets.depthFormat != cr3d::DataFormat::Invalid)
+	if (pipelineDescriptor.renderTargets.depthFormat != crgfx::DataFormat::Invalid)
 	{
 		vkPipelineRenderingInfo.depthAttachmentFormat = crvk::GetVkFormat(pipelineDescriptor.renderTargets.depthFormat);
 
-		if (cr3d::IsDepthStencilFormat(pipelineDescriptor.renderTargets.depthFormat))
+		if (crgfx::IsDepthStencilFormat(pipelineDescriptor.renderTargets.depthFormat))
 		{
 			vkPipelineRenderingInfo.stencilAttachmentFormat = vkPipelineRenderingInfo.depthAttachmentFormat;
 		}

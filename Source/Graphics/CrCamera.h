@@ -13,7 +13,7 @@ public:
 
 	struct ProjectionParams
 	{
-		cr3d::CameraProjection projection;
+		crgfx::CameraProjection projection;
 		float nearPlane;
 
 		float farPlane;
@@ -91,7 +91,7 @@ public:
 
 private:
 
-	cr3d::CameraProjection m_projection;
+	crgfx::CameraProjection m_projection;
 
 	float m_nearPlaneWidth;
 

@@ -6,12 +6,12 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-VkQueryType GetVkQueryType(cr3d::QueryType queryType)
+VkQueryType GetVkQueryType(crgfx::QueryType queryType)
 {
 	switch (queryType)
 	{
-		case cr3d::QueryType::Timestamp: return VK_QUERY_TYPE_TIMESTAMP;
-		case cr3d::QueryType::Occlusion: return VK_QUERY_TYPE_OCCLUSION;
+		case crgfx::QueryType::Timestamp: return VK_QUERY_TYPE_TIMESTAMP;
+		case crgfx::QueryType::Occlusion: return VK_QUERY_TYPE_OCCLUSION;
 		default: return VK_QUERY_TYPE_MAX_ENUM;
 	}
 }
@@ -35,8 +35,8 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const 
 
 	CrHardwareGPUBufferDescriptor queryBufferDescriptor
 	(
-		cr3d::BufferUsage::TransferDst,
-		cr3d::MemoryAccess::GPUWriteCPURead,
+		crgfx::BufferUsage::TransferDst,
+		crgfx::MemoryAccess::GPUWriteCPURead,
 		descriptor.count,
 		m_querySize
 	);

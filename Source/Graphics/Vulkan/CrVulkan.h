@@ -28,64 +28,64 @@ namespace crvk
 		VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
 	};
 
-	VkFormat GetVkFormat(cr3d::DataFormat::T format);
+	VkFormat GetVkFormat(crgfx::DataFormat::T format);
 
-	inline VkIndexType GetVkIndexType(cr3d::DataFormat::T format)
+	inline VkIndexType GetVkIndexType(crgfx::DataFormat::T format)
 	{
 		switch (format)
 		{
-			case cr3d::DataFormat::R32_Uint: return VK_INDEX_TYPE_UINT32;
-			case cr3d::DataFormat::R16_Uint: return VK_INDEX_TYPE_UINT16;
-			case cr3d::DataFormat::R8_Uint: return VK_INDEX_TYPE_UINT8_EXT;
+			case crgfx::DataFormat::R32_Uint: return VK_INDEX_TYPE_UINT32;
+			case crgfx::DataFormat::R16_Uint: return VK_INDEX_TYPE_UINT16;
+			case crgfx::DataFormat::R8_Uint: return VK_INDEX_TYPE_UINT8_EXT;
 			default: return VK_INDEX_TYPE_UINT32;
 		}
 	}
 
-	cr3d::DataFormat::T GetDataFormat(VkFormat vkFormat);
+	crgfx::DataFormat::T GetDataFormat(VkFormat vkFormat);
 
-	VkSamplerAddressMode GetVkAddressMode(cr3d::AddressMode addressMode);
+	VkSamplerAddressMode GetVkAddressMode(crgfx::AddressMode addressMode);
 
-	VkFilter GetVkFilter(cr3d::Filter filter);
+	VkFilter GetVkFilter(crgfx::Filter filter);
 
-	VkSamplerMipmapMode GetVkMipmapMode(cr3d::Filter filter);
+	VkSamplerMipmapMode GetVkMipmapMode(crgfx::Filter filter);
 
-	VkBorderColor GetVkBorderColor(cr3d::BorderColor borderColor);
+	VkBorderColor GetVkBorderColor(crgfx::BorderColor borderColor);
 
-	VkBlendOp GetVkBlendOp(cr3d::BlendOp blendOp);
+	VkBlendOp GetVkBlendOp(crgfx::BlendOp blendOp);
 
-	VkBlendFactor GetVkBlendFactor(cr3d::BlendFactor blendFactor);
+	VkBlendFactor GetVkBlendFactor(crgfx::BlendFactor blendFactor);
 
-	VkCompareOp GetVkCompareOp(cr3d::CompareOp compareOp);
+	VkCompareOp GetVkCompareOp(crgfx::CompareOp compareOp);
 
-	VkStencilOp GetVkStencilOp(cr3d::StencilOp stencilOp);
+	VkStencilOp GetVkStencilOp(crgfx::StencilOp stencilOp);
 
-	VkSampleCountFlagBits GetVkSampleCount(cr3d::SampleCount sampleCount);
+	VkSampleCountFlagBits GetVkSampleCount(crgfx::SampleCount sampleCount);
 
-	VkShaderStageFlagBits GetVkShaderStage(cr3d::ShaderStage::T shaderStage);
+	VkShaderStageFlagBits GetVkShaderStage(crgfx::ShaderStage::T shaderStage);
 	
-	VkPrimitiveTopology GetVkPrimitiveTopology(cr3d::PrimitiveTopology primitiveTopology);
+	VkPrimitiveTopology GetVkPrimitiveTopology(crgfx::PrimitiveTopology primitiveTopology);
 
-	VkVertexInputRate GetVkVertexInputRate(cr3d::VertexInputRate vertexInputRate);
+	VkVertexInputRate GetVkVertexInputRate(crgfx::VertexInputRate vertexInputRate);
 
-	VkPolygonMode GetVkPolygonFillMode(cr3d::PolygonFillMode fillMode);
+	VkPolygonMode GetVkPolygonFillMode(crgfx::PolygonFillMode fillMode);
 
-	VkCullModeFlags GetVkPolygonCullMode(cr3d::PolygonCullMode cullMode);
+	VkCullModeFlags GetVkPolygonCullMode(crgfx::PolygonCullMode cullMode);
 
-	VkFrontFace GetVkFrontFace(cr3d::FrontFace frontFace);
+	VkFrontFace GetVkFrontFace(crgfx::FrontFace frontFace);
 
-	VkDescriptorType GetVkDescriptorType(cr3d::ShaderResourceType::T resourceType);
+	VkDescriptorType GetVkDescriptorType(crgfx::ShaderResourceType::T resourceType);
 
 	VkAttachmentLoadOp GetVkAttachmentLoadOp(CrRenderTargetLoadOp loadOp);
 
 	VkAttachmentStoreOp GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp);
 
-	VkPipelineStageFlags GetVkPipelineStageFlagsFromShaderStages(cr3d::ShaderStageFlags::T shaderStages);
+	VkPipelineStageFlags GetVkPipelineStageFlagsFromShaderStages(crgfx::ShaderStageFlags::T shaderStages);
 
-	VkImageAspectFlags GetVkImageAspectFlags(cr3d::DataFormat::T textureFormat);
+	VkImageAspectFlags GetVkImageAspectFlags(crgfx::DataFormat::T textureFormat);
 
-	VkImageTransitionInfo GetVkImageStateInfo(cr3d::DataFormat::T textureFormat, cr3d::TextureLayout::T textureLayout);
+	VkImageTransitionInfo GetVkImageStateInfo(crgfx::DataFormat::T textureFormat, crgfx::TextureLayout::T textureLayout);
 
-	VkPipelineStageFlags GetVkPipelineStageFlags(const cr3d::TextureState& textureState);
+	VkPipelineStageFlags GetVkPipelineStageFlags(const crgfx::TextureState& textureState);
 
 	VkBufferCreateInfo CreateVkBufferCreateInfo(VkBufferCreateFlags flags, VkDeviceSize size, VkBufferUsageFlags usage, VkSharingMode sharingMode, uint32_t queueFamilyIndexCount, uint32_t* pQueueFamilyIndices);
 

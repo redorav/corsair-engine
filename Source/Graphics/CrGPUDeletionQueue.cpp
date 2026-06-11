@@ -59,9 +59,9 @@ void CrGPUDeletionQueue::Process()
 		// Get the last list we pushed into the active list
 		CrDeletionList* deletionList = m_activeDeletionLists.front();
 
-		cr3d::GPUFenceResult fenceResult = m_renderDevice->GetFenceStatus(deletionList->fence.get());
+		crgfx::GPUFenceResult fenceResult = m_renderDevice->GetFenceStatus(deletionList->fence.get());
 
-		if (fenceResult == cr3d::GPUFenceResult::Success)
+		if (fenceResult == crgfx::GPUFenceResult::Success)
 		{
 			for (CrGPUDeletable* deletable : deletionList->deletables)
 			{
@@ -137,7 +137,7 @@ void CrGPUDeletionQueue::Finalize()
 	// no real risk of locking up here because we have certainty that all fences were queued
 	for (CrDeletionList* deletionList : m_activeDeletionLists)
 	{
-		if (m_renderDevice->WaitForFence(deletionList->fence.get(), UINT64_MAX) == cr3d::GPUFenceResult::Success)
+		if (m_renderDevice->WaitForFence(deletionList->fence.get(), UINT64_MAX) == crgfx::GPUFenceResult::Success)
 		{
 			// Add current fence to the deletion list. We can now guarantee this it the last usage of this list
 			deletionList->fence = nullptr;

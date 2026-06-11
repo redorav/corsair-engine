@@ -90,7 +90,7 @@ struct CrRenderGraphTextureUsage
 	CrRenderTargetLoadOp stencilLoadOp   = CrRenderTargetLoadOp::DontCare;
 	CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare;
 
-	cr3d::TextureState state;
+	crgfx::TextureState state;
 };
 
 // A transition structure that describes the intended state, the state before and the intended state after
@@ -102,9 +102,9 @@ struct CrRenderGraphTextureTransitionInfo
 	uint32_t sliceStart = 0;
 	uint32_t sliceCount = 1;
 
-	cr3d::TextureState initialState; // State it was in before
-	cr3d::TextureState usageState;   // State we want it to be used in
-	cr3d::TextureState finalState;   // State it needs to be left in for the next pass
+	crgfx::TextureState initialState; // State it was in before
+	crgfx::TextureState usageState;   // State we want it to be used in
+	crgfx::TextureState finalState;   // State it needs to be left in for the next pass
 };
 
 // How this buffer is intended to be used in this pass
@@ -125,9 +125,9 @@ struct CrRenderGraphBufferUsage
 	uint32_t stride;
 	uint32_t offset;
 
-	cr3d::ShaderResourceType::T resourceType = cr3d::ShaderResourceType::Count;
-	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined;
-	cr3d::ShaderStageFlags::T shaderStages = cr3d::ShaderStageFlags::None;
+	crgfx::ShaderResourceType::T resourceType = crgfx::ShaderResourceType::Count;
+	crgfx::BufferState::T usageState = crgfx::BufferState::Undefined;
+	crgfx::ShaderStageFlags::T shaderStages = crgfx::ShaderStageFlags::None;
 };
 
 // A transition structure that describes the intended state, the state before and the intended state after
@@ -136,13 +136,13 @@ struct CrRenderGraphBufferTransitionInfo
 	uint32_t offset = 0;
 	uint32_t size = 0;
 
-	cr3d::BufferState::T initialState = cr3d::BufferState::Undefined; // State it comes in
-	cr3d::BufferState::T usageState = cr3d::BufferState::Undefined; // State I want it to be used in
-	cr3d::BufferState::T finalState = cr3d::BufferState::Undefined; // State it needs to be left in
+	crgfx::BufferState::T initialState = crgfx::BufferState::Undefined; // State it comes in
+	crgfx::BufferState::T usageState = crgfx::BufferState::Undefined; // State I want it to be used in
+	crgfx::BufferState::T finalState = crgfx::BufferState::Undefined; // State it needs to be left in
 
-	cr3d::ShaderStageFlags::T initialShaderStages = cr3d::ShaderStageFlags::None;
-	cr3d::ShaderStageFlags::T usageShaderStages = cr3d::ShaderStageFlags::None;
-	cr3d::ShaderStageFlags::T finalShaderStages = cr3d::ShaderStageFlags::None;
+	crgfx::ShaderStageFlags::T initialShaderStages = crgfx::ShaderStageFlags::None;
+	crgfx::ShaderStageFlags::T usageShaderStages = crgfx::ShaderStageFlags::None;
+	crgfx::ShaderStageFlags::T finalShaderStages = crgfx::ShaderStageFlags::None;
 };
 
 struct CrRenderGraphPass
@@ -197,9 +197,9 @@ public:
 
 	uint32_t GetSubresourceId(CrHash subresourceHash);
 
-	void BindTexture(Textures::T textureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, CrTextureView view = CrTextureView());
+	void BindTexture(Textures::T textureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, CrTextureView view = CrTextureView());
 
-	void BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, cr3d::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
+	void BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
 
 	void BindRenderTarget
 	(
@@ -231,21 +231,21 @@ public:
 
 	uint32_t GetUniqueBufferId(CrHash bufferHash);
 
-	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, cr3d::ShaderStageFlags::T shaderStages);
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
 	void Begin(const CrRenderGraphFrameParams& frameParams);
 

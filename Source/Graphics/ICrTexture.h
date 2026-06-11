@@ -15,7 +15,7 @@
 // that lies with the texture. This is to simplify the management of API resources, once a texture is destroyed, all the views it used to
 // manage are destroyed too, preventing issues like binding a view whose resource no longer exists
 
-namespace cr3d
+namespace crgfx
 {
 	namespace TextureViewType
 	{
@@ -35,9 +35,9 @@ struct CrTextureView
 		uint8_t mipmapCount = 0xff, // 0xff means all mips are visible
 		uint16_t sliceStart = 0,
 		uint16_t sliceCount = 0xffff, // 0xffff means all slices are visible
-		cr3d::DataFormat::T format = cr3d::DataFormat::Invalid,
-		cr3d::TextureViewType::T type = cr3d::TextureViewType::Read,
-		cr3d::TexturePlane::T plane = cr3d::TexturePlane::Plane0
+		crgfx::DataFormat::T format = crgfx::DataFormat::Invalid,
+		crgfx::TextureViewType::T type = crgfx::TextureViewType::Read,
+		crgfx::TexturePlane::T plane = crgfx::TexturePlane::Plane0
 	)
 		: mipmapStart(mipmapStart)
 		, mipmapCount(mipmapCount)
@@ -48,7 +48,7 @@ struct CrTextureView
 		, plane(plane)
 	{}
 
-	explicit CrTextureView(cr3d::TexturePlane::T plane) : CrTextureView()
+	explicit CrTextureView(crgfx::TexturePlane::T plane) : CrTextureView()
 	{
 		this->plane = plane;
 	}
@@ -66,9 +66,9 @@ struct CrTextureView
 			uint32_t mipmapCount : 8;
 			uint32_t sliceStart : 16;
 			uint32_t sliceCount : 16;
-			cr3d::DataFormat::T format : 8;
-			cr3d::TextureViewType::T type : 6;
-			cr3d::TexturePlane::T plane : 2;
+			crgfx::DataFormat::T format : 8;
+			crgfx::TextureViewType::T type : 6;
+			crgfx::TexturePlane::T plane : 2;
 		};
 
 		uint64_t key;
@@ -86,11 +86,11 @@ struct CrTextureDescriptor
 	uint32_t depth; // Valid for volume textures
 	uint32_t mipmapCount;
 	uint32_t arraySize; // Valid for texture or cubemap arrays
-	cr3d::DataFormat::T format;
-	cr3d::SampleCount sampleCount;
-	cr3d::TextureType type;
-	cr3d::TextureUsageFlags usage;
-	crstl::fixed_vector<CrTextureView, cr3d::MaxCustomTextureViews> customViews;
+	crgfx::DataFormat::T format;
+	crgfx::SampleCount sampleCount;
+	crgfx::TextureType type;
+	crgfx::TextureUsageFlags usage;
+	crstl::fixed_vector<CrTextureView, crgfx::MaxCustomTextureViews> customViews;
 
 	// Defaults to zero
 	union
@@ -120,25 +120,25 @@ public:
 
 	virtual ~ICrTexture();
 
-	bool IsRenderTarget() const { return (m_usage & cr3d::TextureUsage::RenderTarget) != 0; }
+	bool IsRenderTarget() const { return (m_usage & crgfx::TextureUsage::RenderTarget) != 0; }
 
-	bool IsUnorderedAccess() const { return (m_usage & cr3d::TextureUsage::UnorderedAccess) != 0; }
+	bool IsUnorderedAccess() const { return (m_usage & crgfx::TextureUsage::UnorderedAccess) != 0; }
 
-	bool IsSwapchain() const { return (m_usage & cr3d::TextureUsage::SwapChain) != 0; }
+	bool IsSwapchain() const { return (m_usage & crgfx::TextureUsage::SwapChain) != 0; }
 
-	bool IsDepthStencil() const { return (m_usage & cr3d::TextureUsage::DepthStencil) != 0; }
+	bool IsDepthStencil() const { return (m_usage & crgfx::TextureUsage::DepthStencil) != 0; }
 
-	bool Is1DTexture() const { return m_type == cr3d::TextureType::Tex1D; }
+	bool Is1DTexture() const { return m_type == crgfx::TextureType::Tex1D; }
 
-	bool Is2DTexture() const { return m_type == cr3d::TextureType::Tex2D; }
+	bool Is2DTexture() const { return m_type == crgfx::TextureType::Tex2D; }
 
-	bool IsVolumeTexture() const { return m_type == cr3d::TextureType::Volume; }
+	bool IsVolumeTexture() const { return m_type == crgfx::TextureType::Volume; }
 
-	bool IsCubemap() const { return m_type == cr3d::TextureType::Cubemap; }
+	bool IsCubemap() const { return m_type == crgfx::TextureType::Cubemap; }
 
-	cr3d::DataFormat::T GetFormat() const { return m_format; }
+	crgfx::DataFormat::T GetFormat() const { return m_format; }
 
-	cr3d::SampleCount GetSampleCount() const { return m_sampleCount; }
+	crgfx::SampleCount GetSampleCount() const { return m_sampleCount; }
 
 	uint32_t GetWidth() const { return m_width; }
 
@@ -150,13 +150,13 @@ public:
 
 	uint32_t GetSliceCount() const { return m_arraySize; }
 
-	cr3d::TextureState GetDefaultState() const { return m_defaultState; }
+	crgfx::TextureState GetDefaultState() const { return m_defaultState; }
 
-	static cr3d::MipmapLayout GetDDSMipSliceLayout(cr3d::DataFormat::T format, uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
+	static crgfx::MipmapLayout GetDDSMipSliceLayout(crgfx::DataFormat::T format, uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipmaps, bool isVolume, uint32_t mip, uint32_t slice);
 
-	cr3d::MipmapLayout GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const;
+	crgfx::MipmapLayout GetDDSMipSliceLayout(uint32_t mip, uint32_t slice) const;
 
-	cr3d::MipmapLayout GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const;
+	crgfx::MipmapLayout GetHardwareMipSliceLayout(uint32_t mip, uint32_t slice) const;
 
 	uint32_t GetUsedGPUMemory() const { return m_usedGPUMemoryBytes; }
 
@@ -182,11 +182,11 @@ protected:
 	// We don't allow the constructor externally
 	ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
-	cr3d::DataFormat::T m_format;
+	crgfx::DataFormat::T m_format;
 
-	cr3d::SampleCount m_sampleCount;
+	crgfx::SampleCount m_sampleCount;
 
-	cr3d::TextureType m_type;
+	crgfx::TextureType m_type;
 
 	uint32_t m_width;
 
@@ -202,12 +202,12 @@ protected:
 	// by the hardware and takes into account padding, etc Used for reporting
 	uint32_t m_usedGPUMemoryBytes;
 
-	cr3d::TextureState m_defaultState;
+	crgfx::TextureState m_defaultState;
 
-	cr3d::TextureUsageFlags m_usage;
+	crgfx::TextureUsageFlags m_usage;
 
 	// Mipmap layout that is platform-dependent
-	crstl::array<cr3d::MipmapLayout, cr3d::MaxMipmaps> m_hardwareMipmapLayouts;
+	crstl::array<crgfx::MipmapLayout, crgfx::MaxMipmaps> m_hardwareMipmapLayouts;
 
 	// Distance between two consecutive slices
 	uint32_t m_slicePitchBytes;

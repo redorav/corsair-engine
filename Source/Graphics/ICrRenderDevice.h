@@ -27,13 +27,13 @@ struct CrDriverVersion
 struct CrRenderDeviceProperties
 {
 	// We can choose to search for a vendor. If we don't have it, we choose the best available one
-	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
+	crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
 
 	// Actual vendor we selected
-	cr3d::GraphicsVendor::T vendor = cr3d::GraphicsVendor::Unknown;
+	crgfx::GraphicsVendor::T vendor = crgfx::GraphicsVendor::Unknown;
 
 	// Graphics API
-	cr3d::GraphicsApi::T graphicsApi = cr3d::GraphicsApi::Count;
+	crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
 
 	// Just for display
 	crstl::fixed_string32 graphicsApiDisplay;
@@ -96,7 +96,7 @@ class CrGPUDeletable;
 
 struct CrRenderDeviceDescriptor
 {
-	cr3d::GraphicsVendor::T preferredVendor = cr3d::GraphicsVendor::Unknown;
+	crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
 };
 
 class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
@@ -130,7 +130,7 @@ public:
 
 	ICrCommandBuffer* CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
-	CrIndexBuffer* CreateIndexBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numIndices);
+	CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
 	ICrSampler* CreateSampler(const CrSamplerDescriptor& descriptor);
 
@@ -138,12 +138,12 @@ public:
 
 	ICrTexture* CreateTexture(const CrTextureDescriptor& descriptor);
 
-	CrVertexBuffer* CreateVertexBuffer(cr3d::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+	CrVertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 	template<typename Metadata>
-	CrStructuredBuffer<Metadata>* CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements);
+	CrStructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
 
-	CrTypedBuffer* CreateTypedBuffer(cr3d::MemoryAccess::T access, cr3d::DataFormat::T dataFormat, uint32_t numElements);
+	CrTypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
 
 	ICrGraphicsShader* CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
@@ -167,9 +167,9 @@ public:
 	// GPU Synchronization
 	//--------------------
 
-	cr3d::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
+	crgfx::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
 
-	cr3d::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
+	crgfx::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
 
 	void SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence);
 
@@ -236,9 +236,9 @@ protected:
 	// GPU Synchronization
 	//--------------------
 
-	virtual cr3d::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
+	virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
 
-	virtual cr3d::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
+	virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
 
 	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
 
@@ -312,7 +312,7 @@ private:
 };
 
 template<typename Metadata>
-CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(cr3d::MemoryAccess::T access, uint32_t numElements)
+CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
 {
 	return new CrStructuredBuffer<Metadata>(this, access, numElements);
 }

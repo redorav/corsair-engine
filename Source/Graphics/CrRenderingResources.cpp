@@ -28,36 +28,36 @@ CrRenderingResources::CrRenderingResources(ICrRenderDevice* renderDevice)
 
 	{
 		CrSamplerDescriptor descriptor;
-		descriptor.addressModeU = cr3d::AddressMode::ClampToEdge;
-		descriptor.addressModeV = cr3d::AddressMode::ClampToEdge;
-		descriptor.addressModeW = cr3d::AddressMode::ClampToEdge;
+		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
+		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
+		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
 		descriptor.name = "Linear Clamp Sampler";
 		AllLinearClampSampler = renderDevice->CreateSampler(descriptor);
 	}
 
 	{
 		CrSamplerDescriptor descriptor;
-		descriptor.addressModeU = cr3d::AddressMode::Wrap;
-		descriptor.addressModeV = cr3d::AddressMode::Wrap;
-		descriptor.addressModeW = cr3d::AddressMode::Wrap;
+		descriptor.addressModeU = crgfx::AddressMode::Wrap;
+		descriptor.addressModeV = crgfx::AddressMode::Wrap;
+		descriptor.addressModeW = crgfx::AddressMode::Wrap;
 		descriptor.name = "Linear Wrap Sampler";
 		AllLinearWrapSampler = renderDevice->CreateSampler(descriptor);
 	}
 
 	{
 		CrSamplerDescriptor descriptor;
-		descriptor.addressModeU = cr3d::AddressMode::ClampToEdge;
-		descriptor.addressModeV = cr3d::AddressMode::ClampToEdge;
-		descriptor.addressModeW = cr3d::AddressMode::ClampToEdge;
+		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
+		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
+		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
 		descriptor.name = "Point Clamp Sampler";
 		AllPointClampSampler = renderDevice->CreateSampler(descriptor);
 	}
 
 	{
 		CrSamplerDescriptor descriptor;
-		descriptor.addressModeU = cr3d::AddressMode::Wrap;
-		descriptor.addressModeV = cr3d::AddressMode::Wrap;
-		descriptor.addressModeW = cr3d::AddressMode::Wrap;
+		descriptor.addressModeU = crgfx::AddressMode::Wrap;
+		descriptor.addressModeV = crgfx::AddressMode::Wrap;
+		descriptor.addressModeW = crgfx::AddressMode::Wrap;
 		descriptor.name = "Point Wrap Sampler";
 		AllPointWrapSampler = renderDevice->CreateSampler(descriptor);
 	}

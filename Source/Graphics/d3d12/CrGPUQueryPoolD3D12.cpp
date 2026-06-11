@@ -6,12 +6,12 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(cr3d::QueryType queryType)
+D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(crgfx::QueryType queryType)
 {
 	switch (queryType)
 	{
-		case cr3d::QueryType::Timestamp: return D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
-		case cr3d::QueryType::Occlusion: return D3D12_QUERY_HEAP_TYPE_OCCLUSION;
+		case crgfx::QueryType::Timestamp: return D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+		case crgfx::QueryType::Occlusion: return D3D12_QUERY_HEAP_TYPE_OCCLUSION;
 		default: return D3D12_QUERY_HEAP_TYPE_OCCLUSION;
 	}
 }
@@ -30,7 +30,7 @@ CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(ICrRenderDevice* renderDevice, const Cr
 
 	CrAssertMsg(hResult == S_OK, "Failed to create query pool");
 
-	CrHardwareGPUBufferDescriptor queryBufferDescriptor(cr3d::BufferUsage::TransferDst, cr3d::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
+	CrHardwareGPUBufferDescriptor queryBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
 
 	m_queryBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
 

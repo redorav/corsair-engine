@@ -16,7 +16,7 @@ struct CrOSWindowDescriptor
 		, width(1)
 		, height(1)
 		, parentWindow(nullptr)
-		, swapchainFormat(cr3d::DataFormat::Invalid)
+		, swapchainFormat(crgfx::DataFormat::Invalid)
 		, decoration(true)
 		, topMost(false)
 	{
@@ -29,7 +29,7 @@ struct CrOSWindowDescriptor
 	uint32_t height;
 	CrOSWindow* parentWindow;
 	crstl::fixed_string128 name;
-	cr3d::DataFormat::T swapchainFormat;
+	crgfx::DataFormat::T swapchainFormat;
 	uint32_t decoration : 1;
 	uint32_t topMost : 1;
 };

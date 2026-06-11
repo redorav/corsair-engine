@@ -32,8 +32,8 @@ struct CrImageDescriptor
 	uint8_t* data;
 	uint64_t dataSize;
 
-	cr3d::DataFormat::T format;
-	cr3d::TextureType type;
+	crgfx::DataFormat::T format;
+	crgfx::TextureType type;
 };
 
 class CrImage final : public crstl::intrusive_ptr_interface_delete
@@ -50,9 +50,9 @@ public:
 
 	uint32_t GetDepth() const { return m_depth; }
 
-	cr3d::DataFormat::T GetFormat() const { return m_format; }
+	crgfx::DataFormat::T GetFormat() const { return m_format; }
 
-	cr3d::TextureType GetType() const { return m_type; }
+	crgfx::TextureType GetType() const { return m_type; }
 
 	const uint8_t* GetData() const { return m_data.data(); }
 
@@ -70,6 +70,6 @@ public: // TODO remove
 	uint32_t m_mipmapCount;
 
 	crstl::vector<uint8_t> m_data;
-	cr3d::DataFormat::T m_format;
-	cr3d::TextureType m_type;
+	crgfx::DataFormat::T m_format;
+	crgfx::TextureType m_type;
 };

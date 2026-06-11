@@ -46,8 +46,8 @@ CrImageHandle CrImageDecoderSTB::Decode(void* data, uint64_t dataSize) const
 
 		// This format does not work for textures with 3 channels, so we tell stb to create an alpha channel
 		// because stb can return data with different number of channels depending on the image
-		image->m_format = cr3d::DataFormat::RGBA8_Unorm;
-		image->m_type = cr3d::TextureType::Tex2D;
+		image->m_format = crgfx::DataFormat::RGBA8_Unorm;
+		image->m_type = crgfx::TextureType::Tex2D;
 
 		// Free stb data if the allocation was successful
 		stbi_image_free(dataPointer);
@@ -96,7 +96,7 @@ static void WriteToMemorySTB(void* context, void* imageData, int dataSize)
 
 void CrImageEncoderSTB::Encode(const CrImageHandle& image, CrWriteFileStream& fileStream) const
 {
-	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
+	int channelCount = crgfx::DataFormats[image->GetFormat()].numComponents;
 
 	int width = image->GetWidth();
 	int height = image->GetHeight();
@@ -127,7 +127,7 @@ void CrImageEncoderSTB::Encode(const CrImageHandle& image, CrWriteFileStream& fi
 
 void CrImageEncoderSTB::Encode(const CrImageHandle& image, void* data, uint64_t dataSize) const
 {
-	int channelCount = cr3d::DataFormats[image->GetFormat()].numComponents;
+	int channelCount = crgfx::DataFormats[image->GetFormat()].numComponents;
 
 	int width = image->GetWidth();
 	int height = image->GetHeight();
@@ -140,9 +140,9 @@ void CrImageEncoderSTB::Encode(const CrImageHandle& image, void* data, uint64_t 
 	/*int result = */stbi_write_png_to_func(WriteToMemorySTB, &context, width, height, channelCount, (const unsigned char*)image->GetData(), strideBytes);
 }
 
-bool CrImageEncoderSTB::IsImageFormatSupported(cr3d::DataFormat::T format) const
+bool CrImageEncoderSTB::IsImageFormatSupported(crgfx::DataFormat::T format) const
 {
-	cr3d::DataFormatInfo formatInfo = cr3d::DataFormats[format];
+	crgfx::DataFormatInfo formatInfo = crgfx::DataFormats[format];
 
 	bool supported = false;
 

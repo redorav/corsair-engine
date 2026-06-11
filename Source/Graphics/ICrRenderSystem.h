@@ -18,7 +18,7 @@ struct CrRenderDeviceDescriptor;
 
 namespace crgfx
 {
-	struct RenderSystemDescriptor
+	struct GraphicsSystemDescriptor
 	{
 		crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
 
@@ -32,14 +32,14 @@ namespace crgfx
 		bool enableNVAPI = true;
 	};
 
-	void Initialize(const RenderSystemDescriptor& renderSystemDescriptor);
+	void Initialize(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
 };
 
 class ICrRenderSystem
 {
 public:
 
-	ICrRenderSystem(const crgfx::RenderSystemDescriptor& renderSystemDescriptor);
+	ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
 	virtual ~ICrRenderSystem();
 
@@ -71,7 +71,7 @@ protected:
 
 	CrRenderDeviceHandle m_mainDevice;
 
-	crgfx::RenderSystemDescriptor m_descriptor;
+	crgfx::GraphicsSystemDescriptor m_descriptor;
 
 	CrRenderDoc m_renderDoc;
 

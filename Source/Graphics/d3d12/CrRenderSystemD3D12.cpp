@@ -8,19 +8,19 @@
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::RenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
+CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor) : ICrRenderSystem(graphicsSystemDescriptor)
 {
 	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
-	if (renderSystemDescriptor.enableNVAPI)
+	if (graphicsSystemDescriptor.enableNVAPI)
 	{
 		InitializeNVAPI();
 	}
 
-	if (renderSystemDescriptor.enableRenderDoc)
+	if (graphicsSystemDescriptor.enableRenderDoc)
 	{
 		InitializeRenderdoc();
 	}
-	else if (renderSystemDescriptor.enablePIX)
+	else if (graphicsSystemDescriptor.enablePIX)
 	{
 		/*m_pixEnabled = */InitializePIX();
 	}
@@ -28,7 +28,7 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::RenderSystemDescriptor& re
 	UINT createFactoryFlags = 0;
 	HRESULT hResult = S_OK;
 
-	if (renderSystemDescriptor.enableValidation)
+	if (graphicsSystemDescriptor.enableValidation)
 	{
 		createFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 

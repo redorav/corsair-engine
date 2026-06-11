@@ -12,7 +12,7 @@
 #include <shellapi.h>
 #endif
 
-void CrRenderDoc::Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor)
+void CrRenderDoc::Initialize(const crgfx::GraphicsSystemDescriptor& renderSystemDescriptor)
 {
 #if defined(CR_PLATFORM_WINDOWS)
 

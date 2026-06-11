@@ -10,7 +10,7 @@ class CrRenderSystemVulkan final : public ICrRenderSystem
 {
 public:
 
-	CrRenderSystemVulkan(const crgfx::RenderSystemDescriptor& renderSystemDescriptor);
+	CrRenderSystemVulkan(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
 	VkInstance GetVkInstance() const { return m_vkInstance; }
 

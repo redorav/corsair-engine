@@ -1,13 +1,17 @@
 #pragma once
 
-struct CrRenderSystemDescriptor;
+namespace crgfx
+{
+	struct GraphicsSystemDescriptor;
+}
+
 struct RENDERDOC_API_1_5_0;
 
 class CrRenderDoc
 {
 public:
 
-	void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
+	void Initialize(const crgfx::GraphicsSystemDescriptor& renderSystemDescriptor);
 
 	void TriggerCapture();
 

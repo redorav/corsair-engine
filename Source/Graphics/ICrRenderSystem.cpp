@@ -23,8 +23,8 @@
 
 crstl::unique_ptr<ICrRenderSystem> RenderSystem = nullptr;
 
-ICrRenderSystem::ICrRenderSystem(const crgfx::RenderSystemDescriptor& renderSystemDescriptor)
-	: m_descriptor(renderSystemDescriptor)
+ICrRenderSystem::ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
+	: m_descriptor(graphicsSystemDescriptor)
 	, m_nvapiInitialized(false)
 {
 	// Load builtin shaders here. The render system is only instantiated once and knows which platform it needs to load bytecodes for. Once all bytecodes are loaded, the
@@ -68,23 +68,23 @@ ICrRenderSystem::~ICrRenderSystem()
 
 }
 
-void crgfx::Initialize(const crgfx::RenderSystemDescriptor& renderSystemDescriptor)
+void crgfx::Initialize(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 {
 	ICrRenderSystem* renderSystem = nullptr;
 
 	// Treat this like a factory (on PC) through the API. That way the rest of the code
 	// doesn't need to know about platform-specific code, only the render device.
 #if defined(VULKAN_API)
-	if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
+	if (graphicsSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
 	{
-		renderSystem = new CrRenderSystemVulkan(renderSystemDescriptor);
+		renderSystem = new CrRenderSystemVulkan(graphicsSystemDescriptor);
 	}
 #endif
 
 #if defined(D3D12_API)
-	if (renderSystemDescriptor.graphicsApi == crgfx::GraphicsApi::D3D12)
+	if (graphicsSystemDescriptor.graphicsApi == crgfx::GraphicsApi::D3D12)
 	{
-		renderSystem = new CrRenderSystemD3D12(renderSystemDescriptor);
+		renderSystem = new CrRenderSystemD3D12(graphicsSystemDescriptor);
 	}
 #endif
 

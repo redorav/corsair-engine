@@ -45,9 +45,9 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 	return VK_FALSE;
 }
 
-CrRenderSystemVulkan::CrRenderSystemVulkan(const crgfx::RenderSystemDescriptor& renderSystemDescriptor) : ICrRenderSystem(renderSystemDescriptor)
+CrRenderSystemVulkan::CrRenderSystemVulkan(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor) : ICrRenderSystem(graphicsSystemDescriptor)
 {
-	if (renderSystemDescriptor.enableRenderDoc)
+	if (graphicsSystemDescriptor.enableRenderDoc)
 	{
 		InitializeRenderdoc();
 	}
@@ -137,7 +137,7 @@ CrRenderSystemVulkan::CrRenderSystemVulkan(const crgfx::RenderSystemDescriptor& 
 	instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
 	instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
-	if (renderSystemDescriptor.enableValidation)
+	if (graphicsSystemDescriptor.enableValidation)
 	{
 		if (IsVkInstanceLayerSupported("VK_LAYER_KHRONOS_validation"))
 		{

@@ -405,7 +405,7 @@ void CrRenderGraph::Execute()
 			{
 				// If no previous pass referenced this subresource, set the initial state
 				// TODO As mentioned before track default state in the render device so that we don't always have to transition to and from the same state
-				transitionInfo.initialState = textureUsage.texture->GetDefaultState();
+				transitionInfo.initialState = cr3d::TextureState();
 			}
 
 			renderGraphPass->textureTransitionInfos.insert(textureUsage.subresourceId, transitionInfo);

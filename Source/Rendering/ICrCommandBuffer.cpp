@@ -209,14 +209,22 @@ void ICrCommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassD
 			CrCommandBufferAssertMsg(false, "Invalid combination");
 		}
 
-		CrCommandBufferAssertMsg(renderTargetDescriptor.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		if (renderTargetDescriptor.initialState.layout != cr3d::TextureLayout::Undefined)
+		{
+			CrCommandBufferAssertMsg(renderTargetDescriptor.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		}
+
 		CrCommandBufferAssertMsg(renderTargetDescriptor.usageState.stages != cr3d::ShaderStageFlags::None, "");
 		CrCommandBufferAssertMsg(renderTargetDescriptor.finalState.stages != cr3d::ShaderStageFlags::None, "");
 	}
 
 	if (renderPassDescriptor.depth.texture)
 	{
-		CrCommandBufferAssertMsg(renderPassDescriptor.depth.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		if (renderPassDescriptor.depth.initialState.layout != cr3d::TextureLayout::Undefined)
+		{
+			CrCommandBufferAssertMsg(renderPassDescriptor.depth.initialState.stages != cr3d::ShaderStageFlags::None, "");
+		}
+
 		CrCommandBufferAssertMsg(renderPassDescriptor.depth.usageState.stages != cr3d::ShaderStageFlags::None, "");
 		CrCommandBufferAssertMsg(renderPassDescriptor.depth.finalState.stages != cr3d::ShaderStageFlags::None, "");
 	}

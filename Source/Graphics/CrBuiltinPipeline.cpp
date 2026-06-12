@@ -73,8 +73,8 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	}
 	else
 	{
-		CrShaderBytecodeHandle vertexShaderBytecode = RenderSystem->GetBuiltinShaderBytecode(vertexShaderIndex);
-		CrShaderBytecodeHandle pixelShaderBytecode = RenderSystem->GetBuiltinShaderBytecode(pixelShaderIndex);
+		CrShaderBytecodeHandle vertexShaderBytecode = crgfx::GetBuiltinShaderBytecode(vertexShaderIndex);
+		CrShaderBytecodeHandle pixelShaderBytecode = crgfx::GetBuiltinShaderBytecode(pixelShaderIndex);
 
 		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 
@@ -113,7 +113,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinCompute:
 
 		CrComputeShaderDescriptor computeShaderDescriptor;
 		computeShaderDescriptor.m_debugName = CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str();
-		computeShaderDescriptor.m_bytecode = RenderSystem->GetBuiltinComputeBytecode(computeShaderIndex);
+		computeShaderDescriptor.m_bytecode = crgfx::GetBuiltinComputeBytecode(computeShaderIndex);
 
 		CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
 

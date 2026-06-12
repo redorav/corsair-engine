@@ -96,6 +96,16 @@ const CrRenderDeviceHandle& crgfx::GetRenderDevice()
 	return RenderSystem->GetRenderDevice();
 }
 
+const CrShaderBytecodeHandle& crgfx::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
+{
+	return RenderSystem->GetBuiltinShaderBytecode(builtinShader);
+}
+
+const CrShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
+{
+	return RenderSystem->GetBuiltinComputeBytecode(builtinCompute);
+}
+
 void ICrRenderSystem::InitializeRenderdoc()
 {
 	m_renderDoc.Initialize(m_descriptor);

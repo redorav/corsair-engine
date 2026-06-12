@@ -560,7 +560,7 @@ CrOSWindow::CrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
 		swapchainDescriptor.requestedHeight = windowDescriptor.height;
 		swapchainDescriptor.format = windowDescriptor.swapchainFormat;
 		swapchainDescriptor.requestedBufferCount = 3;
-		m_swapchain = RenderSystem->GetRenderDevice()->CreateSwapchain(swapchainDescriptor);
+		m_swapchain = crgfx::GetRenderDevice()->CreateSwapchain(swapchainDescriptor);
 		m_swapchain->AcquireNextImage();
 	}
 }

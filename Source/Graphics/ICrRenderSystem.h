@@ -35,6 +35,10 @@ namespace crgfx
 	void InitializeGraphicsSystem(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
 	const CrRenderDeviceHandle& GetRenderDevice();
+
+	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
+
+	const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute);
 };
 
 class ICrRenderSystem
@@ -44,8 +48,6 @@ public:
 	ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
 	virtual ~ICrRenderSystem();
-
-	//static void Initialize(const CrRenderSystemDescriptor& renderSystemDescriptor);
 
 	// Only the render device calls these functions, as it knows what device we are using
 

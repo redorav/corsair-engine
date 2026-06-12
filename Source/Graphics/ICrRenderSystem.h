@@ -33,6 +33,8 @@ namespace crgfx
 	};
 
 	void InitializeGraphicsSystem(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
+
+	const CrRenderDeviceHandle& GetRenderDevice();
 };
 
 class ICrRenderSystem

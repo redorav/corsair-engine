@@ -66,7 +66,7 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 	
 		// Create the buffer
 		crgfx::DataFormat::T format = ToDataFormat(gltfIndexAccessor->component_type);
-		CrIndexBufferHandle indexBuffer = RenderSystem->GetRenderDevice()->CreateIndexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
+		CrIndexBufferHandle indexBuffer = crgfx::GetRenderDevice()->CreateIndexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, format, (uint32_t)gltfIndexAccessor->count);
 
 		// Use the buffer view to copy the data
 		const cgltf_buffer_view* gltfBufferView = gltfIndexAccessor->buffer_view;
@@ -143,8 +143,8 @@ CrRenderMeshHandle LoadMesh(const cgltf_primitive& gltfPrimitive)
 		float3 maxVertex = float3(-FLT_MAX);
 
 		// Create the vertex buffer
-		CrVertexBufferHandle positionBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
-		CrVertexBufferHandle additionalBuffer = RenderSystem->GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle positionBuffer = crgfx::GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, PositionVertexDescriptor, (uint32_t)positions.size());
+		CrVertexBufferHandle additionalBuffer = crgfx::GetRenderDevice()->CreateVertexBuffer(crgfx::MemoryAccess::CPUStreamToGPU, AdditionalVertexDescriptor, (uint32_t)positions.size());
 
 		ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)positionBuffer->Lock();
 		ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)additionalBuffer->Lock();
@@ -319,7 +319,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = crgfx::TextureUsage::Default;
 
-			CrTextureHandle texture = RenderSystem->GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = crgfx::GetRenderDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{

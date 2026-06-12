@@ -91,6 +91,11 @@ void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& grap
 	RenderSystem = crstl::unique_ptr<ICrRenderSystem>(renderSystem);
 }
 
+const CrRenderDeviceHandle& crgfx::GetRenderDevice()
+{
+	return RenderSystem->GetRenderDevice();
+}
+
 void ICrRenderSystem::InitializeRenderdoc()
 {
 	m_renderDoc.Initialize(m_descriptor);

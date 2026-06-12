@@ -50,7 +50,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 
 			if (graphicsShader)
 			{
-				CrGraphicsPipelineHandle pipeline = RenderSystem->GetRenderDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+				CrGraphicsPipelineHandle pipeline = crgfx::GetRenderDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
 				m_pipelines[meshIndex][pipelineVariant] = pipeline;
 			}

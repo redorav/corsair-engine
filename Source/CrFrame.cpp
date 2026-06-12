@@ -190,7 +190,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	m_mainWindow = mainWindow;
 
-	CrRenderDeviceHandle renderDevice = RenderSystem->GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
 
 	// TODO Move block to rendering subsystem initialization function
 	{
@@ -1017,7 +1017,7 @@ void CrFrame::DrawDebugUI()
 			crstl::time delta = CrFrameTime::GetFrameDelta();
 			crstl::time averageDelta = CrFrameTime::GetFrameDeltaAverage();
 
-			const CrRenderDeviceProperties& properties = RenderSystem->GetRenderDevice()->GetProperties();
+			const CrRenderDeviceProperties& properties = crgfx::GetRenderDevice()->GetProperties();
 			CrSizeUnit sizeUnit = GetGPUMemorySizeUnit(properties.gpuMemoryBytes);
 
 			ImGui::Text("GPU: %s (%llu %s) (%s)", properties.description.c_str(), sizeUnit.smallUnit, sizeUnit.unit, properties.graphicsApiDisplay.c_str());
@@ -1137,7 +1137,7 @@ void CrFrame::DrawDebugUI()
 
 void CrFrame::RecreateRenderTargets()
 {
-	CrRenderDeviceHandle renderDevice = RenderSystem->GetRenderDevice();
+	CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();

@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 	renderDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	RenderSystem->CreateRenderDevice(renderDeviceDescriptor);
 
-	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
 
 	CrPrintProcessMemory("After Render Device");
 

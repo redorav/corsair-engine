@@ -68,7 +68,7 @@ ICrRenderSystem::~ICrRenderSystem()
 
 }
 
-void crgfx::Initialize(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
+void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 {
 	ICrRenderSystem* renderSystem = nullptr;
 

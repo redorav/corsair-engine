@@ -32,7 +32,7 @@ namespace crgfx
 		bool enableNVAPI = true;
 	};
 
-	void Initialize(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
+	void InitializeGraphicsSystem(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
 };
 
 class ICrRenderSystem

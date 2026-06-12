@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	graphicsSystemDescriptor.enableRenderDoc = enableRenderDoc;
 	graphicsSystemDescriptor.enablePIX = enablePIX;
 
-	crgfx::Initialize(graphicsSystemDescriptor);
+	crgfx::InitializeGraphicsSystem(graphicsSystemDescriptor);
 
 	CrRenderDeviceDescriptor renderDeviceDescriptor;
 	renderDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());

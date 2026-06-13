@@ -4,27 +4,27 @@
 
 namespace crgfx
 {
-	class ICrRenderDevice;
+	class IDevice;
 };
 
 class CrGPUDeletable
 {
 public:
 
-	void CrRenderDeviceDeletionFunction(crgfx::ICrRenderDevice* renderDevice, CrGPUDeletable* deletable);
+	void CrRenderDeviceDeletionFunction(crgfx::IDevice* renderDevice, CrGPUDeletable* deletable);
 
-	CrGPUDeletable(crgfx::ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice) {}
+	CrGPUDeletable(crgfx::IDevice* renderDevice) : m_renderDevice(renderDevice) {}
 
 	virtual ~CrGPUDeletable() {}
 
-	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::IDevice* m_renderDevice = nullptr;
 };
 
 class CrGPUAutoDeletable : public crstl::intrusive_ptr_interface_delete, public CrGPUDeletable
 {
 public:
 
-	CrGPUAutoDeletable(crgfx::ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
+	CrGPUAutoDeletable(crgfx::IDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
 
 	virtual ~CrGPUAutoDeletable() {}
 

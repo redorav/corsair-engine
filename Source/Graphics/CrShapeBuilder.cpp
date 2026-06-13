@@ -5,7 +5,7 @@
 
 #include "CrRendering.h"
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include "Math/CrMath.h"
 

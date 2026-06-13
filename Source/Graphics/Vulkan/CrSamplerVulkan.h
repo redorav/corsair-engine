@@ -3,13 +3,13 @@
 #include "Graphics/ICrSampler.h"
 #include <vulkan/vulkan.h>
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrSamplerVulkan final : public ICrSampler
 {
 public:
 
-	CrSamplerVulkan(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+	CrSamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor);
 
 	~CrSamplerVulkan();
 

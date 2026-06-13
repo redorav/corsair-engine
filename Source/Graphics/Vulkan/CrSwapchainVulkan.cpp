@@ -12,7 +12,7 @@
 
 #include "CrOSWindow.h"
 
-CrSwapchainVulkan::CrSwapchainVulkan(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
+CrSwapchainVulkan::CrSwapchainVulkan(crgfx::IDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor)
 	: ICrSwapchain(renderDevice, swapchainDescriptor)
 
 	// The initialization value is important to start at 0 on the first call to present

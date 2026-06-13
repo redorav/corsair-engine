@@ -5,7 +5,7 @@
 #include "Core/Input/CrPlatformInput.h"
 
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include <windows.h>
 

@@ -3,13 +3,13 @@
 #include "Graphics/ICrShader.h"
 #include <vulkan/vulkan.h>
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrGraphicsShaderVulkan final : public ICrGraphicsShader
 {
 public:
 
-	CrGraphicsShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	CrGraphicsShaderVulkan(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	~CrGraphicsShaderVulkan();
 
@@ -32,7 +32,7 @@ class CrComputeShaderVulkan final : public ICrComputeShader
 {
 public:
 
-	CrComputeShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+	CrComputeShaderVulkan(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
 
 	~CrComputeShaderVulkan();
 

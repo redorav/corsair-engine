@@ -3,7 +3,7 @@
 #include "Graphics/CrStackAllocator.h"
 #include "Graphics/CrRenderingForwardDeclarations.h"
 
-class ICrRenderDevice;
+class IDevice;
 class ICrHardwareGPUBuffer;
 struct CrHardwareGPUBufferDescriptor;
 
@@ -12,7 +12,7 @@ class CrGPUStackAllocator : public CrStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(crgfx::ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+	CrGPUStackAllocator(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	~CrGPUStackAllocator();
 
@@ -28,7 +28,7 @@ public:
 
 protected:
 
-	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::IDevice* m_renderDevice = nullptr;
 
 	CrHardwareGPUBufferHandle m_hardwareBuffer;
 

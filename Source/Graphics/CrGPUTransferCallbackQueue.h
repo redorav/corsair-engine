@@ -30,7 +30,7 @@ public:
 
 	static const uint32_t MaximumCallbackLists = 4;
 
-	void Initialize(crgfx::ICrRenderDevice* renderDevice);
+	void Initialize(crgfx::IDevice* renderDevice);
 
 	void AddToQueue(const CrGPUDownloadCallback& callback);
 
@@ -38,7 +38,7 @@ public:
 
 private:
 	
-	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::IDevice* m_renderDevice = nullptr;
 
 	// Callbacks to be executed after a successful download operation, copying from GPU to CPU
 	CrDownloadCallbackList* m_currentCallbackList = nullptr;

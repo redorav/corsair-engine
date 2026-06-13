@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
 
@@ -8,7 +8,7 @@
 
 class CrTextureVulkan;
 
-class CrRenderDeviceVulkan final : public crgfx::ICrRenderDevice
+class CrRenderDeviceVulkan final : public crgfx::IDevice
 {
 public:
 

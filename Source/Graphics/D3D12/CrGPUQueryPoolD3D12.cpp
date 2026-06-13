@@ -16,7 +16,7 @@ D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(crgfx::QueryType queryType)
 	}
 }
 
-CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
+CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 

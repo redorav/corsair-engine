@@ -3,7 +3,7 @@
 #include "CrGPUSynchronizationVulkan.h"
 #include "CrRenderDeviceVulkan.h"
 
-CrGPUFenceVulkan::CrGPUFenceVulkan(crgfx::ICrRenderDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
+CrGPUFenceVulkan::CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
 {
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 
@@ -19,7 +19,7 @@ CrGPUFenceVulkan::~CrGPUFenceVulkan()
 	vkDestroyFence(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkFence, nullptr);
 }
 
-CrGPUSemaphoreVulkan::CrGPUSemaphoreVulkan(crgfx::ICrRenderDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
+CrGPUSemaphoreVulkan::CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
 {
 	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
 

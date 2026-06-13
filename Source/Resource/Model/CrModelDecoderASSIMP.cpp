@@ -6,7 +6,7 @@
 #include "Core/CrMacros.h"
 
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/ICrTexture.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrMaterial.h"

@@ -34,7 +34,7 @@ class ICrGPUQueryPool : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGPUQueryPool(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	ICrGPUQueryPool(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	virtual ~ICrGPUQueryPool() {}
 

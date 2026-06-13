@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "ICrRenderSystem.h"
-#include "ICrRenderDevice.h"
+#include "IDevice.h"
 #include "ICrCommandBuffer.h"
 #include "ICrSwapchain.h"
 #include "ICrSampler.h"
@@ -27,7 +27,7 @@
 
 namespace crgfx
 {
-	ICrRenderDevice::ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
+	IDevice::IDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
 		: m_isValidPipelineCache(false)
 	{
 		m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Pipeline Cache/";
@@ -42,12 +42,12 @@ namespace crgfx
 		m_gpuTransferCallbackQueue = crstl::unique_ptr<CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());
 	}
 
-	ICrRenderDevice::~ICrRenderDevice()
+	IDevice::~IDevice()
 	{
 
 	}
 
-	void ICrRenderDevice::Initialize()
+	void IDevice::Initialize()
 	{
 		m_gpuDeletionQueue->Initialize(this);
 
@@ -63,7 +63,7 @@ namespace crgfx
 		}
 	}
 
-	const CrCommandBufferHandle& ICrRenderDevice::GetAuxiliaryCommandBuffer()
+	const CrCommandBufferHandle& IDevice::GetAuxiliaryCommandBuffer()
 	{
 		// If we don't have an auxiliary command buffer, get one from the pool
 		if (!m_auxiliaryCommandBuffer)
@@ -78,12 +78,12 @@ namespace crgfx
 		return m_auxiliaryCommandBuffer;
 	}
 
-	void ICrRenderDevice::ProcessDeletionQueue()
+	void IDevice::ProcessDeletionQueue()
 	{
 		m_gpuDeletionQueue->Process();
 	}
 
-	void ICrRenderDevice::ProcessQueuedCommands()
+	void IDevice::ProcessQueuedCommands()
 	{
 		// If we have an auxiliary command buffer, it means we queued some commands
 		// and we need to submit the buffer now
@@ -100,7 +100,7 @@ namespace crgfx
 	// We need a custom deleter for the render device because we cannot call functions that use virtual methods during the destruction
 	// process. It's an unfortunate consequence of the virtual function abstraction. We need to make sure all render device GPU resources
 	// are manually destroyed here, as well as giving an opportunity to the platform-specific render devices to do so
-	void ICrRenderDevice::FinalizeDeletion()
+	void IDevice::FinalizeDeletion()
 	{
 		// Finalize any resources that are platform-specific, such as custom fences
 		FinalizeDeletionPS();
@@ -125,37 +125,37 @@ namespace crgfx
 		m_gpuDeletionQueue->Finalize();
 	}
 
-	ICrCommandBuffer* ICrRenderDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
+	ICrCommandBuffer* IDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
 	{
 		return CreateCommandBufferPS(descriptor);
 	}
 
-	ICrGPUFence* ICrRenderDevice::CreateGPUFence(bool signaled)
+	ICrGPUFence* IDevice::CreateGPUFence(bool signaled)
 	{
 		return CreateGPUFencePS(signaled);
 	}
 
-	ICrGPUSemaphore* ICrRenderDevice::CreateGPUSemaphore()
+	ICrGPUSemaphore* IDevice::CreateGPUSemaphore()
 	{
 		return CreateGPUSemaphorePS();
 	}
 
-	void ICrRenderDevice::AddToDeletionQueue(CrGPUDeletable* resource)
+	void IDevice::AddToDeletionQueue(CrGPUDeletable* resource)
 	{
 		m_gpuDeletionQueue->AddToQueue(resource);
 	}
 
-	ICrGraphicsShader* ICrRenderDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	ICrGraphicsShader* IDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
 		return CreateGraphicsShaderPS(graphicsShaderDescriptor);
 	}
 
-	ICrComputeShader* ICrRenderDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
+	ICrComputeShader* IDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
 		return CreateComputeShaderPS(computeShaderDescriptor);
 	}
 
-	CrGraphicsPipelineHandle ICrRenderDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	CrGraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	{
 		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 		CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
@@ -210,7 +210,7 @@ namespace crgfx
 		return graphicsPipeline;
 	}
 
-	CrComputePipelineHandle ICrRenderDevice::CreateComputePipeline(const CrComputeShaderHandle& computeShader)
+	CrComputePipelineHandle IDevice::CreateComputePipeline(const CrComputeShaderHandle& computeShader)
 	{
 		CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
 
@@ -245,27 +245,27 @@ namespace crgfx
 		return computePipeline;
 	}
 
-	ICrGPUQueryPool* ICrRenderDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+	ICrGPUQueryPool* IDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
 		return CreateGPUQueryPoolPS(queryPoolDescriptor);
 	}
 
-	ICrHardwareGPUBuffer* ICrRenderDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+	ICrHardwareGPUBuffer* IDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
 	{
 		return CreateHardwareGPUBufferPS(descriptor);
 	}
 
-	CrIndexBuffer* ICrRenderDevice::CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
+	CrIndexBuffer* IDevice::CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
 	{
 		return new CrIndexBuffer(this, access, dataFormat, numIndices);
 	}
 
-	ICrSampler* ICrRenderDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
+	ICrSampler* IDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 	{
 		return CreateSamplerPS(descriptor);
 	}
 
-	ICrSwapchain* ICrRenderDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
+	ICrSwapchain* IDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
 	{
 		CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 		CrAssertMsg(swapchainDescriptor.format != crgfx::DataFormat::Invalid, "Must set a data format");
@@ -280,69 +280,69 @@ namespace crgfx
 		return swapchain;
 	}
 
-	ICrTexture* ICrRenderDevice::CreateTexture(const CrTextureDescriptor& descriptor)
+	ICrTexture* IDevice::CreateTexture(const CrTextureDescriptor& descriptor)
 	{
 		return CreateTexturePS(descriptor);
 	}
 
-	CrVertexBuffer* ICrRenderDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+	CrVertexBuffer* IDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 	{
 		return new CrVertexBuffer(this, access, vertexDescriptor, numVertices);
 	}
 
-	CrTypedBuffer* ICrRenderDevice::CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
+	CrTypedBuffer* IDevice::CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
 	{
 		return new CrTypedBuffer(this, access, dataFormat, numElements);
 	}
 
-	crgfx::GPUFenceResult ICrRenderDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+	crgfx::GPUFenceResult IDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
 	{
 		return WaitForFencePS(fence, timeoutNanoseconds);
 	}
 
-	crgfx::GPUFenceResult ICrRenderDevice::GetFenceStatus(ICrGPUFence* fence) const
+	crgfx::GPUFenceResult IDevice::GetFenceStatus(ICrGPUFence* fence) const
 	{
 		return GetFenceStatusPS(fence);
 	}
 
-	void ICrRenderDevice::SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+	void IDevice::SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
 	{
 		return SignalFencePS(queueType, signalFence);
 	}
 
-	void ICrRenderDevice::ResetFence(ICrGPUFence* fence)
+	void IDevice::ResetFence(ICrGPUFence* fence)
 	{
 		ResetFencePS(fence);
 	}
 
-	void ICrRenderDevice::WaitIdle()
+	void IDevice::WaitIdle()
 	{
 		WaitIdlePS();
 	}
 
-	uint8_t* ICrRenderDevice::BeginTextureUpload(const ICrTexture* texture)
+	uint8_t* IDevice::BeginTextureUpload(const ICrTexture* texture)
 	{
 		return BeginTextureUploadPS(texture);
 	}
 
-	void ICrRenderDevice::EndTextureUpload(const ICrTexture* texture)
+	void IDevice::EndTextureUpload(const ICrTexture* texture)
 	{
 		return EndTextureUploadPS(texture);
 	}
 
-	uint8_t* ICrRenderDevice::BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+	uint8_t* IDevice::BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
 	{
 		CrAssertMsg(destinationBuffer->GetUsage() & crgfx::BufferUsage::TransferDst, "Buffer must have transfer destination usage enabled");
 
 		return BeginBufferUploadPS(destinationBuffer);
 	}
 
-	void ICrRenderDevice::EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+	void IDevice::EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
 	{
 		EndBufferUploadPS(destinationBuffer);
 	}
 
-	void ICrRenderDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, const CrGPUTransferCallbackType& callback)
+	void IDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, const CrGPUTransferCallbackType& callback)
 	{
 		CrAssertMsg(sourceBuffer->GetUsage() & crgfx::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
 
@@ -357,17 +357,17 @@ namespace crgfx
 		m_gpuTransferCallbackQueue->AddToQueue(downloadCallback);
 	}
 
-	const CrRenderDeviceProperties& ICrRenderDevice::GetProperties() const
+	const CrRenderDeviceProperties& IDevice::GetProperties() const
 	{
 		return m_renderDeviceProperties;
 	}
 
-	void ICrRenderDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+	void IDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
 	{
 		SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 	}
 
-	void ICrRenderDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize)
+	void IDevice::StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize)
 	{
 		if (m_isValidPipelineCache)
 		{
@@ -385,7 +385,7 @@ namespace crgfx
 		}
 	}
 
-	void ICrRenderDevice::LoadPipelineCache(crstl::vector<char>& pipelineCacheData)
+	void IDevice::LoadPipelineCache(crstl::vector<char>& pipelineCacheData)
 	{
 		if (m_isValidPipelineCache)
 		{

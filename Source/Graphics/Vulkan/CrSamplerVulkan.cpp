@@ -6,7 +6,7 @@
 #include "Math/CrMath.h"
 
 // See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
-CrSamplerVulkan::CrSamplerVulkan(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
+CrSamplerVulkan::CrSamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 

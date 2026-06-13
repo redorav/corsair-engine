@@ -22,7 +22,7 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) override;
 
 #endif
 
@@ -53,7 +53,7 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
 
 #endif
 

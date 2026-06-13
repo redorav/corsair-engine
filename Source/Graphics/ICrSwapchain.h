@@ -32,7 +32,7 @@ class ICrSwapchain : public CrGPUAutoDeletable
 {
 public:
 
-	ICrSwapchain(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
+	ICrSwapchain(crgfx::IDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
 
 	virtual ~ICrSwapchain() {}
 

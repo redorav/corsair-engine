@@ -5,7 +5,7 @@
 
 #include "Core/CrMacros.h"
 
-CrGPUFenceD3D12::CrGPUFenceD3D12(crgfx::ICrRenderDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
+CrGPUFenceD3D12::CrGPUFenceD3D12(crgfx::IDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
@@ -26,7 +26,7 @@ CrGPUFenceD3D12::~CrGPUFenceD3D12()
 	CloseHandle(m_fenceEvent);
 }
 
-CrGPUSemaphoreD3D12::CrGPUSemaphoreD3D12(crgfx::ICrRenderDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
+CrGPUSemaphoreD3D12::CrGPUSemaphoreD3D12(crgfx::IDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
 {
 	ID3D12Device* d3d12Device = static_cast<CrRenderDeviceD3D12*>(renderDevice)->GetD3D12Device();
 	d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));

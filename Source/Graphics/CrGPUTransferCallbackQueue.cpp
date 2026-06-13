@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/ICrGPUSynchronization.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrGPUTransferCallbackQueue.h"
@@ -14,7 +14,7 @@ CrDownloadCallbackList::~CrDownloadCallbackList() {}
 
 CrGPUTransferCallbackQueue::~CrGPUTransferCallbackQueue() {}
 
-void CrGPUTransferCallbackQueue::Initialize(crgfx::ICrRenderDevice* renderDevice)
+void CrGPUTransferCallbackQueue::Initialize(crgfx::IDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 	

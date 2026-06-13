@@ -8,7 +8,7 @@
 #include "crstl/array.h"
 #include "crstl/vector.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 struct CrVkCustomView
 {
@@ -29,7 +29,7 @@ class CrTextureVulkan final : public ICrTexture
 {
 public:
 
-	CrTextureVulkan(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
+	CrTextureVulkan(crgfx::IDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureVulkan();
 

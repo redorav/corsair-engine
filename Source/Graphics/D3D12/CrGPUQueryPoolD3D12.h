@@ -2,13 +2,13 @@
 
 #include "Graphics/ICrGPUQueryPool.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrGPUQueryPoolD3D12 final : public ICrGPUQueryPool
 {
 public:
 
-	CrGPUQueryPoolD3D12(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	~CrGPUQueryPoolD3D12();
 

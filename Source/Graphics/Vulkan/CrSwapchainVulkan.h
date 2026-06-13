@@ -7,7 +7,7 @@ class CrSwapchainVulkan final : public ICrSwapchain
 {
 public:
 
-	CrSwapchainVulkan(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
+	CrSwapchainVulkan(crgfx::IDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
 
 	~CrSwapchainVulkan();
 

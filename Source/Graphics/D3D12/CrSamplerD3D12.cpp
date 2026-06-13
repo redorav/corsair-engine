@@ -5,7 +5,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSamplerD3D12::CrSamplerD3D12(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
+CrSamplerD3D12::CrSamplerD3D12(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
 

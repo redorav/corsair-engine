@@ -101,13 +101,13 @@ namespace crgfx
 		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
 	};
 
-	class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
+	class IDevice : public crstl::intrusive_ptr_interface_base
 	{
 	public:
 
-		ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
+		IDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
 
-		virtual ~ICrRenderDevice();
+		virtual ~IDevice();
 
 		template<typename T>
 		void intrusive_ptr_delete_callback()
@@ -314,7 +314,7 @@ namespace crgfx
 	};
 
 	template<typename Metadata>
-	CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
+	CrStructuredBuffer<Metadata>* IDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
 	{
 		return new CrStructuredBuffer<Metadata>(this, access, numElements);
 	}

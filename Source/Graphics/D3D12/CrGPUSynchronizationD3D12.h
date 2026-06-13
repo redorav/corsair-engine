@@ -3,13 +3,13 @@
 #include "Graphics/ICrGPUSynchronization.h"
 #include "d3d12.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrGPUFenceD3D12 final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceD3D12(crgfx::ICrRenderDevice* renderDevice, bool signaled);
+	CrGPUFenceD3D12(crgfx::IDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceD3D12();
 
@@ -28,7 +28,7 @@ class CrGPUSemaphoreD3D12 final : public ICrGPUSemaphore
 {
 public:
 
-	CrGPUSemaphoreD3D12(crgfx::ICrRenderDevice* renderDevice);
+	CrGPUSemaphoreD3D12(crgfx::IDevice* renderDevice);
 
 	~CrGPUSemaphoreD3D12();
 

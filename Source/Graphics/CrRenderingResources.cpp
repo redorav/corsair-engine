@@ -4,11 +4,11 @@
 
 #include "Graphics/ICrSampler.h"
 #include "Graphics/ICrTexture.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 CrRenderingResources* RenderingResources;
 
-void CrRenderingResources::Initialize(crgfx::ICrRenderDevice* renderDevice)
+void CrRenderingResources::Initialize(crgfx::IDevice* renderDevice)
 {
 	CrAssert(RenderingResources == nullptr);
 	RenderingResources = new CrRenderingResources(renderDevice);
@@ -20,7 +20,7 @@ void CrRenderingResources::Deinitialize()
 	delete RenderingResources;
 }
 
-CrRenderingResources::CrRenderingResources(crgfx::ICrRenderDevice* renderDevice)
+CrRenderingResources::CrRenderingResources(crgfx::IDevice* renderDevice)
 {
 	//------------------------
 	// Create default samplers

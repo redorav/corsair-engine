@@ -4,7 +4,7 @@
 
 #include "Graphics/CrRenderingForwardDeclarations.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 struct CrShaderCompilationDescriptor;
 struct CrShaderBytecodeCompilationDescriptor;
@@ -16,11 +16,11 @@ public:
 
 	static const char* GetShaderBytecodeExtension(crgfx::GraphicsApi::T graphicsApi);
 
-	static void Initialize(crgfx::ICrRenderDevice* renderDevice);
+	static void Initialize(crgfx::IDevice* renderDevice);
 
 	static void Deinitialize();
 
-	crgfx::ICrRenderDevice* GetRenderDevice() const { return m_renderDevice; }
+	crgfx::IDevice* GetRenderDevice() const { return m_renderDevice; }
 
 	CrShaderBytecodeHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 
@@ -34,9 +34,9 @@ public:
 
 protected:
 
-	CrShaderManager(crgfx::ICrRenderDevice* renderDevice);
+	CrShaderManager(crgfx::IDevice* renderDevice);
 
-	crgfx::ICrRenderDevice* m_renderDevice;
+	crgfx::IDevice* m_renderDevice;
 };
 
 extern CrShaderManager* ShaderManager;

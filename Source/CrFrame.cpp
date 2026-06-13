@@ -3,7 +3,7 @@
 #include "Editor/CrEditor.h"
 
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/ICrSwapchain.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShader.h"
@@ -190,7 +190,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	m_mainWindow = mainWindow;
 
-	CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
+	crgfx::CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
 
 	// TODO Move block to rendering subsystem initialization function
 	{
@@ -403,7 +403,7 @@ void CrFrame::Deinitialize()
 
 void CrFrame::Process()
 {
-	const CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
+	const crgfx::CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
 
 	uint32_t windowWidth, windowHeight;
 	m_mainWindow->GetSizePixels(windowWidth, windowHeight);
@@ -1137,7 +1137,7 @@ void CrFrame::DrawDebugUI()
 
 void CrFrame::RecreateRenderTargets()
 {
-	CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
+	crgfx::CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
 
 	// Ensure all operations on the device have been finished before destroying resources
 	renderDevice->WaitIdle();

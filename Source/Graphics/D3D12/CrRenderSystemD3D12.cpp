@@ -67,7 +67,7 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& 
 	}
 }
 
-crgfx::ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor)
+crgfx::IDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor)
 {
 	return new CrRenderDeviceD3D12(this, descriptor);
 }

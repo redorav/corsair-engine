@@ -52,8 +52,8 @@ namespace crgfx
 
 	struct TextureState;
 
-	class ICrRenderDevice;
-	using CrRenderDeviceHandle = crstl::intrusive_ptr<ICrRenderDevice>;
+	class IDevice;
+	using CrRenderDeviceHandle = crstl::intrusive_ptr<IDevice>;
 };
 
 enum class CrRenderTargetLoadOp : uint32_t;

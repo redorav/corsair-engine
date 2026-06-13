@@ -1,6 +1,6 @@
 ﻿#include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShaderReflection.h"
 #include "Graphics/ICrShader.h"
@@ -66,7 +66,7 @@ CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr
 	return shaderCachePath;
 }
 
-void CrShaderManager::Initialize(crgfx::ICrRenderDevice* renderDevice)
+void CrShaderManager::Initialize(crgfx::IDevice* renderDevice)
 {
 	CrAssert(renderDevice != nullptr);
 	CrAssert(ShaderManager == nullptr);
@@ -185,7 +185,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	return nullptr;
 }
 
-CrShaderManager::CrShaderManager(crgfx::ICrRenderDevice* renderDevice)
+CrShaderManager::CrShaderManager(crgfx::IDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

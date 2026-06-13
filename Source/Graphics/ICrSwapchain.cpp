@@ -6,7 +6,7 @@
 
 namespace crgfx
 {
-	class ICrRenderDevice;
+	class IDevice;
 };
 
 CrSwapchainDescriptor::CrSwapchainDescriptor()
@@ -20,7 +20,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
+ICrSwapchain::ICrSwapchain(crgfx::IDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_name(swapchainDescriptor.name)
 	, m_imageCount(0)
 	, m_format(crgfx::DataFormat::Invalid)

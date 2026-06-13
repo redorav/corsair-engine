@@ -8,7 +8,7 @@ public:
 
 	CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
-	virtual crgfx::ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) override;
+	virtual crgfx::IDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) override;
 
 	IDXGIFactory4* GetDXGIFactory4() const { return m_dxgiFactory4; }
 

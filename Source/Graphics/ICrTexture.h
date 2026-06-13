@@ -180,7 +180,7 @@ public:
 protected:
 
 	// We don't allow the constructor externally
-	ICrTexture(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
+	ICrTexture(crgfx::IDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	crgfx::DataFormat::T m_format;
 

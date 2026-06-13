@@ -3,13 +3,13 @@
 #include "Graphics/ICrGPUQueryPool.h"
 #include <vulkan/vulkan.h>
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrGPUQueryPoolVulkan final : public ICrGPUQueryPool
 {
 public:
 
-	CrGPUQueryPoolVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	~CrGPUQueryPoolVulkan();
 

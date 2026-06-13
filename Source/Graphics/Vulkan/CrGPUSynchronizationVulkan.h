@@ -3,13 +3,13 @@
 #include "Graphics/ICrGPUSynchronization.h"
 #include <vulkan/vulkan.h>
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrGPUFenceVulkan final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceVulkan(crgfx::ICrRenderDevice* renderDevice, bool signaled);
+	CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceVulkan();
 
@@ -29,7 +29,7 @@ class CrGPUSemaphoreVulkan final : public ICrGPUSemaphore
 {
 public:
 
-	CrGPUSemaphoreVulkan(crgfx::ICrRenderDevice* renderDevice);
+	CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice);
 
 	~CrGPUSemaphoreVulkan();
 

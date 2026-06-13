@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include "Graphics/CrGPUDeletionQueue.h"
 #include "Graphics/CrGPUDeletable.h"
@@ -16,7 +16,7 @@ CrGPUDeletionQueue::~CrGPUDeletionQueue()
 	
 }
 
-void CrGPUDeletionQueue::Initialize(crgfx::ICrRenderDevice* renderDevice)
+void CrGPUDeletionQueue::Initialize(crgfx::IDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 

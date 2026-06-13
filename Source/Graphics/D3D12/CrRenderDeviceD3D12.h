@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include "Graphics/ICrGPUSynchronization.h"
 
@@ -11,7 +11,7 @@
 class CrCommandQueueD3D12;
 class CrTextureD3D12;
 
-class CrRenderDeviceD3D12 final : public crgfx::ICrRenderDevice
+class CrRenderDeviceD3D12 final : public crgfx::IDevice
 {
 public:
 

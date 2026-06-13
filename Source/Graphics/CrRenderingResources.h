@@ -9,7 +9,7 @@ class CrRenderingResources
 {
 public:
 
-	static void Initialize(crgfx::ICrRenderDevice* renderDevice);
+	static void Initialize(crgfx::IDevice* renderDevice);
 
 	static void Deinitialize();
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-	CrRenderingResources(crgfx::ICrRenderDevice* renderDevice);
+	CrRenderingResources(crgfx::IDevice* renderDevice);
 };
 
 extern CrRenderingResources* RenderingResources;

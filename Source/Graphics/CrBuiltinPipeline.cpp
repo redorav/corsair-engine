@@ -2,7 +2,7 @@
 
 #include "Graphics/CrBuiltinPipeline.h"
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/ICrShader.h"
 #include "Graphics/CrRendererConfig.h"
 #include "Graphics/CrCommonVertexLayouts.h"
@@ -57,7 +57,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	CrBuiltinShaders::T pixelShaderIndex
 )
 {
-	crgfx::ICrRenderDevice* renderDevice = crgfx::GetRenderDevice().get();
+	crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
 
 	CrHash pipelineHash = graphicsPipelineDescriptor.ComputeHash();
 	CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
@@ -107,7 +107,7 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinCompute:
 	}
 	else
 	{
-		crgfx::ICrRenderDevice* renderDevice = crgfx::GetRenderDevice().get();
+		crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
 
 		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
 
@@ -130,7 +130,7 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 {
 #if !defined(CR_CONFIG_FINAL)
 
-	crgfx::ICrRenderDevice* renderDevice = crgfx::GetRenderDevice().get();
+	crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
 	
 	const CrRenderDeviceProperties& deviceProperties = renderDevice->GetProperties();
 	

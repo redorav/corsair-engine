@@ -7,7 +7,7 @@
 #include "crstl/array.h"
 #include "crstl/vector.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 struct CrD3D12CustomView
 {
@@ -41,7 +41,7 @@ class CrTextureD3D12 final : public ICrTexture
 {
 public:
 
-	CrTextureD3D12(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor);
+	CrTextureD3D12(crgfx::IDevice* renderDevice, const CrTextureDescriptor& descriptor);
 
 	~CrTextureD3D12();
 

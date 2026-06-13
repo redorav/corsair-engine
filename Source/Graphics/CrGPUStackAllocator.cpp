@@ -1,12 +1,12 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/CrGPUStackAllocator.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/CrGPUBuffer.h"
 
 #include "Core/CrAlignment.h"
 
-CrGPUStackAllocator::CrGPUStackAllocator(crgfx::ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& gpuBufferDescriptor)
+CrGPUStackAllocator::CrGPUStackAllocator(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& gpuBufferDescriptor)
 	: m_renderDevice(renderDevice)
 	, m_bufferUsage(gpuBufferDescriptor.usage)
 	, m_bufferAccess(gpuBufferDescriptor.access)

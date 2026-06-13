@@ -89,7 +89,7 @@ public:
 
 	bool m_nvapiInitialized;
 
-	virtual crgfx::ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
+	virtual crgfx::IDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
 };
 
 extern crstl::unique_ptr<ICrRenderSystem> RenderSystem;

@@ -42,7 +42,7 @@ static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, c
 	}
 }
 
-CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
@@ -119,7 +119,7 @@ CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
 	vkDestroyDescriptorSetLayout(m_vkDevice, m_vkDescriptorSetLayout, nullptr);
 }
 
-CrComputeShaderVulkan::CrComputeShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
+CrComputeShaderVulkan::CrComputeShaderVulkan(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	: ICrComputeShader(renderDevice, computeShaderDescriptor)
 {
 	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();

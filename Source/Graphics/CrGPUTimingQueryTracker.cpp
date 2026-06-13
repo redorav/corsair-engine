@@ -1,10 +1,10 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/CrGPUTimingQueryTracker.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/ICrCommandBuffer.h"
 
-void CrGPUTimingQueryTracker::Initialize(crgfx::ICrRenderDevice* renderDevice, uint32_t maxFrames)
+void CrGPUTimingQueryTracker::Initialize(crgfx::IDevice* renderDevice, uint32_t maxFrames)
 {
 	m_maxFrames = maxFrames;
 

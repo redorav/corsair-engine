@@ -2,9 +2,9 @@
 
 #include "Graphics/CrGPUDeletable.h"
 
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
-void CrGPUDeletable::CrRenderDeviceDeletionFunction(crgfx::ICrRenderDevice* renderDevice, CrGPUDeletable* deletable)
+void CrGPUDeletable::CrRenderDeviceDeletionFunction(crgfx::IDevice* renderDevice, CrGPUDeletable* deletable)
 {
 	renderDevice->AddToDeletionQueue(deletable);
 }

@@ -5,13 +5,13 @@
 #include "CrD3D12.h"
 #include "CrDescriptorHeapD3D12.h"
 
-class ICrRenderDevice;
+class IDevice;
 
 class CrSamplerD3D12 final : public ICrSampler
 {
 public:
 
-	CrSamplerD3D12(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+	CrSamplerD3D12(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor);
 
 	~CrSamplerD3D12();
 

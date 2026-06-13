@@ -2,7 +2,7 @@
 
 #include "ICrRenderSystem.h"
 
-#include "ICrRenderDevice.h"
+#include "IDevice.h"
 
 // Include all the necessary platforms here
 

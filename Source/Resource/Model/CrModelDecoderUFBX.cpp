@@ -3,7 +3,7 @@
 #include "CrModelDecoderUFBX.h"
 
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrImage.h"

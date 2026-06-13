@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "ICrCommandBuffer.h"
-#include "ICrRenderDevice.h"
+#include "IDevice.h"
 #include "ICrPipeline.h"
 
 #include "ICrShader.h"
@@ -10,7 +10,7 @@
 
 #include "Core/CrMacros.h"
 
-ICrCommandBuffer::ICrCommandBuffer(crgfx::ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+ICrCommandBuffer::ICrCommandBuffer(crgfx::IDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_queueType(descriptor.queueType)
 	, m_submitted(false)
 	, m_recording(false)

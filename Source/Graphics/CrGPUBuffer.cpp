@@ -1,11 +1,11 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/CrGPUBuffer.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 
 #include "Core/Logging/ICrDebug.h"
 
-ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(crgfx::ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_usage(descriptor.usage)
 	, m_access(descriptor.access)
 	, m_dataFormat(descriptor.dataFormat)
@@ -26,7 +26,7 @@ ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(crgfx::ICrRenderDevice* renderDevice,
 
 // This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
 // is not public, and lives here to cater for the two public-facing constructors
-CrGPUBuffer::CrGPUBuffer(crgfx::ICrRenderDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat)
+CrGPUBuffer::CrGPUBuffer(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat)
 	: m_usage(descriptor.usage), m_access(descriptor.access)
 {
 	if (descriptor.usage & crgfx::BufferUsage::Index)

@@ -8,7 +8,10 @@
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor) : ICrRenderSystem(graphicsSystemDescriptor)
+CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
+	: ICrRenderSystem(graphicsSystemDescriptor)
+	, m_d3d12DebugController(nullptr)
+	, m_d3d12DebugController1(nullptr)
 {
 	// Load NVAPI or other extension mechanisms before we load Renderdoc or PIX
 	if (graphicsSystemDescriptor.enableNVAPI)
@@ -64,7 +67,7 @@ CrRenderSystemD3D12::CrRenderSystemD3D12(const crgfx::GraphicsSystemDescriptor& 
 	}
 }
 
-ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor)
+ICrRenderDevice* CrRenderSystemD3D12::CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor)
 {
 	return new CrRenderDeviceD3D12(this, descriptor);
 }

@@ -25,7 +25,7 @@
 #define RENDER_DEVICE_LOGS
 #endif
 
-ICrRenderDevice::ICrRenderDevice(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor)
+ICrRenderDevice::ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
 	: m_isValidPipelineCache(false)
 {
 	m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Pipeline Cache/";

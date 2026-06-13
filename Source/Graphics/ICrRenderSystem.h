@@ -14,10 +14,10 @@ namespace CrBuiltinShaders { enum T : uint32_t; };
 
 namespace CrBuiltinCompute { enum T : uint32_t; };
 
-struct CrRenderDeviceDescriptor;
-
 namespace crgfx
 {
+	struct DeviceDescriptor;
+
 	struct GraphicsSystemDescriptor
 	{
 		crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
@@ -34,11 +34,17 @@ namespace crgfx
 
 	void InitializeGraphicsSystem(const GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
+	void CreateMainDevice(const crgfx::DeviceDescriptor& descriptor);
+
 	const CrRenderDeviceHandle& GetRenderDevice();
 
 	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
 
 	const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute);
+
+	crgfx::GraphicsApi::T GetGraphicsApi();
+
+	bool GetIsValidationEnabled();
 };
 
 class ICrRenderSystem
@@ -55,7 +61,7 @@ public:
 
 	const CrRenderDeviceHandle& GetRenderDevice() const;
 
-	void CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor);
+	void CreateMainDevice(const crgfx::DeviceDescriptor& descriptor);
 
 	bool GetIsValidationEnabled() const;
 
@@ -67,7 +73,7 @@ public:
 
 	const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const;
 
-protected:
+public:
 
 	crstl::vector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
 
@@ -83,7 +89,7 @@ protected:
 
 	bool m_nvapiInitialized;
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const CrRenderDeviceDescriptor& descriptor) = 0;
+	virtual ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
 };
 
 extern crstl::unique_ptr<ICrRenderSystem> RenderSystem;

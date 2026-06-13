@@ -15,7 +15,7 @@ class CrRenderDeviceD3D12 final : public ICrRenderDevice
 {
 public:
 
-	CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
+	CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
 
 	~CrRenderDeviceD3D12();
 

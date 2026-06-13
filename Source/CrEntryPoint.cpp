@@ -79,9 +79,9 @@ int main(int argc, char* argv[])
 
 	crgfx::InitializeGraphicsSystem(graphicsSystemDescriptor);
 
-	CrRenderDeviceDescriptor renderDeviceDescriptor;
-	renderDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
-	RenderSystem->CreateRenderDevice(renderDeviceDescriptor);
+	crgfx::DeviceDescriptor graphicsDeviceDescriptor;
+	graphicsDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
+	crgfx::CreateMainDevice(graphicsDeviceDescriptor);
 
 	const CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
 

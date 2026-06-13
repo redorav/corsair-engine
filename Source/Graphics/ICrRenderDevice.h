@@ -94,16 +94,19 @@ class CrGPUDeletionQueue;
 class CrGPUTransferCallbackQueue;
 class CrGPUDeletable;
 
-struct CrRenderDeviceDescriptor
+namespace crgfx
 {
-	crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
+	struct DeviceDescriptor
+	{
+		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
+	};
 };
 
 class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
 {
 public:
 
-	ICrRenderDevice(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor);
+	ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
 
 	virtual ~ICrRenderDevice();
 

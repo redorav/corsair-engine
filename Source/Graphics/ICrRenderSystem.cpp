@@ -91,6 +91,11 @@ void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& grap
 	RenderSystem = crstl::unique_ptr<ICrRenderSystem>(renderSystem);
 }
 
+void crgfx::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
+{
+	RenderSystem->CreateMainDevice(descriptor);
+}
+
 const CrRenderDeviceHandle& crgfx::GetRenderDevice()
 {
 	return RenderSystem->GetRenderDevice();
@@ -106,6 +111,16 @@ const CrShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute:
 	return RenderSystem->GetBuiltinComputeBytecode(builtinCompute);
 }
 
+crgfx::GraphicsApi::T crgfx::GetGraphicsApi()
+{
+	return RenderSystem->GetGraphicsApi();
+}
+
+bool crgfx::GetIsValidationEnabled()
+{
+	return RenderSystem->GetIsValidationEnabled();
+}
+
 void ICrRenderSystem::InitializeRenderdoc()
 {
 	m_renderDoc.Initialize(m_descriptor);
@@ -116,7 +131,7 @@ const CrRenderDeviceHandle& ICrRenderSystem::GetRenderDevice() const
 	return m_mainDevice;
 }
 
-void ICrRenderSystem::CreateRenderDevice(const CrRenderDeviceDescriptor& descriptor)
+void ICrRenderSystem::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 {
 	m_mainDevice = CrRenderDeviceHandle(CreateRenderDevicePS(descriptor));
 

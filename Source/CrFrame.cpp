@@ -403,7 +403,7 @@ void CrFrame::Deinitialize()
 
 void CrFrame::Process()
 {
-	const CrRenderDeviceHandle& renderDevice = RenderSystem->GetRenderDevice();
+	const CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
 
 	uint32_t windowWidth, windowHeight;
 	m_mainWindow->GetSizePixels(windowWidth, windowHeight);

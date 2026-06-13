@@ -46,7 +46,7 @@ const char* GetD3DFeatureLevelString(D3D_FEATURE_LEVEL featureLevel)
 	}
 }
 
-CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const CrRenderDeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
+CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : ICrRenderDevice(renderSystem, descriptor)
 {
 	CrRenderSystemD3D12* d3d12RenderSystem = static_cast<CrRenderSystemD3D12*>(renderSystem);
 	IDXGIFactory4* dxgiFactory4 = d3d12RenderSystem->GetDXGIFactory4();
@@ -253,7 +253,7 @@ CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const Cr
 	hResult = m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_d3d12GraphicsCommandQueue));
 	CrAssertMsg(SUCCEEDED(hResult), "Error creating command queue");
 
-	if (RenderSystem->GetIsValidationEnabled())
+	if (crgfx::GetIsValidationEnabled())
 	{
 		ID3D12InfoQueue* d3d12InfoQueue = NULL;
 		if (SUCCEEDED(m_d3d12Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&d3d12InfoQueue)))

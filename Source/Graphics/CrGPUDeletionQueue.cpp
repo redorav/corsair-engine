@@ -16,7 +16,7 @@ CrGPUDeletionQueue::~CrGPUDeletionQueue()
 	
 }
 
-void CrGPUDeletionQueue::Initialize(ICrRenderDevice* renderDevice)
+void CrGPUDeletionQueue::Initialize(crgfx::ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 

@@ -4,7 +4,7 @@
 
 #include "Graphics/ICrRenderDevice.h"
 
-void CrGPUDeletable::CrRenderDeviceDeletionFunction(ICrRenderDevice* renderDevice, CrGPUDeletable* deletable)
+void CrGPUDeletable::CrRenderDeviceDeletionFunction(crgfx::ICrRenderDevice* renderDevice, CrGPUDeletable* deletable)
 {
 	renderDevice->AddToDeletionQueue(deletable);
 }

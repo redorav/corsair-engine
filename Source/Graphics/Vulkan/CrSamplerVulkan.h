@@ -9,7 +9,7 @@ class CrSamplerVulkan final : public ICrSampler
 {
 public:
 
-	CrSamplerVulkan(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+	CrSamplerVulkan(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
 
 	~CrSamplerVulkan();
 

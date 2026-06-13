@@ -36,7 +36,7 @@ namespace crgfx
 
 	void CreateMainDevice(const crgfx::DeviceDescriptor& descriptor);
 
-	const CrRenderDeviceHandle& GetRenderDevice();
+	const crgfx::CrRenderDeviceHandle& GetRenderDevice();
 
 	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
 
@@ -59,7 +59,7 @@ public:
 
 	void InitializeRenderdoc();
 
-	const CrRenderDeviceHandle& GetRenderDevice() const;
+	const crgfx::CrRenderDeviceHandle& GetRenderDevice() const;
 
 	void CreateMainDevice(const crgfx::DeviceDescriptor& descriptor);
 
@@ -79,7 +79,7 @@ public:
 
 	crstl::vector<CrShaderBytecodeHandle> m_builtinComputeBytecodes;
 
-	CrRenderDeviceHandle m_mainDevice;
+	crgfx::CrRenderDeviceHandle m_mainDevice;
 
 	crgfx::GraphicsSystemDescriptor m_descriptor;
 
@@ -89,7 +89,7 @@ public:
 
 	bool m_nvapiInitialized;
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
+	virtual crgfx::ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
 };
 
 extern crstl::unique_ptr<ICrRenderSystem> RenderSystem;

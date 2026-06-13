@@ -24,7 +24,7 @@ CrSamplerDescriptor::CrSamplerDescriptor()
 
 }
 
-ICrSampler::ICrSampler(ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice)
+ICrSampler::ICrSampler(crgfx::ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

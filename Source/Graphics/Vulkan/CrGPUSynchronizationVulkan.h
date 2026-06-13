@@ -9,7 +9,7 @@ class CrGPUFenceVulkan final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceVulkan(ICrRenderDevice* renderDevice, bool signaled);
+	CrGPUFenceVulkan(crgfx::ICrRenderDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceVulkan();
 
@@ -29,7 +29,7 @@ class CrGPUSemaphoreVulkan final : public ICrGPUSemaphore
 {
 public:
 
-	CrGPUSemaphoreVulkan(ICrRenderDevice* renderDevice);
+	CrGPUSemaphoreVulkan(crgfx::ICrRenderDevice* renderDevice);
 
 	~CrGPUSemaphoreVulkan();
 

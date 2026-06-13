@@ -11,7 +11,7 @@ class CrSamplerD3D12 final : public ICrSampler
 {
 public:
 
-	CrSamplerD3D12(ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+	CrSamplerD3D12(crgfx::ICrRenderDevice* renderDevice, const CrSamplerDescriptor& descriptor);
 
 	~CrSamplerD3D12();
 

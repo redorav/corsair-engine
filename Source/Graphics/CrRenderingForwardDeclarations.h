@@ -51,6 +51,9 @@ namespace crgfx
 	enum class CameraProjection : uint32_t;
 
 	struct TextureState;
+
+	class ICrRenderDevice;
+	using CrRenderDeviceHandle = crstl::intrusive_ptr<ICrRenderDevice>;
 };
 
 enum class CrRenderTargetLoadOp : uint32_t;
@@ -77,9 +80,6 @@ struct RWTypedBufferMetadata;
 // Forward declare the necessary types for the rendering core
 
 class ICrRenderSystem;
-
-class ICrRenderDevice;
-using CrRenderDeviceHandle = crstl::intrusive_ptr<ICrRenderDevice>;
 
 namespace CrCommandQueueType { enum T : uint32_t; }
 

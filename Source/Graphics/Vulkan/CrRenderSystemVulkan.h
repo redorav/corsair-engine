@@ -18,7 +18,7 @@ public:
 
 	bool IsVkInstanceLayerSupported(const crstl::string& layer);
 
-	virtual ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) override;
+	virtual crgfx::ICrRenderDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) override;
 
 private:
 

@@ -25,7 +25,7 @@ public:
 
 	static const uint32_t MaximumDeletionLists = 4;
 
-	void Initialize(ICrRenderDevice* renderDevice);
+	void Initialize(crgfx::ICrRenderDevice* renderDevice);
 
 	void AddToQueue(CrGPUDeletable* deletable);
 
@@ -37,7 +37,7 @@ public:
 
 private:
 	
-	ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
 
 	// The current deletion list points to all the resources being deleted
 	// before we execute the fence. Once we execute the fence, we add it

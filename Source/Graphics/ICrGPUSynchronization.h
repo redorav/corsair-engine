@@ -16,7 +16,7 @@ class ICrGPUFence : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGPUFence(ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
+	ICrGPUFence(crgfx::ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
 
 	virtual ~ICrGPUFence() {}
 };
@@ -31,7 +31,7 @@ class ICrGPUSemaphore : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGPUSemaphore(ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
+	ICrGPUSemaphore(crgfx::ICrRenderDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
 
 	virtual ~ICrGPUSemaphore() {}
 };

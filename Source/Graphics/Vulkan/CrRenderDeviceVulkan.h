@@ -8,7 +8,7 @@
 
 class CrTextureVulkan;
 
-class CrRenderDeviceVulkan final : public ICrRenderDevice
+class CrRenderDeviceVulkan final : public crgfx::ICrRenderDevice
 {
 public:
 

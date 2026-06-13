@@ -12,7 +12,7 @@ class CrGPUStackAllocator : public CrStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+	CrGPUStackAllocator(crgfx::ICrRenderDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	~CrGPUStackAllocator();
 
@@ -28,7 +28,7 @@ public:
 
 protected:
 
-	ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
 
 	CrHardwareGPUBufferHandle m_hardwareBuffer;
 

@@ -8,7 +8,7 @@ class CrSwapchainD3D12 final : public ICrSwapchain
 {
 public:
 
-	CrSwapchainD3D12(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
+	CrSwapchainD3D12(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor);
 
 	~CrSwapchainD3D12();
 

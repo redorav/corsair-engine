@@ -216,7 +216,7 @@ class ICrGraphicsPipeline : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGraphicsPipeline(ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	virtual ~ICrGraphicsPipeline();
 
@@ -234,9 +234,9 @@ private:
 
 public:
 
-	void Recompile(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader);
+	void Recompile(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader);
 
-	virtual void RecompilePS(ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
+	virtual void RecompilePS(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
 
 	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
 
@@ -265,7 +265,7 @@ class ICrComputePipeline : public CrGPUAutoDeletable
 {
 public:
 
-	ICrComputePipeline(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader);
+	ICrComputePipeline(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader);
 
 	virtual ~ICrComputePipeline();
 
@@ -291,9 +291,9 @@ private:
 
 public:
 
-	void Recompile(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader);
+	void Recompile(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader);
 
-	virtual void RecompilePS(ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
+	virtual void RecompilePS(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
 
 	CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 	

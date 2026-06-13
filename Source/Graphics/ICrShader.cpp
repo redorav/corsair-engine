@@ -46,7 +46,7 @@ ICrShaderBindingLayout::ICrShaderBindingLayout(const CrShaderBindingLayoutResour
 	ProcessResourceArray(crgfx::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 }
 
-ICrGraphicsShader::ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+ICrGraphicsShader::ICrGraphicsShader(crgfx::ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 {
 	for (const CrShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 	{

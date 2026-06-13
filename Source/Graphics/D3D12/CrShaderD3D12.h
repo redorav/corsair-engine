@@ -9,7 +9,7 @@ class CrGraphicsShaderD3D12 final : public ICrGraphicsShader
 {
 public:
 
-	CrGraphicsShaderD3D12(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	CrGraphicsShaderD3D12(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	~CrGraphicsShaderD3D12();
 
@@ -20,7 +20,7 @@ class CrComputeShaderD3D12 final : public ICrComputeShader
 {
 public:
 
-	CrComputeShaderD3D12(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+	CrComputeShaderD3D12(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
 
 private:
 };

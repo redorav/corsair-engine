@@ -26,7 +26,7 @@ class CrGPUTimingQueryTracker
 {
 public:
 
-	void Initialize(ICrRenderDevice* renderDevice, uint32_t maxFrames);
+	void Initialize(crgfx::ICrRenderDevice* renderDevice, uint32_t maxFrames);
 
 	void BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t frameIndex);
 

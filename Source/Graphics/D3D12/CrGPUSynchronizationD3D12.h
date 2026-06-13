@@ -9,7 +9,7 @@ class CrGPUFenceD3D12 final : public ICrGPUFence
 {
 public:
 
-	CrGPUFenceD3D12(ICrRenderDevice* renderDevice, bool signaled);
+	CrGPUFenceD3D12(crgfx::ICrRenderDevice* renderDevice, bool signaled);
 
 	~CrGPUFenceD3D12();
 
@@ -28,7 +28,7 @@ class CrGPUSemaphoreD3D12 final : public ICrGPUSemaphore
 {
 public:
 
-	CrGPUSemaphoreD3D12(ICrRenderDevice* renderDevice);
+	CrGPUSemaphoreD3D12(crgfx::ICrRenderDevice* renderDevice);
 
 	~CrGPUSemaphoreD3D12();
 

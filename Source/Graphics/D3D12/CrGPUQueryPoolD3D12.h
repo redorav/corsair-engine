@@ -8,7 +8,7 @@ class CrGPUQueryPoolD3D12 final : public ICrGPUQueryPool
 {
 public:
 
-	CrGPUQueryPoolD3D12(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	CrGPUQueryPoolD3D12(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	~CrGPUQueryPoolD3D12();
 

@@ -107,7 +107,7 @@ class ICrCommandBuffer : public CrGPUAutoDeletable
 {
 public:
 
-	ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor);
+	ICrCommandBuffer(crgfx::ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor);
 
 	virtual ~ICrCommandBuffer();
 

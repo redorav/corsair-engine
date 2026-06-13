@@ -38,5 +38,5 @@ public:
 
 protected:
 
-	ICrSampler(ICrRenderDevice* renderDevice);
+	ICrSampler(crgfx::ICrRenderDevice* renderDevice);
 };

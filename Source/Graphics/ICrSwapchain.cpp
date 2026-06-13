@@ -4,7 +4,10 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-class ICrRenderDevice;
+namespace crgfx
+{
+	class ICrRenderDevice;
+};
 
 CrSwapchainDescriptor::CrSwapchainDescriptor()
 	: name("")
@@ -17,7 +20,7 @@ CrSwapchainDescriptor::CrSwapchainDescriptor()
 
 }
 
-ICrSwapchain::ICrSwapchain(ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
+ICrSwapchain::ICrSwapchain(crgfx::ICrRenderDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_name(swapchainDescriptor.name)
 	, m_imageCount(0)
 	, m_format(crgfx::DataFormat::Invalid)

@@ -8,7 +8,7 @@
 
 CrRenderingResources* RenderingResources;
 
-void CrRenderingResources::Initialize(ICrRenderDevice* renderDevice)
+void CrRenderingResources::Initialize(crgfx::ICrRenderDevice* renderDevice)
 {
 	CrAssert(RenderingResources == nullptr);
 	RenderingResources = new CrRenderingResources(renderDevice);
@@ -20,7 +20,7 @@ void CrRenderingResources::Deinitialize()
 	delete RenderingResources;
 }
 
-CrRenderingResources::CrRenderingResources(ICrRenderDevice* renderDevice)
+CrRenderingResources::CrRenderingResources(crgfx::ICrRenderDevice* renderDevice)
 {
 	//------------------------
 	// Create default samplers

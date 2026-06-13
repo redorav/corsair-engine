@@ -100,222 +100,222 @@ namespace crgfx
 	{
 		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
 	};
-};
 
-class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
-{
-public:
-
-	ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
-
-	virtual ~ICrRenderDevice();
-
-	template<typename T>
-	void intrusive_ptr_delete_callback()
+	class ICrRenderDevice : public crstl::intrusive_ptr_interface_base
 	{
-		FinalizeDeletion();
-		delete this;
-	}
+	public:
 
-	void Initialize();
+		ICrRenderDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
 
-	void ProcessDeletionQueue();
+		virtual ~ICrRenderDevice();
 
-	void FinalizeDeletion();
+		template<typename T>
+		void intrusive_ptr_delete_callback()
+		{
+			FinalizeDeletion();
+			delete this;
+		}
 
-	void ProcessQueuedCommands();
+		void Initialize();
 
-	const CrCommandBufferHandle& GetAuxiliaryCommandBuffer();
+		void ProcessDeletionQueue();
 
-	//------------------
-	// Resource Creation
-	//------------------
+		void FinalizeDeletion();
 
-	ICrCommandBuffer* CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
+		void ProcessQueuedCommands();
 
-	CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
+		const CrCommandBufferHandle& GetAuxiliaryCommandBuffer();
 
-	ICrSampler* CreateSampler(const CrSamplerDescriptor& descriptor);
+		//------------------
+		// Resource Creation
+		//------------------
 
-	ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
+		ICrCommandBuffer* CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
 
-	ICrTexture* CreateTexture(const CrTextureDescriptor& descriptor);
+		CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
-	CrVertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+		ICrSampler* CreateSampler(const CrSamplerDescriptor& descriptor);
+
+		ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
+
+		ICrTexture* CreateTexture(const CrTextureDescriptor& descriptor);
+
+		CrVertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+
+		template<typename Metadata>
+		CrStructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
+
+		CrTypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
+
+		ICrGraphicsShader* CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+
+		ICrComputeShader* CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor);
+
+		CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+
+		CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
+
+		ICrGPUQueryPool* CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
+
+		ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+
+		ICrGPUFence* CreateGPUFence(bool signaled = false);
+
+		ICrGPUSemaphore* CreateGPUSemaphore();
+
+		void AddToDeletionQueue(CrGPUDeletable* resource);
+
+		//--------------------
+		// GPU Synchronization
+		//--------------------
+
+		crgfx::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
+
+		crgfx::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
+
+		void SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence);
+
+		void ResetFence(ICrGPUFence* fence);
+
+		// Wait until all operations on all queues have completed
+		void WaitIdle();
+
+		//--------------------
+		// Download and Upload
+		//--------------------
+
+		uint8_t* BeginTextureUpload(const ICrTexture* texture);
+
+		void EndTextureUpload(const ICrTexture* texture);
+
+		uint8_t* BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+
+		void EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+
+		void DownloadBuffer(const ICrHardwareGPUBuffer* buffer, const CrGPUTransferCallbackType& callback);
+
+		//-------------------------------
+		// Properties and feature support
+		//-------------------------------
+
+		const CrRenderDeviceProperties& GetProperties() const;
+
+		bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
+
+		bool SupportsTextureFormatCasting() const { return m_renderDeviceProperties.features.textureFormatCasting; }
+
+		void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
+
+	protected:
+
+		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
+
+		virtual ICrGPUFence* CreateGPUFencePS(bool signaled) = 0;
+
+		virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
+
+		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
+
+		virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) = 0;
+
+		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
+
+		virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
+
+		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
+
+		virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
+
+		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+
+		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) = 0;
+
+		virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
+
+		virtual void FinalizeDeletionPS() {}
+
+		//--------------------
+		// GPU Synchronization
+		//--------------------
+
+		virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
+
+		virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
+
+		virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
+
+		virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
+
+		virtual void WaitIdlePS() = 0;
+
+		//--------------------
+		// Download and Upload
+		//--------------------
+
+		// Begins a texture upload. Prepares a buffer and returns a pointer to the beginning of the memory.
+		// External code then populates the given memory
+		virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) = 0;
+
+		// Ends a texture upload. The render device keeps track of the requested upload and matches it to
+		// schedule an upload that is guaranteed to be visible on the next texture usage
+		virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
+
+		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
+
+		virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
+
+		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
+
+		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
+
+		void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
+
+		void LoadPipelineCache(crstl::vector<char>& pipelineCacheData);
+
+		crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
+
+		crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
+
+		CrRenderDeviceProperties m_renderDeviceProperties;
+
+		// Texture uploads that have started but haven't been committed yet
+		crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;
+
+		// Buffer uploads that have started but haven't been committed yet
+		crstl::open_hashmap<CrHash, CrBufferUpload> m_openBufferUploads;
+
+		//--------------------------
+		// Pipeline State Management
+		//--------------------------
+
+		// The platform-specific code is able to determine whether
+		// the pipeline is valid or not
+		bool m_isValidPipelineCache;
+
+		crstl::string m_pipelineCacheDirectory;
+
+		crstl::string m_pipelineCacheFilename;
+
+		crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
+
+		crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_computePipelines;
+
+	private:
+
+		// Auxiliary command buffers. Subclasses don't need to know about the implementation details,
+		// they queue work onto the auxiliary command buffer (via the getter)
+		CrCommandBufferHandle m_auxiliaryCommandBuffer;
+
+		crstl::vector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
+
+		uint32_t m_auxiliaryCommandBufferIndex = 0;
+
+		uint32_t m_auxiliaryCommandBufferCount = 0;
+	};
 
 	template<typename Metadata>
-	CrStructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
-
-	CrTypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
-
-	ICrGraphicsShader* CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
-
-	ICrComputeShader* CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor);
-
-	CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
-	
-	CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
-
-	ICrGPUQueryPool* CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
-
-	ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
-
-	ICrGPUFence* CreateGPUFence(bool signaled = false);
-
-	ICrGPUSemaphore* CreateGPUSemaphore();
-
-	void AddToDeletionQueue(CrGPUDeletable* resource);
-
-	//--------------------
-	// GPU Synchronization
-	//--------------------
-
-	crgfx::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
-
-	crgfx::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
-
-	void SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence);
-
-	void ResetFence(ICrGPUFence* fence);
-
-	// Wait until all operations on all queues have completed
-	void WaitIdle();
-
-	//--------------------
-	// Download and Upload
-	//--------------------
-	
-	uint8_t* BeginTextureUpload(const ICrTexture* texture);
-
-	void EndTextureUpload(const ICrTexture* texture);
-
-	uint8_t* BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
-
-	void EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
-
-	void DownloadBuffer(const ICrHardwareGPUBuffer* buffer, const CrGPUTransferCallbackType& callback);
-
-	//-------------------------------
-	// Properties and feature support
-	//-------------------------------
-
-	const CrRenderDeviceProperties& GetProperties() const;
-
-	bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
-
-	bool SupportsTextureFormatCasting() const { return m_renderDeviceProperties.features.textureFormatCasting; }
-
-	void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
-
-protected:
-
-	virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
-
-	virtual ICrGPUFence* CreateGPUFencePS(bool signaled) = 0;
-
-	virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
-
-	virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
-
-	virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) = 0;
-
-	virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
-
-	virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
-
-	virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
-
-	virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
-	
-	virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
-
-	virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) = 0;
-	
-	virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
-
-	virtual void FinalizeDeletionPS() {}
-
-	//--------------------
-	// GPU Synchronization
-	//--------------------
-
-	virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
-
-	virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
-
-	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
-
-	virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
-
-	virtual void WaitIdlePS() = 0;
-
-	//--------------------
-	// Download and Upload
-	//--------------------
-
-	// Begins a texture upload. Prepares a buffer and returns a pointer to the beginning of the memory.
-	// External code then populates the given memory
-	virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) = 0;
-
-	// Ends a texture upload. The render device keeps track of the requested upload and matches it to
-	// schedule an upload that is guaranteed to be visible on the next texture usage
-	virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
-
-	virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
-
-	virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
-
-	virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
-
-	virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
-
-	void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
-
-	void LoadPipelineCache(crstl::vector<char>& pipelineCacheData);
-
-	crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
-
-	crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
-
-	CrRenderDeviceProperties m_renderDeviceProperties;
-
-	// Texture uploads that have started but haven't been committed yet
-	crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;
-
-	// Buffer uploads that have started but haven't been committed yet
-	crstl::open_hashmap<CrHash, CrBufferUpload> m_openBufferUploads;
-
-	//--------------------------
-	// Pipeline State Management
-	//--------------------------
-
-	// The platform-specific code is able to determine whether
-	// the pipeline is valid or not
-	bool m_isValidPipelineCache;
-
-	crstl::string m_pipelineCacheDirectory;
-
-	crstl::string m_pipelineCacheFilename;
-
-	crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
-
-	crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_computePipelines;
-
-private:
-
-	// Auxiliary command buffers. Subclasses don't need to know about the implementation details,
-	// they queue work onto the auxiliary command buffer (via the getter)
-	CrCommandBufferHandle m_auxiliaryCommandBuffer;
-
-	crstl::vector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
-
-	uint32_t m_auxiliaryCommandBufferIndex = 0;
-
-	uint32_t m_auxiliaryCommandBufferCount = 0;
+	CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
+	{
+		return new CrStructuredBuffer<Metadata>(this, access, numElements);
+	}
 };
-
-template<typename Metadata>
-CrStructuredBuffer<Metadata>* ICrRenderDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
-{
-	return new CrStructuredBuffer<Metadata>(this, access, numElements);
-}

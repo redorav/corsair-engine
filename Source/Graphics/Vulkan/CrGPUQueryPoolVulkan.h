@@ -9,7 +9,7 @@ class CrGPUQueryPoolVulkan final : public ICrGPUQueryPool
 {
 public:
 
-	CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	CrGPUQueryPoolVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
 
 	~CrGPUQueryPoolVulkan();
 

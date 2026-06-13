@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrTextureVulkan::CrTextureVulkan(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
+CrTextureVulkan::CrTextureVulkan(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)
 	, m_vkImage(nullptr)
 	, m_vkImageViewAllMipsAllSlices(nullptr)

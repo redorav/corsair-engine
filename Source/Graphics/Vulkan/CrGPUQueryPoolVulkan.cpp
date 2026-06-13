@@ -16,7 +16,7 @@ VkQueryType GetVkQueryType(crgfx::QueryType queryType)
 	}
 }
 
-CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
+CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
 {
 	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
 

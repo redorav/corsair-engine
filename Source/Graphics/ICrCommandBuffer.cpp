@@ -10,7 +10,7 @@
 
 #include "Core/CrMacros.h"
 
-ICrCommandBuffer::ICrCommandBuffer(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+ICrCommandBuffer::ICrCommandBuffer(crgfx::ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_queueType(descriptor.queueType)
 	, m_submitted(false)
 	, m_recording(false)

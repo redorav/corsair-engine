@@ -10,7 +10,7 @@
 
 #include "Math/CrMath.h"
 
-CrTextureD3D12::CrTextureD3D12(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
+CrTextureD3D12::CrTextureD3D12(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)
 {
 	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);

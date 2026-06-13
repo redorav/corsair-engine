@@ -14,7 +14,7 @@ CrDownloadCallbackList::~CrDownloadCallbackList() {}
 
 CrGPUTransferCallbackQueue::~CrGPUTransferCallbackQueue() {}
 
-void CrGPUTransferCallbackQueue::Initialize(ICrRenderDevice* renderDevice)
+void CrGPUTransferCallbackQueue::Initialize(crgfx::ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 	

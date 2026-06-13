@@ -27,7 +27,7 @@ CrTextureDescriptor::CrTextureDescriptor()
 
 }
 
-ICrTexture::ICrTexture(ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+ICrTexture::ICrTexture(crgfx::ICrRenderDevice* renderDevice, const CrTextureDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 	, m_usedGPUMemoryBytes(0)
 {
 	m_width = descriptor.width;

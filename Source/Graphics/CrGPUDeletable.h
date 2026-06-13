@@ -2,26 +2,29 @@
 
 #include "crstl/intrusive_ptr.h"
 
-class ICrRenderDevice;
+namespace crgfx
+{
+	class ICrRenderDevice;
+};
 
 class CrGPUDeletable
 {
 public:
 
-	void CrRenderDeviceDeletionFunction(ICrRenderDevice* renderDevice, CrGPUDeletable* deletable);
+	void CrRenderDeviceDeletionFunction(crgfx::ICrRenderDevice* renderDevice, CrGPUDeletable* deletable);
 
-	CrGPUDeletable(ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice) {}
+	CrGPUDeletable(crgfx::ICrRenderDevice* renderDevice) : m_renderDevice(renderDevice) {}
 
 	virtual ~CrGPUDeletable() {}
 
-	ICrRenderDevice* m_renderDevice = nullptr;
+	crgfx::ICrRenderDevice* m_renderDevice = nullptr;
 };
 
 class CrGPUAutoDeletable : public crstl::intrusive_ptr_interface_delete, public CrGPUDeletable
 {
 public:
 
-	CrGPUAutoDeletable(ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
+	CrGPUAutoDeletable(crgfx::ICrRenderDevice* renderDevice) : CrGPUDeletable(renderDevice) {}
 
 	virtual ~CrGPUAutoDeletable() {}
 

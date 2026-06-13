@@ -9,7 +9,7 @@ class CrGraphicsShaderVulkan final : public ICrGraphicsShader
 {
 public:
 
-	CrGraphicsShaderVulkan(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	CrGraphicsShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	~CrGraphicsShaderVulkan();
 
@@ -32,7 +32,7 @@ class CrComputeShaderVulkan final : public ICrComputeShader
 {
 public:
 
-	CrComputeShaderVulkan(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+	CrComputeShaderVulkan(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
 
 	~CrComputeShaderVulkan();
 

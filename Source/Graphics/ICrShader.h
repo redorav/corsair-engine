@@ -366,7 +366,7 @@ class ICrGraphicsShader : public ICrShader
 {
 public:
 
-	ICrGraphicsShader(ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+	ICrGraphicsShader(crgfx::ICrRenderDevice* /*renderDevice*/, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 	virtual ~ICrGraphicsShader() {}
 
@@ -398,7 +398,7 @@ class ICrComputeShader : public ICrShader
 {
 public:
 
-	ICrComputeShader(ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
+	ICrComputeShader(crgfx::ICrRenderDevice* /*renderDevice*/, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	{
 		m_bytecode  = computeShaderDescriptor.m_bytecode;
 		m_hash      = computeShaderDescriptor.m_bytecode->GetHash();

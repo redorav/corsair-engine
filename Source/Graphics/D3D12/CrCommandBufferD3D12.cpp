@@ -12,7 +12,7 @@
 #include "Core/CrAlignment.h"
 #include "Core/Logging/ICrDebug.h"
 
-CrCommandBufferD3D12::CrCommandBufferD3D12(ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
+CrCommandBufferD3D12::CrCommandBufferD3D12(crgfx::ICrRenderDevice* renderDevice, const CrCommandBufferDescriptor& descriptor)
 	: ICrCommandBuffer(renderDevice, descriptor)
 	, m_primitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 	, m_shaderResourceDescriptorHeap(nullptr)

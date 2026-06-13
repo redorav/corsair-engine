@@ -66,7 +66,7 @@ CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr
 	return shaderCachePath;
 }
 
-void CrShaderManager::Initialize(ICrRenderDevice* renderDevice)
+void CrShaderManager::Initialize(crgfx::ICrRenderDevice* renderDevice)
 {
 	CrAssert(renderDevice != nullptr);
 	CrAssert(ShaderManager == nullptr);
@@ -185,7 +185,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	return nullptr;
 }
 
-CrShaderManager::CrShaderManager(ICrRenderDevice* renderDevice)
+CrShaderManager::CrShaderManager(crgfx::ICrRenderDevice* renderDevice)
 {
 	m_renderDevice = renderDevice;
 }

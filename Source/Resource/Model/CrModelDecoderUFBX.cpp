@@ -299,7 +299,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 
 				CrRenderMeshHandle renderMesh = CrRenderMeshHandle(new CrRenderMesh());
 
-				const CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
+				const crgfx::CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
 
 				bool hasUVs = ufbxMesh->vertex_uv.exists;
 				bool hasNormals = ufbxMesh->vertex_normal.exists;

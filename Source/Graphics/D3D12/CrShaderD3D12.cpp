@@ -8,7 +8,7 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
 
-CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(crgfx::ICrRenderDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
 	CrShaderBindingLayoutResources resources;
@@ -28,7 +28,7 @@ CrGraphicsShaderD3D12::~CrGraphicsShaderD3D12()
 
 }
 
-CrComputeShaderD3D12::CrComputeShaderD3D12(ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
+CrComputeShaderD3D12::CrComputeShaderD3D12(crgfx::ICrRenderDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	: ICrComputeShader(renderDevice, computeShaderDescriptor)
 {
 	CrShaderBindingLayoutResources resources;

@@ -52,12 +52,14 @@ namespace crgfx
 
 	struct TextureState;
 
-	class IDevice;
-	using CrRenderDeviceHandle = crstl::intrusive_ptr<IDevice>;
-};
+	namespace CommandQueueType { enum T : uint32_t; }
 
-enum class CrRenderTargetLoadOp : uint32_t;
-enum class CrRenderTargetStoreOp : uint32_t;
+	enum class RenderTargetLoadOp : uint32_t;
+	enum class RenderTargetStoreOp : uint32_t;
+
+	class IDevice;
+	using DeviceHandle = crstl::intrusive_ptr<IDevice>;
+};
 
 // Forward declare shader resources
 namespace ConstantBuffers { enum T : uint8_t; }
@@ -80,8 +82,6 @@ struct RWTypedBufferMetadata;
 // Forward declare the necessary types for the rendering core
 
 class ICrRenderSystem;
-
-namespace CrCommandQueueType { enum T : uint32_t; }
 
 class ICrTexture;
 using CrTextureHandle = crstl::intrusive_ptr<ICrTexture>;

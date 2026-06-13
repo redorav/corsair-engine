@@ -57,7 +57,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	CrBuiltinShaders::T pixelShaderIndex
 )
 {
-	crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
+	crgfx::IDevice* device = crgfx::GetDevice().get();
 
 	CrHash pipelineHash = graphicsPipelineDescriptor.ComputeHash();
 	CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
@@ -76,7 +76,7 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 		CrShaderBytecodeHandle vertexShaderBytecode = crgfx::GetBuiltinShaderBytecode(vertexShaderIndex);
 		CrShaderBytecodeHandle pixelShaderBytecode = crgfx::GetBuiltinShaderBytecode(pixelShaderIndex);
 
-		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
+		const crgfx::DeviceProperties& properties = device->GetProperties();
 
 		CrGraphicsShaderDescriptor graphicsShaderDescriptor;
 		graphicsShaderDescriptor.m_debugName += CrBuiltinShaders::GetMetadata(vertexShaderIndex, properties.graphicsApi).name.c_str();
@@ -85,9 +85,9 @@ CrGraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 		graphicsShaderDescriptor.m_bytecodes.push_back(vertexShaderBytecode);
 		graphicsShaderDescriptor.m_bytecodes.push_back(pixelShaderBytecode);
 
-		CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
+		CrGraphicsShaderHandle shader = device->CreateGraphicsShader(graphicsShaderDescriptor);
 
-		CrGraphicsPipelineHandle graphicsPipeline = renderDevice->CreateGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
+		CrGraphicsPipelineHandle graphicsPipeline = device->CreateGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
 
 		m_builtinGraphicsPipelines.insert(finalHash.GetHash(), graphicsPipeline);
@@ -107,9 +107,9 @@ CrComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinCompute:
 	}
 	else
 	{
-		crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
+		crgfx::IDevice* renderDevice = crgfx::GetDevice().get();
 
-		const CrRenderDeviceProperties& properties = renderDevice->GetProperties();
+		const crgfx::DeviceProperties& properties = renderDevice->GetProperties();
 
 		CrComputeShaderDescriptor computeShaderDescriptor;
 		computeShaderDescriptor.m_debugName = CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str();
@@ -130,9 +130,9 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 {
 #if !defined(CR_CONFIG_FINAL)
 
-	crgfx::IDevice* renderDevice = crgfx::GetRenderDevice().get();
+	crgfx::IDevice* device = crgfx::GetDevice().get();
 	
-	const CrRenderDeviceProperties& deviceProperties = renderDevice->GetProperties();
+	const crgfx::DeviceProperties& deviceProperties = device->GetProperties();
 	
 	CrFixedPath outputPath = CrFixedPath(CrGlobalPaths::GetTempEngineDirectory()) / "Bultin Shaders Runtime";
 	
@@ -167,7 +167,7 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 		{
 			// Load the new pipelines after compilation
 			// Make sure we idle the device before attempting recompilation as this will destroy pipelines that could be in flight
-			renderDevice->WaitIdle();
+			device->WaitIdle();
 
 			for (auto iter = m_builtinComputePipelines.begin(); iter != m_builtinComputePipelines.end(); ++iter)
 			{
@@ -189,9 +189,9 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 					computeShaderDescriptor.m_debugName = builtinShaderMetadata.name.c_str();
 					computeShaderDescriptor.m_bytecode = bytecode;
 
-					CrComputeShaderHandle shader = renderDevice->CreateComputeShader(computeShaderDescriptor);
+					CrComputeShaderHandle shader = device->CreateComputeShader(computeShaderDescriptor);
 
-					computePipeline->Recompile(renderDevice, shader);
+					computePipeline->Recompile(device, shader);
 				}
 			}
 
@@ -231,9 +231,9 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 					graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 				}
 
-				CrGraphicsShaderHandle shader = renderDevice->CreateGraphicsShader(graphicsShaderDescriptor);
+				CrGraphicsShaderHandle shader = device->CreateGraphicsShader(graphicsShaderDescriptor);
 
-				graphicsPipeline->Recompile(renderDevice, shader);
+				graphicsPipeline->Recompile(device, shader);
 			}
 		}
 		else

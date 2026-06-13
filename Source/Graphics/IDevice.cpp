@@ -305,7 +305,7 @@ namespace crgfx
 		return GetFenceStatusPS(fence);
 	}
 
-	void IDevice::SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence)
+	void IDevice::SignalFence(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence)
 	{
 		return SignalFencePS(queueType, signalFence);
 	}
@@ -357,7 +357,7 @@ namespace crgfx
 		m_gpuTransferCallbackQueue->AddToQueue(downloadCallback);
 	}
 
-	const CrRenderDeviceProperties& IDevice::GetProperties() const
+	const DeviceProperties& IDevice::GetProperties() const
 	{
 		return m_renderDeviceProperties;
 	}

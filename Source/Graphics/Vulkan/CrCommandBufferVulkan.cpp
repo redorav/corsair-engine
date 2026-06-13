@@ -312,7 +312,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_scissorDirty)
 	{
-		const CrRectangle& scissor = m_currentState.m_scissor;
+		const crgfx::Rectangle& scissor = m_currentState.m_scissor;
 		VkRect2D vkRect2D = { { (int32_t)scissor.x, (int32_t)scissor.y }, { scissor.width, scissor.height } };
 		vkCmdSetScissor(m_vkCommandBuffer, 0, 1, &vkRect2D);
 		m_currentState.m_scissorDirty = false;
@@ -320,7 +320,7 @@ void CrCommandBufferVulkan::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_viewportDirty)
 	{
-		const CrViewport& viewport = m_currentState.m_viewport;
+		const crgfx::Viewport& viewport = m_currentState.m_viewport;
 
 		// TODO Be able to set multiple viewports
 		VkViewport vkViewport =

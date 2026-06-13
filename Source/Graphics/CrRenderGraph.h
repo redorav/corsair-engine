@@ -85,10 +85,10 @@ struct CrRenderGraphTextureUsage
 	float depthClearValue = 0.0f;
 	uint8_t stencilClearValue = 0;
 
-	CrRenderTargetLoadOp loadOp          = CrRenderTargetLoadOp::Load;
-	CrRenderTargetStoreOp storeOp        = CrRenderTargetStoreOp::Store;
-	CrRenderTargetLoadOp stencilLoadOp   = CrRenderTargetLoadOp::DontCare;
-	CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare;
+	crgfx::RenderTargetLoadOp loadOp          = crgfx::RenderTargetLoadOp::Load;
+	crgfx::RenderTargetStoreOp storeOp        = crgfx::RenderTargetStoreOp::Store;
+	crgfx::RenderTargetLoadOp stencilLoadOp   = crgfx::RenderTargetLoadOp::DontCare;
+	crgfx::RenderTargetStoreOp stencilStoreOp = crgfx::RenderTargetStoreOp::DontCare;
 
 	crgfx::TextureState state;
 };
@@ -204,8 +204,8 @@ public:
 	void BindRenderTarget
 	(
 		ICrTexture* texture,
-		CrRenderTargetLoadOp loadOp,
-		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
+		crgfx::RenderTargetLoadOp loadOp,
+		crgfx::RenderTargetStoreOp storeOp = crgfx::RenderTargetStoreOp::Store,
 		float4 clearColor = float4(),
 		uint32_t mipmap = 0, uint32_t slice = 0
 	);
@@ -213,11 +213,11 @@ public:
 	void BindDepthStencilTarget
 	(
 		ICrTexture* texture,
-		CrRenderTargetLoadOp loadOp,
-		CrRenderTargetStoreOp storeOp = CrRenderTargetStoreOp::Store,
+		crgfx::RenderTargetLoadOp loadOp,
+		crgfx::RenderTargetStoreOp storeOp = crgfx::RenderTargetStoreOp::Store,
 		float depthClearValue = 0.0f,
-		CrRenderTargetLoadOp stencilLoadOp = CrRenderTargetLoadOp::DontCare,
-		CrRenderTargetStoreOp stencilStoreOp = CrRenderTargetStoreOp::DontCare,
+		crgfx::RenderTargetLoadOp stencilLoadOp = crgfx::RenderTargetLoadOp::DontCare,
+		crgfx::RenderTargetStoreOp stencilStoreOp = crgfx::RenderTargetStoreOp::DontCare,
 		uint8_t stencilClearValue = 0,
 		uint32_t mipmap = 0, uint32_t slice = 0,
 		bool readOnlyDepth = false, bool readOnlyStencil = false

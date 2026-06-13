@@ -476,7 +476,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_scissorDirty)
 	{
-		const CrRectangle& scissor = m_currentState.m_scissor;
+		const crgfx::Rectangle& scissor = m_currentState.m_scissor;
 		D3D12_RECT d3d12Rect = { (LONG)scissor.x, (LONG)scissor.y, (LONG)(scissor.x + scissor.width), (LONG)(scissor.y + scissor.height) };
 		m_d3d12GraphicsCommandList->RSSetScissorRects(1, &d3d12Rect);
 		m_currentState.m_scissorDirty = false;
@@ -484,7 +484,7 @@ void CrCommandBufferD3D12::FlushGraphicsRenderStatePS()
 
 	if (m_currentState.m_viewportDirty)
 	{
-		const CrViewport& viewport = m_currentState.m_viewport;
+		const crgfx::Viewport& viewport = m_currentState.m_viewport;
 
 		D3D12_VIEWPORT d3d12Viewport =
 		{

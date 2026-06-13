@@ -97,7 +97,7 @@ private:
 
 	virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
 
-	virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
+	virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
 
 	virtual void ResetFencePS(const ICrGPUFence* fence) override;
 

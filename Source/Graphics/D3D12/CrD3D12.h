@@ -4,7 +4,10 @@
 
 #include "Graphics/CrRenderingForwardDeclarations.h"
 
-namespace CrCommandQueueType { enum T : uint32_t; }
+namespace crgfx
+{
+	namespace CommandQueueType { enum T : uint32_t; }
+}
 
 namespace crd3d
 {
@@ -44,11 +47,11 @@ namespace crd3d
 
 	D3D12_CULL_MODE GetD3D12PolygonCullMode(crgfx::PolygonCullMode cullMode);
 
-	D3D12_COMMAND_LIST_TYPE GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType);
+	D3D12_COMMAND_LIST_TYPE GetD3D12CommandQueueType(crgfx::CommandQueueType::T commandQueueType);
 
-	D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE GetD3D12BeginningAccessType(CrRenderTargetLoadOp loadOp);
+	D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE GetD3D12BeginningAccessType(crgfx::RenderTargetLoadOp loadOp);
 
-	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp);
+	D3D12_RENDER_PASS_ENDING_ACCESS_TYPE GetD3D12EndingAccessType(crgfx::RenderTargetStoreOp storeOp);
 
 	TextureBarrierInfoD3D12 GetD3D12TextureBarrierInfo(const crgfx::TextureState& textureState);
 

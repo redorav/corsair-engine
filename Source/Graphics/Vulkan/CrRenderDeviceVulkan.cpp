@@ -160,11 +160,11 @@ crgfx::GPUFenceResult CrRenderDeviceVulkan::GetFenceStatusPS(const ICrGPUFence* 
 	}
 }
 
-void CrRenderDeviceVulkan::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* fence)
+void CrRenderDeviceVulkan::SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* fence)
 {
 	CrAssert(fence != nullptr);
 
-	if (queueType == CrCommandQueueType::Graphics)
+	if (queueType == crgfx::CommandQueueType::Graphics)
 	{
 		VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
 		CrAssert(result == VK_SUCCESS);

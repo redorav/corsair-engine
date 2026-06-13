@@ -85,7 +85,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	static_assert(sizeof(ImDrawVert) == sizeof(UIVertex), "ImGui vertex declaration doesn't match");
 
-	crgfx::CrRenderDeviceHandle renderDevice = crgfx::GetRenderDevice();
+	crgfx::DeviceHandle renderDevice = crgfx::GetDevice();
 
 	// Pipeline description:
 	{
@@ -238,7 +238,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 			commandBuffer->BindIndexBuffer(indexBuffer);
 			commandBuffer->BindVertexBuffer(vertexBuffer, 0);
 			commandBuffer->BindSampler(Samplers::UISampleState, RenderingResources->AllLinearClampSampler.get());
-			commandBuffer->SetViewport(CrViewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
+			commandBuffer->SetViewport(crgfx::Viewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 
 			// Projection matrix. TODO: this could be cached.
 			CrGPUBufferViewT<UIDataCB> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIDataCB>();
@@ -269,7 +269,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 						// Generic rendering.
 						ICrTexture* texture = (ICrTexture*)imDrawCmd->TextureId;
 						commandBuffer->BindTexture(Textures::UITexture, texture);
-						commandBuffer->SetScissor(CrRectangle(x, y, width, height));
+						commandBuffer->SetScissor(crgfx::Rectangle(x, y, width, height));
 						commandBuffer->DrawIndexed(imDrawCmd->ElemCount, 1, imDrawCmd->IdxOffset + totalIndexOffset, imDrawCmd->VtxOffset + totalVertexOffset, 0);
 					}
 					else

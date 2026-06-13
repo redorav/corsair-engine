@@ -384,43 +384,43 @@ D3D12_CULL_MODE crd3d::GetD3D12PolygonCullMode(crgfx::PolygonCullMode cullMode)
 	}
 }
 
-D3D12_COMMAND_LIST_TYPE crd3d::GetD3D12CommandQueueType(CrCommandQueueType::T commandQueueType)
+D3D12_COMMAND_LIST_TYPE crd3d::GetD3D12CommandQueueType(crgfx::CommandQueueType::T commandQueueType)
 {
 	switch (commandQueueType)
 	{
-		case CrCommandQueueType::Graphics:
+		case crgfx::CommandQueueType::Graphics:
 			return D3D12_COMMAND_LIST_TYPE_DIRECT;
-		case CrCommandQueueType::Compute:
+		case crgfx::CommandQueueType::Compute:
 			return D3D12_COMMAND_LIST_TYPE_COMPUTE;
-		case CrCommandQueueType::Copy:
+		case crgfx::CommandQueueType::Copy:
 			return D3D12_COMMAND_LIST_TYPE_COPY;
 		default:
 			return D3D12_COMMAND_LIST_TYPE_DIRECT;
 	}
 }
 
-D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE crd3d::GetD3D12BeginningAccessType(CrRenderTargetLoadOp loadOp)
+D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE crd3d::GetD3D12BeginningAccessType(crgfx::RenderTargetLoadOp loadOp)
 {
 	switch (loadOp)
 	{
-		case CrRenderTargetLoadOp::Clear:
+		case crgfx::RenderTargetLoadOp::Clear:
 			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
-		case CrRenderTargetLoadOp::DontCare:
+		case crgfx::RenderTargetLoadOp::DontCare:
 			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_DISCARD;
-		case CrRenderTargetLoadOp::Load:
+		case crgfx::RenderTargetLoadOp::Load:
 			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_PRESERVE;
 		default:
 			return D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_NO_ACCESS;
 	}
 }
 
-D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(CrRenderTargetStoreOp storeOp)
+D3D12_RENDER_PASS_ENDING_ACCESS_TYPE crd3d::GetD3D12EndingAccessType(crgfx::RenderTargetStoreOp storeOp)
 {
 	switch (storeOp)
 	{
-		case CrRenderTargetStoreOp::DontCare:
+		case crgfx::RenderTargetStoreOp::DontCare:
 			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_DISCARD;
-		case CrRenderTargetStoreOp::Store:
+		case crgfx::RenderTargetStoreOp::Store:
 			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
 		default:
 			return D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_NO_ACCESS;

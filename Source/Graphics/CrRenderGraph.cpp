@@ -94,8 +94,8 @@ void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* text
 void CrRenderGraph::BindRenderTarget
 (
 	ICrTexture* texture,
-	CrRenderTargetLoadOp loadOp,
-	CrRenderTargetStoreOp storeOp,
+	crgfx::RenderTargetLoadOp loadOp,
+	crgfx::RenderTargetStoreOp storeOp,
 	float4 clearColor,
 	uint32_t mipmap, uint32_t slice
 )
@@ -124,11 +124,11 @@ void CrRenderGraph::BindRenderTarget
 void CrRenderGraph::BindDepthStencilTarget
 (
 	ICrTexture* texture,
-	CrRenderTargetLoadOp loadOp,
-	CrRenderTargetStoreOp storeOp,
+	crgfx::RenderTargetLoadOp loadOp,
+	crgfx::RenderTargetStoreOp storeOp,
 	float depthClearValue,
-	CrRenderTargetLoadOp stencilLoadOp,
-	CrRenderTargetStoreOp stencilStoreOp,
+	crgfx::RenderTargetLoadOp stencilLoadOp,
+	crgfx::RenderTargetStoreOp stencilStoreOp,
 	uint8_t stencilClearValue,
 	uint32_t mipmap, uint32_t slice,
 	bool readOnlyDepth, bool readOnlyStencil
@@ -157,8 +157,8 @@ void CrRenderGraph::BindDepthStencilTarget
 	textureUsage.subresourceId = GetSubresourceId(subresourceHash);
 
 	// If we don't care about either the inputs or the outputs, we can conclude that nothing meaningful is going to be written to it
-	bool writeDepth = loadOp == CrRenderTargetLoadOp::Clear || storeOp != CrRenderTargetStoreOp::DontCare;
-	bool writeStencil = stencilLoadOp == CrRenderTargetLoadOp::Clear || stencilStoreOp != CrRenderTargetStoreOp::DontCare;
+	bool writeDepth = loadOp == crgfx::RenderTargetLoadOp::Clear || storeOp != crgfx::RenderTargetStoreOp::DontCare;
+	bool writeStencil = stencilLoadOp == crgfx::RenderTargetLoadOp::Clear || stencilStoreOp != crgfx::RenderTargetStoreOp::DontCare;
 
 	CrAssertMsg(!(writeDepth && readOnlyDepth), "Cannot read and write to depth simultaneously");
 	CrAssertMsg(!(writeStencil && readOnlyStencil), "Cannot read and write to stencil simultaneously");
@@ -168,8 +168,8 @@ void CrRenderGraph::BindDepthStencilTarget
 	// We can still prevent reading if we detect that 
 
 	// If we're not loading or clearing the depth or stencil, we know we won't test it
-	bool readDepth = loadOp != CrRenderTargetLoadOp::DontCare;
-	bool readStencil = stencilLoadOp != CrRenderTargetLoadOp::DontCare;
+	bool readDepth = loadOp != crgfx::RenderTargetLoadOp::DontCare;
+	bool readStencil = stencilLoadOp != crgfx::RenderTargetLoadOp::DontCare;
 
 	crgfx::TextureLayout::T layout = crgfx::TextureLayout::Count;
 

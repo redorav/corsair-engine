@@ -21,10 +21,10 @@ struct CrRenderTargetDescriptor
 		, clearColor(0.0f)
 		, depthClearValue(0.0f)
 		, stencilClearValue(0)
-		, loadOp(CrRenderTargetLoadOp::Load)
-		, storeOp(CrRenderTargetStoreOp::Store)
-		, stencilLoadOp(CrRenderTargetLoadOp::DontCare)
-		, stencilStoreOp(CrRenderTargetStoreOp::DontCare)
+		, loadOp(crgfx::RenderTargetLoadOp::Load)
+		, storeOp(crgfx::RenderTargetStoreOp::Store)
+		, stencilLoadOp(crgfx::RenderTargetLoadOp::DontCare)
+		, stencilStoreOp(crgfx::RenderTargetStoreOp::DontCare)
 	{}
 
 	const ICrTexture* texture;
@@ -35,10 +35,10 @@ struct CrRenderTargetDescriptor
 	float depthClearValue;
 	uint8_t stencilClearValue;
 
-	CrRenderTargetLoadOp loadOp;
-	CrRenderTargetStoreOp storeOp;
-	CrRenderTargetLoadOp stencilLoadOp;
-	CrRenderTargetStoreOp stencilStoreOp;
+	crgfx::RenderTargetLoadOp loadOp;
+	crgfx::RenderTargetStoreOp storeOp;
+	crgfx::RenderTargetLoadOp stencilLoadOp;
+	crgfx::RenderTargetStoreOp stencilStoreOp;
 	crgfx::TextureState initialState;
 	crgfx::TextureState usageState;
 	crgfx::TextureState finalState;

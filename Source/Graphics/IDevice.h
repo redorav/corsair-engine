@@ -13,60 +13,61 @@
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
 
-struct CrDriverVersion
+namespace crgfx
 {
-	CrDriverVersion() = default;
-
-	uint32_t major = 0;
-
-	uint32_t minor = 0;
-
-	uint32_t patch = 0;
-};
-
-struct CrRenderDeviceProperties
-{
-	// We can choose to search for a vendor. If we don't have it, we choose the best available one
-	crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
-
-	// Actual vendor we selected
-	crgfx::GraphicsVendor::T vendor = crgfx::GraphicsVendor::Unknown;
-
-	// Graphics API
-	crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
-
-	// Just for display
-	crstl::fixed_string32 graphicsApiDisplay;
-
-	// Version of the driver
-	CrDriverVersion driverVersion;
-
-	bool isUMA = false; // Whether a unified memory architecture is used here
-
-	crstl::fixed_string128 description;
-
-	uint32_t maxConstantBufferRange = 0;
-	uint32_t maxTextureDimension1D = 0;
-	uint32_t maxTextureDimension2D = 0;
-	uint32_t maxTextureDimension3D = 0;
-
-	uint64_t gpuMemoryBytes = 0;
-
-	struct features
+	struct DriverVersion
 	{
-		bool raytracing = false;
-		bool geometryShaders = false;
-		bool tessellation = false;
-		bool meshShaders = false;
-		bool compressionBC = false;
-		bool compressionETC = false;
-		bool compressionASTC = false;
-		bool conservativeRasterization = false;
-		bool textureFormatCasting = false;
-	} features;
-};
+		DriverVersion() = default;
 
-namespace CrCommandQueueType { enum T : uint32_t; }
+		uint32_t major = 0;
+
+		uint32_t minor = 0;
+
+		uint32_t patch = 0;
+	};
+
+	struct DeviceProperties
+	{
+		// We can choose to search for a vendor. If we don't have it, we choose the best available one
+		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
+
+		// Actual vendor we selected
+		crgfx::GraphicsVendor::T vendor = crgfx::GraphicsVendor::Unknown;
+
+		// Graphics API
+		crgfx::GraphicsApi::T graphicsApi = crgfx::GraphicsApi::Count;
+
+		// Just for display
+		crstl::fixed_string32 graphicsApiDisplay;
+
+		// Version of the driver
+		crgfx::DriverVersion driverVersion;
+
+		bool isUMA = false; // Whether a unified memory architecture is used here
+
+		crstl::fixed_string128 description;
+
+		uint32_t maxConstantBufferRange = 0;
+		uint32_t maxTextureDimension1D = 0;
+		uint32_t maxTextureDimension2D = 0;
+		uint32_t maxTextureDimension3D = 0;
+
+		uint64_t gpuMemoryBytes = 0;
+
+		struct features
+		{
+			bool raytracing = false;
+			bool geometryShaders = false;
+			bool tessellation = false;
+			bool meshShaders = false;
+			bool compressionBC = false;
+			bool compressionETC = false;
+			bool compressionASTC = false;
+			bool conservativeRasterization = false;
+			bool textureFormatCasting = false;
+		} features;
+	};
+};
 
 // Texture uploads encapsulate the idea that platforms have
 // an optimal texture format but for some (PC mainly) we can
@@ -173,7 +174,7 @@ namespace crgfx
 
 		crgfx::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
 
-		void SignalFence(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence);
+		void SignalFence(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence);
 
 		void ResetFence(ICrGPUFence* fence);
 
@@ -198,7 +199,7 @@ namespace crgfx
 		// Properties and feature support
 		//-------------------------------
 
-		const CrRenderDeviceProperties& GetProperties() const;
+		const DeviceProperties& GetProperties() const;
 
 		bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
 
@@ -242,7 +243,7 @@ namespace crgfx
 
 		virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
 
-		virtual void SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
+		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
 
 		virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
 
@@ -276,7 +277,7 @@ namespace crgfx
 
 		crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
 
-		CrRenderDeviceProperties m_renderDeviceProperties;
+		DeviceProperties m_renderDeviceProperties;
 
 		// Texture uploads that have started but haven't been committed yet
 		crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;

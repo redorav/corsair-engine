@@ -99,7 +99,7 @@ void CrGPUDeletionQueue::Process()
 		}
 
 		m_activeDeletionLists.push_back(m_currentDeletionList);
-		m_renderDevice->SignalFence(CrCommandQueueType::Graphics, m_currentDeletionList->fence.get());
+		m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentDeletionList->fence.get());
 		m_currentDeletionList = nullptr;
 	}
 
@@ -130,7 +130,7 @@ void CrGPUDeletionQueue::Finalize()
 
 	// Push current list to the main queue and signal it. These are the last remaining resources in flight
 	m_activeDeletionLists.push_back(m_currentDeletionList);
-	m_renderDevice->SignalFence(CrCommandQueueType::Graphics, m_currentDeletionList->fence.get());
+	m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentDeletionList->fence.get());
 
 	// Clear the rest of the resources that have been added to the lists, and wait for them
 	// instead of just checking whether the fence has been signaled at this point. There is

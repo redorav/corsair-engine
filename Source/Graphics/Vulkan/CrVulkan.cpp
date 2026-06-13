@@ -580,28 +580,28 @@ VkDescriptorType crvk::GetVkDescriptorType(crgfx::ShaderResourceType::T resource
 	//VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT = 10,
 }
 
-VkAttachmentLoadOp crvk::GetVkAttachmentLoadOp(CrRenderTargetLoadOp loadOp)
+VkAttachmentLoadOp crvk::GetVkAttachmentLoadOp(crgfx::RenderTargetLoadOp loadOp)
 {
 	switch (loadOp)
 	{
-		case CrRenderTargetLoadOp::Clear:
+		case crgfx::RenderTargetLoadOp::Clear:
 			return VK_ATTACHMENT_LOAD_OP_CLEAR;
-		case CrRenderTargetLoadOp::DontCare:
+		case crgfx::RenderTargetLoadOp::DontCare:
 			return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		case CrRenderTargetLoadOp::Load:
+		case crgfx::RenderTargetLoadOp::Load:
 			return VK_ATTACHMENT_LOAD_OP_LOAD;
 		default:
 			return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
 	}
 }
 
-VkAttachmentStoreOp crvk::GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp)
+VkAttachmentStoreOp crvk::GetVkAttachmentStoreOp(crgfx::RenderTargetStoreOp storeOp)
 {
 	switch (storeOp)
 	{
-		case CrRenderTargetStoreOp::DontCare:
+		case crgfx::RenderTargetStoreOp::DontCare:
 			return VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		case CrRenderTargetStoreOp::Store:
+		case crgfx::RenderTargetStoreOp::Store:
 			return VK_ATTACHMENT_STORE_OP_STORE;
 		default:
 			return VK_ATTACHMENT_STORE_OP_MAX_ENUM;

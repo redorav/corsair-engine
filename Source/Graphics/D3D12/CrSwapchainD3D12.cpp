@@ -82,7 +82,7 @@ CrSwapchainD3D12::~CrSwapchainD3D12()
 
 CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(crgfx::GetRenderDevice().get());
+	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(crgfx::GetDevice().get());
 	ID3D12CommandQueue* commandQueue = d3d12RenderDevice->GetD3D12GraphicsCommandQueue();
 
 	// Signal the fence

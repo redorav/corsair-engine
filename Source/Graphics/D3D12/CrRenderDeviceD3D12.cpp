@@ -497,13 +497,13 @@ crgfx::GPUFenceResult CrRenderDeviceD3D12::GetFenceStatusPS(const ICrGPUFence* f
 	}
 }
 
-void CrRenderDeviceD3D12::SignalFencePS(CrCommandQueueType::T queueType, const ICrGPUFence* fence)
+void CrRenderDeviceD3D12::SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* fence)
 {
 	const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
 
 	// To signal a fence, we set its value to 1. Note that we're using fences like Vulkan
 	// uses fences, there are no values
-	if (queueType == CrCommandQueueType::Graphics)
+	if (queueType == crgfx::CommandQueueType::Graphics)
 	{
 		m_d3d12GraphicsCommandQueue->Signal(d3dFence->GetD3D12Fence(), 1);
 	}
@@ -529,7 +529,7 @@ void CrRenderDeviceD3D12::WaitIdlePS()
 	ResetFence(m_waitIdleFence.get());
 
 	// Signal a fence and immediately wait for it
-	SignalFence(CrCommandQueueType::Graphics, m_waitIdleFence.get());
+	SignalFence(crgfx::CommandQueueType::Graphics, m_waitIdleFence.get());
 
 	WaitForFence(m_waitIdleFence.get(), UINT64_MAX);
 }
@@ -765,5 +765,5 @@ void CrRenderDeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandB
 	m_d3d12GraphicsCommandQueue->ExecuteCommandLists(1, &d3d12CommandList);
 
 	// Signal fence so we can wait for it on next use
-	SignalFencePS(CrCommandQueueType::Graphics, signalFence);
+	SignalFencePS(crgfx::CommandQueueType::Graphics, signalFence);
 }

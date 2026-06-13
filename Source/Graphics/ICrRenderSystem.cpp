@@ -96,7 +96,7 @@ void crgfx::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 	RenderSystem->CreateMainDevice(descriptor);
 }
 
-const crgfx::CrRenderDeviceHandle& crgfx::GetRenderDevice()
+const crgfx::DeviceHandle& crgfx::GetDevice()
 {
 	return RenderSystem->GetRenderDevice();
 }
@@ -126,14 +126,14 @@ void ICrRenderSystem::InitializeRenderdoc()
 	m_renderDoc.Initialize(m_descriptor);
 }
 
-const crgfx::CrRenderDeviceHandle& ICrRenderSystem::GetRenderDevice() const
+const crgfx::DeviceHandle& ICrRenderSystem::GetRenderDevice() const
 {
 	return m_mainDevice;
 }
 
 void ICrRenderSystem::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 {
-	m_mainDevice = crgfx::CrRenderDeviceHandle(CreateRenderDevicePS(descriptor));
+	m_mainDevice = crgfx::DeviceHandle(CreateRenderDevicePS(descriptor));
 
 	m_mainDevice->Initialize();
 }

@@ -75,9 +75,9 @@ namespace crvk
 
 	VkDescriptorType GetVkDescriptorType(crgfx::ShaderResourceType::T resourceType);
 
-	VkAttachmentLoadOp GetVkAttachmentLoadOp(CrRenderTargetLoadOp loadOp);
+	VkAttachmentLoadOp GetVkAttachmentLoadOp(crgfx::RenderTargetLoadOp loadOp);
 
-	VkAttachmentStoreOp GetVkAttachmentStoreOp(CrRenderTargetStoreOp storeOp);
+	VkAttachmentStoreOp GetVkAttachmentStoreOp(crgfx::RenderTargetStoreOp storeOp);
 
 	VkPipelineStageFlags GetVkPipelineStageFlagsFromShaderStages(crgfx::ShaderStageFlags::T shaderStages);
 

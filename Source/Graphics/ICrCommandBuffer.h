@@ -30,7 +30,7 @@
 
 struct CrCommandBufferDescriptor
 {
-	CrCommandQueueType::T queueType = CrCommandQueueType::Graphics;
+	crgfx::CommandQueueType::T queueType = crgfx::CommandQueueType::Graphics;
 
 	crstl::fixed_string64 name;
 
@@ -117,9 +117,9 @@ public:
 
 	void Submit();
 
-	void SetViewport(const CrViewport& viewport);
+	void SetViewport(const crgfx::Viewport& viewport);
 
-	void SetScissor(const CrRectangle& scissor);
+	void SetScissor(const crgfx::Rectangle& scissor);
 
 	void SetStencilRef(uint32_t stencilRef);
 
@@ -299,16 +299,16 @@ protected:
 		const ICrHardwareGPUBuffer*     m_indexBuffer;
 		uint32_t                        m_indexBufferOffset;
 		uint32_t                        m_indexBufferSize;
-		crgfx::DataFormat::T             m_indexBufferFormat;
+		crgfx::DataFormat::T            m_indexBufferFormat;
 		bool                            m_indexBufferDirty = false;
 
 		CrVertexBufferBinding           m_vertexBuffers[crgfx::MaxVertexStreams];
 		bool                            m_vertexBufferDirty = false;
 
-		CrRectangle                     m_scissor;
+		crgfx::Rectangle                m_scissor;
 		bool                            m_scissorDirty = true;
 
-		CrViewport                      m_viewport;
+		crgfx::Viewport                 m_viewport;
 		bool                            m_viewportDirty = true;
 
 		const ICrGraphicsPipeline*      m_graphicsPipeline;
@@ -339,7 +339,7 @@ protected:
 		bool                            m_renderPassActive;
 	};
 
-	CurrentState					m_currentState;
+	CurrentState m_currentState;
 
 	crstl::unique_ptr<CrGPUStackAllocator> m_bufferGPUStack;
 
@@ -348,17 +348,17 @@ protected:
 	crstl::unique_ptr<CrGPUStackAllocator> m_indexBufferGPUStack;
 
 	// Signal fence when execution completes
-	CrGPUFenceHandle			m_completionFence;
+	CrGPUFenceHandle             m_completionFence;
 
-	CrCommandQueueType::T			m_queueType;
+	crgfx::CommandQueueType::T   m_queueType;
 
-	bool							m_submitted;
+	bool                         m_submitted;
 
 	// If this command buffer is recording commands. We cannot begin a command list twice
-	bool							m_recording;
+	bool                         m_recording;
 };
 
-inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
+inline void ICrCommandBuffer::SetViewport(const crgfx::Viewport& viewport)
 {
 	if (m_currentState.m_viewport != viewport)
 	{
@@ -367,7 +367,7 @@ inline void ICrCommandBuffer::SetViewport(const CrViewport& viewport)
 	}
 }
 
-inline void ICrCommandBuffer::SetScissor(const CrRectangle& scissor)
+inline void ICrCommandBuffer::SetScissor(const crgfx::Rectangle& scissor)
 {
 	if (m_currentState.m_scissor != scissor)
 	{

@@ -567,94 +567,97 @@ namespace crgfx
 		uint32_t offsetBytes;          // Where this mipmap begins
 		uint32_t heightInPixelsBlocks; // Height in pixels or blocks if compressed
 	};
-}
 
-struct CrViewport
-{
-	CrViewport() : x(0.0f), y(0.0f), width(1.0f), height(1.0f), minDepth(0.0f), maxDepth(1.0f) {}
-
-	CrViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
-		: x(x), y(y), width(width), height(height), minDepth(minDepth), maxDepth(maxDepth)
-	{}
-
-	explicit CrViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height, float minDepth, float maxDepth)
-		: x((float)x), y((float)y), width((float)width), height((float)height), minDepth(minDepth), maxDepth(maxDepth)
-	{}
-
-	CrViewport(float x, float y, float width, float height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
-	{}
-
-	explicit CrViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : CrViewport(x, y, width, height, 0.0f, 1.0f)
-	{}
-
-	bool operator == (const CrViewport& viewport)
+	struct Viewport
 	{
-		return x == viewport.x && y == viewport.y && width == viewport.width && height == viewport.height;
-	}
+		Viewport() : x(0.0f), y(0.0f), width(1.0f), height(1.0f), minDepth(0.0f), maxDepth(1.0f) {}
 
-	bool operator != (const CrViewport& viewport)
-	{
-		return !(*this == viewport);
-	}
+		Viewport(float x, float y, float width, float height, float minDepth, float maxDepth)
+			: x(x), y(y), width(width), height(height), minDepth(minDepth), maxDepth(maxDepth)
+		{
+		}
 
-	float x;
-	float y;
-	float width;
-	float height;
-	float minDepth;
-	float maxDepth;
-};
+		explicit Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height, float minDepth, float maxDepth)
+			: x((float)x), y((float)y), width((float)width), height((float)height), minDepth(minDepth), maxDepth(maxDepth)
+		{
+		}
 
-struct CrRectangle
-{
-	CrRectangle() {}
+		Viewport(float x, float y, float width, float height) : Viewport(x, y, width, height, 0.0f, 1.0f)
+		{
+		}
 
-	CrRectangle(int32_t x, int32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
+		explicit Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : Viewport(x, y, width, height, 0.0f, 1.0f)
+		{
+		}
 
-	bool operator == (const CrRectangle& rect)
-	{
-		return x == rect.x && y == rect.y && width == rect.width && height == rect.height;
-	}
+		bool operator == (const Viewport& viewport)
+		{
+			return x == viewport.x && y == viewport.y && width == viewport.width && height == viewport.height;
+		}
 
-	bool operator != (const CrRectangle& rect)
-	{
-		return !(*this == rect);
-	}
+		bool operator != (const Viewport& viewport)
+		{
+			return !(*this == viewport);
+		}
 
-	int32_t x = 0;
-	int32_t y = 0;
-	uint32_t width = 0;
-	uint32_t height = 0;
-};
-
-// todo put in cr3d
-enum class CrRenderTargetLoadOp : uint32_t
-{
-	Load, Clear, DontCare
-};
-
-enum class CrRenderTargetStoreOp : uint32_t
-{
-	Store, DontCare
-};
-
-namespace CrCommandQueueType
-{
-	// Queues are each a subset of the other
-	//  ______________
-	// |   Graphics   |
-	// |  __________  |
-	// | |  Compute | |
-	// | |  ______  | |
-	// | | | Copy | | |
-	// | | |______| | |
-	// | |__________| |
-	// |______________|
-
-	enum T : uint32_t
-	{
-		Graphics,
-		Compute,
-		Copy
+		float x;
+		float y;
+		float width;
+		float height;
+		float minDepth;
+		float maxDepth;
 	};
-};
+
+	struct Rectangle
+	{
+		Rectangle() {}
+
+		Rectangle(int32_t x, int32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
+
+		bool operator == (const Rectangle& rect)
+		{
+			return x == rect.x && y == rect.y && width == rect.width && height == rect.height;
+		}
+
+		bool operator != (const Rectangle& rect)
+		{
+			return !(*this == rect);
+		}
+
+		int32_t x = 0;
+		int32_t y = 0;
+		uint32_t width = 0;
+		uint32_t height = 0;
+	};
+
+	enum class RenderTargetLoadOp : uint32_t
+	{
+		Load, Clear, DontCare
+	};
+
+	enum class RenderTargetStoreOp : uint32_t
+	{
+		Store, DontCare
+	};
+
+	namespace CommandQueueType
+	{
+		// Queues are each a subset of the other
+		//  ______________
+		// |   Graphics   |
+		// |  __________  |
+		// | |  Compute | |
+		// | |  ______  | |
+		// | | | Copy | | |
+		// | | |______| | |
+		// | |__________| |
+		// |______________|
+
+		enum T : uint32_t
+		{
+			Graphics,
+			Compute,
+			Copy
+		};
+	};
+}

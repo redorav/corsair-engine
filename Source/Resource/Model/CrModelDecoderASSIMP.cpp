@@ -120,7 +120,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 	aiColor4D materialColor(1.0f, 1.0f, 1.0f, 1.0f);
 	aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &materialColor);
 
-	const crgfx::CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
+	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
 
 	CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
 	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
@@ -268,7 +268,7 @@ CrMaterialHandle CrModelDecoderASSIMP::LoadMaterial(const aiMaterial* aiMaterial
 			textureParams.mipmapCount = image->m_mipmapCount;
 			textureParams.usage = crgfx::TextureUsage::Default;
 
-			CrTextureHandle texture = crgfx::GetRenderDevice()->CreateTexture(textureParams);
+			CrTextureHandle texture = crgfx::GetDevice()->CreateTexture(textureParams);
 
 			if (!texture)
 			{

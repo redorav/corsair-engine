@@ -1,5 +1,5 @@
 #include "Graphics/ICrRenderSystem.h"
-#include "Graphics/ICrRenderDevice.h"
+#include "Graphics/IDevice.h"
 #include "Graphics/CrRenderingResources.h"
 #include "Graphics/CrShaderSources.h"
 #include "Graphics/CrShaderManager.h"
@@ -83,16 +83,16 @@ int main(int argc, char* argv[])
 	graphicsDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	crgfx::CreateMainDevice(graphicsDeviceDescriptor);
 
-	const crgfx::CrRenderDeviceHandle& renderDevice = crgfx::GetRenderDevice();
+	const crgfx::DeviceHandle& device = crgfx::GetDevice();
 
 	CrPrintProcessMemory("After Render Device");
 
 	CrInputManager::Initialize();
 	CrShaderSources::Initialize();
-	CrShaderManager::Initialize(renderDevice.get());
+	CrShaderManager::Initialize(device.get());
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
-	CrRenderingResources::Initialize(renderDevice.get());
+	CrRenderingResources::Initialize(device.get());
 	CrOSWindow::Initialize();
 
 	CrOSWindowDescriptor osWindowDescriptor;

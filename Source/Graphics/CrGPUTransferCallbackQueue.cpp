@@ -76,7 +76,7 @@ void CrGPUTransferCallbackQueue::Process()
 	if (!m_currentCallbackList->callbacks.empty())
 	{
 		m_activeCallbackLists.push_back(m_currentCallbackList);
-		m_renderDevice->SignalFence(CrCommandQueueType::Graphics, m_currentCallbackList->fence.get());
+		m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentCallbackList->fence.get());
 		m_currentCallbackList = nullptr;
 	}
 

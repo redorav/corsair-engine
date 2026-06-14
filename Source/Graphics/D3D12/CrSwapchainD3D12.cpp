@@ -39,7 +39,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(crgfx::IDevice* renderDevice, const CrSwapcha
 
 	IDXGISwapChain1* swapchain;
 
-	HRESULT hResult = static_cast<const CrRenderSystemD3D12*>(RenderSystem.get())->GetDXGIFactory4()->CreateSwapChainForHwnd
+	HRESULT hResult = static_cast<const CrRenderSystemD3D12*>(GraphicsSystem.get())->GetDXGIFactory4()->CreateSwapChainForHwnd
 	(
 		d3d12RenderDevice->GetD3D12GraphicsCommandQueue(),
 		(HWND)swapchainDescriptor.window->GetNativeWindowHandle(),

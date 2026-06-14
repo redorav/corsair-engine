@@ -46,7 +46,7 @@ const char* GetD3DFeatureLevelString(D3D_FEATURE_LEVEL featureLevel)
 	}
 }
 
-CrRenderDeviceD3D12::CrRenderDeviceD3D12(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
+CrRenderDeviceD3D12::CrRenderDeviceD3D12(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
 {
 	CrRenderSystemD3D12* d3d12RenderSystem = static_cast<CrRenderSystemD3D12*>(renderSystem);
 	IDXGIFactory4* dxgiFactory4 = d3d12RenderSystem->GetDXGIFactory4();

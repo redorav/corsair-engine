@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/CrMaterialCompiler.h"
 #include "Graphics/CrMaterial.h"

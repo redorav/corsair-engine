@@ -4,7 +4,7 @@
 #include "CrCommonVertexLayouts.h"
 
 #include "CrRendering.h"
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 
 #include "Math/CrMath.h"

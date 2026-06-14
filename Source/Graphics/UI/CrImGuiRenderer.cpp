@@ -10,7 +10,7 @@
 #include "Graphics/ICrShader.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrTexture.h"
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ICrCommandBuffer.h"
 #include "Graphics/ICrSampler.h"

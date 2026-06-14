@@ -4,7 +4,7 @@
 #include "Graphics/CrRenderMesh.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/ICrPipeline.h"
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 
 uint32_t CrRenderModelDescriptor::AddMaterial(const CrMaterialHandle& material)

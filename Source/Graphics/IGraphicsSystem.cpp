@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "ICrRenderSystem.h"
+#include "IGraphicsSystem.h"
 
 #include "IDevice.h"
 
@@ -21,9 +21,9 @@
 
 #include "crstl/unique_ptr.h"
 
-crstl::unique_ptr<ICrRenderSystem> RenderSystem = nullptr;
+crstl::unique_ptr<IGraphicsSystem> GraphicsSystem = nullptr;
 
-ICrRenderSystem::ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
+IGraphicsSystem::IGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 	: m_descriptor(graphicsSystemDescriptor)
 	, m_nvapiInitialized(false)
 {
@@ -63,14 +63,14 @@ ICrRenderSystem::ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphics
 	}
 }
 
-ICrRenderSystem::~ICrRenderSystem()
+IGraphicsSystem::~IGraphicsSystem()
 {
 
 }
 
 void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 {
-	ICrRenderSystem* renderSystem = nullptr;
+	IGraphicsSystem* renderSystem = nullptr;
 
 	// Treat this like a factory (on PC) through the API. That way the rest of the code
 	// doesn't need to know about platform-specific code, only the render device.
@@ -88,72 +88,72 @@ void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& grap
 	}
 #endif
 
-	RenderSystem = crstl::unique_ptr<ICrRenderSystem>(renderSystem);
+	GraphicsSystem = crstl::unique_ptr<IGraphicsSystem>(renderSystem);
 }
 
 void crgfx::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 {
-	RenderSystem->CreateMainDevice(descriptor);
+	GraphicsSystem->CreateMainDevice(descriptor);
 }
 
 const crgfx::DeviceHandle& crgfx::GetDevice()
 {
-	return RenderSystem->GetRenderDevice();
+	return GraphicsSystem->GetRenderDevice();
 }
 
 const CrShaderBytecodeHandle& crgfx::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
 {
-	return RenderSystem->GetBuiltinShaderBytecode(builtinShader);
+	return GraphicsSystem->GetBuiltinShaderBytecode(builtinShader);
 }
 
 const CrShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
 {
-	return RenderSystem->GetBuiltinComputeBytecode(builtinCompute);
+	return GraphicsSystem->GetBuiltinComputeBytecode(builtinCompute);
 }
 
 crgfx::GraphicsApi::T crgfx::GetGraphicsApi()
 {
-	return RenderSystem->GetGraphicsApi();
+	return GraphicsSystem->GetGraphicsApi();
 }
 
 bool crgfx::GetIsValidationEnabled()
 {
-	return RenderSystem->GetIsValidationEnabled();
+	return GraphicsSystem->GetIsValidationEnabled();
 }
 
-void ICrRenderSystem::InitializeRenderdoc()
+void IGraphicsSystem::InitializeRenderdoc()
 {
 	m_renderDoc.Initialize(m_descriptor);
 }
 
-const crgfx::DeviceHandle& ICrRenderSystem::GetRenderDevice() const
+const crgfx::DeviceHandle& IGraphicsSystem::GetRenderDevice() const
 {
 	return m_mainDevice;
 }
 
-void ICrRenderSystem::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
+void IGraphicsSystem::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 {
 	m_mainDevice = crgfx::DeviceHandle(CreateRenderDevicePS(descriptor));
 
 	m_mainDevice->Initialize();
 }
 
-bool ICrRenderSystem::GetIsValidationEnabled() const
+bool IGraphicsSystem::GetIsValidationEnabled() const
 {
 	return m_descriptor.enableValidation;
 }
 
-crgfx::GraphicsApi::T ICrRenderSystem::GetGraphicsApi() const
+crgfx::GraphicsApi::T IGraphicsSystem::GetGraphicsApi() const
 {
 	return m_descriptor.graphicsApi;
 }
 
-const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
+const CrShaderBytecodeHandle& IGraphicsSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
 {
 	return m_builtinShaderBytecodes[builtinShader];
 }
 
-const CrShaderBytecodeHandle& ICrRenderSystem::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const
+const CrShaderBytecodeHandle& IGraphicsSystem::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const
 {
 	return m_builtinComputeBytecodes[builtinCompute];
 }

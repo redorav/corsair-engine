@@ -81,7 +81,7 @@ struct RWTypedBufferMetadata;
 
 // Forward declare the necessary types for the rendering core
 
-class ICrRenderSystem;
+class IGraphicsSystem;
 
 class ICrTexture;
 using CrTextureHandle = crstl::intrusive_ptr<ICrTexture>;

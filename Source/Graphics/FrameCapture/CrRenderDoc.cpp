@@ -3,7 +3,7 @@
 #include "CrRenderDoc.h"
 #include "renderdoc_app.h"
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/FileSystem/CrFixedPath.h"

@@ -47,13 +47,13 @@ namespace crgfx
 	bool GetIsValidationEnabled();
 };
 
-class ICrRenderSystem
+class IGraphicsSystem
 {
 public:
 
-	ICrRenderSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
+	IGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
 
-	virtual ~ICrRenderSystem();
+	virtual ~IGraphicsSystem();
 
 	// Only the render device calls these functions, as it knows what device we are using
 
@@ -92,4 +92,4 @@ public:
 	virtual crgfx::IDevice* CreateRenderDevicePS(const crgfx::DeviceDescriptor& descriptor) = 0;
 };
 
-extern crstl::unique_ptr<ICrRenderSystem> RenderSystem;
+extern crstl::unique_ptr<IGraphicsSystem> GraphicsSystem;

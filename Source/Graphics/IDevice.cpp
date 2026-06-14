@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "ICrRenderSystem.h"
+#include "IGraphicsSystem.h"
 #include "IDevice.h"
 #include "ICrCommandBuffer.h"
 #include "ICrSwapchain.h"
@@ -27,7 +27,7 @@
 
 namespace crgfx
 {
-	IDevice::IDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
+	IDevice::IDevice(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
 		: m_isValidPipelineCache(false)
 	{
 		m_pipelineCacheDirectory = CrGlobalPaths::GetTempEngineDirectory() + "Pipeline Cache/";

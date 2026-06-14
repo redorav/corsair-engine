@@ -1,4 +1,4 @@
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/CrRenderingResources.h"
 #include "Graphics/CrShaderSources.h"

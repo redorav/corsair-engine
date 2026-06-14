@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/CrBuiltinPipeline.h"
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ICrShader.h"
 #include "Graphics/CrRendererConfig.h"

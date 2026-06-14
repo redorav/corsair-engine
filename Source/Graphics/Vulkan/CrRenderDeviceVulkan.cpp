@@ -30,7 +30,7 @@ struct VkPipelineCacheHeader
 	uint8_t uuid[VK_UUID_SIZE]; // A pipeline cache ID equal to VkPhysicalDeviceProperties::pipelineCacheUUID
 };
 
-CrRenderDeviceVulkan::CrRenderDeviceVulkan(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
+CrRenderDeviceVulkan::CrRenderDeviceVulkan(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
 	, m_numCommandQueues(0)
 {
 	m_vkInstance = static_cast<const CrRenderSystemVulkan*>(renderSystem)->GetVkInstance();

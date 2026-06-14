@@ -2,7 +2,7 @@
 
 #include "Editor/CrEditor.h"
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ICrSwapchain.h"
 #include "Graphics/CrShaderManager.h"

@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 
 #include "CrPipelineD3D12.h"
 #include "CrRenderDeviceD3D12.h"

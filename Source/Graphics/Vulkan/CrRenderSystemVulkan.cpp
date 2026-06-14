@@ -45,7 +45,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL CrVkDebugCallback
 	return VK_FALSE;
 }
 
-CrRenderSystemVulkan::CrRenderSystemVulkan(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor) : ICrRenderSystem(graphicsSystemDescriptor)
+CrRenderSystemVulkan::CrRenderSystemVulkan(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor) : IGraphicsSystem(graphicsSystemDescriptor)
 {
 	if (graphicsSystemDescriptor.enableRenderDoc)
 	{

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 
 #include "crstl/open_hashmap.h"
 #include "crstl/string.h"
 #include "crstl/vector.h"
 
-class CrRenderSystemVulkan final : public ICrRenderSystem
+class CrRenderSystemVulkan final : public IGraphicsSystem
 {
 public:
 

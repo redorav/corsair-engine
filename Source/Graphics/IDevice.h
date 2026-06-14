@@ -106,7 +106,7 @@ namespace crgfx
 	{
 	public:
 
-		IDevice(ICrRenderSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
+		IDevice(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
 
 		virtual ~IDevice();
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Graphics/ICrRenderSystem.h"
+#include "Graphics/IGraphicsSystem.h"
 
-class CrRenderSystemD3D12 final : public ICrRenderSystem
+class CrRenderSystemD3D12 final : public IGraphicsSystem
 {
 public:
 

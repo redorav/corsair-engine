@@ -172,7 +172,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 
-		material->m_shaders[variant] = ShaderManager->GetRenderDevice()->CreateGraphicsShader(shaderDescriptor);
+		material->m_shaders[variant] = ShaderManager->GetDevice()->CreateGraphicsShader(shaderDescriptor);
 	}
 
 	return material;

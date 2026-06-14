@@ -2,7 +2,7 @@
 
 #include "CrCommandBufferD3D12.h"
 #include "CrTextureD3D12.h"
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrAlignment.h"
@@ -13,7 +13,7 @@
 CrTextureD3D12::CrTextureD3D12(crgfx::IDevice* renderDevice, const CrTextureDescriptor& descriptor)
 	: ICrTexture(renderDevice, descriptor)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
 	ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
 	ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
 
@@ -355,7 +355,7 @@ CrTextureD3D12::CrTextureD3D12(crgfx::IDevice* renderDevice, const CrTextureDesc
 
 CrTextureD3D12::~CrTextureD3D12()
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
 
 	if (IsRenderTarget() || IsSwapchain())
 	{
@@ -466,7 +466,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE CrTextureD3D12::CreateShaderResourceView
 		}
 	}
 
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
 	D3D12_CPU_DESCRIPTOR_HANDLE d3d12SRVDescriptorHandle = d3d12RenderDevice->AllocateShaderResourceDescriptor();
 	d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, d3d12SRVDescriptorHandle);
 	return d3d12SRVDescriptorHandle;

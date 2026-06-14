@@ -2,7 +2,7 @@
 
 #include "CrCommandBufferVulkan.h"
 #include "CrTextureVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"
@@ -12,7 +12,7 @@ CrTextureVulkan::CrTextureVulkan(crgfx::IDevice* renderDevice, const CrTextureDe
 	, m_vkImage(nullptr)
 	, m_vkImageViewAllMipsAllSlices(nullptr)
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	VkResult vkResult;
@@ -365,7 +365,7 @@ CrTextureVulkan::CrTextureVulkan(crgfx::IDevice* renderDevice, const CrTextureDe
 
 CrTextureVulkan::~CrTextureVulkan()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 	CrAssert(m_vkImageViewAllMipsAllSlices);

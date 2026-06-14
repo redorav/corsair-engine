@@ -4,7 +4,10 @@
 
 #include "crstl/vector.h"
 
-class CrRenderDeviceD3D12;
+namespace crgfx
+{
+	class DeviceD3D12;
+};
 
 struct CrDescriptorHeapDescriptor
 {
@@ -20,7 +23,7 @@ public:
 
 	static uint32_t GetMaxDescriptorsPerHeap(const CrDescriptorHeapDescriptor& descriptor);
 
-	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetHeapStartCPU() const
 	{
@@ -57,7 +60,7 @@ class CrCPUDescriptorPoolD3D12
 {
 public:
 
-	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE Allocate();
 
@@ -107,7 +110,7 @@ class CrDescriptorStreamD3D12
 {
 public:
 
-	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
 
 	CrDescriptorStreamD3D12();
 

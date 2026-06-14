@@ -2,7 +2,10 @@
 
 #include "Graphics/ICrPipeline.h"
 
-class CrRenderDeviceVulkan;
+namespace crgfx
+{
+	class DeviceVulkan;
+};
 
 class CrGraphicsPipelineVulkan final : public ICrGraphicsPipeline
 {
@@ -10,7 +13,7 @@ public:
 
 	CrGraphicsPipelineVulkan
 	(
-		CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
+		crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
@@ -28,7 +31,7 @@ public:
 
 private:
 
-	void Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	void Deinitialize();
 
@@ -43,7 +46,7 @@ class CrComputePipelineVulkan final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
 
 	~CrComputePipelineVulkan();
 
@@ -59,7 +62,7 @@ public:
 
 private:
 
-	void Initialize(CrRenderDeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
 
 	void Deinitialize();
 

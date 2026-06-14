@@ -1,11 +1,11 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "CrGPUSynchronizationVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 
 CrGPUFenceVulkan::CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
 {
-	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
 	VkFenceCreateInfo vkFenceCreateInfo {};
 	vkFenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -16,12 +16,12 @@ CrGPUFenceVulkan::CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled) 
 
 CrGPUFenceVulkan::~CrGPUFenceVulkan()
 {
-	vkDestroyFence(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkFence, nullptr);
+	vkDestroyFence(static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkFence, nullptr);
 }
 
 CrGPUSemaphoreVulkan::CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
 {
-	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
 	VkSemaphoreCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -31,5 +31,5 @@ CrGPUSemaphoreVulkan::CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice) : ICrGP
 
 CrGPUSemaphoreVulkan::~CrGPUSemaphoreVulkan()
 {
-	vkDestroySemaphore(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSemaphore, nullptr);
+	vkDestroySemaphore(static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSemaphore, nullptr);
 }

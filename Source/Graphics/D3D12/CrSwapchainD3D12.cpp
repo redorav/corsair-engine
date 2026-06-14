@@ -1,9 +1,9 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrRenderSystemD3D12.h"
+#include "GraphicsSystemD3D12.h"
 #include "CrSwapchainD3D12.h"
 #include "CrTextureD3D12.h"
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrGPUSynchronizationD3D12.h"
 #include "CrD3D12.h"
 
@@ -14,7 +14,7 @@
 
 CrSwapchainD3D12::CrSwapchainD3D12(crgfx::IDevice* renderDevice, const CrSwapchainDescriptor& swapchainDescriptor) : ICrSwapchain(renderDevice, swapchainDescriptor)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
 
 	m_d3d12SwapchainFlags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -39,7 +39,7 @@ CrSwapchainD3D12::CrSwapchainD3D12(crgfx::IDevice* renderDevice, const CrSwapcha
 
 	IDXGISwapChain1* swapchain;
 
-	HRESULT hResult = static_cast<const CrRenderSystemD3D12*>(GraphicsSystem.get())->GetDXGIFactory4()->CreateSwapChainForHwnd
+	HRESULT hResult = static_cast<const crgfx::GraphicsSystemD3D12*>(GraphicsSystem.get())->GetDXGIFactory4()->CreateSwapChainForHwnd
 	(
 		d3d12RenderDevice->GetD3D12GraphicsCommandQueue(),
 		(HWND)swapchainDescriptor.window->GetNativeWindowHandle(),
@@ -82,7 +82,7 @@ CrSwapchainD3D12::~CrSwapchainD3D12()
 
 CrSwapchainResult CrSwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(crgfx::GetDevice().get());
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(crgfx::GetDevice().get());
 	ID3D12CommandQueue* commandQueue = d3d12RenderDevice->GetD3D12GraphicsCommandQueue();
 
 	// Signal the fence

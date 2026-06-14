@@ -2,7 +2,7 @@
 
 #include "CrSwapchainVulkan.h"
 #include "CrTextureVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrGPUSynchronizationVulkan.h"
 #include "CrVulkan.h"
 
@@ -18,7 +18,7 @@ CrSwapchainVulkan::CrSwapchainVulkan(crgfx::IDevice* renderDevice, const CrSwapc
 	// The initialization value is important to start at 0 on the first call to present
 	, m_currentSemaphoreIndex((uint32_t)-1)
 {
-	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	crgfx::DeviceVulkan* vulkanDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 
 	VkInstance vkInstance = vulkanDevice->GetVkInstance();
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
@@ -235,8 +235,8 @@ CrSwapchainVulkan::CrSwapchainVulkan(crgfx::IDevice* renderDevice, const CrSwapc
 
 CrSwapchainVulkan::~CrSwapchainVulkan()
 {
-	VkInstance vkInstance = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkInstance();
-	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
+	VkInstance vkInstance = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkInstance();
+	VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	vkDestroySwapchainKHR(vkDevice, m_vkSwapchain, nullptr);
 
@@ -249,7 +249,7 @@ CrSwapchainResult CrSwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseco
 {
 	if (!m_acquired)
 	{
-		VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
+		VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 		m_currentSemaphoreIndex = (m_currentSemaphoreIndex + 1) % m_imageCount;
 
@@ -273,7 +273,7 @@ void CrSwapchainVulkan::PresentPS()
 {
 	CrAssert(m_acquired == true);
 
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 	VkQueue vkQueue = vulkanRenderDevice->GetVkGraphicsQueue();
@@ -303,7 +303,7 @@ void CrSwapchainVulkan::PresentPS()
 
 void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
 {
-	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 	VkPhysicalDevice vkPhysicalDevice = vulkanDevice->GetVkPhysicalDevice();
 
@@ -344,7 +344,7 @@ void CrSwapchainVulkan::ResizePS(uint32_t width, uint32_t height)
 
 void CrSwapchainVulkan::CreateSwapchainTextures()
 {
-	CrRenderDeviceVulkan* vulkanDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	VkDevice vkDevice = vulkanDevice->GetVkDevice();
 
 	crstl::fixed_vector<VkImage, 8> images(m_imageCount);

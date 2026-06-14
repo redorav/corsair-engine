@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrGPUQueryPoolD3D12.h"
 #include "CrGPUBufferD3D12.h"
 
@@ -18,7 +18,7 @@ D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(crgfx::QueryType queryType)
 
 CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
 
 	m_querySize = sizeof(uint64_t);
 

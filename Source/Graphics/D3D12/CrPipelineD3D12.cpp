@@ -3,7 +3,7 @@
 #include "Graphics/IGraphicsSystem.h"
 
 #include "CrPipelineD3D12.h"
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrShaderD3D12.h"
 #include "CrD3D12.h"
 
@@ -11,7 +11,7 @@
 
 CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 (
-	CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
+	crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
 	: ICrGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
@@ -19,7 +19,7 @@ CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 	Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-void CrGraphicsPipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
@@ -209,13 +209,13 @@ void CrGraphicsPipelineD3D12::Deinitialize()
 	m_d3d12PipelineState->Release();
 }
 
-CrComputePipelineD3D12::CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
+CrComputePipelineD3D12::CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(d3d12RenderDevice, computeShader)
 {
 	Initialize(d3d12RenderDevice, computeShader);
 }
 
-void CrComputePipelineD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 	d3d12PipelineStateDescriptor.NodeMask = 0;
@@ -246,13 +246,13 @@ void CrComputePipelineD3D12::Deinitialize()
 void CrGraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
-	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
+	Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
 void CrComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader)
 {
 	Deinitialize();
-	Initialize(static_cast<CrRenderDeviceD3D12*>(renderDevice), computeShader);
+	Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), computeShader);
 }
 
 #endif

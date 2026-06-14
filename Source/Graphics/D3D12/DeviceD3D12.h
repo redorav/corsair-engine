@@ -1,0 +1,226 @@
+#pragma once
+
+#include "Graphics/IDevice.h"
+
+#include "Graphics/ICrGPUSynchronization.h"
+
+#include "CrDescriptorHeapD3D12.h"
+
+#include "d3d12.h"
+
+class CrCommandQueueD3D12;
+class CrTextureD3D12;
+
+namespace crgfx
+{
+	class DeviceD3D12 final : public crgfx::IDevice
+	{
+	public:
+
+		DeviceD3D12(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor);
+
+		~DeviceD3D12();
+
+		IDXGIAdapter1* GetDXGIAdapter() const { return m_dxgiAdapter; }
+
+		ID3D12Device* GetD3D12Device() const { return m_d3d12Device; }
+
+		ID3D12Device10* GetD3D12Device10() const { return m_d3d12Device10; }
+
+		ID3D12CommandQueue* GetD3D12GraphicsCommandQueue() const { return m_d3d12GraphicsCommandQueue; }
+
+		ID3D12RootSignature* GetD3D12GraphicsRootSignature() const { return m_d3d12GraphicsRootSignature; }
+
+		ID3D12RootSignature* GetD3D12ComputeRootSignature() const { return m_d3d12ComputeRootSignature; }
+
+		ID3D12CommandSignature* GetD3D12DrawIndirectCommandSignature() const { return m_d3d12DrawIndirectCommandSignature; }
+
+		ID3D12CommandSignature* GetD3D12DrawIndexedIndirectCommandSignature() const { return m_d3d12DrawIndexedIndirectCommandSignature; }
+
+		ID3D12CommandSignature* GetD3D12DispatchIndirectCommandSignature() const { return m_d3d12DispatchIndirectCommandSignature; }
+
+		D3D12_CPU_DESCRIPTOR_HANDLE AllocateRTVDescriptor();
+
+		void FreeRTVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE AllocateDSVDescriptor();
+
+		void FreeDSVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE AllocateSamplerDescriptor();
+
+		void FreeSamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE AllocateShaderResourceDescriptor();
+
+		void FreeShaderResourceDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+
+		void SetD3D12ObjectName(ID3D12Object* object, const char* name);
+
+		uint64_t GetD3D12TimestampFrequency() const { return m_d3d12TimestampFrequency; }
+
+	private:
+
+		//------------------
+		// Resource Creation
+		//------------------
+
+		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
+
+		virtual ICrGPUFence* CreateGPUFencePS(bool signaled) override;
+
+		virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
+
+		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) override;
+
+		virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) override;
+
+		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
+
+		virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
+
+		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
+
+		virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) override;
+
+		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+
+		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) override;
+
+		virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) override;
+
+		virtual void FinalizeDeletionPS() override;
+
+		//--------------------
+		// GPU Synchronization
+		//--------------------
+
+		virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
+
+		virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
+
+		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
+
+		virtual void ResetFencePS(const ICrGPUFence* fence) override;
+
+		virtual void WaitIdlePS() override;
+
+		//--------------------
+		// Download and Upload
+		//--------------------
+
+		virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) override;
+
+		virtual void EndTextureUploadPS(const ICrTexture* texture) override;
+
+		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
+
+		virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
+
+		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
+
+		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
+
+		// Heap for Render Target Views
+		CrCPUDescriptorPoolD3D12 m_rtvPool;
+
+		// Heap for Depth Stencil Views
+		CrCPUDescriptorPoolD3D12 m_dsvPool;
+
+		// Heap for Samplers
+		CrCPUDescriptorPoolD3D12 m_samplerPool;
+
+		// Heap for SRVs, CBVs, UAVs
+		CrCPUDescriptorPoolD3D12 m_shaderResourcePool;
+
+		CrGPUFenceHandle m_waitIdleFence;
+
+		ID3D12CommandQueue* m_d3d12GraphicsCommandQueue = nullptr;
+
+		ID3D12RootSignature* m_d3d12GraphicsRootSignature = nullptr;
+
+		ID3D12RootSignature* m_d3d12ComputeRootSignature = nullptr;
+
+		ID3D12CommandSignature* m_d3d12DrawIndirectCommandSignature = nullptr;
+
+		ID3D12CommandSignature* m_d3d12DrawIndexedIndirectCommandSignature = nullptr;
+
+		ID3D12CommandSignature* m_d3d12DispatchIndirectCommandSignature = nullptr;
+
+		IDXGIAdapter1* m_dxgiAdapter = nullptr;
+
+		ID3D12Device* m_d3d12Device = nullptr;
+
+		ID3D12Device1* m_d3d12Device1 = nullptr;
+
+		ID3D12Device2* m_d3d12Device2 = nullptr;
+
+		ID3D12Device3* m_d3d12Device3 = nullptr;
+
+		ID3D12Device4* m_d3d12Device4 = nullptr;
+
+		ID3D12Device5* m_d3d12Device5 = nullptr;
+
+		ID3D12Device6* m_d3d12Device6 = nullptr;
+
+		ID3D12Device7* m_d3d12Device7 = nullptr;
+
+		ID3D12Device8* m_d3d12Device8 = nullptr;
+
+		ID3D12Device9* m_d3d12Device9 = nullptr;
+
+		ID3D12Device10* m_d3d12Device10 = nullptr;
+
+		ID3D12Device11* m_d3d12Device11 = nullptr;
+
+		ID3D12Device12* m_d3d12Device12 = nullptr;
+
+		ID3D12Device13* m_d3d12Device13 = nullptr;
+
+		ID3D12Device14* m_d3d12Device14 = nullptr;
+
+		uint64_t m_d3d12TimestampFrequency = 0;
+	};
+
+	inline D3D12_CPU_DESCRIPTOR_HANDLE DeviceD3D12::AllocateRTVDescriptor()
+	{
+		return m_rtvPool.Allocate();
+	}
+
+	inline void DeviceD3D12::FreeRTVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
+	{
+		CrAssertMsg(descriptor.ptr != 0, "Invalid handle being returned to pool");
+		m_rtvPool.Free(descriptor);
+	}
+
+	inline D3D12_CPU_DESCRIPTOR_HANDLE DeviceD3D12::AllocateDSVDescriptor()
+	{
+		return m_dsvPool.Allocate();
+	}
+
+	inline void DeviceD3D12::FreeDSVDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
+	{
+		CrAssertMsg(descriptor.ptr != 0, "Invalid handle being returned to pool");
+		m_dsvPool.Free(descriptor);
+	}
+
+	inline D3D12_CPU_DESCRIPTOR_HANDLE DeviceD3D12::AllocateSamplerDescriptor()
+	{
+		return m_samplerPool.Allocate();
+	}
+
+	inline void DeviceD3D12::FreeSamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
+	{
+		m_samplerPool.Free(descriptor);
+	}
+
+	inline D3D12_CPU_DESCRIPTOR_HANDLE DeviceD3D12::AllocateShaderResourceDescriptor()
+	{
+		return m_shaderResourcePool.Allocate();
+	}
+
+	inline void DeviceD3D12::FreeShaderResourceDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
+	{
+		m_shaderResourcePool.Free(descriptor);
+	}
+};

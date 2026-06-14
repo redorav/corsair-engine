@@ -1,12 +1,12 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "CrGPUBufferVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
+CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
 	: ICrHardwareGPUBuffer(vulkanRenderDevice, descriptor)
 {
 	VkResult vkResult = VK_SUCCESS;
@@ -105,7 +105,7 @@ CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* vulka
 
 CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
 	if (m_vkBufferView)
 	{
@@ -187,7 +187,7 @@ void* CrHardwareGPUBufferVulkan::LockPS()
 {
 	void* data = nullptr;
 
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	VkResult vkResult = vmaMapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation, &data);
 	CrAssert(vkResult == VK_SUCCESS);
 	return data;
@@ -195,7 +195,7 @@ void* CrHardwareGPUBufferVulkan::LockPS()
 
 void CrHardwareGPUBufferVulkan::UnlockPS()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
 }
 

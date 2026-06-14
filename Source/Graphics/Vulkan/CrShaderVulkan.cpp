@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 #include "CrShaderVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "renderdoc_app.h"
@@ -45,7 +45,7 @@ static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, c
 CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
 	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
 {
-	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	m_vkDevice = static_cast<const crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
 	crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
 	CrShaderBindingLayoutResources resources;
@@ -104,7 +104,7 @@ CrGraphicsShaderVulkan::CrGraphicsShaderVulkan(crgfx::IDevice* renderDevice, con
 		}
 	}
 
-	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
+	CreateVkDescriptorSetLayout(static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
 	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
 }
@@ -122,7 +122,7 @@ CrGraphicsShaderVulkan::~CrGraphicsShaderVulkan()
 CrComputeShaderVulkan::CrComputeShaderVulkan(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
 	: ICrComputeShader(renderDevice, computeShaderDescriptor)
 {
-	m_vkDevice = static_cast<const CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice();
+	m_vkDevice = static_cast<const crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
 	const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
 
@@ -153,7 +153,7 @@ CrComputeShaderVulkan::CrComputeShaderVulkan(crgfx::IDevice* renderDevice, const
 		layoutBindings.push_back(layoutBinding);
 	});
 
-	CreateVkDescriptorSetLayout(static_cast<CrRenderDeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
+	CreateVkDescriptorSetLayout(static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
 	// Create the optimized shader resource table
 	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));

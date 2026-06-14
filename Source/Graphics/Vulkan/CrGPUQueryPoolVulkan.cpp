@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrGPUQueryPoolVulkan.h"
 #include "CrGPUBufferVulkan.h"
 
@@ -18,7 +18,7 @@ VkQueryType GetVkQueryType(crgfx::QueryType queryType)
 
 CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 
 	m_querySize = sizeof(uint64_t);
 
@@ -48,7 +48,7 @@ CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const C
 
 CrGPUQueryPoolVulkan::~CrGPUQueryPoolVulkan()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 	vkDestroyQueryPool(vulkanRenderDevice->GetVkDevice(), m_vkQueryPool, nullptr);
 }
 

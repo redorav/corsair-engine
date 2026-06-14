@@ -1,12 +1,12 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "CrGPUBufferD3D12.h"
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
+CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
 	: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 {
 	ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();

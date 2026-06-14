@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 #include "CrSamplerVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrVulkan.h"
 
 #include "Math/CrMath.h"
@@ -8,7 +8,7 @@
 // See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
 CrSamplerVulkan::CrSamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
@@ -50,5 +50,5 @@ CrSamplerVulkan::CrSamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDe
 
 CrSamplerVulkan::~CrSamplerVulkan()
 {
-	vkDestroySampler(static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSampler, nullptr);
+	vkDestroySampler(static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSampler, nullptr);
 }

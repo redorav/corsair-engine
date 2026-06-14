@@ -1,0 +1,39 @@
+#pragma once
+
+#include "Graphics/IGraphicsSystem.h"
+
+namespace crgfx
+{
+	class GraphicsSystemD3D12 final : public IGraphicsSystem
+	{
+	public:
+
+		GraphicsSystemD3D12(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor);
+
+		virtual crgfx::IDevice* CreateDevicePS(const crgfx::DeviceDescriptor& descriptor) override;
+
+		IDXGIFactory4* GetDXGIFactory4() const { return m_dxgiFactory4; }
+
+		IDXGIFactory6* GetDXGIFactory6() const { return m_dxgiFactory6; }
+
+		IDXGIFactory6* GetDXGIFactory7() const { return m_dxgiFactory7; }
+
+		bool InitializeNVAPI();
+
+		bool InitializePIX();
+
+	private:
+
+		ID3D12Debug* m_d3d12DebugController;
+
+		ID3D12Debug1* m_d3d12DebugController1;
+
+		IDXGIFactory4* m_dxgiFactory4 = nullptr;
+
+		IDXGIFactory6* m_dxgiFactory6 = nullptr;
+
+		IDXGIFactory7* m_dxgiFactory7 = nullptr;
+
+		bool m_pixInitialized = false;
+	};
+};

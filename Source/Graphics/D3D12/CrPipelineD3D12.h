@@ -2,7 +2,10 @@
 
 #include "Graphics/ICrPipeline.h"
 
-class CrRenderDeviceD3D12;
+namespace crgfx
+{
+	class DeviceD3D12;
+};
 
 class CrGraphicsPipelineD3D12 final : public ICrGraphicsPipeline
 {
@@ -10,7 +13,7 @@ public:
 
 	CrGraphicsPipelineD3D12
 	(
-		CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
+		crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
 		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
@@ -30,7 +33,7 @@ public:
 
 private:
 
-	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	void Deinitialize();
 
@@ -45,7 +48,7 @@ class CrComputePipelineD3D12 final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineD3D12(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
 
 	~CrComputePipelineD3D12();
 
@@ -61,7 +64,7 @@ public:
 
 private:
 
-	void Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
 
 	void Deinitialize();
 

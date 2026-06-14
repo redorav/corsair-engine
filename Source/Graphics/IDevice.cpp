@@ -34,8 +34,8 @@ namespace crgfx
 		m_pipelineCacheDirectory += crgfx::GraphicsApi::ToString(renderSystem->GetGraphicsApi());
 		m_pipelineCacheDirectory += "/";
 		m_pipelineCacheFilename = "PipelineCache.bin";
-		m_renderDeviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
-		m_renderDeviceProperties.preferredVendor = descriptor.preferredVendor;
+		m_deviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
+		m_deviceProperties.preferredVendor = descriptor.preferredVendor;
 
 		m_gpuDeletionQueue = crstl::unique_ptr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
 
@@ -359,7 +359,7 @@ namespace crgfx
 
 	const DeviceProperties& IDevice::GetProperties() const
 	{
-		return m_renderDeviceProperties;
+		return m_deviceProperties;
 	}
 
 	void IDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)

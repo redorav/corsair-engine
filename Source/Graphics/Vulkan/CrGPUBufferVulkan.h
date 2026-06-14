@@ -10,13 +10,16 @@ struct CrVkBufferStateInfo
 	VkAccessFlags accessMask = VK_ACCESS_FLAG_BITS_MAX_ENUM;
 };
 
-class CrRenderDeviceVulkan;
+namespace crgfx
+{
+	class DeviceVulkan;
+};
 
 class CrHardwareGPUBufferVulkan final : public ICrHardwareGPUBuffer
 {
 public:
 
-	CrHardwareGPUBufferVulkan(CrRenderDeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+	CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
 
 	virtual ~CrHardwareGPUBufferVulkan() override;
 

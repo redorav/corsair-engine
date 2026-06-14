@@ -57,6 +57,8 @@ namespace crgfx
 	enum class RenderTargetLoadOp : uint32_t;
 	enum class RenderTargetStoreOp : uint32_t;
 
+	class IGraphicsSystem;
+
 	class IDevice;
 	using DeviceHandle = crstl::intrusive_ptr<IDevice>;
 };
@@ -80,8 +82,6 @@ struct RWStorageBufferMetadata;
 struct RWTypedBufferMetadata;
 
 // Forward declare the necessary types for the rendering core
-
-class IGraphicsSystem;
 
 class ICrTexture;
 using CrTextureHandle = crstl::intrusive_ptr<ICrTexture>;

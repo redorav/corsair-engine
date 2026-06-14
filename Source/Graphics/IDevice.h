@@ -201,9 +201,9 @@ namespace crgfx
 
 		const DeviceProperties& GetProperties() const;
 
-		bool SupportsConservativeRasterization() const { return m_renderDeviceProperties.features.conservativeRasterization; }
+		bool SupportsConservativeRasterization() const { return m_deviceProperties.features.conservativeRasterization; }
 
-		bool SupportsTextureFormatCasting() const { return m_renderDeviceProperties.features.textureFormatCasting; }
+		bool SupportsTextureFormatCasting() const { return m_deviceProperties.features.textureFormatCasting; }
 
 		void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
 
@@ -277,7 +277,7 @@ namespace crgfx
 
 		crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
 
-		DeviceProperties m_renderDeviceProperties;
+		DeviceProperties m_deviceProperties;
 
 		// Texture uploads that have started but haven't been committed yet
 		crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;

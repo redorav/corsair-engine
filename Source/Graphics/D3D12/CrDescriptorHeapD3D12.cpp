@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrAlignment.h"
@@ -28,7 +28,7 @@ uint32_t CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const CrDescriptorHeapD
 	}
 }
 
-void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& heapDescriptor)
+void CrDescriptorHeapD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& heapDescriptor)
 {
 	m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
 
@@ -59,7 +59,7 @@ void CrDescriptorHeapD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, c
 	}
 }
 
-void CrCPUDescriptorPoolD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
+void CrCPUDescriptorPoolD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
 {
 	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
@@ -118,7 +118,7 @@ CrDescriptorStreamD3D12::CrDescriptorStreamD3D12()
 	
 }
 
-void CrDescriptorStreamD3D12::Initialize(CrRenderDeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
+void CrDescriptorStreamD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
 {
 	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 

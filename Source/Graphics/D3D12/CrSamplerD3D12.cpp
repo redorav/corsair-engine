@@ -1,13 +1,13 @@
 #include "Graphics/CrRendering_pch.h"
 #include "CrSamplerD3D12.h"
-#include "CrRenderDeviceD3D12.h"
+#include "DeviceD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/Logging/ICrDebug.h"
 
-CrSamplerD3D12::CrSamplerD3D12(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ICrSampler(renderDevice)
+CrSamplerD3D12::CrSamplerD3D12(crgfx::IDevice* device, const CrSamplerDescriptor& descriptor) : ICrSampler(device)
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(device);
 
 	D3D12_SAMPLER_DESC samplerDescriptor;
 	samplerDescriptor.Filter = crd3d::GetD3DFilter(descriptor.minFilter, descriptor.magFilter, descriptor.mipmapFilter, descriptor.enableAnisotropy, descriptor.enableCompare);
@@ -49,6 +49,6 @@ CrSamplerD3D12::CrSamplerD3D12(crgfx::IDevice* renderDevice, const CrSamplerDesc
 
 CrSamplerD3D12::~CrSamplerD3D12()
 {
-	CrRenderDeviceD3D12* d3d12RenderDevice = static_cast<CrRenderDeviceD3D12*>(m_renderDevice);
+	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
 	d3d12RenderDevice->FreeSamplerDescriptor(m_d3d12Descriptor);
 }

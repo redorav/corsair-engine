@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "CrCommandBufferVulkan.h"
-#include "CrRenderDeviceVulkan.h"
+#include "DeviceVulkan.h"
 #include "CrTextureVulkan.h"
 #include "CrSamplerVulkan.h"
 #include "CrShaderVulkan.h"
@@ -14,7 +14,7 @@
 
 #include "crstl/array.h"
 
-CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderDevice, const CrCommandBufferDescriptor& descriptor)
+CrCommandBufferVulkan::CrCommandBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrCommandBufferDescriptor& descriptor)
 	: ICrCommandBuffer(vulkanRenderDevice, descriptor)
 {
 	VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
@@ -71,7 +71,7 @@ CrCommandBufferVulkan::CrCommandBufferVulkan(CrRenderDeviceVulkan* vulkanRenderD
 
 CrCommandBufferVulkan::~CrCommandBufferVulkan()
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
 	vkDestroyDescriptorPool(vulkanRenderDevice->GetVkDevice(), m_vkDescriptorPool, nullptr);
 
@@ -86,7 +86,7 @@ CrCommandBufferVulkan::~CrCommandBufferVulkan()
 void CrCommandBufferVulkan::UpdateResourceTableVulkan
 (const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout)
 {
-	CrRenderDeviceVulkan* vulkanRenderDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice);
+	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
 	// 1. Allocate an available descriptor set for this drawcall and update it
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo;
@@ -613,7 +613,7 @@ void CrCommandBufferVulkan::BeginPS()
 {
 	CrAssertMsg(m_vkCommandBuffer != nullptr, "Called Begin() on a null command buffer");
 
-	VkDevice vkDevice = static_cast<CrRenderDeviceVulkan*>(m_renderDevice)->GetVkDevice();
+	VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
 	// Reset the descriptor pool on a Begin(). The same command buffer can never be used more than once per frame, so resetting here makes sense. All resources are sent
 	// back to the descriptor pool. Beware that the validation layer has a memory leak: https://github.com/KhronosGroup/Vulkan-ValidationLayers/issues/236

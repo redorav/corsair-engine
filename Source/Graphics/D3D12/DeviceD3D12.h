@@ -67,9 +67,9 @@ namespace crgfx
 
 		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
-		virtual crgfx::ICrGPUFence* CreateGPUFencePS(bool signaled) override;
+		virtual crgfx::IGPUFence* CreateGPUFencePS(bool signaled) override;
 
-		virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
+		virtual IGPUSemaphore* CreateGPUSemaphorePS() override;
 
 		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) override;
 
@@ -95,13 +95,13 @@ namespace crgfx
 		// GPU Synchronization
 		//--------------------
 
-		virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) override;
+		virtual crgfx::GPUFenceResult WaitForFencePS(const IGPUFence* fence, uint64_t timeoutNanoseconds) override;
 
-		virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const override;
+		virtual crgfx::GPUFenceResult GetFenceStatusPS(const IGPUFence* fence) const override;
 
-		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence) override;
+		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const IGPUFence* signalFence) override;
 
-		virtual void ResetFencePS(const ICrGPUFence* fence) override;
+		virtual void ResetFencePS(const IGPUFence* fence) override;
 
 		virtual void WaitIdlePS() override;
 
@@ -119,7 +119,7 @@ namespace crgfx
 
 		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
 
-		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) override;
+		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) override;
 
 		// Heap for Render Target Views
 		CrCPUDescriptorPoolD3D12 m_rtvPool;

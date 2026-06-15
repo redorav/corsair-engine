@@ -136,9 +136,9 @@ namespace crgfx
 		StorePipelineCache(pipelineCacheData.data(), pipelineCacheSize);
 	}
 
-	crgfx::GPUFenceResult DeviceVulkan::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+	crgfx::GPUFenceResult DeviceVulkan::WaitForFencePS(const IGPUFence* fence, uint64_t timeoutNanoseconds)
 	{
-		VkFence vkFence = static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence();
+		VkFence vkFence = static_cast<const GPUFenceVulkan*>(fence)->GetVkFence();
 
 		VkResult result = vkWaitForFences(m_vkDevice, 1, &vkFence, true, timeoutNanoseconds);
 
@@ -150,9 +150,9 @@ namespace crgfx
 		}
 	}
 
-	crgfx::GPUFenceResult DeviceVulkan::GetFenceStatusPS(const ICrGPUFence* fence) const
+	crgfx::GPUFenceResult DeviceVulkan::GetFenceStatusPS(const IGPUFence* fence) const
 	{
-		VkResult result = vkGetFenceStatus(m_vkDevice, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+		VkResult result = vkGetFenceStatus(m_vkDevice, static_cast<const GPUFenceVulkan*>(fence)->GetVkFence());
 
 		switch (result)
 		{
@@ -162,13 +162,13 @@ namespace crgfx
 		}
 	}
 
-	void DeviceVulkan::SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* fence)
+	void DeviceVulkan::SignalFencePS(crgfx::CommandQueueType::T queueType, const IGPUFence* fence)
 	{
 		CrAssert(fence != nullptr);
 
 		if (queueType == crgfx::CommandQueueType::Graphics)
 		{
-			VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence());
+			VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 0, nullptr, static_cast<const GPUFenceVulkan*>(fence)->GetVkFence());
 			CrAssert(result == VK_SUCCESS);
 		}
 		else
@@ -177,9 +177,9 @@ namespace crgfx
 		}
 	}
 
-	void DeviceVulkan::ResetFencePS(const ICrGPUFence* fence)
+	void DeviceVulkan::ResetFencePS(const IGPUFence* fence)
 	{
-		VkFence vkFence = static_cast<const CrGPUFenceVulkan*>(fence)->GetVkFence();
+		VkFence vkFence = static_cast<const GPUFenceVulkan*>(fence)->GetVkFence();
 		vkResetFences(m_vkDevice, 1, &vkFence);
 	}
 
@@ -405,7 +405,7 @@ namespace crgfx
 		return stagingBuffer;
 	}
 
-	void DeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+	void DeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -415,7 +415,7 @@ namespace crgfx
 
 		if (waitSemaphore)
 		{
-			VkSemaphore vkSemaphore = static_cast<const CrGPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
+			VkSemaphore vkSemaphore = static_cast<const GPUSemaphoreVulkan*>(waitSemaphore)->GetVkSemaphore();
 			submitInfo.pWaitSemaphores = &vkSemaphore;
 			submitInfo.waitSemaphoreCount = 1;
 			submitInfo.pWaitDstStageMask = &waitStageMask;
@@ -423,14 +423,14 @@ namespace crgfx
 
 		if (signalSemaphore)
 		{
-			VkSemaphore vkSemaphore = static_cast<const CrGPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
+			VkSemaphore vkSemaphore = static_cast<const GPUSemaphoreVulkan*>(signalSemaphore)->GetVkSemaphore();
 			submitInfo.pSignalSemaphores = &vkSemaphore;
 			submitInfo.signalSemaphoreCount = 1;
 		}
 
 		submitInfo.pCommandBuffers = &static_cast<const CrCommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer();
 
-		VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 1, &submitInfo, signalFence ? static_cast<const CrGPUFenceVulkan*>(signalFence)->GetVkFence() : nullptr);
+		VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 1, &submitInfo, signalFence ? static_cast<const GPUFenceVulkan*>(signalFence)->GetVkFence() : nullptr);
 		CrAssert(result == VK_SUCCESS);
 	}
 
@@ -683,14 +683,14 @@ namespace crgfx
 		return new CrCommandBufferVulkan(this, descriptor);
 	}
 
-	ICrGPUFence* DeviceVulkan::CreateGPUFencePS(bool signaled)
+	IGPUFence* DeviceVulkan::CreateGPUFencePS(bool signaled)
 	{
-		return new CrGPUFenceVulkan(this, signaled);
+		return new GPUFenceVulkan(this, signaled);
 	}
 
-	ICrGPUSemaphore* DeviceVulkan::CreateGPUSemaphorePS()
+	IGPUSemaphore* DeviceVulkan::CreateGPUSemaphorePS()
 	{
-		return new CrGPUSemaphoreVulkan(this);
+		return new GPUSemaphoreVulkan(this);
 	}
 
 	ICrGraphicsShader* DeviceVulkan::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)

@@ -160,9 +160,9 @@ namespace crgfx
 
 		ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
-		ICrGPUFence* CreateGPUFence(bool signaled = false);
+		IGPUFence* CreateGPUFence(bool signaled = false);
 
-		ICrGPUSemaphore* CreateGPUSemaphore();
+		IGPUSemaphore* CreateGPUSemaphore();
 
 		void AddToDeletionQueue(CrGPUDeletable* resource);
 
@@ -170,13 +170,13 @@ namespace crgfx
 		// GPU Synchronization
 		//--------------------
 
-		crgfx::GPUFenceResult WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds);
+		crgfx::GPUFenceResult WaitForFence(IGPUFence* fence, uint64_t timeoutNanoseconds);
 
-		crgfx::GPUFenceResult GetFenceStatus(ICrGPUFence* fence) const;
+		crgfx::GPUFenceResult GetFenceStatus(IGPUFence* fence) const;
 
-		void SignalFence(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence);
+		void SignalFence(crgfx::CommandQueueType::T queueType, const IGPUFence* signalFence);
 
-		void ResetFence(ICrGPUFence* fence);
+		void ResetFence(IGPUFence* fence);
 
 		// Wait until all operations on all queues have completed
 		void WaitIdle();
@@ -205,15 +205,15 @@ namespace crgfx
 
 		bool SupportsTextureFormatCasting() const { return m_deviceProperties.features.textureFormatCasting; }
 
-		void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence);
+		void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence);
 
 	protected:
 
 		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
 
-		virtual ICrGPUFence* CreateGPUFencePS(bool signaled) = 0;
+		virtual IGPUFence* CreateGPUFencePS(bool signaled) = 0;
 
-		virtual ICrGPUSemaphore* CreateGPUSemaphorePS() = 0;
+		virtual IGPUSemaphore* CreateGPUSemaphorePS() = 0;
 
 		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
 
@@ -239,13 +239,13 @@ namespace crgfx
 		// GPU Synchronization
 		//--------------------
 
-		virtual crgfx::GPUFenceResult WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
+		virtual crgfx::GPUFenceResult WaitForFencePS(const IGPUFence* fence, uint64_t timeoutNanoseconds) = 0;
 
-		virtual crgfx::GPUFenceResult GetFenceStatusPS(const ICrGPUFence* fence) const = 0;
+		virtual crgfx::GPUFenceResult GetFenceStatusPS(const IGPUFence* fence) const = 0;
 
-		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence) = 0;
+		virtual void SignalFencePS(crgfx::CommandQueueType::T queueType, const IGPUFence* signalFence) = 0;
 
-		virtual void ResetFencePS(const ICrGPUFence* fence) = 0;
+		virtual void ResetFencePS(const IGPUFence* fence) = 0;
 
 		virtual void WaitIdlePS() = 0;
 
@@ -267,7 +267,7 @@ namespace crgfx
 
 		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
 
-		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence) = 0;
+		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) = 0;
 
 		void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 

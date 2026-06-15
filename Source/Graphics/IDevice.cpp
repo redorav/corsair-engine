@@ -130,12 +130,12 @@ namespace crgfx
 		return CreateCommandBufferPS(descriptor);
 	}
 
-	ICrGPUFence* IDevice::CreateGPUFence(bool signaled)
+	IGPUFence* IDevice::CreateGPUFence(bool signaled)
 	{
 		return CreateGPUFencePS(signaled);
 	}
 
-	ICrGPUSemaphore* IDevice::CreateGPUSemaphore()
+	IGPUSemaphore* IDevice::CreateGPUSemaphore()
 	{
 		return CreateGPUSemaphorePS();
 	}
@@ -295,22 +295,22 @@ namespace crgfx
 		return new CrTypedBuffer(this, access, dataFormat, numElements);
 	}
 
-	crgfx::GPUFenceResult IDevice::WaitForFence(ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+	crgfx::GPUFenceResult IDevice::WaitForFence(IGPUFence* fence, uint64_t timeoutNanoseconds)
 	{
 		return WaitForFencePS(fence, timeoutNanoseconds);
 	}
 
-	crgfx::GPUFenceResult IDevice::GetFenceStatus(ICrGPUFence* fence) const
+	crgfx::GPUFenceResult IDevice::GetFenceStatus(IGPUFence* fence) const
 	{
 		return GetFenceStatusPS(fence);
 	}
 
-	void IDevice::SignalFence(crgfx::CommandQueueType::T queueType, const ICrGPUFence* signalFence)
+	void IDevice::SignalFence(crgfx::CommandQueueType::T queueType, const IGPUFence* signalFence)
 	{
 		return SignalFencePS(queueType, signalFence);
 	}
 
-	void IDevice::ResetFence(ICrGPUFence* fence)
+	void IDevice::ResetFence(IGPUFence* fence)
 	{
 		ResetFencePS(fence);
 	}
@@ -362,7 +362,7 @@ namespace crgfx
 		return m_deviceProperties;
 	}
 
-	void IDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+	void IDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 	}

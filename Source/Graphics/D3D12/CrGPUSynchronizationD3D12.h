@@ -7,13 +7,13 @@ namespace crgfx
 {
 	class IDevice;
 
-	class CrGPUFenceD3D12 final : public ICrGPUFence
+	class GPUFenceD3D12 final : public IGPUFence
 	{
 	public:
 
-		CrGPUFenceD3D12(crgfx::IDevice* renderDevice, bool signaled);
+		GPUFenceD3D12(crgfx::IDevice* renderDevice, bool signaled);
 
-		~CrGPUFenceD3D12();
+		~GPUFenceD3D12();
 
 		ID3D12Fence* GetD3D12Fence() const { return m_d3d12Fence; }
 
@@ -26,13 +26,13 @@ namespace crgfx
 		ID3D12Fence* m_d3d12Fence;
 	};
 
-	class CrGPUSemaphoreD3D12 final : public ICrGPUSemaphore
+	class GPUSemaphoreD3D12 final : public IGPUSemaphore
 	{
 	public:
 
-		CrGPUSemaphoreD3D12(crgfx::IDevice* renderDevice);
+		GPUSemaphoreD3D12(crgfx::IDevice* renderDevice);
 
-		~CrGPUSemaphoreD3D12();
+		~GPUSemaphoreD3D12();
 
 	private:
 

@@ -7,13 +7,13 @@ namespace crgfx
 {
 	class IDevice;
 
-	class CrGPUFenceVulkan final : public ICrGPUFence
+	class GPUFenceVulkan final : public IGPUFence
 	{
 	public:
 
-		CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled);
+		GPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled);
 
-		~CrGPUFenceVulkan();
+		~GPUFenceVulkan();
 
 		VkFence GetVkFence() const;
 
@@ -22,18 +22,18 @@ namespace crgfx
 		VkFence m_vkFence;
 	};
 
-	inline VkFence CrGPUFenceVulkan::GetVkFence() const
+	inline VkFence GPUFenceVulkan::GetVkFence() const
 	{
 		return m_vkFence;
 	}
 
-	class CrGPUSemaphoreVulkan final : public ICrGPUSemaphore
+	class GPUSemaphoreVulkan final : public IGPUSemaphore
 	{
 	public:
 
-		CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice);
+		GPUSemaphoreVulkan(crgfx::IDevice* renderDevice);
 
-		~CrGPUSemaphoreVulkan();
+		~GPUSemaphoreVulkan();
 
 		VkSemaphore GetVkSemaphore() const;
 
@@ -42,7 +42,7 @@ namespace crgfx
 		VkSemaphore m_vkSemaphore;
 	};
 
-	inline VkSemaphore CrGPUSemaphoreVulkan::GetVkSemaphore() const
+	inline VkSemaphore GPUSemaphoreVulkan::GetVkSemaphore() const
 	{
 		return m_vkSemaphore;
 	}

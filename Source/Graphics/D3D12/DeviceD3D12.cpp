@@ -396,12 +396,12 @@ namespace crgfx
 		return new CrCommandBufferD3D12(this, descriptor);
 	}
 
-	ICrGPUFence* DeviceD3D12::CreateGPUFencePS(bool signaled)
+	IGPUFence* DeviceD3D12::CreateGPUFencePS(bool signaled)
 	{
-		return new CrGPUFenceD3D12(this, signaled);
+		return new GPUFenceD3D12(this, signaled);
 	}
 
-	ICrGPUSemaphore* DeviceD3D12::CreateGPUSemaphorePS()
+	IGPUSemaphore* DeviceD3D12::CreateGPUSemaphorePS()
 	{
 		CrAssertMsg(false, "Not implemented");
 		return nullptr;
@@ -460,9 +460,9 @@ namespace crgfx
 		m_waitIdleFence = nullptr;
 	}
 
-	crgfx::GPUFenceResult DeviceD3D12::WaitForFencePS(const ICrGPUFence* fence, uint64_t timeoutNanoseconds)
+	crgfx::GPUFenceResult DeviceD3D12::WaitForFencePS(const IGPUFence* fence, uint64_t timeoutNanoseconds)
 	{
-		const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+		const GPUFenceD3D12* d3dFence = static_cast<const GPUFenceD3D12*>(fence);
 		ID3D12Fence* d3d12Fence = d3dFence->GetD3D12Fence();
 
 		DWORD waitResult = 0;
@@ -485,9 +485,9 @@ namespace crgfx
 		}
 	}
 
-	crgfx::GPUFenceResult DeviceD3D12::GetFenceStatusPS(const ICrGPUFence* fence) const
+	crgfx::GPUFenceResult DeviceD3D12::GetFenceStatusPS(const IGPUFence* fence) const
 	{
-		const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+		const GPUFenceD3D12* d3dFence = static_cast<const GPUFenceD3D12*>(fence);
 
 		if (d3dFence->GetD3D12Fence()->GetCompletedValue() == 1)
 		{
@@ -499,9 +499,9 @@ namespace crgfx
 		}
 	}
 
-	void DeviceD3D12::SignalFencePS(crgfx::CommandQueueType::T queueType, const ICrGPUFence* fence)
+	void DeviceD3D12::SignalFencePS(crgfx::CommandQueueType::T queueType, const IGPUFence* fence)
 	{
-		const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+		const GPUFenceD3D12* d3dFence = static_cast<const GPUFenceD3D12*>(fence);
 
 		// To signal a fence, we set its value to 1. Note that we're using fences like Vulkan
 		// uses fences, there are no values
@@ -515,12 +515,12 @@ namespace crgfx
 		}
 	}
 
-	void DeviceD3D12::ResetFencePS(const ICrGPUFence* fence)
+	void DeviceD3D12::ResetFencePS(const IGPUFence* fence)
 	{
 		// To reset the fence we signal it on the CPU side back to 0, and also
 		// manually reset the event. This is manual so we can wait for the same
 		// fence in multiple sites
-		const CrGPUFenceD3D12* d3dFence = static_cast<const CrGPUFenceD3D12*>(fence);
+		const GPUFenceD3D12* d3dFence = static_cast<const GPUFenceD3D12*>(fence);
 		d3dFence->GetD3D12Fence()->Signal(0);
 		ResetEvent(d3dFence->GetFenceEvent());
 	}
@@ -756,7 +756,7 @@ namespace crgfx
 		return stagingBuffer;
 	}
 
-	void DeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const ICrGPUSemaphore* waitSemaphore, const ICrGPUSemaphore* signalSemaphore, const ICrGPUFence* signalFence)
+	void DeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		unused_parameter(waitSemaphore);
 		unused_parameter(signalSemaphore);

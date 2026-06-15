@@ -257,7 +257,7 @@ namespace crgfx
 
 			//const ICrGPUSemaphore* signalSemaphore = m_presentCompleteSemaphores[m_currentSemaphoreIndex].get();
 
-			CrGPUFenceVulkan* imageReadyFence = static_cast<CrGPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
+			GPUFenceVulkan* imageReadyFence = static_cast<GPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
 
 			// Acquire image signals the semaphore we pass in
 			VkResult res = vkAcquireNextImageKHR(vkDevice, m_vkSwapchain, timeoutNanoseconds, nullptr, imageReadyFence->GetVkFence(), &m_currentBufferIndex);
@@ -281,7 +281,7 @@ namespace crgfx
 		VkQueue vkQueue = vulkanRenderDevice->GetVkGraphicsQueue();
 		//CrGPUSemaphoreVulkan* waitSemaphore = static_cast<CrGPUSemaphoreVulkan*>(m_presentCompleteSemaphores[m_currentSemaphoreIndex].get());
 
-		CrGPUFenceVulkan* imageReadyFence = static_cast<CrGPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
+		GPUFenceVulkan* imageReadyFence = static_cast<GPUFenceVulkan*>(m_imageReadyFences[m_currentSemaphoreIndex].get());
 		VkFence vkImageReadyFence = imageReadyFence->GetVkFence();
 
 		vkWaitForFences(vkDevice, 1, &vkImageReadyFence, true, UINT64_MAX);

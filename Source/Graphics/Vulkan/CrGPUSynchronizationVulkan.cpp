@@ -5,7 +5,7 @@
 
 namespace crgfx
 {
-	CrGPUFenceVulkan::CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled) : ICrGPUFence(renderDevice)
+	GPUFenceVulkan::GPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled) : IGPUFence(renderDevice)
 	{
 		VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
@@ -16,12 +16,12 @@ namespace crgfx
 		vkCreateFence(vkDevice, &vkFenceCreateInfo, nullptr, &m_vkFence);
 	}
 
-	CrGPUFenceVulkan::~CrGPUFenceVulkan()
+	GPUFenceVulkan::~GPUFenceVulkan()
 	{
 		vkDestroyFence(static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkFence, nullptr);
 	}
 
-	CrGPUSemaphoreVulkan::CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice) : ICrGPUSemaphore(renderDevice)
+	GPUSemaphoreVulkan::GPUSemaphoreVulkan(crgfx::IDevice* renderDevice) : IGPUSemaphore(renderDevice)
 	{
 		VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice();
 
@@ -31,7 +31,7 @@ namespace crgfx
 		vkCreateSemaphore(vkDevice, &info, nullptr, &m_vkSemaphore);
 	}
 
-	CrGPUSemaphoreVulkan::~CrGPUSemaphoreVulkan()
+	GPUSemaphoreVulkan::~GPUSemaphoreVulkan()
 	{
 		vkDestroySemaphore(static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice(), m_vkSemaphore, nullptr);
 	}

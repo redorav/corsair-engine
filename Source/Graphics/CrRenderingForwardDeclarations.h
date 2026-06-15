@@ -75,24 +75,6 @@ namespace crgfx
 	struct CrSwapchainDescriptor;
 };
 
-// Forward declare shader resources
-namespace ConstantBuffers { enum T : uint8_t; }
-namespace Samplers { enum T : uint8_t; }
-namespace Textures { enum T : uint8_t; }
-namespace RWTextures { enum T : uint8_t; }
-namespace StorageBuffers { enum T : uint8_t; }
-namespace RWStorageBuffers { enum T : uint8_t; }
-namespace TypedBuffers { enum T : uint8_t; }
-namespace RWTypedBuffers { enum T : uint8_t; }
-
-struct ConstantBufferMetadata;
-struct SamplerMetadata;
-struct TextureMetadata;
-struct RWTextureMetadata;
-struct StorageBufferMetadata;
-struct RWStorageBufferMetadata;
-struct RWTypedBufferMetadata;
-
 // Forward declare the necessary types for the rendering core
 
 class ICrGPUFence;
@@ -207,3 +189,21 @@ using CrRenderModelHandle = crstl::intrusive_ptr<CrRenderModel>;
 
 class CrRenderMesh;
 using CrRenderMeshHandle = crstl::intrusive_ptr<CrRenderMesh>;
+
+// Forward declare shader resources
+namespace ConstantBuffers { enum T : uint8_t; }
+namespace Samplers { enum T : uint8_t; }
+namespace Textures { enum T : uint8_t; }
+namespace RWTextures { enum T : uint8_t; }
+namespace StorageBuffers { enum T : uint8_t; }
+namespace RWStorageBuffers { enum T : uint8_t; }
+namespace TypedBuffers { enum T : uint8_t; }
+namespace RWTypedBuffers { enum T : uint8_t; }
+
+struct ConstantBufferMetadata;
+struct SamplerMetadata;
+struct TextureMetadata;
+struct RWTextureMetadata;
+struct StorageBufferMetadata;
+struct RWStorageBufferMetadata;
+struct RWTypedBufferMetadata;

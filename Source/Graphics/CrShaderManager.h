@@ -16,11 +16,9 @@ public:
 
 	static const char* GetShaderBytecodeExtension(crgfx::GraphicsApi::T graphicsApi);
 
-	static void Initialize(crgfx::IDevice* device);
+	static void Initialize();
 
 	static void Deinitialize();
-
-	crgfx::IDevice* GetDevice() const { return m_device; }
 
 	CrShaderBytecodeHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const;
 
@@ -31,12 +29,6 @@ public:
 	CrComputeShaderHandle CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
 	CrFixedPath GetCompiledShadersPath(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi) const;
-
-protected:
-
-	CrShaderManager(crgfx::IDevice* device);
-
-	crgfx::IDevice* m_device;
 };
 
 extern CrShaderManager* ShaderManager;

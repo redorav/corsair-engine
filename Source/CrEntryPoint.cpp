@@ -83,16 +83,14 @@ int main(int argc, char* argv[])
 	graphicsDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	crgfx::CreateMainDevice(graphicsDeviceDescriptor);
 
-	const crgfx::DeviceHandle& device = crgfx::GetDevice();
-
-	CrPrintProcessMemory("After Render Device");
+	CrPrintProcessMemory("After Graphics Device");
 
 	CrInputManager::Initialize();
 	CrShaderSources::Initialize();
-	CrShaderManager::Initialize(device.get());
+	CrShaderManager::Initialize();
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
-	CrRenderingResources::Initialize(device.get());
+	CrRenderingResources::Initialize();
 	CrOSWindow::Initialize();
 
 	CrOSWindowDescriptor osWindowDescriptor;

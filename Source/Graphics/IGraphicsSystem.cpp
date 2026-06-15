@@ -72,25 +72,25 @@ namespace crgfx
 
 	void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 	{
-		IGraphicsSystem* renderSystem = nullptr;
+		IGraphicsSystem* graphicsSystem = nullptr;
 
 		// Treat this like a factory (on PC) through the API. That way the rest of the code
 		// doesn't need to know about platform-specific code, only the render device.
 #if defined(VULKAN_API)
 		if (graphicsSystemDescriptor.graphicsApi == crgfx::GraphicsApi::Vulkan)
 		{
-			renderSystem = new GraphicsSystemVulkan(graphicsSystemDescriptor);
+			graphicsSystem = new GraphicsSystemVulkan(graphicsSystemDescriptor);
 		}
 #endif
 
 #if defined(D3D12_API)
 		if (graphicsSystemDescriptor.graphicsApi == crgfx::GraphicsApi::D3D12)
 		{
-			renderSystem = new GraphicsSystemD3D12(graphicsSystemDescriptor);
+			graphicsSystem = new GraphicsSystemD3D12(graphicsSystemDescriptor);
 		}
 #endif
 
-		GraphicsSystem = crstl::unique_ptr<IGraphicsSystem>(renderSystem);
+		GraphicsSystem = crstl::unique_ptr<IGraphicsSystem>(graphicsSystem);
 	}
 
 	void crgfx::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)

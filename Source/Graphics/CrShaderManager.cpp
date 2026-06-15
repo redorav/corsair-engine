@@ -1,5 +1,6 @@
 ﻿#include "Graphics/CrRendering_pch.h"
 
+#include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShaderReflection.h"
@@ -42,7 +43,7 @@ CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderComp
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
 
-	CrGraphicsShaderHandle graphicsShader = m_device->CreateGraphicsShader(graphicsShaderDescriptor);
+	CrGraphicsShaderHandle graphicsShader = crgfx::GetDevice()->CreateGraphicsShader(graphicsShaderDescriptor);
 
 	return graphicsShader;
 }
@@ -53,7 +54,7 @@ CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompil
 	CrComputeShaderDescriptor computeShaderDescriptor;
 	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
-	CrComputeShaderHandle computeShader = m_device->CreateComputeShader(computeShaderDescriptor);
+	CrComputeShaderHandle computeShader = crgfx::GetDevice()->CreateComputeShader(computeShaderDescriptor);
 
 	return computeShader;
 }
@@ -66,11 +67,10 @@ CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, cr
 	return shaderCachePath;
 }
 
-void CrShaderManager::Initialize(crgfx::IDevice* renderDevice)
+void CrShaderManager::Initialize()
 {
-	CrAssert(renderDevice != nullptr);
 	CrAssert(ShaderManager == nullptr);
-	ShaderManager = new CrShaderManager(renderDevice);
+	ShaderManager = new CrShaderManager();
 }
 
 void CrShaderManager::Deinitialize()
@@ -183,9 +183,4 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 	}
 
 	return nullptr;
-}
-
-CrShaderManager::CrShaderManager(crgfx::IDevice* renderDevice)
-{
-	m_device = renderDevice;
 }

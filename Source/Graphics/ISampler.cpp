@@ -7,7 +7,7 @@
 
 namespace crgfx
 {
-	CrSamplerDescriptor::CrSamplerDescriptor()
+	SamplerDescriptor::SamplerDescriptor()
 		: minFilter(crgfx::Filter::Linear)
 		, magFilter(crgfx::Filter::Linear)
 		, mipmapFilter(crgfx::Filter::Linear)

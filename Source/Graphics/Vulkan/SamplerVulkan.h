@@ -11,7 +11,7 @@ namespace crgfx
 	{
 	public:
 
-		SamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+		SamplerVulkan(crgfx::IDevice* renderDevice, const crgfx::SamplerDescriptor& descriptor);
 
 		~SamplerVulkan();
 

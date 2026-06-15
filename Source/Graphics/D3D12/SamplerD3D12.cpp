@@ -7,7 +7,7 @@
 
 namespace crgfx
 {
-	SamplerD3D12::SamplerD3D12(crgfx::IDevice* device, const crgfx::CrSamplerDescriptor& descriptor) : ISampler(device)
+	SamplerD3D12::SamplerD3D12(crgfx::IDevice* device, const crgfx::SamplerDescriptor& descriptor) : ISampler(device)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(device);
 

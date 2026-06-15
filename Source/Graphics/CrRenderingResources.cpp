@@ -28,7 +28,7 @@ CrRenderingResources::CrRenderingResources()
 	//------------------------
 
 	{
-		crgfx::CrSamplerDescriptor descriptor;
+		crgfx::SamplerDescriptor descriptor;
 		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
 		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
 		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
@@ -37,7 +37,7 @@ CrRenderingResources::CrRenderingResources()
 	}
 
 	{
-		crgfx::CrSamplerDescriptor descriptor;
+		crgfx::SamplerDescriptor descriptor;
 		descriptor.addressModeU = crgfx::AddressMode::Wrap;
 		descriptor.addressModeV = crgfx::AddressMode::Wrap;
 		descriptor.addressModeW = crgfx::AddressMode::Wrap;
@@ -46,7 +46,7 @@ CrRenderingResources::CrRenderingResources()
 	}
 
 	{
-		crgfx::CrSamplerDescriptor descriptor;
+		crgfx::SamplerDescriptor descriptor;
 		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
 		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
 		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
@@ -55,7 +55,7 @@ CrRenderingResources::CrRenderingResources()
 	}
 
 	{
-		crgfx::CrSamplerDescriptor descriptor;
+		crgfx::SamplerDescriptor descriptor;
 		descriptor.addressModeU = crgfx::AddressMode::Wrap;
 		descriptor.addressModeV = crgfx::AddressMode::Wrap;
 		descriptor.addressModeW = crgfx::AddressMode::Wrap;

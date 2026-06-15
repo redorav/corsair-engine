@@ -8,7 +8,7 @@
 namespace crgfx
 {
 	// See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html
-	SamplerVulkan::SamplerVulkan(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor) : ISampler(renderDevice)
+	SamplerVulkan::SamplerVulkan(crgfx::IDevice* renderDevice, const crgfx::SamplerDescriptor& descriptor) : ISampler(renderDevice)
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 

@@ -13,7 +13,7 @@ namespace crgfx
 	{
 	public:
 
-		SamplerD3D12(crgfx::IDevice* renderDevice, const CrSamplerDescriptor& descriptor);
+		SamplerD3D12(crgfx::IDevice* renderDevice, const crgfx::SamplerDescriptor& descriptor);
 
 		~SamplerD3D12();
 

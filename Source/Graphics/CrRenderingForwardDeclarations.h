@@ -67,8 +67,8 @@ namespace crgfx
 	struct TextureDescriptor;
 
 	class ISampler;
-	using CrSamplerHandle = crstl::intrusive_ptr<ISampler>;
-	struct CrSamplerDescriptor;
+	using SamplerHandle = crstl::intrusive_ptr<ISampler>;
+	struct SamplerDescriptor;
 };
 
 // Forward declare shader resources

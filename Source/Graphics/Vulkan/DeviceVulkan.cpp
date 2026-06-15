@@ -708,7 +708,7 @@ namespace crgfx
 		return new CrHardwareGPUBufferVulkan(this, descriptor);
 	}
 
-	ISampler* DeviceVulkan::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
+	ISampler* DeviceVulkan::CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor)
 	{
 		return new SamplerVulkan(this, descriptor);
 	}

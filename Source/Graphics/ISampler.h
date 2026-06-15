@@ -10,9 +10,9 @@
 
 namespace crgfx
 {
-	struct CrSamplerDescriptor
+	struct SamplerDescriptor
 	{
-		CrSamplerDescriptor();
+		SamplerDescriptor();
 
 		crgfx::Filter minFilter;
 		crgfx::Filter magFilter;

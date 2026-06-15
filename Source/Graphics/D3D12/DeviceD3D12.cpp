@@ -48,7 +48,7 @@ const char* GetD3DFeatureLevelString(D3D_FEATURE_LEVEL featureLevel)
 
 namespace crgfx
 {
-	DeviceD3D12::DeviceD3D12(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
+	DeviceD3D12::DeviceD3D12(IGraphicsSystem* renderSystem, const DeviceDescriptor& descriptor) : IDevice(renderSystem, descriptor)
 	{
 		GraphicsSystemD3D12* d3d12RenderSystem = static_cast<GraphicsSystemD3D12*>(renderSystem);
 		IDXGIFactory4* dxgiFactory4 = d3d12RenderSystem->GetDXGIFactory4();
@@ -422,7 +422,7 @@ namespace crgfx
 		return new CrHardwareGPUBufferD3D12(this, descriptor);
 	}
 
-	ISampler* DeviceD3D12::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
+	ISampler* DeviceD3D12::CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor)
 	{
 		return new SamplerD3D12(this, descriptor);
 	}

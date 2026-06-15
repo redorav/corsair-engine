@@ -260,7 +260,7 @@ namespace crgfx
 		return new CrIndexBuffer(this, access, dataFormat, numIndices);
 	}
 
-	ISampler* IDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
+	ISampler* IDevice::CreateSampler(const crgfx::SamplerDescriptor& descriptor)
 	{
 		return CreateSamplerPS(descriptor);
 	}

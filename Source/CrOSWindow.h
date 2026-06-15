@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrSwapchain.h"
+#include "Graphics/ISwapchain.h"
 #include "Graphics/CrRenderingForwardDeclarations.h"
 #include "Graphics/CrDataFormats.h"
 
@@ -19,9 +19,7 @@ struct CrOSWindowDescriptor
 		, swapchainFormat(crgfx::DataFormat::Invalid)
 		, decoration(true)
 		, topMost(false)
-	{
-
-	}
+	{}
 
 	uint32_t positionX;
 	uint32_t positionY;
@@ -98,7 +96,7 @@ public:
 
 	void Show();
 
-	const CrSwapchainHandle& GetSwapchain() { return m_swapchain; }
+	const crgfx::SwapchainHandle& GetSwapchain() { return m_swapchain; }
 
 private:
 
@@ -112,5 +110,5 @@ private:
 
 	uint64_t m_exStyle = 0;
 
-	CrSwapchainHandle m_swapchain;
+	crgfx::SwapchainHandle m_swapchain;
 };

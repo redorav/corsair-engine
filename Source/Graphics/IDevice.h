@@ -137,7 +137,7 @@ namespace crgfx
 
 		ISampler* CreateSampler(const crgfx::SamplerDescriptor& descriptor);
 
-		ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
+		ISwapchain* CreateSwapchain(const crgfx::CrSwapchainDescriptor& swapchainDescriptor);
 
 		crgfx::ITexture* CreateTexture(const crgfx::TextureDescriptor& descriptor);
 
@@ -223,7 +223,7 @@ namespace crgfx
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) = 0;
 
-		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
+		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 

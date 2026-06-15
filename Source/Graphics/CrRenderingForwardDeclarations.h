@@ -69,6 +69,10 @@ namespace crgfx
 	class ISampler;
 	using SamplerHandle = crstl::intrusive_ptr<ISampler>;
 	struct SamplerDescriptor;
+	
+	class ISwapchain;
+	using SwapchainHandle = crstl::intrusive_ptr<ISwapchain>;
+	struct CrSwapchainDescriptor;
 };
 
 // Forward declare shader resources
@@ -90,10 +94,6 @@ struct RWStorageBufferMetadata;
 struct RWTypedBufferMetadata;
 
 // Forward declare the necessary types for the rendering core
-
-class ICrSwapchain;
-using CrSwapchainHandle = crstl::intrusive_ptr<ICrSwapchain>;
-struct CrSwapchainDescriptor;
 
 class ICrGPUFence;
 using CrGPUFenceHandle = crstl::intrusive_ptr<ICrGPUFence>;

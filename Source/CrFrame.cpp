@@ -4,7 +4,7 @@
 
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/ICrSwapchain.h"
+#include "Graphics/ISwapchain.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShader.h"
 #include "Graphics/ITexture.h"

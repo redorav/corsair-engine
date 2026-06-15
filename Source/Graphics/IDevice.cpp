@@ -3,7 +3,7 @@
 #include "IGraphicsSystem.h"
 #include "IDevice.h"
 #include "ICrCommandBuffer.h"
-#include "ICrSwapchain.h"
+#include "ISwapchain.h"
 #include "ISampler.h"
 #include "ITexture.h"
 #include "ICrShader.h"
@@ -265,12 +265,12 @@ namespace crgfx
 		return CreateSamplerPS(descriptor);
 	}
 
-	ICrSwapchain* IDevice::CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* IDevice::CreateSwapchain(const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
 	{
 		CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 		CrAssertMsg(swapchainDescriptor.format != crgfx::DataFormat::Invalid, "Must set a data format");
 
-		ICrSwapchain* swapchain = CreateSwapchainPS(swapchainDescriptor);
+		ISwapchain* swapchain = CreateSwapchainPS(swapchainDescriptor);
 
 		CrAssertMsg(swapchain->GetWidth() > 0, "Swapchain must have a width");
 		CrAssertMsg(swapchain->GetHeight() > 0, "Swapchain must have a height");

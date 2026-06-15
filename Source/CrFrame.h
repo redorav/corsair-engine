@@ -65,7 +65,7 @@ private:
 
 	CrGraphicsPipelineHandle m_editorGridPipeline;
 
-	CrSwapchainHandle m_swapchain;
+	crgfx::SwapchainHandle m_swapchain;
 
 	crgfx::TextureHandle m_depthStencilTexture;
 

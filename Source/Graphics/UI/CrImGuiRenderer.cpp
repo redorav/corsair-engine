@@ -197,7 +197,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 		ImGuiViewport* imguiViewport = imguiPlatformIO.Viewports[i];
 		ImGuiViewportsData* viewportData = (ImGuiViewportsData*)imguiViewport->PlatformUserData;
 		CrOSWindow* osWindow = viewportData->osWindow;
-		CrSwapchainHandle swapchain = osWindow->GetSwapchain();
+		crgfx::SwapchainHandle swapchain = osWindow->GetSwapchain();
 
 		CrRenderGraphString imguiPassString;
 		imguiPassString.append_sprintf("ImGui Render Viewport %i", i);

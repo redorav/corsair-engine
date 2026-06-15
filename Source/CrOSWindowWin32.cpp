@@ -553,7 +553,7 @@ CrOSWindow::CrOSWindow(const CrOSWindowDescriptor& windowDescriptor)
 
 	if (windowDescriptor.swapchainFormat != crgfx::DataFormat::Invalid)
 	{
-		CrSwapchainDescriptor swapchainDescriptor = {};
+		crgfx::CrSwapchainDescriptor swapchainDescriptor = {};
 		swapchainDescriptor.name = windowDescriptor.name.c_str();
 		swapchainDescriptor.window = this;
 		swapchainDescriptor.requestedWidth = windowDescriptor.width;

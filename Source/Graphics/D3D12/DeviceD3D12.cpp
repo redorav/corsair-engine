@@ -5,7 +5,7 @@
 #include "CrCommandBufferD3D12.h"
 #include "TextureD3D12.h"
 #include "SamplerD3D12.h"
-#include "CrSwapchainD3D12.h"
+#include "SwapchainD3D12.h"
 #include "CrGPUBufferD3D12.h"
 #include "CrGPUSynchronizationD3D12.h"
 #include "CrShaderD3D12.h"
@@ -427,9 +427,9 @@ namespace crgfx
 		return new SamplerD3D12(this, descriptor);
 	}
 
-	ICrSwapchain* DeviceD3D12::CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* DeviceD3D12::CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
 	{
-		return new CrSwapchainD3D12(this, swapchainDescriptor);
+		return new SwapchainD3D12(this, swapchainDescriptor);
 	}
 
 	ITexture* DeviceD3D12::CreateTexturePS(const crgfx::TextureDescriptor& params)

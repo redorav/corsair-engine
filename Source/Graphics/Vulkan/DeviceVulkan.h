@@ -69,7 +69,7 @@ namespace crgfx
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
 
-		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
+		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) override;
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 

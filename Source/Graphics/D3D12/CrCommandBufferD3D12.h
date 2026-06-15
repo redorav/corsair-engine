@@ -82,7 +82,7 @@ private:
 
 	void WriteTextureSRV(const CrTextureBinding& textureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle);
 
-	void WriteSamplerView(const ICrSampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle);
+	void WriteSamplerView(const crgfx::ISampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle);
 
 	void WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle);
 

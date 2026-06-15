@@ -77,7 +77,7 @@ namespace crgfx
 
 		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
 
-		virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
+		virtual ISampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) override;
 
 		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 

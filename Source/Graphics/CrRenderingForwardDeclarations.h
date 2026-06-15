@@ -65,6 +65,10 @@ namespace crgfx
 	class ITexture;
 	using TextureHandle = crstl::intrusive_ptr<ITexture>;
 	struct TextureDescriptor;
+
+	class ISampler;
+	using CrSamplerHandle = crstl::intrusive_ptr<ISampler>;
+	struct CrSamplerDescriptor;
 };
 
 // Forward declare shader resources
@@ -86,10 +90,6 @@ struct RWStorageBufferMetadata;
 struct RWTypedBufferMetadata;
 
 // Forward declare the necessary types for the rendering core
-
-class ICrSampler;
-using CrSamplerHandle = crstl::intrusive_ptr<ICrSampler>;
-struct CrSamplerDescriptor;
 
 class ICrSwapchain;
 using CrSwapchainHandle = crstl::intrusive_ptr<ICrSwapchain>;

@@ -55,9 +55,10 @@ private:
 
 	CrComputePipelineHandle m_createIndirectArguments;
 
-	CrTextureHandle m_colorfulVolumeTexture;
+	crgfx::TextureHandle m_colorfulVolumeTexture;
 
-	CrTextureHandle m_colorfulTextureArray;
+
+	crgfx::TextureHandle m_colorfulTextureArray;
 
 	// Editor Shaders
 	CrGraphicsPipelineHandle m_editorEdgeSelectionPipeline;
@@ -66,24 +67,26 @@ private:
 
 	CrSwapchainHandle m_swapchain;
 
-	CrTextureHandle m_depthStencilTexture;
+	crgfx::TextureHandle m_depthStencilTexture;
 
 	// Linear depth with a min max mip chain
-	CrTextureHandle m_linearDepthMinMaxMipChain;
+	crgfx::TextureHandle m_linearDepthMinMaxMipChain;
 
-	CrTextureHandle m_preSwapchainTexture;
+	crgfx::TextureHandle m_preSwapchainTexture;
 
-	CrTextureHandle m_gbufferAlbedoAOTexture;
-	CrTextureHandle m_gbufferNormalsTexture;
-	CrTextureHandle m_gbufferMaterialTexture;
+	crgfx::TextureHandle m_gbufferAlbedoAOTexture;
+	crgfx::TextureHandle m_gbufferNormalsTexture;
+	crgfx::TextureHandle m_gbufferMaterialTexture;
 
-	CrTextureHandle m_lightingTexture;
+	crgfx::TextureHandle m_lightingTexture;
 
-	CrTextureHandle m_debugShaderTexture;
+	crgfx::TextureHandle m_lightClusters;
+
+	crgfx::TextureHandle m_debugShaderTexture;
 
 	CrGPUBufferHandle m_mouseSelectionBuffer;
 
-	CrTextureHandle m_colorsRWTexture;
+	crgfx::TextureHandle m_colorsRWTexture;
 
 	CrStructuredBufferHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
 

@@ -5,7 +5,7 @@
 
 #include "CrCommandBufferVulkan.h"
 #include "TextureVulkan.h"
-#include "CrSamplerVulkan.h"
+#include "SamplerVulkan.h"
 #include "CrSwapchainVulkan.h"
 #include "CrGPUBufferVulkan.h"
 #include "CrGPUSynchronizationVulkan.h"
@@ -708,9 +708,9 @@ namespace crgfx
 		return new CrHardwareGPUBufferVulkan(this, descriptor);
 	}
 
-	ICrSampler* DeviceVulkan::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
+	ISampler* DeviceVulkan::CreateSamplerPS(const CrSamplerDescriptor& descriptor)
 	{
-		return new CrSamplerVulkan(this, descriptor);
+		return new SamplerVulkan(this, descriptor);
 	}
 
 	ICrSwapchain* DeviceVulkan::CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor)

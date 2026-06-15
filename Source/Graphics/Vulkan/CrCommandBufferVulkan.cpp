@@ -3,7 +3,7 @@
 #include "CrCommandBufferVulkan.h"
 #include "DeviceVulkan.h"
 #include "TextureVulkan.h"
-#include "CrSamplerVulkan.h"
+#include "SamplerVulkan.h"
 #include "CrShaderVulkan.h"
 #include "CrGPUBufferVulkan.h"
 #include "Graphics/CrRenderPassDescriptor.h"
@@ -138,7 +138,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 
 	bindingLayout.ForEachSampler([&](crgfx::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
 	{
-		const CrSamplerVulkan* vulkanSampler = static_cast<const CrSamplerVulkan*>(m_currentState.m_samplers[id]);
+		const crgfx::SamplerVulkan* vulkanSampler = static_cast<const crgfx::SamplerVulkan*>(m_currentState.m_samplers[id]);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;

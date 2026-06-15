@@ -15,13 +15,13 @@ public:
 
 	// Global samplers
 
-	CrSamplerHandle AllLinearClampSampler;
+	crgfx::CrSamplerHandle AllLinearClampSampler;
 
-	CrSamplerHandle AllLinearWrapSampler;
+	crgfx::CrSamplerHandle AllLinearWrapSampler;
 
-	CrSamplerHandle AllPointClampSampler;
+	crgfx::CrSamplerHandle AllPointClampSampler;
 
-	CrSamplerHandle AllPointWrapSampler;
+	crgfx::CrSamplerHandle AllPointWrapSampler;
 
 	crgfx::TextureHandle WhiteSmallTexture;
 

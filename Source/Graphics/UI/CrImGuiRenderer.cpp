@@ -13,7 +13,7 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ICrCommandBuffer.h"
-#include "Graphics/ICrSampler.h"
+#include "Graphics/ISampler.h"
 #include "Graphics/CrRenderPassDescriptor.h"
 #include "Graphics/CrRenderGraph.h"
 #include "Graphics/CrRenderingResources.h"
@@ -203,9 +203,10 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 		imguiPassString.append_sprintf("ImGui Render Viewport %i", i);
 
 		renderGraph.AddRenderPass(imguiPassString, float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Graphics,
-		[swapchain](CrRenderGraph& renderGraph)
+		[swapchain, i](CrRenderGraph& renderGraph)
 		{
-			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get());
+			// The main viewport loads the previous contents, the rest ignore it. TODO This needs reworking so each viewport knows if it preserves the previous contents or not
+			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get(), i == 0 ? crgfx::RenderTargetLoadOp::Load : crgfx::RenderTargetLoadOp::Clear);
 		},
 		[this, imguiViewport, swapchain](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{

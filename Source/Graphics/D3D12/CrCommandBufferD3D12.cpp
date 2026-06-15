@@ -4,7 +4,7 @@
 #include "DeviceD3D12.h"
 #include "CrPipelineD3D12.h"
 #include "TextureD3D12.h"
-#include "CrSamplerD3D12.h"
+#include "SamplerD3D12.h"
 #include "CrShaderD3D12.h"
 
 #include "Graphics/Extensions/CrPIXHeader.h"
@@ -362,9 +362,9 @@ void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBindin
 	srvHandle = srvDescriptor;
 }
 
-void CrCommandBufferD3D12::WriteSamplerView(const ICrSampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle)
+void CrCommandBufferD3D12::WriteSamplerView(const crgfx::ISampler* sampler, D3D12_CPU_DESCRIPTOR_HANDLE& samplerHandle)
 {
-	const CrSamplerD3D12* d3d12Sampler = static_cast<const CrSamplerD3D12*>(sampler);
+	const crgfx::SamplerD3D12* d3d12Sampler = static_cast<const crgfx::SamplerD3D12*>(sampler);
 	samplerHandle = d3d12Sampler->GetD3D12Descriptor();
 }
 

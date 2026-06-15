@@ -135,7 +135,7 @@ namespace crgfx
 
 		CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
-		ICrSampler* CreateSampler(const CrSamplerDescriptor& descriptor);
+		ISampler* CreateSampler(const CrSamplerDescriptor& descriptor);
 
 		ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
@@ -221,7 +221,7 @@ namespace crgfx
 
 		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
 
-		virtual ICrSampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
+		virtual ISampler* CreateSamplerPS(const CrSamplerDescriptor& descriptor) = 0;
 
 		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 

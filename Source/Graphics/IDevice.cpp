@@ -4,7 +4,7 @@
 #include "IDevice.h"
 #include "ICrCommandBuffer.h"
 #include "ICrSwapchain.h"
-#include "ICrSampler.h"
+#include "ISampler.h"
 #include "ITexture.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
@@ -260,7 +260,7 @@ namespace crgfx
 		return new CrIndexBuffer(this, access, dataFormat, numIndices);
 	}
 
-	ICrSampler* IDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
+	ISampler* IDevice::CreateSampler(const CrSamplerDescriptor& descriptor)
 	{
 		return CreateSamplerPS(descriptor);
 	}

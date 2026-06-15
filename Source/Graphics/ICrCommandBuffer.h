@@ -151,7 +151,7 @@ public:
 
 	// Textures and Samplers
 
-	void BindSampler(Samplers::T samplerIndex, const ICrSampler* sampler);
+	void BindSampler(Samplers::T samplerIndex, const crgfx::ISampler* sampler);
 
 	void BindTexture(Textures::T textureIndex, const crgfx::ITexture* texture, crgfx::TextureView view = crgfx::TextureView());
 
@@ -319,7 +319,7 @@ protected:
 
 		CrConstantBufferBinding         m_constantBuffers[ConstantBuffers::Count];
 
-		const ICrSampler*               m_samplers[Samplers::Count];
+		const crgfx::ISampler*        m_samplers[Samplers::Count];
 
 		CrTextureBinding                m_textures[Textures::Count];
 
@@ -593,7 +593,7 @@ inline void ICrCommandBuffer::BindConstantBuffer(const CrGPUBufferView& constant
 	BindConstantBuffer((ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSizeBytes(), constantBufferView.GetByteOffset());
 }
 
-inline void ICrCommandBuffer::BindSampler(Samplers::T samplerIndex, const ICrSampler* sampler)
+inline void ICrCommandBuffer::BindSampler(Samplers::T samplerIndex, const crgfx::ISampler* sampler)
 {
 	CrCommandBufferAssertMsg(sampler != nullptr, "Sampler is null");
 	CrCommandBufferAssertMsg(samplerIndex < Samplers::Count, "Invalid binding index");

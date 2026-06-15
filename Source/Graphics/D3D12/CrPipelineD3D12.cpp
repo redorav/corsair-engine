@@ -49,18 +49,18 @@ void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, 
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.IndependentBlendEnable = false;
 
-	const CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
+	const crgfx::CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
 	static_assert(crgfx::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats), "Array not large enough ");
 
 	for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 	{
-		const CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
+		const crgfx::CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
 		D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
 		if (renderTargets.colorFormats[i] != crgfx::DataFormat::Invalid)
 		{
-			const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
+			const crgfx::CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 
 			renderTargetDesc.BlendEnable = renderTargetBlend.enable;
 			renderTargetDesc.LogicOpEnable = false;

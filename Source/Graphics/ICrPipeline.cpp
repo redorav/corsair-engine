@@ -4,7 +4,7 @@
 #include "Graphics/ICrShader.h"
 #include "Graphics/CrVertexDescriptor.h"
 
-CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
+crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 {
 	crgfx::BlendFactor::One,
 	crgfx::BlendFactor::One,
@@ -16,7 +16,7 @@ CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 	false
 };
 
-CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
+crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 {
 	crgfx::BlendFactor::SrcAlpha,
 	crgfx::BlendFactor::OneMinusSrcAlpha,

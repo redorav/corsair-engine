@@ -135,7 +135,7 @@ namespace crgfx
 
 		CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
-		ISampler* CreateSampler(const CrSamplerDescriptor& descriptor);
+		ISampler* CreateSampler(const crgfx::CrSamplerDescriptor& descriptor);
 
 		ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 

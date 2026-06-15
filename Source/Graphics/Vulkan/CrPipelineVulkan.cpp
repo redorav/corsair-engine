@@ -57,8 +57,8 @@ void CrGraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevic
 	crstl::fixed_vector<VkPipelineColorBlendAttachmentState, crgfx::MaxRenderTargets> blendAttachments;
 	for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 	{
-		const CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-		const CrRenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
+		const crgfx::CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
+		const crgfx::CrRenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
 
 		if (renderTarget.colorFormats[i] != crgfx::DataFormat::Invalid)
 		{

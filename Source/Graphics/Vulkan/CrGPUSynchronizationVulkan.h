@@ -3,44 +3,47 @@
 #include "Graphics/ICrGPUSynchronization.h"
 #include <vulkan/vulkan.h>
 
-class IDevice;
-
-class CrGPUFenceVulkan final : public ICrGPUFence
+namespace crgfx
 {
-public:
+	class IDevice;
 
-	CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled);
+	class CrGPUFenceVulkan final : public ICrGPUFence
+	{
+	public:
 
-	~CrGPUFenceVulkan();
+		CrGPUFenceVulkan(crgfx::IDevice* renderDevice, bool signaled);
 
-	VkFence GetVkFence() const;
+		~CrGPUFenceVulkan();
 
-private:
+		VkFence GetVkFence() const;
 
-	VkFence m_vkFence;
+	private:
+
+		VkFence m_vkFence;
+	};
+
+	inline VkFence CrGPUFenceVulkan::GetVkFence() const
+	{
+		return m_vkFence;
+	}
+
+	class CrGPUSemaphoreVulkan final : public ICrGPUSemaphore
+	{
+	public:
+
+		CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice);
+
+		~CrGPUSemaphoreVulkan();
+
+		VkSemaphore GetVkSemaphore() const;
+
+	private:
+
+		VkSemaphore m_vkSemaphore;
+	};
+
+	inline VkSemaphore CrGPUSemaphoreVulkan::GetVkSemaphore() const
+	{
+		return m_vkSemaphore;
+	}
 };
-
-inline VkFence CrGPUFenceVulkan::GetVkFence() const
-{
-	return m_vkFence;
-}
-
-class CrGPUSemaphoreVulkan final : public ICrGPUSemaphore
-{
-public:
-
-	CrGPUSemaphoreVulkan(crgfx::IDevice* renderDevice);
-
-	~CrGPUSemaphoreVulkan();
-
-	VkSemaphore GetVkSemaphore() const;
-
-private:
-
-	VkSemaphore m_vkSemaphore;
-};
-
-inline VkSemaphore CrGPUSemaphoreVulkan::GetVkSemaphore() const
-{
-	return m_vkSemaphore;
-}

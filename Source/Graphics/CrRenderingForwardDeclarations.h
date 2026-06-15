@@ -73,15 +73,16 @@ namespace crgfx
 	class ISwapchain;
 	using SwapchainHandle = crstl::intrusive_ptr<ISwapchain>;
 	struct CrSwapchainDescriptor;
+
+	class ICrGPUFence;
+	using CrGPUFenceHandle = crstl::intrusive_ptr<ICrGPUFence>;
+
+	class ICrGPUSemaphore;
+	using CrGPUSemaphoreHandle = crstl::intrusive_ptr<ICrGPUSemaphore>;
+
 };
 
 // Forward declare the necessary types for the rendering core
-
-class ICrGPUFence;
-using CrGPUFenceHandle = crstl::intrusive_ptr<ICrGPUFence>;
-
-class ICrGPUSemaphore;
-using CrGPUSemaphoreHandle = crstl::intrusive_ptr<ICrGPUSemaphore>;
 
 class ICrCommandBuffer;
 using CrCommandBufferHandle = crstl::intrusive_ptr<ICrCommandBuffer>;

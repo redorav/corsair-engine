@@ -67,7 +67,7 @@ namespace crgfx
 
 		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
 
-		virtual ICrGPUFence* CreateGPUFencePS(bool signaled) override;
+		virtual crgfx::ICrGPUFence* CreateGPUFencePS(bool signaled) override;
 
 		virtual ICrGPUSemaphore* CreateGPUSemaphorePS() override;
 
@@ -77,11 +77,11 @@ namespace crgfx
 
 		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
 
-		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
+		virtual crgfx::ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
 
 		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) override;
 
-		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
+		virtual crgfx::ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
 		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 

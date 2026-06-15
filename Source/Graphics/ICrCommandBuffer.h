@@ -348,7 +348,7 @@ protected:
 	crstl::unique_ptr<CrGPUStackAllocator> m_indexBufferGPUStack;
 
 	// Signal fence when execution completes
-	CrGPUFenceHandle             m_completionFence;
+	crgfx::CrGPUFenceHandle      m_completionFence;
 
 	crgfx::CommandQueueType::T   m_queueType;
 

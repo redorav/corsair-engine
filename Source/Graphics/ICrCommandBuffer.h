@@ -4,7 +4,7 @@
 
 #include "Graphics/CrGPUBuffer.h"
 
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 
 #include "Graphics/CrGPUDeletable.h"
 
@@ -74,20 +74,20 @@ struct CrTextureBinding
 {
 	CrTextureBinding() = default;
 
-	CrTextureBinding(const ICrTexture* texture, CrTextureView view) : texture(texture), view(view) {}
+	CrTextureBinding(const crgfx::ITexture* texture, crgfx::TextureView view) : texture(texture), view(view) {}
 
-	const ICrTexture* texture = nullptr;
+	const crgfx::ITexture* texture = nullptr;
 
-	CrTextureView view;
+	crgfx::TextureView view;
 };
 
 struct CrRWTextureBinding
 {
 	CrRWTextureBinding() {}
 
-	CrRWTextureBinding(const ICrTexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
+	CrRWTextureBinding(const crgfx::ITexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
 
-	const ICrTexture* texture = nullptr;
+	const crgfx::ITexture* texture = nullptr;
 	uint32_t mip = 0;
 };
 
@@ -153,9 +153,9 @@ public:
 
 	void BindSampler(Samplers::T samplerIndex, const ICrSampler* sampler);
 
-	void BindTexture(Textures::T textureIndex, const ICrTexture* texture, CrTextureView view = CrTextureView());
+	void BindTexture(Textures::T textureIndex, const crgfx::ITexture* texture, crgfx::TextureView view = crgfx::TextureView());
 
-	void BindRWTexture(RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip);
+	void BindRWTexture(RWTextures::T rwTextureIndex, const crgfx::ITexture* texture, uint32_t mip);
 
 	// Storage Buffers
 
@@ -185,7 +185,7 @@ public:
 	// Commands
 	//---------
 
-	void ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount);
+	void ClearRenderTarget(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount);
 
 	void Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 
@@ -255,7 +255,7 @@ protected:
 
 	virtual void EndPS() = 0;
 
-	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) = 0;
+	virtual void ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) = 0;
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) = 0;
 
@@ -459,7 +459,7 @@ inline void ICrCommandBuffer::BindComputePipelineState(const ICrComputePipeline*
 	}	
 }
 
-inline void ICrCommandBuffer::ClearRenderTarget(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
+inline void ICrCommandBuffer::ClearRenderTarget(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	ClearRenderTargetPS(renderTarget, color, mip, slice, mipCount, sliceCount);
 }
@@ -601,7 +601,7 @@ inline void ICrCommandBuffer::BindSampler(Samplers::T samplerIndex, const ICrSam
 	m_currentState.m_samplers[samplerIndex] = sampler;
 }
 
-inline void ICrCommandBuffer::BindTexture(Textures::T textureIndex, const ICrTexture* texture, CrTextureView view)
+inline void ICrCommandBuffer::BindTexture(Textures::T textureIndex, const crgfx::ITexture* texture, crgfx::TextureView view)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(textureIndex < Textures::Count, "Invalid binding index");
@@ -610,7 +610,7 @@ inline void ICrCommandBuffer::BindTexture(Textures::T textureIndex, const ICrTex
 	m_currentState.m_textures[textureIndex] = CrTextureBinding(texture, view);
 }
 
-inline void ICrCommandBuffer::BindRWTexture(RWTextures::T rwTextureIndex, const ICrTexture* texture, uint32_t mip)
+inline void ICrCommandBuffer::BindRWTexture(RWTextures::T rwTextureIndex, const crgfx::ITexture* texture, uint32_t mip)
 {
 	CrCommandBufferAssertMsg(texture != nullptr, "Texture is null");
 	CrCommandBufferAssertMsg(texture->IsUnorderedAccess(), "Texture must be created with UnorderedAccess flag");

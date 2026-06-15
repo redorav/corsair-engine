@@ -2,7 +2,7 @@
 
 #include "Graphics/CrRenderingForwardDeclarations.h"
 #include "Graphics/CrBuiltinPipeline.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 
 #include "crstl/intrusive_ptr.h"
 
@@ -26,7 +26,7 @@ public:
 
 	void NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindow);
 
-	void AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle& swapchainTexture);
+	void AddRenderPass(CrRenderGraph& renderGraph, const crgfx::TextureHandle& swapchainTexture);
 
 private:
 
@@ -36,7 +36,7 @@ private:
 
 	CrGraphicsPipelineHandle m_imguiGraphicsPipeline;
 
-	CrTextureHandle m_fontAtlas;
+	crgfx::TextureHandle m_fontAtlas;
 
 	CrImGuiRendererInitParams m_initParams;
 };

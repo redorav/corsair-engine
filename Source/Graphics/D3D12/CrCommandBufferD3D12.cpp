@@ -3,7 +3,7 @@
 #include "CrCommandBufferD3D12.h"
 #include "DeviceD3D12.h"
 #include "CrPipelineD3D12.h"
-#include "CrTextureD3D12.h"
+#include "TextureD3D12.h"
 #include "CrSamplerD3D12.h"
 #include "CrShaderD3D12.h"
 
@@ -73,7 +73,7 @@ void CrCommandBufferD3D12::ProcessTextureBarriers
 {
 	for (const CrRenderPassTextureDescriptor& descriptor : textures)
 	{
-		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(descriptor.texture);
+		const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(descriptor.texture);
 
 		crd3d::TextureBarrierInfoD3D12 sourceTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(descriptor.sourceState);
 		crd3d::TextureBarrierInfoD3D12 destinationTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(descriptor.destinationState);
@@ -125,7 +125,7 @@ void CrCommandBufferD3D12::ProcessRenderTargetBarrier
 	CrTextureBarrierVectorD3D12& d3d12TextureBarriers
 )
 {
-	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
+	const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(renderTargetDescriptor.texture);
 
 	crd3d::TextureBarrierInfoD3D12 sourceTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(initialState);
 	crd3d::TextureBarrierInfoD3D12 destinationTextureBarrierInfo = crd3d::GetD3D12TextureBarrierInfo(finalState);
@@ -207,7 +207,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 		{
 			const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
 			D3D12_RENDER_PASS_RENDER_TARGET_DESC& renderTargetDesc = d3d12RenderTargets[i];
-			const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(renderTargetDescriptor.texture);
+			const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(renderTargetDescriptor.texture);
 			renderTargetDesc.cpuDescriptor = d3d12Texture->GetD3D12RenderTargetView(renderTargetDescriptor.mipmap, renderTargetDescriptor.slice);
 			
 			// Render Target Load Operation
@@ -221,7 +221,7 @@ void CrCommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& rende
 
 		if (depthDescriptor.texture)
 		{
-			const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(depthDescriptor.texture);
+			const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(depthDescriptor.texture);
 			d3d12DepthStencil.cpuDescriptor = d3d12Texture->GetD3D12DepthStencilView();
 			
 			// Depth Load Operation
@@ -341,14 +341,14 @@ void CrCommandBufferD3D12::WriteCBV(const CrConstantBufferBinding& binding, D3D1
 
 void CrCommandBufferD3D12::WriteTextureSRV(const CrTextureBinding& textureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle)
 {
-	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(textureBinding.texture);
+	const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(textureBinding.texture);
 	D3D12_CPU_DESCRIPTOR_HANDLE srvDescriptor {};
 
-	if (textureBinding.view == CrTextureView())
+	if (textureBinding.view == crgfx::TextureView())
 	{
 		srvDescriptor = d3d12Texture->GetD3D12SRVDescriptor();
 	}
-	else if (textureBinding.view == CrTextureView(crgfx::TexturePlane::Stencil))
+	else if (textureBinding.view == crgfx::TextureView(crgfx::TexturePlane::Stencil))
 	{
 		srvDescriptor = d3d12Texture->GetD3D12StencilSRVDescriptor();
 	}
@@ -370,7 +370,7 @@ void CrCommandBufferD3D12::WriteSamplerView(const ICrSampler* sampler, D3D12_CPU
 
 void CrCommandBufferD3D12::WriteRWTextureUAV(const CrRWTextureBinding& rwTextureBinding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle)
 {
-	const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(rwTextureBinding.texture);
+	const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(rwTextureBinding.texture);
 	uavHandle = d3d12Texture->GetD3D12UAVDescriptor(rwTextureBinding.mip);
 }
 
@@ -789,7 +789,7 @@ void CrCommandBufferD3D12::BeginPS()
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }
 
-void CrCommandBufferD3D12::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
+void CrCommandBufferD3D12::ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	unused_parameter(renderTarget);
 	unused_parameter(color);

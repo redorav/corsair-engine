@@ -3,7 +3,7 @@
 #include "ICrGPUSynchronization.h"
 
 #include "Graphics/CrRenderingForwardDeclarations.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 
 #include "crstl/fixed_string.h"
 #include "crstl/vector.h"
@@ -52,7 +52,7 @@ public:
 
 	void Resize(uint32_t width, uint32_t height);
 
-	const CrTextureHandle& GetCurrentTexture();
+	const crgfx::TextureHandle& GetCurrentTexture();
 
 protected:
 
@@ -62,7 +62,7 @@ protected:
 
 	virtual CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 
-	crstl::vector<CrTextureHandle> m_textures;
+	crstl::vector<crgfx::TextureHandle> m_textures;
 
 	crstl::fixed_string32 m_name;
 

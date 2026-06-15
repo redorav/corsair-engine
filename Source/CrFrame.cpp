@@ -7,7 +7,7 @@
 #include "Graphics/ICrSwapchain.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShader.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/ICrCommandBuffer.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/UI/CrImGuiRenderer.h"
@@ -259,7 +259,8 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	m_renderWorld->SetCamera(m_camera);
 
-	CrTextureDescriptor rwTextureParams;
+
+	crgfx::TextureDescriptor rwTextureParams;
 	rwTextureParams.width = 64;
 	rwTextureParams.height = 64;
 	rwTextureParams.format = crgfx::DataFormat::RGBA16_Unorm;
@@ -321,7 +322,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	}
 
 	{
-		CrTextureDescriptor colorfulVolumeTextureDescriptor;
+		crgfx::TextureDescriptor colorfulVolumeTextureDescriptor;
 		colorfulVolumeTextureDescriptor.width = 4;
 		colorfulVolumeTextureDescriptor.height = 4;
 		colorfulVolumeTextureDescriptor.depth = 4;
@@ -350,7 +351,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	}
 
 	{
-		CrTextureDescriptor colorfulTextureArrayDescriptor;
+		crgfx::TextureDescriptor colorfulTextureArrayDescriptor;
 		colorfulTextureArrayDescriptor.width = 4;
 		colorfulTextureArrayDescriptor.height = 4;
 		colorfulTextureArrayDescriptor.type = crgfx::TextureType::Tex2D;
@@ -562,8 +563,8 @@ void CrFrame::Process()
 	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize.get());
-		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), CrTextureView(crgfx::TexturePlane::Depth));
-		commandBuffer->BindTexture(Textures::StencilTexture, m_depthStencilTexture.get(), CrTextureView(crgfx::TexturePlane::Stencil));
+		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), crgfx::TextureView(crgfx::TexturePlane::Depth));
+		commandBuffer->BindTexture(Textures::StencilTexture, m_depthStencilTexture.get(), crgfx::TextureView(crgfx::TexturePlane::Stencil));
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip1, m_linearDepthMinMaxMipChain.get(), 0);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip2, m_linearDepthMinMaxMipChain.get(), 1);
 		commandBuffer->BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepthMinMaxMipChain.get(), 2);
@@ -752,7 +753,7 @@ void CrFrame::Process()
 		});
 	}
 
-	CrTextureHandle swapchainTexture = m_swapchain->GetCurrentTexture();
+	crgfx::TextureHandle swapchainTexture = m_swapchain->GetCurrentTexture();
 
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Copy Pass"), float4(1.0f, 0.0f, 1.0f, 1.0f), CrRenderGraphPassType::Graphics,
 	[this, &swapchainTexture](CrRenderGraph& renderGraph)
@@ -830,7 +831,7 @@ void CrFrame::Process()
 		},
 		[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
 		{
-			const ICrTexture* debugShaderTexture = m_debugShaderTexture.get();
+			const crgfx::ITexture* debugShaderTexture = m_debugShaderTexture.get();
 	
 			commandBuffer->SetViewport(crgfx::Viewport(0.0f, 0.0f, (float)debugShaderTexture->GetWidth(), (float)debugShaderTexture->GetHeight()));
 			commandBuffer->SetScissor(crgfx::Rectangle(0, 0, debugShaderTexture->GetWidth(), debugShaderTexture->GetHeight()));
@@ -1146,7 +1147,7 @@ void CrFrame::RecreateRenderTargets()
 	m_swapchain = m_mainWindow->GetSwapchain();
 
 	// Recreate depth stencil texture
-	CrTextureDescriptor depthTextureDescriptor;
+	crgfx::TextureDescriptor depthTextureDescriptor;
 	depthTextureDescriptor.width = m_swapchain->GetWidth();
 	depthTextureDescriptor.height = m_swapchain->GetHeight();
 	depthTextureDescriptor.format = CrRendererConfig::DepthBufferFormat;
@@ -1167,7 +1168,7 @@ void CrFrame::RecreateRenderTargets()
 
 	// Recreate render targets
 	{
-		CrTextureDescriptor preSwapchainDescriptor;
+		crgfx::TextureDescriptor preSwapchainDescriptor;
 		preSwapchainDescriptor.width = m_swapchain->GetWidth();
 		preSwapchainDescriptor.height = m_swapchain->GetHeight();
 		preSwapchainDescriptor.format = m_swapchain->GetFormat();
@@ -1177,7 +1178,7 @@ void CrFrame::RecreateRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor albedoAODescriptor;
+		crgfx::TextureDescriptor albedoAODescriptor;
 		albedoAODescriptor.width = m_swapchain->GetWidth();
 		albedoAODescriptor.height = m_swapchain->GetHeight();
 		albedoAODescriptor.format = CrRendererConfig::GBufferAlbedoAOFormat;
@@ -1187,7 +1188,7 @@ void CrFrame::RecreateRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor normalsDescriptor;
+		crgfx::TextureDescriptor normalsDescriptor;
 		normalsDescriptor.width  = m_swapchain->GetWidth();
 		normalsDescriptor.height = m_swapchain->GetHeight();
 		normalsDescriptor.format = CrRendererConfig::GBufferNormalsFormat;
@@ -1197,7 +1198,7 @@ void CrFrame::RecreateRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor materialDescriptor;
+		crgfx::TextureDescriptor materialDescriptor;
 		materialDescriptor.width  = m_swapchain->GetWidth();
 		materialDescriptor.height = m_swapchain->GetHeight();
 		materialDescriptor.format = CrRendererConfig::GBufferMaterialFormat;
@@ -1207,7 +1208,7 @@ void CrFrame::RecreateRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor lightingDescriptor;
+		crgfx::TextureDescriptor lightingDescriptor;
 		lightingDescriptor.width  = m_swapchain->GetWidth();
 		lightingDescriptor.height = m_swapchain->GetHeight();
 		lightingDescriptor.format = CrRendererConfig::LightingFormat;
@@ -1217,7 +1218,7 @@ void CrFrame::RecreateRenderTargets()
 	}
 
 	{
-		CrTextureDescriptor debugShaderDescriptor;
+		crgfx::TextureDescriptor debugShaderDescriptor;
 		debugShaderDescriptor.width  = m_swapchain->GetWidth();
 		debugShaderDescriptor.height = m_swapchain->GetHeight();
 		debugShaderDescriptor.format = CrRendererConfig::DebugShaderFormat;

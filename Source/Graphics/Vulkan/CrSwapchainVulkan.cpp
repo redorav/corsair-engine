@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "CrSwapchainVulkan.h"
-#include "CrTextureVulkan.h"
+#include "TextureVulkan.h"
 #include "DeviceVulkan.h"
 #include "CrGPUSynchronizationVulkan.h"
 #include "CrVulkan.h"
@@ -353,13 +353,13 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 
 	vkWaitForFences(vkDevice, 1, &m_swapchainRecreationFence, VK_TRUE, UINT64_MAX);
 
-	m_textures = crstl::vector<CrTextureHandle>(m_imageCount);
+	m_textures = crstl::vector<crgfx::TextureHandle>(m_imageCount);
 
-	CrTextureDescriptor swapchainTextureParams;
-	swapchainTextureParams.width = m_width;
-	swapchainTextureParams.height = m_height;
-	swapchainTextureParams.format = m_format;
-	swapchainTextureParams.usage = crgfx::TextureUsage::SwapChain;
+	crgfx::TextureDescriptor swapchainTextureDescriptor;
+	swapchainTextureDescriptor.width = m_width;
+	swapchainTextureDescriptor.height = m_height;
+	swapchainTextureDescriptor.format = m_format;
+	swapchainTextureDescriptor.usage = crgfx::TextureUsage::SwapChain;
 
 	crstl::fixed_vector<VkImageMemoryBarrier, 8> imageMemoryBarriers(m_imageCount);
 
@@ -367,9 +367,9 @@ void CrSwapchainVulkan::CreateSwapchainTextures()
 	{
 		crstl::fixed_string128 swapchainTextureName(m_name);
 		swapchainTextureName.append_sprintf(" Texture %i", i);
-		swapchainTextureParams.name = swapchainTextureName.c_str();
-		swapchainTextureParams.extraDataPtr = images[i]; // Swapchain texture
-		m_textures[i] = vulkanDevice->CreateTexture(swapchainTextureParams);
+		swapchainTextureDescriptor.name = swapchainTextureName.c_str();
+		swapchainTextureDescriptor.extraDataPtr = images[i]; // Swapchain texture
+		m_textures[i] = vulkanDevice->CreateTexture(swapchainTextureDescriptor);
 
 		VkImageSubresourceRange subresourceRange = {};
 		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

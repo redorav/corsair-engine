@@ -12,7 +12,7 @@
 
 #include "Graphics/CrCPUStackAllocator.h"
 
-class CrTextureVulkan;
+class TextureVulkan;
 class ICrShaderBindingLayout;
 
 class CrCommandBufferVulkan final : public ICrCommandBuffer
@@ -33,7 +33,7 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) override;
+	virtual void ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) override;
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
 
@@ -71,7 +71,7 @@ private:
 
 	void GatherImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
 
-	void QueueVkImageBarrier(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
+	void QueueVkImageBarrier(const crgfx::ITexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
 		const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState);
 
 	void FlushImageAndBufferBarriers();

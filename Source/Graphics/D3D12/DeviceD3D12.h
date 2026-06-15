@@ -9,7 +9,7 @@
 #include "d3d12.h"
 
 class CrCommandQueueD3D12;
-class CrTextureD3D12;
+class TextureD3D12;
 
 namespace crgfx
 {
@@ -81,7 +81,7 @@ namespace crgfx
 
 		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
-		virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) override;
+		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
 		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
@@ -109,9 +109,9 @@ namespace crgfx
 		// Download and Upload
 		//--------------------
 
-		virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) override;
+		virtual uint8_t* BeginTextureUploadPS(const crgfx::ITexture* texture) override;
 
-		virtual void EndTextureUploadPS(const ICrTexture* texture) override;
+		virtual void EndTextureUploadPS(const crgfx::ITexture* texture) override;
 
 		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
 

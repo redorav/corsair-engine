@@ -8,7 +8,7 @@
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrRenderMesh.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/CrImage.h"
 #include "Graphics/CrCommonVertexLayouts.h"
 #include "Graphics/CrRenderingForwardDeclarations.h"
@@ -300,7 +300,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 
 		CrRenderModelDescriptor modelDescriptor;
 
-		crstl::open_hashmap<void*, CrTextureHandle> textureMap;
+		crstl::open_hashmap<void*, crgfx::TextureHandle> textureMap;
 
 		for (uint32_t t = 0; t < gltfData->textures_count; ++t)
 		{
@@ -310,16 +310,16 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(imagePath);
 
-			CrTextureDescriptor textureParams;
-			textureParams.width = image->GetWidth();
-			textureParams.height = image->GetHeight();
-			textureParams.format = image->GetFormat();
-			textureParams.initialData = image->GetData();
-			textureParams.initialDataSize = image->GetDataSize();
-			textureParams.mipmapCount = image->m_mipmapCount;
-			textureParams.usage = crgfx::TextureUsage::Default;
+			crgfx::TextureDescriptor textureDescriptor;
+			textureDescriptor.width = image->GetWidth();
+			textureDescriptor.height = image->GetHeight();
+			textureDescriptor.format = image->GetFormat();
+			textureDescriptor.initialData = image->GetData();
+			textureDescriptor.initialDataSize = image->GetDataSize();
+			textureDescriptor.mipmapCount = image->m_mipmapCount;
+			textureDescriptor.usage = crgfx::TextureUsage::Default;
 
-			CrTextureHandle texture = crgfx::GetDevice()->CreateTexture(textureParams);
+			crgfx::TextureHandle texture = crgfx::GetDevice()->CreateTexture(textureDescriptor);
 
 			if (!texture)
 			{
@@ -334,7 +334,7 @@ CrRenderModelHandle CrModelDecoderCGLTF::Decode(const crstl::file& file)
 			const auto textureIter = textureMap.find(cgltfKey);
 			if (textureIter != textureMap.end())
 			{
-				const CrTextureHandle& texture = textureIter->second;
+				const crgfx::TextureHandle& texture = textureIter->second;
 				material->AddTexture(texture, semantic);
 			}
 		};

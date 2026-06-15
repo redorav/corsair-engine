@@ -9,7 +9,7 @@
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/ICrShader.h"
 #include "Graphics/CrShaderManager.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ICrCommandBuffer.h"
@@ -113,15 +113,15 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 		int fontWidth, fontHeight;
 		io.Fonts->GetTexDataAsRGBA32(&fontData, &fontWidth, &fontHeight);
 
-		CrTextureDescriptor fontParams;
-		fontParams.width = (uint32_t)fontWidth;
-		fontParams.height = (uint32_t)fontHeight;
-		fontParams.format = crgfx::DataFormat::RGBA8_Unorm;
-		fontParams.name = "ImGui Font Atlas";
-		fontParams.initialData = fontData;
-		fontParams.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
+		crgfx::TextureDescriptor fontTextureDescriptor;
+		fontTextureDescriptor.width = (uint32_t)fontWidth;
+		fontTextureDescriptor.height = (uint32_t)fontHeight;
+		fontTextureDescriptor.format = crgfx::DataFormat::RGBA8_Unorm;
+		fontTextureDescriptor.name = "ImGui Font Atlas";
+		fontTextureDescriptor.initialData = fontData;
+		fontTextureDescriptor.initialDataSize = 4 * fontWidth * fontHeight; // Can't this be computed internally from texture params?
 
-		m_fontAtlas = renderDevice->CreateTexture(fontParams);
+		m_fontAtlas = renderDevice->CreateTexture(fontTextureDescriptor);
 		CrAssertMsg(m_fontAtlas.get(), "Failed to create the ImGui font atlas");
 		io.Fonts->TexID = (ImTextureID)m_fontAtlas.get();
 	}
@@ -179,7 +179,7 @@ void CrImGuiRenderer::NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindo
 	ImGui::NewFrame();
 }
 
-void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureHandle&)
+void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::TextureHandle&)
 {
 	renderGraph.AddRenderPass(CrRenderGraphString("ImGui Render Viewports"), float4(0.3f, 0.3f, 0.6f, 1.0f), CrRenderGraphPassType::Behavior,
 	[&](CrRenderGraph&)
@@ -267,7 +267,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const CrTextureH
 					if (!imDrawCmd->UserCallback)
 					{
 						// Generic rendering.
-						ICrTexture* texture = (ICrTexture*)imDrawCmd->TextureId;
+						crgfx::ITexture* texture = (crgfx::ITexture*)imDrawCmd->TextureId;
 						commandBuffer->BindTexture(Textures::UITexture, texture);
 						commandBuffer->SetScissor(crgfx::Rectangle(x, y, width, height));
 						commandBuffer->DrawIndexed(imDrawCmd->ElemCount, 1, imDrawCmd->IdxOffset + totalIndexOffset, imDrawCmd->VtxOffset + totalVertexOffset, 0);

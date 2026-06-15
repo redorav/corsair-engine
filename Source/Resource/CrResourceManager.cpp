@@ -3,7 +3,7 @@
 #include "CrResourceManager.h"
 
 #include "Graphics/CrImage.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrRenderModel.h"
 

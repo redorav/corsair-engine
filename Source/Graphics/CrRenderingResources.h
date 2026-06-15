@@ -23,12 +23,12 @@ public:
 
 	CrSamplerHandle AllPointWrapSampler;
 
-	CrTextureHandle WhiteSmallTexture;
+	crgfx::TextureHandle WhiteSmallTexture;
 
-	CrTextureHandle BlackSmallTexture;
+	crgfx::TextureHandle BlackSmallTexture;
 
 	// Points up in tangent space
-	CrTextureHandle NormalsSmallTexture;
+	crgfx::TextureHandle NormalsSmallTexture;
 
 private:
 

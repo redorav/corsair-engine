@@ -3,7 +3,7 @@
 #include "GraphicsSystemD3D12.h"
 #include "DeviceD3D12.h"
 #include "CrCommandBufferD3D12.h"
-#include "CrTextureD3D12.h"
+#include "TextureD3D12.h"
 #include "CrSamplerD3D12.h"
 #include "CrSwapchainD3D12.h"
 #include "CrGPUBufferD3D12.h"
@@ -432,9 +432,9 @@ namespace crgfx
 		return new CrSwapchainD3D12(this, swapchainDescriptor);
 	}
 
-	ICrTexture* DeviceD3D12::CreateTexturePS(const CrTextureDescriptor& params)
+	ITexture* DeviceD3D12::CreateTexturePS(const crgfx::TextureDescriptor& params)
 	{
-		return new CrTextureD3D12(this, params);
+		return new TextureD3D12(this, params);
 	}
 
 	ICrGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
@@ -536,9 +536,9 @@ namespace crgfx
 		WaitForFence(m_waitIdleFence.get(), UINT64_MAX);
 	}
 
-	uint8_t* DeviceD3D12::BeginTextureUploadPS(const ICrTexture* texture)
+	uint8_t* DeviceD3D12::BeginTextureUploadPS(const crgfx::ITexture* texture)
 	{
-		const CrTextureD3D12* d3d12Texture = static_cast<const CrTextureD3D12*>(texture);
+		const TextureD3D12* d3d12Texture = static_cast<const TextureD3D12*>(texture);
 
 		D3D12_RESOURCE_DESC resourceDescriptor = d3d12Texture->GetD3D12Resource()->GetDesc();
 
@@ -563,7 +563,7 @@ namespace crgfx
 		return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get())->Lock();
 	}
 
-	void DeviceD3D12::EndTextureUploadPS(const ICrTexture* destinationTexture)
+	void DeviceD3D12::EndTextureUploadPS(const crgfx::ITexture* destinationTexture)
 	{
 		CrHash textureHash(&destinationTexture, sizeof(destinationTexture));
 		const auto textureUploadIter = m_openTextureUploads.find(textureHash);
@@ -571,7 +571,7 @@ namespace crgfx
 
 		const CrTextureUpload& textureUpload = textureUploadIter->second;
 
-		const CrTextureD3D12* d3d12DestinationTexture = static_cast<const CrTextureD3D12*>(destinationTexture);
+		const TextureD3D12* d3d12DestinationTexture = static_cast<const TextureD3D12*>(destinationTexture);
 		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get());
 
 		d3d12StagingBuffer->Unlock();

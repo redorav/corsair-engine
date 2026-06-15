@@ -2,7 +2,7 @@
 
 #include "Graphics/CrRenderingForwardDeclarations.h"
 #include "Graphics/CrRendering.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 
 #include "Core/CrHash.h"
 
@@ -68,9 +68,9 @@ struct CrRenderGraphTextureUsage
 		: textureIndex((Textures::T)-1)
 	{}
 
-	ICrTexture* texture = nullptr;
+	crgfx::ITexture* texture = nullptr;
 
-	CrTextureView view;
+	crgfx::TextureView view;
 
 	// TODO Move to subresource
 	uint64_t subresourceId = 0xffffffff;
@@ -161,7 +161,7 @@ struct CrRenderGraphPass
 
 	crstl::fixed_open_hashmap<uint64_t, CrRenderGraphBufferTransitionInfo, 16> bufferTransitionInfos;
 
-	ICrTexture* depthTexture;
+	crgfx::ITexture* depthTexture;
 
 	CrRenderGraphExecutionFunction executionFunction;
 };
@@ -197,13 +197,13 @@ public:
 
 	uint32_t GetSubresourceId(CrHash subresourceHash);
 
-	void BindTexture(Textures::T textureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, CrTextureView view = CrTextureView());
+	void BindTexture(Textures::T textureIndex, crgfx::ITexture* texture, crgfx::ShaderStageFlags::T shaderStages, crgfx::TextureView view = crgfx::TextureView());
 
-	void BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
+	void BindRWTexture(RWTextures::T rwTextureIndex, crgfx::ITexture* texture, crgfx::ShaderStageFlags::T shaderStages, uint32_t mipmap = 0, uint32_t sliceStart = 0, uint32_t sliceCount = 1);
 
 	void BindRenderTarget
 	(
-		ICrTexture* texture,
+		crgfx::ITexture* texture,
 		crgfx::RenderTargetLoadOp loadOp,
 		crgfx::RenderTargetStoreOp storeOp = crgfx::RenderTargetStoreOp::Store,
 		float4 clearColor = float4(),
@@ -212,7 +212,7 @@ public:
 
 	void BindDepthStencilTarget
 	(
-		ICrTexture* texture,
+		crgfx::ITexture* texture,
 		crgfx::RenderTargetLoadOp loadOp,
 		crgfx::RenderTargetStoreOp storeOp = crgfx::RenderTargetStoreOp::Store,
 		float depthClearValue = 0.0f,
@@ -223,7 +223,7 @@ public:
 		bool readOnlyDepth = false, bool readOnlyStencil = false
 	);
 
-	void BindSwapchain(ICrTexture* texture, uint32_t mipmap = 0, uint32_t slice = 0);
+	void BindSwapchain(crgfx::ITexture* texture, uint32_t mipmap = 0, uint32_t slice = 0);
 
 	//---------------
 	// Buffer binding

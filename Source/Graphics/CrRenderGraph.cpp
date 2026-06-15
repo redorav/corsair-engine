@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/CrRenderGraph.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/ICrCommandBuffer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
 
@@ -50,9 +50,7 @@ uint32_t CrRenderGraph::GetSubresourceId(CrHash subresourceHash)
 	return subresourceId;
 }
 
-void CrRenderGraph::BindTexture
-(
-	Textures::T textureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, CrTextureView view)
+void CrRenderGraph::BindTexture(Textures::T textureIndex, crgfx::ITexture* texture, crgfx::ShaderStageFlags::T shaderStages, crgfx::TextureView view)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -70,7 +68,7 @@ void CrRenderGraph::BindTexture
 	CrRenderGraphLog("Added Texture %s", texture->GetDebugName());
 }
 
-void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* texture, crgfx::ShaderStageFlags::T shaderStages, uint32_t mipmap, uint32_t sliceStart, uint32_t sliceCount)
+void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, crgfx::ITexture* texture, crgfx::ShaderStageFlags::T shaderStages, uint32_t mipmap, uint32_t sliceStart, uint32_t sliceCount)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -93,7 +91,7 @@ void CrRenderGraph::BindRWTexture(RWTextures::T rwTextureIndex, ICrTexture* text
 
 void CrRenderGraph::BindRenderTarget
 (
-	ICrTexture* texture,
+	crgfx::ITexture* texture,
 	crgfx::RenderTargetLoadOp loadOp,
 	crgfx::RenderTargetStoreOp storeOp,
 	float4 clearColor,
@@ -123,7 +121,7 @@ void CrRenderGraph::BindRenderTarget
 
 void CrRenderGraph::BindDepthStencilTarget
 (
-	ICrTexture* texture,
+	crgfx::ITexture* texture,
 	crgfx::RenderTargetLoadOp loadOp,
 	crgfx::RenderTargetStoreOp storeOp,
 	float depthClearValue,
@@ -215,7 +213,7 @@ void CrRenderGraph::BindDepthStencilTarget
 	CrRenderGraphLog("Added Depth Stencil Target %s", texture->GetDebugName());
 }
 
-void CrRenderGraph::BindSwapchain(ICrTexture* texture, uint32_t mipmap, uint32_t slice)
+void CrRenderGraph::BindSwapchain(crgfx::ITexture* texture, uint32_t mipmap, uint32_t slice)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 

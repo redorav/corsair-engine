@@ -74,7 +74,7 @@ void ICrSwapchain::Resize(uint32_t width, uint32_t height)
 	m_height = height;
 }
 
-const CrTextureHandle& ICrSwapchain::GetCurrentTexture()
+const crgfx::TextureHandle& ICrSwapchain::GetCurrentTexture()
 {
 	return m_textures[m_currentBufferIndex];
 }

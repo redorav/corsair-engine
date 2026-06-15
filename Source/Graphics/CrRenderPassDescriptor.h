@@ -27,7 +27,7 @@ struct CrRenderTargetDescriptor
 		, stencilStoreOp(crgfx::RenderTargetStoreOp::DontCare)
 	{}
 
-	const ICrTexture* texture;
+	const crgfx::ITexture* texture;
 	uint32_t mipmap;
 	uint32_t slice;
 
@@ -70,12 +70,12 @@ struct CrRenderPassBufferDescriptor
 
 struct CrRenderPassTextureDescriptor
 {
-	CrRenderPassTextureDescriptor(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
+	CrRenderPassTextureDescriptor(const crgfx::ITexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, 
 		uint32_t sliceStart, uint32_t sliceCount, crgfx::TexturePlane::T texturePlane, const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState)
 		: texture(texture), mipmapStart(mipmapStart), mipmapCount(mipmapCount), sliceStart(sliceStart), sliceCount(sliceCount), texturePlane(texturePlane)
 		, sourceState(sourceState), destinationState(destinationState) {}
 
-	const ICrTexture* texture;
+	const crgfx::ITexture* texture;
 
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;

@@ -2,7 +2,7 @@
 
 #include "GraphicsSystemD3D12.h"
 #include "CrSwapchainD3D12.h"
-#include "CrTextureD3D12.h"
+#include "TextureD3D12.h"
 #include "DeviceD3D12.h"
 #include "CrGPUSynchronizationD3D12.h"
 #include "CrD3D12.h"
@@ -128,7 +128,7 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 	for (uint32_t i = 0; i < m_imageCount; i++)
 	{
 		CrAssertMsg(m_textures[i]->get_ref() == 1, "Reference to resource being held externally");
-		CrTextureD3D12* d3d12Texture = (CrTextureD3D12*)m_textures[i].get();
+		crgfx::TextureD3D12* d3d12Texture = (crgfx::TextureD3D12*)m_textures[i].get();
 		d3d12Texture->GetD3D12Resource()->Release();
 	}
 
@@ -148,7 +148,7 @@ void CrSwapchainD3D12::ResizePS(uint32_t width, uint32_t height)
 
 void CrSwapchainD3D12::CreateSwapchainTextures()
 {
-	CrTextureDescriptor swapchainTextureParams;
+	crgfx::TextureDescriptor swapchainTextureParams;
 	swapchainTextureParams.width = m_width;
 	swapchainTextureParams.height = m_height;
 	swapchainTextureParams.format = m_format;

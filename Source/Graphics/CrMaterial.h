@@ -4,7 +4,7 @@
 #include "Core/CrPlatform.h"
 
 #include "Graphics/ICrPipeline.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
@@ -146,13 +146,13 @@ public:
 
 	const CrGraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
 
-	void AddTexture(const CrTextureHandle& texture, Textures::T semantic);
+	void AddTexture(const crgfx::TextureHandle& texture, Textures::T semantic);
 
 //private: TODO Fix
 
 	struct TextureBinding
 	{
-		CrTextureHandle texture;
+		crgfx::TextureHandle texture;
 		Textures::T semantic;
 	};
 

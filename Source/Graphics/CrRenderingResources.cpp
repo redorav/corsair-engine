@@ -4,7 +4,7 @@
 
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/ICrSampler.h"
-#include "Graphics/ICrTexture.h"
+#include "Graphics/ITexture.h"
 #include "Graphics/IDevice.h"
 
 CrRenderingResources* RenderingResources;
@@ -71,7 +71,7 @@ CrRenderingResources::CrRenderingResources()
 		uint8_t whiteTextureInitialData[4 * 4 * 4];
 		memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
 
-		CrTextureDescriptor whiteTextureDescriptor;
+		crgfx::TextureDescriptor whiteTextureDescriptor;
 		whiteTextureDescriptor.width = 4;
 		whiteTextureDescriptor.height = 4;
 		whiteTextureDescriptor.initialData = whiteTextureInitialData;
@@ -84,7 +84,7 @@ CrRenderingResources::CrRenderingResources()
 		uint8_t blackTextureInitialData[4 * 4 * 4];
 		memset(blackTextureInitialData, 0, sizeof(blackTextureInitialData));
 
-		CrTextureDescriptor blackTextureDescriptor;
+		crgfx::TextureDescriptor blackTextureDescriptor;
 		blackTextureDescriptor.width = 4;
 		blackTextureDescriptor.height = 4;
 		blackTextureDescriptor.initialData = blackTextureInitialData;
@@ -107,7 +107,7 @@ CrRenderingResources::CrRenderingResources()
 			}
 		}
 
-		CrTextureDescriptor defaultNormalTextureDescriptor;
+		crgfx::TextureDescriptor defaultNormalTextureDescriptor;
 		defaultNormalTextureDescriptor.width = 4;
 		defaultNormalTextureDescriptor.height = 4;
 		defaultNormalTextureDescriptor.initialData = (const uint8_t*)normalMapInitialData;

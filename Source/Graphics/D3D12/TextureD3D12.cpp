@@ -1,0 +1,476 @@
+#include "Graphics/CrRendering_pch.h"
+
+#include "CrCommandBufferD3D12.h"
+#include "TextureD3D12.h"
+#include "DeviceD3D12.h"
+#include "CrD3D12.h"
+
+#include "Core/CrAlignment.h"
+#include "Core/Logging/ICrDebug.h"
+
+#include "Math/CrMath.h"
+
+namespace crgfx
+{
+	TextureD3D12::TextureD3D12(crgfx::IDevice* renderDevice, const crgfx::TextureDescriptor& descriptor)
+		: ITexture(renderDevice, descriptor)
+	{
+		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
+		ID3D12Device* d3d12Device = d3d12RenderDevice->GetD3D12Device();
+		ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
+
+		m_d3d12InitialLayout = crd3d::GetD3D12BarrierTextureLayout(m_defaultState.layout);
+
+		DXGI_FORMAT dxgiFormat = crd3d::GetDXGIFormat(descriptor.format);
+
+		D3D12_RESOURCE_DESC1 d3d12ResourceDescriptor = {};
+		d3d12ResourceDescriptor.Width = m_width;
+		d3d12ResourceDescriptor.Height = m_height;
+		d3d12ResourceDescriptor.MipLevels = (UINT16)m_mipmapCount;
+		d3d12ResourceDescriptor.Format = dxgiFormat;
+		d3d12ResourceDescriptor.SampleDesc.Count = crd3d::GetD3D12SampleCount(descriptor.sampleCount);
+		d3d12ResourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+		if (IsDepthStencil())
+		{
+			d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		}
+	
+		if (IsRenderTarget())
+		{
+			d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		}
+
+		if (IsUnorderedAccess())
+		{
+			d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+
+		if (IsCubemap())
+		{
+			d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)(6 * m_arraySize);
+		}
+		else if(IsVolumeTexture())
+		{
+			d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+			d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_depth;
+		}
+		else if (Is1DTexture())
+		{
+			d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE1D;
+			d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
+		}
+		else
+		{
+			d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			d3d12ResourceDescriptor.DepthOrArraySize = (UINT16)m_arraySize;
+		}
+
+		crstl::fixed_vector<DXGI_FORMAT, crgfx::MaxCustomTextureViews> castableFormats;
+
+		for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+		{
+			if (descriptor.customViews[i].format != crgfx::DataFormat::Invalid && descriptor.customViews[i].format != m_format)
+			{
+				castableFormats.push_back(crd3d::GetDXGIFormat(descriptor.customViews[i].format));
+			}
+		}
+
+		if (IsSwapchain())
+		{
+			m_d3d12Resource = (ID3D12Resource*)descriptor.extraDataPtr;
+		}
+		else
+		{
+			// TODO Create resource heap in render device to use CreatePlacedResource
+			D3D12_HEAP_PROPERTIES heapProperties = {};
+			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+			bool useOptimizedClearValue = IsRenderTarget();
+
+			D3D12_CLEAR_VALUE clearValue;
+			clearValue.Format = dxgiFormat;
+
+			if (crgfx::IsDepthFormat(descriptor.format))
+			{
+				clearValue.DepthStencil.Depth = descriptor.depthClear;
+				clearValue.DepthStencil.Stencil = descriptor.stencilClear;
+			}
+			else
+			{
+				clearValue.Color[0] = descriptor.colorClear[0];
+				clearValue.Color[1] = descriptor.colorClear[1];
+				clearValue.Color[2] = descriptor.colorClear[2];
+				clearValue.Color[3] = descriptor.colorClear[3];
+			}
+
+			HRESULT hResult = S_FALSE;
+
+			hResult = d3d12Device10->CreateCommittedResource3
+			(
+				&heapProperties,
+				D3D12_HEAP_FLAG_NONE,
+				&d3d12ResourceDescriptor,
+				m_d3d12InitialLayout,
+				useOptimizedClearValue ? &clearValue : nullptr,
+				nullptr,
+				(UINT32)castableFormats.size(),
+				castableFormats.size() ? castableFormats.data() : nullptr,
+				IID_PPV_ARGS(&m_d3d12Resource)
+			);
+
+			CrAssertMsg(SUCCEEDED(hResult), "Failed to create texture");
+		}
+
+		if (IsRenderTarget() || IsDepthStencil() || IsUnorderedAccess() || IsSwapchain() || descriptor.customViews.size() > 0)
+		{
+			m_additionalViews = crstl::unique_ptr<CrD3D12AdditionalTextureViews>(new CrD3D12AdditionalTextureViews());
+		}
+
+		// Create Render Target views
+		if (IsSwapchain() || IsRenderTarget())
+		{
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDescriptor = {};
+			rtvDescriptor.Format = dxgiFormat;
+
+			// Set the view dimensions depending on the texture type
+			if (IsVolumeTexture())
+			{
+				rtvDescriptor.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
+			}
+			else if (IsCubemap())
+			{
+				rtvDescriptor.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+			}
+			else if(Is1DTexture())
+			{
+				rtvDescriptor.ViewDimension = m_arraySize > 1 ? D3D12_RTV_DIMENSION_TEXTURE1DARRAY : D3D12_RTV_DIMENSION_TEXTURE1D;
+			}
+			else
+			{
+				rtvDescriptor.ViewDimension = m_arraySize > 1 ? D3D12_RTV_DIMENSION_TEXTURE2DARRAY : D3D12_RTV_DIMENSION_TEXTURE2D;
+			}
+
+			// Create one render target view for each mip/slice combination
+			for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
+			{
+				rtvDescriptor.Texture2D.MipSlice = mip;
+
+				m_additionalViews->m_d3d12RTVSingleMipSlice[mip].resize(m_arraySize);
+
+				for (uint32_t slice = 0; slice < m_arraySize; ++slice)
+				{
+					// Allocate RTV descriptor from render device
+					rtvDescriptor.Texture2DArray.FirstArraySlice = slice;
+					rtvDescriptor.Texture2DArray.ArraySize = 1;
+					m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice] = d3d12RenderDevice->AllocateRTVDescriptor();
+					d3d12Device->CreateRenderTargetView(m_d3d12Resource, &rtvDescriptor, m_additionalViews->m_d3d12RTVSingleMipSlice[mip][slice]);
+				}
+			}
+		}
+
+		// Create depth stencil views
+		// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ns-d3d11-d3d11_depth_stencil_view_desc
+		if (IsDepthStencil())
+		{
+			// Map texture formats to depth stencil formats
+			D3D12_DEPTH_STENCIL_VIEW_DESC dsvDescriptor = {};
+			dsvDescriptor.Flags = D3D12_DSV_FLAG_NONE;
+			dsvDescriptor.Format = DXGI_FORMAT_UNKNOWN;
+
+			switch (descriptor.format)
+			{
+				case crgfx::DataFormat::D16_Unorm: dsvDescriptor.Format = DXGI_FORMAT_D16_UNORM; break;
+				case crgfx::DataFormat::D32_Float: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT; break;
+				case crgfx::DataFormat::D24_Unorm_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
+				case crgfx::DataFormat::D32_Float_S8_Uint: dsvDescriptor.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT; break;
+				default: break;
+			}
+
+			// Set the view dimensions depending on the texture type
+			if (IsCubemap())
+			{
+				dsvDescriptor.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+			}
+			else if (Is1DTexture())
+			{
+				dsvDescriptor.ViewDimension = m_arraySize > 1 ? D3D12_DSV_DIMENSION_TEXTURE1DARRAY : D3D12_DSV_DIMENSION_TEXTURE1D;
+			}
+			else
+			{
+				dsvDescriptor.ViewDimension = m_arraySize > 1 ? D3D12_DSV_DIMENSION_TEXTURE2DARRAY : D3D12_DSV_DIMENSION_TEXTURE2D;
+			}
+
+			m_additionalViews->m_d3d12DSVSingleMipSlice = d3d12RenderDevice->AllocateDSVDescriptor();
+			d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSlice);
+
+			if (crgfx::IsDepthStencilFormat(descriptor.format))
+			{
+				dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+				m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth = d3d12RenderDevice->AllocateDSVDescriptor();
+				d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
+
+				dsvDescriptor.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+				m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil = d3d12RenderDevice->AllocateDSVDescriptor();
+				d3d12Device->CreateDepthStencilView(m_d3d12Resource, &dsvDescriptor, m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
+			}
+		}
+
+		// Create unordered access views
+		if (IsUnorderedAccess())
+		{
+			for (uint32_t i = 0; i < m_mipmapCount; ++i)
+			{
+				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDescriptor;
+				uavDescriptor.Format = dxgiFormat;
+				uavDescriptor.Texture2DArray.MipSlice = i;
+
+				if (IsCubemap())
+				{
+					uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+					uavDescriptor.Texture2DArray.FirstArraySlice = 0;
+					uavDescriptor.Texture2DArray.ArraySize = m_arraySize * 6;
+					uavDescriptor.Texture2DArray.PlaneSlice = 0;
+				}
+				else if (IsVolumeTexture())
+				{
+					uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
+					uavDescriptor.Texture3D.FirstWSlice = 0;
+					uavDescriptor.Texture3D.WSize = (UINT)-1;
+				}
+				else if (Is1DTexture())
+				{
+					if (m_arraySize > 1)
+					{
+						uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1DARRAY;
+						uavDescriptor.Texture1DArray.FirstArraySlice = 0;
+						uavDescriptor.Texture1DArray.ArraySize = m_arraySize;
+					}
+					else
+					{
+						uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1D;
+					}
+				}
+				else
+				{
+					if (m_arraySize > 1)
+					{
+						uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+						uavDescriptor.Texture2DArray.FirstArraySlice = 0;
+						uavDescriptor.Texture2DArray.ArraySize = m_arraySize;
+						uavDescriptor.Texture2DArray.PlaneSlice = 0;
+					}
+					else
+					{
+						uavDescriptor.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+						uavDescriptor.Texture2D.PlaneSlice = 0;
+					}
+				}
+
+				m_additionalViews->m_d3d12UAVSingleMipAllSlices[i] = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+				d3d12Device->CreateUnorderedAccessView(m_d3d12Resource, nullptr, &uavDescriptor, m_additionalViews->m_d3d12UAVSingleMipAllSlices[i]);
+			}
+		}
+
+		// Create shader resource views
+
+		DXGI_FORMAT srvFormat = dxgiFormat;
+
+		switch (descriptor.format)
+		{
+			case crgfx::DataFormat::D16_Unorm: srvFormat = DXGI_FORMAT_R16_UNORM; break;
+			case crgfx::DataFormat::D32_Float: srvFormat = DXGI_FORMAT_R32_FLOAT; break;
+			case crgfx::DataFormat::D24_Unorm_S8_Uint: srvFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
+			case crgfx::DataFormat::D32_Float_S8_Uint: srvFormat = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS; break;
+			default: break;
+		}
+
+		m_d3d12SRVDescriptor = CreateShaderResourceView(srvFormat, m_type, 0, m_mipmapCount, 0, m_arraySize, 0);
+
+		if (IsDepthStencil())
+		{
+			m_additionalViews->m_d3d12StencilSRVDescriptor = CreateShaderResourceView(DXGI_FORMAT_X32_TYPELESS_G8X24_UINT, m_type, 0, m_mipmapCount, 0, m_arraySize, 1);
+		}
+
+		for (size_t i = 0; i < descriptor.customViews.size(); ++i)
+		{
+			crgfx::TextureView textureView = descriptor.customViews[i];
+	
+			DXGI_FORMAT customFormat = textureView.format == crgfx::DataFormat::Invalid ? srvFormat : crd3d::GetDXGIFormat(textureView.format);
+	
+			if (textureView.type == crgfx::TextureViewType::Read)
+			{
+				m_additionalViews->m_d3d12CustomViews.push_back({ textureView, CreateShaderResourceView(customFormat, m_type, textureView.mipmapStart, textureView.mipmapCount, textureView.sliceStart, textureView.sliceCount, textureView.plane) });
+			}
+			else if(textureView.type == crgfx::TextureViewType::Write)
+			{
+				CrAssertMsg(false, "Not implemented!");
+			}
+		}
+
+		d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
+
+		// Calculate number of subresources by computing the last subresource in the resource
+		m_d3d12SubresourceCount = crd3d::CalculateSubresource(m_mipmapCount - 1, m_arraySize - 1, 0, m_mipmapCount, m_arraySize) + 1;
+
+		D3D12_RESOURCE_ALLOCATION_INFO d3d12ResourceAllocationInfo = d3d12RenderDevice->GetD3D12Device()->GetResourceAllocationInfo(0, 1, (D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor);
+		m_usedGPUMemoryBytes = (uint32_t)d3d12ResourceAllocationInfo.SizeInBytes;
+
+		// Prepare the hardware mipmap layout
+		{
+			// Calculate twice the number of subresources for array textures, so we can calculate the slice pitch
+			const uint32_t MaxSubresources = 2 * crgfx::MaxMipmaps;
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
+			UINT numRows[MaxSubresources];
+			d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints((D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
+
+			for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
+			{
+				uint32_t subresourceIndex = crd3d::CalculateSubresource(mip, 0, 0, m_mipmapCount, m_arraySize);
+				crgfx::MipmapLayout& mipmapLayout  = m_hardwareMipmapLayouts[mip];
+				mipmapLayout.rowPitchBytes        = subresourceFootprints[subresourceIndex].Footprint.RowPitch;
+				mipmapLayout.offsetBytes          = (uint32_t)subresourceFootprints[subresourceIndex].Offset;
+				mipmapLayout.heightInPixelsBlocks = numRows[subresourceIndex];
+			}
+
+			if (m_arraySize > 1)
+			{
+				// The offset for the first mip of the second slice is the distance between slices
+				m_slicePitchBytes = (uint32_t)subresourceFootprints[m_mipmapCount].Offset;
+			}
+			else
+			{
+				m_slicePitchBytes = 0;
+			}
+		}
+
+		if (descriptor.initialData)
+		{
+			uint8_t* textureData = m_renderDevice->BeginTextureUpload(this);
+			{
+				CopyIntoTextureMemory(textureData, descriptor.initialData, 0, m_mipmapCount, 0, m_arraySize);
+			}
+			m_renderDevice->EndTextureUpload(this);
+		}
+	}
+
+	TextureD3D12::~TextureD3D12()
+	{
+		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
+
+		if (IsRenderTarget() || IsSwapchain())
+		{
+			for (size_t mip = 0; mip < m_mipmapCount; ++mip)
+			{
+				const crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& sliceArray = m_additionalViews->m_d3d12RTVSingleMipSlice[mip];
+
+				for (const auto& descriptor : sliceArray)
+				{
+					d3d12RenderDevice->FreeRTVDescriptor(descriptor);
+				}
+			}
+		}
+
+		if (IsDepthStencil())
+		{
+			d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSlice);
+
+			if (crgfx::IsDepthStencilFormat(m_format))
+			{
+				d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyDepth);
+				d3d12RenderDevice->FreeDSVDescriptor(m_additionalViews->m_d3d12DSVSingleMipSliceReadOnlyStencil);
+			}
+		}
+
+		d3d12RenderDevice->FreeShaderResourceDescriptor(m_d3d12SRVDescriptor);
+
+		// Don't release the swapchain texture in the destructor, as we'll destroy it manually in the swapchain class
+		// This simplifies our model greatly as we don't need to go through the deletion queue
+		if (!IsSwapchain())
+		{
+			m_d3d12Resource->Release();
+		}
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE TextureD3D12::CreateShaderResourceView
+	(
+		DXGI_FORMAT srvFormat,
+		crgfx::TextureType type,
+		uint32_t mipmapStart,
+		uint32_t mipmapCount,
+		uint32_t arrayStart,
+		uint32_t arraySize,
+		uint32_t planeSlice
+	)
+	{
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3d12SRVDescriptor = {};
+		d3d12SRVDescriptor.Format = srvFormat;
+		d3d12SRVDescriptor.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+		mipmapCount = min(mipmapCount, m_mipmapCount);
+		arraySize = min(arraySize, m_arraySize);
+
+		if (type == crgfx::TextureType::Cubemap)
+		{
+			d3d12SRVDescriptor.TextureCube.MostDetailedMip = mipmapStart;
+			d3d12SRVDescriptor.TextureCube.MipLevels = mipmapCount;
+
+			if (arraySize > 1)
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+				d3d12SRVDescriptor.TextureCubeArray.First2DArrayFace = arrayStart;
+				d3d12SRVDescriptor.TextureCubeArray.NumCubes = arraySize;
+			}
+			else
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+			}
+		}
+		else if (type == crgfx::TextureType::Volume)
+		{
+			d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+			d3d12SRVDescriptor.Texture3D.MostDetailedMip = mipmapStart;
+			d3d12SRVDescriptor.Texture3D.MipLevels = mipmapCount;
+		}
+		else if (type == crgfx::TextureType::Tex1D)
+		{
+			d3d12SRVDescriptor.Texture1D.MostDetailedMip = mipmapStart;
+			d3d12SRVDescriptor.Texture1D.MipLevels = mipmapCount;
+
+			if (arraySize > 1)
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
+				d3d12SRVDescriptor.Texture1DArray.FirstArraySlice = arrayStart;
+				d3d12SRVDescriptor.Texture1DArray.ArraySize = m_arraySize;
+			}
+			else
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+			}
+		}
+		else
+		{
+			d3d12SRVDescriptor.Texture2D.MostDetailedMip = mipmapStart;
+			d3d12SRVDescriptor.Texture2D.MipLevels = mipmapCount;
+
+			if (arraySize > 1)
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+				d3d12SRVDescriptor.Texture2DArray.FirstArraySlice = arrayStart;
+				d3d12SRVDescriptor.Texture2DArray.ArraySize = arraySize;
+				d3d12SRVDescriptor.Texture2DArray.PlaneSlice = planeSlice;
+			}
+			else
+			{
+				d3d12SRVDescriptor.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				d3d12SRVDescriptor.Texture2D.PlaneSlice = planeSlice;
+			}
+		}
+
+		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
+		D3D12_CPU_DESCRIPTOR_HANDLE d3d12SRVDescriptorHandle = d3d12RenderDevice->AllocateShaderResourceDescriptor();
+		d3d12RenderDevice->GetD3D12Device()->CreateShaderResourceView(m_d3d12Resource, &d3d12SRVDescriptor, d3d12SRVDescriptorHandle);
+		return d3d12SRVDescriptorHandle;
+	}
+};

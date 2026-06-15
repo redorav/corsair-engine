@@ -6,10 +6,10 @@
 
 #include "crstl/string.h"
 
-class CrTextureVulkan;
-
 namespace crgfx
 {
+	class TextureVulkan;
+
 	class DeviceVulkan final : public crgfx::IDevice
 	{
 	public:
@@ -45,7 +45,7 @@ namespace crgfx
 
 		VkCommandPool GetVkGraphicsCommandPool() const;
 
-		void TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const crgfx::TextureState& textureState);
+		void TransitionVkTextureToInitialLayout(const crgfx::TextureVulkan* vulkanTexture, const crgfx::TextureState& textureState);
 
 		void SetVkObjectName(uint64_t vkObject, VkObjectType objectType, const char* name) const;
 
@@ -71,7 +71,7 @@ namespace crgfx
 
 		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) override;
 
-		virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) override;
+		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
 		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
@@ -97,9 +97,9 @@ namespace crgfx
 		// Download and Upload
 		//--------------------
 
-		virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) override;
+		virtual uint8_t* BeginTextureUploadPS(const crgfx::ITexture* texture) override;
 
-		virtual void EndTextureUploadPS(const ICrTexture* texture) override;
+		virtual void EndTextureUploadPS(const crgfx::ITexture* texture) override;
 
 		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
 

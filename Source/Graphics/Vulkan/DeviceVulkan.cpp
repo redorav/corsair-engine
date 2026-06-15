@@ -4,7 +4,7 @@
 #include "DeviceVulkan.h"
 
 #include "CrCommandBufferVulkan.h"
-#include "CrTextureVulkan.h"
+#include "TextureVulkan.h"
 #include "CrSamplerVulkan.h"
 #include "CrSwapchainVulkan.h"
 #include "CrGPUBufferVulkan.h"
@@ -188,7 +188,7 @@ namespace crgfx
 		vkDeviceWaitIdle(m_vkDevice);
 	}
 
-	uint8_t* DeviceVulkan::BeginTextureUploadPS(const ICrTexture* texture)
+	uint8_t* DeviceVulkan::BeginTextureUploadPS(const crgfx::ITexture* texture)
 	{
 		uint32_t stagingBufferSizeBytes = texture->GetUsedGPUMemory();
 
@@ -210,7 +210,7 @@ namespace crgfx
 		return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get())->Lock();
 	}
 
-	void DeviceVulkan::EndTextureUploadPS(const ICrTexture* texture)
+	void DeviceVulkan::EndTextureUploadPS(const crgfx::ITexture* texture)
 	{
 		CrHash textureHash(&texture, sizeof(texture));
 		const auto textureUploadIter = m_openTextureUploads.find(textureHash);
@@ -218,7 +218,7 @@ namespace crgfx
 
 		const CrTextureUpload& textureUpload = textureUploadIter->second;
 
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
+		const TextureVulkan* vulkanTexture = static_cast<const TextureVulkan*>(texture);
 		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get());
 
 		vulkanStagingBuffer->Unlock();
@@ -718,9 +718,9 @@ namespace crgfx
 		return new CrSwapchainVulkan(this, swapchainDescriptor);
 	}
 
-	ICrTexture* DeviceVulkan::CreateTexturePS(const CrTextureDescriptor& descriptor)
+	ITexture* DeviceVulkan::CreateTexturePS(const crgfx::TextureDescriptor& descriptor)
 	{
-		return new CrTextureVulkan(this, descriptor);
+		return new TextureVulkan(this, descriptor);
 	}
 
 	ICrGraphicsPipeline* DeviceVulkan::CreateGraphicsPipelinePS
@@ -935,7 +935,7 @@ namespace crgfx
 	}
 
 	// Transitions texture to an initial, predictable state
-	void DeviceVulkan::TransitionVkTextureToInitialLayout(const CrTextureVulkan* vulkanTexture, const crgfx::TextureState& textureState)
+	void DeviceVulkan::TransitionVkTextureToInitialLayout(const crgfx::TextureVulkan* vulkanTexture, const crgfx::TextureState& textureState)
 	{
 		// Transition all resources to their initial state
 		VkImageSubresourceRange subresourceRange;

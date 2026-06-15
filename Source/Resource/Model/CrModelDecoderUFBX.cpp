@@ -177,16 +177,16 @@ static CrMaterialHandle LoadMaterial(const ufbx_material* ufbxMaterial, const Cr
 			CrFixedPath imagePath = materialPath.parent_path() / availableTexture->filename.data;
 			CrImageHandle image = CrResourceManager::LoadImageFromDisk(imagePath);
 
-			CrTextureDescriptor textureParams;
-			textureParams.width = image->GetWidth();
-			textureParams.height = image->GetHeight();
-			textureParams.format = image->GetFormat();
-			textureParams.initialData = image->GetData();
-			textureParams.initialDataSize = image->GetDataSize();
-			textureParams.mipmapCount = image->m_mipmapCount;
-			textureParams.usage = crgfx::TextureUsage::Default;
+			crgfx::TextureDescriptor textureDescriptor;
+			textureDescriptor.width = image->GetWidth();
+			textureDescriptor.height = image->GetHeight();
+			textureDescriptor.format = image->GetFormat();
+			textureDescriptor.initialData = image->GetData();
+			textureDescriptor.initialDataSize = image->GetDataSize();
+			textureDescriptor.mipmapCount = image->m_mipmapCount;
+			textureDescriptor.usage = crgfx::TextureUsage::Default;
 
-			CrTextureHandle texture = crgfx::GetDevice()->CreateTexture(textureParams);
+			crgfx::TextureHandle texture = crgfx::GetDevice()->CreateTexture(textureDescriptor);
 
 			if (!texture)
 			{

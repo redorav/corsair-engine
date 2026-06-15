@@ -75,7 +75,7 @@ namespace crgfx
 struct CrTextureUpload
 {
 	CrHardwareGPUBufferHandle stagingBuffer;
-	ICrTexture* texture;
+	crgfx::ITexture* texture;
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;
 	uint32_t sliceStart;
@@ -139,7 +139,7 @@ namespace crgfx
 
 		ICrSwapchain* CreateSwapchain(const CrSwapchainDescriptor& swapchainDescriptor);
 
-		ICrTexture* CreateTexture(const CrTextureDescriptor& descriptor);
+		crgfx::ITexture* CreateTexture(const crgfx::TextureDescriptor& descriptor);
 
 		CrVertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
@@ -185,9 +185,9 @@ namespace crgfx
 		// Download and Upload
 		//--------------------
 
-		uint8_t* BeginTextureUpload(const ICrTexture* texture);
+		uint8_t* BeginTextureUpload(const crgfx::ITexture* texture);
 
-		void EndTextureUpload(const ICrTexture* texture);
+		void EndTextureUpload(const crgfx::ITexture* texture);
 
 		uint8_t* BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
 
@@ -225,7 +225,7 @@ namespace crgfx
 
 		virtual ICrSwapchain* CreateSwapchainPS(const CrSwapchainDescriptor& swapchainDescriptor) = 0;
 
-		virtual ICrTexture* CreateTexturePS(const CrTextureDescriptor& descriptor) = 0;
+		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 
 		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
 
@@ -255,11 +255,11 @@ namespace crgfx
 
 		// Begins a texture upload. Prepares a buffer and returns a pointer to the beginning of the memory.
 		// External code then populates the given memory
-		virtual uint8_t* BeginTextureUploadPS(const ICrTexture* texture) = 0;
+		virtual uint8_t* BeginTextureUploadPS(const crgfx::ITexture* texture) = 0;
 
 		// Ends a texture upload. The render device keeps track of the requested upload and matches it to
 		// schedule an upload that is guaranteed to be visible on the next texture usage
-		virtual void EndTextureUploadPS(const ICrTexture* texture) = 0;
+		virtual void EndTextureUploadPS(const crgfx::ITexture* texture) = 0;
 
 		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
 

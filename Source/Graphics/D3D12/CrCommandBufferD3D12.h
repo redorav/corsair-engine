@@ -9,7 +9,7 @@
 
 #include "Core/CrMacros.h"
 
-class CrTextureD3D12;
+class TextureD3D12;
 
 typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> CrTextureBarrierVectorD3D12;
 typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, CrRenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
@@ -30,7 +30,7 @@ private:
 
 	virtual void EndPS() override;
 
-	virtual void ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) override;
+	virtual void ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) override;
 
 	virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) override;
 

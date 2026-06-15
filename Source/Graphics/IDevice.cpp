@@ -5,7 +5,7 @@
 #include "ICrCommandBuffer.h"
 #include "ICrSwapchain.h"
 #include "ICrSampler.h"
-#include "ICrTexture.h"
+#include "ITexture.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
 #include "ICrGPUQueryPool.h"
@@ -280,7 +280,7 @@ namespace crgfx
 		return swapchain;
 	}
 
-	ICrTexture* IDevice::CreateTexture(const CrTextureDescriptor& descriptor)
+	ITexture* IDevice::CreateTexture(const crgfx::TextureDescriptor& descriptor)
 	{
 		return CreateTexturePS(descriptor);
 	}
@@ -320,12 +320,12 @@ namespace crgfx
 		WaitIdlePS();
 	}
 
-	uint8_t* IDevice::BeginTextureUpload(const ICrTexture* texture)
+	uint8_t* IDevice::BeginTextureUpload(const crgfx::ITexture* texture)
 	{
 		return BeginTextureUploadPS(texture);
 	}
 
-	void IDevice::EndTextureUpload(const ICrTexture* texture)
+	void IDevice::EndTextureUpload(const crgfx::ITexture* texture)
 	{
 		return EndTextureUploadPS(texture);
 	}

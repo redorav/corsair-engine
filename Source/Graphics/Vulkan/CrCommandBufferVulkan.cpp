@@ -2,7 +2,7 @@
 
 #include "CrCommandBufferVulkan.h"
 #include "DeviceVulkan.h"
-#include "CrTextureVulkan.h"
+#include "TextureVulkan.h"
 #include "CrSamplerVulkan.h"
 #include "CrShaderVulkan.h"
 #include "CrGPUBufferVulkan.h"
@@ -154,15 +154,15 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	bindingLayout.ForEachTexture([&](crgfx::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
 	{
 		const CrTextureBinding& textureBinding = m_currentState.m_textures[id];
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(textureBinding.texture);
+		const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(textureBinding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 
-		if (textureBinding.view == CrTextureView())
+		if (textureBinding.view == crgfx::TextureView())
 		{
 			imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
 		}
-		else if (textureBinding.view == CrTextureView(crgfx::TexturePlane::Stencil))
+		else if (textureBinding.view == crgfx::TextureView(crgfx::TexturePlane::Stencil))
 		{
 			imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
 		}
@@ -187,7 +187,7 @@ void CrCommandBufferVulkan::UpdateResourceTableVulkan
 	bindingLayout.ForEachRWTexture([&](crgfx::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
 	{
 		const CrRWTextureBinding& binding = m_currentState.m_rwTextures[id];
-		const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(binding.texture);
+		const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(binding.texture);
 
 		VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
 		imageInfo.imageView = vulkanTexture->GetVkImageViewSingleMipAllSlices(binding.mip);
@@ -389,11 +389,11 @@ void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 	bufferMemoryBarrier.size = bufferDescriptor.numElements * bufferDescriptor.stride;
 }
 
-void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const ICrTexture* texture,
+void PopulateVkImageBarrier(VkImageMemoryBarrier& imageMemoryBarrier, const crgfx::ITexture* texture,
 	uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
 	crgfx::TextureLayout::T sourceLayout, crgfx::TextureLayout::T destinationLayout)
 {
-	const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(texture);
+	const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(texture);
 
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	imageMemoryBarrier.pNext = nullptr;
@@ -441,7 +441,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 			for (size_t i = 0; i < numColorAttachments; ++i)
 			{
 				const CrRenderTargetDescriptor& colorAttachment = renderPassDescriptor.color[i];
-				const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(colorAttachment.texture);
+				const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(colorAttachment.texture);
 
 				VkRenderingAttachmentInfo& colorAttachmentInfo = vkColorAttachments.push_back();
 				colorAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
@@ -468,7 +468,7 @@ void CrCommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& rend
 		if (renderPassDescriptor.depth.texture)
 		{
 			const CrRenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
-			const CrTextureVulkan* vulkanTexture = static_cast<const CrTextureVulkan*>(depthAttachment.texture);
+			const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(depthAttachment.texture);
 
 			vkDepthAttachment.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
 			vkDepthAttachment.imageView   = vulkanTexture->GetVkImageViewSingleMipSlice(depthAttachment.mipmap, depthAttachment.slice);
@@ -565,7 +565,7 @@ void CrCommandBufferVulkan::GatherImageAndBufferBarriers(const CrRenderPassDescr
 	}
 }
 
-void CrCommandBufferVulkan::QueueVkImageBarrier(const ICrTexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
+void CrCommandBufferVulkan::QueueVkImageBarrier(const crgfx::ITexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
 	const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState)
 {
 	VkImageMemoryBarrier& imageMemoryBarrier = m_imageMemoryBarriers.push_back();
@@ -629,7 +629,7 @@ void CrCommandBufferVulkan::BeginPS()
 	CrAssert(result == VK_SUCCESS);
 }
 
-void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
+void CrCommandBufferVulkan::ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount)
 {
 	VkClearColorValue clearColor;
 	store(clearColor.float32, color);
@@ -643,7 +643,7 @@ void CrCommandBufferVulkan::ClearRenderTargetPS(const ICrTexture* renderTarget, 
 	imageSubResourceRange.layerCount = sliceCount;
 
 	// TODO Image layout needs to be correct
-	vkCmdClearColorImage(m_vkCommandBuffer, static_cast<const CrTextureVulkan*>(renderTarget)->GetVkImage(), VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageSubResourceRange);
+	vkCmdClearColorImage(m_vkCommandBuffer, static_cast<const crgfx::TextureVulkan*>(renderTarget)->GetVkImage(), VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageSubResourceRange);
 }
 
 void CrCommandBufferVulkan::DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)

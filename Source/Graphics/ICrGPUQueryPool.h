@@ -71,11 +71,11 @@ public:
 	// This doesn't mean the data is available now, it just means the GPU will
 	// copy it across as soon as it can. Then we can use the GetData() function
 	// to retrieve it on the CPU
-	void Resolve(ICrCommandBuffer* commandBuffer);
+	void Resolve(crgfx::ICommandBuffer* commandBuffer);
 
 	void GetTimestampData(CrGPUTimestamp* timingData, uint32_t count);
 
-	void Reset(ICrCommandBuffer* commandBuffer);
+	void Reset(crgfx::ICommandBuffer* commandBuffer);
 
 	// Computes the duration in nanoseconds between two timestamps
 	double GetDuration(CrGPUTimestamp startTime, CrGPUTimestamp endTime) const;

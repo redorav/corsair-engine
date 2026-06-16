@@ -2,8 +2,10 @@
 
 #include "Graphics/CrRenderGraph.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICommandBuffer.h"
+#include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
+#include "Graphics/CrRenderPassDescriptor.h"
 
 #include "Core/Logging/ICrDebug.h"
 

@@ -65,7 +65,7 @@ namespace crgfx
 		// Resource Creation
 		//------------------
 
-		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) override;
+		virtual crgfx::ICommandBuffer* CreateCommandBufferPS(const crgfx::CommandBufferDescriptor& descriptor) override;
 
 		virtual crgfx::IGPUFence* CreateGPUFencePS(bool signaled) override;
 
@@ -119,7 +119,7 @@ namespace crgfx
 
 		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
 
-		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) override;
+		virtual void SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) override;
 
 		// Heap for Render Target Views
 		CrCPUDescriptorPoolD3D12 m_rtvPool;

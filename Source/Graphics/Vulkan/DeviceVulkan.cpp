@@ -3,7 +3,7 @@
 #include "GraphicsSystemVulkan.h"
 #include "DeviceVulkan.h"
 
-#include "CrCommandBufferVulkan.h"
+#include "CommandBufferVulkan.h"
 #include "TextureVulkan.h"
 #include "SamplerVulkan.h"
 #include "SwapchainVulkan.h"
@@ -225,7 +225,7 @@ namespace crgfx
 
 		const crvk::VkImageTransitionInfo& vkImageStateInfo = crvk::GetVkImageStateInfo(texture->GetFormat(), vulkanTexture->GetDefaultState().layout);
 
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
 			VkImageAspectFlags vkImageAspectMask = crvk::GetVkImageAspectFlags(vulkanTexture->GetFormat());
 
@@ -326,7 +326,7 @@ namespace crgfx
 
 		vulkanStagingBuffer->Unlock();
 
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
 			VkBufferMemoryBarrier bufferMemoryBarrier;
 			bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -372,7 +372,7 @@ namespace crgfx
 		CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
 			const CrHardwareGPUBufferVulkan* vulkanSourceBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(sourceBuffer);
 
@@ -405,7 +405,7 @@ namespace crgfx
 		return stagingBuffer;
 	}
 
-	void DeviceVulkan::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
+	void DeviceVulkan::SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -428,7 +428,7 @@ namespace crgfx
 			submitInfo.signalSemaphoreCount = 1;
 		}
 
-		submitInfo.pCommandBuffers = &static_cast<const CrCommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer();
+		submitInfo.pCommandBuffers = &static_cast<const CommandBufferVulkan*>(commandBuffer)->GetVkCommandBuffer();
 
 		VkResult result = vkQueueSubmit(m_vkGraphicsQueue, 1, &submitInfo, signalFence ? static_cast<const GPUFenceVulkan*>(signalFence)->GetVkFence() : nullptr);
 		CrAssert(result == VK_SUCCESS);
@@ -678,9 +678,9 @@ namespace crgfx
 		return result;
 	}
 
-	ICrCommandBuffer* DeviceVulkan::CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor)
+	crgfx::ICommandBuffer* DeviceVulkan::CreateCommandBufferPS(const crgfx::CommandBufferDescriptor& descriptor)
 	{
-		return new CrCommandBufferVulkan(this, descriptor);
+		return new CommandBufferVulkan(this, descriptor);
 	}
 
 	IGPUFence* DeviceVulkan::CreateGPUFencePS(bool signaled)
@@ -962,7 +962,7 @@ namespace crgfx
 		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
 		// No need to specify anything special
-		CrCommandBufferVulkan* vulkanCommandBuffer = static_cast<CrCommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		vkCmdPipelineBarrier(vulkanCommandBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 	}
 

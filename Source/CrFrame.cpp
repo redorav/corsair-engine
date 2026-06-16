@@ -8,7 +8,7 @@
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ICrShader.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICommandBuffer.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/UI/CrImGuiRenderer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
@@ -75,7 +75,7 @@ bool HashingAssert()
 // Batches render packets
 struct CrRenderPacketBatcher
 {
-	CrRenderPacketBatcher(ICrCommandBuffer* commandBuffer)
+	CrRenderPacketBatcher(crgfx::ICommandBuffer* commandBuffer)
 	{
 		m_commandBuffer = commandBuffer;
 		m_maxBatchSize = (uint32_t)m_matrices.size();
@@ -176,7 +176,7 @@ struct CrRenderPacketBatcher
 	const ICrGraphicsPipeline* m_pipeline = nullptr;
 	const void* m_extra = nullptr;
 
-	ICrCommandBuffer* m_commandBuffer = nullptr;
+	crgfx::ICommandBuffer* m_commandBuffer = nullptr;
 
 	uint32_t m_maxBatchSize = 0;
 
@@ -433,7 +433,7 @@ void CrFrame::Process()
 
 	CrRenderingStatistics::Reset();
 
-	ICrCommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_currentCommandBuffer].get();
+	crgfx::ICommandBuffer* drawCommandBuffer = m_drawCmdBuffers[m_currentCommandBuffer].get();
 
 	const MouseState& mouseState = CrInput.GetMouseState();
 	const KeyboardState& keyboardState = CrInput.GetKeyboardState();
@@ -534,7 +534,7 @@ void CrFrame::Process()
 		renderGraph.BindRenderTarget(m_gbufferNormalsTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
 		renderGraph.BindRenderTarget(m_gbufferMaterialTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
 	},
-	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->SetViewport(crgfx::Viewport(0.0f, 0.0f, (float)m_gbufferAlbedoAOTexture->GetWidth(), (float)m_gbufferAlbedoAOTexture->GetHeight()));
 		commandBuffer->SetScissor(crgfx::Rectangle(0, 0, m_gbufferAlbedoAOTexture->GetWidth(), m_gbufferAlbedoAOTexture->GetHeight()));
@@ -560,7 +560,7 @@ void CrFrame::Process()
 		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip3, m_linearDepthMinMaxMipChain.get(), crgfx::ShaderStageFlags::Compute, 2);
 		renderGraph.BindRWTexture(RWTextures::RWLinearDepthMinMaxMip4, m_linearDepthMinMaxMipChain.get(), crgfx::ShaderStageFlags::Compute, 3);
 	},
-	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_depthDownsampleLinearize.get());
 		commandBuffer->BindTexture(Textures::RawDepthTexture, m_depthStencilTexture.get(), crgfx::TextureView(crgfx::TexturePlane::Depth));
@@ -588,7 +588,7 @@ void CrFrame::Process()
 		renderGraph.BindTexture(Textures::GBufferMaterialTexture, m_gbufferMaterialTexture.get(), crgfx::ShaderStageFlags::Pixel);
 	},
 	[this]
-	(const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	(const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
 		DynamicLightCB* lightData = lightConstantBuffer.GetData();
@@ -615,7 +615,7 @@ void CrFrame::Process()
 			renderGraph.BindRenderTarget(m_lightingTexture.get(), crgfx::RenderTargetLoadOp::Load, crgfx::RenderTargetStoreOp::Store);
 			renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), crgfx::RenderTargetLoadOp::Load, crgfx::RenderTargetStoreOp::Store, 0.0f);
 		},
-		[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			commandBuffer->SetViewport(crgfx::Viewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 			commandBuffer->SetScissor(crgfx::Rectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
@@ -639,7 +639,7 @@ void CrFrame::Process()
 		renderGraph.BindTexture(Textures::HDRInput, m_lightingTexture.get(), crgfx::ShaderStageFlags::Compute);
 		renderGraph.BindRWTexture(RWTextures::RWPostProcessedOutput, m_preSwapchainTexture.get(), crgfx::ShaderStageFlags::Compute);
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(Textures::HDRInput, m_lightingTexture.get());
 		commandBuffer->BindRWTexture(RWTextures::RWPostProcessedOutput, m_preSwapchainTexture.get(), 0);
@@ -662,7 +662,7 @@ void CrFrame::Process()
 		renderGraph.BindRenderTarget(m_preSwapchainTexture.get(), crgfx::RenderTargetLoadOp::Load, crgfx::RenderTargetStoreOp::Store);
 		renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), crgfx::RenderTargetLoadOp::Load, crgfx::RenderTargetStoreOp::Store);
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		float subdivisionWidth = 1.0f;
 
@@ -685,7 +685,7 @@ void CrFrame::Process()
 			renderGraph.BindRenderTarget(m_debugShaderTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(0.0f, 0.0f, 0.0f, 0.0f));
 			renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, 0.0f);
 		},
-		[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			commandBuffer->SetViewport(crgfx::Viewport(0.0f, 0.0f, (float)m_swapchain->GetWidth(), (float)m_swapchain->GetHeight()));
 			commandBuffer->SetScissor(crgfx::Rectangle(0, 0, m_swapchain->GetWidth(), m_swapchain->GetHeight()));
@@ -715,7 +715,7 @@ void CrFrame::Process()
 			renderGraph.BindRenderTarget(m_preSwapchainTexture.get(), crgfx::RenderTargetLoadOp::Load, crgfx::RenderTargetStoreOp::Store);
 			renderGraph.BindTexture(Textures::EditorSelectionTexture, m_debugShaderTexture.get(), crgfx::ShaderStageFlags::Pixel);
 		},
-		[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			commandBuffer->BindTexture(Textures::EditorSelectionTexture, m_debugShaderTexture.get());
 			commandBuffer->BindGraphicsPipelineState(m_editorEdgeSelectionPipeline.get());
@@ -735,7 +735,7 @@ void CrFrame::Process()
 			renderGraph.BindTexture(Textures::GBufferNormalsTexture, m_gbufferNormalsTexture.get(), crgfx::ShaderStageFlags::Pixel);
 			renderGraph.BindTexture(Textures::GBufferMaterialTexture, m_gbufferMaterialTexture.get(), crgfx::ShaderStageFlags::Pixel);
 		},
-		[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			CrGPUBufferViewT<GBufferDebugCB> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebugCB>();
 			GBufferDebugCB* gbufferDebugData = gbufferDebug.GetData();
@@ -761,7 +761,7 @@ void CrFrame::Process()
 		renderGraph.BindTexture(Textures::CopyTexture, m_preSwapchainTexture.get(), crgfx::ShaderStageFlags::Pixel);
 		renderGraph.BindRenderTarget(swapchainTexture.get(), crgfx::RenderTargetLoadOp::DontCare, crgfx::RenderTargetStoreOp::Store, float4(0.0f));
 	},
-	[this](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(Textures::CopyTexture, m_preSwapchainTexture.get());
 		commandBuffer->BindGraphicsPipelineState(m_copyTexturePipeline.get());
@@ -776,7 +776,7 @@ void CrFrame::Process()
 		renderGraph.BindRWTypedBuffer(RWTypedBuffers::ExampleRWTypedBufferCompute, m_colorsRWTypedBuffer->GetHardwareBuffer(), crgfx::ShaderStageFlags::Compute);
 		renderGraph.BindRWTexture(RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), crgfx::ShaderStageFlags::Compute);
 	},
-	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_exampleComputePipeline.get());
 		commandBuffer->BindStorageBuffer(StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer->GetHardwareBuffer());
@@ -793,7 +793,7 @@ void CrFrame::Process()
 	{
 		renderGraph.BindRWStorageBuffer(RWStorageBuffers::ExampleIndirectBuffer, m_indirectDispatchArguments->GetHardwareBuffer(), crgfx::ShaderStageFlags::Compute);
 	},
-	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_createIndirectArguments.get());
 		commandBuffer->BindRWStorageBuffer(RWStorageBuffers::ExampleIndirectBuffer, m_indirectDispatchArguments->GetHardwareBuffer());
@@ -808,7 +808,7 @@ void CrFrame::Process()
 		renderGraph.BindRWTypedBuffer(RWTypedBuffers::ExampleRWTypedBufferCompute, m_colorsRWTypedBuffer->GetHardwareBuffer(), crgfx::ShaderStageFlags::Compute);
 		renderGraph.BindRWTexture(RWTextures::ExampleRWTextureCompute, m_colorsRWTexture.get(), crgfx::ShaderStageFlags::Compute, 0, 0, 1);
 	},
-	[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+	[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindComputePipelineState(m_exampleComputePipeline.get());
 		commandBuffer->BindStorageBuffer(StorageBuffers::ExampleStructuredBufferCompute, m_structuredBuffer->GetHardwareBuffer());
@@ -829,7 +829,7 @@ void CrFrame::Process()
 			renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, 0.0f);
 			renderGraph.BindRenderTarget(m_debugShaderTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(1.0f, 1.0f, 1.0f, 1.0f));
 		},
-		[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			const crgfx::ITexture* debugShaderTexture = m_debugShaderTexture.get();
 	
@@ -874,7 +874,7 @@ void CrFrame::Process()
 			renderGraph.BindRWStorageBuffer(RWStorageBuffers::EditorSelectedInstanceID, m_mouseSelectionBuffer->GetHardwareBuffer(), crgfx::ShaderStageFlags::Compute);
 			renderGraph.BindTexture(Textures::EditorInstanceIDTexture, m_debugShaderTexture.get(), crgfx::ShaderStageFlags::Compute);
 		},
-		[=](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>();
 			MouseSelectionCB* mouseSelectionData = mouseSelectionBuffer.GetData();
@@ -894,7 +894,7 @@ void CrFrame::Process()
 	m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Draw Debug UI"), float4(), CrRenderGraphPassType::Behavior,
 	[](CrRenderGraph&)
 	{},
-	[this](const CrRenderGraph&, ICrCommandBuffer*)
+	[this](const CrRenderGraph&, crgfx::ICommandBuffer*)
 	{
 		DrawDebugUI();
 	});
@@ -909,7 +909,7 @@ void CrFrame::Process()
 	{
 		renderGraph.BindSwapchain(swapchainTexture.get());
 	},
-	[](const CrRenderGraph&, ICrCommandBuffer*)
+	[](const CrRenderGraph&, crgfx::ICommandBuffer*)
 	{
 
 	});
@@ -1231,7 +1231,7 @@ void CrFrame::RecreateRenderTargets()
 	m_drawCmdBuffers.resize(m_swapchain->GetImageCount());
 	for (uint32_t i = 0; i < m_drawCmdBuffers.size(); ++i)
 	{
-		CrCommandBufferDescriptor descriptor;
+		crgfx::CommandBufferDescriptor descriptor;
 		descriptor.dynamicBufferSizeBytes = 8 * 1024 * 1024; // 8 MB
 		descriptor.dynamicVertexBufferSizeVertices = 1024 * 1024; // 1 million vertices
 		descriptor.name.append_sprintf("Draw Command Buffer %i", i);

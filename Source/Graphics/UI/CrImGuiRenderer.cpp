@@ -12,7 +12,7 @@
 #include "Graphics/ITexture.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICommandBuffer.h"
 #include "Graphics/ISampler.h"
 #include "Graphics/CrRenderPassDescriptor.h"
 #include "Graphics/CrRenderGraph.h"
@@ -185,7 +185,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 	[&](CrRenderGraph&)
 	{
 	},
-	[](const CrRenderGraph&, ICrCommandBuffer*)
+	[](const CrRenderGraph&, crgfx::ICommandBuffer*)
 	{
 		ImGui::Render();
 	});
@@ -208,7 +208,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 			// The main viewport loads the previous contents, the rest ignore it. TODO This needs reworking so each viewport knows if it preserves the previous contents or not
 			renderGraph.BindRenderTarget(swapchain->GetCurrentTexture().get(), i == 0 ? crgfx::RenderTargetLoadOp::Load : crgfx::RenderTargetLoadOp::Clear);
 		},
-		[this, imguiViewport, swapchain](const CrRenderGraph&, ICrCommandBuffer* commandBuffer)
+		[this, imguiViewport, swapchain](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
 			// Query the draw data for this frame:
 			ImDrawData* data = imguiViewport->DrawData;

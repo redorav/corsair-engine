@@ -36,7 +36,7 @@ private:
 
 	uint32_t m_currentCommandBuffer = 0;
 
-	crstl::vector<CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
+	crstl::vector<crgfx::CrCommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	
 	CrComputePipelineHandle m_exampleComputePipeline;
 

@@ -131,7 +131,7 @@ namespace crgfx
 		// Resource Creation
 		//------------------
 
-		ICrCommandBuffer* CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor);
+		crgfx::ICommandBuffer* CreateCommandBuffer(const crgfx::CommandBufferDescriptor& descriptor);
 
 		CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
@@ -205,11 +205,11 @@ namespace crgfx
 
 		bool SupportsTextureFormatCasting() const { return m_deviceProperties.features.textureFormatCasting; }
 
-		void SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence);
+		void SubmitCommandBuffer(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence);
 
 	protected:
 
-		virtual ICrCommandBuffer* CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor) = 0;
+		virtual crgfx::ICommandBuffer* CreateCommandBufferPS(const crgfx::CommandBufferDescriptor& descriptor) = 0;
 
 		virtual IGPUFence* CreateGPUFencePS(bool signaled) = 0;
 
@@ -267,7 +267,7 @@ namespace crgfx
 
 		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
 
-		virtual void SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) = 0;
+		virtual void SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) = 0;
 
 		void StorePipelineCache(void* pipelineCacheData, size_t pipelineCacheSize);
 

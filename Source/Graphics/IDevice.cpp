@@ -2,7 +2,7 @@
 
 #include "IGraphicsSystem.h"
 #include "IDevice.h"
-#include "ICrCommandBuffer.h"
+#include "ICommandBuffer.h"
 #include "ISwapchain.h"
 #include "ISampler.h"
 #include "ITexture.h"
@@ -57,7 +57,7 @@ namespace crgfx
 
 		for (uint32_t i = 0; i < m_auxiliaryCommandBufferCount; ++i)
 		{
-			CrCommandBufferDescriptor descriptor;
+			crgfx::CommandBufferDescriptor descriptor;
 			descriptor.name.append_sprintf("Render Device Auxiliary Command Buffer %i", i);
 			m_auxiliaryCommandBuffers.push_back(CreateCommandBuffer(descriptor));
 		}
@@ -125,7 +125,7 @@ namespace crgfx
 		m_gpuDeletionQueue->Finalize();
 	}
 
-	ICrCommandBuffer* IDevice::CreateCommandBuffer(const CrCommandBufferDescriptor& descriptor)
+	crgfx::ICommandBuffer* IDevice::CreateCommandBuffer(const crgfx::CommandBufferDescriptor& descriptor)
 	{
 		return CreateCommandBufferPS(descriptor);
 	}
@@ -362,7 +362,7 @@ namespace crgfx
 		return m_deviceProperties;
 	}
 
-	void IDevice::SubmitCommandBuffer(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
+	void IDevice::SubmitCommandBuffer(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 	}

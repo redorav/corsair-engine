@@ -2,7 +2,7 @@
 
 #include "GraphicsSystemD3D12.h"
 #include "DeviceD3D12.h"
-#include "CrCommandBufferD3D12.h"
+#include "CommandBufferD3D12.h"
 #include "TextureD3D12.h"
 #include "SamplerD3D12.h"
 #include "SwapchainD3D12.h"
@@ -391,9 +391,9 @@ namespace crgfx
 		}
 	}
 
-	ICrCommandBuffer* DeviceD3D12::CreateCommandBufferPS(const CrCommandBufferDescriptor& descriptor)
+	crgfx::ICommandBuffer* DeviceD3D12::CreateCommandBufferPS(const crgfx::CommandBufferDescriptor& descriptor)
 	{
-		return new CrCommandBufferD3D12(this, descriptor);
+		return new CommandBufferD3D12(this, descriptor);
 	}
 
 	IGPUFence* DeviceD3D12::CreateGPUFencePS(bool signaled)
@@ -576,7 +576,7 @@ namespace crgfx
 
 		d3d12StagingBuffer->Unlock();
 
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferD3D12* d3d12CommandBuffer = static_cast<CommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
 			D3D12_TEXTURE_BARRIER d3d12TextureBarrier;
 			d3d12TextureBarrier.pResource = d3d12DestinationTexture->GetD3D12Resource();
@@ -689,7 +689,7 @@ namespace crgfx
 
 		d3d12StagingBuffer->Unlock();
 
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferD3D12* d3d12CommandBuffer = static_cast<CommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
 			// TODO Consider using CopyResource when copying the entire resource
 
@@ -719,7 +719,7 @@ namespace crgfx
 		CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 
-		CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<CrCommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
+		CommandBufferD3D12* d3d12CommandBuffer = static_cast<CommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{
 			// We assume the staging buffer is in the copy destination state, as we've created it in here
 
@@ -756,12 +756,12 @@ namespace crgfx
 		return stagingBuffer;
 	}
 
-	void DeviceD3D12::SubmitCommandBufferPS(const ICrCommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
+	void DeviceD3D12::SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		unused_parameter(waitSemaphore);
 		unused_parameter(signalSemaphore);
 
-		const CrCommandBufferD3D12* d3d12CommandBuffer = static_cast<const CrCommandBufferD3D12*>(commandBuffer);
+		const CommandBufferD3D12* d3d12CommandBuffer = static_cast<const CommandBufferD3D12*>(commandBuffer);
 
 		ID3D12CommandList* d3d12CommandList = { d3d12CommandBuffer->GetD3D12CommandList() };
 		m_d3d12GraphicsCommandQueue->ExecuteCommandLists(1, &d3d12CommandList);

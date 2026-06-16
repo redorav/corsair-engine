@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrCommandBufferVulkan.h"
+#include "CommandBufferVulkan.h"
 #include "TextureVulkan.h"
 #include "DeviceVulkan.h"
 #include "CrVulkan.h"
@@ -13,6 +13,7 @@ namespace crgfx
 		: ITexture(renderDevice, descriptor)
 		, m_vkImage(nullptr)
 		, m_vkImageViewAllMipsAllSlices(nullptr)
+		, m_vmaAllocation(nullptr)
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 		VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();

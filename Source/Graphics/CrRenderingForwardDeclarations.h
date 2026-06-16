@@ -79,13 +79,13 @@ namespace crgfx
 
 	class IGPUSemaphore;
 	using CrGPUSemaphoreHandle = crstl::intrusive_ptr<IGPUSemaphore>;
+
+	class ICommandBuffer;
+	using CrCommandBufferHandle = crstl::intrusive_ptr<ICommandBuffer>;
+	struct CommandBufferDescriptor;
 };
 
 // Forward declare the necessary types for the rendering core
-
-class ICrCommandBuffer;
-using CrCommandBufferHandle = crstl::intrusive_ptr<ICrCommandBuffer>;
-struct CrCommandBufferDescriptor;
 
 struct CrRenderPassDescriptor;
 struct CrComputePassDescriptor;

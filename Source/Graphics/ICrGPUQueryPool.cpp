@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/ICrGPUQueryPool.h"
-#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICommandBuffer.h"
 
 #include "Math/CrMath.h"
 
@@ -13,7 +13,7 @@ ICrGPUQueryPool::ICrGPUQueryPool(crgfx::IDevice* renderDevice, const CrGPUQueryP
 , m_timestampPeriod(1.0) // Gets calculated per platform
 {}
 
-void ICrGPUQueryPool::Resolve(ICrCommandBuffer* commandBuffer)
+void ICrGPUQueryPool::Resolve(crgfx::ICommandBuffer* commandBuffer)
 {
 	commandBuffer->ResolveGPUQueries(this, 0, m_currentQuery);
 	m_resolved = true;
@@ -30,7 +30,7 @@ void ICrGPUQueryPool::GetTimestampData(CrGPUTimestamp* timingData, uint32_t timi
 	}
 }
 
-void ICrGPUQueryPool::Reset(ICrCommandBuffer* commandBuffer)
+void ICrGPUQueryPool::Reset(crgfx::ICommandBuffer* commandBuffer)
 {
 	commandBuffer->ResetGPUQueries(this, 0, m_descriptor.count);
 	m_currentQuery = 0;

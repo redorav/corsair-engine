@@ -28,9 +28,9 @@ public:
 
 	void Initialize(crgfx::IDevice* renderDevice, uint32_t maxFrames);
 
-	void BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t frameIndex);
+	void BeginFrame(crgfx::ICommandBuffer* commandBuffer, uint64_t frameIndex);
 
-	void EndFrame(ICrCommandBuffer* commandBuffer);
+	void EndFrame(crgfx::ICommandBuffer* commandBuffer);
 
 	CrGPUTimingRequest AllocateTimingRequest(CrHash hash);
 

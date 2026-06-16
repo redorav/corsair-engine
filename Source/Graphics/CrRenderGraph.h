@@ -48,7 +48,7 @@ class CrRenderGraph;
 struct CrRenderGraphPass;
 
 using CrRenderGraphSetupFunction = crstl::fixed_function<32, void(CrRenderGraph& renderGraph)>;
-using CrRenderGraphExecutionFunction = crstl::fixed_function<32, void(const CrRenderGraph& renderGraph, ICrCommandBuffer*)>;
+using CrRenderGraphExecutionFunction = crstl::fixed_function<32, void(const CrRenderGraph& renderGraph, crgfx::ICommandBuffer*)>;
 using CrRenderGraphString = crstl::fixed_string32;
 
 namespace CrRenderGraphPassType
@@ -174,7 +174,7 @@ struct CrRenderGraphFrameParams
 		, frameIndex(0)
 	{}
 
-	ICrCommandBuffer* commandBuffer;
+	crgfx::ICommandBuffer* commandBuffer;
 	CrGPUTimingQueryTracker* timingQueryTracker;
 	uint64_t frameIndex;
 };

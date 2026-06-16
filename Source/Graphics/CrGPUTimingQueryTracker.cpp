@@ -2,7 +2,7 @@
 
 #include "Graphics/CrGPUTimingQueryTracker.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/ICrCommandBuffer.h"
+#include "Graphics/ICommandBuffer.h"
 
 void CrGPUTimingQueryTracker::Initialize(crgfx::IDevice* renderDevice, uint32_t maxFrames)
 {
@@ -19,7 +19,7 @@ void CrGPUTimingQueryTracker::Initialize(crgfx::IDevice* renderDevice, uint32_t 
 	m_timingRequests.resize(maxFrames);
 }
 
-void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64_t frameIndex)
+void CrGPUTimingQueryTracker::BeginFrame(crgfx::ICommandBuffer* commandBuffer, uint64_t frameIndex)
 {
 	m_currentFrame = frameIndex;
 
@@ -68,7 +68,7 @@ void CrGPUTimingQueryTracker::BeginFrame(ICrCommandBuffer* commandBuffer, uint64
 	commandBuffer->BeginTimestampQuery(currentPool, m_frameTimingRequest.startQuery);
 }
 
-void CrGPUTimingQueryTracker::EndFrame(ICrCommandBuffer* commandBuffer)
+void CrGPUTimingQueryTracker::EndFrame(crgfx::ICommandBuffer* commandBuffer)
 {
 	ICrGPUQueryPool* currentPool = GetCurrentQueryPool();
 

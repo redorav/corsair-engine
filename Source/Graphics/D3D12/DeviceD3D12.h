@@ -2,7 +2,7 @@
 
 #include "Graphics/IDevice.h"
 
-#include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/IGPUSynchronization.h"
 
 #include "DescriptorHeapD3D12.h"
 

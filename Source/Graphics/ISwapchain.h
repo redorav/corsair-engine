@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ICrGPUSynchronization.h"
+#include "IGPUSynchronization.h"
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/ITexture.h"

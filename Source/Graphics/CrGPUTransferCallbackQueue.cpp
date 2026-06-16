@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "Graphics/IDevice.h"
-#include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/IGPUSynchronization.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrGPUTransferCallbackQueue.h"
 

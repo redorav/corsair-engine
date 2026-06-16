@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/IGPUSynchronization.h"
 #include "d3d12.h"
 
 namespace crgfx

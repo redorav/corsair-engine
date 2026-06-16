@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/IGPUSynchronization.h"
 #include <vulkan/vulkan.h>
 
 namespace crgfx

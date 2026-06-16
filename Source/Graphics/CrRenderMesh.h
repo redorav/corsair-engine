@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrVisibility.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrVertexDescriptor.h"
 
 #include "crstl/intrusive_ptr.h"

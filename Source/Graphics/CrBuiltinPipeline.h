@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/ICrPipeline.h"
 #include "Graphics/CrVertexDescriptor.h"
 

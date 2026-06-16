@@ -5,7 +5,7 @@
 
 #include "Graphics/ICrPipeline.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 #include "Math/CrHlslppVectorFloatType.h"
 

@@ -4,7 +4,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrLight.h"
 #include "Graphics/RenderWorld/CrModelInstance.h"

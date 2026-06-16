@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CrRenderingForwardDeclarations.h"
+#include "CrGraphicsForwardDeclarations.h"
 
 #include "Graphics/ICrGPUSynchronization.h"
 

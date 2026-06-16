@@ -2,7 +2,7 @@
 
 #include "d3d12.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 namespace crgfx
 {

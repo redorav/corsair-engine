@@ -9,7 +9,7 @@
 #include "Graphics/CrShaderReflectionHeader.h"
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"

@@ -11,7 +11,7 @@
 #include "Graphics/ITexture.h"
 #include "Graphics/CrImage.h"
 #include "Graphics/CrCommonVertexLayouts.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

@@ -2,7 +2,7 @@
 
 #include "ICrModelDecoder.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 class CrModelDecoderUFBX final : public ICrModelDecoder
 {

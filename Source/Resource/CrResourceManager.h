@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/CrCoreForwardDeclarations.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Image/CrImageForwardDeclarations.h"
 
 class CrShader;

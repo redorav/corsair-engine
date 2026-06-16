@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CrRenderingForwardDeclarations.h"
+#include "CrGraphicsForwardDeclarations.h"
 
 #include "crstl/deque.h"
 #include "crstl/fixed_function.h"

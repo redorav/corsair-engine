@@ -2,7 +2,7 @@
 
 #include "ICrGPUSynchronization.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/ITexture.h"
 
 #include "crstl/fixed_string.h"

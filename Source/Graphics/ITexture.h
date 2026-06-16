@@ -3,7 +3,7 @@
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Graphics/CrRendering.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrGPUDeletable.h"
 #include "Graphics/CrDataFormats.h"
 

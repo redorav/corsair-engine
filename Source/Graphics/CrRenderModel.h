@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrVisibility.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrRenderMesh.h"
 

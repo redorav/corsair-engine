@@ -8,7 +8,7 @@
 
 #include "CrVulkan.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 #include "Graphics/CrCPUStackAllocator.h"
 

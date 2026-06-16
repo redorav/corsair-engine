@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrDataFormats.h"
 
 extern PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName;

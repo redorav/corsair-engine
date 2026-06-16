@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Core/CrCoreForwardDeclarations.h"
 
 using bindpoint_t = uint8_t;

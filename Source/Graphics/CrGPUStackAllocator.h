@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrStackAllocator.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 class IDevice;
 class ICrHardwareGPUBuffer;

@@ -8,7 +8,7 @@
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrGPUStackAllocator.h"
 #include "Graphics/ICrGPUSynchronization.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 

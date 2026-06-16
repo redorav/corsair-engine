@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/ISwapchain.h"
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrDataFormats.h"
 
 #include "Math/CrMath.h"

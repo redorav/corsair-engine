@@ -10,7 +10,7 @@ void CrGPUTimingQueryTracker::Initialize(crgfx::IDevice* renderDevice, uint32_t 
 
 	m_queryPools.resize(maxFrames);
 
-	CrGPUQueryPoolDescriptor queryPoolDescriptor(crgfx::QueryType::Timestamp, 1024);
+	crgfx::GPUQueryPoolDescriptor queryPoolDescriptor(crgfx::QueryType::Timestamp, 1024);
 	for (uint32_t i = 0; i < maxFrames; ++i)
 	{
 		m_queryPools[i] = renderDevice->CreateGPUQueryPool(queryPoolDescriptor);
@@ -26,7 +26,7 @@ void CrGPUTimingQueryTracker::BeginFrame(crgfx::ICommandBuffer* commandBuffer, u
 	m_currentPoolIndex = frameIndex % m_maxFrames;
 
 	// Resolve queries from the oldest frame
-	ICrGPUQueryPool* oldestPool = GetOldestQueryPool();
+	crgfx::IGPUQueryPool* oldestPool = GetOldestQueryPool();
 	m_timestampData.resize(oldestPool->GetActiveQueryCount());
 	m_timingIntervals.clear();
 	m_timingRequests[m_currentPoolIndex].clear();
@@ -37,16 +37,16 @@ void CrGPUTimingQueryTracker::BeginFrame(crgfx::ICommandBuffer* commandBuffer, u
 		oldestPool->GetTimestampData(m_timestampData.data(), (uint32_t)m_timestampData.size());
 
 		// Resolve into intervals
-		CrGPUTimestamp frameStartTimeTicks = m_timestampData[m_frameTimingRequest.startQuery.id];
-		CrGPUTimestamp frameEndTimeTicks   = m_timestampData[m_frameTimingRequest.endQuery.id];
+		crgfx::GPUTimestamp frameStartTimeTicks = m_timestampData[m_frameTimingRequest.startQuery.id];
+		crgfx::GPUTimestamp frameEndTimeTicks   = m_timestampData[m_frameTimingRequest.endQuery.id];
 
 		for (const auto& iter : m_timingRequests[(m_currentPoolIndex + 1) % m_maxFrames])
 		{
 			CrHash hash = iter.first;
 			CrGPUTimingRequest request = iter.second;
 
-			CrGPUTimestamp intervalStart = m_timestampData[request.startQuery.id];
-			CrGPUTimestamp intervalEnd = m_timestampData[request.endQuery.id];
+			crgfx::GPUTimestamp intervalStart = m_timestampData[request.startQuery.id];
+			crgfx::GPUTimestamp intervalEnd = m_timestampData[request.endQuery.id];
 
 			CrGPUInterval interval;
 			interval.startTimeNanoseconds = oldestPool->GetDuration(frameStartTimeTicks, intervalStart);
@@ -59,7 +59,7 @@ void CrGPUTimingQueryTracker::BeginFrame(crgfx::ICommandBuffer* commandBuffer, u
 		m_totalFrameInterval.durationNanoseconds  = oldestPool->GetDuration(frameStartTimeTicks, frameEndTimeTicks);
 	}
 
-	ICrGPUQueryPool* currentPool = GetCurrentQueryPool();
+	crgfx::IGPUQueryPool* currentPool = GetCurrentQueryPool();
 	currentPool->Reset(commandBuffer);
 
 	m_frameTimingRequest.startQuery = currentPool->Allocate();
@@ -70,7 +70,7 @@ void CrGPUTimingQueryTracker::BeginFrame(crgfx::ICommandBuffer* commandBuffer, u
 
 void CrGPUTimingQueryTracker::EndFrame(crgfx::ICommandBuffer* commandBuffer)
 {
-	ICrGPUQueryPool* currentPool = GetCurrentQueryPool();
+	crgfx::IGPUQueryPool* currentPool = GetCurrentQueryPool();
 
 	// Insert final query for the frame
 	commandBuffer->EndTimestampQuery(currentPool, m_frameTimingRequest.endQuery);
@@ -80,7 +80,7 @@ void CrGPUTimingQueryTracker::EndFrame(crgfx::ICommandBuffer* commandBuffer)
 
 CrGPUTimingRequest CrGPUTimingQueryTracker::AllocateTimingRequest(CrHash hash)
 {
-	ICrGPUQueryPool* currentPool = GetCurrentQueryPool();
+	crgfx::IGPUQueryPool* currentPool = GetCurrentQueryPool();
 
 	CrGPUTimingRequest request;
 	request.startQuery = currentPool->Allocate();
@@ -109,12 +109,12 @@ CrGPUInterval CrGPUTimingQueryTracker::GetFrameDuration() const
 	return m_totalFrameInterval;
 }
 
-ICrGPUQueryPool* CrGPUTimingQueryTracker::GetCurrentQueryPool() const
+crgfx::IGPUQueryPool* CrGPUTimingQueryTracker::GetCurrentQueryPool() const
 {
 	return m_queryPools[m_currentPoolIndex].get();
 }
 
-ICrGPUQueryPool* CrGPUTimingQueryTracker::GetOldestQueryPool() const
+crgfx::IGPUQueryPool* CrGPUTimingQueryTracker::GetOldestQueryPool() const
 {
 	return m_queryPools[(m_currentPoolIndex + 1) % m_maxFrames].get();
 }

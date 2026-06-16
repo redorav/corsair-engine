@@ -310,14 +310,14 @@ namespace crgfx
 		}
 	}
 
-	void CommandBufferD3D12::ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+	void CommandBufferD3D12::ResetGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
 		unused_parameter(queryPool);
 		unused_parameter(start);
 		unused_parameter(count);
 	}
 
-	void CommandBufferD3D12::ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+	void CommandBufferD3D12::ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
 		const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
 		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(d3d12QueryPool->GetResultsBuffer());

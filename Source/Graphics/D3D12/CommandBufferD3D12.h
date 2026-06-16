@@ -52,13 +52,13 @@ namespace crgfx
 
 		virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
 
-		virtual void BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+		virtual void BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
-		virtual void EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+		virtual void EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
-		virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
+		virtual void ResetGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
-		virtual void ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
+		virtual void ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
 		virtual void FlushGraphicsRenderStatePS() override;
 
@@ -133,13 +133,13 @@ namespace crgfx
 		m_d3d12GraphicsCommandList->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 	}
 
-	inline void CommandBufferD3D12::BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	inline void CommandBufferD3D12::BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
 		m_d3d12GraphicsCommandList->EndQuery(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, query.id);
 	}
 
-	inline void CommandBufferD3D12::EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	inline void CommandBufferD3D12::EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		BeginTimestampQueryPS(queryPool, query);
 	}

@@ -16,59 +16,62 @@ VkQueryType GetVkQueryType(crgfx::QueryType queryType)
 	}
 }
 
-CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
+namespace crgfx
 {
-	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
-
-	m_querySize = sizeof(uint64_t);
-
-	VkQueryPoolCreateInfo poolCreateInfo = {};
-	poolCreateInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
-	poolCreateInfo.flags = 0;
-	poolCreateInfo.queryType = GetVkQueryType(descriptor.type);
-	poolCreateInfo.queryCount = descriptor.count;
-
-	VkResult vkResult = VK_SUCCESS;
-
-	vkResult = vkCreateQueryPool(vulkanRenderDevice->GetVkDevice(), &poolCreateInfo, nullptr, &m_vkQueryPool);
-	CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create query pool");
-
-	CrHardwareGPUBufferDescriptor queryBufferDescriptor
-	(
-		crgfx::BufferUsage::TransferDst,
-		crgfx::MemoryAccess::GPUWriteCPURead,
-		descriptor.count,
-		m_querySize
-	);
-
-	m_queryBuffer = vulkanRenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
-
-	m_timestampPeriod = vulkanRenderDevice->GetVkPhysicalDeviceProperties().limits.timestampPeriod;
-}
-
-CrGPUQueryPoolVulkan::~CrGPUQueryPoolVulkan()
-{
-	crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
-	vkDestroyQueryPool(vulkanRenderDevice->GetVkDevice(), m_vkQueryPool, nullptr);
-}
-
-void CrGPUQueryPoolVulkan::GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount)
-{
-	uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+	CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
 	{
-		memcpy(timingData, memory, timingCount * sizeof(timingData));
+		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
+
+		m_querySize = sizeof(uint64_t);
+
+		VkQueryPoolCreateInfo poolCreateInfo = {};
+		poolCreateInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+		poolCreateInfo.flags = 0;
+		poolCreateInfo.queryType = GetVkQueryType(descriptor.type);
+		poolCreateInfo.queryCount = descriptor.count;
+
+		VkResult vkResult = VK_SUCCESS;
+
+		vkResult = vkCreateQueryPool(vulkanRenderDevice->GetVkDevice(), &poolCreateInfo, nullptr, &m_vkQueryPool);
+		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create query pool");
+
+		CrHardwareGPUBufferDescriptor queryBufferDescriptor
+		(
+			crgfx::BufferUsage::TransferDst,
+			crgfx::MemoryAccess::GPUWriteCPURead,
+			descriptor.count,
+			m_querySize
+		);
+
+		m_queryBuffer = vulkanRenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
+
+		m_timestampPeriod = vulkanRenderDevice->GetVkPhysicalDeviceProperties().limits.timestampPeriod;
 	}
-	m_queryBuffer->Unlock();
-}
 
-void CrGPUQueryPoolVulkan::GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t occlusionCount)
-{
-	uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+	CrGPUQueryPoolVulkan::~CrGPUQueryPoolVulkan()
 	{
-		for (uint32_t i = 0; i < occlusionCount; i++)
+		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
+		vkDestroyQueryPool(vulkanRenderDevice->GetVkDevice(), m_vkQueryPool, nullptr);
+	}
+
+	void CrGPUQueryPoolVulkan::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
+	{
+		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{
-			occlusionData[i].visibilitySamples = memory[i];
+			memcpy(timingData, memory, timingCount * sizeof(timingData));
 		}
+		m_queryBuffer->Unlock();
 	}
-	m_queryBuffer->Unlock();
-}
+
+	void CrGPUQueryPoolVulkan::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
+	{
+		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+		{
+			for (uint32_t i = 0; i < occlusionCount; i++)
+			{
+				occlusionData[i].visibilitySamples = memory[i];
+			}
+		}
+		m_queryBuffer->Unlock();
+	}
+};

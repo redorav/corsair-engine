@@ -86,19 +86,14 @@ namespace crgfx
 
 	struct RenderPassDescriptor;
 	struct CrComputePassDescriptor;
+
+	// GPU Queries
+	class IGPUQueryPool;
+	struct GPUQueryPoolDescriptor;
+	using CrGPUQueryPoolHandle = crstl::intrusive_ptr<IGPUQueryPool>;
 };
 
-// Forward declare the necessary types for the rendering core
-
-// GPU Queries
-class ICrGPUQueryPool;
-struct CrGPUQueryPoolDescriptor;
-using CrGPUQueryPoolHandle = crstl::intrusive_ptr<ICrGPUQueryPool>;
-
-class CrGPUQueryDummy;
-using CrGPUQueryId = CrTypedId<CrGPUQueryDummy, uint32_t>;
-
-struct CrGPUTimestamp;
+using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
 
 class CrGPUTimingQueryTracker;
 

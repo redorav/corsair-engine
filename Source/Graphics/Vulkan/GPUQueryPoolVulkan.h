@@ -3,28 +3,31 @@
 #include "Graphics/ICrGPUQueryPool.h"
 #include <vulkan/vulkan.h>
 
-class IDevice;
-
-class CrGPUQueryPoolVulkan final : public ICrGPUQueryPool
+namespace crgfx
 {
-public:
+	class IDevice;
 
-	CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	class CrGPUQueryPoolVulkan final : public IGPUQueryPool
+	{
+	public:
 
-	~CrGPUQueryPoolVulkan();
+		CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
 
-	VkQueryPool GetVkQueryPool() const { return m_vkQueryPool; }
+		~CrGPUQueryPoolVulkan();
 
-	const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
+		VkQueryPool GetVkQueryPool() const { return m_vkQueryPool; }
 
-protected:
+		const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
 
-	virtual void GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount) override;
+	protected:
 
-	virtual void GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t count) override;
+		virtual void GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount) override;
 
-	// Use the platform-independent code so we don't have to rewrite it
-	CrHardwareGPUBufferHandle m_queryBuffer;
+		virtual void GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t count) override;
 
-	VkQueryPool m_vkQueryPool;
+		// Use the platform-independent code so we don't have to rewrite it
+		CrHardwareGPUBufferHandle m_queryBuffer;
+
+		VkQueryPool m_vkQueryPool;
+	};
 };

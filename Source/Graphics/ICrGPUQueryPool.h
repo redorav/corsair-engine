@@ -7,95 +7,98 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrTypedId.h"
 
-struct CrGPUTimestamp
+namespace crgfx
 {
-	CrGPUTimestamp() { ticks = 0; }
-	CrGPUTimestamp(uint64_t ticks) : ticks(ticks) {}
-
-	uint64_t ticks;
-};
-
-struct CrGPUOcclusion
-{
-	uint64_t visibilitySamples; // Number of samples passed by this query
-};
-
-struct CrGPUQueryPoolDescriptor
-{
-	CrGPUQueryPoolDescriptor(crgfx::QueryType type, uint32_t count) : type(type), count(count) {}
-
-	crgfx::QueryType type;
-	uint32_t count;
-};
-
-// Pool that contains queries of the type passed in as a template
-// The template must be one of the interfaces provided above
-class ICrGPUQueryPool : public CrGPUAutoDeletable
-{
-public:
-
-	ICrGPUQueryPool(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
-
-	virtual ~ICrGPUQueryPool() {}
-
-	uint32_t GetActiveQueryCount() const
+	struct GPUTimestamp
 	{
-		return m_currentQuery;
-	}
+		GPUTimestamp() { ticks = 0; }
+		GPUTimestamp(uint64_t ticks) : ticks(ticks) {}
 
-	uint32_t GetTotalQueryCount() const
+		uint64_t ticks;
+	};
+
+	struct GPUOcclusion
 	{
-		return m_descriptor.count;
-	}
+		uint64_t visibilitySamples; // Number of samples passed by this query
+	};
 
-	uint32_t GetQuerySize() const
+	struct GPUQueryPoolDescriptor
 	{
-		return m_querySize;
-	}
+		GPUQueryPoolDescriptor(crgfx::QueryType type, uint32_t count) : type(type), count(count) {}
 
-	crgfx::QueryType GetType() const
+		crgfx::QueryType type;
+		uint32_t count;
+	};
+
+	// Pool that contains queries of the type passed in as a template
+	// The template must be one of the interfaces provided above
+	class IGPUQueryPool : public CrGPUAutoDeletable
 	{
-		return m_descriptor.type;
-	}
+	public:
 
-	// Allocate a GPU query id. We can use this to begin or end a query on a command buffer
-	CrGPUQueryId Allocate()
-	{
-		// TODO Check bounds
-		uint32_t currentQuery = m_currentQuery;
-		m_currentQuery++;
-		return CrGPUQueryId(currentQuery);
-	}
+		IGPUQueryPool(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
 
-	// Resolve all pending queries using this command buffer to copy data across
-	// This doesn't mean the data is available now, it just means the GPU will
-	// copy it across as soon as it can. Then we can use the GetData() function
-	// to retrieve it on the CPU
-	void Resolve(crgfx::ICommandBuffer* commandBuffer);
+		virtual ~IGPUQueryPool() {}
 
-	void GetTimestampData(CrGPUTimestamp* timingData, uint32_t count);
+		uint32_t GetActiveQueryCount() const
+		{
+			return m_currentQuery;
+		}
 
-	void Reset(crgfx::ICommandBuffer* commandBuffer);
+		uint32_t GetTotalQueryCount() const
+		{
+			return m_descriptor.count;
+		}
 
-	// Computes the duration in nanoseconds between two timestamps
-	double GetDuration(CrGPUTimestamp startTime, CrGPUTimestamp endTime) const;
+		uint32_t GetQuerySize() const
+		{
+			return m_querySize;
+		}
 
-protected:
+		crgfx::QueryType GetType() const
+		{
+			return m_descriptor.type;
+		}
 
-	virtual void GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t count) = 0;
+		// Allocate a GPU query id. We can use this to begin or end a query on a command buffer
+		CrGPUQueryId Allocate()
+		{
+			// TODO Check bounds
+			uint32_t currentQuery = m_currentQuery;
+			m_currentQuery++;
+			return CrGPUQueryId(currentQuery);
+		}
 
-	virtual void GetOcclusionDataPS(CrGPUOcclusion* data, uint32_t count) = 0;
+		// Resolve all pending queries using this command buffer to copy data across
+		// This doesn't mean the data is available now, it just means the GPU will
+		// copy it across as soon as it can. Then we can use the GetData() function
+		// to retrieve it on the CPU
+		void Resolve(crgfx::ICommandBuffer* commandBuffer);
 
-	CrGPUQueryPoolDescriptor m_descriptor;
-	
-	bool m_resolved;
+		void GetTimestampData(GPUTimestamp* timingData, uint32_t count);
 
-	// Size of each query in bytes
-	uint32_t m_querySize;
+		void Reset(crgfx::ICommandBuffer* commandBuffer);
 
-	uint32_t m_currentQuery;
+		// Computes the duration in nanoseconds between two timestamps
+		double GetDuration(GPUTimestamp startTime, GPUTimestamp endTime) const;
 
-	// Not all platforms work the same way, so this is the multiplier that takes us from raw ticks to nanoseconds. In common cases it will just be 1.0, but it could be 10.0 depending on
-	// the timer resolution of the current device we're working with
-	double m_timestampPeriod;
+	protected:
+
+		virtual void GetTimingDataPS(GPUTimestamp* timingData, uint32_t count) = 0;
+
+		virtual void GetOcclusionDataPS(GPUOcclusion* data, uint32_t count) = 0;
+
+		GPUQueryPoolDescriptor m_descriptor;
+
+		bool m_resolved;
+
+		// Size of each query in bytes
+		uint32_t m_querySize;
+
+		uint32_t m_currentQuery;
+
+		// Not all platforms work the same way, so this is the multiplier that takes us from raw ticks to nanoseconds. In common cases it will just be 1.0, but it could be 10.0 depending on
+		// the timer resolution of the current device we're working with
+		double m_timestampPeriod;
+	};
 };

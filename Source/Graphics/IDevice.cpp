@@ -245,7 +245,7 @@ namespace crgfx
 		return computePipeline;
 	}
 
-	ICrGPUQueryPool* IDevice::CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+	IGPUQueryPool* IDevice::CreateGPUQueryPool(const GPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
 		return CreateGPUQueryPoolPS(queryPoolDescriptor);
 	}

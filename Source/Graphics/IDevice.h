@@ -156,7 +156,7 @@ namespace crgfx
 
 		CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
 
-		ICrGPUQueryPool* CreateGPUQueryPool(const CrGPUQueryPoolDescriptor& queryPoolDescriptor);
+		IGPUQueryPool* CreateGPUQueryPool(const GPUQueryPoolDescriptor& queryPoolDescriptor);
 
 		ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
 
@@ -231,7 +231,7 @@ namespace crgfx
 
 		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) = 0;
 
-		virtual ICrGPUQueryPool* CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
+		virtual IGPUQueryPool* CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
 
 		virtual void FinalizeDeletionPS() {}
 

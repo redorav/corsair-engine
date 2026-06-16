@@ -2,28 +2,31 @@
 
 #include "Graphics/ICrGPUQueryPool.h"
 
-class IDevice;
-
-class CrGPUQueryPoolD3D12 final : public ICrGPUQueryPool
+namespace crgfx
 {
-public:
+	class IDevice;
 
-	CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor);
+	class CrGPUQueryPoolD3D12 final : public IGPUQueryPool
+	{
+	public:
 
-	~CrGPUQueryPoolD3D12();
+		CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
 
-	ID3D12QueryHeap* GetD3D12QueryHeap() const { return m_d3d12QueryHeap; }
+		~CrGPUQueryPoolD3D12();
 
-	const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
+		ID3D12QueryHeap* GetD3D12QueryHeap() const { return m_d3d12QueryHeap; }
 
-protected:
+		const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
 
-	virtual void GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount) override;
+	protected:
 
-	virtual void GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t count) override;
+		virtual void GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount) override;
 
-	// Use the platform-independent code so we don't have to rewrite it
-	CrHardwareGPUBufferHandle m_queryBuffer;
+		virtual void GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t count) override;
 
-	ID3D12QueryHeap* m_d3d12QueryHeap;
+		// Use the platform-independent code so we don't have to rewrite it
+		CrHardwareGPUBufferHandle m_queryBuffer;
+
+		ID3D12QueryHeap* m_d3d12QueryHeap;
+	};
 };

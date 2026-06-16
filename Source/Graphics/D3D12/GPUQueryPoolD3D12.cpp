@@ -16,49 +16,52 @@ D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(crgfx::QueryType queryType)
 	}
 }
 
-CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const CrGPUQueryPoolDescriptor& descriptor) : ICrGPUQueryPool(renderDevice, descriptor)
+namespace crgfx
 {
-	crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
-
-	m_querySize = sizeof(uint64_t);
-
-	D3D12_QUERY_HEAP_DESC queryHeapDescriptor;
-	queryHeapDescriptor.Type = GetD3D12QueryType(descriptor.type);
-	queryHeapDescriptor.Count = descriptor.count;
-	queryHeapDescriptor.NodeMask = 0;
-	HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateQueryHeap(&queryHeapDescriptor, IID_PPV_ARGS(&m_d3d12QueryHeap));
-
-	CrAssertMsg(hResult == S_OK, "Failed to create query pool");
-
-	CrHardwareGPUBufferDescriptor queryBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
-
-	m_queryBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
-
-	m_timestampPeriod = (double)(1000000000 / d3d12RenderDevice->GetD3D12TimestampFrequency());
-}
-
-CrGPUQueryPoolD3D12::~CrGPUQueryPoolD3D12()
-{
-	m_d3d12QueryHeap->Release();
-}
-
-void CrGPUQueryPoolD3D12::GetTimingDataPS(CrGPUTimestamp* timingData, uint32_t timingCount)
-{
-	uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+	CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
 	{
-		memcpy(timingData, memory, timingCount * sizeof(timingData));
+		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
+
+		m_querySize = sizeof(uint64_t);
+
+		D3D12_QUERY_HEAP_DESC queryHeapDescriptor;
+		queryHeapDescriptor.Type = GetD3D12QueryType(descriptor.type);
+		queryHeapDescriptor.Count = descriptor.count;
+		queryHeapDescriptor.NodeMask = 0;
+		HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateQueryHeap(&queryHeapDescriptor, IID_PPV_ARGS(&m_d3d12QueryHeap));
+
+		CrAssertMsg(hResult == S_OK, "Failed to create query pool");
+
+		CrHardwareGPUBufferDescriptor queryBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
+
+		m_queryBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
+
+		m_timestampPeriod = (double)(1000000000 / d3d12RenderDevice->GetD3D12TimestampFrequency());
 	}
-	m_queryBuffer->Unlock();
-}
 
-void CrGPUQueryPoolD3D12::GetOcclusionDataPS(CrGPUOcclusion* occlusionData, uint32_t occlusionCount)
-{
-	uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+	CrGPUQueryPoolD3D12::~CrGPUQueryPoolD3D12()
 	{
-		for (uint32_t i = 0; i < occlusionCount; i++)
+		m_d3d12QueryHeap->Release();
+	}
+
+	void CrGPUQueryPoolD3D12::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
+	{
+		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{
-			occlusionData[i].visibilitySamples = memory[i];
+			memcpy(timingData, memory, timingCount * sizeof(timingData));
 		}
+		m_queryBuffer->Unlock();
 	}
-	m_queryBuffer->Unlock();
+
+	void CrGPUQueryPoolD3D12::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
+	{
+		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
+		{
+			for (uint32_t i = 0; i < occlusionCount; i++)
+			{
+				occlusionData[i].visibilitySamples = memory[i];
+			}
+		}
+		m_queryBuffer->Unlock();
+	}
 }

@@ -738,7 +738,7 @@ namespace crgfx
 		return new CrComputePipelineVulkan(this, computeShader);
 	}
 
-	ICrGPUQueryPool* DeviceVulkan::CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+	IGPUQueryPool* DeviceVulkan::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
 		return new CrGPUQueryPoolVulkan(this, queryPoolDescriptor);
 	}

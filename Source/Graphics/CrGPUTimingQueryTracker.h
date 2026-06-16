@@ -38,11 +38,11 @@ public:
 
 	CrGPUInterval GetFrameDuration() const;
 
-	ICrGPUQueryPool* GetCurrentQueryPool() const;
+	crgfx::IGPUQueryPool* GetCurrentQueryPool() const;
 
 private:
 
-	ICrGPUQueryPool* GetOldestQueryPool() const;
+	crgfx::IGPUQueryPool* GetOldestQueryPool() const;
 
 	uint64_t m_currentFrame;
 
@@ -56,14 +56,14 @@ private:
 	CrGPUTimingRequest m_frameTimingRequest;
 
 	// Collection of query pools, ideally one per frame
-	crstl::vector<CrGPUQueryPoolHandle> m_queryPools;
+	crstl::vector<crgfx::CrGPUQueryPoolHandle> m_queryPools;
 
 	// There is a hashmap per frame as the query ids change every frame
 	crstl::vector<crstl::open_hashmap<CrHash, CrGPUTimingRequest>> m_timingRequests;
 
 	// Data for timings that were resolved this frame. They'll get stomped next frame
 	// This is the raw data for the timestamps
-	crstl::vector<CrGPUTimestamp> m_timestampData;
+	crstl::vector<crgfx::GPUTimestamp> m_timestampData;
 
 	// Intervals resolved for the current raw data. Starting time is with respect to the
 	// query inserted by the tracker on Begin()

@@ -450,7 +450,7 @@ namespace crgfx
 		return new CrComputePipelineD3D12(this, computeShader);
 	}
 
-	ICrGPUQueryPool* DeviceD3D12::CreateGPUQueryPoolPS(const CrGPUQueryPoolDescriptor& queryPoolDescriptor)
+	IGPUQueryPool* DeviceD3D12::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
 		return new CrGPUQueryPoolD3D12(this, queryPoolDescriptor);
 	}

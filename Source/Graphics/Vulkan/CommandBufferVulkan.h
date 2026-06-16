@@ -54,13 +54,13 @@ namespace crgfx
 
 		virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) override;
 
-		virtual void BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+		virtual void BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
-		virtual void EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query) override;
+		virtual void EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) override;
 
-		virtual void ResetGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
+		virtual void ResetGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
-		virtual void ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
+		virtual void ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) override;
 
 		virtual void FlushGraphicsRenderStatePS() override;
 
@@ -151,13 +151,13 @@ namespace crgfx
 		}
 	}
 
-	inline void CommandBufferVulkan::BeginTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	inline void CommandBufferVulkan::BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
 		vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), query.id);
 	}
 
-	inline void CommandBufferVulkan::EndTimestampQueryPS(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	inline void CommandBufferVulkan::EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
 		vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), query.id);

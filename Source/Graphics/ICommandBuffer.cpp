@@ -116,22 +116,22 @@ namespace crgfx
 		m_renderDevice->SubmitCommandBuffer(this, nullptr, nullptr, m_completionFence.get());
 	}
 
-	void ICommandBuffer::BeginTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	void ICommandBuffer::BeginTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		BeginTimestampQueryPS(queryPool, query);
 	}
 
-	void ICommandBuffer::EndTimestampQuery(const ICrGPUQueryPool* queryPool, CrGPUQueryId query)
+	void ICommandBuffer::EndTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryId query)
 	{
 		EndTimestampQueryPS(queryPool, query);
 	}
 
-	void ICommandBuffer::ResetGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+	void ICommandBuffer::ResetGPUQueries(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
 		ResetGPUQueriesPS(queryPool, start, count);
 	}
 
-	void ICommandBuffer::ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count)
+	void ICommandBuffer::ResolveGPUQueries(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
 		ResolveGPUQueriesPS(queryPool, start, count);
 	}

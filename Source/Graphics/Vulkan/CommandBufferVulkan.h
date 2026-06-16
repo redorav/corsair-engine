@@ -2,9 +2,9 @@
 
 #include "Graphics/ICommandBuffer.h"
 
-#include "CrPipelineVulkan.h"
+#include "PipelineVulkan.h"
 
-#include "CrGPUQueryPoolVulkan.h"
+#include "GPUQueryPoolVulkan.h"
 
 #include "CrVulkan.h"
 

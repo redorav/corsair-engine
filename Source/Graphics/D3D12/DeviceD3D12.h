@@ -4,7 +4,7 @@
 
 #include "Graphics/ICrGPUSynchronization.h"
 
-#include "CrDescriptorHeapD3D12.h"
+#include "DescriptorHeapD3D12.h"
 
 #include "d3d12.h"
 

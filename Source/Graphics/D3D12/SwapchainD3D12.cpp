@@ -4,7 +4,7 @@
 #include "SwapchainD3D12.h"
 #include "TextureD3D12.h"
 #include "DeviceD3D12.h"
-#include "CrGPUSynchronizationD3D12.h"
+#include "GPUSynchronizationD3D12.h"
 #include "CrD3D12.h"
 
 #include "CrOSWindow.h"

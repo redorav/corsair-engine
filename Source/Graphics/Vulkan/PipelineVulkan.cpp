@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
-#include "CrPipelineVulkan.h"
+#include "PipelineVulkan.h"
 #include "DeviceVulkan.h"
-#include "CrShaderVulkan.h"
+#include "ShaderVulkan.h"
 
 CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 (

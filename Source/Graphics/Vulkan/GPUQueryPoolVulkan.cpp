@@ -1,8 +1,8 @@
 #include "Graphics/CrRendering_pch.h"
 
 #include "DeviceVulkan.h"
-#include "CrGPUQueryPoolVulkan.h"
-#include "CrGPUBufferVulkan.h"
+#include "GPUQueryPoolVulkan.h"
+#include "GPUBufferVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"
 

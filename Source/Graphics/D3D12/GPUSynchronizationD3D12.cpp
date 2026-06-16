@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrGPUSynchronizationD3D12.h"
+#include "GPUSynchronizationD3D12.h"
 #include "DeviceD3D12.h"
 
 #include "Core/CrMacros.h"

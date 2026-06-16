@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrGPUBufferD3D12.h"
+#include "GPUBufferD3D12.h"
 #include "DeviceD3D12.h"
 #include "CrD3D12.h"
 

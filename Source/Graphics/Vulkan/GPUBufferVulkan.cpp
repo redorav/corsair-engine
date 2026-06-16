@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrGPUBufferVulkan.h"
+#include "GPUBufferVulkan.h"
 #include "DeviceVulkan.h"
 #include "CrVulkan.h"
 

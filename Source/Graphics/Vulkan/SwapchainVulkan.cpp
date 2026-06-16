@@ -3,7 +3,7 @@
 #include "SwapchainVulkan.h"
 #include "TextureVulkan.h"
 #include "DeviceVulkan.h"
-#include "CrGPUSynchronizationVulkan.h"
+#include "GPUSynchronizationVulkan.h"
 #include "CrVulkan.h"
 
 #include "Core/Logging/ICrDebug.h"

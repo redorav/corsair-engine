@@ -2,7 +2,7 @@
 
 #include "Graphics/IGraphicsSystem.h"
 
-#include "CrPipelineD3D12.h"
+#include "PipelineD3D12.h"
 #include "DeviceD3D12.h"
 #include "CrShaderD3D12.h"
 #include "CrD3D12.h"

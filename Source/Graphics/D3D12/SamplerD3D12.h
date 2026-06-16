@@ -3,7 +3,7 @@
 #include "Graphics/ISampler.h"
 
 #include "CrD3D12.h"
-#include "CrDescriptorHeapD3D12.h"
+#include "DescriptorHeapD3D12.h"
 
 namespace crgfx
 {

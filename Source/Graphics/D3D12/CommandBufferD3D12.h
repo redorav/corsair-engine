@@ -2,9 +2,9 @@
 
 #include "Graphics/ICommandBuffer.h"
 #include "Graphics/CrRendering.h"
-#include "CrGPUBufferD3D12.h"
-#include "CrGPUQueryPoolD3D12.h"
-#include "CrDescriptorHeapD3D12.h"
+#include "GPUBufferD3D12.h"
+#include "GPUQueryPoolD3D12.h"
+#include "DescriptorHeapD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrMacros.h"

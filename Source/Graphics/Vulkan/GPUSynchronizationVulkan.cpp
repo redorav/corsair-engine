@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrGPUSynchronizationVulkan.h"
+#include "GPUSynchronizationVulkan.h"
 #include "DeviceVulkan.h"
 
 namespace crgfx

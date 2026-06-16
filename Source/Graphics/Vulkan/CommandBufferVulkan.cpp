@@ -4,8 +4,8 @@
 #include "DeviceVulkan.h"
 #include "TextureVulkan.h"
 #include "SamplerVulkan.h"
-#include "CrShaderVulkan.h"
-#include "CrGPUBufferVulkan.h"
+#include "ShaderVulkan.h"
+#include "GPUBufferVulkan.h"
 
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrShaderResourceMetadata.h"
@@ -17,7 +17,6 @@
 
 namespace crgfx
 {
-
 	CommandBufferVulkan::CommandBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CommandBufferDescriptor& descriptor)
 		: crgfx::ICommandBuffer(vulkanRenderDevice, descriptor)
 	{

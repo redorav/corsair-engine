@@ -6,10 +6,10 @@
 #include "TextureD3D12.h"
 #include "SamplerD3D12.h"
 #include "SwapchainD3D12.h"
-#include "CrGPUBufferD3D12.h"
-#include "CrGPUSynchronizationD3D12.h"
+#include "GPUBufferD3D12.h"
+#include "GPUSynchronizationD3D12.h"
 #include "CrShaderD3D12.h"
-#include "CrPipelineD3D12.h"
+#include "PipelineD3D12.h"
 #include "CrD3D12.h"
 
 #include "Core/CrMacros.h"

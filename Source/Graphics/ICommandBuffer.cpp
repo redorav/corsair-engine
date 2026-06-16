@@ -190,7 +190,7 @@ namespace crgfx
 		return indexBufferView;
 	}
 
-	void ICommandBuffer::BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor)
+	void ICommandBuffer::BeginRenderPass(const crgfx::RenderPassDescriptor& renderPassDescriptor)
 	{
 		CrCommandBufferAssertMsg(!m_currentState.m_renderPassActive, "Render pass already active. Have you forgotten to close a render pass?");
 
@@ -205,7 +205,7 @@ namespace crgfx
 #if defined(COMMAND_BUFFER_VALIDATION)
 		for (uint32_t i = 0; i < renderPassDescriptor.color.size(); ++i)
 		{
-			const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
+			const RenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
 			if (renderTargetDescriptor.loadOp == crgfx::RenderTargetLoadOp::Load && renderTargetDescriptor.initialState.layout == crgfx::TextureLayout::Undefined)
 			{
 				CrCommandBufferAssertMsg(false, "Invalid combination");

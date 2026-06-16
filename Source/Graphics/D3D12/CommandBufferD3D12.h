@@ -13,8 +13,8 @@ namespace crgfx
 {
 	class TextureD3D12;
 
-	typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, CrRenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> CrTextureBarrierVectorD3D12;
-	typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, CrRenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
+	typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> CrTextureBarrierVectorD3D12;
+	typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
 
 	class CommandBufferD3D12 final : public ICommandBuffer
 	{
@@ -64,17 +64,17 @@ namespace crgfx
 
 		virtual void FlushComputeRenderStatePS() override;
 
-		virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
+		virtual void BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor) override;
 
 		virtual void EndRenderPassPS() override;
 
-		void ProcessTextureBarriers(const CrRenderPassDescriptor::TextureTransitionVector& textures, CrTextureBarrierVectorD3D12& d3d12TextureBarriers);
+		void ProcessTextureBarriers(const crgfx::RenderPassDescriptor::TextureTransitionVector& textures, CrTextureBarrierVectorD3D12& d3d12TextureBarriers);
 
-		void ProcessBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers);
+		void ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers);
 
 		void ProcessRenderTargetBarrier
 		(
-			const CrRenderTargetDescriptor& renderTargetDescriptor,
+			const RenderTargetDescriptor& renderTargetDescriptor,
 			const crgfx::TextureState& initialState,
 			const crgfx::TextureState& finalState,
 			CrTextureBarrierVectorD3D12& textureBarriers

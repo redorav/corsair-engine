@@ -66,11 +66,11 @@ namespace crgfx
 
 		virtual void FlushComputeRenderStatePS() override;
 
-		virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) override;
+		virtual void BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor) override;
 
 		virtual void EndRenderPassPS() override;
 
-		void GatherImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures);
+		void GatherImageAndBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, const crgfx::RenderPassDescriptor::TextureTransitionVector& textures);
 
 		void QueueVkImageBarrier(const crgfx::ITexture* texture, uint32_t mipmapStart, uint32_t mipmapCount, uint32_t sliceStart, uint32_t sliceCount,
 			const crgfx::TextureState& sourceState, const crgfx::TextureState& destinationState);
@@ -89,9 +89,9 @@ namespace crgfx
 
 		VkPipelineStageFlags m_destStageMask = VK_PIPELINE_STAGE_NONE; // destStageMask is an OR of all pipeline barrier stage masks
 
-		crstl::fixed_vector<VkBufferMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_bufferMemoryBarriers;
+		crstl::fixed_vector<VkBufferMemoryBarrier, RenderPassDescriptor::MaxTransitionCount> m_bufferMemoryBarriers;
 
-		crstl::fixed_vector<VkImageMemoryBarrier, CrRenderPassDescriptor::MaxTransitionCount> m_imageMemoryBarriers;
+		crstl::fixed_vector<VkImageMemoryBarrier, RenderPassDescriptor::MaxTransitionCount> m_imageMemoryBarriers;
 	};
 
 	inline const VkCommandBuffer& CommandBufferVulkan::GetVkCommandBuffer() const

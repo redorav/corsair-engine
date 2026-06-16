@@ -5,7 +5,7 @@
 #include "Graphics/ICommandBuffer.h"
 #include "Graphics/CrGPUBuffer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
-#include "Graphics/CrRenderPassDescriptor.h"
+#include "Graphics/RenderPassDescriptor.h"
 
 #include "Core/Logging/ICrDebug.h"
 
@@ -458,7 +458,7 @@ void CrRenderGraph::Execute()
 
 		if (renderGraphPass.type != CrRenderGraphPassType::Behavior)
 		{
-			CrRenderPassDescriptor renderPassDescriptor;
+			crgfx::RenderPassDescriptor renderPassDescriptor;
 			renderPassDescriptor.debugName = renderGraphPass.name;
 			renderPassDescriptor.debugColor = renderGraphPass.color;
 
@@ -480,7 +480,7 @@ void CrRenderGraph::Execute()
 				{
 					case crgfx::TextureLayout::RenderTarget:
 					{
-						CrRenderTargetDescriptor renderTargetDescriptor;
+						crgfx::RenderTargetDescriptor renderTargetDescriptor;
 						renderTargetDescriptor.texture      = textureUsage.texture;
 						renderTargetDescriptor.mipmap       = textureUsage.view.mipmapStart;
 						renderTargetDescriptor.slice        = textureUsage.view.sliceStart;
@@ -507,7 +507,7 @@ void CrRenderGraph::Execute()
 					case crgfx::TextureLayout::DepthStencilReadOnly:
 					case crgfx::TextureLayout::DepthStencilReadOnlyShader:
 					{
-						CrRenderTargetDescriptor depthDescriptor;
+						crgfx::RenderTargetDescriptor depthDescriptor;
 						depthDescriptor.texture           = textureUsage.texture;
 						depthDescriptor.mipmap            = textureUsage.view.mipmapStart;
 						depthDescriptor.slice             = textureUsage.view.sliceStart;

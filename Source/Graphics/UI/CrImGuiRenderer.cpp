@@ -14,7 +14,7 @@
 #include "Graphics/IDevice.h"
 #include "Graphics/ICommandBuffer.h"
 #include "Graphics/ISampler.h"
-#include "Graphics/CrRenderPassDescriptor.h"
+#include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrRenderGraph.h"
 #include "Graphics/CrRenderingResources.h"
 #include "Graphics/CrRendering.h"

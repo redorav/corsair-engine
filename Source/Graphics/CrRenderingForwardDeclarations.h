@@ -83,12 +83,12 @@ namespace crgfx
 	class ICommandBuffer;
 	using CommandBufferHandle = crstl::intrusive_ptr<ICommandBuffer>;
 	struct CommandBufferDescriptor;
+
+	struct RenderPassDescriptor;
+	struct CrComputePassDescriptor;
 };
 
 // Forward declare the necessary types for the rendering core
-
-struct CrRenderPassDescriptor;
-struct CrComputePassDescriptor;
 
 // GPU Queries
 class ICrGPUQueryPool;

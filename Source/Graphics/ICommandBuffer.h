@@ -1,24 +1,16 @@
 #pragma once
 
 #include "Graphics/ICrPipeline.h"
-
 #include "Graphics/CrGPUBuffer.h"
-
 #include "Graphics/ITexture.h"
-
 #include "Graphics/CrGPUDeletable.h"
-
 #include "Graphics/CrRenderingStatistics.h"
-
-#include "Graphics/CrRenderPassDescriptor.h"
-
+#include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrGPUStackAllocator.h"
-
 #include "Graphics/ICrGPUSynchronization.h"
+#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
-
-#include "Graphics/CrRenderingForwardDeclarations.h"
 
 #define COMMAND_BUFFER_VALIDATION
 
@@ -223,7 +215,7 @@ namespace crgfx
 
 		void ResolveGPUQueries(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count);
 
-		void BeginRenderPass(const CrRenderPassDescriptor& renderPassDescriptor);
+		void BeginRenderPass(const crgfx::RenderPassDescriptor& renderPassDescriptor);
 
 		void EndRenderPass();
 
@@ -286,7 +278,7 @@ namespace crgfx
 
 		virtual void ResolveGPUQueriesPS(const ICrGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
 
-		virtual void BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor) = 0;
+		virtual void BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor) = 0;
 
 		virtual void EndRenderPassPS() = 0;
 
@@ -337,7 +329,7 @@ namespace crgfx
 			uint32_t                        m_stencilRef;
 			bool                            m_stencilRefDirty;
 
-			CrRenderPassDescriptor          m_currentRenderPass;
+			crgfx::RenderPassDescriptor   m_currentRenderPass;
 
 			bool                            m_renderPassActive;
 		};

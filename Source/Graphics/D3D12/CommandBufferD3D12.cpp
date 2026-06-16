@@ -69,11 +69,11 @@ namespace crgfx
 
 	void CommandBufferD3D12::ProcessTextureBarriers
 	(
-		const CrRenderPassDescriptor::TextureTransitionVector& textures,
+		const crgfx::RenderPassDescriptor::TextureTransitionVector& textures,
 		CrTextureBarrierVectorD3D12& d3d12TextureBarriers
 	)
 	{
-		for (const CrRenderPassTextureDescriptor& descriptor : textures)
+		for (const RenderPassTextureDescriptor& descriptor : textures)
 		{
 			const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(descriptor.texture);
 
@@ -99,9 +99,9 @@ namespace crgfx
 		}
 	}
 
-	void CommandBufferD3D12::ProcessBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers)
+	void CommandBufferD3D12::ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers)
 	{
-		for (const CrRenderPassBufferDescriptor& descriptor : buffers)
+		for (const RenderPassBufferDescriptor& descriptor : buffers)
 		{
 			const CrHardwareGPUBufferD3D12* d3d12Buffer = static_cast<const CrHardwareGPUBufferD3D12*>(descriptor.hardwareBuffer);
 
@@ -121,7 +121,7 @@ namespace crgfx
 
 	void CommandBufferD3D12::ProcessRenderTargetBarrier
 	(
-		const CrRenderTargetDescriptor& renderTargetDescriptor,
+		const RenderTargetDescriptor& renderTargetDescriptor,
 		const crgfx::TextureState& initialState,
 		const crgfx::TextureState& finalState,
 		CrTextureBarrierVectorD3D12& d3d12TextureBarriers
@@ -152,18 +152,18 @@ namespace crgfx
 		d3d12TextureBarriers.push_back(d3d12TextureBarrier);
 	}
 
-	void CommandBufferD3D12::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
+	void CommandBufferD3D12::BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor)
 	{
 		CrTextureBarrierVectorD3D12 textureBarriers;
 		CrBufferBarrierVectorD3D12 bufferBarriers;
 
-		const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
+		const RenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
 		ProcessTextureBarriers(renderPassDescriptor.beginTextures, textureBarriers);
 
 		ProcessBufferBarriers(renderPassDescriptor.beginBuffers, bufferBarriers);
 
-		for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+		for (const RenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
 		{
 			if (renderTargetDescriptor.initialState != renderTargetDescriptor.usageState)
 			{
@@ -207,7 +207,7 @@ namespace crgfx
 
 			for (uint32_t i = 0, renderTargetCount = (uint32_t)renderPassDescriptor.color.size(); i < renderTargetCount; ++i)
 			{
-				const CrRenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
+				const RenderTargetDescriptor& renderTargetDescriptor = renderPassDescriptor.color[i];
 				D3D12_RENDER_PASS_RENDER_TARGET_DESC& renderTargetDesc = d3d12RenderTargets[i];
 				const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(renderTargetDescriptor.texture);
 				renderTargetDesc.cpuDescriptor = d3d12Texture->GetD3D12RenderTargetView(renderTargetDescriptor.mipmap, renderTargetDescriptor.slice);
@@ -259,15 +259,15 @@ namespace crgfx
 	{
 		CrTextureBarrierVectorD3D12 textureBarriers;
 		CrBufferBarrierVectorD3D12 bufferBarriers;
-		const CrRenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
+		const crgfx::RenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
 
 		if (renderPassDescriptor.type == crgfx::RenderPassType::Graphics)
 		{
 			m_d3d12GraphicsCommandList->EndRenderPass();
 
-			const CrRenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
+			const RenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
-			for (const CrRenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
+			for (const RenderTargetDescriptor& renderTargetDescriptor : renderPassDescriptor.color)
 			{
 				if (renderTargetDescriptor.usageState != renderTargetDescriptor.finalState)
 				{

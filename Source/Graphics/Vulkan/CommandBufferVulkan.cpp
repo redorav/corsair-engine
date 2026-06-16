@@ -6,7 +6,8 @@
 #include "SamplerVulkan.h"
 #include "CrShaderVulkan.h"
 #include "CrGPUBufferVulkan.h"
-#include "Graphics/CrRenderPassDescriptor.h"
+
+#include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrShaderResourceMetadata.h"
 #include "Graphics/CrRendering.h"
 
@@ -374,7 +375,7 @@ namespace crgfx
 	}
 
 	void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
-		const CrRenderPassBufferDescriptor& bufferDescriptor, crgfx::BufferState::T sourceState, crgfx::BufferState::T destinationState)
+		const RenderPassBufferDescriptor& bufferDescriptor, crgfx::BufferState::T sourceState, crgfx::BufferState::T destinationState)
 	{
 		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(bufferDescriptor.hardwareBuffer);
 
@@ -419,7 +420,7 @@ namespace crgfx
 		imageMemoryBarrier.dstAccessMask = resourceStateInfoDestination.accessMask;
 	}
 
-	void CommandBufferVulkan::BeginRenderPassPS(const CrRenderPassDescriptor& renderPassDescriptor)
+	void CommandBufferVulkan::BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor)
 	{
 		// Always process buffers and textures
 		GatherImageAndBufferBarriers(renderPassDescriptor.beginBuffers, renderPassDescriptor.beginTextures);
@@ -443,7 +444,7 @@ namespace crgfx
 			{
 				for (size_t i = 0; i < numColorAttachments; ++i)
 				{
-					const CrRenderTargetDescriptor& colorAttachment = renderPassDescriptor.color[i];
+					const RenderTargetDescriptor& colorAttachment = renderPassDescriptor.color[i];
 					const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(colorAttachment.texture);
 
 					VkRenderingAttachmentInfo& colorAttachmentInfo = vkColorAttachments.push_back();
@@ -470,7 +471,7 @@ namespace crgfx
 
 			if (renderPassDescriptor.depth.texture)
 			{
-				const CrRenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
+				const RenderTargetDescriptor& depthAttachment = renderPassDescriptor.depth;
 				const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(depthAttachment.texture);
 
 				vkDepthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
@@ -523,7 +524,7 @@ namespace crgfx
 
 			for (uint32_t i = 0; i < numColorAttachments; ++i)
 			{
-				const CrRenderTargetDescriptor& colorAttachment = m_currentState.m_currentRenderPass.color[i];
+				const RenderTargetDescriptor& colorAttachment = m_currentState.m_currentRenderPass.color[i];
 
 				if (colorAttachment.usageState.layout != colorAttachment.finalState.layout)
 				{
@@ -533,7 +534,7 @@ namespace crgfx
 
 			if (m_currentState.m_currentRenderPass.depth.texture)
 			{
-				const CrRenderTargetDescriptor& depthAttachment = m_currentState.m_currentRenderPass.depth;
+				const RenderTargetDescriptor& depthAttachment = m_currentState.m_currentRenderPass.depth;
 
 				if (depthAttachment.usageState.layout != depthAttachment.finalState.layout)
 				{
@@ -551,9 +552,9 @@ namespace crgfx
 
 	// Create the image and buffer barriers for the buffer and texture transitions specified in the arrays
 	// They're all calculated and batched together for efficiency
-	void CommandBufferVulkan::GatherImageAndBufferBarriers(const CrRenderPassDescriptor::BufferTransitionVector& buffers, const CrRenderPassDescriptor::TextureTransitionVector& textures)
+	void CommandBufferVulkan::GatherImageAndBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, const RenderPassDescriptor::TextureTransitionVector& textures)
 	{
-		for (const CrRenderPassBufferDescriptor& bufferDescriptor : buffers)
+		for (const RenderPassBufferDescriptor& bufferDescriptor : buffers)
 		{
 			VkBufferMemoryBarrier& bufferMemoryBarrier = m_bufferMemoryBarriers.push_back();
 			PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
@@ -561,7 +562,7 @@ namespace crgfx
 			m_destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
 		}
 
-		for (const CrRenderPassTextureDescriptor& textureDescriptor : textures)
+		for (const RenderPassTextureDescriptor& textureDescriptor : textures)
 		{
 			QueueVkImageBarrier(textureDescriptor.texture, textureDescriptor.mipmapStart, textureDescriptor.mipmapCount,
 				textureDescriptor.sliceStart, textureDescriptor.sliceCount, textureDescriptor.sourceState, textureDescriptor.destinationState);

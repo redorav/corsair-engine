@@ -3,8 +3,7 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/CrShaderManager.h"
-#include "Graphics/ICrShaderReflection.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrShaderReflectionHeader.h"
 #include "Resource/CrResourceManager.h"
 

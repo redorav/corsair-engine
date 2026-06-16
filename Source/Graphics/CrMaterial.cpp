@@ -2,7 +2,7 @@
 
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrRendererConfig.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrRenderMesh.h"
 
 #include "Core/Logging/ICrDebug.h"

@@ -2,7 +2,7 @@
 
 #include "Graphics/CrGPUStackAllocator.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 
 #include "Core/CrAlignment.h"
 

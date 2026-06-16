@@ -5,7 +5,7 @@
 #include "Graphics/CrMaterialCompiler.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrShaderManager.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrShaderSources.h"
 
 #include "Core/CrGlobalPaths.h"

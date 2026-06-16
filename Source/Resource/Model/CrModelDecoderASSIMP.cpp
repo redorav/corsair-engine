@@ -8,7 +8,7 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/CrMaterialCompiler.h"
 #include "Graphics/CrRenderModel.h"

@@ -8,7 +8,7 @@
 
 #include "Graphics/CrImage.h"
 #include "Graphics/CrRendering.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 #include "ddspp.h"
 

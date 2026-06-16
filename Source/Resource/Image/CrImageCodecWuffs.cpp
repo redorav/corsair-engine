@@ -4,7 +4,7 @@
 
 #include "Graphics/CrImage.h"
 #include "Graphics/CrRendering.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 #pragma warning(push, 0)
 #include <wuffs-unsupported-snapshot.c>

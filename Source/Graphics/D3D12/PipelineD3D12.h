@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrPipeline.h"
+#include "Graphics/IPipeline.h"
 
 namespace crgfx
 {

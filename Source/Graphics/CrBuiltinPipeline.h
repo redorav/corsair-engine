@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/ICrPipeline.h"
+#include "Graphics/IPipeline.h"
 #include "Graphics/CrVertexDescriptor.h"
 
 #include "crstl/open_hashmap.h"

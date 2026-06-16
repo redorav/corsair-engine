@@ -2,7 +2,7 @@
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrRendering.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 #include "Graphics/CrGPUDeletable.h"
 #include "Graphics/CrVertexDescriptor.h"
 

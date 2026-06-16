@@ -3,7 +3,7 @@
 #include "Core/CrHash.h"
 #include "Core/CrPlatform.h"
 
-#include "Graphics/ICrPipeline.h"
+#include "Graphics/IPipeline.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 

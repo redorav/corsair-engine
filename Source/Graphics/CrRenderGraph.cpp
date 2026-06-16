@@ -3,7 +3,7 @@
 #include "Graphics/CrRenderGraph.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/ICommandBuffer.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
 #include "Graphics/RenderPassDescriptor.h"
 

@@ -1,7 +1,7 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrPipeline.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IPipeline.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrVertexDescriptor.h"
 
 crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend

@@ -5,7 +5,7 @@
 #include "Graphics/CrRendering.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrGPUDeletable.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 #include "crstl/array.h"
 #include "crstl/fixed_string.h"

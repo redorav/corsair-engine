@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Graphics/ICrPipeline.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/IPipeline.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/CrGPUDeletable.h"
 #include "Graphics/CrRenderingStatistics.h"

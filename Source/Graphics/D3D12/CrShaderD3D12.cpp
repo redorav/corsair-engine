@@ -3,7 +3,7 @@
 #include "DeviceD3D12.h"
 
 #include "Graphics/CrShaderResourceMetadata.h"
-#include "Graphics/ICrShader.inl"
+#include "Graphics/IShader.inl"
 
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"

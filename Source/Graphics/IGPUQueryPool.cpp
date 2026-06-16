@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/ICrGPUQueryPool.h"
+#include "Graphics/IGPUQueryPool.h"
 #include "Graphics/ICommandBuffer.h"
 
 #include "Math/CrMath.h"

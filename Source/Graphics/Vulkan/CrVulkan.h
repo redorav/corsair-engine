@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 extern PFN_vkSetDebugUtilsObjectNameEXT    vkSetDebugUtilsObjectName;
 extern PFN_vkSetDebugUtilsObjectTagEXT     vkSetDebugUtilsObjectTag;

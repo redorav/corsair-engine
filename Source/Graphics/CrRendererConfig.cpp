@@ -2,7 +2,7 @@
 
 #include "Graphics/CrRendererConfig.h"
 
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 crgfx::DataFormat::T CrRendererConfig::DepthBufferFormat = crgfx::DataFormat::D32_Float_S8_Uint;
 

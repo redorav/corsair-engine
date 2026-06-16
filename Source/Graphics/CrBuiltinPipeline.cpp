@@ -3,7 +3,7 @@
 #include "Graphics/CrBuiltinPipeline.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrRendererConfig.h"
 #include "Graphics/CrCommonVertexLayouts.h"
 

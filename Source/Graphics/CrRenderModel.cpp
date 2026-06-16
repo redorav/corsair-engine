@@ -3,7 +3,7 @@
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrRenderMesh.h"
 #include "Graphics/CrMaterial.h"
-#include "Graphics/ICrPipeline.h"
+#include "Graphics/IPipeline.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 

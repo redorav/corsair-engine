@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/ICrGPUQueryPool.h"
+#include "Graphics/IGPUQueryPool.h"
 #include <vulkan/vulkan.h>
 
 namespace crgfx

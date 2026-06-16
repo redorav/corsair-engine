@@ -3,7 +3,7 @@
 #include "Graphics/CrShaderDiskCache.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/CrMaterial.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"

@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/IDevice.h"
 
 #include "Core/Logging/ICrDebug.h"

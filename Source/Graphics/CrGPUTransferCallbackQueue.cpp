@@ -2,7 +2,7 @@
 
 #include "Graphics/IDevice.h"
 #include "Graphics/IGPUSynchronization.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/CrGPUTransferCallbackQueue.h"
 
 #include "Core/Logging/ICrDebug.h"

@@ -6,8 +6,8 @@
 #include "Core/CrPlatform.h"
 #include "Core/CrFrameTime.h"
 
-#include "Graphics/CrGPUBuffer.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/GPUBuffer.h"
+#include "Graphics/IShader.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/IGraphicsSystem.h"

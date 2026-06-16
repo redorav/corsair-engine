@@ -6,10 +6,10 @@
 #include "Graphics/IDevice.h"
 #include "Graphics/ISwapchain.h"
 #include "Graphics/CrShaderManager.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/ICommandBuffer.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/UI/CrImGuiRenderer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
 

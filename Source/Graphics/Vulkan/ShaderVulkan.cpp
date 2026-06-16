@@ -6,7 +6,7 @@
 #include "renderdoc_app.h"
 
 #include "Graphics/CrShaderResourceMetadata.h"
-#include "Graphics/ICrShader.inl"
+#include "Graphics/IShader.inl"
 
 #include "Core/Logging/ICrDebug.h"
 

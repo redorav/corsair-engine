@@ -4,7 +4,7 @@
 
 #include "Graphics/CrImage.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/CrGPUBuffer.h"
+#include "Graphics/GPUBuffer.h"
 #include "Graphics/CrRenderModel.h"
 
 #include "Core/CrCommandLine.h"

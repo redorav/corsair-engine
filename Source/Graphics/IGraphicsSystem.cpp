@@ -15,7 +15,7 @@
 #endif
 
 #include "Core/Streams/CrMemoryStream.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 
 #include "GeneratedShaders/BuiltinShaders.h"
 

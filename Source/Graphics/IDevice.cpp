@@ -6,10 +6,10 @@
 #include "ISwapchain.h"
 #include "ISampler.h"
 #include "ITexture.h"
-#include "ICrShader.h"
-#include "ICrPipeline.h"
+#include "IShader.h"
+#include "IPipeline.h"
 #include "IGPUQueryPool.h"
-#include "CrGPUBuffer.h"
+#include "GPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 
 #include "Core/CrMacros.h"

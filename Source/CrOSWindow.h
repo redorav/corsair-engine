@@ -2,7 +2,7 @@
 
 #include "Graphics/ISwapchain.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrDataFormats.h"
+#include "Graphics/DataFormats.h"
 
 #include "Math/CrMath.h"
 

@@ -2,9 +2,9 @@
 
 #include "ICommandBuffer.h"
 #include "IDevice.h"
-#include "ICrPipeline.h"
+#include "IPipeline.h"
 
-#include "ICrShader.h"
+#include "IShader.h"
 #include "CrGPUStackAllocator.h"
 #include "CrCPUStackAllocator.h"
 

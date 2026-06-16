@@ -6,14 +6,14 @@
 CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
 (
 	crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+	const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
 	: ICrGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 {
 	Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-void CrGraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrGraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -166,17 +166,17 @@ void CrGraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevic
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
-	const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const CrGraphicsShaderVulkan*>(graphicsShader.get());
+	const crgfx::GraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const crgfx::GraphicsShaderVulkan*>(graphicsShader.get());
 
 	const crstl::vector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
 
-	const crstl::vector<CrShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
+	const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
 
 	uint32_t usedShaderStages = 0;
 
 	for (uint32_t i = 0; i < bytecodes.size(); ++i)
 	{
-		const CrShaderBytecodeHandle& bytecode = bytecodes[i];
+		const crgfx::ShaderBytecodeHandle& bytecode = bytecodes[i];
 		const VkShaderModule vkShaderModule = vkShaderModules[i];
 
 		shaderStageCreateInfo.module = vkShaderModule;
@@ -312,20 +312,20 @@ void CrGraphicsPipelineVulkan::Deinitialize()
 	vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
 }
 
-CrComputePipelineVulkan::CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
+CrComputePipelineVulkan::CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(vulkanRenderDevice, computeShader)
 {
 	Initialize(vulkanRenderDevice, computeShader);
 }
 
-void CrComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 {
-	const CrComputeShaderVulkan* vulkanComputeShader = static_cast<const CrComputeShaderVulkan*>(computeShader.get());
+	const crgfx::ComputeShaderVulkan* vulkanComputeShader = static_cast<const crgfx::ComputeShaderVulkan*>(computeShader.get());
 
 	VkPipelineShaderStageCreateInfo shaderStage = {};
 	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	shaderStage.module = static_cast<const CrComputeShaderVulkan*>(computeShader.get())->GetVkShaderModule();
+	shaderStage.module = static_cast<const crgfx::ComputeShaderVulkan*>(computeShader.get())->GetVkShaderModule();
 	shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
 	VkResult vkResult;
@@ -373,13 +373,13 @@ void CrComputePipelineVulkan::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
+void CrGraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
 	Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
-void CrComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 {
 	Deinitialize();
 	Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), computeShader);

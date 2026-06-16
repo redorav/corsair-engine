@@ -28,32 +28,32 @@ const char* CrShaderManager::GetShaderBytecodeExtension(crgfx::GraphicsApi::T gr
 	}
 }
 
-CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
+crgfx::CrGraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	// Create the graphics shader descriptor
-	CrGraphicsShaderDescriptor graphicsShaderDescriptor;
+	crgfx::GraphicsShaderDescriptor graphicsShaderDescriptor;
 	graphicsShaderDescriptor.m_bytecodes.reserve(shaderCompilationDescriptor.GetBytecodeDescriptors().size());
 
 	// Load all the relevant shader bytecodes
 	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : shaderCompilationDescriptor.GetBytecodeDescriptors())
 	{
-		CrShaderBytecodeHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
+		crgfx::ShaderBytecodeHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
 
-	CrGraphicsShaderHandle graphicsShader = crgfx::GetDevice()->CreateGraphicsShader(graphicsShaderDescriptor);
+	crgfx::CrGraphicsShaderHandle graphicsShader = crgfx::GetDevice()->CreateGraphicsShader(graphicsShaderDescriptor);
 
 	return graphicsShader;
 }
-CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
+crgfx::CrComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = shaderCompilationDescriptor.GetBytecodeDescriptors()[0];
 
-	CrComputeShaderDescriptor computeShaderDescriptor;
+	crgfx::ComputeShaderDescriptor computeShaderDescriptor;
 	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
-	CrComputeShaderHandle computeShader = crgfx::GetDevice()->CreateComputeShader(computeShaderDescriptor);
+	crgfx::CrComputeShaderHandle computeShader = crgfx::GetDevice()->CreateComputeShader(computeShaderDescriptor);
 
 	return computeShader;
 }
@@ -78,12 +78,12 @@ void CrShaderManager::Deinitialize()
 	delete ShaderManager;
 }
 
-CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
+crgfx::ShaderBytecodeHandle CrShaderManager::CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor) const
 {
 	return CompileShaderBytecode(bytecodeDescriptor, CrShaderCompilerDefines::Dummy);
 }
 
-CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
+crgfx::ShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 (
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor,
 	const CrShaderCompilerDefines& defines
@@ -156,7 +156,7 @@ CrShaderBytecodeHandle CrShaderManager::CompileShaderBytecode
 		{
 			// Serialize in bytecode
 			CrReadFileStream compilationOutput(outputPath.c_str());
-			CrShaderBytecodeHandle bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+			crgfx::ShaderBytecodeHandle bytecode = crgfx::ShaderBytecodeHandle(new crgfx::ShaderBytecode());
 			compilationOutput << *bytecode.get();
 
 			CrLog("Compiled %s [%s] for %s %s (%f ms)",

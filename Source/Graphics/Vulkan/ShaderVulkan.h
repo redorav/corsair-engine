@@ -3,48 +3,49 @@
 #include "Graphics/IShader.h"
 #include <vulkan/vulkan.h>
 
-class IDevice;
-
-class CrGraphicsShaderVulkan final : public ICrGraphicsShader
+namespace crgfx
 {
-public:
+	class GraphicsShaderVulkan final : public IGraphicsShader
+	{
+	public:
 
-	CrGraphicsShaderVulkan(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+		GraphicsShaderVulkan(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
-	~CrGraphicsShaderVulkan();
+		~GraphicsShaderVulkan();
 
-	const crstl::vector<VkShaderModule>& GetVkShaderModules() const { return m_vkShaderModules; }
+		const crstl::vector<VkShaderModule>& GetVkShaderModules() const { return m_vkShaderModules; }
 
-	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
+		VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 
-private:
+	private:
 
-	VkDevice m_vkDevice;
+		VkDevice m_vkDevice;
 
-	crstl::vector<VkShaderModule> m_vkShaderModules;
+		crstl::vector<VkShaderModule> m_vkShaderModules;
 
-	// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
-	// The layout is also needed when allocating descriptor sets from a pool.
-	VkDescriptorSetLayout m_vkDescriptorSetLayout;
-};
+		// We store the descriptor set layout to connect it later on to the pipeline resource layout when creating it.
+		// The layout is also needed when allocating descriptor sets from a pool.
+		VkDescriptorSetLayout m_vkDescriptorSetLayout;
+	};
 
-class CrComputeShaderVulkan final : public ICrComputeShader
-{
-public:
+	class ComputeShaderVulkan final : public IComputeShader
+	{
+	public:
 
-	CrComputeShaderVulkan(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
+		ComputeShaderVulkan(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderDescriptor& computeShaderDescriptor);
 
-	~CrComputeShaderVulkan();
+		~ComputeShaderVulkan();
 
-	VkShaderModule GetVkShaderModule() const { return m_vkShaderModule; }
+		VkShaderModule GetVkShaderModule() const { return m_vkShaderModule; }
 
-	VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
+		VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
 
-private:
+	private:
 
-	VkDevice m_vkDevice;
+		VkDevice m_vkDevice;
 
-	VkShaderModule m_vkShaderModule;
+		VkShaderModule m_vkShaderModule;
 
-	VkDescriptorSetLayout m_vkDescriptorSetLayout;
+		VkDescriptorSetLayout m_vkDescriptorSetLayout;
+	};
 };

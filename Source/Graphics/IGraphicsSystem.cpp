@@ -45,7 +45,7 @@ namespace crgfx
 			if (metadata.shaderCode)
 			{
 				CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
-				const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+				const ShaderBytecodeHandle& bytecode = ShaderBytecodeHandle(new ShaderBytecode());
 				shaderBytecodeStream << *bytecode.get();
 				m_builtinShaderBytecodes[i] = bytecode;
 			}
@@ -58,7 +58,7 @@ namespace crgfx
 			if (metadata.shaderCode)
 			{
 				CrReadMemoryStream shaderBytecodeStream(metadata.shaderCode);
-				const CrShaderBytecodeHandle& bytecode = CrShaderBytecodeHandle(new CrShaderBytecode());
+				const ShaderBytecodeHandle& bytecode = ShaderBytecodeHandle(new ShaderBytecode());
 				shaderBytecodeStream << *bytecode.get();
 				m_builtinComputeBytecodes[i] = bytecode;
 			}
@@ -103,12 +103,12 @@ namespace crgfx
 		return GraphicsSystem->GetDevice();
 	}
 
-	const CrShaderBytecodeHandle& crgfx::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
+	const ShaderBytecodeHandle& crgfx::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
 	{
 		return GraphicsSystem->GetBuiltinShaderBytecode(builtinShader);
 	}
 
-	const CrShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
+	const ShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
 	{
 		return GraphicsSystem->GetBuiltinComputeBytecode(builtinCompute);
 	}
@@ -150,12 +150,12 @@ namespace crgfx
 		return m_descriptor.graphicsApi;
 	}
 
-	const CrShaderBytecodeHandle& IGraphicsSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
+	const ShaderBytecodeHandle& IGraphicsSystem::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const
 	{
 		return m_builtinShaderBytecodes[builtinShader];
 	}
 
-	const CrShaderBytecodeHandle& IGraphicsSystem::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const
+	const ShaderBytecodeHandle& IGraphicsSystem::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const
 	{
 		return m_builtinComputeBytecodes[builtinCompute];
 	}

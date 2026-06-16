@@ -436,7 +436,7 @@ namespace crgfx
 	void CommandBufferD3D12::FlushGraphicsRenderStatePS()
 	{
 		const CrGraphicsPipelineD3D12* d3d12GraphicsPipeline = static_cast<const CrGraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
-		const CrGraphicsShaderHandle& currentGraphicsShader = d3d12GraphicsPipeline->GetShader();
+		const crgfx::CrGraphicsShaderHandle& currentGraphicsShader = d3d12GraphicsPipeline->GetShader();
 
 		if (m_currentState.m_indexBufferDirty)
 		{
@@ -525,7 +525,7 @@ namespace crgfx
 			m_currentState.m_stencilRefDirty = false;
 		}
 
-		const ICrShaderBindingLayout& bindingLayout = currentGraphicsShader->GetBindingLayout();
+		const ShaderBindingLayout& bindingLayout = currentGraphicsShader->GetBindingLayout();
 
 		// Samplers go in a different descriptor heap
 		uint32_t totalShaderResourceCount = bindingLayout.GetTotalResourceCount() - bindingLayout.GetSamplerCount();
@@ -691,7 +691,7 @@ namespace crgfx
 			m_currentState.m_computePipelineDirty = false;
 		}
 
-		const ICrShaderBindingLayout& bindingLayout = currentComputeShader->GetBindingLayout();
+		const ShaderBindingLayout& bindingLayout = currentComputeShader->GetBindingLayout();
 
 		// Samplers go in a different descriptor heap
 		uint32_t shaderResourceCount = bindingLayout.GetTotalResourceCount() - bindingLayout.GetSamplerCount();

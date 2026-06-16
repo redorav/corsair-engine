@@ -180,7 +180,7 @@ namespace crgfx
 		// Commands
 		//---------
 
-		void ClearRenderTarget(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount);
+		void ClearRenderTarget(const ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount);
 
 		void Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 
@@ -215,7 +215,7 @@ namespace crgfx
 
 		void ResolveGPUQueries(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count);
 
-		void BeginRenderPass(const crgfx::RenderPassDescriptor& renderPassDescriptor);
+		void BeginRenderPass(const RenderPassDescriptor& renderPassDescriptor);
 
 		void EndRenderPass();
 
@@ -242,7 +242,7 @@ namespace crgfx
 
 		CrGPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
-		CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, crgfx::DataFormat::T indexFormat);
+		CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, DataFormat::T indexFormat);
 
 	protected:
 
@@ -250,7 +250,7 @@ namespace crgfx
 
 		virtual void EndPS() = 0;
 
-		virtual void ClearRenderTargetPS(const crgfx::ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) = 0;
+		virtual void ClearRenderTargetPS(const ITexture* renderTarget, const float4& color, uint32_t mip, uint32_t slice, uint32_t mipCount, uint32_t sliceCount) = 0;
 
 		virtual void DrawPS(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) = 0;
 
@@ -278,7 +278,7 @@ namespace crgfx
 
 		virtual void ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
 
-		virtual void BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor) = 0;
+		virtual void BeginRenderPassPS(const RenderPassDescriptor& renderPassDescriptor) = 0;
 
 		virtual void EndRenderPassPS() = 0;
 

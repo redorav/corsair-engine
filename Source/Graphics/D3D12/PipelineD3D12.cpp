@@ -12,14 +12,14 @@
 CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
 (
 	crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-	const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+	const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 )
 	: ICrGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 {
 	Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 }
 
-void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
@@ -130,7 +130,7 @@ void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, 
 	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const crstl::vector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+	const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 	d3d12PipelineStateDescriptor.VS = {};
 	d3d12PipelineStateDescriptor.PS = {};
@@ -140,7 +140,7 @@ void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, 
 
 	for (uint32_t i = 0; i < bytecodes.size(); ++i)
 	{
-		const CrShaderBytecodeHandle& bytecode = bytecodes[i];
+		const crgfx::ShaderBytecodeHandle& bytecode = bytecodes[i];
 
 		switch (bytecode->GetShaderStage())
 		{
@@ -209,20 +209,20 @@ void CrGraphicsPipelineD3D12::Deinitialize()
 	m_d3d12PipelineState->Release();
 }
 
-CrComputePipelineD3D12::CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
+CrComputePipelineD3D12::CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 	: ICrComputePipeline(d3d12RenderDevice, computeShader)
 {
 	Initialize(d3d12RenderDevice, computeShader);
 }
 
-void CrComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 	d3d12PipelineStateDescriptor.NodeMask = 0;
 	d3d12PipelineStateDescriptor.CachedPSO = {};
 	d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	const CrShaderBytecodeHandle& bytecode = computeShader->GetBytecode();
+	const crgfx::ShaderBytecodeHandle& bytecode = computeShader->GetBytecode();
 	d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() };
 
 	m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12ComputeRootSignature();
@@ -243,13 +243,13 @@ void CrComputePipelineD3D12::Deinitialize()
 
 #if !defined(CR_CONFIG_FINAL)
 
-void CrGraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader)
+void CrGraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader)
 {
 	Deinitialize();
 	Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 }
 
-void CrComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader)
+void CrComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
 {
 	Deinitialize();
 	Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), computeShader);

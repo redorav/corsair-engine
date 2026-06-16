@@ -10,7 +10,7 @@
 #include "Graphics/CrBuiltinPipeline.h"
 #include "Graphics/CrShapeBuilder.h"
 #include "Graphics/CrMaterial.h"
-#include "Graphics/ICrShader.h"
+#include "Graphics/IShader.h"
 
 #include "Math/CrHlslppQuaternion.h"
 #include "Math/CrHlslppMatrixFloat.h"

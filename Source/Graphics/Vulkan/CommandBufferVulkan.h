@@ -12,10 +12,10 @@
 
 #include "Graphics/CrCPUStackAllocator.h"
 
-class ICrShaderBindingLayout;
-
 namespace crgfx
 {
+	class ShaderBindingLayout;
+
 	class CommandBufferVulkan final : public crgfx::ICommandBuffer
 	{
 	public:
@@ -77,7 +77,7 @@ namespace crgfx
 
 		void FlushImageAndBufferBarriers();
 
-		void UpdateResourceTableVulkan(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout);
+		void UpdateResourceTableVulkan(const crgfx::ShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout);
 
 		VkCommandBuffer m_vkCommandBuffer;
 

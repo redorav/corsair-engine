@@ -14,7 +14,7 @@ public:
 	CrGraphicsPipelineD3D12
 	(
 		crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
 	~CrGraphicsPipelineD3D12();
@@ -27,13 +27,13 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) override;
 
 #endif
 
 private:
 
-	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	void Deinitialize();
 
@@ -48,7 +48,7 @@ class CrComputePipelineD3D12 final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
 	~CrComputePipelineD3D12();
 
@@ -58,13 +58,13 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) override;
 
 #endif
 
 private:
 
-	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrComputeShaderHandle& computeShader);
+	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
 	void Deinitialize();
 

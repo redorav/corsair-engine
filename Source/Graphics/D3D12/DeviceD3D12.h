@@ -71,9 +71,9 @@ namespace crgfx
 
 		virtual IGPUSemaphore* CreateGPUSemaphorePS() override;
 
-		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) override;
+		virtual IGraphicsShader* CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor) override;
 
-		virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) override;
+		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) override;
 
 		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
 
@@ -83,7 +83,7 @@ namespace crgfx
 
 		virtual crgfx::ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
-		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
 		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) override;
 

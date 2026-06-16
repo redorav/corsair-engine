@@ -220,17 +220,17 @@ class ICrGraphicsPipeline : public CrGPUAutoDeletable
 {
 public:
 
-	ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	virtual ~ICrGraphicsPipeline();
 
-	const CrGraphicsShaderHandle& GetShader() const { return m_shader; }
+	const crgfx::CrGraphicsShaderHandle& GetShader() const { return m_shader; }
 
 	uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
 
 private:
 
-	CrGraphicsShaderHandle m_shader;
+	crgfx::CrGraphicsShaderHandle m_shader;
 	
 	uint32_t m_usedVertexStreamCount = 0;
 
@@ -238,9 +238,9 @@ private:
 
 public:
 
-	void Recompile(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader);
+	void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader);
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) = 0;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) = 0;
 
 	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
 
@@ -269,11 +269,11 @@ class ICrComputePipeline : public CrGPUAutoDeletable
 {
 public:
 
-	ICrComputePipeline(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader);
+	ICrComputePipeline(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
 	virtual ~ICrComputePipeline();
 
-	const CrComputeShaderHandle& GetShader() const { return m_shader; }
+	const crgfx::CrComputeShaderHandle& GetShader() const { return m_shader; }
 
 	uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
 
@@ -289,15 +289,15 @@ private:
 
 	uint32_t m_threadGroupSizeZ;
 
-	CrComputeShaderHandle m_shader;
+	crgfx::CrComputeShaderHandle m_shader;
 
 #if !defined(CR_CONFIG_FINAL)
 
 public:
 
-	void Recompile(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader);
+	void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader) = 0;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) = 0;
 
 	CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 	

@@ -14,7 +14,7 @@ public:
 	CrGraphicsPipelineVulkan
 	(
 		crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, 
-		const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	);
 
 	~CrGraphicsPipelineVulkan();
@@ -25,13 +25,13 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrGraphicsShaderHandle& graphicsShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) override;
 
 #endif
 
 private:
 
-	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 	void Deinitialize();
 
@@ -46,7 +46,7 @@ class CrComputePipelineVulkan final : public ICrComputePipeline
 {
 public:
 
-	CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+	CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
 	~CrComputePipelineVulkan();
 
@@ -56,13 +56,13 @@ public:
 
 #if !defined(CR_CONFIG_FINAL)
 
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const CrComputeShaderHandle& computeShader) override;
+	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) override;
 
 #endif
 
 private:
 
-	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrComputeShaderHandle& computeShader);
+	void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
 
 	void Deinitialize();
 

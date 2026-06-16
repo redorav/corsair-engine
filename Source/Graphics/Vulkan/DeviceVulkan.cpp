@@ -693,14 +693,14 @@ namespace crgfx
 		return new GPUSemaphoreVulkan(this);
 	}
 
-	ICrGraphicsShader* DeviceVulkan::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	IGraphicsShader* DeviceVulkan::CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
-		return new CrGraphicsShaderVulkan(this, graphicsShaderDescriptor);
+		return new GraphicsShaderVulkan(this, graphicsShaderDescriptor);
 	}
 
-	ICrComputeShader* DeviceVulkan::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor)
+	IComputeShader* DeviceVulkan::CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor)
 	{
-		return new CrComputeShaderVulkan(this, computeShaderDescriptor);
+		return new ComputeShaderVulkan(this, computeShaderDescriptor);
 	}
 
 	ICrHardwareGPUBuffer* DeviceVulkan::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)

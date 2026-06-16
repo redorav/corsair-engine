@@ -46,7 +46,7 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 		{
 			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(mesh, pipelineVariant);
 
-			const CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
+			const crgfx::CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
 
 			if (graphicsShader)
 			{

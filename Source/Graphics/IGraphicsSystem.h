@@ -38,9 +38,9 @@ namespace crgfx
 
 	const crgfx::DeviceHandle& GetDevice();
 
-	const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
+	const ShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader);
 
-	const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute);
+	const ShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute);
 
 	crgfx::GraphicsApi::T GetGraphicsApi();
 
@@ -68,15 +68,15 @@ namespace crgfx
 
 		bool GetIsNVAPIInitialized() const { return m_nvapiInitialized; }
 
-		const CrShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const;
+		const ShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader) const;
 
-		const CrShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const;
+		const ShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute) const;
 
 	public:
 
-		crstl::vector<CrShaderBytecodeHandle> m_builtinShaderBytecodes;
+		crstl::vector<ShaderBytecodeHandle> m_builtinShaderBytecodes;
 
-		crstl::vector<CrShaderBytecodeHandle> m_builtinComputeBytecodes;
+		crstl::vector<ShaderBytecodeHandle> m_builtinComputeBytecodes;
 
 		crgfx::DeviceHandle m_mainDevice;
 

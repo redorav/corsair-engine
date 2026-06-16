@@ -8,31 +8,34 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrMacros.h"
 
-CrGraphicsShaderD3D12::CrGraphicsShaderD3D12(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
-	: ICrGraphicsShader(renderDevice, graphicsShaderDescriptor)
+namespace crgfx
 {
-	CrShaderBindingLayoutResources resources;
-
-	// Create the shader modules and parse reflection information
-	for (const CrShaderBytecodeHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
+	GraphicsShaderD3D12::GraphicsShaderD3D12(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderDescriptor& graphicsShaderDescriptor)
+		: IGraphicsShader(renderDevice, graphicsShaderDescriptor)
 	{
-		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
-		ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
+		ShaderBindingLayoutResources resources;
+
+		// Create the shader modules and parse reflection information
+		for (const ShaderBytecodeHandle& shaderBytecode : graphicsShaderDescriptor.m_bytecodes)
+		{
+			const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
+			ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
+		}
+
+		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
 	}
 
-	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
-}
+	GraphicsShaderD3D12::~GraphicsShaderD3D12()
+	{
 
-CrGraphicsShaderD3D12::~CrGraphicsShaderD3D12()
-{
+	}
 
-}
-
-CrComputeShaderD3D12::CrComputeShaderD3D12(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor)
-	: ICrComputeShader(renderDevice, computeShaderDescriptor)
-{
-	CrShaderBindingLayoutResources resources;
-	const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
-	ICrShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
-	m_bindingLayout = crstl::unique_ptr<ICrShaderBindingLayout>(new ICrShaderBindingLayout(resources));
-}
+	ComputeShaderD3D12::ComputeShaderD3D12(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderDescriptor& computeShaderDescriptor)
+		: IComputeShader(renderDevice, computeShaderDescriptor)
+	{
+		ShaderBindingLayoutResources resources;
+		const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
+		ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
+		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
+	}
+};

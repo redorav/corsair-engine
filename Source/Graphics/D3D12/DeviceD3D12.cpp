@@ -316,12 +316,12 @@ namespace crgfx
 
 		// Create root signatures
 
-		const CrShaderBytecodeHandle& graphicsRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);
+		const ShaderBytecodeHandle& graphicsRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureGraphics);
 		hResult = m_d3d12Device->CreateRootSignature(0, graphicsRootSignatureBytecode->GetBytecode().data(), graphicsRootSignatureBytecode->GetBytecode().size(),
 			__uuidof(ID3D12RootSignature), (void**)&m_d3d12GraphicsRootSignature);
 		CrAssertMsg(SUCCEEDED(hResult), "Error creating graphics root signature");
 
-		const CrShaderBytecodeHandle& computeRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureCompute);
+		const ShaderBytecodeHandle& computeRootSignatureBytecode = renderSystem->GetBuiltinShaderBytecode(CrBuiltinShaders::RootSignatureCompute);
 		hResult = m_d3d12Device->CreateRootSignature(0, computeRootSignatureBytecode->GetBytecode().data(), computeRootSignatureBytecode->GetBytecode().size(),
 			__uuidof(ID3D12RootSignature), (void**)&m_d3d12ComputeRootSignature);
 		CrAssertMsg(SUCCEEDED(hResult), "Error creating compute root signature");
@@ -407,14 +407,14 @@ namespace crgfx
 		return nullptr;
 	}
 
-	ICrGraphicsShader* DeviceD3D12::CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	IGraphicsShader* DeviceD3D12::CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
-		return new CrGraphicsShaderD3D12(this, graphicsShaderDescriptor);
+		return new GraphicsShaderD3D12(this, graphicsShaderDescriptor);
 	}
 
-	ICrComputeShader* DeviceD3D12::CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor)
+	IComputeShader* DeviceD3D12::CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor)
 	{
-		return new CrComputeShaderD3D12(this, computeShaderDescriptor);
+		return new ComputeShaderD3D12(this, computeShaderDescriptor);
 	}
 
 	ICrHardwareGPUBuffer* DeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)
@@ -439,7 +439,7 @@ namespace crgfx
 
 	ICrGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
 	(
-		const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	)
 	{
 		return new CrGraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);

@@ -87,7 +87,7 @@ namespace crgfx
 	// properly because if these tables persist across frames, they should have the same
 	// lifetime as the resources they contain
 	void CommandBufferVulkan::UpdateResourceTableVulkan
-	(const ICrShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout)
+	(const crgfx::ShaderBindingLayout& bindingLayout, VkPipelineBindPoint vkPipelineBindPoint, VkDescriptorSetLayout vkDescriptorSetLayout, VkPipelineLayout vkPipelineLayout)
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
@@ -117,139 +117,139 @@ namespace crgfx
 		uint32_t texelBufferCount = 0;   // Total number of texel buffers
 
 		bindingLayout.ForEachConstantBuffer([&](crgfx::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
-			{
-				const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
-				const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+		{
+			const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
+			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
-				// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
-				// in terms of functionality
-				// TODO There is a limit to the offset 
-				VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-				bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-				bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
-				bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
+			// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
+			// in terms of functionality
+			// TODO There is a limit to the offset 
+			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+			bufferInfo.offset = 0; // Buffer type is DYNAMIC so offset = 0 (this offset is actually taken into account so would be baseAddress + offset + dynamicOffset)
+			bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
-				dynamicOffsets[dynamicOffsetCount] = binding.offsetBytes;
-				dynamicOffsetCount++;
+			dynamicOffsets[dynamicOffsetCount] = binding.offsetBytes;
+			dynamicOffsetCount++;
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, nullptr, &bufferInfo, nullptr);
 
-				descriptorCount++;
-				bufferCount++;
-			});
+			descriptorCount++;
+			bufferCount++;
+		});
 
 		bindingLayout.ForEachSampler([&](crgfx::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
-			{
-				const crgfx::SamplerVulkan* vulkanSampler = static_cast<const crgfx::SamplerVulkan*>(m_currentState.m_samplers[id]);
+		{
+			const crgfx::SamplerVulkan* vulkanSampler = static_cast<const crgfx::SamplerVulkan*>(m_currentState.m_samplers[id]);
 
-				VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-				imageInfo.sampler = vulkanSampler->GetVkSampler();
+			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+			imageInfo.sampler = vulkanSampler->GetVkSampler();
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_SAMPLER, &imageInfo, nullptr, nullptr);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_SAMPLER, &imageInfo, nullptr, nullptr);
 
-				descriptorCount++;
-				imageCount++;
-			});
+			descriptorCount++;
+			imageCount++;
+		});
 
 		bindingLayout.ForEachTexture([&](crgfx::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
+		{
+			const TextureBinding& textureBinding = m_currentState.m_textures[id];
+			const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(textureBinding.texture);
+
+			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+
+			if (textureBinding.view == crgfx::TextureView())
 			{
-				const TextureBinding& textureBinding = m_currentState.m_textures[id];
-				const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(textureBinding.texture);
+				imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
+			}
+			else if (textureBinding.view == crgfx::TextureView(crgfx::TexturePlane::Stencil))
+			{
+				imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
+			}
+			else
+			{
+				imageInfo.imageView = vulkanTexture->GetCustomVkImageView(textureBinding.view);
+			}
 
-				VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+			CrAssertMsg(imageInfo.imageView != VK_NULL_HANDLE, "Invalid image view");
 
-				if (textureBinding.view == crgfx::TextureView())
-				{
-					imageInfo.imageView = vulkanTexture->GetVkImageViewShaderAllMipsAllSlices();
-				}
-				else if (textureBinding.view == crgfx::TextureView(crgfx::TexturePlane::Stencil))
-				{
-					imageInfo.imageView = vulkanTexture->GetVkImageViewStencil();
-				}
-				else
-				{
-					imageInfo.imageView = vulkanTexture->GetCustomVkImageView(textureBinding.view);
-				}
+			// TODO Handle when image is bound to depth stencil and also as shader input
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.sampler = nullptr;
 
-				CrAssertMsg(imageInfo.imageView != VK_NULL_HANDLE, "Invalid image view");
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, &imageInfo, nullptr, nullptr);
 
-				// TODO Handle when image is bound to depth stencil and also as shader input
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				imageInfo.sampler = nullptr;
-
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, &imageInfo, nullptr, nullptr);
-
-				descriptorCount++;
-				imageCount++;
-			});
+			descriptorCount++;
+			imageCount++;
+		});
 
 		bindingLayout.ForEachRWTexture([&](crgfx::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
-			{
-				const RWTextureBinding& binding = m_currentState.m_rwTextures[id];
-				const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(binding.texture);
+		{
+			const RWTextureBinding& binding = m_currentState.m_rwTextures[id];
+			const crgfx::TextureVulkan* vulkanTexture = static_cast<const crgfx::TextureVulkan*>(binding.texture);
 
-				VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
-				imageInfo.imageView = vulkanTexture->GetVkImageViewSingleMipAllSlices(binding.mip);
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-				imageInfo.sampler = nullptr;
+			VkDescriptorImageInfo& imageInfo = imageInfos[imageCount];
+			imageInfo.imageView = vulkanTexture->GetVkImageViewSingleMipAllSlices(binding.mip);
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+			imageInfo.sampler = nullptr;
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, &imageInfo, nullptr, nullptr);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, &imageInfo, nullptr, nullptr);
 
-				descriptorCount++;
-				imageCount++;
-			});
+			descriptorCount++;
+			imageCount++;
+		});
 
 		bindingLayout.ForEachStorageBuffer([&](crgfx::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				const StorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
-				const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+		{
+			const StorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
+			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
-				VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-				bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-				bufferInfo.offset = binding.offsetBytes;
-				bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
+			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+			bufferInfo.offset = binding.offsetBytes;
+			bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
 
-				descriptorCount++;
-				bufferCount++;
-			});
+			descriptorCount++;
+			bufferCount++;
+		});
 
 		bindingLayout.ForEachRWStorageBuffer([&](crgfx::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
-				const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+		{
+			const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
+			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
 
-				VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-				bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
-				bufferInfo.offset = binding.offsetBytes;
-				bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
+			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
+			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
+			bufferInfo.offset = binding.offsetBytes;
+			bufferInfo.range = (VkDeviceSize)binding.sizeBytes;
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
-				(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet
+			(descriptorSet, bindPoint, 0, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, nullptr, &bufferInfo, nullptr);
 
-				descriptorCount++;
-				bufferCount++;
-			});
+			descriptorCount++;
+			bufferCount++;
+		});
 
 		bindingLayout.ForEachRWTypedBuffer([&](crgfx::ShaderStage::T, RWTypedBuffers::T id, bindpoint_t bindPoint)
-			{
-				const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
+		{
+			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
 
-				bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
+			bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
 
-				writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
-					VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, nullptr, nullptr, &bufferViews[texelBufferCount]);
+			writeDescriptorSets[descriptorCount] = crvk::CreateVkWriteDescriptorSet(descriptorSet, bindPoint, 0, 1,
+				VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, nullptr, nullptr, &bufferViews[texelBufferCount]);
 
-				descriptorCount++;
-				texelBufferCount++;
-			});
+			descriptorCount++;
+			texelBufferCount++;
+		});
 
 		CrAssert(descriptorCount < writeDescriptorSets.size());
 
@@ -279,8 +279,8 @@ namespace crgfx
 	void CommandBufferVulkan::FlushGraphicsRenderStatePS()
 	{
 		const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-		const CrGraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
-		const CrGraphicsShaderVulkan* vulkanGraphicsShader = static_cast<CrGraphicsShaderVulkan*>(graphicsShader.get());
+		const crgfx::CrGraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
+		const GraphicsShaderVulkan* vulkanGraphicsShader = static_cast<GraphicsShaderVulkan*>(graphicsShader.get());
 
 		if (m_currentState.m_indexBufferDirty)
 		{
@@ -361,7 +361,7 @@ namespace crgfx
 	{
 		const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
 		const CrComputeShaderHandle& computeShader = vulkanComputePipeline->GetShader();
-		const CrComputeShaderVulkan* vulkanComputeShader = static_cast<CrComputeShaderVulkan*>(computeShader.get());
+		const ComputeShaderVulkan* vulkanComputeShader = static_cast<ComputeShaderVulkan*>(computeShader.get());
 
 		if (m_currentState.m_computePipelineDirty)
 		{

@@ -91,20 +91,25 @@ namespace crgfx
 	class IGPUQueryPool;
 	struct GPUQueryPoolDescriptor;
 	using CrGPUQueryPoolHandle = crstl::intrusive_ptr<IGPUQueryPool>;
+
+	// Shaders & Pipeline Objects
+	class IGraphicsShader;
+	using CrGraphicsShaderHandle = crstl::intrusive_ptr<IGraphicsShader>;
+	struct GraphicsShaderDescriptor;
+
+	class IComputeShader;
+	using CrComputeShaderHandle = crstl::intrusive_ptr<IComputeShader>;
+	struct ComputeShaderDescriptor;
+
+	// Shader Bytecode
+	class ShaderBytecode;
+	using ShaderBytecodeHandle = crstl::intrusive_ptr<ShaderBytecode>;
+	struct CrShaderCompilationDescriptor;
+	struct CrShaderBytecodeCompilationDescriptor;
 };
 
 using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
-
 class CrGPUTimingQueryTracker;
-
-// Shaders & Pipeline Objects
-class ICrGraphicsShader;
-using CrGraphicsShaderHandle = crstl::intrusive_ptr<ICrGraphicsShader>;
-struct CrGraphicsShaderDescriptor;
-
-class ICrComputeShader;
-using CrComputeShaderHandle = crstl::intrusive_ptr<ICrComputeShader>;
-struct CrComputeShaderDescriptor;
 
 class ICrGraphicsPipeline;
 using CrGraphicsPipelineHandle = crstl::intrusive_ptr<ICrGraphicsPipeline>;
@@ -114,16 +119,11 @@ class ICrComputePipeline;
 using CrComputePipelineHandle = crstl::intrusive_ptr<ICrComputePipeline>;
 struct CrComputePipelineDescriptor;
 
-// Shader Bytecode
-class CrShaderBytecode;
-using CrShaderBytecodeHandle = crstl::intrusive_ptr<CrShaderBytecode>;
-struct CrShaderCompilationDescriptor;
-struct CrShaderBytecodeCompilationDescriptor;
-struct CrShaderCompilerDefines;
 struct CrShaderReflectionHeader;
 
 class CrMaterial;
 using CrMaterialHandle = crstl::intrusive_ptr<CrMaterial>;
+struct CrShaderCompilerDefines;
 
 // GPU Buffers
 class ICrHardwareGPUBuffer;

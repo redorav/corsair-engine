@@ -145,17 +145,17 @@ namespace crgfx
 		m_gpuDeletionQueue->AddToQueue(resource);
 	}
 
-	ICrGraphicsShader* IDevice::CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor)
+	IGraphicsShader* IDevice::CreateGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
 		return CreateGraphicsShaderPS(graphicsShaderDescriptor);
 	}
 
-	ICrComputeShader* IDevice::CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor)
+	IComputeShader* IDevice::CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor)
 	{
 		return CreateComputeShaderPS(computeShaderDescriptor);
 	}
 
-	CrGraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	CrGraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	{
 		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 		CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
@@ -183,7 +183,7 @@ namespace crgfx
 #if defined(RENDER_DEVICE_LOGS)
 
 			// Print out a message that includes meaningful information
-			const crstl::vector<CrShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+			const crstl::vector<ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 			// Add entry point names
 			crstl::fixed_string128 entryPoints("(");

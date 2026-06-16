@@ -148,11 +148,11 @@ namespace crgfx
 
 		CrTypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
 
-		ICrGraphicsShader* CreateGraphicsShader(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+		IGraphicsShader* CreateGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
-		ICrComputeShader* CreateComputeShader(const CrComputeShaderDescriptor& computeShaderDescriptor);
+		IComputeShader* CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor);
 
-		CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 		CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
 
@@ -215,9 +215,9 @@ namespace crgfx
 
 		virtual IGPUSemaphore* CreateGPUSemaphorePS() = 0;
 
-		virtual ICrGraphicsShader* CreateGraphicsShaderPS(const CrGraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
+		virtual IGraphicsShader* CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
 
-		virtual ICrComputeShader* CreateComputeShaderPS(const CrComputeShaderDescriptor& computeShaderDescriptor) = 0;
+		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) = 0;
 
 		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
 
@@ -227,7 +227,7 @@ namespace crgfx
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 
-		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
 
 		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) = 0;
 

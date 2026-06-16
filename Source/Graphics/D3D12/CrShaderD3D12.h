@@ -3,24 +3,21 @@
 #include "Graphics/IShader.h"
 #include <d3d12.h>
 
-class IDevice;
-
-class CrGraphicsShaderD3D12 final : public ICrGraphicsShader
+namespace crgfx
 {
-public:
+	class GraphicsShaderD3D12 final : public IGraphicsShader
+	{
+	public:
 
-	CrGraphicsShaderD3D12(crgfx::IDevice* renderDevice, const CrGraphicsShaderDescriptor& graphicsShaderDescriptor);
+		GraphicsShaderD3D12(crgfx::IDevice* renderDevice, const GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
-	~CrGraphicsShaderD3D12();
+		~GraphicsShaderD3D12();
+	};
 
-private:
-};
+	class ComputeShaderD3D12 final : public IComputeShader
+	{
+	public:
 
-class CrComputeShaderD3D12 final : public ICrComputeShader
-{
-public:
-
-	CrComputeShaderD3D12(crgfx::IDevice* renderDevice, const CrComputeShaderDescriptor& computeShaderDescriptor);
-
-private:
+		ComputeShaderD3D12(crgfx::IDevice* renderDevice, const ComputeShaderDescriptor& computeShaderDescriptor);
+	};
 };

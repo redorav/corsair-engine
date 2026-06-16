@@ -70,11 +70,11 @@ void CrMaterialCompiler::CreateMaterialShaderDefines(const CrMaterialShaderDescr
 	defines.AddDefine(materialShaderVariantDefine);
 }
 
-CrShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
+crgfx::ShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderBytecode
 (const CrFixedPath& shaderSourcePath, const crstl::string& entryPoint, const CrHash& shaderHash, const CrMaterialShaderDescriptor& materialShaderDescriptor)
 {
 	// Try to load bytecode from cache
-	CrShaderBytecodeHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache(shaderHash, materialShaderDescriptor.graphicsApi);
+	crgfx::ShaderBytecodeHandle shaderBytecode = m_bytecodeDiskCache.LoadFromCache(shaderHash, materialShaderDescriptor.graphicsApi);
 	
 	// If we couldn't find the bytecode in the cache, compile and cache here
 	if (!shaderBytecode)
@@ -150,7 +150,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 	for (CrMaterialShaderVariant::T variant = CrMaterialShaderVariant::First; variant < CrMaterialShaderVariant::Count; ++variant)
 	{
-		CrGraphicsShaderDescriptor shaderDescriptor;
+		crgfx::GraphicsShaderDescriptor shaderDescriptor;
 
 		CrMaterialShaderDescriptor materialShaderDescriptor = baseShaderDescriptor;
 		materialShaderDescriptor.shaderVariant = variant;
@@ -159,7 +159,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 		{
 			materialShaderDescriptor.shaderStage = stage;
 
-			CrShaderBytecodeHandle bytecode = GetDiskCachedOrCompileShaderBytecode
+			crgfx::ShaderBytecodeHandle bytecode = GetDiskCachedOrCompileShaderBytecode
 			(
 				patchedShaderSourcePath, 
 				entryPoints[stage], 

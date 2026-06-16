@@ -18,9 +18,9 @@ public:
 
 	CrFixedPath CreateCachedFilePath(const CrHash& hash, crgfx::GraphicsApi::T graphicsApi) const;
 
-	CrShaderBytecodeHandle LoadFromCache(const CrHash& hash, crgfx::GraphicsApi::T graphicsApi) const;
+	crgfx::ShaderBytecodeHandle LoadFromCache(const CrHash& hash, crgfx::GraphicsApi::T graphicsApi) const;
 
-	void SaveToCache(const CrHash& hash, crgfx::GraphicsApi::T graphicsApi, const CrShaderBytecodeHandle& bytecode) const;
+	void SaveToCache(const CrHash& hash, crgfx::GraphicsApi::T graphicsApi, const crgfx::ShaderBytecodeHandle& bytecode) const;
 
 private:
 

@@ -125,7 +125,7 @@ namespace crgfx
 
 		void ProcessQueuedCommands();
 
-		const CrCommandBufferHandle& GetAuxiliaryCommandBuffer();
+		const CommandBufferHandle& GetAuxiliaryCommandBuffer();
 
 		//------------------
 		// Resource Creation
@@ -305,9 +305,9 @@ namespace crgfx
 
 		// Auxiliary command buffers. Subclasses don't need to know about the implementation details,
 		// they queue work onto the auxiliary command buffer (via the getter)
-		CrCommandBufferHandle m_auxiliaryCommandBuffer;
+		CommandBufferHandle m_auxiliaryCommandBuffer;
 
-		crstl::vector<CrCommandBufferHandle> m_auxiliaryCommandBuffers;
+		crstl::vector<CommandBufferHandle> m_auxiliaryCommandBuffers;
 
 		uint32_t m_auxiliaryCommandBufferIndex = 0;
 

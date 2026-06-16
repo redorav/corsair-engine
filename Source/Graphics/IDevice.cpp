@@ -63,7 +63,7 @@ namespace crgfx
 		}
 	}
 
-	const CrCommandBufferHandle& IDevice::GetAuxiliaryCommandBuffer()
+	const CommandBufferHandle& IDevice::GetAuxiliaryCommandBuffer()
 	{
 		// If we don't have an auxiliary command buffer, get one from the pool
 		if (!m_auxiliaryCommandBuffer)

@@ -81,7 +81,7 @@ namespace crgfx
 	using CrGPUSemaphoreHandle = crstl::intrusive_ptr<IGPUSemaphore>;
 
 	class ICommandBuffer;
-	using CrCommandBufferHandle = crstl::intrusive_ptr<ICommandBuffer>;
+	using CommandBufferHandle = crstl::intrusive_ptr<ICommandBuffer>;
 	struct CommandBufferDescriptor;
 };
 

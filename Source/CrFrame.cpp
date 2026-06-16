@@ -639,7 +639,7 @@ void CrFrame::Process()
 		renderGraph.BindTexture(Textures::HDRInput, m_lightingTexture.get(), crgfx::ShaderStageFlags::Compute);
 		renderGraph.BindRWTexture(RWTextures::RWPostProcessedOutput, m_preSwapchainTexture.get(), crgfx::ShaderStageFlags::Compute);
 	},
-		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
+	[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
 		commandBuffer->BindTexture(Textures::HDRInput, m_lightingTexture.get());
 		commandBuffer->BindRWTexture(RWTextures::RWPostProcessedOutput, m_preSwapchainTexture.get(), 0);

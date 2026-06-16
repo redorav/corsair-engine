@@ -8,7 +8,7 @@
 #include "ITexture.h"
 #include "ICrShader.h"
 #include "ICrPipeline.h"
-#include "ICrGPUQueryPool.h"
+#include "IGPUQueryPool.h"
 #include "CrGPUBuffer.h"
 #include "CrGPUStackAllocator.h"
 

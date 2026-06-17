@@ -1,5 +1,5 @@
 #include "Graphics/CrRendering_pch.h"
-#include "CrShaderD3D12.h"
+#include "ShaderD3D12.h"
 #include "DeviceD3D12.h"
 
 #include "Graphics/CrShaderResourceMetadata.h"

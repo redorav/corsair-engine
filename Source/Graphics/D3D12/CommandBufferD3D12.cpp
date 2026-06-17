@@ -5,7 +5,7 @@
 #include "PipelineD3D12.h"
 #include "TextureD3D12.h"
 #include "SamplerD3D12.h"
-#include "CrShaderD3D12.h"
+#include "ShaderD3D12.h"
 
 #include "Graphics/Extensions/CrPIXHeader.h"
 

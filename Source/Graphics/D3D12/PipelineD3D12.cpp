@@ -4,7 +4,7 @@
 
 #include "PipelineD3D12.h"
 #include "DeviceD3D12.h"
-#include "CrShaderD3D12.h"
+#include "ShaderD3D12.h"
 #include "CrD3D12.h"
 
 #include "Graphics/Extensions/CrNVAPIHeader.h"

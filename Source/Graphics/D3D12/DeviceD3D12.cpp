@@ -8,7 +8,7 @@
 #include "SwapchainD3D12.h"
 #include "GPUBufferD3D12.h"
 #include "GPUSynchronizationD3D12.h"
-#include "CrShaderD3D12.h"
+#include "ShaderD3D12.h"
 #include "PipelineD3D12.h"
 #include "CrD3D12.h"
 

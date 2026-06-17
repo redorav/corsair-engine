@@ -218,8 +218,8 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 			}
 
 			// Check index buffer size. By default indices are unsigned shorts (ImDrawIdx):
-			CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, crgfx::DataFormat::R16_Uint);
-			CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
+			crgfx::CrGPUBufferView indexBuffer = commandBuffer->AllocateIndexBuffer(data->TotalIdxCount, crgfx::DataFormat::R16_Uint);
+			crgfx::CrGPUBufferView vertexBuffer = commandBuffer->AllocateVertexBuffer(data->TotalVtxCount, sizeof(UIVertex));
 
 			// Update contents:
 			ImDrawIdx* indexBufferData = (ImDrawIdx*)indexBuffer.GetData();
@@ -242,7 +242,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 			commandBuffer->SetViewport(crgfx::Viewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 
 			// Projection matrix. TODO: this could be cached.
-			CrGPUBufferViewT<UIDataCB> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIDataCB>();
+			crgfx::CrGPUBufferViewT<UIDataCB> uiDataBuffer = commandBuffer->AllocateConstantBuffer<UIDataCB>();
 			UIDataCB* uiData = uiDataBuffer.GetData();
 			{
 				uiData->projection = ComputeProjectionMatrix(data);

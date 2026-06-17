@@ -128,7 +128,7 @@ struct CrRenderPacketBatcher
 		if (m_numInstances > 0)
 		{
 			// Allocate constant buffer with all transforms and copy them across
-			CrGPUBufferViewT<InstanceCB> transformBuffer = m_commandBuffer->AllocateConstantBuffer<InstanceCB>(m_numInstances, sizeof(InstanceCB::local2World[0]));
+			crgfx::CrGPUBufferViewT<InstanceCB> transformBuffer = m_commandBuffer->AllocateConstantBuffer<InstanceCB>(m_numInstances, sizeof(InstanceCB::local2World[0]));
 			hlslpp::interop::float4x4* transforms = (hlslpp::interop::float4x4*)transformBuffer.GetData();
 			{
 				for (uint32_t i = 0; i < m_numInstances; ++i)
@@ -146,7 +146,7 @@ struct CrRenderPacketBatcher
 				m_commandBuffer->BindTexture(binding.semantic, binding.texture.get());
 			}
 
-			CrGPUBufferViewT<MaterialCB> materialBuffer = m_commandBuffer->AllocateConstantBuffer<MaterialCB>();
+			crgfx::CrGPUBufferViewT<MaterialCB> materialBuffer = m_commandBuffer->AllocateConstantBuffer<MaterialCB>();
 			MaterialCB* materialData = materialBuffer.GetData();
 			{
 				materialData->color = m_material->m_color;
@@ -383,15 +383,15 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	m_structuredBuffer = device->CreateStructuredBuffer<ExampleStructuredBufferCompute>(crgfx::MemoryAccess::GPUOnlyRead, 32);
 
-	CrGPUBufferDescriptor argumentsDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte, crgfx::MemoryAccess::GPUOnlyWrite);
-	m_indirectDispatchArguments = CrGPUBufferHandle(new CrGPUBuffer(device.get(), argumentsDescriptor, 3, 4));
+	crgfx::CrGPUBufferDescriptor argumentsDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte, crgfx::MemoryAccess::GPUOnlyWrite);
+	m_indirectDispatchArguments = crgfx::CrGPUBufferHandle(new crgfx::CrGPUBuffer(device.get(), argumentsDescriptor, 3, 4));
 
 	uint32_t initialValue = 65535;
-	CrGPUBufferDescriptor mouseSelectionBufferDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte | crgfx::BufferUsage::TransferSrc | crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUOnlyWrite);
+	crgfx::CrGPUBufferDescriptor mouseSelectionBufferDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte | crgfx::BufferUsage::TransferSrc | crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUOnlyWrite);
 	mouseSelectionBufferDescriptor.initialData = (uint8_t*)&initialValue;
 	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
 	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
-	m_mouseSelectionBuffer = CrGPUBufferHandle(new CrGPUBuffer(device.get(), mouseSelectionBufferDescriptor, 1, 4));
+	m_mouseSelectionBuffer = crgfx::CrGPUBufferHandle(new crgfx::CrGPUBuffer(device.get(), mouseSelectionBufferDescriptor, 1, 4));
 }
 
 void CrFrame::Deinitialize()
@@ -485,7 +485,7 @@ void CrFrame::Process()
 
 	// Set up default values for common constant buffers
 
-	CrGPUBufferViewT<MaterialCB> materialBuffer = drawCommandBuffer->AllocateConstantBuffer<MaterialCB>();
+	crgfx::CrGPUBufferViewT<MaterialCB> materialBuffer = drawCommandBuffer->AllocateConstantBuffer<MaterialCB>();
 	MaterialCB* materialData = materialBuffer.GetData();
 	{
 		materialData->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -509,14 +509,14 @@ void CrFrame::Process()
 	);
 	m_cameraConstantData.worldPosition = float4(m_camera->GetPosition(), m_camera->GetNearPlane());
 
-	CrGPUBufferViewT<CameraCB> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<CameraCB>();
+	crgfx::CrGPUBufferViewT<CameraCB> cameraDataBuffer = drawCommandBuffer->AllocateConstantBuffer<CameraCB>();
 	CameraCB* cameraData = cameraDataBuffer.GetData();
 	{
 		*cameraData = m_cameraConstantData;
 	}
 	drawCommandBuffer->BindConstantBuffer(cameraDataBuffer);
 
-	CrGPUBufferViewT<InstanceCB> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<InstanceCB>();
+	crgfx::CrGPUBufferViewT<InstanceCB> identityConstantBuffer = drawCommandBuffer->AllocateConstantBuffer<InstanceCB>();
 	InstanceCB* identityTransformData = identityConstantBuffer.GetData();
 	{
 		identityTransformData->local2World[0] = float4x4::identity();
@@ -590,7 +590,7 @@ void CrFrame::Process()
 	[this]
 	(const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 	{
-		CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
+		crgfx::CrGPUBufferViewT<DynamicLightCB> lightConstantBuffer = commandBuffer->AllocateConstantBuffer<DynamicLightCB>();
 		DynamicLightCB* lightData = lightConstantBuffer.GetData();
 		{
 			lightData->positionRadius = float4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -666,7 +666,7 @@ void CrFrame::Process()
 	{
 		float subdivisionWidth = 1.0f;
 
-		CrGPUBufferViewT<EditorGridCB> gridCB = commandBuffer->AllocateConstantBuffer<EditorGridCB>();
+		crgfx::CrGPUBufferViewT<EditorGridCB> gridCB = commandBuffer->AllocateConstantBuffer<EditorGridCB>();
 		EditorGridCB* gridData = gridCB.GetData();
 		{
 			gridData->gridParams = float4(1000.0f, subdivisionWidth, 0.0f, 0.0f);
@@ -694,7 +694,7 @@ void CrFrame::Process()
 
 			CrRenderPacketBatcher renderPacketBatcher(commandBuffer);
 
-			CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
+			crgfx::CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
 			DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 			{
 				debugShaderData->debugProperties = float4(1.0f, 0.0f, 0.0f, 0.0f);
@@ -737,7 +737,7 @@ void CrFrame::Process()
 		},
 		[this](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
-			CrGPUBufferViewT<GBufferDebugCB> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebugCB>();
+			crgfx::CrGPUBufferViewT<GBufferDebugCB> gbufferDebug = commandBuffer->AllocateConstantBuffer<GBufferDebugCB>();
 			GBufferDebugCB* gbufferDebugData = gbufferDebug.GetData();
 			{
 				gbufferDebugData->decodeOptions = uint4((uint32_t)m_gbufferDebugMode, 0.0f, 0.0f, 0.0f);
@@ -846,7 +846,7 @@ void CrFrame::Process()
 			{
 				renderPacketBatcher.FlushBatch();
 
-				CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
+			crgfx::CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
 				DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 				{
 					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
@@ -876,7 +876,7 @@ void CrFrame::Process()
 		},
 		[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
-			CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>();
+			crgfx::CrGPUBufferViewT<MouseSelectionCB> mouseSelectionBuffer = commandBuffer->AllocateConstantBuffer<MouseSelectionCB>();
 			MouseSelectionCB* mouseSelectionData = mouseSelectionBuffer.GetData();
 			{
 				mouseSelectionData->mouseCoordinates.x = mouseX;
@@ -932,7 +932,7 @@ void CrFrame::Process()
 		device->DownloadBuffer
 		(
 			m_mouseSelectionBuffer->GetHardwareBuffer(),
-			[mouseState, keyboardState](const CrHardwareGPUBufferHandle& mouseIdBuffer)
+			[mouseState, keyboardState](const crgfx::CrHardwareGPUBufferHandle& mouseIdBuffer)
 			{
 				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
 				{

@@ -15,9 +15,9 @@ public:
 
 	const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
 
-	void AddVertexBuffer(const CrVertexBufferHandle& vertexBuffer);
+	void AddVertexBuffer(const crgfx::CrVertexBufferHandle& vertexBuffer);
 
-	const CrVertexBufferHandle& GetVertexBuffer(uint32_t index) const { return m_vertexBuffers[index]; }
+	const crgfx::CrVertexBufferHandle& GetVertexBuffer(uint32_t index) const { return m_vertexBuffers[index]; }
 
 	uint32_t GetVertexBufferCount() const { return (uint32_t)m_vertexBuffers.size(); }
 
@@ -25,9 +25,9 @@ public:
 
 	void SetBoundingBox(const CrBoundingBox& boundingBox) { m_boundingBox = boundingBox; }
 	
-	const CrIndexBufferHandle& GetIndexBuffer() const { return m_indexBuffer; }
+	const crgfx::CrIndexBufferHandle& GetIndexBuffer() const { return m_indexBuffer; }
 
-	void SetIndexBuffer(const CrIndexBufferHandle& indexBuffer);
+	void SetIndexBuffer(const crgfx::CrIndexBufferHandle& indexBuffer);
 
 	void SetIsDoubleSided(bool isDoubleSided) { m_isDoubleSided = isDoubleSided; }
 
@@ -39,11 +39,11 @@ private:
 
 	bool m_isDoubleSided = false;
 
-	crstl::vector<CrVertexBufferHandle> m_vertexBuffers;
+	crstl::vector<crgfx::CrVertexBufferHandle> m_vertexBuffers;
 
 	CrVertexDescriptor m_vertexDescriptor;
 
-	CrIndexBufferHandle m_indexBuffer;
+	crgfx::CrIndexBufferHandle m_indexBuffer;
 
 	CrBoundingBox m_boundingBox;
 };

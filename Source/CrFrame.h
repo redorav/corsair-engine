@@ -85,17 +85,17 @@ private:
 
 	crgfx::TextureHandle m_debugShaderTexture;
 
-	CrGPUBufferHandle m_mouseSelectionBuffer;
+	crgfx::CrGPUBufferHandle m_mouseSelectionBuffer;
 
 	crgfx::TextureHandle m_colorsRWTexture;
 
-	CrStructuredBufferHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
+	crgfx::CrStructuredBufferHandle<ExampleRWStructuredBufferCompute> m_rwStructuredBuffer;
 
-	CrStructuredBufferHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
+	crgfx::CrStructuredBufferHandle<ExampleStructuredBufferCompute> m_structuredBuffer;
 
-	CrTypedBufferHandle m_colorsRWTypedBuffer;
+	crgfx::CrTypedBufferHandle m_colorsRWTypedBuffer;
 
-	CrGPUBufferHandle m_indirectDispatchArguments;
+	crgfx::CrGPUBufferHandle m_indirectDispatchArguments;
 
 	crstl::intrusive_ptr<CrOSWindow> m_mainWindow;
 

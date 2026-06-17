@@ -3,16 +3,12 @@
 #include "Graphics/CrStackAllocator.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 
-class IDevice;
-class ICrHardwareGPUBuffer;
-struct CrHardwareGPUBufferDescriptor;
-
 // Manages transient memory allocated per frame for GPU resources
 class CrGPUStackAllocator : public CrStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+	CrGPUStackAllocator(crgfx::IDevice* renderDevice, const crgfx::CrHardwareGPUBufferDescriptor& descriptor);
 
 	~CrGPUStackAllocator();
 
@@ -20,7 +16,7 @@ public:
 
 	void End();
 
-	ICrHardwareGPUBuffer* GetHardwareGPUBuffer() const;
+	crgfx::ICrHardwareGPUBuffer* GetHardwareGPUBuffer() const;
 
 	crgfx::BufferUsage::T GetUsage() const;
 
@@ -30,14 +26,14 @@ protected:
 
 	crgfx::IDevice* m_renderDevice = nullptr;
 
-	CrHardwareGPUBufferHandle m_hardwareBuffer;
+	crgfx::CrHardwareGPUBufferHandle m_hardwareBuffer;
 
 	crgfx::BufferUsage::T m_bufferUsage;
 
 	crgfx::MemoryAccess::T m_bufferAccess;
 };
 
-inline ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
+inline crgfx::ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
 {
 	return m_hardwareBuffer.get();
 }

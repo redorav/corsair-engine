@@ -74,7 +74,7 @@ namespace crgfx
 // only provide the data in a linear format
 struct CrTextureUpload
 {
-	CrHardwareGPUBufferHandle stagingBuffer;
+	crgfx::CrHardwareGPUBufferHandle stagingBuffer;
 	crgfx::ITexture* texture;
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;
@@ -84,8 +84,8 @@ struct CrTextureUpload
 
 struct CrBufferUpload
 {
-	CrHardwareGPUBufferHandle stagingBuffer;
-	const ICrHardwareGPUBuffer* destinationBuffer;
+	crgfx::CrHardwareGPUBufferHandle stagingBuffer;
+	const crgfx::ICrHardwareGPUBuffer* destinationBuffer;
 	uint32_t sizeBytes;
 	uint32_t sourceOffsetBytes;
 	uint32_t destinationOffsetBytes;

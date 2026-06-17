@@ -46,8 +46,8 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 	// Compute number of indices (number of quads * 2 triangles per quad * 3 vertices per triangle)
 	uint32_t indexCount = quadCountX * quadCountY * 2 * 3;
 
-	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 	
@@ -94,7 +94,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor
 	renderDevice->EndBufferUpload(positionBuffer->GetHardwareBuffer());
 	renderDevice->EndBufferUpload(additionalBuffer->GetHardwareBuffer());
 
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
+	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
 	{
 		uint32_t currentIndex = 0;
@@ -165,9 +165,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCube(const CrCubeDescriptor& descriptor
 	uint32_t indexCount = (quadCountY * quadCountZ + quadCountX * quadCountZ + quadCountX * quadCountY) * 2 * 2 * 3;
 
 	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
-	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
+	crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
@@ -299,9 +299,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateSphere(const CrSphereDescriptor& descri
 	uint32_t indexCount = (quadCountFace * quadCountFace) * 3 * 2 * 2 * 3;
 
 	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
-	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
+	crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
@@ -434,9 +434,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 	uint32_t indexCount = triangleCount * 3;
 
 	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
-	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
+	crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 
@@ -590,9 +590,9 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 	uint32_t indexCount = triangleCount * 3;
 
 	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
-	CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
-	CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
-	CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
+	crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, vertexCount);
+	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, vertexCount);
+	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, indexCount);
 
 	float4 colorAsByte = descriptor.color * 255.0f;
 

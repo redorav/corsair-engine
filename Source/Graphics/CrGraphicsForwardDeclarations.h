@@ -110,44 +110,40 @@ namespace crgfx
 
 	class IComputePipeline;
 	using ComputePipelineHandle = crstl::intrusive_ptr<IComputePipeline>;
+
+	// GPU Buffers
+	class ICrHardwareGPUBuffer;
+	using CrHardwareGPUBufferHandle = crstl::intrusive_ptr<ICrHardwareGPUBuffer>;
+	struct CrHardwareGPUBufferDescriptor;
+
+	class CrGPUBuffer;
+	using CrGPUBufferHandle = crstl::intrusive_ptr<CrGPUBuffer>;
+	struct CrGPUBufferDescriptor;
+
+	class CrIndexBuffer;
+	using CrIndexBufferHandle = crstl::intrusive_ptr<CrIndexBuffer>;
+
+	class CrVertexBuffer;
+	using CrVertexBufferHandle = crstl::intrusive_ptr<CrVertexBuffer>;
+
+	template<typename Metadata>
+	class CrStructuredBuffer;
+
+	template<typename Metadata>
+	using CrStructuredBufferHandle = crstl::intrusive_ptr<CrStructuredBuffer<Metadata>>;
+
+	class CrTypedBuffer;
+	using CrTypedBufferHandle = crstl::intrusive_ptr<CrTypedBuffer>;
+
+	typedef crstl::fixed_function<128, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 };
+
+class CrGPUStackAllocator;
 
 using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
 class CrGPUTimingQueryTracker;
 
 struct CrShaderReflectionHeader;
-
-class CrMaterial;
-using CrMaterialHandle = crstl::intrusive_ptr<CrMaterial>;
-struct CrShaderCompilerDefines;
-
-// GPU Buffers
-class ICrHardwareGPUBuffer;
-using CrHardwareGPUBufferHandle = crstl::intrusive_ptr<ICrHardwareGPUBuffer>;
-struct CrHardwareGPUBufferDescriptor;
-
-class CrGPUBuffer;
-using CrGPUBufferHandle = crstl::intrusive_ptr<CrGPUBuffer>;
-
-struct CrGPUBufferDescriptor;
-class CrGPUStackAllocator;
-
-class CrIndexBuffer;
-using CrIndexBufferHandle = crstl::intrusive_ptr<CrIndexBuffer>;
-
-class CrVertexBuffer;
-using CrVertexBufferHandle = crstl::intrusive_ptr<CrVertexBuffer>;
-
-template<typename Metadata>
-class CrStructuredBuffer;
-
-template<typename Metadata>
-using CrStructuredBufferHandle = crstl::intrusive_ptr<CrStructuredBuffer<Metadata>>;
-
-class CrTypedBuffer;
-using CrTypedBufferHandle = crstl::intrusive_ptr<CrTypedBuffer>;
-
-typedef crstl::fixed_function<128, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
 
 namespace CrVertexSemantic { enum T : uint32_t; }
 struct CrVertexDescriptor;
@@ -163,6 +159,18 @@ using CrCameraHandle = crstl::intrusive_ptr<CrCamera>;
 class CrRenderWorld;
 using CrRenderWorldHandle = crstl::intrusive_ptr<CrRenderWorld>;
 
+// Material
+
+class CrMaterial;
+using CrMaterialHandle = crstl::intrusive_ptr<CrMaterial>;
+struct CrShaderCompilerDefines;
+
+class CrRenderModel;
+using CrRenderModelHandle = crstl::intrusive_ptr<CrRenderModel>;
+
+class CrRenderMesh;
+using CrRenderMeshHandle = crstl::intrusive_ptr<CrRenderMesh>;
+
 // RenderGraph
 class CrRenderGraph;
 
@@ -174,12 +182,6 @@ using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint16_t>
 
 struct CrRenderGraphBufferResource;
 using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint16_t>;
-
-class CrRenderModel;
-using CrRenderModelHandle = crstl::intrusive_ptr<CrRenderModel>;
-
-class CrRenderMesh;
-using CrRenderMeshHandle = crstl::intrusive_ptr<CrRenderMesh>;
 
 // Forward declare shader resources
 namespace ConstantBuffers { enum T : uint8_t; }

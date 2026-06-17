@@ -6,17 +6,19 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
-	: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
+namespace crgfx
 {
-	ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
-
-	D3D12_HEAP_PROPERTIES heapProperties;
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-
-	switch (descriptor.access)
+	CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
+		: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 	{
+		ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
+
+		D3D12_HEAP_PROPERTIES heapProperties;
+		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+		heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+
+		switch (descriptor.access)
+		{
 		case crgfx::MemoryAccess::GPUOnlyWrite:
 		case crgfx::MemoryAccess::GPUOnlyRead:
 			heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -35,85 +37,86 @@ CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12Rend
 			break;
 		default:
 			break;
-	}
+		}
 
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProperties.CreationNodeMask = 1;
-	heapProperties.VisibleNodeMask = 1;
+		heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProperties.CreationNodeMask = 1;
+		heapProperties.VisibleNodeMask = 1;
 
-	D3D12_RESOURCE_DESC1 d3d12ResourceDescriptor;
-	d3d12ResourceDescriptor.Alignment = 0;
-	d3d12ResourceDescriptor.DepthOrArraySize = 1;
-	d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	d3d12ResourceDescriptor.Flags = D3D12_RESOURCE_FLAG_NONE;
-	d3d12ResourceDescriptor.Format = DXGI_FORMAT_UNKNOWN;
-	d3d12ResourceDescriptor.Height = 1;
-	d3d12ResourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	d3d12ResourceDescriptor.MipLevels = 1;
-	d3d12ResourceDescriptor.SampleDesc = { 1, 0 };
-	d3d12ResourceDescriptor.Width = m_sizeBytes;
-
-	if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
-	{
-		d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	}
-
-	HRESULT hResult = S_OK;
-
-	hResult = d3d12Device10->CreateCommittedResource3
-	(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&d3d12ResourceDescriptor,
-		D3D12_BARRIER_LAYOUT_UNDEFINED,
-		nullptr,
-		nullptr,
-		0,
-		nullptr,
-		IID_PPV_ARGS(&m_d3d12Resource)
-	);
-
-	CrAssertMsg(hResult == S_OK, "Failed to create buffer");
-
-	if (descriptor.initialData)
-	{
-		CrAssertMsg(descriptor.initialDataSize <= m_sizeBytes, "Not enough memory in buffer");
+		D3D12_RESOURCE_DESC1 d3d12ResourceDescriptor;
+		d3d12ResourceDescriptor.Alignment = 0;
+		d3d12ResourceDescriptor.DepthOrArraySize = 1;
+		d3d12ResourceDescriptor.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		d3d12ResourceDescriptor.Flags = D3D12_RESOURCE_FLAG_NONE;
+		d3d12ResourceDescriptor.Format = DXGI_FORMAT_UNKNOWN;
+		d3d12ResourceDescriptor.Height = 1;
+		d3d12ResourceDescriptor.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		d3d12ResourceDescriptor.MipLevels = 1;
+		d3d12ResourceDescriptor.SampleDesc = { 1, 0 };
+		d3d12ResourceDescriptor.Width = m_sizeBytes;
 
 		if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
 		{
-			uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
-			{
-				memcpy(bufferData, descriptor.initialData, descriptor.initialDataSize);
-			}
-			m_renderDevice->EndBufferUpload(this);
+			d3d12ResourceDescriptor.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 		}
-		else
+
+		HRESULT hResult = S_OK;
+
+		hResult = d3d12Device10->CreateCommittedResource3
+		(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&d3d12ResourceDescriptor,
+			D3D12_BARRIER_LAYOUT_UNDEFINED,
+			nullptr,
+			nullptr,
+			0,
+			nullptr,
+			IID_PPV_ARGS(&m_d3d12Resource)
+		);
+
+		CrAssertMsg(hResult == S_OK, "Failed to create buffer");
+
+		if (descriptor.initialData)
 		{
-			void* data;
-			hResult = m_d3d12Resource->Map(0, nullptr, &data);
-			CrAssertMsg(hResult == S_OK, "Failed to map buffer");
-			memcpy(data, descriptor.initialData, descriptor.initialDataSize);
-			m_d3d12Resource->Unmap(0, nullptr);
+			CrAssertMsg(descriptor.initialDataSize <= m_sizeBytes, "Not enough memory in buffer");
+
+			if (descriptor.access == crgfx::MemoryAccess::GPUOnlyWrite)
+			{
+				uint8_t* bufferData = m_renderDevice->BeginBufferUpload(this);
+				{
+					memcpy(bufferData, descriptor.initialData, descriptor.initialDataSize);
+				}
+				m_renderDevice->EndBufferUpload(this);
+			}
+			else
+			{
+				void* data;
+				hResult = m_d3d12Resource->Map(0, nullptr, &data);
+				CrAssertMsg(hResult == S_OK, "Failed to map buffer");
+				memcpy(data, descriptor.initialData, descriptor.initialDataSize);
+				m_d3d12Resource->Unmap(0, nullptr);
+			}
 		}
+
+		d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
 	}
 
-	d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
-}
+	CrHardwareGPUBufferD3D12::~CrHardwareGPUBufferD3D12()
+	{
+		m_d3d12Resource->Release();
+	}
 
-CrHardwareGPUBufferD3D12::~CrHardwareGPUBufferD3D12()
-{
-	m_d3d12Resource->Release();
-}
+	void* CrHardwareGPUBufferD3D12::LockPS()
+	{
+		void* data = nullptr;
+		HRESULT hResult = m_d3d12Resource->Map(0, nullptr, &data);
+		CrAssertMsg(hResult == S_OK, "Failed to map buffer");
+		return data;
+	}
 
-void* CrHardwareGPUBufferD3D12::LockPS()
-{
-	void* data = nullptr;
-	HRESULT hResult = m_d3d12Resource->Map(0, nullptr, &data);
-	CrAssertMsg(hResult == S_OK, "Failed to map buffer");
-	return data;
-}
-
-void CrHardwareGPUBufferD3D12::UnlockPS()
-{
-	m_d3d12Resource->Unmap(0, nullptr);
-}
+	void CrHardwareGPUBufferD3D12::UnlockPS()
+	{
+		m_d3d12Resource->Unmap(0, nullptr);
+	}
+};

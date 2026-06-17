@@ -8,14 +8,14 @@ CrRenderMesh::~CrRenderMesh()
 
 }
 
-void CrRenderMesh::AddVertexBuffer(const CrVertexBufferHandle& vertexBuffer)
+void CrRenderMesh::AddVertexBuffer(const crgfx::CrVertexBufferHandle& vertexBuffer)
 {
 	m_vertexBuffers.push_back(vertexBuffer);
 
 	MergeVertexDescriptors();
 }
 
-void CrRenderMesh::SetIndexBuffer(const CrIndexBufferHandle& indexBuffer)
+void CrRenderMesh::SetIndexBuffer(const crgfx::CrIndexBufferHandle& indexBuffer)
 {
 	m_indexBuffer = indexBuffer;
 }

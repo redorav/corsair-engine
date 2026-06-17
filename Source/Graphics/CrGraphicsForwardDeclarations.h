@@ -72,46 +72,44 @@ namespace crgfx
 	
 	class ISwapchain;
 	using SwapchainHandle = crstl::intrusive_ptr<ISwapchain>;
-	struct CrSwapchainDescriptor;
+	struct SwapchainDescriptor;
 
 	class IGPUFence;
-	using CrGPUFenceHandle = crstl::intrusive_ptr<IGPUFence>;
+	using GPUFenceHandle = crstl::intrusive_ptr<IGPUFence>;
 
 	class IGPUSemaphore;
-	using CrGPUSemaphoreHandle = crstl::intrusive_ptr<IGPUSemaphore>;
+	using GPUSemaphoreHandle = crstl::intrusive_ptr<IGPUSemaphore>;
 
 	class ICommandBuffer;
 	using CommandBufferHandle = crstl::intrusive_ptr<ICommandBuffer>;
 	struct CommandBufferDescriptor;
 
 	struct RenderPassDescriptor;
-	struct CrComputePassDescriptor;
 
 	// GPU Queries
 	class IGPUQueryPool;
 	struct GPUQueryPoolDescriptor;
-	using CrGPUQueryPoolHandle = crstl::intrusive_ptr<IGPUQueryPool>;
+	using GPUQueryPoolHandle = crstl::intrusive_ptr<IGPUQueryPool>;
 
 	// Shaders & Pipeline Objects
 	class IGraphicsShader;
-	using CrGraphicsShaderHandle = crstl::intrusive_ptr<IGraphicsShader>;
+	using GraphicsShaderHandle = crstl::intrusive_ptr<IGraphicsShader>;
 	struct GraphicsShaderDescriptor;
 
 	class IComputeShader;
-	using CrComputeShaderHandle = crstl::intrusive_ptr<IComputeShader>;
+	using ComputeShaderHandle = crstl::intrusive_ptr<IComputeShader>;
 	struct ComputeShaderDescriptor;
 
 	// Shader Bytecode
 	class ShaderBytecode;
 	using ShaderBytecodeHandle = crstl::intrusive_ptr<ShaderBytecode>;
 
-	class ICrGraphicsPipeline;
-	using CrGraphicsPipelineHandle = crstl::intrusive_ptr<ICrGraphicsPipeline>;
-	struct CrGraphicsPipelineDescriptor;
+	class IGraphicsPipeline;
+	using GraphicsPipelineHandle = crstl::intrusive_ptr<IGraphicsPipeline>;
+	struct GraphicsPipelineDescriptor;
 
-	class ICrComputePipeline;
-	using CrComputePipelineHandle = crstl::intrusive_ptr<ICrComputePipeline>;
-	struct CrComputePipelineDescriptor;
+	class IComputePipeline;
+	using ComputePipelineHandle = crstl::intrusive_ptr<IComputePipeline>;
 };
 
 using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;

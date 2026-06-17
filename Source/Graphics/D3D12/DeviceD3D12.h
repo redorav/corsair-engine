@@ -79,13 +79,13 @@ namespace crgfx
 
 		virtual crgfx::ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
 
-		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) override;
+		virtual ISwapchain* CreateSwapchainPS(const crgfx::SwapchainDescriptor& swapchainDescriptor) override;
 
 		virtual crgfx::ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
-		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
-		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) override;
+		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) override;
 
 		virtual IGPUQueryPool* CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor) override;
 
@@ -133,7 +133,7 @@ namespace crgfx
 		// Heap for SRVs, CBVs, UAVs
 		CrCPUDescriptorPoolD3D12 m_shaderResourcePool;
 
-		CrGPUFenceHandle m_waitIdleFence;
+		GPUFenceHandle m_waitIdleFence;
 
 		ID3D12CommandQueue* m_d3d12GraphicsCommandQueue = nullptr;
 

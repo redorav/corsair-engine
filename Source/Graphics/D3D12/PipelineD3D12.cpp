@@ -11,17 +11,17 @@
 
 namespace crgfx
 {
-	CrGraphicsPipelineD3D12::CrGraphicsPipelineD3D12
+	GraphicsPipelineD3D12::GraphicsPipelineD3D12
 	(
-		crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
+		const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	)
-		: ICrGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
+		: IGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 	{
 		Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	void CrGraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
@@ -51,18 +51,18 @@ namespace crgfx
 		blendDesc.AlphaToCoverageEnable = false;
 		blendDesc.IndependentBlendEnable = false;
 
-		const crgfx::CrRenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
+		const crgfx::RenderTargetBlendDescriptor& firstBlendState = pipelineDescriptor.blendState.renderTargetBlends[0];
 
 		static_assert(crgfx::MaxRenderTargets == sizeof_array(d3d12PipelineStateDescriptor.RTVFormats), "Array not large enough ");
 
 		for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 		{
-			const crgfx::CrRenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
+			const crgfx::RenderTargetFormatDescriptor& renderTargets = pipelineDescriptor.renderTargets;
 			D3D12_RENDER_TARGET_BLEND_DESC& renderTargetDesc = blendDesc.RenderTarget[i];
 
 			if (renderTargets.colorFormats[i] != crgfx::DataFormat::Invalid)
 			{
-				const crgfx::CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
+				const crgfx::RenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
 
 				renderTargetDesc.BlendEnable = renderTargetBlend.enable;
 				renderTargetDesc.LogicOpEnable = false;
@@ -201,23 +201,23 @@ namespace crgfx
 		CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
 	}
 
-	CrGraphicsPipelineD3D12::~CrGraphicsPipelineD3D12()
+	GraphicsPipelineD3D12::~GraphicsPipelineD3D12()
 	{
 		Deinitialize();
 	}
 
-	void CrGraphicsPipelineD3D12::Deinitialize()
+	void GraphicsPipelineD3D12::Deinitialize()
 	{
 		m_d3d12PipelineState->Release();
 	}
 
-	CrComputePipelineD3D12::CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
-		: ICrComputePipeline(d3d12RenderDevice, computeShader)
+	ComputePipelineD3D12::ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader)
+		: IComputePipeline(d3d12RenderDevice, computeShader)
 	{
 		Initialize(d3d12RenderDevice, computeShader);
 	}
 
-	void CrComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	void ComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 		d3d12PipelineStateDescriptor.NodeMask = 0;
@@ -233,25 +233,25 @@ namespace crgfx
 		CrAssertMsg(hResult == S_OK, "Failed to create compute pipeline");
 	}
 
-	CrComputePipelineD3D12::~CrComputePipelineD3D12()
+	ComputePipelineD3D12::~ComputePipelineD3D12()
 	{
 		Deinitialize();
 	}
 
-	void CrComputePipelineD3D12::Deinitialize()
+	void ComputePipelineD3D12::Deinitialize()
 	{
 		m_d3d12PipelineState->Release();
 	}
 
 	#if !defined(CR_CONFIG_FINAL)
 
-	void CrGraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader)
+	void GraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
 	{
 		Deinitialize();
 		Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 	}
 
-	void CrComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	void ComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		Deinitialize();
 		Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), computeShader);

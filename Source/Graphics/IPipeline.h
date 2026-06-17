@@ -17,7 +17,7 @@ namespace CrBuiltinCompute { enum T : uint32_t; }
 
 namespace crgfx
 {
-	struct CrRasterizerStateDescriptor
+	struct RasterizerStateDescriptor
 	{
 		crgfx::PolygonFillMode fillMode : 2;
 		crgfx::PolygonCullMode cullMode : 2;
@@ -34,11 +34,11 @@ namespace crgfx
 		float slopeScaledDepthBias;
 	};
 
-	static_assert(sizeof(CrRasterizerStateDescriptor) == 16, "CrRasterizerStateDescriptor size mismatch");
+	static_assert(sizeof(RasterizerStateDescriptor) == 16, "RasterizerStateDescriptor size mismatch");
 
-	struct CrRenderTargetBlendDescriptor
+	struct RenderTargetBlendDescriptor
 	{
-		CrRenderTargetBlendDescriptor()
+		RenderTargetBlendDescriptor()
 		{
 			// We default to standard alpha blending, where colors are blended and alpha is replaced
 			bits = 0;
@@ -51,7 +51,7 @@ namespace crgfx
 			alphaBlendOp = crgfx::BlendOp::Add;
 		}
 
-		CrRenderTargetBlendDescriptor
+		RenderTargetBlendDescriptor
 		(
 			crgfx::BlendFactor srcColorBlendFactor,
 			crgfx::BlendFactor dstColorBlendFactor,
@@ -94,16 +94,16 @@ namespace crgfx
 			uint32_t bits;
 		};
 
-		bool operator == (const CrRenderTargetBlendDescriptor& other) const { return bits == other.bits; }
+		bool operator == (const RenderTargetBlendDescriptor& other) const { return bits == other.bits; }
 
-		bool operator != (const CrRenderTargetBlendDescriptor& other) const { return bits != other.bits; }
+		bool operator != (const RenderTargetBlendDescriptor& other) const { return bits != other.bits; }
 	};
 
-	static_assert(sizeof(CrRenderTargetBlendDescriptor) == 4, "CrRenderTargetBlendDescriptor size mismatch");
+	static_assert(sizeof(RenderTargetBlendDescriptor) == 4, "RenderTargetBlendDescriptor size mismatch");
 
-	struct CrBlendStateDescriptor
+	struct BlendStateDescriptor
 	{
-		crstl::array<crgfx::CrRenderTargetBlendDescriptor, crgfx::MaxRenderTargets> renderTargetBlends;
+		crstl::array<crgfx::RenderTargetBlendDescriptor, crgfx::MaxRenderTargets> renderTargetBlends;
 
 		// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
 		// in the blend state and not a per render target field.
@@ -113,9 +113,9 @@ namespace crgfx
 		float blendConstants[4];
 	};
 
-	static_assert(sizeof(CrBlendStateDescriptor) == 52, "CrBlendStateDescriptor size mismatch");
+	static_assert(sizeof(BlendStateDescriptor) == 52, "BlendStateDescriptor size mismatch");
 
-	struct CrDepthStencilStateDescriptor
+	struct DepthStencilStateDescriptor
 	{
 		crgfx::CompareOp      depthCompareOp : 3;
 		uint32_t              depthTestEnable : 1;
@@ -145,9 +145,9 @@ namespace crgfx
 		float                 maxDepthBounds;
 	};
 
-	static_assert(sizeof(CrDepthStencilStateDescriptor) == 16, "CrDepthStencilStateDescriptor size mismatch");
+	static_assert(sizeof(DepthStencilStateDescriptor) == 16, "DepthStencilStateDescriptor size mismatch");
 
-	struct CrRenderTargetFormatDescriptor
+	struct RenderTargetFormatDescriptor
 	{
 		crstl::array<crgfx::DataFormat::T, crgfx::MaxRenderTargets> colorFormats =
 		{
@@ -159,12 +159,12 @@ namespace crgfx
 		crgfx::SampleCount sampleCount = crgfx::SampleCount::S1;
 	};
 
-	static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40, "CrRenderTargetFormatDescriptor size mismatch");
+	static_assert(sizeof(RenderTargetFormatDescriptor) == 40, "CrRenderTargetFormatDescriptor size mismatch");
 
 	// TODO Optimize size of pipeline descriptor
-	struct CrGraphicsPipelineDescriptor
+	struct GraphicsPipelineDescriptor
 	{
-		CrGraphicsPipelineDescriptor()
+		GraphicsPipelineDescriptor()
 		{
 			primitiveTopology = crgfx::PrimitiveTopology::TriangleList;
 			sampleCount = crgfx::SampleCount::S1;
@@ -198,31 +198,31 @@ namespace crgfx
 
 		crgfx::PrimitiveTopology        primitiveTopology : 4;
 		crgfx::SampleCount              sampleCount : 4;
-		uint32_t                       padding : 24;
+		uint32_t                        padding : 24;
 
-		crgfx::CrRasterizerStateDescriptor    rasterizerState = {};
-		crgfx::CrBlendStateDescriptor         blendState = {};
-		crgfx::CrDepthStencilStateDescriptor  depthStencilState = {};
-		crgfx::CrRenderTargetFormatDescriptor renderTargets = {};
+		crgfx::RasterizerStateDescriptor    rasterizerState = {};
+		crgfx::BlendStateDescriptor         blendState = {};
+		crgfx::DepthStencilStateDescriptor  depthStencilState = {};
+		crgfx::RenderTargetFormatDescriptor renderTargets = {};
 	};
 
-	static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
+	static_assert(sizeof(GraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-	class ICrGraphicsPipeline : public CrGPUAutoDeletable
+	class IGraphicsPipeline : public CrGPUAutoDeletable
 	{
 	public:
 
-		ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
-		virtual ~ICrGraphicsPipeline();
+		virtual ~IGraphicsPipeline();
 
-		const crgfx::CrGraphicsShaderHandle& GetShader() const { return m_shader; }
+		const GraphicsShaderHandle& GetShader() const { return m_shader; }
 
 		uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
 
 	private:
 
-		crgfx::CrGraphicsShaderHandle m_shader;
+		GraphicsShaderHandle m_shader;
 
 		uint32_t m_usedVertexStreamCount = 0;
 
@@ -230,9 +230,9 @@ namespace crgfx
 
 	public:
 
-		void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader);
+		void Recompile(IDevice* renderDevice, const GraphicsShaderHandle& graphicsShader);
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) = 0;
+		virtual void RecompilePS(IDevice* renderDevice, const GraphicsShaderHandle& graphicsShader) = 0;
 
 		CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
 
@@ -246,7 +246,7 @@ namespace crgfx
 
 	protected:
 
-		CrGraphicsPipelineDescriptor m_pipelineDescriptor;
+		GraphicsPipelineDescriptor m_pipelineDescriptor;
 
 		CrVertexDescriptor m_vertexDescriptor;
 
@@ -257,15 +257,15 @@ namespace crgfx
 #endif
 	};
 
-	class ICrComputePipeline : public CrGPUAutoDeletable
+	class IComputePipeline : public CrGPUAutoDeletable
 	{
 	public:
 
-		ICrComputePipeline(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		IComputePipeline(IDevice* renderDevice, const ComputeShaderHandle& computeShader);
 
-		virtual ~ICrComputePipeline();
+		virtual ~IComputePipeline();
 
-		const crgfx::CrComputeShaderHandle& GetShader() const { return m_shader; }
+		const ComputeShaderHandle& GetShader() const { return m_shader; }
 
 		uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
 
@@ -281,15 +281,15 @@ namespace crgfx
 
 		uint32_t m_threadGroupSizeZ;
 
-		crgfx::CrComputeShaderHandle m_shader;
+		ComputeShaderHandle m_shader;
 
 #if !defined(CR_CONFIG_FINAL)
 
 	public:
 
-		void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		void Recompile(IDevice* renderDevice, const ComputeShaderHandle& computeShader);
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) = 0;
+		virtual void RecompilePS(IDevice* renderDevice, const ComputeShaderHandle& computeShader) = 0;
 
 		CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 
@@ -306,6 +306,6 @@ namespace crgfx
 // TODO Move to common graphics resources
 namespace CrStandardPipelineStates
 {
-	extern crgfx::CrRenderTargetBlendDescriptor OpaqueBlend;
-	extern crgfx::CrRenderTargetBlendDescriptor AlphaBlend;
+	extern crgfx::RenderTargetBlendDescriptor OpaqueBlend;
+	extern crgfx::RenderTargetBlendDescriptor AlphaBlend;
 };

@@ -66,7 +66,7 @@ static_assert(sizeof_array(GBufferDebugString) == GBufferDebugMode::Count, "");
 // TODO Put somewhere else
 bool HashingAssert()
 {
-	crgfx::CrGraphicsPipelineDescriptor defaultDescriptor;
+	crgfx::GraphicsPipelineDescriptor defaultDescriptor;
 	CrHash defaultDescriptorHash = CrHash(defaultDescriptor);
 	CrAssertMsg(defaultDescriptorHash == CrHash(14802820647099604725u), "Failed to hash known pipeline descriptor!");
 	return true;
@@ -173,7 +173,7 @@ struct CrRenderPacketBatcher
 	uint32_t m_numInstances = 0;
 	const CrMaterial* m_material = nullptr;
 	const CrRenderMesh* m_renderMesh = nullptr;
-	const crgfx::ICrGraphicsPipeline* m_pipeline = nullptr;
+	const crgfx::IGraphicsPipeline* m_pipeline = nullptr;
 	const void* m_extra = nullptr;
 
 	crgfx::ICommandBuffer* m_commandBuffer = nullptr;
@@ -274,7 +274,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	m_mouseSelectionResolvePipeline = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::EditorMouseSelectionResolveCS);
 
 	{
-		crgfx::CrGraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
+		crgfx::GraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = crgfx::DataFormat::BGRA8_Unorm;
 		copyTextureGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		m_copyTexturePipeline = BuiltinPipelines->GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
@@ -285,7 +285,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	m_postProcessing = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::PostProcessingCS);
 
 	{
-		crgfx::CrGraphicsPipelineDescriptor directionalLightPipelineDescriptor;
+		crgfx::GraphicsPipelineDescriptor directionalLightPipelineDescriptor;
 		directionalLightPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::LightingFormat;
 		directionalLightPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		directionalLightPipelineDescriptor.depthStencilState.depthWriteEnable = false;
@@ -293,7 +293,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 	}
 
 	{
-		crgfx::CrGraphicsPipelineDescriptor gbufferDebugPipelineDescriptor;
+		crgfx::GraphicsPipelineDescriptor gbufferDebugPipelineDescriptor;
 		gbufferDebugPipelineDescriptor.renderTargets.colorFormats[0] = CrRendererConfig::SwapchainFormat;
 		gbufferDebugPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		gbufferDebugPipelineDescriptor.depthStencilState.depthWriteEnable = false;
@@ -302,14 +302,14 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	// Editor shaders
 	{
-		crgfx::CrGraphicsPipelineDescriptor editorEdgeSelectionPipelineDescriptor;
+		crgfx::GraphicsPipelineDescriptor editorEdgeSelectionPipelineDescriptor;
 		editorEdgeSelectionPipelineDescriptor.renderTargets.colorFormats[0] = crgfx::DataFormat::BGRA8_Unorm;
 		editorEdgeSelectionPipelineDescriptor.depthStencilState.depthTestEnable = false;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].enable = true;
 		editorEdgeSelectionPipelineDescriptor.blendState.renderTargetBlends[0].colorBlendOp = crgfx::BlendOp::Add;
 		m_editorEdgeSelectionPipeline = BuiltinPipelines->GetGraphicsPipeline(editorEdgeSelectionPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::EditorEdgeSelectionPS);
 	
-		crgfx::CrGraphicsPipelineDescriptor editorGridPipelineDescriptor;
+		crgfx::GraphicsPipelineDescriptor editorGridPipelineDescriptor;
 		editorGridPipelineDescriptor.renderTargets.colorFormats[0] = crgfx::DataFormat::BGRA8_Unorm;
 		editorGridPipelineDescriptor.renderTargets.depthFormat = CrRendererConfig::DepthBufferFormat;
 		editorGridPipelineDescriptor.depthStencilState.depthTestEnable = true;
@@ -864,7 +864,7 @@ void CrFrame::Process()
 			renderPacketBatcher.FlushBatch(); // Execute last batch
 		});
 	
-		const crgfx::ICrComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline.get();
+		const crgfx::IComputePipeline* mouseSelectionResolvePipeline = m_mouseSelectionResolvePipeline.get();
 		int32_t mouseX = mouseState.position.x;
 		int32_t mouseY = mouseState.position.y;
 	

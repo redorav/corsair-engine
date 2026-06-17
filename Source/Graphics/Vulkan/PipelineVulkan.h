@@ -6,17 +6,17 @@ namespace crgfx
 {
 	class DeviceVulkan;
 
-	class CrGraphicsPipelineVulkan final : public ICrGraphicsPipeline
+	class GraphicsPipelineVulkan final : public IGraphicsPipeline
 	{
 	public:
 
-		CrGraphicsPipelineVulkan
+		GraphicsPipelineVulkan
 		(
-			crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-			const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+			crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
+			const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 		);
 
-		~CrGraphicsPipelineVulkan();
+		~GraphicsPipelineVulkan();
 
 		VkPipeline GetVkPipeline() const { return m_vkPipeline; }
 
@@ -24,13 +24,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 		void Deinitialize();
 
@@ -41,13 +41,13 @@ namespace crgfx
 		VkPipeline m_vkPipeline;
 	};
 
-	class CrComputePipelineVulkan final : public ICrComputePipeline
+	class ComputePipelineVulkan final : public IComputePipeline
 	{
 	public:
 
-		CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader);
 
-		~CrComputePipelineVulkan();
+		~ComputePipelineVulkan();
 
 		VkPipeline GetVkPipeline() const { return m_vkPipeline; }
 
@@ -55,13 +55,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader);
 
 		void Deinitialize();
 

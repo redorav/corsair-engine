@@ -69,13 +69,13 @@ namespace crgfx
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
 
-		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) override;
+		virtual ISwapchain* CreateSwapchainPS(const crgfx::SwapchainDescriptor& swapchainDescriptor) override;
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
-		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
 
-		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) override;
+		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) override;
 
 		virtual IGPUQueryPool* CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor) override;
 

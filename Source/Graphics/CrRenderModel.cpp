@@ -46,11 +46,11 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 		{
 			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(mesh, pipelineVariant);
 
-			const crgfx::CrGraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
+			const crgfx::GraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
 
 			if (graphicsShader)
 			{
-				crgfx::CrGraphicsPipelineHandle pipeline = crgfx::GetDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+				crgfx::GraphicsPipelineHandle pipeline = crgfx::GetDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
 
 				m_pipelines[meshIndex][pipelineVariant] = pipeline;
 			}

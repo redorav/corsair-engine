@@ -18,7 +18,7 @@ struct CrDownloadCallbackList
 {
 	~CrDownloadCallbackList();
 
-	crgfx::CrGPUFenceHandle fence;
+	crgfx::GPUFenceHandle fence;
 	crstl::vector<CrGPUDownloadCallback> callbacks;
 };
 

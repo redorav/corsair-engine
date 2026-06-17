@@ -93,7 +93,7 @@ struct CrMaterialPassProperties
 	static CrMaterialPassProperties GetMaterialPassProperties(const CrRenderMeshHandle& renderMesh, CrMaterialPipelineVariant::T pipelineVariant);
 
 	// We'll modify the pipeline descriptor as we need based on the pipeline variant
-	crgfx::CrGraphicsPipelineDescriptor pipelineDescriptor;
+	crgfx::GraphicsPipelineDescriptor pipelineDescriptor;
 
 	CrMaterialShaderVariant::T shaderVariant = CrMaterialShaderVariant::Count;
 };
@@ -144,7 +144,7 @@ public:
 
 	~CrMaterial();
 
-	const crgfx::CrGraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
+	const crgfx::GraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
 
 	void AddTexture(const crgfx::TextureHandle& texture, Textures::T semantic);
 
@@ -158,7 +158,7 @@ public:
 
 	crstl::vector<TextureBinding> m_textures;
 
-	crgfx::CrGraphicsShaderHandle m_shaders[CrMaterialShaderVariant::Count];
+	crgfx::GraphicsShaderHandle m_shaders[CrMaterialShaderVariant::Count];
 
 	float4 m_color;
 

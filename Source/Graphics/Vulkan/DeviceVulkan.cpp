@@ -713,7 +713,7 @@ namespace crgfx
 		return new SamplerVulkan(this, descriptor);
 	}
 
-	ISwapchain* DeviceVulkan::CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* DeviceVulkan::CreateSwapchainPS(const crgfx::SwapchainDescriptor& swapchainDescriptor)
 	{
 		return new SwapchainVulkan(this, swapchainDescriptor);
 	}
@@ -723,19 +723,19 @@ namespace crgfx
 		return new TextureVulkan(this, descriptor);
 	}
 
-	ICrGraphicsPipeline* DeviceVulkan::CreateGraphicsPipelinePS
+	IGraphicsPipeline* DeviceVulkan::CreateGraphicsPipelinePS
 	(
-		const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-		const CrGraphicsShaderHandle& graphicsShader,
+		const GraphicsPipelineDescriptor& pipelineDescriptor,
+		const GraphicsShaderHandle& graphicsShader,
 		const CrVertexDescriptor& vertexDescriptor
 	)
 	{
-		return new CrGraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		return new GraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	ICrComputePipeline* DeviceVulkan::CreateComputePipelinePS(const CrComputeShaderHandle& computeShader)
+	IComputePipeline* DeviceVulkan::CreateComputePipelinePS(const ComputeShaderHandle& computeShader)
 	{
-		return new CrComputePipelineVulkan(this, computeShader);
+		return new ComputePipelineVulkan(this, computeShader);
 	}
 
 	IGPUQueryPool* DeviceVulkan::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)

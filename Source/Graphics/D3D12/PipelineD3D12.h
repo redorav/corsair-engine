@@ -6,17 +6,17 @@ namespace crgfx
 {
 	class DeviceD3D12;
 
-	class CrGraphicsPipelineD3D12 final : public ICrGraphicsPipeline
+	class GraphicsPipelineD3D12 final : public IGraphicsPipeline
 	{
 	public:
 
-		CrGraphicsPipelineD3D12
+		GraphicsPipelineD3D12
 		(
-			crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-			const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+			crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
+			const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 		);
 
-		~CrGraphicsPipelineD3D12();
+		~GraphicsPipelineD3D12();
 
 		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState; }
 
@@ -26,13 +26,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
 		void Deinitialize();
 
@@ -43,13 +43,13 @@ namespace crgfx
 		ID3D12PipelineState* m_d3d12PipelineState;
 	};
 
-	class CrComputePipelineD3D12 final : public ICrComputePipeline
+	class ComputePipelineD3D12 final : public IComputePipeline
 	{
 	public:
 
-		CrComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader);
 
-		~CrComputePipelineD3D12();
+		~ComputePipelineD3D12();
 
 		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12PipelineState; }
 
@@ -57,13 +57,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader);
 
 		void Deinitialize();
 

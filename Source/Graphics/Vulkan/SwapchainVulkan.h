@@ -9,7 +9,7 @@ namespace crgfx
 	{
 	public:
 
-		SwapchainVulkan(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor);
+		SwapchainVulkan(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor);
 
 		~SwapchainVulkan();
 
@@ -26,9 +26,9 @@ namespace crgfx
 		void CreateSwapchainTextures();
 
 		// Semaphores are signaled when present completes
-		crstl::vector<CrGPUSemaphoreHandle> m_presentCompleteSemaphores;
+		crstl::vector<GPUSemaphoreHandle> m_presentCompleteSemaphores;
 
-		crstl::vector<CrGPUFenceHandle> m_imageReadyFences;
+		crstl::vector<GPUFenceHandle> m_imageReadyFences;
 
 		// We need to have another index for the semaphore because we don't really know
 		// the buffer index until we have acquired the image, but we need to signal the

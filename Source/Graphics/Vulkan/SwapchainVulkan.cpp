@@ -14,7 +14,7 @@
 
 namespace crgfx
 {
-	SwapchainVulkan::SwapchainVulkan(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
+	SwapchainVulkan::SwapchainVulkan(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor)
 		: ISwapchain(renderDevice, swapchainDescriptor)
 
 		// The initialization value is important to start at 0 on the first call to present
@@ -227,7 +227,7 @@ namespace crgfx
 
 		m_presentCompleteSemaphores.resize(m_imageCount);
 
-		for (CrGPUSemaphoreHandle& waitSemaphore : m_presentCompleteSemaphores)
+		for (GPUSemaphoreHandle& waitSemaphore : m_presentCompleteSemaphores)
 		{
 			waitSemaphore = m_renderDevice->CreateGPUSemaphore();
 		}
@@ -411,7 +411,7 @@ namespace crgfx
 
 		m_imageReadyFences.resize(m_imageCount);
 
-		for (CrGPUFenceHandle& imageReadyFence : m_imageReadyFences)
+		for (GPUFenceHandle& imageReadyFence : m_imageReadyFences)
 		{
 			imageReadyFence = m_renderDevice->CreateGPUFence();
 		}

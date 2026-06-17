@@ -137,7 +137,7 @@ namespace crgfx
 
 		ISampler* CreateSampler(const crgfx::SamplerDescriptor& descriptor);
 
-		ISwapchain* CreateSwapchain(const crgfx::CrSwapchainDescriptor& swapchainDescriptor);
+		ISwapchain* CreateSwapchain(const crgfx::SwapchainDescriptor& swapchainDescriptor);
 
 		crgfx::ITexture* CreateTexture(const crgfx::TextureDescriptor& descriptor);
 
@@ -152,9 +152,9 @@ namespace crgfx
 
 		IComputeShader* CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor);
 
-		CrGraphicsPipelineHandle CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
-		CrComputePipelineHandle CreateComputePipeline(const CrComputeShaderHandle& computeShader);
+		ComputePipelineHandle CreateComputePipeline(const ComputeShaderHandle& computeShader);
 
 		IGPUQueryPool* CreateGPUQueryPool(const GPUQueryPoolDescriptor& queryPoolDescriptor);
 
@@ -223,13 +223,13 @@ namespace crgfx
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) = 0;
 
-		virtual ISwapchain* CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor) = 0;
+		virtual ISwapchain* CreateSwapchainPS(const crgfx::SwapchainDescriptor& swapchainDescriptor) = 0;
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 
-		virtual ICrGraphicsPipeline* CreateGraphicsPipelinePS(const CrGraphicsPipelineDescriptor& psoDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& psoDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
 
-		virtual ICrComputePipeline* CreateComputePipelinePS(const CrComputeShaderHandle& computeShader) = 0;
+		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) = 0;
 
 		virtual IGPUQueryPool* CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
 
@@ -297,9 +297,9 @@ namespace crgfx
 
 		crstl::string m_pipelineCacheFilename;
 
-		crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_graphicsPipelines;
+		crstl::open_hashmap<uint64_t, GraphicsPipelineHandle> m_graphicsPipelines;
 
-		crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_computePipelines;
+		crstl::open_hashmap<uint64_t, ComputePipelineHandle> m_computePipelines;
 
 	private:
 

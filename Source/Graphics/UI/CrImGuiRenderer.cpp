@@ -89,7 +89,7 @@ CrImGuiRenderer::CrImGuiRenderer(const CrImGuiRendererInitParams& initParams)
 
 	// Pipeline description:
 	{
-		CrGraphicsPipelineDescriptor psoDescriptor;
+		crgfx::GraphicsPipelineDescriptor psoDescriptor;
 		psoDescriptor.depthStencilState.depthTestEnable = false;
 		psoDescriptor.depthStencilState.depthWriteEnable = false;
 		psoDescriptor.blendState.renderTargetBlends[0].enable = true;

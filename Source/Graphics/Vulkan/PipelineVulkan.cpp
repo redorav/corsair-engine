@@ -5,17 +5,17 @@
 
 namespace crgfx
 {
-	CrGraphicsPipelineVulkan::CrGraphicsPipelineVulkan
+	GraphicsPipelineVulkan::GraphicsPipelineVulkan
 	(
-		crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
+		const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	)
-		: ICrGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
+		: IGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 	{
 		Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	void CrGraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	{
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 		inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -59,8 +59,8 @@ namespace crgfx
 		crstl::fixed_vector<VkPipelineColorBlendAttachmentState, crgfx::MaxRenderTargets> blendAttachments;
 		for (uint32_t i = 0, end = crgfx::MaxRenderTargets; i < end; ++i)
 		{
-			const crgfx::CrRenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
-			const crgfx::CrRenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
+			const crgfx::RenderTargetBlendDescriptor& renderTargetBlend = pipelineDescriptor.blendState.renderTargetBlends[i];
+			const crgfx::RenderTargetFormatDescriptor& renderTarget = pipelineDescriptor.renderTargets;
 
 			if (renderTarget.colorFormats[i] != crgfx::DataFormat::Invalid)
 			{
@@ -300,12 +300,12 @@ namespace crgfx
 		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShader->GetDebugName());
 	}
 
-	CrGraphicsPipelineVulkan::~CrGraphicsPipelineVulkan()
+	GraphicsPipelineVulkan::~GraphicsPipelineVulkan()
 	{
 		Deinitialize();
 	}
 
-	void CrGraphicsPipelineVulkan::Deinitialize()
+	void GraphicsPipelineVulkan::Deinitialize()
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
@@ -314,13 +314,13 @@ namespace crgfx
 		vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
 	}
 
-	CrComputePipelineVulkan::CrComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
-		: ICrComputePipeline(vulkanRenderDevice, computeShader)
+	ComputePipelineVulkan::ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
+		: IComputePipeline(vulkanRenderDevice, computeShader)
 	{
 		Initialize(vulkanRenderDevice, computeShader);
 	}
 
-	void CrComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	void ComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		const crgfx::ComputeShaderVulkan* vulkanComputeShader = static_cast<const crgfx::ComputeShaderVulkan*>(computeShader.get());
 
@@ -359,12 +359,12 @@ namespace crgfx
 		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShader->GetDebugName());
 	}
 
-	CrComputePipelineVulkan::~CrComputePipelineVulkan()
+	ComputePipelineVulkan::~ComputePipelineVulkan()
 	{
 		Deinitialize();
 	}
 
-	void CrComputePipelineVulkan::Deinitialize()
+	void ComputePipelineVulkan::Deinitialize()
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
@@ -375,13 +375,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void CrGraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader)
+	void GraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
 	{
 		Deinitialize();
 		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
 	}
 
-	void CrComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	void ComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		Deinitialize();
 		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), computeShader);

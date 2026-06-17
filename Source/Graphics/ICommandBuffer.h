@@ -172,9 +172,9 @@ namespace crgfx
 
 		void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer);
 
-		void BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline);
+		void BindGraphicsPipelineState(const IGraphicsPipeline* graphicsPipeline);
 
-		void BindComputePipelineState(const ICrComputePipeline* computePipeline);
+		void BindComputePipelineState(const IComputePipeline* computePipeline);
 
 		//---------
 		// Commands
@@ -306,10 +306,10 @@ namespace crgfx
 			crgfx::Viewport                 m_viewport;
 			bool                            m_viewportDirty = true;
 
-			const ICrGraphicsPipeline* m_graphicsPipeline;
+			const IGraphicsPipeline* m_graphicsPipeline;
 			bool                            m_graphicsPipelineDirty;
 
-			const ICrComputePipeline* m_computePipeline;
+			const IComputePipeline* m_computePipeline;
 			bool                            m_computePipelineDirty;
 
 			ConstantBufferBinding         m_constantBuffers[ConstantBuffers::Count];
@@ -343,7 +343,7 @@ namespace crgfx
 		crstl::unique_ptr<CrGPUStackAllocator> m_indexBufferGPUStack;
 
 		// Signal fence when execution completes
-		crgfx::CrGPUFenceHandle      m_completionFence;
+		crgfx::GPUFenceHandle      m_completionFence;
 
 		crgfx::CommandQueueType::T   m_queueType;
 
@@ -436,7 +436,7 @@ namespace crgfx
 		BindVertexBuffer(vertexBuffer->GetHardwareBuffer(), streamId, elementOffset * vertexBuffer->GetStride(), vertexBuffer->GetNumElements(), vertexBuffer->GetStride());
 	}
 
-	inline void ICommandBuffer::BindGraphicsPipelineState(const ICrGraphicsPipeline* graphicsPipeline)
+	inline void ICommandBuffer::BindGraphicsPipelineState(const IGraphicsPipeline* graphicsPipeline)
 	{
 		if (m_currentState.m_graphicsPipeline != graphicsPipeline)
 		{
@@ -445,7 +445,7 @@ namespace crgfx
 		}
 	}
 
-	inline void ICommandBuffer::BindComputePipelineState(const ICrComputePipeline* computePipeline)
+	inline void ICommandBuffer::BindComputePipelineState(const IComputePipeline* computePipeline)
 	{
 		if (m_currentState.m_computePipeline != computePipeline)
 		{

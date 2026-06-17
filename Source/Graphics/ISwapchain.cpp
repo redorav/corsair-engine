@@ -8,7 +8,7 @@ namespace crgfx
 {
 	class IDevice;
 
-	ISwapchain::ISwapchain(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
+	ISwapchain::ISwapchain(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor) : CrGPUAutoDeletable(renderDevice)
 		, m_name(swapchainDescriptor.name)
 		, m_imageCount(0)
 		, m_format(crgfx::DataFormat::Invalid)

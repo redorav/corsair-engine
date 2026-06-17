@@ -155,7 +155,7 @@ namespace crgfx
 		return CreateComputeShaderPS(computeShaderDescriptor);
 	}
 
-	CrGraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 	{
 		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 		CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
@@ -168,7 +168,7 @@ namespace crgfx
 
 		const auto& pipelineIter = m_graphicsPipelines.find(combinedHash.GetHash());
 
-		CrGraphicsPipelineHandle graphicsPipeline;
+		GraphicsPipelineHandle graphicsPipeline;
 
 		if (pipelineIter != m_graphicsPipelines.end())
 		{
@@ -178,7 +178,7 @@ namespace crgfx
 		{
 			crstl::timer pipelineCreationTime;
 
-			graphicsPipeline = CrGraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+			graphicsPipeline = GraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
 
 #if defined(RENDER_DEVICE_LOGS)
 
@@ -210,14 +210,14 @@ namespace crgfx
 		return graphicsPipeline;
 	}
 
-	CrComputePipelineHandle IDevice::CreateComputePipeline(const CrComputeShaderHandle& computeShader)
+	ComputePipelineHandle IDevice::CreateComputePipeline(const ComputeShaderHandle& computeShader)
 	{
 		CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
 
 		const CrHash computeShaderHash = computeShader->GetHash();
 
 		const auto& pipelineIter = m_computePipelines.find(computeShaderHash.GetHash());
-		CrComputePipelineHandle computePipeline;
+		ComputePipelineHandle computePipeline;
 
 		if (pipelineIter != m_computePipelines.end())
 		{
@@ -227,7 +227,7 @@ namespace crgfx
 		{
 			crstl::timer pipelineCreationTime;
 
-			computePipeline = CrComputePipelineHandle(CreateComputePipelinePS(computeShader));
+			computePipeline = ComputePipelineHandle(CreateComputePipelinePS(computeShader));
 
 #if defined(RENDER_DEVICE_LOGS)
 
@@ -265,7 +265,7 @@ namespace crgfx
 		return CreateSamplerPS(descriptor);
 	}
 
-	ISwapchain* IDevice::CreateSwapchain(const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* IDevice::CreateSwapchain(const crgfx::SwapchainDescriptor& swapchainDescriptor)
 	{
 		CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 		CrAssertMsg(swapchainDescriptor.format != crgfx::DataFormat::Invalid, "Must set a data format");

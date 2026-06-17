@@ -14,7 +14,7 @@
 
 namespace crgfx
 {
-	SwapchainD3D12::SwapchainD3D12(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor) : ISwapchain(renderDevice, swapchainDescriptor)
+	SwapchainD3D12::SwapchainD3D12(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor) : ISwapchain(renderDevice, swapchainDescriptor)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
 

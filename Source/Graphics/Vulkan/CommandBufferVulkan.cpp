@@ -278,8 +278,8 @@ namespace crgfx
 
 	void CommandBufferVulkan::FlushGraphicsRenderStatePS()
 	{
-		const CrGraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-		const crgfx::CrGraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
+		const GraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const GraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
+		const crgfx::GraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
 		const GraphicsShaderVulkan* vulkanGraphicsShader = static_cast<GraphicsShaderVulkan*>(graphicsShader.get());
 
 		if (m_currentState.m_indexBufferDirty)
@@ -344,7 +344,7 @@ namespace crgfx
 		if (m_currentState.m_graphicsPipelineDirty)
 		{
 			// In Vulkan we specify the type of pipeline. In DX12 for instance they are separate objects
-			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const CrGraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline)->GetVkPipeline());
+			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const GraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline)->GetVkPipeline());
 			m_currentState.m_graphicsPipelineDirty = false;
 		}
 
@@ -359,14 +359,14 @@ namespace crgfx
 
 	void CommandBufferVulkan::FlushComputeRenderStatePS()
 	{
-		const CrComputePipelineVulkan* vulkanComputePipeline = static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline);
-		const CrComputeShaderHandle& computeShader = vulkanComputePipeline->GetShader();
+		const ComputePipelineVulkan* vulkanComputePipeline = static_cast<const ComputePipelineVulkan*>(m_currentState.m_computePipeline);
+		const ComputeShaderHandle& computeShader = vulkanComputePipeline->GetShader();
 		const ComputeShaderVulkan* vulkanComputeShader = static_cast<ComputeShaderVulkan*>(computeShader.get());
 
 		if (m_currentState.m_computePipelineDirty)
 		{
 			// In Vulkan we specify the type of pipeline. In D3D12 for instance they are separate objects
-			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const CrComputePipelineVulkan*>(m_currentState.m_computePipeline)->GetVkPipeline());
+			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const ComputePipelineVulkan*>(m_currentState.m_computePipeline)->GetVkPipeline());
 			m_currentState.m_computePipelineDirty = false;
 		}
 

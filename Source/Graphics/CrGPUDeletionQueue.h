@@ -11,7 +11,7 @@ class CrGPUDeletable;
 
 struct CrDeletionList
 {
-	crgfx::CrGPUFenceHandle fence;
+	crgfx::GPUFenceHandle fence;
 	crstl::vector<CrGPUDeletable*> deletables;
 };
 

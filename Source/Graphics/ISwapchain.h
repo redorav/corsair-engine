@@ -18,9 +18,9 @@ namespace crgfx
 		Invalid
 	};
 
-	struct CrSwapchainDescriptor
+	struct SwapchainDescriptor
 	{
-		CrSwapchainDescriptor()
+		SwapchainDescriptor()
 			: name("")
 			, window(nullptr)
 			, requestedWidth(0)
@@ -41,7 +41,7 @@ namespace crgfx
 	{
 	public:
 
-		ISwapchain(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor);
+		ISwapchain(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor);
 
 		virtual ~ISwapchain() {}
 

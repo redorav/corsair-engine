@@ -427,7 +427,7 @@ namespace crgfx
 		return new SamplerD3D12(this, descriptor);
 	}
 
-	ISwapchain* DeviceD3D12::CreateSwapchainPS(const crgfx::CrSwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* DeviceD3D12::CreateSwapchainPS(const crgfx::SwapchainDescriptor& swapchainDescriptor)
 	{
 		return new SwapchainD3D12(this, swapchainDescriptor);
 	}
@@ -437,17 +437,17 @@ namespace crgfx
 		return new TextureD3D12(this, params);
 	}
 
-	ICrGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
+	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
 	(
-		const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
 	)
 	{
-		return new CrGraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		return new GraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	ICrComputePipeline* DeviceD3D12::CreateComputePipelinePS(const CrComputeShaderHandle& computeShader)
+	IComputePipeline* DeviceD3D12::CreateComputePipelinePS(const ComputeShaderHandle& computeShader)
 	{
-		return new CrComputePipelineD3D12(this, computeShader);
+		return new ComputePipelineD3D12(this, computeShader);
 	}
 
 	IGPUQueryPool* DeviceD3D12::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)

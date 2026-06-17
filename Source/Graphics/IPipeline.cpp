@@ -4,7 +4,7 @@
 #include "Graphics/IShader.h"
 #include "Graphics/CrVertexDescriptor.h"
 
-crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
+crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 {
 	crgfx::BlendFactor::One,
 	crgfx::BlendFactor::One,
@@ -16,7 +16,7 @@ crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 	false
 };
 
-crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
+crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 {
 	crgfx::BlendFactor::SrcAlpha,
 	crgfx::BlendFactor::OneMinusSrcAlpha,
@@ -30,7 +30,7 @@ crgfx::CrRenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 
 namespace crgfx
 {
-	ICrGraphicsPipeline::ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
 		: CrGPUAutoDeletable(renderDevice)
 		, m_shader(graphicsShader)
 #if !defined(CR_CONFIG_FINAL)
@@ -41,11 +41,11 @@ namespace crgfx
 		m_usedVertexStreamCount = vertexDescriptor.GetStreamCount();
 	}
 
-	ICrGraphicsPipeline::~ICrGraphicsPipeline() {}
+	IGraphicsPipeline::~IGraphicsPipeline() {}
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void ICrGraphicsPipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader)
+	void IGraphicsPipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
 	{
 		RecompilePS(renderDevice, graphicsShader);
 		m_shader = graphicsShader;
@@ -53,7 +53,7 @@ namespace crgfx
 
 #endif
 
-	ICrComputePipeline::ICrComputePipeline(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
 		: CrGPUAutoDeletable(renderDevice), m_shader(computeShader)
 	{
 		const CrShaderReflectionHeader& reflection = computeShader->GetBytecode()->GetReflection();
@@ -62,11 +62,11 @@ namespace crgfx
 		m_threadGroupSizeZ = reflection.threadGroupSizeZ;
 	}
 
-	ICrComputePipeline::~ICrComputePipeline() {}
+	IComputePipeline::~IComputePipeline() {}
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void ICrComputePipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader)
+	void IComputePipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		RecompilePS(renderDevice, computeShader);
 		m_shader = computeShader;

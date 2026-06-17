@@ -435,8 +435,8 @@ namespace crgfx
 
 	void CommandBufferD3D12::FlushGraphicsRenderStatePS()
 	{
-		const CrGraphicsPipelineD3D12* d3d12GraphicsPipeline = static_cast<const CrGraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
-		const crgfx::CrGraphicsShaderHandle& currentGraphicsShader = d3d12GraphicsPipeline->GetShader();
+		const GraphicsPipelineD3D12* d3d12GraphicsPipeline = static_cast<const GraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
+		const crgfx::GraphicsShaderHandle& currentGraphicsShader = d3d12GraphicsPipeline->GetShader();
 
 		if (m_currentState.m_indexBufferDirty)
 		{
@@ -505,7 +505,7 @@ namespace crgfx
 
 		if (m_currentState.m_graphicsPipelineDirty)
 		{
-			const CrGraphicsPipelineD3D12* d3dGraphicsPipeline = static_cast<const CrGraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
+			const GraphicsPipelineD3D12* d3dGraphicsPipeline = static_cast<const GraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
 			m_d3d12GraphicsCommandList->SetPipelineState(d3dGraphicsPipeline->GetD3D12PipelineState());
 			m_d3d12GraphicsCommandList->SetGraphicsRootSignature(d3dGraphicsPipeline->GetD3D12RootSignature()); // TODO Cache
 
@@ -681,8 +681,8 @@ namespace crgfx
 
 	void CommandBufferD3D12::FlushComputeRenderStatePS()
 	{
-		const CrComputePipelineD3D12* d3dComputePipeline = static_cast<const CrComputePipelineD3D12*>(m_currentState.m_computePipeline);
-		const CrComputeShaderHandle& currentComputeShader = d3dComputePipeline->GetShader();
+		const ComputePipelineD3D12* d3dComputePipeline = static_cast<const ComputePipelineD3D12*>(m_currentState.m_computePipeline);
+		const ComputeShaderHandle& currentComputeShader = d3dComputePipeline->GetShader();
 
 		if (m_currentState.m_computePipelineDirty)
 		{

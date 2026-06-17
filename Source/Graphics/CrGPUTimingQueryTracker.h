@@ -56,7 +56,7 @@ private:
 	CrGPUTimingRequest m_frameTimingRequest;
 
 	// Collection of query pools, ideally one per frame
-	crstl::vector<crgfx::CrGPUQueryPoolHandle> m_queryPools;
+	crstl::vector<crgfx::GPUQueryPoolHandle> m_queryPools;
 
 	// There is a hashmap per frame as the query ids change every frame
 	crstl::vector<crstl::open_hashmap<CrHash, CrGPUTimingRequest>> m_timingRequests;

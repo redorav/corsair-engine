@@ -10,7 +10,7 @@ namespace crgfx
 	{
 	public:
 
-		SwapchainD3D12(crgfx::IDevice* renderDevice, const crgfx::CrSwapchainDescriptor& swapchainDescriptor);
+		SwapchainD3D12(crgfx::IDevice* renderDevice, const crgfx::SwapchainDescriptor& swapchainDescriptor);
 
 		~SwapchainD3D12();
 

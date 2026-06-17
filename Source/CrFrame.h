@@ -38,23 +38,23 @@ private:
 
 	crstl::vector<crgfx::CommandBufferHandle> m_drawCmdBuffers; // Command buffers used for rendering
 	
-	crgfx::CrComputePipelineHandle m_exampleComputePipeline;
+	crgfx::ComputePipelineHandle m_exampleComputePipeline;
 
-	crgfx::CrComputePipelineHandle m_depthDownsampleLinearize;
+	crgfx::ComputePipelineHandle m_depthDownsampleLinearize;
 
-	crgfx::CrComputePipelineHandle m_postProcessing;
+	crgfx::ComputePipelineHandle m_postProcessing;
 
-	crgfx::CrGraphicsPipelineHandle m_copyTexturePipeline;
+	crgfx::GraphicsPipelineHandle m_copyTexturePipeline;
 
 	// Gets the value of the instance id at the mouse position and stores it in a buffer
-	crgfx::CrComputePipelineHandle m_mouseSelectionResolvePipeline;
+	crgfx::ComputePipelineHandle m_mouseSelectionResolvePipeline;
 
 
-	crgfx::CrGraphicsPipelineHandle m_directionalLightPipeline;
+	crgfx::GraphicsPipelineHandle m_directionalLightPipeline;
 
-	crgfx::CrGraphicsPipelineHandle m_gbufferDebugPipeline;
+	crgfx::GraphicsPipelineHandle m_gbufferDebugPipeline;
 
-	crgfx::CrComputePipelineHandle m_createIndirectArguments;
+	crgfx::ComputePipelineHandle m_createIndirectArguments;
 
 	crgfx::TextureHandle m_colorfulVolumeTexture;
 
@@ -62,9 +62,9 @@ private:
 	crgfx::TextureHandle m_colorfulTextureArray;
 
 	// Editor Shaders
-	crgfx::CrGraphicsPipelineHandle m_editorEdgeSelectionPipeline;
+	crgfx::GraphicsPipelineHandle m_editorEdgeSelectionPipeline;
 
-	crgfx::CrGraphicsPipelineHandle m_editorGridPipeline;
+	crgfx::GraphicsPipelineHandle m_editorGridPipeline;
 
 	crgfx::SwapchainHandle m_swapchain;
 

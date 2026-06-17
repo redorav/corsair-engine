@@ -24,7 +24,7 @@ namespace crgfx
 {
 	struct CommandBufferDescriptor
 	{
-		crgfx::CommandQueueType::T queueType = crgfx::CommandQueueType::Graphics;
+		CommandQueueType::T queueType = CommandQueueType::Graphics;
 
 		crstl::fixed_string64 name;
 
@@ -68,20 +68,20 @@ namespace crgfx
 	{
 		TextureBinding() = default;
 
-		TextureBinding(const crgfx::ITexture* texture, crgfx::TextureView view) : texture(texture), view(view) {}
+		TextureBinding(const ITexture* texture, TextureView view) : texture(texture), view(view) {}
 
-		const crgfx::ITexture* texture = nullptr;
+		const ITexture* texture = nullptr;
 
-		crgfx::TextureView view;
+		TextureView view;
 	};
 
 	struct RWTextureBinding
 	{
 		RWTextureBinding() {}
 
-		RWTextureBinding(const crgfx::ITexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
+		RWTextureBinding(const ITexture* texture, uint32_t mip) : texture(texture), mip(mip) {}
 
-		const crgfx::ITexture* texture = nullptr;
+		const ITexture* texture = nullptr;
 		uint32_t mip = 0;
 	};
 
@@ -102,7 +102,7 @@ namespace crgfx
 	{
 	public:
 
-		ICommandBuffer(crgfx::IDevice* renderDevice, const crgfx::CommandBufferDescriptor& descriptor);
+		ICommandBuffer(IDevice* renderDevice, const CommandBufferDescriptor& descriptor);
 
 		virtual ~ICommandBuffer();
 
@@ -112,9 +112,9 @@ namespace crgfx
 
 		void Submit();
 
-		void SetViewport(const crgfx::Viewport& viewport);
+		void SetViewport(const Viewport& viewport);
 
-		void SetScissor(const crgfx::Rectangle& scissor);
+		void SetScissor(const Rectangle& scissor);
 
 		void SetStencilRef(uint32_t stencilRef);
 
@@ -124,7 +124,7 @@ namespace crgfx
 
 		// Index Buffer
 
-		void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, crgfx::DataFormat::T indexFormat);
+		void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, DataFormat::T indexFormat);
 
 		void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
 
@@ -146,11 +146,11 @@ namespace crgfx
 
 		// Textures and Samplers
 
-		void BindSampler(Samplers::T samplerIndex, const crgfx::ISampler* sampler);
+		void BindSampler(Samplers::T samplerIndex, const ISampler* sampler);
 
-		void BindTexture(Textures::T textureIndex, const crgfx::ITexture* texture, crgfx::TextureView view = crgfx::TextureView());
+		void BindTexture(Textures::T textureIndex, const ITexture* texture, TextureView view = TextureView());
 
-		void BindRWTexture(RWTextures::T rwTextureIndex, const crgfx::ITexture* texture, uint32_t mip);
+		void BindRWTexture(RWTextures::T rwTextureIndex, const ITexture* texture, uint32_t mip);
 
 		// Storage Buffers
 

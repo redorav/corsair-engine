@@ -61,7 +61,7 @@ public:
 		return m_materials[meshIndex];
 	}
 
-	const CrGraphicsPipelineHandle& GetPipeline(uint32_t meshIndex, CrMaterialPipelineVariant::T pipelineVariant) const
+	const crgfx::CrGraphicsPipelineHandle& GetPipeline(uint32_t meshIndex, CrMaterialPipelineVariant::T pipelineVariant) const
 	{
 		return m_pipelines[meshIndex][pipelineVariant];
 	}
@@ -90,5 +90,5 @@ private:
 
 	crstl::vector<CrMaterialHandle> m_materials;
 
-	crstl::vector<crstl::array<CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
+	crstl::vector<crstl::array<crgfx::CrGraphicsPipelineHandle, CrMaterialPipelineVariant::Count>> m_pipelines;
 };

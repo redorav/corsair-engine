@@ -18,33 +18,33 @@ public:
 
 	static void Deinitialize();
 
-	CrGraphicsPipelineHandle GetGraphicsPipeline
+	crgfx::CrGraphicsPipelineHandle GetGraphicsPipeline
 	(
-		const CrGraphicsPipelineDescriptor& graphicsPipelineDescriptor,
+		const crgfx::CrGraphicsPipelineDescriptor& graphicsPipelineDescriptor,
 		const CrVertexDescriptor& vertexDescriptor,
 		CrBuiltinShaders::T vertexShader,
 		CrBuiltinShaders::T pixelShader
 	);
 
-	CrComputePipelineHandle GetComputePipeline(CrBuiltinCompute::T computeShader);
+	crgfx::CrComputePipelineHandle GetComputePipeline(CrBuiltinCompute::T computeShader);
 
 	void RecompileBuiltinPipelines();
 
 	// Ubershader builtin pipelines
 
-	CrGraphicsPipelineHandle BasicUbershaderForward;
+	crgfx::CrGraphicsPipelineHandle BasicUbershaderForward;
 
-	CrGraphicsPipelineHandle BasicUbershaderGBuffer;
+	crgfx::CrGraphicsPipelineHandle BasicUbershaderGBuffer;
 
-	CrGraphicsPipelineHandle BasicUbershaderDebug;
+	crgfx::CrGraphicsPipelineHandle BasicUbershaderDebug;
 
 private:
 
 	CrBuiltinPipelines();
 
-	crstl::open_hashmap<uint64_t, CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
+	crstl::open_hashmap<uint64_t, crgfx::CrGraphicsPipelineHandle> m_builtinGraphicsPipelines;
 
-	crstl::open_hashmap<uint64_t, CrComputePipelineHandle> m_builtinComputePipelines;
+	crstl::open_hashmap<uint64_t, crgfx::CrComputePipelineHandle> m_builtinComputePipelines;
 };
 
 extern CrBuiltinPipelines* BuiltinPipelines;

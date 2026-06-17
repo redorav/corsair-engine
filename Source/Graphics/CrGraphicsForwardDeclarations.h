@@ -104,18 +104,18 @@ namespace crgfx
 	// Shader Bytecode
 	class ShaderBytecode;
 	using ShaderBytecodeHandle = crstl::intrusive_ptr<ShaderBytecode>;
+
+	class ICrGraphicsPipeline;
+	using CrGraphicsPipelineHandle = crstl::intrusive_ptr<ICrGraphicsPipeline>;
+	struct CrGraphicsPipelineDescriptor;
+
+	class ICrComputePipeline;
+	using CrComputePipelineHandle = crstl::intrusive_ptr<ICrComputePipeline>;
+	struct CrComputePipelineDescriptor;
 };
 
 using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
 class CrGPUTimingQueryTracker;
-
-class ICrGraphicsPipeline;
-using CrGraphicsPipelineHandle = crstl::intrusive_ptr<ICrGraphicsPipeline>;
-struct CrGraphicsPipelineDescriptor;
-
-class ICrComputePipeline;
-using CrComputePipelineHandle = crstl::intrusive_ptr<ICrComputePipeline>;
-struct CrComputePipelineDescriptor;
 
 struct CrShaderReflectionHeader;
 

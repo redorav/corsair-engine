@@ -11,6 +11,10 @@
 #include "crstl/array.h"
 #include "crstl/intrusive_ptr.h"
 
+namespace CrBuiltinShaders { enum T : uint32_t; }
+
+namespace CrBuiltinCompute { enum T : uint32_t; }
+
 namespace crgfx
 {
 	struct CrRasterizerStateDescriptor
@@ -156,156 +160,152 @@ namespace crgfx
 	};
 
 	static_assert(sizeof(CrRenderTargetFormatDescriptor) == 40, "CrRenderTargetFormatDescriptor size mismatch");
-};
 
-// TODO Optimize size of pipeline descriptor
-struct CrGraphicsPipelineDescriptor
-{
-	CrGraphicsPipelineDescriptor()
+	// TODO Optimize size of pipeline descriptor
+	struct CrGraphicsPipelineDescriptor
 	{
-		primitiveTopology = crgfx::PrimitiveTopology::TriangleList;
-		sampleCount = crgfx::SampleCount::S1;
+		CrGraphicsPipelineDescriptor()
+		{
+			primitiveTopology = crgfx::PrimitiveTopology::TriangleList;
+			sampleCount = crgfx::SampleCount::S1;
 
-		rasterizerState.fillMode = crgfx::PolygonFillMode::Fill;
-		rasterizerState.frontFace = crgfx::FrontFace::Clockwise;
-		rasterizerState.cullMode = crgfx::PolygonCullMode::Back;
-		rasterizerState.depthClipEnable = true;
+			rasterizerState.fillMode = crgfx::PolygonFillMode::Fill;
+			rasterizerState.frontFace = crgfx::FrontFace::Clockwise;
+			rasterizerState.cullMode = crgfx::PolygonCullMode::Back;
+			rasterizerState.depthClipEnable = true;
 
-		padding = 0;
+			padding = 0;
 
-		// Don't put a loop here to initialize the color write masks
-		blendState.renderTargetBlends[0].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[1].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[2].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[3].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[4].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[5].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[6].colorWriteMask = crgfx::ColorWriteComponent::All;
-		blendState.renderTargetBlends[7].colorWriteMask = crgfx::ColorWriteComponent::All;
+			// Don't put a loop here to initialize the color write masks
+			blendState.renderTargetBlends[0].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[1].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[2].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[3].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[4].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[5].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[6].colorWriteMask = crgfx::ColorWriteComponent::All;
+			blendState.renderTargetBlends[7].colorWriteMask = crgfx::ColorWriteComponent::All;
 
-		depthStencilState.depthTestEnable = true;
-		depthStencilState.depthWriteEnable = true;
-		depthStencilState.depthCompareOp = crgfx::CompareOp::Greater; // Reverse depth by default
-	}
+			depthStencilState.depthTestEnable = true;
+			depthStencilState.depthWriteEnable = true;
+			depthStencilState.depthCompareOp = crgfx::CompareOp::Greater; // Reverse depth by default
+		}
 
-	CrHash ComputeHash() const
+		CrHash ComputeHash() const
+		{
+			return CrHash(this, sizeof(*this));
+		}
+
+		crgfx::PrimitiveTopology        primitiveTopology : 4;
+		crgfx::SampleCount              sampleCount : 4;
+		uint32_t                       padding : 24;
+
+		crgfx::CrRasterizerStateDescriptor    rasterizerState = {};
+		crgfx::CrBlendStateDescriptor         blendState = {};
+		crgfx::CrDepthStencilStateDescriptor  depthStencilState = {};
+		crgfx::CrRenderTargetFormatDescriptor renderTargets = {};
+	};
+
+	static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
+
+	class ICrGraphicsPipeline : public CrGPUAutoDeletable
 	{
-		return CrHash(this, sizeof(*this));
-	}
+	public:
 
-	crgfx::PrimitiveTopology        primitiveTopology : 4;
-	crgfx::SampleCount              sampleCount : 4;
-	uint32_t                       padding : 24;
+		ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
 
-	crgfx::CrRasterizerStateDescriptor    rasterizerState = {};
-	crgfx::CrBlendStateDescriptor         blendState = {};
-	crgfx::CrDepthStencilStateDescriptor  depthStencilState = {};
-	crgfx::CrRenderTargetFormatDescriptor renderTargets = {};
+		virtual ~ICrGraphicsPipeline();
+
+		const crgfx::CrGraphicsShaderHandle& GetShader() const { return m_shader; }
+
+		uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
+
+	private:
+
+		crgfx::CrGraphicsShaderHandle m_shader;
+
+		uint32_t m_usedVertexStreamCount = 0;
+
+#if !defined(CR_CONFIG_FINAL)
+
+	public:
+
+		void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader);
+
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) = 0;
+
+		CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
+
+		CrBuiltinShaders::T GetPixelShaderIndex() const { return m_pixelShaderIndex; }
+
+		void SetShaderIndices(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex)
+		{
+			m_vertexShaderIndex = vertexShaderIndex;
+			m_pixelShaderIndex = pixelShaderIndex;
+		}
+
+	protected:
+
+		CrGraphicsPipelineDescriptor m_pipelineDescriptor;
+
+		CrVertexDescriptor m_vertexDescriptor;
+
+		CrBuiltinShaders::T m_vertexShaderIndex = (CrBuiltinShaders::T)-1;
+
+		CrBuiltinShaders::T m_pixelShaderIndex = (CrBuiltinShaders::T)-1;
+
+#endif
+	};
+
+	class ICrComputePipeline : public CrGPUAutoDeletable
+	{
+	public:
+
+		ICrComputePipeline(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+
+		virtual ~ICrComputePipeline();
+
+		const crgfx::CrComputeShaderHandle& GetShader() const { return m_shader; }
+
+		uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
+
+		uint32_t GetGroupSizeY() const { return m_threadGroupSizeY; }
+
+		uint32_t GetGroupSizeZ() const { return m_threadGroupSizeZ; }
+
+	private:
+
+		uint32_t m_threadGroupSizeX;
+
+		uint32_t m_threadGroupSizeY;
+
+		uint32_t m_threadGroupSizeZ;
+
+		crgfx::CrComputeShaderHandle m_shader;
+
+#if !defined(CR_CONFIG_FINAL)
+
+	public:
+
+		void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
+
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) = 0;
+
+		CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
+
+		void SetComputeShaderIndex(CrBuiltinCompute::T computeShaderIndex) { m_computeShaderIndex = computeShaderIndex; }
+
+	private:
+
+		CrBuiltinCompute::T m_computeShaderIndex = (CrBuiltinCompute::T)-1;
+
+#endif
+	};
 };
-
-static_assert(sizeof(CrGraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
 // TODO Move to common graphics resources
 namespace CrStandardPipelineStates
 {
 	extern crgfx::CrRenderTargetBlendDescriptor OpaqueBlend;
 	extern crgfx::CrRenderTargetBlendDescriptor AlphaBlend;
-};
-
-namespace CrBuiltinShaders { enum T : uint32_t; }
-
-namespace CrBuiltinCompute { enum T : uint32_t; }
-
-class ICrGraphicsPipeline : public CrGPUAutoDeletable
-{
-public:
-
-	ICrGraphicsPipeline(crgfx::IDevice* renderDevice, const CrGraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::CrGraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
-
-	virtual ~ICrGraphicsPipeline();
-
-	const crgfx::CrGraphicsShaderHandle& GetShader() const { return m_shader; }
-
-	uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
-
-private:
-
-	crgfx::CrGraphicsShaderHandle m_shader;
-	
-	uint32_t m_usedVertexStreamCount = 0;
-
-#if !defined(CR_CONFIG_FINAL)
-
-public:
-
-	void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader);
-
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrGraphicsShaderHandle& graphicsShader) = 0;
-
-	CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
-
-	CrBuiltinShaders::T GetPixelShaderIndex() const { return m_pixelShaderIndex; }
-
-	void SetShaderIndices(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex)
-	{
-		m_vertexShaderIndex = vertexShaderIndex;
-		m_pixelShaderIndex = pixelShaderIndex;
-	}
-
-protected:
-
-	CrGraphicsPipelineDescriptor m_pipelineDescriptor;
-
-	CrVertexDescriptor m_vertexDescriptor;
-
-	CrBuiltinShaders::T m_vertexShaderIndex = (CrBuiltinShaders::T)-1;
-
-	CrBuiltinShaders::T m_pixelShaderIndex = (CrBuiltinShaders::T)-1;
-
-#endif
-};
-
-class ICrComputePipeline : public CrGPUAutoDeletable
-{
-public:
-
-	ICrComputePipeline(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
-
-	virtual ~ICrComputePipeline();
-
-	const crgfx::CrComputeShaderHandle& GetShader() const { return m_shader; }
-
-	uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
-
-	uint32_t GetGroupSizeY() const { return m_threadGroupSizeY; }
-
-	uint32_t GetGroupSizeZ() const { return m_threadGroupSizeZ; }
-
-private:
-
-	uint32_t m_threadGroupSizeX;
-
-	uint32_t m_threadGroupSizeY;
-
-	uint32_t m_threadGroupSizeZ;
-
-	crgfx::CrComputeShaderHandle m_shader;
-
-#if !defined(CR_CONFIG_FINAL)
-
-public:
-
-	void Recompile(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader);
-
-	virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::CrComputeShaderHandle& computeShader) = 0;
-
-	CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
-	
-	void SetComputeShaderIndex(CrBuiltinCompute::T computeShaderIndex) { m_computeShaderIndex = computeShaderIndex; }
-
-private:
-
-	CrBuiltinCompute::T m_computeShaderIndex = (CrBuiltinCompute::T)-1;
-
-#endif
 };

@@ -104,8 +104,6 @@ namespace crgfx
 	// Shader Bytecode
 	class ShaderBytecode;
 	using ShaderBytecodeHandle = crstl::intrusive_ptr<ShaderBytecode>;
-	struct CrShaderCompilationDescriptor;
-	struct CrShaderBytecodeCompilationDescriptor;
 };
 
 using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;

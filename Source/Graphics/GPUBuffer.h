@@ -302,7 +302,7 @@ namespace crgfx
 	{
 	public:
 
-		VertexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+		VertexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, const VertexDescriptor& vertexDescriptor, uint32_t numVertices)
 			: GPUBuffer(renderDevice, GPUBufferDescriptor(
 				crgfx::BufferUsage::Vertex | (access == crgfx::MemoryAccess::GPUOnlyRead ? crgfx::BufferUsage::TransferDst : crgfx::BufferUsage::None),
 				access), numVertices, vertexDescriptor.GetDataSize())
@@ -310,11 +310,11 @@ namespace crgfx
 		{
 		}
 
-		const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
+		const VertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
 
 	private:
 
-		CrVertexDescriptor m_vertexDescriptor;
+		VertexDescriptor m_vertexDescriptor;
 	};
 
 	//-------------

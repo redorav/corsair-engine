@@ -100,7 +100,7 @@ namespace crgfx
 					if (interfaceVariable.type == crgfx::ShaderInterfaceBuiltinType::None)
 					{
 						VertexInput& input = m_inputSignature.inputs.push_back();
-						input.semantic = CrVertexSemantic::FromString(interfaceVariable.name.c_str());
+						input.semantic = VertexSemantic::FromString(interfaceVariable.name.c_str());
 					}
 				}
 			}

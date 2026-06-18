@@ -83,7 +83,7 @@ namespace crgfx
 
 		virtual crgfx::ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) override;
 
-		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) override;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor) override;
 
 		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) override;
 

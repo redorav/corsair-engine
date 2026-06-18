@@ -212,7 +212,7 @@ namespace crgfx
 	{
 	public:
 
-		IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
 
 		virtual ~IGraphicsPipeline();
 
@@ -248,7 +248,7 @@ namespace crgfx
 
 		GraphicsPipelineDescriptor m_pipelineDescriptor;
 
-		CrVertexDescriptor m_vertexDescriptor;
+		VertexDescriptor m_vertexDescriptor;
 
 		CrBuiltinShaders::T m_vertexShaderIndex = (CrBuiltinShaders::T)-1;
 

@@ -8,14 +8,14 @@ namespace crgfx
 	GraphicsPipelineVulkan::GraphicsPipelineVulkan
 	(
 		crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
 	)
 		: IGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 	{
 		Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 		inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -220,7 +220,7 @@ namespace crgfx
 		uint32_t streamId = 0;
 		for (uint32_t i = 0; i < attributeCount; ++i)
 		{
-			const CrVertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
+			const VertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
 			const crgfx::DataFormatInfo& vertexFormatInfo = crgfx::DataFormats[vertexAttribute.format];
 			attributeDescriptions[i].binding = vertexAttribute.streamId;
 			attributeDescriptions[i].location = i; // We assume attributes come in the order the shader expects them

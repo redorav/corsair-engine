@@ -727,7 +727,7 @@ namespace crgfx
 	(
 		const GraphicsPipelineDescriptor& pipelineDescriptor,
 		const GraphicsShaderHandle& graphicsShader,
-		const CrVertexDescriptor& vertexDescriptor
+		const VertexDescriptor& vertexDescriptor
 	)
 	{
 		return new GraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);

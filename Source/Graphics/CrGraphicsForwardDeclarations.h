@@ -48,7 +48,6 @@ namespace crgfx
 	enum class VertexInputRate : uint32_t;
 
 	enum class QueryType : uint32_t;
-	enum class CameraProjection : uint32_t;
 
 	struct TextureState;
 
@@ -135,6 +134,9 @@ namespace crgfx
 	class TypedBuffer;
 	using TypedBufferHandle = crstl::intrusive_ptr<TypedBuffer>;
 
+	namespace VertexSemantic { enum T : uint32_t; }
+	struct VertexDescriptor;
+
 	typedef crstl::fixed_function<128, void(const HardwareGPUBufferHandle&)> GPUTransferCallback;
 };
 
@@ -144,9 +146,6 @@ using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
 class CrGPUTimingQueryTracker;
 
 struct CrShaderReflectionHeader;
-
-namespace CrVertexSemantic { enum T : uint32_t; }
-struct CrVertexDescriptor;
 
 // Visibility
 struct CrBoundingBox;

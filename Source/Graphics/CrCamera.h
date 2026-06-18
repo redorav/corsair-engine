@@ -6,6 +6,12 @@
 
 #include "crstl/intrusive_ptr.h"
 
+enum class CameraProjection : uint32_t
+{
+	Orthographic,
+	Perspective
+};
+
 // TODO Remove the CrEntity hierarchy. This is the engine object
 class CrCamera final : public CrEntity, public crstl::intrusive_ptr_interface_delete
 {
@@ -13,7 +19,7 @@ public:
 
 	struct ProjectionParams
 	{
-		crgfx::CameraProjection projection;
+		CameraProjection projection;
 		float nearPlane;
 
 		float farPlane;
@@ -91,7 +97,7 @@ public:
 
 private:
 
-	crgfx::CameraProjection m_projection;
+	CameraProjection m_projection;
 
 	float m_nearPlaneWidth;
 

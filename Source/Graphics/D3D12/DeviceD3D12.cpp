@@ -439,7 +439,7 @@ namespace crgfx
 
 	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
 	(
-		const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
 	)
 	{
 		return new GraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);

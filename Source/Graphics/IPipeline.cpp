@@ -30,7 +30,7 @@ crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 
 namespace crgfx
 {
-	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 		: CrGPUAutoDeletable(renderDevice)
 		, m_shader(graphicsShader)
 #if !defined(CR_CONFIG_FINAL)

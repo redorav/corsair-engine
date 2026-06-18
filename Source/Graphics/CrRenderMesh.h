@@ -13,7 +13,7 @@ public:
 
 	~CrRenderMesh();
 
-	const CrVertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
+	const crgfx::VertexDescriptor& GetVertexDescriptor() const { return m_vertexDescriptor; }
 
 	void AddVertexBuffer(const crgfx::VertexBufferHandle& vertexBuffer);
 
@@ -41,7 +41,7 @@ private:
 
 	crstl::vector<crgfx::VertexBufferHandle> m_vertexBuffers;
 
-	CrVertexDescriptor m_vertexDescriptor;
+	crgfx::VertexDescriptor m_vertexDescriptor;
 
 	crgfx::IndexBufferHandle m_indexBuffer;
 

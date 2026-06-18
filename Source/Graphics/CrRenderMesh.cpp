@@ -35,15 +35,15 @@ void CrRenderMesh::SetIndexBuffer(const crgfx::IndexBufferHandle& indexBuffer)
 
 void CrRenderMesh::MergeVertexDescriptors()
 {
-	m_vertexDescriptor = CrVertexDescriptor();
+	m_vertexDescriptor = crgfx::VertexDescriptor();
 
 	for (uint32_t streamId = 0; streamId < m_vertexBuffers.size(); ++streamId)
 	{
-		const CrVertexDescriptor& vertexBufferDescriptor = m_vertexBuffers[streamId]->GetVertexDescriptor();
+		const crgfx::VertexDescriptor& vertexBufferDescriptor = m_vertexBuffers[streamId]->GetVertexDescriptor();
 
 		for (uint32_t i = 0; i < vertexBufferDescriptor.GetAttributeCount(); ++i)
 		{
-			CrVertexAttribute attribute = vertexBufferDescriptor.GetAttribute(i);
+			crgfx::VertexAttribute attribute = vertexBufferDescriptor.GetAttribute(i);
 			attribute.streamId = streamId;
 			m_vertexDescriptor.AddAttribute(attribute);
 		}

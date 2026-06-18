@@ -21,7 +21,7 @@ public:
 	crgfx::GraphicsPipelineHandle GetGraphicsPipeline
 	(
 		const crgfx::GraphicsPipelineDescriptor& graphicsPipelineDescriptor,
-		const CrVertexDescriptor& vertexDescriptor,
+		const crgfx::VertexDescriptor& vertexDescriptor,
 		CrBuiltinShaders::T vertexShader,
 		CrBuiltinShaders::T pixelShader
 	);

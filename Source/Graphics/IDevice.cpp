@@ -155,7 +155,7 @@ namespace crgfx
 		return CreateComputeShaderPS(computeShaderDescriptor);
 	}
 
-	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
 		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
 		CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
@@ -285,7 +285,7 @@ namespace crgfx
 		return CreateTexturePS(descriptor);
 	}
 
-	VertexBuffer* IDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+	VertexBuffer* IDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const VertexDescriptor& vertexDescriptor, uint32_t numVertices)
 	{
 		return new VertexBuffer(this, access, vertexDescriptor, numVertices);
 	}

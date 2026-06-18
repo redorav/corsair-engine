@@ -12,208 +12,212 @@
 
 #include "Math/CrVectorT.h"
 
-// These are the vertex semantics that we can use. They need to mirror the vertex semantics
-// in the shader
-// TODO It would be good to have a shared file that has the names
-namespace CrVertexSemantic
+namespace crgfx
 {
-	enum T : uint32_t
+	// These are the vertex semantics that we can use. They need to mirror the vertex semantics
+	// in the shader
+	// TODO It would be good to have a shared file that has the names
+	namespace VertexSemantic
 	{
-		Position,
-		Normal,
-		Tangent,
-		Color,
-		TexCoord0,
-		Count
-	};
-
-	struct Data
-	{
-		Data() {}
-		Data(CrVertexSemantic::T semantic, const char* name);
-
-		CrVertexSemantic::T semantic;
-		crstl::string semanticName;
-		
-		uint32_t index; // Which index this semantic has
-		uint32_t indexOffset; // Where in the string the first digit is
-	};
-
-	extern crstl::array<Data, CrVertexSemantic::Count> VertexSemanticData;
-
-	bool CreateVertexSemanticData();
-
-	inline const Data& GetData(T semantic)
-	{
-		return VertexSemanticData[semantic];
-	}
-
-	inline const char* ToString(T semantic)
-	{
-		return VertexSemanticData[semantic].semanticName.c_str();
-	}
-
-	inline CrVertexSemantic::T FromString(const char* semanticString)
-	{
-		if (semanticString)
+		enum T : uint32_t
 		{
-			for (uint32_t s = 0; s < VertexSemanticData.size(); ++s)
+			Position,
+			Normal,
+			Tangent,
+			Color,
+			TexCoord0,
+			Count
+		};
+
+		struct Data
+		{
+			Data() {}
+			Data(VertexSemantic::T semantic, const char* name);
+
+			VertexSemantic::T semantic;
+			crstl::string semanticName;
+
+			uint32_t index; // Which index this semantic has
+			uint32_t indexOffset; // Where in the string the first digit is
+		};
+
+		extern crstl::array<Data, VertexSemantic::Count> VertexSemanticData;
+
+		bool CreateVertexSemanticData();
+
+		inline const Data& GetData(T semantic)
+		{
+			return VertexSemanticData[semantic];
+		}
+
+		inline const char* ToString(T semantic)
+		{
+			return VertexSemanticData[semantic].semanticName.c_str();
+		}
+
+		inline VertexSemantic::T FromString(const char* semanticString)
+		{
+			if (semanticString)
 			{
-				if (VertexSemanticData[s].semanticName == semanticString)
+				for (uint32_t s = 0; s < VertexSemanticData.size(); ++s)
 				{
-					return (CrVertexSemantic::T)s;
+					if (VertexSemanticData[s].semanticName == semanticString)
+					{
+						return (VertexSemantic::T)s;
+					}
 				}
 			}
+
+			return VertexSemantic::Count;
+		}
+	};
+
+	template<typename T, crgfx::DataFormat::T F>
+	class VertexElement
+	{
+	public:
+
+		VertexElement()
+		{
+			StaticAsserts();
 		}
 
-		return CrVertexSemantic::Count;
-	}
-};
-
-template<typename T, crgfx::DataFormat::T F>
-class CrVertexElement
-{
-public:
-
-	CrVertexElement()
-	{
-		StaticAsserts();
-	}
-
-	CrVertexElement(std::initializer_list<T> l) : data(l)
-	{
-		StaticAsserts();
-	}
-
-	static crgfx::DataFormat::T GetFormat()
-	{
-		return F;
-	}
-
-	uint32_t GetDataSize()
-	{
-		return sizeof(data);
-	}
-
-	VectorT<T, crgfx::DataFormats[F].numComponents> data;
-
-private:
-
-	void StaticAsserts()
-	{
-		static_assert(crgfx::CrTypeName<T>() == crgfx::DataFormats[F].name, "Type does not match");
-		static_assert(F == crgfx::DataFormats[F].format, "Vertex format is in an incorrect position with respect to the enum"); // Do not compile if the order in the array does not match the order in the enum
-		static_assert(sizeof(T) == crgfx::DataFormats[F].elementSizeR / 8, "Data type size does not match");
-	}
-};
-
-struct CrVertexAttribute
-{
-	CrVertexAttribute() : semantic(0), format(0), streamId(0) {}
-
-	CrVertexAttribute(CrVertexSemantic::T semantic, crgfx::DataFormat::T format, uint32_t streamId)
-		: semantic((uint16_t)semantic), format((uint16_t)format), streamId((uint16_t)streamId) {}
-
-	uint16_t semantic : 4; // CrVertexSemantic::T
-	uint16_t format   : 6; // cr3d::DataFormat::T - we only care for the uncompressed formats
-	uint16_t streamId : 3;
-};
-
-static_assert(sizeof(CrVertexAttribute) == 2, "Vertex attribute size mismatch");
-static_assert(crgfx::DataFormat::LastUncompressed < 64, "Formats out of range");
-
-// A vertex format defines the layout for a vertex buffer or a mesh
-// If it is owned by a vertex buffer, streamId is always 0
-// If it is owned by a mesh, stream id belongs to the stream we've
-// decided to put it in. The input layout of a pipeline will need
-// to mirror this layout exactly when instantiated and the mesh
-// will have to bind the necessary data
-struct CrVertexDescriptor
-{
-	CrVertexDescriptor() {}
-
-	CrVertexDescriptor(const std::initializer_list<CrVertexAttribute>& vertexAttributes)
-	{
-		auto it = vertexAttributes.begin();
-		while (it != vertexAttributes.end())
+		VertexElement(std::initializer_list<T> l) : data(l)
 		{
-			AddAttribute(*it);
-			++it;
+			StaticAsserts();
 		}
-	}
 
-	void AddAttribute(const CrVertexAttribute& attribute)
-	{
-		m_dataSize += (uint16_t)crgfx::DataFormats[attribute.format].dataOrBlockSize;
-		m_streamMask.set(attribute.streamId);
-		m_attributes[m_attributeCount] = attribute;
-		m_attributeCount++;
-	}
-
-	const CrVertexAttribute& GetAttribute(uint32_t attributeIndex) const
-	{
-		//CrAssertMsg(i < m_attributeCount, "Index out of bounds");
-		return m_attributes[attributeIndex];
-	}
-
-	uint32_t GetAttributeCount() const
-	{
-		return m_attributeCount;
-	}
-
-	const crgfx::DataFormatInfo& GetDataFormatInfo(uint32_t attributeIndex)
-	{
-		return crgfx::DataFormats[GetAttribute(attributeIndex).format];
-	}
-
-	uint32_t GetStreamCount() const
-	{
-		return (uint32_t)m_streamMask.count();
-	}
-
-	uint32_t GetStreamStride(uint32_t streamId) const
-	{
-		uint32_t stride = 0;
-		for (uint32_t i = 0; i < m_attributeCount; ++i)
+		static crgfx::DataFormat::T GetFormat()
 		{
-			if (m_attributes[i].streamId == streamId)
+			return F;
+		}
+
+		uint32_t GetDataSize()
+		{
+			return sizeof(data);
+		}
+
+		VectorT<T, crgfx::DataFormats[F].numComponents> data;
+
+	private:
+
+		void StaticAsserts()
+		{
+			static_assert(crgfx::CrTypeName<T>() == crgfx::DataFormats[F].name, "Type does not match");
+			static_assert(F == crgfx::DataFormats[F].format, "Vertex format is in an incorrect position with respect to the enum"); // Do not compile if the order in the array does not match the order in the enum
+			static_assert(sizeof(T) == crgfx::DataFormats[F].elementSizeR / 8, "Data type size does not match");
+		}
+	};
+
+	struct VertexAttribute
+	{
+		VertexAttribute() : semantic(0), format(0), streamId(0) {}
+
+		VertexAttribute(VertexSemantic::T semantic, crgfx::DataFormat::T format, uint32_t streamId)
+			: semantic((uint16_t)semantic), format((uint16_t)format), streamId((uint16_t)streamId) {
+		}
+
+		uint16_t semantic : 4; // CrVertexSemantic::T
+		uint16_t format : 6; // cr3d::DataFormat::T - we only care for the uncompressed formats
+		uint16_t streamId : 3;
+	};
+
+	static_assert(sizeof(VertexAttribute) == 2, "Vertex attribute size mismatch");
+	static_assert(crgfx::DataFormat::LastUncompressed < 64, "Formats out of range");
+
+	// A vertex format defines the layout for a vertex buffer or a mesh
+	// If it is owned by a vertex buffer, streamId is always 0
+	// If it is owned by a mesh, stream id belongs to the stream we've
+	// decided to put it in. The input layout of a pipeline will need
+	// to mirror this layout exactly when instantiated and the mesh
+	// will have to bind the necessary data
+	struct VertexDescriptor
+	{
+		VertexDescriptor() {}
+
+		VertexDescriptor(const std::initializer_list<VertexAttribute>& vertexAttributes)
+		{
+			auto it = vertexAttributes.begin();
+			while (it != vertexAttributes.end())
 			{
-				stride += crgfx::DataFormats[m_attributes[i].format].dataOrBlockSize;
+				AddAttribute(*it);
+				++it;
 			}
 		}
 
-		return stride;
-	}
+		void AddAttribute(const VertexAttribute& attribute)
+		{
+			m_dataSize += (uint16_t)crgfx::DataFormats[attribute.format].dataOrBlockSize;
+			m_streamMask.set(attribute.streamId);
+			m_attributes[m_attributeCount] = attribute;
+			m_attributeCount++;
+		}
 
-	crgfx::VertexInputRate GetInputRate(uint32_t streamId) const
-	{
-		return (crgfx::VertexInputRate)m_inputRates[streamId];
-	}
+		const VertexAttribute& GetAttribute(uint32_t attributeIndex) const
+		{
+			//CrAssertMsg(i < m_attributeCount, "Index out of bounds");
+			return m_attributes[attributeIndex];
+		}
 
-	uint32_t GetDataSize() const
-	{
-		return m_dataSize;
-	}
+		uint32_t GetAttributeCount() const
+		{
+			return m_attributeCount;
+		}
 
-	CrHash ComputeHash() const
-	{
-		return CrHash(*this);
-	}
+		const crgfx::DataFormatInfo& GetDataFormatInfo(uint32_t attributeIndex)
+		{
+			return crgfx::DataFormats[GetAttribute(attributeIndex).format];
+		}
 
-private:
+		uint32_t GetStreamCount() const
+		{
+			return (uint32_t)m_streamMask.count();
+		}
 
-	// Attributes
-	crstl::array<CrVertexAttribute, crgfx::MaxVertexAttributes> m_attributes;
+		uint32_t GetStreamStride(uint32_t streamId) const
+		{
+			uint32_t stride = 0;
+			for (uint32_t i = 0; i < m_attributeCount; ++i)
+			{
+				if (m_attributes[i].streamId == streamId)
+				{
+					stride += crgfx::DataFormats[m_attributes[i].format].dataOrBlockSize;
+				}
+			}
 
-	// Indicates which streams are being used
-	crstl::bitset<crgfx::MaxVertexStreams, uint16_t> m_streamMask;
-	
-	// Indicate which input rates are used (0 - vertex, 1 - instance)
-	crstl::bitset<crgfx::MaxVertexStreams, uint16_t> m_inputRates;
+			return stride;
+		}
 
-	// Total number of attributes
-	uint16_t m_attributeCount = 0;
+		crgfx::VertexInputRate GetInputRate(uint32_t streamId) const
+		{
+			return (crgfx::VertexInputRate)m_inputRates[streamId];
+		}
 
-	// Total data size of this vertex
-	uint16_t m_dataSize = 0;
+		uint32_t GetDataSize() const
+		{
+			return m_dataSize;
+		}
+
+		CrHash ComputeHash() const
+		{
+			return CrHash(*this);
+		}
+
+	private:
+
+		// Attributes
+		crstl::array<VertexAttribute, crgfx::MaxVertexAttributes> m_attributes;
+
+		// Indicates which streams are being used
+		crstl::bitset<crgfx::MaxVertexStreams, uint16_t> m_streamMask;
+
+		// Indicate which input rates are used (0 - vertex, 1 - instance)
+		crstl::bitset<crgfx::MaxVertexStreams, uint16_t> m_inputRates;
+
+		// Total number of attributes
+		uint16_t m_attributeCount = 0;
+
+		// Total data size of this vertex
+		uint16_t m_dataSize = 0;
+	};
 };

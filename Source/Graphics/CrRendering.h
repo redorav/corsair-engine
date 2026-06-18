@@ -499,12 +499,6 @@ namespace crgfx
 		PipelineStats // Use to measure stats in the pipeline
 	};
 
-	enum class CameraProjection : uint32_t
-	{
-		Orthographic,
-		Perspective
-	};
-
 	namespace BufferUsage
 	{
 		enum T : uint32_t

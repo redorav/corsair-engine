@@ -141,7 +141,7 @@ namespace crgfx
 
 		crgfx::ITexture* CreateTexture(const crgfx::TextureDescriptor& descriptor);
 
-		VertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+		VertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const VertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 		template<typename Metadata>
 		StructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
@@ -152,7 +152,7 @@ namespace crgfx
 
 		IComputeShader* CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor);
 
-		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor);
+		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
 
 		ComputePipelineHandle CreateComputePipeline(const ComputeShaderHandle& computeShader);
 
@@ -227,7 +227,7 @@ namespace crgfx
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 
-		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& psoDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor) = 0;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& psoDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor) = 0;
 
 		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) = 0;
 

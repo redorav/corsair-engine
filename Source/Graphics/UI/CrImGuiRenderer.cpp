@@ -35,16 +35,16 @@
 // Based on ImDrawVert
 struct UIVertex
 {
-	CrVertexElement<float, crgfx::DataFormat::RG32_Float> position;
-	CrVertexElement<float, crgfx::DataFormat::RG32_Float> uv;
-	CrVertexElement<uint8_t, crgfx::DataFormat::RGBA8_Unorm> color;
+	crgfx::VertexElement<float, crgfx::DataFormat::RG32_Float> position;
+	crgfx::VertexElement<float, crgfx::DataFormat::RG32_Float> uv;
+	crgfx::VertexElement<uint8_t, crgfx::DataFormat::RGBA8_Unorm> color;
 };
 
-CrVertexDescriptor UIVertexDescriptor =
+crgfx::VertexDescriptor UIVertexDescriptor =
 {
-	CrVertexAttribute(CrVertexSemantic::Position, crgfx::DataFormat::RG32_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::TexCoord0, crgfx::DataFormat::RG32_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Position, crgfx::DataFormat::RG32_Float, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::TexCoord0, crgfx::DataFormat::RG32_Float, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
 };
 
 float4x4 ComputeProjectionMatrix(ImDrawData* data)

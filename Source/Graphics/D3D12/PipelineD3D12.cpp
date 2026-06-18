@@ -14,14 +14,14 @@ namespace crgfx
 	GraphicsPipelineD3D12::GraphicsPipelineD3D12
 	(
 		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor
+		const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
 	)
 		: IGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
 	{
 		Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
-	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const CrVertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
@@ -163,8 +163,8 @@ namespace crgfx
 		for (uint32_t i = 0; i < vertexDescriptor.GetAttributeCount(); ++i)
 		{
 			D3D12_INPUT_ELEMENT_DESC& inputElementDescriptor = inputElementDescriptors[i];
-			const CrVertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
-			const CrVertexSemantic::Data& semanticData = CrVertexSemantic::GetData((CrVertexSemantic::T)vertexAttribute.semantic);
+			const VertexAttribute& vertexAttribute = vertexDescriptor.GetAttribute(i);
+			const VertexSemantic::Data& semanticData = VertexSemantic::GetData((VertexSemantic::T)vertexAttribute.semantic);
 
 			// D3D12 doesn't like semantics with names at the end, instead it
 			// expects the index as an integer in SemanticIndex

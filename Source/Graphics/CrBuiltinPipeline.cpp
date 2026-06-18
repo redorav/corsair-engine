@@ -52,7 +52,7 @@ CrBuiltinPipelines::CrBuiltinPipelines()
 crgfx::GraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 (
 	const crgfx::GraphicsPipelineDescriptor& graphicsPipelineDescriptor,
-	const CrVertexDescriptor& vertexDescriptor,
+	const crgfx::VertexDescriptor& vertexDescriptor,
 	CrBuiltinShaders::T vertexShaderIndex,
 	CrBuiltinShaders::T pixelShaderIndex
 )

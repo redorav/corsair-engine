@@ -2,35 +2,35 @@
 
 #include "Graphics/CrCommonVertexLayouts.h"
 
-CrVertexDescriptor SimpleVertexDescriptor
+crgfx::VertexDescriptor SimpleVertexDescriptor
 ({
-	CrVertexAttribute(CrVertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::Normal, crgfx::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 0)
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Normal, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 0)
 });
 
-CrVertexDescriptor NullVertexDescriptor({});
+crgfx::VertexDescriptor NullVertexDescriptor({});
 
-CrVertexDescriptor PositionVertexDescriptor
+crgfx::VertexDescriptor PositionVertexDescriptor
 ({
-	CrVertexAttribute(CrVertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
 });
 
-CrVertexDescriptor AdditionalVertexDescriptor
+crgfx::VertexDescriptor AdditionalVertexDescriptor
 ({
-	CrVertexAttribute(CrVertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::Normal, crgfx::DataFormat::RGBA8_Snorm, 0),
-	CrVertexAttribute(CrVertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 0),
-	CrVertexAttribute(CrVertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 0)
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Normal, crgfx::DataFormat::RGBA8_Snorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 0)
 });
 
-CrVertexDescriptor ComplexVertexDescriptor
+crgfx::VertexDescriptor ComplexVertexDescriptor
 ({
-	CrVertexAttribute(CrVertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
-	CrVertexAttribute(CrVertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 1),
-	CrVertexAttribute(CrVertexSemantic::Normal, crgfx::DataFormat::RGBA8_Unorm, 1),
-	CrVertexAttribute(CrVertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 1),
-	CrVertexAttribute(CrVertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 1)
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Position, crgfx::DataFormat::RGBA16_Float, 0),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Color, crgfx::DataFormat::RGBA8_Unorm, 1),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Normal, crgfx::DataFormat::RGBA8_Unorm, 1),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::Tangent, crgfx::DataFormat::RGBA8_Unorm, 1),
+	crgfx::VertexAttribute(crgfx::VertexSemantic::TexCoord0, crgfx::DataFormat::RG16_Float, 1)
 });

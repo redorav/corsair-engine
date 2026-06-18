@@ -17,16 +17,13 @@ namespace crgfx
 	struct HardwareGPUBufferDescriptor
 	{
 		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t size)
-			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(1), stride(size) {
-		}
+			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(1), stride(size) {}
 
 		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, uint32_t stride)
-			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(numElements), stride(stride) {
-		}
+			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(numElements), stride(stride) {}
 
 		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, crgfx::DataFormat::T dataFormat)
-			: usage(usage), access(access), dataFormat(dataFormat), numElements(numElements), stride(crgfx::DataFormats[dataFormat].dataOrBlockSize) {
-		}
+			: usage(usage), access(access), dataFormat(dataFormat), numElements(numElements), stride(crgfx::DataFormats[dataFormat].dataOrBlockSize) {}
 
 		crgfx::BufferUsage::T usage;
 

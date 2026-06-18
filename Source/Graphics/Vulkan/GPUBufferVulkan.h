@@ -14,11 +14,11 @@ namespace crgfx
 {
 	class DeviceVulkan;
 
-	class CrHardwareGPUBufferVulkan final : public ICrHardwareGPUBuffer
+	class CrHardwareGPUBufferVulkan final : public IHardwareGPUBuffer
 	{
 	public:
 
-		CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+		CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* renderDevice, const HardwareGPUBufferDescriptor& descriptor);
 
 		virtual ~CrHardwareGPUBufferVulkan() override;
 

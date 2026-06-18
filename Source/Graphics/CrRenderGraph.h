@@ -110,7 +110,7 @@ struct CrRenderGraphTextureTransitionInfo
 // How this buffer is intended to be used in this pass
 struct CrRenderGraphBufferUsage
 {
-	const crgfx::ICrHardwareGPUBuffer* buffer = nullptr;
+	const crgfx::IHardwareGPUBuffer* buffer = nullptr;
 
 	union
 	{
@@ -231,21 +231,21 @@ public:
 
 	uint32_t GetUniqueBufferId(CrHash bufferHash);
 
-	void BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
+	void BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
+	void BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
+	void BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
-	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
+	void BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages);
 
 	void Begin(const CrRenderGraphFrameParams& frameParams);
 

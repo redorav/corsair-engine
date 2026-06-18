@@ -417,7 +417,7 @@ namespace crgfx
 		return new ComputeShaderD3D12(this, computeShaderDescriptor);
 	}
 
-	ICrHardwareGPUBuffer* DeviceD3D12::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)
+	IHardwareGPUBuffer* DeviceD3D12::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)
 	{
 		return new CrHardwareGPUBufferD3D12(this, descriptor);
 	}
@@ -545,7 +545,7 @@ namespace crgfx
 		UINT64 stagingBufferSizeBytes;
 		m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, d3d12Texture->GetD3D12SubresourceCount(), 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
 
 		CrTextureUpload textureUpload;
@@ -654,11 +654,11 @@ namespace crgfx
 		m_openTextureUploads.erase(textureUploadIter);
 	}
 
-	uint8_t* DeviceD3D12::BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+	uint8_t* DeviceD3D12::BeginBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
 
 		CrBufferUpload bufferUpload;
@@ -676,7 +676,7 @@ namespace crgfx
 		return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get())->Lock();
 	}
 
-	void DeviceD3D12::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+	void DeviceD3D12::EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
 		const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
@@ -704,7 +704,7 @@ namespace crgfx
 		m_openBufferUploads.erase(bufferUploadIter);
 	}
 
-	CrHardwareGPUBufferHandle DeviceD3D12::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
+	HardwareGPUBufferHandle DeviceD3D12::DownloadBufferPS(const IHardwareGPUBuffer* sourceBuffer)
 	{
 		const CrHardwareGPUBufferD3D12* d3d12SourceBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(sourceBuffer);
 
@@ -715,8 +715,8 @@ namespace crgfx
 		UINT64 stagingBufferSizeBytes;
 		m_d3d12Device->GetCopyableFootprints(&resourceDescriptor, 0, 1, 0, nullptr, nullptr, nullptr, &stagingBufferSizeBytes);
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
-		CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
+		HardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
 
 		CommandBufferD3D12* d3d12CommandBuffer = static_cast<CommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());

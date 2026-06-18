@@ -65,7 +65,7 @@ namespace crgfx
 
 		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) override;
 
-		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor) override;
+		virtual IHardwareGPUBuffer* CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor) override;
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;
 
@@ -101,11 +101,11 @@ namespace crgfx
 
 		virtual void EndTextureUploadPS(const crgfx::ITexture* texture) override;
 
-		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
+		virtual uint8_t* BeginBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer) override;
 
-		virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) override;
+		virtual void EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer) override;
 
-		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) override;
+		virtual HardwareGPUBufferHandle DownloadBufferPS(const IHardwareGPUBuffer* sourceBuffer) override;
 
 		virtual void SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) override;
 

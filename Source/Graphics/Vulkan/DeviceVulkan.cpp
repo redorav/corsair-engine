@@ -192,7 +192,7 @@ namespace crgfx
 	{
 		uint32_t stagingBufferSizeBytes = texture->GetUsedGPUMemory();
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
 
 		CrTextureUpload textureUpload;
@@ -291,11 +291,11 @@ namespace crgfx
 		m_openTextureUploads.erase(textureUploadIter);
 	}
 
-	uint8_t* DeviceVulkan::BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+	uint8_t* DeviceVulkan::BeginBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		uint32_t stagingBufferSizeBytes = destinationBuffer->GetSizeBytes();
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
 
 		CrBufferUpload bufferUpload;
@@ -313,7 +313,7 @@ namespace crgfx
 		return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get())->Lock();
 	}
 
-	void DeviceVulkan::EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer)
+	void DeviceVulkan::EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		CrHash bufferHash(&destinationBuffer, sizeof(destinationBuffer));
 		const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
@@ -364,12 +364,12 @@ namespace crgfx
 		m_openBufferUploads.erase(bufferUploadIter);
 	}
 
-	CrHardwareGPUBufferHandle DeviceVulkan::DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer)
+	HardwareGPUBufferHandle DeviceVulkan::DownloadBufferPS(const IHardwareGPUBuffer* sourceBuffer)
 	{
 		uint32_t stagingBufferSizeBytes = sourceBuffer->GetSizeBytes();
 
-		CrHardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
-		CrHardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
+		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
+		HardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
@@ -703,7 +703,7 @@ namespace crgfx
 		return new ComputeShaderVulkan(this, computeShaderDescriptor);
 	}
 
-	ICrHardwareGPUBuffer* DeviceVulkan::CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& descriptor)
+	IHardwareGPUBuffer* DeviceVulkan::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)
 	{
 		return new CrHardwareGPUBufferVulkan(this, descriptor);
 	}

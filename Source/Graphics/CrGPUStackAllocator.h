@@ -8,7 +8,7 @@ class CrGPUStackAllocator : public CrStackAllocator
 {
 public:
 
-	CrGPUStackAllocator(crgfx::IDevice* renderDevice, const crgfx::CrHardwareGPUBufferDescriptor& descriptor);
+	CrGPUStackAllocator(crgfx::IDevice* renderDevice, const crgfx::HardwareGPUBufferDescriptor& descriptor);
 
 	~CrGPUStackAllocator();
 
@@ -16,7 +16,7 @@ public:
 
 	void End();
 
-	crgfx::ICrHardwareGPUBuffer* GetHardwareGPUBuffer() const;
+	crgfx::IHardwareGPUBuffer* GetHardwareGPUBuffer() const;
 
 	crgfx::BufferUsage::T GetUsage() const;
 
@@ -26,14 +26,14 @@ protected:
 
 	crgfx::IDevice* m_renderDevice = nullptr;
 
-	crgfx::CrHardwareGPUBufferHandle m_hardwareBuffer;
+	crgfx::HardwareGPUBufferHandle m_hardwareBuffer;
 
 	crgfx::BufferUsage::T m_bufferUsage;
 
 	crgfx::MemoryAccess::T m_bufferAccess;
 };
 
-inline crgfx::ICrHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
+inline crgfx::IHardwareGPUBuffer* CrGPUStackAllocator::GetHardwareGPUBuffer() const
 {
 	return m_hardwareBuffer.get();
 }

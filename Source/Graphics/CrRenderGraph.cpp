@@ -253,7 +253,7 @@ uint32_t CrRenderGraph::GetUniqueBufferId(CrHash bufferHash)
 	return bufferId;
 }
 
-void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
+void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -273,12 +273,12 @@ void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx
 	workingPass.bufferUsages.push_back(bufferUsage);
 }
 
-void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
+void CrRenderGraph::BindStorageBuffer(StorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
 {
 	BindStorageBuffer(bufferIndex, buffer, shaderStages, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
-void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
+void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -298,12 +298,12 @@ void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const c
 	workingPass.bufferUsages.push_back(bufferUsage);
 }
 
-void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
+void CrRenderGraph::BindRWStorageBuffer(RWStorageBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
 {
 	BindRWStorageBuffer(bufferIndex, buffer, shaderStages, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
-void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
+void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -323,12 +323,12 @@ void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::IC
 	workingPass.bufferUsages.push_back(bufferUsage);
 }
 
-void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
+void CrRenderGraph::BindTypedBuffer(TypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
 {
 	BindTypedBuffer(bufferIndex, buffer, shaderStages, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }
 
-void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
+void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages, uint32_t numElements, uint32_t stride, uint32_t offset)
 {
 	CrRenderGraphPass& workingPass = GetWorkingRenderPass();
 
@@ -348,7 +348,7 @@ void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx
 	workingPass.bufferUsages.push_back(bufferUsage);
 }
 
-void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::ICrHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
+void CrRenderGraph::BindRWTypedBuffer(RWTypedBuffers::T bufferIndex, const crgfx::IHardwareGPUBuffer* buffer, crgfx::ShaderStageFlags::T shaderStages)
 {
 	BindRWTypedBuffer(bufferIndex, buffer, shaderStages, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 }

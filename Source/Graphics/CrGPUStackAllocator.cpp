@@ -6,7 +6,7 @@
 
 #include "Core/CrAlignment.h"
 
-CrGPUStackAllocator::CrGPUStackAllocator(crgfx::IDevice* renderDevice, const crgfx::CrHardwareGPUBufferDescriptor& gpuBufferDescriptor)
+CrGPUStackAllocator::CrGPUStackAllocator(crgfx::IDevice* renderDevice, const crgfx::HardwareGPUBufferDescriptor& gpuBufferDescriptor)
 	: m_renderDevice(renderDevice)
 	, m_bufferUsage(gpuBufferDescriptor.usage)
 	, m_bufferAccess(gpuBufferDescriptor.access)

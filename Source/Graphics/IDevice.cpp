@@ -250,14 +250,14 @@ namespace crgfx
 		return CreateGPUQueryPoolPS(queryPoolDescriptor);
 	}
 
-	ICrHardwareGPUBuffer* IDevice::CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor)
+	IHardwareGPUBuffer* IDevice::CreateHardwareGPUBuffer(const HardwareGPUBufferDescriptor& descriptor)
 	{
 		return CreateHardwareGPUBufferPS(descriptor);
 	}
 
-	CrIndexBuffer* IDevice::CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
+	IndexBuffer* IDevice::CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
 	{
-		return new CrIndexBuffer(this, access, dataFormat, numIndices);
+		return new IndexBuffer(this, access, dataFormat, numIndices);
 	}
 
 	ISampler* IDevice::CreateSampler(const crgfx::SamplerDescriptor& descriptor)
@@ -285,14 +285,14 @@ namespace crgfx
 		return CreateTexturePS(descriptor);
 	}
 
-	CrVertexBuffer* IDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+	VertexBuffer* IDevice::CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
 	{
-		return new CrVertexBuffer(this, access, vertexDescriptor, numVertices);
+		return new VertexBuffer(this, access, vertexDescriptor, numVertices);
 	}
 
-	CrTypedBuffer* IDevice::CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
+	TypedBuffer* IDevice::CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
 	{
-		return new CrTypedBuffer(this, access, dataFormat, numElements);
+		return new TypedBuffer(this, access, dataFormat, numElements);
 	}
 
 	crgfx::GPUFenceResult IDevice::WaitForFence(IGPUFence* fence, uint64_t timeoutNanoseconds)
@@ -330,24 +330,24 @@ namespace crgfx
 		return EndTextureUploadPS(texture);
 	}
 
-	uint8_t* IDevice::BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+	uint8_t* IDevice::BeginBufferUpload(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		CrAssertMsg(destinationBuffer->GetUsage() & crgfx::BufferUsage::TransferDst, "Buffer must have transfer destination usage enabled");
 
 		return BeginBufferUploadPS(destinationBuffer);
 	}
 
-	void IDevice::EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer)
+	void IDevice::EndBufferUpload(const IHardwareGPUBuffer* destinationBuffer)
 	{
 		EndBufferUploadPS(destinationBuffer);
 	}
 
-	void IDevice::DownloadBuffer(const ICrHardwareGPUBuffer* sourceBuffer, const CrGPUTransferCallbackType& callback)
+	void IDevice::DownloadBuffer(const IHardwareGPUBuffer* sourceBuffer, const GPUTransferCallback& callback)
 	{
 		CrAssertMsg(sourceBuffer->GetUsage() & crgfx::BufferUsage::TransferSrc, "Buffer must have transfer source usage enabled");
 
 		// Queue the download operation and return the buffer that contains the data for the CPU
-		CrHardwareGPUBufferHandle buffer = DownloadBufferPS(sourceBuffer);
+		HardwareGPUBufferHandle buffer = DownloadBufferPS(sourceBuffer);
 
 		// Create a callback that will be called by the render device during processing once it's done
 		// We store the callback and the buffer as we will most likely want to map it

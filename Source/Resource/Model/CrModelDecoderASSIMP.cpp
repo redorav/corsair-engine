@@ -122,8 +122,8 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 
 	const crgfx::DeviceHandle& renderDevice = crgfx::GetDevice();
 
-	crgfx::CrVertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
-	crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	crgfx::VertexBufferHandle positionBuffer   = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)mesh->mNumVertices);
+	crgfx::VertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)mesh->mNumVertices);
 
 	float3 minVertex = float3( FLT_MAX);
 	float3 maxVertex = float3(-FLT_MAX);
@@ -209,7 +209,7 @@ CrRenderMeshHandle CrModelDecoderASSIMP::LoadMesh(const aiScene* scene, const ai
 
 	renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-	crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
+	crgfx::IndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)mesh->mNumFaces * 3);
 
 	size_t index = 0;
 	uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());

@@ -383,15 +383,15 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 	m_structuredBuffer = device->CreateStructuredBuffer<ExampleStructuredBufferCompute>(crgfx::MemoryAccess::GPUOnlyRead, 32);
 
-	crgfx::CrGPUBufferDescriptor argumentsDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte, crgfx::MemoryAccess::GPUOnlyWrite);
-	m_indirectDispatchArguments = crgfx::CrGPUBufferHandle(new crgfx::CrGPUBuffer(device.get(), argumentsDescriptor, 3, 4));
+	crgfx::GPUBufferDescriptor argumentsDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte, crgfx::MemoryAccess::GPUOnlyWrite);
+	m_indirectDispatchArguments = crgfx::GPUBufferHandle(new crgfx::GPUBuffer(device.get(), argumentsDescriptor, 3, 4));
 
 	uint32_t initialValue = 65535;
-	crgfx::CrGPUBufferDescriptor mouseSelectionBufferDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte | crgfx::BufferUsage::TransferSrc | crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUOnlyWrite);
+	crgfx::GPUBufferDescriptor mouseSelectionBufferDescriptor(crgfx::BufferUsage::Indirect | crgfx::BufferUsage::Byte | crgfx::BufferUsage::TransferSrc | crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUOnlyWrite);
 	mouseSelectionBufferDescriptor.initialData = (uint8_t*)&initialValue;
 	mouseSelectionBufferDescriptor.initialDataSize = sizeof(initialValue);
 	mouseSelectionBufferDescriptor.name = "Mouse Selection Entity Id Buffer";
-	m_mouseSelectionBuffer = crgfx::CrGPUBufferHandle(new crgfx::CrGPUBuffer(device.get(), mouseSelectionBufferDescriptor, 1, 4));
+	m_mouseSelectionBuffer = crgfx::GPUBufferHandle(new crgfx::GPUBuffer(device.get(), mouseSelectionBufferDescriptor, 1, 4));
 }
 
 void CrFrame::Deinitialize()
@@ -846,7 +846,7 @@ void CrFrame::Process()
 			{
 				renderPacketBatcher.FlushBatch();
 
-			crgfx::CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
+				crgfx::CrGPUBufferViewT<DebugShaderCB> debugShaderBuffer = commandBuffer->AllocateConstantBuffer<DebugShaderCB>();
 				DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 				{
 					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
@@ -932,7 +932,7 @@ void CrFrame::Process()
 		device->DownloadBuffer
 		(
 			m_mouseSelectionBuffer->GetHardwareBuffer(),
-			[mouseState, keyboardState](const crgfx::CrHardwareGPUBufferHandle& mouseIdBuffer)
+			[mouseState, keyboardState](const crgfx::HardwareGPUBufferHandle& mouseIdBuffer)
 			{
 				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
 				{

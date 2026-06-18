@@ -19,7 +19,7 @@
 	#define CrRenderWorldAssertMsg(condition, message, ...)
 #endif
 
-static CrSortKey CreateStandardSortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
+static CrSortKey CreateStandardSortKey(uint32_t depthUint, const crgfx::IGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
 {
 	// Sorting is implemented in ascending order, so a lower depth sorts first
 	uint64_t depthKey    = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
@@ -39,7 +39,7 @@ static CrSortKey CreateStandardSortKey(uint32_t depthUint, const ICrGraphicsPipe
 		;
 }
 
-static CrSortKey CreateTransparencySortKey(uint32_t depthUint, const ICrGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
+static CrSortKey CreateTransparencySortKey(uint32_t depthUint, const crgfx::IGraphicsPipeline* pipeline, const CrRenderMesh* renderMesh, const CrMaterial* material)
 {
 	uint16_t depthKeyReversed = (uint16_t)(depthUint >> 15); // Take top bits but don't include sign
 	depthKeyReversed = 0xffff - depthKeyReversed; // Invert as we're dealing with transparency
@@ -242,9 +242,9 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 			mainPacket.numInstances = 1;
 			mainPacket.extra        = nullptr;
 
-			const ICrGraphicsPipeline* transparencyPipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
-			const ICrGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
-			const ICrGraphicsPipeline* debugPipeline        = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
+			const crgfx::IGraphicsPipeline* transparencyPipeline = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Transparency).get();
+			const crgfx::IGraphicsPipeline* gBufferPipeline      = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::GBuffer).get();
+			const crgfx::IGraphicsPipeline* debugPipeline        = renderModel->GetPipeline(meshIndex, CrMaterialPipelineVariant::Debug).get();
 
 			// The default rendering for everything is opaque. However, the shading model or options in the material
 			// can make a material go down the transparency path instead. It doesn't make sense to render the same mesh
@@ -330,7 +330,7 @@ void CrRenderWorld::EndRendering()
 	}
 }
 
-void CrRenderWorld::SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle)
+void CrRenderWorld::SetMouseSelectionEnabled(bool enable, const crgfx::Rectangle& boundingRectangle)
 {
 	m_computeMouseSelection = enable;
 	m_mouseSelectionBoundingRectangle = boundingRectangle;

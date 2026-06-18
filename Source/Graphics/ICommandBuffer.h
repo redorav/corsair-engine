@@ -40,9 +40,9 @@ namespace crgfx
 	{
 		ConstantBufferBinding() = default;
 
-		ConstantBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
+		ConstantBufferBinding(const IHardwareGPUBuffer* buffer, uint32_t sizeBytes, uint32_t offsetBytes) : buffer(buffer), sizeBytes(sizeBytes), offsetBytes(offsetBytes) {}
 
-		const ICrHardwareGPUBuffer* buffer = nullptr;
+		const IHardwareGPUBuffer* buffer = nullptr;
 		uint32_t sizeBytes = 0;
 		uint32_t offsetBytes = 0;
 	};
@@ -51,13 +51,13 @@ namespace crgfx
 	{
 		StorageBufferBinding() = default;
 
-		StorageBufferBinding(const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
+		StorageBufferBinding(const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t strideBytes, uint32_t offsetBytes)
 			: buffer(buffer), numElements(numElements), offsetBytes(offsetBytes), strideBytes(strideBytes)
 		{
 			sizeBytes = numElements * strideBytes;
 		}
 
-		const ICrHardwareGPUBuffer* buffer = nullptr;
+		const IHardwareGPUBuffer* buffer = nullptr;
 		uint32_t numElements = 0;
 		uint32_t offsetBytes = 0;
 		uint32_t sizeBytes = 0;
@@ -88,11 +88,11 @@ namespace crgfx
 	struct VertexBufferBinding
 	{
 		VertexBufferBinding() = default;
-		VertexBufferBinding(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
+		VertexBufferBinding(const IHardwareGPUBuffer* vertexBuffer, uint32_t vertexCount, uint32_t offset, uint32_t stride)
 			: vertexBuffer(vertexBuffer), vertexCount(vertexCount), offset(offset), stride(stride) {
 		}
 
-		const ICrHardwareGPUBuffer* vertexBuffer = nullptr;
+		const IHardwareGPUBuffer* vertexBuffer = nullptr;
 		uint32_t vertexCount = 0;
 		uint32_t offset = 0;
 		uint32_t stride = 0;
@@ -124,23 +124,23 @@ namespace crgfx
 
 		// Index Buffer
 
-		void BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, DataFormat::T indexFormat);
+		void BindIndexBuffer(const IHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, DataFormat::T indexFormat);
 
 		void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
 
-		void BindIndexBuffer(const CrIndexBuffer* indexBuffer, uint32_t elementOffset = 0);
+		void BindIndexBuffer(const IndexBuffer* indexBuffer, uint32_t elementOffset = 0);
 
 		// Vertex Buffer
 
-		void BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride);
+		void BindVertexBuffer(const IHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride);
 
 		void BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId);
 
-		void BindVertexBuffer(const CrVertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
+		void BindVertexBuffer(const VertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
 
 		// Constant Buffer
 
-		void BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const ICrHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset);
+		void BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const IHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset);
 
 		void BindConstantBuffer(const CrGPUBufferView& constantBufferView);
 
@@ -154,23 +154,23 @@ namespace crgfx
 
 		// Storage Buffers
 
-		void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
+		void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-		void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer);
+		void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer);
 
 		void BindStorageBuffer(const CrGPUBufferView& storageBufferView);
 
 		// RW Storage Buffers
 
-		void BindRWStorageBuffer(RWStorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
+		void BindRWStorageBuffer(RWStorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-		void BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer);
+		void BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const IHardwareGPUBuffer* buffer);
 
 		// RW Data Buffers
 
-		void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
+		void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset);
 
-		void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer);
+		void BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const IHardwareGPUBuffer* buffer);
 
 		void BindGraphicsPipelineState(const IGraphicsPipeline* graphicsPipeline);
 
@@ -188,7 +188,7 @@ namespace crgfx
 
 		void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ);
 
-		void DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+		void DrawIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
 
 		void DispatchTexture1D(uint32_t textureWidth);
 
@@ -196,9 +196,9 @@ namespace crgfx
 
 		void DispatchTexture3D(uint32_t textureWidth, uint32_t textureHeight, uint32_t textureDepth);
 
-		void DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+		void DrawIndexedIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
 
-		void DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset);
+		void DispatchIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset);
 
 		void BeginDebugEvent(const char* eventName, const float4& color);
 
@@ -258,11 +258,11 @@ namespace crgfx
 
 		virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) = 0;
 
-		virtual void DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
+		virtual void DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
 
-		virtual void DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
+		virtual void DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
 
-		virtual void DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset) = 0;
+		virtual void DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset) = 0;
 
 		virtual void BeginDebugEventPS(const char* eventName, const float4& color) = 0;
 
@@ -291,7 +291,7 @@ namespace crgfx
 
 		struct CurrentState
 		{
-			const ICrHardwareGPUBuffer* m_indexBuffer;
+			const IHardwareGPUBuffer* m_indexBuffer;
 			uint32_t                        m_indexBufferOffset;
 			uint32_t                        m_indexBufferSize;
 			crgfx::DataFormat::T            m_indexBufferFormat;
@@ -380,7 +380,7 @@ namespace crgfx
 		}
 	}
 
-	inline void ICommandBuffer::BindIndexBuffer(const ICrHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, crgfx::DataFormat::T indexFormat)
+	inline void ICommandBuffer::BindIndexBuffer(const IHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, crgfx::DataFormat::T indexFormat)
 	{
 		CrCommandBufferAssertMsg(indexBuffer != nullptr, "Buffer is null");
 		CrCommandBufferAssertMsg(indexBuffer->GetUsage() & crgfx::BufferUsage::Index, "Buffer must have index buffer flag");
@@ -404,12 +404,12 @@ namespace crgfx
 		BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetSizeBytes(), indexBufferView.GetFormat());
 	}
 
-	inline void ICommandBuffer::BindIndexBuffer(const CrIndexBuffer* indexBuffer, uint32_t elementOffset)
+	inline void ICommandBuffer::BindIndexBuffer(const IndexBuffer* indexBuffer, uint32_t elementOffset)
 	{
 		BindIndexBuffer(indexBuffer->GetHardwareBuffer(), elementOffset * indexBuffer->GetStride(), indexBuffer->GetNumElements() * indexBuffer->GetStride(), indexBuffer->GetFormat());
 	}
 
-	inline void ICommandBuffer::BindVertexBuffer(const ICrHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride)
+	inline void ICommandBuffer::BindVertexBuffer(const IHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride)
 	{
 		CrCommandBufferAssertMsg(vertexBuffer != nullptr, "Buffer is null");
 		CrCommandBufferAssertMsg(vertexBuffer->GetUsage() & crgfx::BufferUsage::Vertex, "Buffer must have vertex buffer flag");
@@ -431,7 +431,7 @@ namespace crgfx
 		BindVertexBuffer(vertexBufferView.GetHardwareBuffer(), streamId, vertexBufferView.GetByteOffset(), vertexBufferView.GetNumElements(), vertexBufferView.GetStride());
 	}
 
-	inline void ICommandBuffer::BindVertexBuffer(const CrVertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset)
+	inline void ICommandBuffer::BindVertexBuffer(const VertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset)
 	{
 		BindVertexBuffer(vertexBuffer->GetHardwareBuffer(), streamId, elementOffset * vertexBuffer->GetStride(), vertexBuffer->GetNumElements(), vertexBuffer->GetStride());
 	}
@@ -485,7 +485,7 @@ namespace crgfx
 		CrRenderingStatistics::AddInstances(instanceCount);
 	}
 
-	inline void ICommandBuffer::DrawIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	inline void ICommandBuffer::DrawIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Graphics, "Render pass type must be Graphics");
 
@@ -521,7 +521,7 @@ namespace crgfx
 		Dispatch((textureWidth + dispatchThreadX - 1) / dispatchThreadX, (textureHeight + dispatchThreadY - 1) / dispatchThreadY, (textureDepth + dispatchThreadZ - 1) / dispatchThreadZ);
 	}
 
-	inline void ICommandBuffer::DrawIndexedIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	inline void ICommandBuffer::DrawIndexedIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		FlushGraphicsRenderState();
 
@@ -531,7 +531,7 @@ namespace crgfx
 		// We cannot add the vertices here because we don't know them
 	}
 
-	inline void ICommandBuffer::DispatchIndirect(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
+	inline void ICommandBuffer::DispatchIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 	{
 		CrCommandBufferAssertMsg(m_currentState.m_currentRenderPass.type == crgfx::RenderPassType::Compute, "Render pass type must be Compute");
 
@@ -574,7 +574,7 @@ namespace crgfx
 		InsertDebugMarkerPS(markerName, color);
 	}
 
-	inline void ICommandBuffer::BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const ICrHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset)
+	inline void ICommandBuffer::BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const IHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset)
 	{
 		CrCommandBufferAssertMsg(constantBuffer != nullptr, "Buffer is null");
 		CrCommandBufferAssertMsg(constantBuffer->HasUsage(crgfx::BufferUsage::Constant), "Buffer must have constant buffer flag");
@@ -615,7 +615,7 @@ namespace crgfx
 		m_currentState.m_rwTextures[rwTextureIndex] = RWTextureBinding(texture, mip);
 	}
 
-	inline void ICommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
+	inline void ICommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 	{
 		CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 		CrCommandBufferAssertMsg(buffer->HasUsage(crgfx::BufferUsage::Storage), "Buffer must have storage buffer flag");
@@ -625,7 +625,7 @@ namespace crgfx
 		m_currentState.m_storageBuffers[storageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 	}
 
-	inline void ICommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const ICrHardwareGPUBuffer* buffer)
+	inline void ICommandBuffer::BindStorageBuffer(StorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer)
 	{
 		BindStorageBuffer(storageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 	}
@@ -635,7 +635,7 @@ namespace crgfx
 		BindStorageBuffer((StorageBuffers::T)structuredBufferView.GetBindingIndex(), structuredBufferView.GetHardwareBuffer(), structuredBufferView.GetNumElements(), structuredBufferView.GetStride(), structuredBufferView.GetByteOffset());
 	}
 
-	inline void ICommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
+	inline void ICommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 	{
 		CrCommandBufferAssertMsg(buffer != nullptr, "Buffer is null");
 		CrCommandBufferAssertMsg(buffer->HasUsage(crgfx::BufferUsage::Storage), "Buffer must have storage buffer flag");
@@ -646,12 +646,12 @@ namespace crgfx
 		m_currentState.m_rwStorageBuffers[rwStorageBufferIndex] = StorageBufferBinding(buffer, numElements, stride, offset);
 	}
 
-	inline void ICommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const ICrHardwareGPUBuffer* buffer)
+	inline void ICommandBuffer::BindRWStorageBuffer(RWStorageBuffers::T rwStorageBufferIndex, const IHardwareGPUBuffer* buffer)
 	{
 		BindRWStorageBuffer(rwStorageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 	}
 
-	inline void ICommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwBufferIndex, const ICrHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
+	inline void ICommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwBufferIndex, const IHardwareGPUBuffer* buffer, uint32_t numElements, uint32_t stride, uint32_t offset)
 	{
 		unused_parameter(numElements); unused_parameter(stride); unused_parameter(offset);
 
@@ -664,7 +664,7 @@ namespace crgfx
 		m_currentState.m_rwTypedBuffers[rwBufferIndex].buffer = buffer;
 	}
 
-	inline void ICommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const ICrHardwareGPUBuffer* buffer)
+	inline void ICommandBuffer::BindRWTypedBuffer(RWTypedBuffers::T rwTypedBufferIndex, const IHardwareGPUBuffer* buffer)
 	{
 		BindRWTypedBuffer(rwTypedBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 	}

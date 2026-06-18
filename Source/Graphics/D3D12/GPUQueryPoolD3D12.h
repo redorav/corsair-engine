@@ -16,7 +16,7 @@ namespace crgfx
 
 		ID3D12QueryHeap* GetD3D12QueryHeap() const { return m_d3d12QueryHeap; }
 
-		const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
+		const IHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
 
 	protected:
 
@@ -25,7 +25,7 @@ namespace crgfx
 		virtual void GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t count) override;
 
 		// Use the platform-independent code so we don't have to rewrite it
-		CrHardwareGPUBufferHandle m_queryBuffer;
+		HardwareGPUBufferHandle m_queryBuffer;
 
 		ID3D12QueryHeap* m_d3d12QueryHeap;
 	};

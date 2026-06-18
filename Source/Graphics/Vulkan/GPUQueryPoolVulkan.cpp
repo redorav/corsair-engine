@@ -35,7 +35,7 @@ namespace crgfx
 		vkResult = vkCreateQueryPool(vulkanRenderDevice->GetVkDevice(), &poolCreateInfo, nullptr, &m_vkQueryPool);
 		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create query pool");
 
-		CrHardwareGPUBufferDescriptor queryBufferDescriptor
+		HardwareGPUBufferDescriptor queryBufferDescriptor
 		(
 			crgfx::BufferUsage::TransferDst,
 			crgfx::MemoryAccess::GPUWriteCPURead,

@@ -8,8 +8,8 @@
 
 namespace crgfx
 {
-	CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
-		: ICrHardwareGPUBuffer(d3d12RenderDevice, descriptor)
+	CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const HardwareGPUBufferDescriptor& descriptor)
+		: IHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 	{
 		ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
 

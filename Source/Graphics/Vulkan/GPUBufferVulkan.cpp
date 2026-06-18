@@ -8,8 +8,8 @@
 
 namespace crgfx
 {
-	CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const CrHardwareGPUBufferDescriptor& descriptor)
-		: ICrHardwareGPUBuffer(vulkanRenderDevice, descriptor)
+	CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const HardwareGPUBufferDescriptor& descriptor)
+		: IHardwareGPUBuffer(vulkanRenderDevice, descriptor)
 	{
 		VkResult vkResult = VK_SUCCESS;
 

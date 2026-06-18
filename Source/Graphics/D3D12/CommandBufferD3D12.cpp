@@ -801,21 +801,21 @@ namespace crgfx
 		unused_parameter(sliceCount);
 	}
 
-	void CommandBufferD3D12::DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	void CommandBufferD3D12::DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndirectCommandSignature();
 		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 		m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 	}
 
-	void CommandBufferD3D12::DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	void CommandBufferD3D12::DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndexedIndirectCommandSignature();
 		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 		m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 	}
 
-	void CommandBufferD3D12::DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
+	void CommandBufferD3D12::DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DispatchIndirectCommandSignature();
 		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();

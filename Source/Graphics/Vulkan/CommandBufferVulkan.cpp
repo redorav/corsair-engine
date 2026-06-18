@@ -649,19 +649,19 @@ namespace crgfx
 		vkCmdClearColorImage(m_vkCommandBuffer, static_cast<const crgfx::TextureVulkan*>(renderTarget)->GetVkImage(), VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageSubResourceRange);
 	}
 
-	void CommandBufferVulkan::DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	void CommandBufferVulkan::DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDrawIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndirectCommand));
 	}
 
-	void CommandBufferVulkan::DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
+	void CommandBufferVulkan::DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDrawIndexedIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndexedIndirectCommand));
 	}
 
-	void CommandBufferVulkan::DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset)
+	void CommandBufferVulkan::DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 	{
 		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDispatchIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset);

@@ -112,30 +112,30 @@ namespace crgfx
 	using ComputePipelineHandle = crstl::intrusive_ptr<IComputePipeline>;
 
 	// GPU Buffers
-	class ICrHardwareGPUBuffer;
-	using CrHardwareGPUBufferHandle = crstl::intrusive_ptr<ICrHardwareGPUBuffer>;
-	struct CrHardwareGPUBufferDescriptor;
+	class IHardwareGPUBuffer;
+	using HardwareGPUBufferHandle = crstl::intrusive_ptr<IHardwareGPUBuffer>;
+	struct HardwareGPUBufferDescriptor;
 
-	class CrGPUBuffer;
-	using CrGPUBufferHandle = crstl::intrusive_ptr<CrGPUBuffer>;
-	struct CrGPUBufferDescriptor;
+	class GPUBuffer;
+	using GPUBufferHandle = crstl::intrusive_ptr<GPUBuffer>;
+	struct GPUBufferDescriptor;
 
-	class CrIndexBuffer;
-	using CrIndexBufferHandle = crstl::intrusive_ptr<CrIndexBuffer>;
+	class IndexBuffer;
+	using IndexBufferHandle = crstl::intrusive_ptr<IndexBuffer>;
 
-	class CrVertexBuffer;
-	using CrVertexBufferHandle = crstl::intrusive_ptr<CrVertexBuffer>;
-
-	template<typename Metadata>
-	class CrStructuredBuffer;
+	class VertexBuffer;
+	using VertexBufferHandle = crstl::intrusive_ptr<VertexBuffer>;
 
 	template<typename Metadata>
-	using CrStructuredBufferHandle = crstl::intrusive_ptr<CrStructuredBuffer<Metadata>>;
+	class StructuredBuffer;
 
-	class CrTypedBuffer;
-	using CrTypedBufferHandle = crstl::intrusive_ptr<CrTypedBuffer>;
+	template<typename Metadata>
+	using StructuredBufferHandle = crstl::intrusive_ptr<StructuredBuffer<Metadata>>;
 
-	typedef crstl::fixed_function<128, void(const CrHardwareGPUBufferHandle&)> CrGPUTransferCallbackType;
+	class TypedBuffer;
+	using TypedBufferHandle = crstl::intrusive_ptr<TypedBuffer>;
+
+	typedef crstl::fixed_function<128, void(const HardwareGPUBufferHandle&)> GPUTransferCallback;
 };
 
 class CrGPUStackAllocator;

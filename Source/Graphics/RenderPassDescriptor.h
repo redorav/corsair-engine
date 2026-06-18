@@ -54,14 +54,14 @@ namespace crgfx
 	{
 		RenderPassBufferDescriptor
 		(
-			const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t offset,
+			const IHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t offset,
 			crgfx::BufferState::T sourceState, crgfx::ShaderStageFlags::T sourceShaderStages,
 			crgfx::BufferState::T destinationState, crgfx::ShaderStageFlags::T destinationShaderStages)
 			: hardwareBuffer(hardwareBuffer), numElements(numElements), stride(stride), offset(offset), sourceState(sourceState), sourceShaderStages(sourceShaderStages),
 			destinationState(destinationState), destinationShaderStages(destinationShaderStages) {
 		}
 
-		const ICrHardwareGPUBuffer* hardwareBuffer;
+		const IHardwareGPUBuffer* hardwareBuffer;
 		uint32_t numElements;
 		uint32_t stride;
 		uint32_t offset;

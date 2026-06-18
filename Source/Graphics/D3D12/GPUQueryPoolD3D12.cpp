@@ -32,7 +32,7 @@ namespace crgfx
 
 		CrAssertMsg(hResult == S_OK, "Failed to create query pool");
 
-		CrHardwareGPUBufferDescriptor queryBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
+		HardwareGPUBufferDescriptor queryBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::GPUWriteCPURead, descriptor.count, m_querySize);
 
 		m_queryBuffer = d3d12RenderDevice->CreateHardwareGPUBuffer(queryBufferDescriptor);
 

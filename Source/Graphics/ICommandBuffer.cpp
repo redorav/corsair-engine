@@ -24,7 +24,7 @@ namespace crgfx
 		{
 			if (descriptor.dynamicBufferSizeBytes > 0)
 			{
-				CrHardwareGPUBufferDescriptor gpuBufferStack(crgfx::BufferUsage::Constant | crgfx::BufferUsage::Structured, crgfx::MemoryAccess::CPUStreamToGPU, descriptor.dynamicBufferSizeBytes);
+				HardwareGPUBufferDescriptor gpuBufferStack(crgfx::BufferUsage::Constant | crgfx::BufferUsage::Structured, crgfx::MemoryAccess::CPUStreamToGPU, descriptor.dynamicBufferSizeBytes);
 				gpuBufferStack.name = "GPU Buffer Stack";
 				m_bufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, gpuBufferStack));
 			}
@@ -37,11 +37,11 @@ namespace crgfx
 				uint32_t maxVertices = descriptor.dynamicVertexBufferSizeVertices;
 				uint32_t maxIndices = maxVertices * 3;
 
-				CrHardwareGPUBufferDescriptor vertexBufferStack(crgfx::BufferUsage::Vertex, crgfx::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
+				HardwareGPUBufferDescriptor vertexBufferStack(crgfx::BufferUsage::Vertex, crgfx::MemoryAccess::CPUStreamToGPU, maxVertices, 4);
 				vertexBufferStack.name = "Vertex Buffer Stack";
 				m_vertexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, vertexBufferStack));
 
-				CrHardwareGPUBufferDescriptor indexBufferStack(crgfx::BufferUsage::Index, crgfx::MemoryAccess::CPUStreamToGPU, maxIndices, crgfx::DataFormats[crgfx::DataFormat::R16_Uint].dataOrBlockSize);
+				HardwareGPUBufferDescriptor indexBufferStack(crgfx::BufferUsage::Index, crgfx::MemoryAccess::CPUStreamToGPU, maxIndices, crgfx::DataFormats[crgfx::DataFormat::R16_Uint].dataOrBlockSize);
 				indexBufferStack.name = "Index Buffer Stack";
 				m_indexBufferGPUStack = crstl::unique_ptr<CrGPUStackAllocator>(new CrGPUStackAllocator(m_renderDevice, indexBufferStack));
 			}

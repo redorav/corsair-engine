@@ -10,8 +10,8 @@ struct CrGPUDownloadCallback
 {
 	~CrGPUDownloadCallback();
 
-	crgfx::CrGPUTransferCallbackType callback;
-	crgfx::CrHardwareGPUBufferHandle buffer;
+	crgfx::GPUTransferCallback callback;
+	crgfx::HardwareGPUBufferHandle buffer;
 };
 
 struct CrDownloadCallbackList

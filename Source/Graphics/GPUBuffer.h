@@ -14,17 +14,17 @@
 
 namespace crgfx
 {
-	struct CrHardwareGPUBufferDescriptor
+	struct HardwareGPUBufferDescriptor
 	{
-		CrHardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t size)
+		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t size)
 			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(1), stride(size) {
 		}
 
-		CrHardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, uint32_t stride)
+		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, uint32_t stride)
 			: usage(usage), access(access), dataFormat(crgfx::DataFormat::Invalid), numElements(numElements), stride(stride) {
 		}
 
-		CrHardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, crgfx::DataFormat::T dataFormat)
+		HardwareGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access, uint32_t numElements, crgfx::DataFormat::T dataFormat)
 			: usage(usage), access(access), dataFormat(dataFormat), numElements(numElements), stride(crgfx::DataFormats[dataFormat].dataOrBlockSize) {
 		}
 
@@ -45,11 +45,11 @@ namespace crgfx
 		const char* name = nullptr;
 	};
 
-	struct CrGPUBufferDescriptor
+	struct GPUBufferDescriptor
 	{
-		CrGPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access) : usage(usage), access(access) {}
+		GPUBufferDescriptor(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access) : usage(usage), access(access) {}
 
-		CrGPUBufferDescriptor(const CrGPUBufferDescriptor& descriptor) = default;
+		GPUBufferDescriptor(const GPUBufferDescriptor& descriptor) = default;
 
 		crgfx::BufferUsage::T usage;
 
@@ -67,13 +67,13 @@ namespace crgfx
 	// to allocate a relatively big buffer and suballocate from there, it is not intended to
 	// be created other than by lower level systems. From there one can reserve an offset and
 	// a size, and APIs can bind appropriately
-	class ICrHardwareGPUBuffer : public CrGPUAutoDeletable
+	class IHardwareGPUBuffer : public CrGPUAutoDeletable
 	{
 	public:
 
-		ICrHardwareGPUBuffer(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+		IHardwareGPUBuffer(crgfx::IDevice* renderDevice, const HardwareGPUBufferDescriptor& descriptor);
 
-		virtual ~ICrHardwareGPUBuffer() {}
+		virtual ~IHardwareGPUBuffer() {}
 
 		void* Lock();
 
@@ -131,14 +131,14 @@ namespace crgfx
 #endif
 	};
 
-	inline void* ICrHardwareGPUBuffer::Lock()
+	inline void* IHardwareGPUBuffer::Lock()
 	{
 		CrAssertMsg(m_access != crgfx::MemoryAccess::GPUOnlyWrite && m_access != crgfx::MemoryAccess::GPUOnlyRead, "Cannot map a buffer with no CPU access");
 
 		return LockPS();
 	}
 
-	inline void ICrHardwareGPUBuffer::Unlock()
+	inline void IHardwareGPUBuffer::Unlock()
 	{
 		CrAssertMsg(m_access != crgfx::MemoryAccess::GPUOnlyWrite && m_access != crgfx::MemoryAccess::GPUOnlyRead, "Cannot unmap a buffer with no CPU access");
 
@@ -156,7 +156,7 @@ namespace crgfx
 
 		CrGPUBufferView() = default;
 
-		CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
+		CrGPUBufferView(const IHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
 			: m_hardwareBuffer(hardwareBuffer)
 			, m_memory(memory)
 			, m_byteOffset(byteOffset)
@@ -165,7 +165,7 @@ namespace crgfx
 		{
 		}
 
-		CrGPUBufferView(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, crgfx::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
+		CrGPUBufferView(const IHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, crgfx::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
 			: m_hardwareBuffer(hardwareBuffer)
 			, m_memory(memory)
 			, m_byteOffset(byteOffset)
@@ -175,7 +175,7 @@ namespace crgfx
 		{
 		}
 
-		const ICrHardwareGPUBuffer* GetHardwareBuffer() const { return m_hardwareBuffer; }
+		const IHardwareGPUBuffer* GetHardwareBuffer() const { return m_hardwareBuffer; }
 
 		uint32_t GetNumElements() const { return m_numElements; }
 
@@ -193,7 +193,7 @@ namespace crgfx
 
 	protected:
 
-		const ICrHardwareGPUBuffer* m_hardwareBuffer = nullptr;
+		const IHardwareGPUBuffer* m_hardwareBuffer = nullptr;
 
 		void* m_memory = nullptr;
 
@@ -218,13 +218,13 @@ namespace crgfx
 			m_bindingIndex = MetaType::index;
 		}
 
-		CrGPUBufferViewT(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
+		CrGPUBufferViewT(const IHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, uint32_t stride, uint32_t byteOffset, void* memory = nullptr)
 			: CrGPUBufferView(hardwareBuffer, numElements, stride, byteOffset, memory)
 		{
 			m_bindingIndex = MetaType::index;
 		}
 
-		CrGPUBufferViewT(const ICrHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, crgfx::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
+		CrGPUBufferViewT(const IHardwareGPUBuffer* hardwareBuffer, uint32_t numElements, crgfx::DataFormat::T dataFormat, uint32_t byteOffset, void* memory = nullptr)
 			: CrGPUBufferView(hardwareBuffer, numElements, dataFormat, byteOffset, memory)
 		{
 			m_bindingIndex = MetaType::index;
@@ -239,20 +239,20 @@ namespace crgfx
 	// A CrGPUBuffer holds an actual hardware buffer. It can have other convenient data in the derived classes,
 	// such as vertex descriptors, index sizes, binding indices, etc. It exists so we don't burden the hardware
 	// buffer with metadata that varies depending on usage
-	class CrGPUBuffer : public crstl::intrusive_ptr_interface_delete
+	class GPUBuffer : public crstl::intrusive_ptr_interface_delete
 	{
 	public:
 
 		// Vertex buffers don't have a single fixed format but we can supply a stride
-		CrGPUBuffer(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride)
-			: CrGPUBuffer(renderDevice, descriptor, numElements, stride, crgfx::DataFormat::Invalid) {
+		GPUBuffer(crgfx::IDevice* renderDevice, const GPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride)
+			: GPUBuffer(renderDevice, descriptor, numElements, stride, crgfx::DataFormat::Invalid) {
 		}
 
-		CrGPUBuffer(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, crgfx::DataFormat::T dataFormat)
-			: CrGPUBuffer(renderDevice, descriptor, numElements, crgfx::DataFormats[dataFormat].dataOrBlockSize, dataFormat) {
+		GPUBuffer(crgfx::IDevice* renderDevice, const GPUBufferDescriptor& descriptor, uint32_t numElements, crgfx::DataFormat::T dataFormat)
+			: GPUBuffer(renderDevice, descriptor, numElements, crgfx::DataFormats[dataFormat].dataOrBlockSize, dataFormat) {
 		}
 
-		const crgfx::ICrHardwareGPUBuffer* GetHardwareBuffer() const { return m_buffer.get(); }
+		const crgfx::IHardwareGPUBuffer* GetHardwareBuffer() const { return m_buffer.get(); }
 
 		uint32_t GetNumElements() const { return m_buffer->GetNumElements(); }
 
@@ -266,7 +266,7 @@ namespace crgfx
 
 	protected:
 
-		crgfx::CrHardwareGPUBufferHandle m_buffer;
+		crgfx::HardwareGPUBufferHandle m_buffer;
 
 		crgfx::BufferUsage::T m_usage;
 
@@ -274,23 +274,23 @@ namespace crgfx
 
 	private:
 
-		CrGPUBuffer(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat);
+		GPUBuffer(crgfx::IDevice* renderDevice, const GPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat);
 	};
 
 	template<typename MetaType>
-	class CrGPUBufferType : public CrGPUBuffer
+	class CrGPUBufferType : public GPUBuffer
 	{
 	public:
 
-		CrGPUBufferType(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements)
-			: CrGPUBuffer(renderDevice, descriptor, numElements, sizeof(MetaType))
+		CrGPUBufferType(crgfx::IDevice* renderDevice, const GPUBufferDescriptor& descriptor, uint32_t numElements)
+			: GPUBuffer(renderDevice, descriptor, numElements, sizeof(MetaType))
 		{
 			//m_globalIndex = MetaType::index;
 		}
 
 		MetaType* Lock()
 		{
-			return static_cast<MetaType*>(CrGPUBuffer::Lock());
+			return static_cast<MetaType*>(GPUBuffer::Lock());
 		}
 	};
 
@@ -298,12 +298,12 @@ namespace crgfx
 	// Vertex Buffer
 	//--------------
 
-	class CrVertexBuffer : public CrGPUBuffer
+	class VertexBuffer : public GPUBuffer
 	{
 	public:
 
-		CrVertexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
-			: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(
+		VertexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices)
+			: GPUBuffer(renderDevice, GPUBufferDescriptor(
 				crgfx::BufferUsage::Vertex | (access == crgfx::MemoryAccess::GPUOnlyRead ? crgfx::BufferUsage::TransferDst : crgfx::BufferUsage::None),
 				access), numVertices, vertexDescriptor.GetDataSize())
 			, m_vertexDescriptor(vertexDescriptor)
@@ -321,12 +321,12 @@ namespace crgfx
 	// Index Buffer
 	//-------------
 
-	class CrIndexBuffer : public CrGPUBuffer
+	class IndexBuffer : public GPUBuffer
 	{
 	public:
 
-		CrIndexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
-			: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(
+		IndexBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices)
+			: GPUBuffer(renderDevice, GPUBufferDescriptor(
 				crgfx::BufferUsage::Index | (access == crgfx::MemoryAccess::GPUOnlyRead ? crgfx::BufferUsage::TransferDst : crgfx::BufferUsage::None),
 				access), numIndices, dataFormat) {
 		}
@@ -351,16 +351,16 @@ namespace crgfx
 	//------------------
 
 	template<typename Metadata>
-	class CrStructuredBuffer : public CrGPUBufferType<Metadata>
+	class StructuredBuffer : public CrGPUBufferType<Metadata>
 	{
 	public:
 
-		CrStructuredBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T bufferAccess, uint32_t numElements)
-			: CrGPUBufferType<Metadata>(renderDevice, CrGPUBufferDescriptor(crgfx::BufferUsage::Structured, bufferAccess), numElements) {}
+		StructuredBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T bufferAccess, uint32_t numElements)
+			: CrGPUBufferType<Metadata>(renderDevice, GPUBufferDescriptor(crgfx::BufferUsage::Structured, bufferAccess), numElements) {}
 
 		Metadata* Lock()
 		{
-			return static_cast<Metadata*>(CrGPUBuffer::Lock());
+			return static_cast<Metadata*>(GPUBuffer::Lock());
 		}
 	};
 
@@ -368,12 +368,12 @@ namespace crgfx
 	// Data Buffer
 	//------------
 
-	class CrTypedBuffer : public CrGPUBuffer
+	class TypedBuffer : public GPUBuffer
 	{
 	public:
 
-		CrTypedBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
-			: CrGPUBuffer(renderDevice, CrGPUBufferDescriptor(crgfx::BufferUsage::Typed, access), numElements, dataFormat) {
+		TypedBuffer(crgfx::IDevice* renderDevice, crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements)
+			: GPUBuffer(renderDevice, GPUBufferDescriptor(crgfx::BufferUsage::Typed, access), numElements, dataFormat) {
 		}
 	};
 };

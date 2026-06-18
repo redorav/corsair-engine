@@ -40,11 +40,11 @@ namespace crgfx
 
 		virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) override;
 
-		virtual void DrawIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+		virtual void DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
 
-		virtual void DrawIndexedIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
+		virtual void DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) override;
 
-		virtual void DispatchIndirectPS(const ICrHardwareGPUBuffer* indirectBuffer, uint32_t offset) override;
+		virtual void DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset) override;
 
 		virtual void BeginDebugEventPS(const char* eventName, const float4& color) override;
 

@@ -430,8 +430,8 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 				float3 minVertex = float3(FLT_MAX);
 				float3 maxVertex = float3(-FLT_MAX);
 
-				crgfx::CrVertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)importMesh.vertices.size());
-				crgfx::CrVertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)importMesh.vertices.size());
+				crgfx::VertexBufferHandle positionBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, PositionVertexDescriptor, (uint32_t)importMesh.vertices.size());
+				crgfx::VertexBufferHandle additionalBuffer = renderDevice->CreateVertexBuffer(crgfx::MemoryAccess::GPUOnlyRead, AdditionalVertexDescriptor, (uint32_t)importMesh.vertices.size());
 
 				ComplexVertexPosition* positionBufferData = (ComplexVertexPosition*)renderDevice->BeginBufferUpload(positionBuffer->GetHardwareBuffer());
 				ComplexVertexAdditional* additionalBufferData = (ComplexVertexAdditional*)renderDevice->BeginBufferUpload(additionalBuffer->GetHardwareBuffer());
@@ -516,7 +516,7 @@ CrRenderModelHandle CrModelDecoderUFBX::Decode(const crstl::file& file)
 
 				renderMesh->SetBoundingBox(CrBoundingBox((maxVertex + minVertex) * 0.5f, (maxVertex - minVertex) * 0.5f));
 
-				crgfx::CrIndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)importMesh.triangles.size() * 3);
+				crgfx::IndexBufferHandle indexBuffer = renderDevice->CreateIndexBuffer(crgfx::MemoryAccess::GPUOnlyRead, crgfx::DataFormat::R16_Uint, (uint32_t)importMesh.triangles.size() * 3);
 
 				uint16_t* indexData = (uint16_t*)renderDevice->BeginBufferUpload(indexBuffer->GetHardwareBuffer());
 				{

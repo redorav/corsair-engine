@@ -17,7 +17,7 @@ namespace crgfx
 
 		VkQueryPool GetVkQueryPool() const { return m_vkQueryPool; }
 
-		const ICrHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
+		const IHardwareGPUBuffer* GetResultsBuffer() const { return m_queryBuffer.get(); }
 
 	protected:
 
@@ -26,7 +26,7 @@ namespace crgfx
 		virtual void GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t count) override;
 
 		// Use the platform-independent code so we don't have to rewrite it
-		CrHardwareGPUBufferHandle m_queryBuffer;
+		HardwareGPUBufferHandle m_queryBuffer;
 
 		VkQueryPool m_vkQueryPool;
 	};

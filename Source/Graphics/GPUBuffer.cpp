@@ -7,7 +7,7 @@
 
 namespace crgfx
 {
-	ICrHardwareGPUBuffer::ICrHardwareGPUBuffer(crgfx::IDevice* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+	IHardwareGPUBuffer::IHardwareGPUBuffer(crgfx::IDevice* renderDevice, const HardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
 		, m_usage(descriptor.usage)
 		, m_access(descriptor.access)
 		, m_dataFormat(descriptor.dataFormat)
@@ -28,7 +28,7 @@ namespace crgfx
 
 	// This constructor takes both a stride and a data format. While this looks like redundant information, this constructor
 	// is not public, and lives here to cater for the two public-facing constructors
-	CrGPUBuffer::CrGPUBuffer(crgfx::IDevice* renderDevice, const CrGPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat)
+	GPUBuffer::GPUBuffer(crgfx::IDevice* renderDevice, const GPUBufferDescriptor& descriptor, uint32_t numElements, uint32_t stride, crgfx::DataFormat::T dataFormat)
 		: m_usage(descriptor.usage), m_access(descriptor.access)
 	{
 		if (descriptor.usage & crgfx::BufferUsage::Index)
@@ -41,7 +41,7 @@ namespace crgfx
 			CrAssertMsg(descriptor.usage & (crgfx::BufferUsage::Structured | crgfx::BufferUsage::Byte), "Must specify structured or byte buffer to write to an indirect buffer");
 		}
 
-		CrHardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
+		HardwareGPUBufferDescriptor hardwareGPUBufferDescriptor(descriptor.usage, descriptor.access, numElements, stride);
 		hardwareGPUBufferDescriptor.dataFormat = dataFormat;
 		hardwareGPUBufferDescriptor.initialData = descriptor.initialData;
 		hardwareGPUBufferDescriptor.initialDataSize = descriptor.initialDataSize;
@@ -49,12 +49,12 @@ namespace crgfx
 		m_buffer = renderDevice->CreateHardwareGPUBuffer(hardwareGPUBufferDescriptor);
 	}
 
-	void* CrGPUBuffer::Lock()
+	void* GPUBuffer::Lock()
 	{
 		return m_buffer->Lock();
 	}
 
-	void CrGPUBuffer::Unlock()
+	void GPUBuffer::Unlock()
 	{
 		m_buffer->Unlock();
 	}

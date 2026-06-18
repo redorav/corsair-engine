@@ -74,7 +74,7 @@ namespace crgfx
 // only provide the data in a linear format
 struct CrTextureUpload
 {
-	crgfx::CrHardwareGPUBufferHandle stagingBuffer;
+	crgfx::HardwareGPUBufferHandle stagingBuffer;
 	crgfx::ITexture* texture;
 	uint32_t mipmapStart;
 	uint32_t mipmapCount;
@@ -84,8 +84,8 @@ struct CrTextureUpload
 
 struct CrBufferUpload
 {
-	crgfx::CrHardwareGPUBufferHandle stagingBuffer;
-	const crgfx::ICrHardwareGPUBuffer* destinationBuffer;
+	crgfx::HardwareGPUBufferHandle stagingBuffer;
+	const crgfx::IHardwareGPUBuffer* destinationBuffer;
 	uint32_t sizeBytes;
 	uint32_t sourceOffsetBytes;
 	uint32_t destinationOffsetBytes;
@@ -133,7 +133,7 @@ namespace crgfx
 
 		crgfx::ICommandBuffer* CreateCommandBuffer(const crgfx::CommandBufferDescriptor& descriptor);
 
-		CrIndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
+		IndexBuffer* CreateIndexBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numIndices);
 
 		ISampler* CreateSampler(const crgfx::SamplerDescriptor& descriptor);
 
@@ -141,12 +141,12 @@ namespace crgfx
 
 		crgfx::ITexture* CreateTexture(const crgfx::TextureDescriptor& descriptor);
 
-		CrVertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
+		VertexBuffer* CreateVertexBuffer(crgfx::MemoryAccess::T access, const CrVertexDescriptor& vertexDescriptor, uint32_t numVertices);
 
 		template<typename Metadata>
-		CrStructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
+		StructuredBuffer<Metadata>* CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements);
 
-		CrTypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
+		TypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
 
 		IGraphicsShader* CreateGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
@@ -158,7 +158,7 @@ namespace crgfx
 
 		IGPUQueryPool* CreateGPUQueryPool(const GPUQueryPoolDescriptor& queryPoolDescriptor);
 
-		ICrHardwareGPUBuffer* CreateHardwareGPUBuffer(const CrHardwareGPUBufferDescriptor& descriptor);
+		IHardwareGPUBuffer* CreateHardwareGPUBuffer(const HardwareGPUBufferDescriptor& descriptor);
 
 		IGPUFence* CreateGPUFence(bool signaled = false);
 
@@ -189,11 +189,11 @@ namespace crgfx
 
 		void EndTextureUpload(const crgfx::ITexture* texture);
 
-		uint8_t* BeginBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+		uint8_t* BeginBufferUpload(const IHardwareGPUBuffer* destinationBuffer);
 
-		void EndBufferUpload(const ICrHardwareGPUBuffer* destinationBuffer);
+		void EndBufferUpload(const IHardwareGPUBuffer* destinationBuffer);
 
-		void DownloadBuffer(const ICrHardwareGPUBuffer* buffer, const CrGPUTransferCallbackType& callback);
+		void DownloadBuffer(const IHardwareGPUBuffer* buffer, const GPUTransferCallback& callback);
 
 		//-------------------------------
 		// Properties and feature support
@@ -219,7 +219,7 @@ namespace crgfx
 
 		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) = 0;
 
-		virtual ICrHardwareGPUBuffer* CreateHardwareGPUBufferPS(const CrHardwareGPUBufferDescriptor& params) = 0;
+		virtual IHardwareGPUBuffer* CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& params) = 0;
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) = 0;
 
@@ -261,11 +261,11 @@ namespace crgfx
 		// schedule an upload that is guaranteed to be visible on the next texture usage
 		virtual void EndTextureUploadPS(const crgfx::ITexture* texture) = 0;
 
-		virtual uint8_t* BeginBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
+		virtual uint8_t* BeginBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer) = 0;
 
-		virtual void EndBufferUploadPS(const ICrHardwareGPUBuffer* destinationBuffer) = 0;
+		virtual void EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer) = 0;
 
-		virtual CrHardwareGPUBufferHandle DownloadBufferPS(const ICrHardwareGPUBuffer* sourceBuffer) = 0;
+		virtual HardwareGPUBufferHandle DownloadBufferPS(const IHardwareGPUBuffer* sourceBuffer) = 0;
 
 		virtual void SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) = 0;
 
@@ -315,8 +315,8 @@ namespace crgfx
 	};
 
 	template<typename Metadata>
-	CrStructuredBuffer<Metadata>* IDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
+	StructuredBuffer<Metadata>* IDevice::CreateStructuredBuffer(crgfx::MemoryAccess::T access, uint32_t numElements)
 	{
-		return new CrStructuredBuffer<Metadata>(this, access, numElements);
+		return new StructuredBuffer<Metadata>(this, access, numElements);
 	}
 };

@@ -9,11 +9,11 @@ namespace crgfx
 {
 	class DeviceD3D12;
 
-	class CrHardwareGPUBufferD3D12 final : public ICrHardwareGPUBuffer
+	class CrHardwareGPUBufferD3D12 final : public IHardwareGPUBuffer
 	{
 	public:
 
-		CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* renderDevice, const CrHardwareGPUBufferDescriptor& descriptor);
+		CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* renderDevice, const HardwareGPUBufferDescriptor& descriptor);
 
 		virtual ~CrHardwareGPUBufferD3D12() override;
 

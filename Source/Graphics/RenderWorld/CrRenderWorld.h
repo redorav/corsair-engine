@@ -30,7 +30,7 @@ struct CrRenderPacket
 	float4x4* transforms;
 	const CrRenderMesh* renderMesh;
 	const CrMaterial* material; // TODO Replace with resource table (textures, constants, etc)
-	const ICrGraphicsPipeline* pipeline;
+	const crgfx::IGraphicsPipeline* pipeline;
 	const void* extra = nullptr; // Use this to piggyback extra data
 
 	// This decides how many instances are rendered of this mesh, and also
@@ -197,14 +197,14 @@ private:
 
 public:
 
-	void SetMouseSelectionEnabled(bool enable, const CrRectangle& boundingRectangle);
+	void SetMouseSelectionEnabled(bool enable, const crgfx::Rectangle& boundingRectangle);
 	bool GetMouseSelectionEnabled() const;
 
 private:
 
 	bool m_computeMouseSelection = false;
 
-	CrRectangle m_mouseSelectionBoundingRectangle;
+	crgfx::Rectangle m_mouseSelectionBoundingRectangle;
 
 #endif
 };

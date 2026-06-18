@@ -1,7 +1,7 @@
 #include "Core/CrCoreForwardDeclarations.h"
 #include "Core/FileSystem/CrFixedPath.h"
 
-#include "Graphics/CrRenderingForwardDeclarations.h"
+#include "Graphics/CrGraphicsForwardDeclarations.h"
 
 struct CrBuiltinShadersDescriptor
 {

@@ -3,7 +3,7 @@
 #include "CrShapeBuilder.h"
 #include "CrCommonVertexLayouts.h"
 
-#include "CrRendering.h"
+#include "CrGraphics.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 

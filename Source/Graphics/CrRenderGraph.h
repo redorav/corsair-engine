@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/ITexture.h"
 
 #include "Core/CrHash.h"

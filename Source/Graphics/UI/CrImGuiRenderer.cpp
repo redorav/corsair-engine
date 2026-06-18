@@ -17,7 +17,7 @@
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrRenderGraph.h"
 #include "Graphics/CrRenderingResources.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 #include "CrOSWindow.h"
 

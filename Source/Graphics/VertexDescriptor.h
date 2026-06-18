@@ -7,7 +7,7 @@
 #include "crstl/string.h"
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/DataFormats.h"
 
 #include "Math/CrVectorT.h"

@@ -3,7 +3,7 @@
 #include "CrImageCodecWuffs.h"
 
 #include "Graphics/CrImage.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/DataFormats.h"
 
 #pragma warning(push, 0)

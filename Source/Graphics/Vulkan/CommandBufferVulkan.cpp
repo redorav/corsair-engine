@@ -9,7 +9,7 @@
 
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrShaderResourceMetadata.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 #include "Core/Logging/ICrDebug.h"
 

@@ -3,7 +3,7 @@
 
 #include "Core/CrMacros.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 namespace crgfx
 {

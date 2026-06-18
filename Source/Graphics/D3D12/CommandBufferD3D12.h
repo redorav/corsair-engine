@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/ICommandBuffer.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "GPUBufferD3D12.h"
 #include "GPUQueryPoolD3D12.h"
 #include "DescriptorHeapD3D12.h"

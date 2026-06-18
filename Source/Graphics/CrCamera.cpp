@@ -2,7 +2,7 @@
 
 #include "Graphics/CrCamera.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/CrRendererConfig.h"
 
 #include "Math/CrMath.h"

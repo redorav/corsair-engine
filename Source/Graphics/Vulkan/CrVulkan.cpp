@@ -7,7 +7,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 VkFormat crvk::GetVkFormat(crgfx::DataFormat::T format)
 {

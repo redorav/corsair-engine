@@ -3,7 +3,7 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 DXGI_FORMAT crd3d::GetDXGIFormat(crgfx::DataFormat::T format)
 {

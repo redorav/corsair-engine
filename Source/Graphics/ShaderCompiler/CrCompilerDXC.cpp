@@ -17,7 +17,7 @@
 
 #include "CrShaderCompiler.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/CrShaderReflectionHeader.h"
 
 #include "Core/Streams/CrFileStream.h"

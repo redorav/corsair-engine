@@ -2,7 +2,7 @@
 
 #include "Graphics/CrVisibility.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrVertexDescriptor.h"
+#include "Graphics/VertexDescriptor.h"
 
 #include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"

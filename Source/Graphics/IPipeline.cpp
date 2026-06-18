@@ -2,7 +2,7 @@
 
 #include "Graphics/IPipeline.h"
 #include "Graphics/IShader.h"
-#include "Graphics/CrVertexDescriptor.h"
+#include "Graphics/VertexDescriptor.h"
 
 crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::OpaqueBlend
 {

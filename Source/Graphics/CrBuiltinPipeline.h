@@ -2,7 +2,7 @@
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/IPipeline.h"
-#include "Graphics/CrVertexDescriptor.h"
+#include "Graphics/VertexDescriptor.h"
 
 #include "crstl/open_hashmap.h"
 

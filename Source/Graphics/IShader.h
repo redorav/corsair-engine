@@ -5,7 +5,7 @@
 #include "Core/CrHash.h"
 #include "Core/Streams/CrFileStream.h"
 
-#include "Graphics/CrVertexDescriptor.h"
+#include "Graphics/VertexDescriptor.h"
 #include "Graphics/CrShaderReflectionHeader.h"
 
 #include "Core/CrCoreForwardDeclarations.h"

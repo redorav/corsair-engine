@@ -1,5 +1,5 @@
 #include "Graphics/CrRendering_pch.h"
-#include "CrVertexDescriptor.h"
+#include "VertexDescriptor.h"
 
 namespace crgfx
 {

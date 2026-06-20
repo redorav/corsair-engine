@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/ITexture.h"
 
 #include "crstl/intrusive_ptr.h"

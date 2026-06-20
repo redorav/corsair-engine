@@ -7,7 +7,7 @@
 
 #include "Graphics/RenderWorld/CrRenderWorld.h"
 #include "Graphics/CrCamera.h"
-#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/CrShapeBuilder.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/IShader.h"

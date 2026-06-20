@@ -4,7 +4,7 @@
 #include "Graphics/CrShaderSources.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/CrMaterialCompiler.h"
-#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/CrRendererConfig.h"
 #include "CrFrame.h"
 

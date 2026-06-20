@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 #include "Graphics/IShader.h"

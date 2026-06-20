@@ -2,7 +2,7 @@
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrRenderGraph.h"
-#include "Graphics/CrBuiltinPipeline.h"
+#include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/RenderWorld/CrRenderWorld.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"

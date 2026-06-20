@@ -17,8 +17,9 @@
 #include "Core/CrGlobalPaths.h"
 
 #include "Graphics/CrGPUDeletionQueue.h"
-#include "Graphics/CrGPUTransferCallbackQueue.h"
 
+#include "crstl/deque.h"
+#include "crstl/fixed_function.h"
 #include "crstl/timer.h"
 
 #if !defined(CR_CONFIG_FINAL)
@@ -27,6 +28,48 @@
 
 namespace crgfx
 {
+	struct CrGPUDownloadCallback
+	{
+		crgfx::GPUTransferCallback callback;
+		crgfx::HardwareGPUBufferHandle buffer;
+	};
+
+	struct CrDownloadCallbackList
+	{
+		crgfx::GPUFenceHandle fence;
+		crstl::vector<CrGPUDownloadCallback> callbacks;
+	};
+
+	class CrGPUTransferCallbackQueue
+	{
+	public:
+
+		static const uint32_t MaximumCallbackLists = 4;
+
+		void Initialize(crgfx::IDevice* renderDevice);
+
+		void AddToQueue(const CrGPUDownloadCallback& callback);
+
+		void Process();
+
+	private:
+
+		crgfx::IDevice* m_renderDevice = nullptr;
+
+		// Callbacks to be executed after a successful download operation, copying from GPU to CPU
+		CrDownloadCallbackList* m_currentCallbackList = nullptr;
+
+		// Active callback lists have had fence signal commands scheduled on
+		// the GPU, and are waiting to receive that on the CPU. We want to
+		// push back, but then get front to query the fence
+		crstl::deque<CrDownloadCallbackList*> m_activeCallbackLists;
+
+		// Available callback lists are there to be reused
+		crstl::fixed_vector<CrDownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;
+
+		crstl::fixed_vector<CrDownloadCallbackList, MaximumCallbackLists> m_callbackLists;
+	};
+
 	IDevice::IDevice(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
 		: m_isValidPipelineCache(false)
 	{
@@ -398,5 +441,80 @@ namespace crgfx
 				CrLog("Successfully loaded serialized pipeline cache from %s", pipelineCachePath.c_str());
 			}
 		}
+	}
+
+	void CrGPUTransferCallbackQueue::Initialize(crgfx::IDevice* renderDevice)
+	{
+		m_renderDevice = renderDevice;
+
+		// We need as many as the system requests plus an extra one for when they're
+		// all in flight (and the system reserves "the next one"). We could lazily
+		// allocate in the AddToQueue function but this is simpler to reason about
+		m_callbackLists.resize(MaximumCallbackLists);
+
+		for (uint32_t i = 0; i < m_callbackLists.size(); ++i)
+		{
+			m_callbackLists[i].fence = m_renderDevice->CreateGPUFence();
+
+			m_availableCallbackLists.push_back(&m_callbackLists[i]);
+		}
+
+		// Pop from the vector to get an available list
+		m_currentCallbackList = m_availableCallbackLists.back();
+		m_availableCallbackLists.pop_back();
+	}
+
+	void CrGPUTransferCallbackQueue::AddToQueue(const CrGPUDownloadCallback& callback)
+	{
+		// TODO Add synchronization for multithreading
+		m_currentCallbackList->callbacks.push_back(callback);
+	}
+
+	void CrGPUTransferCallbackQueue::Process()
+	{
+		while (!m_activeCallbackLists.empty())
+		{
+			// Get the last list we pushed into the active list
+			CrDownloadCallbackList* callbackList = m_activeCallbackLists.front();
+
+			if (m_renderDevice->GetFenceStatus(callbackList->fence.get()) == crgfx::GPUFenceResult::Success)
+			{
+				for (const CrGPUDownloadCallback& callback : callbackList->callbacks)
+				{
+					callback.callback(callback.buffer);
+				}
+
+				// Reset the deletion list's properties
+				callbackList->callbacks.clear();
+				m_renderDevice->ResetFence(callbackList->fence.get());
+
+				// Put back in the available list and remove from active
+				m_availableCallbackLists.push_back(callbackList);
+				m_activeCallbackLists.pop_front();
+			}
+			else
+			{
+				// Our lists are sequential, i.e. if this one has not been signaled,
+				// it is guaranteed the others won't have been
+				break;
+			}
+		}
+
+		// 2. If there are any elements to delete, add the current list to the active
+		// list and submit a fence signal to the queue
+		if (!m_currentCallbackList->callbacks.empty())
+		{
+			m_activeCallbackLists.push_back(m_currentCallbackList);
+			m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentCallbackList->fence.get());
+			m_currentCallbackList = nullptr;
+		}
+
+		if (!m_currentCallbackList && !m_availableCallbackLists.empty())
+		{
+			m_currentCallbackList = m_availableCallbackLists.back();
+			m_availableCallbackLists.pop_back();
+		}
+
+		CrAssertMsg(m_currentCallbackList, "Current callback list cannot be null");
 	}
 };

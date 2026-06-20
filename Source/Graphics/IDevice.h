@@ -15,6 +15,8 @@
 
 namespace crgfx
 {
+	class CrGPUTransferCallbackQueue;
+
 	struct DriverVersion
 	{
 		DriverVersion() = default;
@@ -96,8 +98,6 @@ class CrGPUDeletable;
 
 namespace crgfx
 {
-	class CrGPUTransferCallbackQueue;
-
 	struct DeviceDescriptor
 	{
 		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;

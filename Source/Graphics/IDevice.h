@@ -72,32 +72,31 @@ namespace crgfx
 	};
 };
 
-// Texture uploads encapsulate the idea that platforms have
-// an optimal texture format but for some (PC mainly) we can
-// only provide the data in a linear format
-struct CrTextureUpload
-{
-	crgfx::HardwareGPUBufferHandle stagingBuffer;
-	crgfx::ITexture* texture;
-	uint32_t mipmapStart;
-	uint32_t mipmapCount;
-	uint32_t sliceStart;
-	uint32_t sliceCount;
-};
-
-struct CrBufferUpload
-{
-	crgfx::HardwareGPUBufferHandle stagingBuffer;
-	const crgfx::IHardwareGPUBuffer* destinationBuffer;
-	uint32_t sizeBytes;
-	uint32_t sourceOffsetBytes;
-	uint32_t destinationOffsetBytes;
-};
-
 class CrGPUDeletable;
 
 namespace crgfx
 {
+	// Texture uploads encapsulate the idea that some platforms have an optimal texture format but for some (PC mainly) we can
+	// only provide the data in a linear format
+	struct TextureUpload
+	{
+		crgfx::HardwareGPUBufferHandle stagingBuffer;
+		crgfx::ITexture* texture;
+		uint32_t mipmapStart;
+		uint32_t mipmapCount;
+		uint32_t sliceStart;
+		uint32_t sliceCount;
+	};
+
+	struct BufferUpload
+	{
+		crgfx::HardwareGPUBufferHandle stagingBuffer;
+		const crgfx::IHardwareGPUBuffer* destinationBuffer;
+		uint32_t sizeBytes;
+		uint32_t sourceOffsetBytes;
+		uint32_t destinationOffsetBytes;
+	};
+
 	struct DeviceDescriptor
 	{
 		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
@@ -281,10 +280,10 @@ namespace crgfx
 		DeviceProperties m_deviceProperties;
 
 		// Texture uploads that have started but haven't been committed yet
-		crstl::open_hashmap<CrHash, CrTextureUpload> m_openTextureUploads;
+		crstl::open_hashmap<CrHash, TextureUpload> m_openTextureUploads;
 
 		// Buffer uploads that have started but haven't been committed yet
-		crstl::open_hashmap<CrHash, CrBufferUpload> m_openBufferUploads;
+		crstl::open_hashmap<CrHash, BufferUpload> m_openBufferUploads;
 
 		//--------------------------
 		// Pipeline State Management

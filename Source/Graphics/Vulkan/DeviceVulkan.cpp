@@ -195,7 +195,7 @@ namespace crgfx
 		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Texture Upload Staging Buffer";
 
-		CrTextureUpload textureUpload;
+		TextureUpload textureUpload;
 		textureUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		textureUpload.mipmapStart = 0;
 		textureUpload.mipmapCount = texture->GetMipmapCount();
@@ -216,7 +216,7 @@ namespace crgfx
 		const auto textureUploadIter = m_openTextureUploads.find(textureHash);
 		CrAssertMsg(textureUploadIter != m_openTextureUploads.end(), "Tried ending texture upload with no begin");
 
-		const CrTextureUpload& textureUpload = textureUploadIter->second;
+		const TextureUpload& textureUpload = textureUploadIter->second;
 
 		const TextureVulkan* vulkanTexture = static_cast<const TextureVulkan*>(texture);
 		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get());
@@ -298,7 +298,7 @@ namespace crgfx
 		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferSrc, crgfx::MemoryAccess::StagingUpload, (uint32_t)stagingBufferSizeBytes);
 		stagingBufferDescriptor.name = "Buffer Upload Staging Buffer";
 
-		CrBufferUpload bufferUpload;
+		BufferUpload bufferUpload;
 		bufferUpload.stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
 		bufferUpload.destinationBuffer = destinationBuffer;
 		bufferUpload.sizeBytes = destinationBuffer->GetSizeBytes();
@@ -319,7 +319,7 @@ namespace crgfx
 		const auto bufferUploadIter = m_openBufferUploads.find(bufferHash);
 		CrAssertMsg(bufferUploadIter != m_openBufferUploads.end(), "Tried ending buffer upload with no begin");
 
-		const CrBufferUpload& bufferUpload = bufferUploadIter->second;
+		const BufferUpload& bufferUpload = bufferUploadIter->second;
 
 		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(destinationBuffer);
 		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());

@@ -1,6 +1,6 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/CrCommonResources.h"
+#include "Graphics/CommonResources.h"
 #include "Graphics/CrShaderSources.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/CrMaterialCompiler.h"

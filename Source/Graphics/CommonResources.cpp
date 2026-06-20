@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrCommonResources.h"
+#include "CommonResources.h"
 
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/ISampler.h"

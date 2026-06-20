@@ -16,7 +16,7 @@
 #include "Graphics/ISampler.h"
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrRenderGraph.h"
-#include "Graphics/CrCommonResources.h"
+#include "Graphics/CommonResources.h"
 #include "Graphics/CrGraphics.h"
 
 #include "CrOSWindow.h"

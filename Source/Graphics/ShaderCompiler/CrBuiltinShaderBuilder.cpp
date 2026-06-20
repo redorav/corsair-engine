@@ -248,7 +248,7 @@ void CrBuiltinShaderBuilder::BuildBuiltinShaderMetadataAndHeaderFiles
 	builtinShadersGenericHeader += "#pragma once\n\n";
 	builtinShadersGenericHeader += "#include \"Core/CrCoreForwardDeclarations.h\"\n";
 	builtinShadersGenericHeader += "#include \"crstl/string.h\"\n";
-	builtinShadersGenericHeader += "#include \"Graphics/CrRendering.h\"\n";
+	builtinShadersGenericHeader += "#include \"Graphics/CrGraphics.h\"\n";
 	builtinShadersGenericHeader += "\n";
 	builtinShadersGenericHeader += builtinShadersEnum;
 	builtinShadersGenericHeader += "\n\n";

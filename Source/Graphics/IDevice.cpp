@@ -39,7 +39,7 @@ namespace crgfx
 
 		m_gpuDeletionQueue = crstl::unique_ptr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
 
-		m_gpuTransferCallbackQueue = crstl::unique_ptr<CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());
+		m_gpuTransferCallbackQueue = crstl::unique_ptr<crgfx::CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());
 	}
 
 	IDevice::~IDevice()

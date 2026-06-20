@@ -92,11 +92,12 @@ struct CrBufferUpload
 };
 
 class CrGPUDeletionQueue;
-class CrGPUTransferCallbackQueue;
 class CrGPUDeletable;
 
 namespace crgfx
 {
+	class CrGPUTransferCallbackQueue;
+
 	struct DeviceDescriptor
 	{
 		crgfx::GraphicsVendor::T preferredVendor = crgfx::GraphicsVendor::Unknown;
@@ -275,7 +276,7 @@ namespace crgfx
 
 		crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
 
-		crstl::unique_ptr<CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
+		crstl::unique_ptr<crgfx::CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
 
 		DeviceProperties m_deviceProperties;
 

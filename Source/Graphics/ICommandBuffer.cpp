@@ -6,7 +6,6 @@
 
 #include "IShader.h"
 #include "CrGPUStackAllocator.h"
-#include "CrCPUStackAllocator.h"
 
 #include "Core/CrMacros.h"
 

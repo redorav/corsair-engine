@@ -3,8 +3,7 @@
 #include "Core/CrCoreForwardDeclarations.h"
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-
-#include "CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 
 #include "crstl/fixed_string.h"
 

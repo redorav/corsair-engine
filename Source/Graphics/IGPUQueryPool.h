@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"

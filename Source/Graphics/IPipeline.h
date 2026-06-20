@@ -3,7 +3,7 @@
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrGraphics.h"
 #include "Graphics/DataFormats.h"
-#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 #include "Graphics/VertexDescriptor.h"
 
 #include "Core/CrHash.h"

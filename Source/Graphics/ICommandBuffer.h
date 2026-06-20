@@ -3,7 +3,7 @@
 #include "Graphics/IPipeline.h"
 #include "Graphics/GPUBuffer.h"
 #include "Graphics/ITexture.h"
-#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 #include "Graphics/CrRenderingStatistics.h"
 #include "Graphics/RenderPassDescriptor.h"
 #include "Graphics/CrGPUStackAllocator.h"

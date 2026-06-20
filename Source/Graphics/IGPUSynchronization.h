@@ -2,7 +2,7 @@
 
 #include "Core/CrCoreForwardDeclarations.h"
 
-#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 
 namespace crgfx
 {

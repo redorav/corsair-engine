@@ -1,6 +1,6 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/CrGPUDeletable.h"
+#include "Graphics/GPUDeletable.h"
 
 #include "Graphics/IDevice.h"
 

@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
 	crgfx::DeviceDescriptor graphicsDeviceDescriptor;
 	graphicsDeviceDescriptor.preferredVendor = crgfx::GraphicsVendor::FromString(graphicsVendorString.c_str());
 	crgfx::CreateMainDevice(graphicsDeviceDescriptor);
+	crgfx::InitializeCommonResources();
 
 	CrPrintProcessMemory("After Graphics Device");
 
@@ -90,7 +91,6 @@ int main(int argc, char* argv[])
 	CrShaderManager::Initialize();
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
-	CrCommonResources::Initialize();
 	CrOSWindow::Initialize();
 
 	CrOSWindowDescriptor osWindowDescriptor;
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 
 	frame.Deinitialize();
 
-	CrCommonResources::Deinitialize();
+	crgfx::DeinitializeCommonResources();
 
 	return 0;
 }

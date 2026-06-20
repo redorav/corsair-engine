@@ -238,7 +238,7 @@ void CrImGuiRenderer::AddRenderPass(CrRenderGraph& renderGraph, const crgfx::Tex
 			commandBuffer->BindGraphicsPipelineState(m_imguiGraphicsPipeline.get());
 			commandBuffer->BindIndexBuffer(indexBuffer);
 			commandBuffer->BindVertexBuffer(vertexBuffer, 0);
-			commandBuffer->BindSampler(Samplers::UISampleState, RenderingResources->AllLinearClampSampler.get());
+			commandBuffer->BindSampler(Samplers::UISampleState, crgfx::AllLinearClampSampler.get());
 			commandBuffer->SetViewport(crgfx::Viewport(0, 0, swapchain->GetWidth(), swapchain->GetHeight()));
 
 			// Projection matrix. TODO: this could be cached.

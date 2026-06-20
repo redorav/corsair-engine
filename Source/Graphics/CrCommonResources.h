@@ -4,35 +4,19 @@
 
 #include "crstl/intrusive_ptr.h"
 
-// Rendering resources that are used as default
-class CrCommonResources
+namespace crgfx
 {
-public:
-
-	static void Initialize();
-
-	static void Deinitialize();
-
-	// Global samplers
-
-	crgfx::SamplerHandle AllLinearClampSampler;
-
-	crgfx::SamplerHandle AllLinearWrapSampler;
-
-	crgfx::SamplerHandle AllPointClampSampler;
-
-	crgfx::SamplerHandle AllPointWrapSampler;
-
-	crgfx::TextureHandle WhiteSmallTexture;
-
-	crgfx::TextureHandle BlackSmallTexture;
+	extern crgfx::SamplerHandle AllLinearClampSampler;
+	extern crgfx::SamplerHandle AllLinearWrapSampler;
+	extern crgfx::SamplerHandle AllPointClampSampler;
+	extern crgfx::SamplerHandle AllPointWrapSampler;
+	extern crgfx::TextureHandle WhiteSmallTexture;
+	extern crgfx::TextureHandle BlackSmallTexture;
 
 	// Points up in tangent space
-	crgfx::TextureHandle NormalsSmallTexture;
+	extern crgfx::TextureHandle NormalsSmallTexture;
 
-private:
+	void InitializeCommonResources();
 
-	CrCommonResources();
+	void DeinitializeCommonResources();
 };
-
-extern CrCommonResources* RenderingResources;

@@ -7,112 +7,120 @@
 #include "Graphics/ITexture.h"
 #include "Graphics/IDevice.h"
 
-CrCommonResources* RenderingResources;
-
-void CrCommonResources::Initialize()
+namespace crgfx
 {
-	CrAssert(RenderingResources == nullptr);
-	RenderingResources = new CrCommonResources();
-}
+	crgfx::SamplerHandle AllLinearClampSampler;
+	crgfx::SamplerHandle AllLinearWrapSampler;
+	crgfx::SamplerHandle AllPointClampSampler;
+	crgfx::SamplerHandle AllPointWrapSampler;
+	crgfx::TextureHandle WhiteSmallTexture;
+	crgfx::TextureHandle BlackSmallTexture;
+	crgfx::TextureHandle NormalsSmallTexture;
 
-void CrCommonResources::Deinitialize()
-{
-	CrAssert(RenderingResources != nullptr);
-	delete RenderingResources;
-}
-
-CrCommonResources::CrCommonResources()
-{
-	//------------------------
-	// Create default samplers
-	//------------------------
-
+	void InitializeCommonResources()
 	{
-		crgfx::SamplerDescriptor descriptor;
-		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
-		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
-		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
-		descriptor.name = "Linear Clamp Sampler";
-		AllLinearClampSampler = crgfx::GetDevice()->CreateSampler(descriptor);
-	}
+		//------------------------
+		// Create default samplers
+		//------------------------
 
-	{
-		crgfx::SamplerDescriptor descriptor;
-		descriptor.addressModeU = crgfx::AddressMode::Wrap;
-		descriptor.addressModeV = crgfx::AddressMode::Wrap;
-		descriptor.addressModeW = crgfx::AddressMode::Wrap;
-		descriptor.name = "Linear Wrap Sampler";
-		AllLinearWrapSampler = crgfx::GetDevice()->CreateSampler(descriptor);
-	}
-
-	{
-		crgfx::SamplerDescriptor descriptor;
-		descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
-		descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
-		descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
-		descriptor.name = "Point Clamp Sampler";
-		AllPointClampSampler = crgfx::GetDevice()->CreateSampler(descriptor);
-	}
-
-	{
-		crgfx::SamplerDescriptor descriptor;
-		descriptor.addressModeU = crgfx::AddressMode::Wrap;
-		descriptor.addressModeV = crgfx::AddressMode::Wrap;
-		descriptor.addressModeW = crgfx::AddressMode::Wrap;
-		descriptor.name = "Point Wrap Sampler";
-		AllPointWrapSampler = crgfx::GetDevice()->CreateSampler(descriptor);
-	}
-
-	//------------------------
-	// Create default textures
-	//------------------------
-
-	{
-		uint8_t whiteTextureInitialData[4 * 4 * 4];
-		memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
-
-		crgfx::TextureDescriptor whiteTextureDescriptor;
-		whiteTextureDescriptor.width = 4;
-		whiteTextureDescriptor.height = 4;
-		whiteTextureDescriptor.initialData = whiteTextureInitialData;
-		whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
-		whiteTextureDescriptor.name = "White Small Texture";
-		WhiteSmallTexture = crgfx::GetDevice()->CreateTexture(whiteTextureDescriptor);
-	}
-
-	{
-		uint8_t blackTextureInitialData[4 * 4 * 4];
-		memset(blackTextureInitialData, 0, sizeof(blackTextureInitialData));
-
-		crgfx::TextureDescriptor blackTextureDescriptor;
-		blackTextureDescriptor.width = 4;
-		blackTextureDescriptor.height = 4;
-		blackTextureDescriptor.initialData = blackTextureInitialData;
-		blackTextureDescriptor.initialDataSize = sizeof(blackTextureInitialData);
-		blackTextureDescriptor.name = "Black Small Texture";
-		BlackSmallTexture = crgfx::GetDevice()->CreateTexture(blackTextureDescriptor);
-	}
-
-	{
-		uint8_t normalMapInitialData[4 * 4 * 4];
-
-		for (uint32_t x = 0; x < 4; ++x)
 		{
-			for (uint32_t y = 0; y < 4; ++y)
-			{
-				normalMapInitialData[y * 4 * 4 + x * 4 + 0] = 128;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 1] = 128;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 2] = 255;
-				normalMapInitialData[y * 4 * 4 + x * 4 + 3] = 255;
-			}
+			crgfx::SamplerDescriptor descriptor;
+			descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
+			descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
+			descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
+			descriptor.name = "Linear Clamp Sampler";
+			AllLinearClampSampler = crgfx::GetDevice()->CreateSampler(descriptor);
 		}
 
-		crgfx::TextureDescriptor defaultNormalTextureDescriptor;
-		defaultNormalTextureDescriptor.width = 4;
-		defaultNormalTextureDescriptor.height = 4;
-		defaultNormalTextureDescriptor.initialData = (const uint8_t*)normalMapInitialData;
-		defaultNormalTextureDescriptor.initialDataSize = sizeof(normalMapInitialData);
-		defaultNormalTextureDescriptor.name = "Normal Map Small Texture";
-		NormalsSmallTexture = crgfx::GetDevice()->CreateTexture(defaultNormalTextureDescriptor);
+		{
+			crgfx::SamplerDescriptor descriptor;
+			descriptor.addressModeU = crgfx::AddressMode::Wrap;
+			descriptor.addressModeV = crgfx::AddressMode::Wrap;
+			descriptor.addressModeW = crgfx::AddressMode::Wrap;
+			descriptor.name = "Linear Wrap Sampler";
+			AllLinearWrapSampler = crgfx::GetDevice()->CreateSampler(descriptor);
+		}
+
+		{
+			crgfx::SamplerDescriptor descriptor;
+			descriptor.addressModeU = crgfx::AddressMode::ClampToEdge;
+			descriptor.addressModeV = crgfx::AddressMode::ClampToEdge;
+			descriptor.addressModeW = crgfx::AddressMode::ClampToEdge;
+			descriptor.name = "Point Clamp Sampler";
+			AllPointClampSampler = crgfx::GetDevice()->CreateSampler(descriptor);
+		}
+
+		{
+			crgfx::SamplerDescriptor descriptor;
+			descriptor.addressModeU = crgfx::AddressMode::Wrap;
+			descriptor.addressModeV = crgfx::AddressMode::Wrap;
+			descriptor.addressModeW = crgfx::AddressMode::Wrap;
+			descriptor.name = "Point Wrap Sampler";
+			AllPointWrapSampler = crgfx::GetDevice()->CreateSampler(descriptor);
+		}
+
+		//------------------------
+		// Create default textures
+		//------------------------
+
+		{
+			uint8_t whiteTextureInitialData[4 * 4 * 4];
+			memset(whiteTextureInitialData, 0xff, sizeof(whiteTextureInitialData));
+
+			crgfx::TextureDescriptor whiteTextureDescriptor;
+			whiteTextureDescriptor.width = 4;
+			whiteTextureDescriptor.height = 4;
+			whiteTextureDescriptor.initialData = whiteTextureInitialData;
+			whiteTextureDescriptor.initialDataSize = sizeof(whiteTextureInitialData);
+			whiteTextureDescriptor.name = "White Small Texture";
+			WhiteSmallTexture = crgfx::GetDevice()->CreateTexture(whiteTextureDescriptor);
+		}
+
+		{
+			uint8_t blackTextureInitialData[4 * 4 * 4];
+			memset(blackTextureInitialData, 0, sizeof(blackTextureInitialData));
+
+			crgfx::TextureDescriptor blackTextureDescriptor;
+			blackTextureDescriptor.width = 4;
+			blackTextureDescriptor.height = 4;
+			blackTextureDescriptor.initialData = blackTextureInitialData;
+			blackTextureDescriptor.initialDataSize = sizeof(blackTextureInitialData);
+			blackTextureDescriptor.name = "Black Small Texture";
+			BlackSmallTexture = crgfx::GetDevice()->CreateTexture(blackTextureDescriptor);
+		}
+
+		{
+			uint8_t normalMapInitialData[4 * 4 * 4];
+
+			for (uint32_t x = 0; x < 4; ++x)
+			{
+				for (uint32_t y = 0; y < 4; ++y)
+				{
+					normalMapInitialData[y * 4 * 4 + x * 4 + 0] = 128;
+					normalMapInitialData[y * 4 * 4 + x * 4 + 1] = 128;
+					normalMapInitialData[y * 4 * 4 + x * 4 + 2] = 255;
+					normalMapInitialData[y * 4 * 4 + x * 4 + 3] = 255;
+				}
+			}
+
+			crgfx::TextureDescriptor defaultNormalTextureDescriptor;
+			defaultNormalTextureDescriptor.width = 4;
+			defaultNormalTextureDescriptor.height = 4;
+			defaultNormalTextureDescriptor.initialData = (const uint8_t*)normalMapInitialData;
+			defaultNormalTextureDescriptor.initialDataSize = sizeof(normalMapInitialData);
+			defaultNormalTextureDescriptor.name = "Normal Map Small Texture";
+			NormalsSmallTexture = crgfx::GetDevice()->CreateTexture(defaultNormalTextureDescriptor);
+		}
 	}
-}
+
+	void DeinitializeCommonResources()
+	{
+		AllLinearClampSampler = nullptr;
+		AllLinearWrapSampler = nullptr;
+		AllPointClampSampler = nullptr;
+		AllPointWrapSampler = nullptr;
+		WhiteSmallTexture = nullptr;
+		BlackSmallTexture = nullptr;
+		NormalsSmallTexture = nullptr;
+	}
+};

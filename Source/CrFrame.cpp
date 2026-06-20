@@ -474,14 +474,14 @@ void CrFrame::Process()
 
 	drawCommandBuffer->Begin();
 
-	drawCommandBuffer->BindTexture(Textures::DiffuseTexture0, RenderingResources->WhiteSmallTexture.get());
-	drawCommandBuffer->BindTexture(Textures::NormalTexture0, RenderingResources->NormalsSmallTexture.get());
-	drawCommandBuffer->BindTexture(Textures::SpecularTexture0, RenderingResources->WhiteSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::DiffuseTexture0, crgfx::WhiteSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::NormalTexture0, crgfx::NormalsSmallTexture.get());
+	drawCommandBuffer->BindTexture(Textures::SpecularTexture0, crgfx::WhiteSmallTexture.get());
 
-	drawCommandBuffer->BindSampler(Samplers::AllLinearClampSampler, RenderingResources->AllLinearClampSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllLinearWrapSampler, RenderingResources->AllLinearWrapSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllPointClampSampler, RenderingResources->AllPointClampSampler.get());
-	drawCommandBuffer->BindSampler(Samplers::AllPointWrapSampler, RenderingResources->AllPointWrapSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllLinearClampSampler, crgfx::AllLinearClampSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllLinearWrapSampler, crgfx::AllLinearWrapSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllPointClampSampler, crgfx::AllPointClampSampler.get());
+	drawCommandBuffer->BindSampler(Samplers::AllPointWrapSampler, crgfx::AllPointWrapSampler.get());
 
 	// Set up default values for common constant buffers
 

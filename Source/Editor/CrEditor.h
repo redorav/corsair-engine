@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 #include "Graphics/RenderWorld/CrModelInstance.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"

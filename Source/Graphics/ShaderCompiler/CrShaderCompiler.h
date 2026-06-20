@@ -25,8 +25,8 @@ struct CompilationDescriptor
 	: platform(cr::Platform::Count)
 	, graphicsApi(crgfx::GraphicsApi::Count)
 	, shaderStage(crgfx::ShaderStage::Count)
-	, metadata(false)
 	, optimization(OptimizationLevel::O3)
+	, metadata(false)
 	, processed(false)
 	{}
 

@@ -129,7 +129,7 @@ namespace crgfx
 		const char* name;
 	};
 
-	class ITexture : public CrGPUAutoDeletable
+	class ITexture : public GPUAutoDeletable
 	{
 	public:
 

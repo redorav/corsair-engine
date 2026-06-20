@@ -14,11 +14,11 @@ namespace crgfx
 	// e.g. GPU signals and CPU waits
 	// Vulkan: vkFence
 	// D3D12: ID3D12Fence
-	class IGPUFence : public CrGPUAutoDeletable
+	class IGPUFence : public GPUAutoDeletable
 	{
 	public:
 
-		IGPUFence(crgfx::IDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
+		IGPUFence(crgfx::IDevice* renderDevice) : GPUAutoDeletable(renderDevice) {}
 
 		virtual ~IGPUFence() {}
 	};
@@ -29,11 +29,11 @@ namespace crgfx
 	// e.g. Graphics queue signals, graphics queue receives
 	// Vulkan: vkSemaphore
 	// D3D12: ID3D12Fence
-	class IGPUSemaphore : public CrGPUAutoDeletable
+	class IGPUSemaphore : public GPUAutoDeletable
 	{
 	public:
 
-		IGPUSemaphore(crgfx::IDevice* renderDevice) : CrGPUAutoDeletable(renderDevice) {}
+		IGPUSemaphore(crgfx::IDevice* renderDevice) : GPUAutoDeletable(renderDevice) {}
 
 		virtual ~IGPUSemaphore() {}
 	};

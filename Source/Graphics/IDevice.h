@@ -17,7 +17,7 @@ namespace crgfx
 {
 	class GPUTransferCallbackQueue;
 	class GPUDeletionQueue;
-	class CrGPUDeletable;
+	class GPUDeletable;
 
 	struct DriverVersion
 	{
@@ -160,7 +160,7 @@ namespace crgfx
 
 		IGPUSemaphore* CreateGPUSemaphore();
 
-		void AddToDeletionQueue(CrGPUDeletable* resource);
+		void AddToDeletionQueue(GPUDeletable* resource);
 
 		//--------------------
 		// GPU Synchronization

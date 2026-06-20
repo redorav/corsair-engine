@@ -7,7 +7,7 @@
 
 namespace crgfx
 {
-	IGPUQueryPool::IGPUQueryPool(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+	IGPUQueryPool::IGPUQueryPool(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : GPUAutoDeletable(renderDevice)
 		, m_descriptor(descriptor)
 		, m_resolved(false)
 		, m_querySize(0) // Gets calculated by each platform

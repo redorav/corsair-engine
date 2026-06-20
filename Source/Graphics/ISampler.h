@@ -31,7 +31,7 @@ namespace crgfx
 		crstl::fixed_string128 name;
 	};
 
-	class ISampler : public CrGPUAutoDeletable
+	class ISampler : public GPUAutoDeletable
 	{
 	public:
 

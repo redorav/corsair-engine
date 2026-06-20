@@ -11,7 +11,7 @@
 
 namespace crgfx
 {
-	ICommandBuffer::ICommandBuffer(crgfx::IDevice* renderDevice, const crgfx::CommandBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+	ICommandBuffer::ICommandBuffer(crgfx::IDevice* renderDevice, const crgfx::CommandBufferDescriptor& descriptor) : GPUAutoDeletable(renderDevice)
 		, m_queueType(descriptor.queueType)
 		, m_submitted(false)
 		, m_recording(false)

@@ -7,7 +7,7 @@
 
 namespace crgfx
 {
-	IHardwareGPUBuffer::IHardwareGPUBuffer(crgfx::IDevice* renderDevice, const HardwareGPUBufferDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+	IHardwareGPUBuffer::IHardwareGPUBuffer(crgfx::IDevice* renderDevice, const HardwareGPUBufferDescriptor& descriptor) : GPUAutoDeletable(renderDevice)
 		, m_usage(descriptor.usage)
 		, m_access(descriptor.access)
 		, m_dataFormat(descriptor.dataFormat)

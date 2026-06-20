@@ -32,7 +32,7 @@ namespace crgfx
 
 	// Pool that contains queries of the type passed in as a template
 	// The template must be one of the interfaces provided above
-	class IGPUQueryPool : public CrGPUAutoDeletable
+	class IGPUQueryPool : public GPUAutoDeletable
 	{
 	public:
 

@@ -75,7 +75,7 @@ namespace crgfx
 	struct CrDeletionList
 	{
 		crgfx::GPUFenceHandle fence;
-		crstl::vector<CrGPUDeletable*> deletables;
+		crstl::vector<GPUDeletable*> deletables;
 	};
 
 	// A queue that manages deletion of GPU objects. Anything added to this queue
@@ -90,7 +90,7 @@ namespace crgfx
 
 		void Initialize(crgfx::IDevice* renderDevice);
 
-		void AddToQueue(CrGPUDeletable* deletable);
+		void AddToQueue(GPUDeletable* deletable);
 
 		// Processes pending requests and adds current requests so that they're waited on
 		// This is intended for in-flight resources during the frame
@@ -231,7 +231,7 @@ namespace crgfx
 		return CreateGPUSemaphorePS();
 	}
 
-	void IDevice::AddToDeletionQueue(CrGPUDeletable* resource)
+	void IDevice::AddToDeletionQueue(GPUDeletable* resource)
 	{
 		m_gpuDeletionQueue->AddToQueue(resource);
 	}
@@ -594,7 +594,7 @@ namespace crgfx
 		m_availableDeletionLists.pop_back();
 	}
 
-	void GPUDeletionQueue::AddToQueue(CrGPUDeletable* deletable)
+	void GPUDeletionQueue::AddToQueue(GPUDeletable* deletable)
 	{
 		// TODO Add synchronization for multithreading
 		m_currentDeletionList->deletables.push_back(deletable);
@@ -622,7 +622,7 @@ namespace crgfx
 
 			if (fenceResult == crgfx::GPUFenceResult::Success)
 			{
-				for (CrGPUDeletable* deletable : deletionList->deletables)
+				for (GPUDeletable* deletable : deletionList->deletables)
 				{
 					delete deletable;
 				}
@@ -707,7 +707,7 @@ namespace crgfx
 				// such that one of them won't be in flight at the same time that the parent has been synchronized
 				while (!deletionList->deletables.empty())
 				{
-					CrGPUDeletable* deletable = deletionList->deletables.back();
+					GPUDeletable* deletable = deletionList->deletables.back();
 					deletionList->deletables.pop_back();
 					delete deletable;
 				}

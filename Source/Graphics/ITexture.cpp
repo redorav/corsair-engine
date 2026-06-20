@@ -17,7 +17,7 @@ namespace crd3d
 
 namespace crgfx
 {
-	ITexture::ITexture(crgfx::IDevice* renderDevice, const crgfx::TextureDescriptor& descriptor) : CrGPUAutoDeletable(renderDevice)
+	ITexture::ITexture(crgfx::IDevice* renderDevice, const crgfx::TextureDescriptor& descriptor) : GPUAutoDeletable(renderDevice)
 		, m_usedGPUMemoryBytes(0)
 	{
 		m_width = descriptor.width;

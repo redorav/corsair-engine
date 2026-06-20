@@ -6,7 +6,7 @@
 
 namespace crgfx
 {
-	void CrGPUDeletable::CrRenderDeviceDeletionFunction(crgfx::IDevice* renderDevice, CrGPUDeletable* deletable)
+	void GPUDeletable::CrRenderDeviceDeletionFunction(crgfx::IDevice* renderDevice, GPUDeletable* deletable)
 	{
 		renderDevice->AddToDeletionQueue(deletable);
 	}

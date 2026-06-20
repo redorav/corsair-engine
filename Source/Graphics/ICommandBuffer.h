@@ -98,7 +98,7 @@ namespace crgfx
 		uint32_t stride = 0;
 	};
 
-	class ICommandBuffer : public CrGPUAutoDeletable
+	class ICommandBuffer : public GPUAutoDeletable
 	{
 	public:
 

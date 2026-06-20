@@ -208,7 +208,7 @@ namespace crgfx
 
 	static_assert(sizeof(GraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
 
-	class IGraphicsPipeline : public CrGPUAutoDeletable
+	class IGraphicsPipeline : public GPUAutoDeletable
 	{
 	public:
 
@@ -257,7 +257,7 @@ namespace crgfx
 #endif
 	};
 
-	class IComputePipeline : public CrGPUAutoDeletable
+	class IComputePipeline : public GPUAutoDeletable
 	{
 	public:
 

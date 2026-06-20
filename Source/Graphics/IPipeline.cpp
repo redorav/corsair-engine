@@ -31,7 +31,7 @@ crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 namespace crgfx
 {
 	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
-		: CrGPUAutoDeletable(renderDevice)
+		: GPUAutoDeletable(renderDevice)
 		, m_shader(graphicsShader)
 #if !defined(CR_CONFIG_FINAL)
 		, m_pipelineDescriptor(pipelineDescriptor)
@@ -54,7 +54,7 @@ namespace crgfx
 #endif
 
 	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
-		: CrGPUAutoDeletable(renderDevice), m_shader(computeShader)
+		: GPUAutoDeletable(renderDevice), m_shader(computeShader)
 	{
 		const CrShaderReflectionHeader& reflection = computeShader->GetBytecode()->GetReflection();
 		m_threadGroupSizeX = reflection.threadGroupSizeX;

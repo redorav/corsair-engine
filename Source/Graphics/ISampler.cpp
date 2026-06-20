@@ -26,7 +26,7 @@ namespace crgfx
 
 	}
 
-	ISampler::ISampler(crgfx::IDevice* renderDevice) : CrGPUAutoDeletable(renderDevice)
+	ISampler::ISampler(crgfx::IDevice* renderDevice) : GPUAutoDeletable(renderDevice)
 	{
 		m_renderDevice = renderDevice;
 	}

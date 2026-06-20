@@ -37,7 +37,7 @@ namespace crgfx
 		crgfx::DataFormat::T format;
 	};
 
-	class ISwapchain : public CrGPUAutoDeletable
+	class ISwapchain : public GPUAutoDeletable
 	{
 	public:
 

@@ -27,7 +27,7 @@
 #include "Graphics/RenderWorld/CrModelInstance.h"
 
 #include "Graphics/CrRendererConfig.h"
-#include "Graphics/CrRenderingResources.h"
+#include "Graphics/CrCommonResources.h"
 
 #include "Graphics/CrCommonVertexLayouts.h"
 

@@ -5,7 +5,7 @@
 #include "Graphics/IDevice.h"
 #include "Graphics/IShader.h"
 #include "Graphics/CrRendererConfig.h"
-#include "Graphics/CommonResources.h"
+#include "Graphics/CrCommonVertexLayouts.h"
 
 #include "Core/CrGlobalPaths.h"
 #include "crstl/process.h"

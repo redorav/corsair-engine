@@ -9,12 +9,15 @@
 #include "Graphics/CrImage.h"
 #include "Graphics/CrMaterialCompiler.h"
 #include "Graphics/CrCommonVertexLayouts.h"
+#include "Graphics/GPUBuffer.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "crstl/filesystem.h"
 #include "crstl/open_hashmap.h"
 #include "crstl/vector.h"
+
+#include "Core/Logging/ICrDebug.h"
 
 warnings_off
 // Make sure to compile the static library with this define as well

@@ -12,10 +12,13 @@
 #include "Graphics/CrImage.h"
 #include "Graphics/CrCommonVertexLayouts.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
+#include "Graphics/GPUBuffer.h"
 
 #include "GeneratedShaders/ShaderMetadata.h"
 
 #include "Core/FileSystem/CrFixedPath.h"
+#include "Core/Logging/ICrDebug.h"
+
 #include "crstl/open_hashmap.h"
 #include "crstl/filesystem.h"
 

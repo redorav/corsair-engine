@@ -28,8 +28,6 @@
 #define RENDER_DEVICE_LOGS
 #endif
 
-class CrGPUDeletable;
-
 namespace crgfx
 {
 	struct GPUDownloadCallback

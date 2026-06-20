@@ -17,6 +17,7 @@ namespace crgfx
 {
 	class GPUTransferCallbackQueue;
 	class GPUDeletionQueue;
+	class CrGPUDeletable;
 
 	struct DriverVersion
 	{
@@ -70,12 +71,7 @@ namespace crgfx
 			bool textureFormatCasting = false;
 		} features;
 	};
-};
 
-class CrGPUDeletable;
-
-namespace crgfx
-{
 	// Texture uploads encapsulate the idea that some platforms have an optimal texture format but for some (PC mainly) we can
 	// only provide the data in a linear format
 	struct TextureUpload

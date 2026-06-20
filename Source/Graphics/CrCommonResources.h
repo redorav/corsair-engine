@@ -5,7 +5,7 @@
 #include "crstl/intrusive_ptr.h"
 
 // Rendering resources that are used as default
-class CrRenderingResources
+class CrCommonResources
 {
 public:
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-	CrRenderingResources();
+	CrCommonResources();
 };
 
-extern CrRenderingResources* RenderingResources;
+extern CrCommonResources* RenderingResources;

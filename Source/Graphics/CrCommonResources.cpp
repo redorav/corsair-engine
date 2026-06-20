@@ -1,27 +1,27 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "CrRenderingResources.h"
+#include "CrCommonResources.h"
 
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/ISampler.h"
 #include "Graphics/ITexture.h"
 #include "Graphics/IDevice.h"
 
-CrRenderingResources* RenderingResources;
+CrCommonResources* RenderingResources;
 
-void CrRenderingResources::Initialize()
+void CrCommonResources::Initialize()
 {
 	CrAssert(RenderingResources == nullptr);
-	RenderingResources = new CrRenderingResources();
+	RenderingResources = new CrCommonResources();
 }
 
-void CrRenderingResources::Deinitialize()
+void CrCommonResources::Deinitialize()
 {
 	CrAssert(RenderingResources != nullptr);
 	delete RenderingResources;
 }
 
-CrRenderingResources::CrRenderingResources()
+CrCommonResources::CrCommonResources()
 {
 	//------------------------
 	// Create default samplers

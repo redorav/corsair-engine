@@ -1,6 +1,6 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
-#include "Graphics/CrRenderingResources.h"
+#include "Graphics/CrCommonResources.h"
 #include "Graphics/CrShaderSources.h"
 #include "Graphics/CrShaderManager.h"
 #include "Graphics/CrMaterialCompiler.h"
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 	CrShaderManager::Initialize();
 	CrMaterialCompiler::Initialize();
 	CrBuiltinPipelines::Initialize();
-	CrRenderingResources::Initialize();
+	CrCommonResources::Initialize();
 	CrOSWindow::Initialize();
 
 	CrOSWindowDescriptor osWindowDescriptor;
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 
 	frame.Deinitialize();
 
-	CrRenderingResources::Deinitialize();
+	CrCommonResources::Deinitialize();
 
 	return 0;
 }

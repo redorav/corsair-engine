@@ -183,15 +183,15 @@ KeyboardKey::Code GetKeyboardKeyFromVkKey(USHORT virtualKey)
 		//case VK_OEM_COMMA:   // ',' any country
 		//case VK_OEM_MINUS:   // '-' any country
 		//case VK_OEM_PERIOD:   // '.' any country
-		//case VK_OEM_2:   // '/?' for US
-		//case VK_OEM_3:   // '`~' for US
+		//case VK_OEM_2:  // '/?' for US
+		//case VK_OEM_3:  // '`~' for US
 		//case VK_OEM_4:  //  '[{' for US
 		//case VK_OEM_5:  //  '\|' for US
 		//case VK_OEM_6:  //  ']}' for US
 		//case VK_OEM_7:  //  ''"' for US
 		//case VK_OEM_8:
 		//case VK_OEM_AX:  //  'AX' key on Japanese AX kbd
-		//case VK_OEM_102:  //  "<>" or "\|" on RT 102-key kbd.
+		case VK_OEM_102: return KeyboardKey::OEM102; // "<>" or "\|" on RT 102-key kbd.
 		//case VK_ICO_HELP:  //  Help key on ICO
 		//case VK_ICO_00:  //  00 key on ICO
 		//case VK_PROCESSKEY:

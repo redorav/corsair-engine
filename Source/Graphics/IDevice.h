@@ -15,7 +15,8 @@
 
 namespace crgfx
 {
-	class CrGPUTransferCallbackQueue;
+	class GPUTransferCallbackQueue;
+	class GPUDeletionQueue;
 
 	struct DriverVersion
 	{
@@ -93,7 +94,6 @@ struct CrBufferUpload
 	uint32_t destinationOffsetBytes;
 };
 
-class CrGPUDeletionQueue;
 class CrGPUDeletable;
 
 namespace crgfx
@@ -274,9 +274,9 @@ namespace crgfx
 
 		void LoadPipelineCache(crstl::vector<char>& pipelineCacheData);
 
-		crstl::unique_ptr<CrGPUDeletionQueue> m_gpuDeletionQueue;
+		crstl::unique_ptr<GPUDeletionQueue> m_gpuDeletionQueue;
 
-		crstl::unique_ptr<crgfx::CrGPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
+		crstl::unique_ptr<crgfx::GPUTransferCallbackQueue> m_gpuTransferCallbackQueue;
 
 		DeviceProperties m_deviceProperties;
 

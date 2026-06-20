@@ -16,7 +16,9 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrGlobalPaths.h"
 
-#include "Graphics/CrGPUDeletionQueue.h"
+// TODO Improve this, how to best deal with the frame counter?
+// Seems like the wrong place to have it here
+#include "Core/CrFrameTime.h"
 
 #include "crstl/deque.h"
 #include "crstl/fixed_function.h"
@@ -26,21 +28,23 @@
 #define RENDER_DEVICE_LOGS
 #endif
 
+class CrGPUDeletable;
+
 namespace crgfx
 {
-	struct CrGPUDownloadCallback
+	struct GPUDownloadCallback
 	{
 		crgfx::GPUTransferCallback callback;
 		crgfx::HardwareGPUBufferHandle buffer;
 	};
 
-	struct CrDownloadCallbackList
+	struct DownloadCallbackList
 	{
 		crgfx::GPUFenceHandle fence;
-		crstl::vector<CrGPUDownloadCallback> callbacks;
+		crstl::vector<GPUDownloadCallback> callbacks;
 	};
 
-	class CrGPUTransferCallbackQueue
+	class GPUTransferCallbackQueue
 	{
 	public:
 
@@ -48,7 +52,7 @@ namespace crgfx
 
 		void Initialize(crgfx::IDevice* renderDevice);
 
-		void AddToQueue(const CrGPUDownloadCallback& callback);
+		void AddToQueue(const GPUDownloadCallback& callback);
 
 		void Process();
 
@@ -57,17 +61,63 @@ namespace crgfx
 		crgfx::IDevice* m_renderDevice = nullptr;
 
 		// Callbacks to be executed after a successful download operation, copying from GPU to CPU
-		CrDownloadCallbackList* m_currentCallbackList = nullptr;
+		DownloadCallbackList* m_currentCallbackList = nullptr;
 
 		// Active callback lists have had fence signal commands scheduled on
 		// the GPU, and are waiting to receive that on the CPU. We want to
 		// push back, but then get front to query the fence
-		crstl::deque<CrDownloadCallbackList*> m_activeCallbackLists;
+		crstl::deque<DownloadCallbackList*> m_activeCallbackLists;
 
 		// Available callback lists are there to be reused
-		crstl::fixed_vector<CrDownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;
+		crstl::fixed_vector<DownloadCallbackList*, MaximumCallbackLists> m_availableCallbackLists;
 
-		crstl::fixed_vector<CrDownloadCallbackList, MaximumCallbackLists> m_callbackLists;
+		crstl::fixed_vector<DownloadCallbackList, MaximumCallbackLists> m_callbackLists;
+	};
+
+	struct CrDeletionList
+	{
+		crgfx::GPUFenceHandle fence;
+		crstl::vector<CrGPUDeletable*> deletables;
+	};
+
+	// A queue that manages deletion of GPU objects. Anything added to this queue
+	// will eventually get destroyed
+	class GPUDeletionQueue
+	{
+	public:
+
+		~GPUDeletionQueue();
+
+		static const uint32_t MaximumDeletionLists = 4;
+
+		void Initialize(crgfx::IDevice* renderDevice);
+
+		void AddToQueue(CrGPUDeletable* deletable);
+
+		// Processes pending requests and adds current requests so that they're waited on
+		// This is intended for in-flight resources during the frame
+		void Process();
+
+		void Finalize();
+
+	private:
+
+		crgfx::IDevice* m_renderDevice = nullptr;
+
+		// The current deletion list points to all the resources being deleted before we execute the fence. Once we execute the fence, we add it
+		// to the active deletion lists to be waited on
+		CrDeletionList* m_currentDeletionList = nullptr;
+
+		// Active deletion lists have had fence signal commands scheduled on the GPU, and are waiting to receive that on the CPU. We want to
+		// push back, but then get front to query the fence
+		crstl::deque<CrDeletionList*> m_activeDeletionLists;
+
+		// Available deletion lists are there to be reused
+		crstl::fixed_vector<CrDeletionList*, MaximumDeletionLists> m_availableDeletionLists;
+
+		// These are the actual contents of the CrDeletionList. The other lists point to the contents here. We cannot
+		// have reallocation on these lists so we use fixed size vectors
+		crstl::fixed_vector<CrDeletionList, MaximumDeletionLists> m_deletionLists;
 	};
 
 	IDevice::IDevice(IGraphicsSystem* renderSystem, const crgfx::DeviceDescriptor& descriptor)
@@ -80,9 +130,9 @@ namespace crgfx
 		m_deviceProperties.graphicsApi = renderSystem->GetGraphicsApi();
 		m_deviceProperties.preferredVendor = descriptor.preferredVendor;
 
-		m_gpuDeletionQueue = crstl::unique_ptr<CrGPUDeletionQueue>(new CrGPUDeletionQueue());
+		m_gpuDeletionQueue = crstl::unique_ptr<GPUDeletionQueue>(new GPUDeletionQueue());
 
-		m_gpuTransferCallbackQueue = crstl::unique_ptr<crgfx::CrGPUTransferCallbackQueue>(new CrGPUTransferCallbackQueue());
+		m_gpuTransferCallbackQueue = crstl::unique_ptr<crgfx::GPUTransferCallbackQueue>(new GPUTransferCallbackQueue());
 	}
 
 	IDevice::~IDevice()
@@ -303,12 +353,12 @@ namespace crgfx
 		return new IndexBuffer(this, access, dataFormat, numIndices);
 	}
 
-	ISampler* IDevice::CreateSampler(const crgfx::SamplerDescriptor& descriptor)
+	ISampler* IDevice::CreateSampler(const SamplerDescriptor& descriptor)
 	{
 		return CreateSamplerPS(descriptor);
 	}
 
-	ISwapchain* IDevice::CreateSwapchain(const crgfx::SwapchainDescriptor& swapchainDescriptor)
+	ISwapchain* IDevice::CreateSwapchain(const SwapchainDescriptor& swapchainDescriptor)
 	{
 		CrAssertMsg(swapchainDescriptor.window, "Window cannot be null");
 		CrAssertMsg(swapchainDescriptor.format != crgfx::DataFormat::Invalid, "Must set a data format");
@@ -323,7 +373,7 @@ namespace crgfx
 		return swapchain;
 	}
 
-	ITexture* IDevice::CreateTexture(const crgfx::TextureDescriptor& descriptor)
+	ITexture* IDevice::CreateTexture(const TextureDescriptor& descriptor)
 	{
 		return CreateTexturePS(descriptor);
 	}
@@ -363,12 +413,12 @@ namespace crgfx
 		WaitIdlePS();
 	}
 
-	uint8_t* IDevice::BeginTextureUpload(const crgfx::ITexture* texture)
+	uint8_t* IDevice::BeginTextureUpload(const ITexture* texture)
 	{
 		return BeginTextureUploadPS(texture);
 	}
 
-	void IDevice::EndTextureUpload(const crgfx::ITexture* texture)
+	void IDevice::EndTextureUpload(const ITexture* texture)
 	{
 		return EndTextureUploadPS(texture);
 	}
@@ -394,7 +444,7 @@ namespace crgfx
 
 		// Create a callback that will be called by the render device during processing once it's done
 		// We store the callback and the buffer as we will most likely want to map it
-		CrGPUDownloadCallback downloadCallback;
+		GPUDownloadCallback downloadCallback;
 		downloadCallback.callback = callback;
 		downloadCallback.buffer = buffer;
 		m_gpuTransferCallbackQueue->AddToQueue(downloadCallback);
@@ -405,7 +455,7 @@ namespace crgfx
 		return m_deviceProperties;
 	}
 
-	void IDevice::SubmitCommandBuffer(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
+	void IDevice::SubmitCommandBuffer(const ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence)
 	{
 		SubmitCommandBufferPS(commandBuffer, waitSemaphore, signalSemaphore, signalFence);
 	}
@@ -443,7 +493,7 @@ namespace crgfx
 		}
 	}
 
-	void CrGPUTransferCallbackQueue::Initialize(crgfx::IDevice* renderDevice)
+	void GPUTransferCallbackQueue::Initialize(IDevice* renderDevice)
 	{
 		m_renderDevice = renderDevice;
 
@@ -464,22 +514,22 @@ namespace crgfx
 		m_availableCallbackLists.pop_back();
 	}
 
-	void CrGPUTransferCallbackQueue::AddToQueue(const CrGPUDownloadCallback& callback)
+	void GPUTransferCallbackQueue::AddToQueue(const GPUDownloadCallback& callback)
 	{
 		// TODO Add synchronization for multithreading
 		m_currentCallbackList->callbacks.push_back(callback);
 	}
 
-	void CrGPUTransferCallbackQueue::Process()
+	void GPUTransferCallbackQueue::Process()
 	{
 		while (!m_activeCallbackLists.empty())
 		{
 			// Get the last list we pushed into the active list
-			CrDownloadCallbackList* callbackList = m_activeCallbackLists.front();
+			DownloadCallbackList* callbackList = m_activeCallbackLists.front();
 
 			if (m_renderDevice->GetFenceStatus(callbackList->fence.get()) == crgfx::GPUFenceResult::Success)
 			{
-				for (const CrGPUDownloadCallback& callback : callbackList->callbacks)
+				for (const GPUDownloadCallback& callback : callbackList->callbacks)
 				{
 					callback.callback(callback.buffer);
 				}
@@ -516,5 +566,159 @@ namespace crgfx
 		}
 
 		CrAssertMsg(m_currentCallbackList, "Current callback list cannot be null");
+	}
+
+	static const bool DebugDeletionQueues = false;
+
+	GPUDeletionQueue::~GPUDeletionQueue()
+	{
+
+	}
+
+	void GPUDeletionQueue::Initialize(crgfx::IDevice* renderDevice)
+	{
+		m_renderDevice = renderDevice;
+
+		// We need as many as the system requests plus an extra one for when they're
+		// all in flight (and the system reserves "the next one"). We could lazily
+		// allocate in the AddToQueue function but this is simpler to reason about
+		m_deletionLists.resize(MaximumDeletionLists);
+
+		for (uint32_t i = 0; i < m_deletionLists.size(); ++i)
+		{
+			m_deletionLists[i].fence = m_renderDevice->CreateGPUFence();
+
+			m_availableDeletionLists.push_back(&m_deletionLists[i]);
+		}
+
+		// Pop from the vector to get an available list
+		m_currentDeletionList = m_availableDeletionLists.back();
+		m_availableDeletionLists.pop_back();
+	}
+
+	void GPUDeletionQueue::AddToQueue(CrGPUDeletable* deletable)
+	{
+		// TODO Add synchronization for multithreading
+		m_currentDeletionList->deletables.push_back(deletable);
+	}
+
+	void GPUDeletionQueue::Process()
+	{
+		// 1. Loop through the active lists and delete any objects that are guaranteed
+		// to have been processed by the GPU
+
+		if (DebugDeletionQueues)
+		{
+			// TODO Remove this. Should we track the frame index internally, passed into the deletion queue?
+			// Or update the device
+			CrLog("CrGPUDeletionQueue Current Frame %i", CrFrameTime::GetFrameIndex());
+			CrLog("%i active deletion lists", m_activeDeletionLists.size());
+		}
+
+		while (!m_activeDeletionLists.empty())
+		{
+			// Get the last list we pushed into the active list
+			CrDeletionList* deletionList = m_activeDeletionLists.front();
+
+			crgfx::GPUFenceResult fenceResult = m_renderDevice->GetFenceStatus(deletionList->fence.get());
+
+			if (fenceResult == crgfx::GPUFenceResult::Success)
+			{
+				for (CrGPUDeletable* deletable : deletionList->deletables)
+				{
+					delete deletable;
+				}
+
+				// Reset the deletion list's properties
+				deletionList->deletables.clear();
+				m_renderDevice->ResetFence(deletionList->fence.get());
+
+				// Put back in the available list and remove from active
+				m_availableDeletionLists.push_back(deletionList);
+				m_activeDeletionLists.pop_front();
+
+				if (DebugDeletionQueues)
+				{
+					CrLog("Deletion list emptied");
+				}
+			}
+			else
+			{
+				// Our lists are sequential, i.e. if this one has not been signaled,
+				// it is guaranteed the others won't have been
+				break;
+			}
+		}
+
+		// 2. If there are any elements to delete, add the current list to the active
+		// list and submit a fence signal to the queue
+		if (!m_currentDeletionList->deletables.empty())
+		{
+			if (DebugDeletionQueues)
+			{
+				CrLog("Added current deletion list to active lists");
+			}
+
+			m_activeDeletionLists.push_back(m_currentDeletionList);
+			m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentDeletionList->fence.get());
+			m_currentDeletionList = nullptr;
+		}
+
+		// 3. Find an available list and assign it to the current deletion list
+		if (!m_currentDeletionList && !m_availableDeletionLists.empty())
+		{
+			if (DebugDeletionQueues)
+			{
+				CrLog("Deletion list reserved from available list");
+			}
+
+			m_currentDeletionList = m_availableDeletionLists.back();
+			m_availableDeletionLists.pop_back();
+		}
+
+		CrAssertMsg(m_currentDeletionList, "Current deletion list cannot be null");
+	}
+
+	void GPUDeletionQueue::Finalize()
+	{
+		// Delete all the fence that aren't currently in an available deletion list. It won't matter
+		// who waits for them. We cannot do this with the deletion lists that are currently active
+		// as we need to wait for the fences to finish
+		for (CrDeletionList* deletionList : m_availableDeletionLists)
+		{
+			deletionList->fence = nullptr;
+		}
+
+		// Push current list to the main queue and signal it. These are the last remaining resources in flight
+		m_activeDeletionLists.push_back(m_currentDeletionList);
+		m_renderDevice->SignalFence(crgfx::CommandQueueType::Graphics, m_currentDeletionList->fence.get());
+
+		// Clear the rest of the resources that have been added to the lists, and wait for them
+		// instead of just checking whether the fence has been signaled at this point. There is
+		// no real risk of locking up here because we have certainty that all fences were queued
+		for (CrDeletionList* deletionList : m_activeDeletionLists)
+		{
+			if (m_renderDevice->WaitForFence(deletionList->fence.get(), UINT64_MAX) == crgfx::GPUFenceResult::Success)
+			{
+				// Add current fence to the deletion list. We can now guarantee this it the last usage of this list
+				deletionList->fence = nullptr;
+
+				// We need to get the last element, pop it out, and then delete it, because resources can be holding on
+				// to resources that get added to the list while we start deleting, for example a command buffer that
+				// holds reference to an auxiliary buffer. We assume in this model that the lifetimes for these are tied
+				// such that one of them won't be in flight at the same time that the parent has been synchronized
+				while (!deletionList->deletables.empty())
+				{
+					CrGPUDeletable* deletable = deletionList->deletables.back();
+					deletionList->deletables.pop_back();
+					delete deletable;
+				}
+
+				deletionList->deletables.clear();
+			}
+		}
+
+		m_currentDeletionList = nullptr;
+		m_activeDeletionLists.clear();
 	}
 };

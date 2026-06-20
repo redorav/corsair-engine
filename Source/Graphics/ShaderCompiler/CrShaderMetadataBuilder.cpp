@@ -9,7 +9,7 @@
 #include "Core/FileSystem/CrFixedPath.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Graphics/CrRendering.h"
+#include "Graphics/CrGraphics.h"
 
 #include "spirv_reflect.h"
 

@@ -70,7 +70,7 @@ namespace crgfx
 
 	}
 
-	void crgfx::InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
+	void InitializeGraphicsSystem(const crgfx::GraphicsSystemDescriptor& graphicsSystemDescriptor)
 	{
 		IGraphicsSystem* graphicsSystem = nullptr;
 
@@ -93,32 +93,32 @@ namespace crgfx
 		GraphicsSystem = crstl::unique_ptr<IGraphicsSystem>(graphicsSystem);
 	}
 
-	void crgfx::CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
+	void CreateMainDevice(const crgfx::DeviceDescriptor& descriptor)
 	{
 		GraphicsSystem->CreateMainDevice(descriptor);
 	}
 
-	const crgfx::DeviceHandle& crgfx::GetDevice()
+	const crgfx::DeviceHandle& GetDevice()
 	{
 		return GraphicsSystem->GetDevice();
 	}
 
-	const ShaderBytecodeHandle& crgfx::GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
+	const ShaderBytecodeHandle& GetBuiltinShaderBytecode(CrBuiltinShaders::T builtinShader)
 	{
 		return GraphicsSystem->GetBuiltinShaderBytecode(builtinShader);
 	}
 
-	const ShaderBytecodeHandle& crgfx::GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
+	const ShaderBytecodeHandle& GetBuiltinComputeBytecode(CrBuiltinCompute::T builtinCompute)
 	{
 		return GraphicsSystem->GetBuiltinComputeBytecode(builtinCompute);
 	}
 
-	crgfx::GraphicsApi::T crgfx::GetGraphicsApi()
+	crgfx::GraphicsApi::T GetGraphicsApi()
 	{
 		return GraphicsSystem->GetGraphicsApi();
 	}
 
-	bool crgfx::GetIsValidationEnabled()
+	bool GetIsValidationEnabled()
 	{
 		return GraphicsSystem->GetIsValidationEnabled();
 	}

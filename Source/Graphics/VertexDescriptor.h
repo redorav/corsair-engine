@@ -14,8 +14,7 @@
 
 namespace crgfx
 {
-	// These are the vertex semantics that we can use. They need to mirror the vertex semantics
-	// in the shader
+	// These are the vertex semantics that we can use. They need to mirror the vertex semantics in the shader
 	// TODO It would be good to have a shared file that has the names
 	namespace VertexSemantic
 	{
@@ -125,12 +124,9 @@ namespace crgfx
 	static_assert(sizeof(VertexAttribute) == 2, "Vertex attribute size mismatch");
 	static_assert(crgfx::DataFormat::LastUncompressed < 64, "Formats out of range");
 
-	// A vertex format defines the layout for a vertex buffer or a mesh
-	// If it is owned by a vertex buffer, streamId is always 0
-	// If it is owned by a mesh, stream id belongs to the stream we've
-	// decided to put it in. The input layout of a pipeline will need
-	// to mirror this layout exactly when instantiated and the mesh
-	// will have to bind the necessary data
+	// A vertex format defines the layout for a vertex buffer or a mesh. If it is owned by a vertex buffer, streamId is always 0
+	// If it is owned by a mesh, stream id belongs to the stream we've decided to put it in. The input layout of a pipeline will need
+	// to mirror this layout exactly when instantiated and the mesh will have to bind the necessary data
 	struct VertexDescriptor
 	{
 		VertexDescriptor() {}

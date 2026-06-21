@@ -20,7 +20,7 @@
 struct SelectionState
 {
 	// Id of the entity we've selected
-	uint32_t modelInstanceId = 0xffffffff;
+	uint32_t uniqueInstanceId = 0xffffffff;
 
 	MouseState mouseState;
 
@@ -40,19 +40,19 @@ struct CrManipulator
 {
 	float4x4 transformMtx;
 
-	CrModelInstanceId xAxis;
-	CrModelInstanceId yAxis;
-	CrModelInstanceId zAxis;
-	CrModelInstanceId xzPlane;
-	CrModelInstanceId xyPlane;
-	CrModelInstanceId yzPlane;
+	CrModelInstanceID xAxis;
+	CrModelInstanceID yAxis;
+	CrModelInstanceID zAxis;
+	CrModelInstanceID xzPlane;
+	CrModelInstanceID xyPlane;
+	CrModelInstanceID yzPlane;
 };
 
 // Properties of instances that are currently selected. We use this to be able to transform
 // relative to their original state instead of accumulating which can produce drift
 struct SelectedInstanceState
 {
-	CrModelInstanceId modelInstanceId;
+	CrModelInstanceID modelInstanceId;
 
 	float4x4 initialTransform;
 };
@@ -110,15 +110,15 @@ private:
 
 	// Selection functionality
 
-	void SetSelected(CrModelInstanceId instanceId);
+	void SetSelected(CrModelInstanceID instanceId);
 
-	void ToggleSelected(CrModelInstanceId instanceId);
+	void ToggleSelected(CrModelInstanceID instanceId);
 
-	bool GetIsSelected(CrModelInstanceId instanceId);
+	bool GetIsSelected(CrModelInstanceID instanceId);
 
-	void AddSelected(CrModelInstanceId instanceId);
+	void AddSelected(CrModelInstanceID instanceId);
 
-	void RemoveSelected(CrModelInstanceId instanceId);
+	void RemoveSelected(CrModelInstanceID instanceId);
 
 	void ClearSelectedInstances();
 
@@ -138,7 +138,7 @@ private:
 
 	crstl::vector<SelectionState> m_selectionStateQueue;
 
-	crstl::open_hashmap<CrModelInstanceId::type, SelectedInstanceState> m_selectedInstances;
+	crstl::open_hashmap<CrModelInstanceID::type, SelectedInstanceState> m_selectedInstances;
 
 	// Pointer to a currently spawned manipulator
 	crstl::unique_ptr<CrManipulator> m_manipulator;

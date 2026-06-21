@@ -4,8 +4,10 @@
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrRenderMesh.h"
 #include "Graphics/CrCamera.h"
+#include "Graphics/CrShapeBuilder.h"
 
 #include "Graphics/CrCPUStackAllocator.h"
+#include "Graphics/CrBuiltinPipelines.h"
 
 #include "crstl/sort.h"
 
@@ -76,12 +78,12 @@ CrRenderWorld::~CrRenderWorld()
 	//CrAssertMsg(m_numModelInstances.id == 0, "Not all model instances were destroyed correctly");
 }
 
-CrModelInstanceId CrRenderWorld::CreateModelInstance()
+CrModelInstanceID CrRenderWorld::CreateModelInstance()
 {
-	CrModelInstanceId availableId;
+	CrModelInstanceID availableId;
 
 	// If we have an available id (from a previously deleted instance) reuse that
-	if (m_lastAvailableModelInstanceId != CrModelInstanceId())
+	if (m_lastAvailableModelInstanceId != CrModelInstanceID())
 	{
 		availableId = m_lastAvailableModelInstanceId;
 		m_lastAvailableModelInstanceId.id = m_modelInstanceIdToIndex[m_lastAvailableModelInstanceId.id].id;
@@ -92,11 +94,11 @@ CrModelInstanceId CrRenderWorld::CreateModelInstance()
 		m_maxModelInstanceId++;
 	}
 
-	m_modelInstances[m_numModelInstances.id] = CrModelInstance();
+	m_modelInstances[m_numModelInstances.id] = CrModelInstance(availableId);
 
 	// Initialize remapping tables
 	m_modelInstanceIdToIndex[availableId.id] = CrModelInstanceIndex(m_numModelInstances.id);
-	m_modelInstanceIndexToId[m_numModelInstances.id] = CrModelInstanceId(availableId.id);
+	m_modelInstanceIndexToId[m_numModelInstances.id] = CrModelInstanceID(availableId.id);
 
 	m_numModelInstances++;
 
@@ -106,33 +108,37 @@ CrModelInstanceId CrRenderWorld::CreateModelInstance()
 	return availableId;
 }
 
-void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
+void CrRenderWorld::DestroyModelInstance(CrModelInstanceID instanceId)
 {
-	CrAssertMsg(instanceId.id < CrModelInstanceId::MaxId, "Invalid model instance id");
+	CrAssertMsg(instanceId.id < CrModelInstanceID::MaxId, "Invalid model instance id");
 	CrAssertMsg(m_numModelInstances.id > 0, "Destroying more model instances than were created");
 
 	// Instance id and index of the model instance about to be destroyed
-	CrModelInstanceId destroyedInstanceId       = instanceId;
+	CrModelInstanceID destroyedInstanceId       = instanceId;
 	CrModelInstanceIndex destroyedInstanceIndex = GetModelInstanceIndex(destroyedInstanceId);
 
 	// Instance id and index of the model instance located at the end of the list (which we're about to swap)
 	CrModelInstanceIndex lastInstanceIndex      = m_numModelInstances - 1;
-	CrModelInstanceId lastInstanceId            = GetModelInstanceId(lastInstanceIndex);
+	CrModelInstanceID lastInstanceId            = GetModelInstanceId(lastInstanceIndex);
 	
 	//---------------
 	// Swap resources
 	//---------------
 
 	// We want them always well packed. Take the index where the data lived for the destroyed model instance
-	// and copy the data belonging to the last model instance in the array
-	m_modelInstances[destroyedInstanceIndex.id]          = m_modelInstances[lastInstanceIndex.id];
+	// and copy the data belonging to the last model instance in the array. There's no need to copy it if the
+	// instance we're deleting is the last one
+	if (destroyedInstanceIndex != lastInstanceIndex)
+	{
+		m_modelInstances[destroyedInstanceIndex.id] = m_modelInstances[lastInstanceIndex.id];
+	}
 
 	//--------------------------
 	// Update indirection tables
 	//--------------------------
 
 	// Update the last instance id to point to the index of the destroyed instance
-	m_modelInstanceIdToIndex[lastInstanceId.id]      = CrModelInstanceIndex(destroyedInstanceIndex.id);
+	m_modelInstanceIdToIndex[lastInstanceId.id] = CrModelInstanceIndex(destroyedInstanceIndex.id);
 
 	// Store the last available id in the destroyed instance id's slot
 	// Cast the data here even though it's not correct (storing instance index in place of instance id)
@@ -145,7 +151,7 @@ void CrRenderWorld::DestroyModelInstance(CrModelInstanceId instanceId)
 	m_modelInstanceIndexToId[destroyedInstanceIndex.id] = lastInstanceId;
 
 	// Point last model instance to an invalid id
-	m_modelInstanceIndexToId[lastInstanceIndex.id]      = CrModelInstanceId();
+	m_modelInstanceIndexToId[lastInstanceIndex.id] = CrModelInstanceID();
 	
 	// Decrement number of model instances
 	m_numModelInstances.id--;
@@ -201,7 +207,9 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		m_visibleModelInstances.push_back(instanceIndex);
 
-		CrModelInstanceId instanceId = GetModelInstanceId(instanceIndex);
+		CrModelInstanceID instanceId = GetModelInstanceId(instanceIndex);
+
+		CrEntityID entityID = modelInstance.GetEntityID();
 
 		bool isEditorEdgeHighlight = modelInstance.GetIsEdgeHighlight();
 
@@ -294,7 +302,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 				{
 					mainPacket.pipeline = debugPipeline;
 					mainPacket.sortKey = CreateStandardSortKey(depthUint, mainPacket.pipeline, renderMesh, material);
-					mainPacket.extra = (void*)(uintptr_t)instanceId.id;
+					mainPacket.extra = (void*)(uintptr_t)entityID.instanceID;
 					m_renderLists[CrRenderListUsage::MouseSelection].AddPacket(mainPacket);
 				}
 			}

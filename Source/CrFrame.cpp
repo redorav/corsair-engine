@@ -27,7 +27,7 @@
 #include "Graphics/RenderWorld/CrModelInstance.h"
 
 #include "Graphics/CrRendererConfig.h"
-#include "Graphics/CrCommonResources.h"
+#include "Graphics/CommonResources.h"
 
 #include "Graphics/CrCommonVertexLayouts.h"
 
@@ -225,7 +225,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 
 		for (uint32_t i = 0; i < numModels; ++i)
 		{
-			CrModelInstanceId modelInstanceId = m_renderWorld->CreateModelInstance();
+			CrModelInstanceID modelInstanceId = m_renderWorld->CreateModelInstance();
 			CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(modelInstanceId);
 
 			float angle = 2.39996322f * i;
@@ -826,8 +826,9 @@ void CrFrame::Process()
 		m_mainRenderGraph.AddRenderPass(CrRenderGraphString("Mouse Instance ID"), float4(0.5f, 0.0, 0.5f, 1.0f), CrRenderGraphPassType::Graphics,
 		[&](CrRenderGraph& renderGraph)
 		{
+			float nanAsFloat = asfloat(0xffffffff);
 			renderGraph.BindDepthStencilTarget(m_depthStencilTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, 0.0f);
-			renderGraph.BindRenderTarget(m_debugShaderTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(1.0f, 1.0f, 1.0f, 1.0f));
+			renderGraph.BindRenderTarget(m_debugShaderTexture.get(), crgfx::RenderTargetLoadOp::Clear, crgfx::RenderTargetStoreOp::Store, float4(nanAsFloat, nanAsFloat, nanAsFloat, nanAsFloat));
 		},
 		[=](const CrRenderGraph&, crgfx::ICommandBuffer* commandBuffer)
 		{
@@ -850,7 +851,7 @@ void CrFrame::Process()
 				DebugShaderCB* debugShaderData = debugShaderBuffer.GetData();
 				{
 					uint32_t instanceId = (uint32_t)(uintptr_t)renderPacket.extra;
-					debugShaderData->debugProperties = float4(0.0f, instanceId, 0.0f, 0.0f);
+					debugShaderData->debugProperties = float4(0.0f, asfloat(instanceId), 0.0f, 0.0f);
 				}
 				commandBuffer->BindConstantBuffer(debugShaderBuffer);
 
@@ -937,7 +938,7 @@ void CrFrame::Process()
 				uint32_t* mouseIdMemory = (uint32_t*)mouseIdBuffer->Lock();
 				{
 					SelectionState state;
-					state.modelInstanceId = *mouseIdMemory;
+					state.uniqueInstanceId = *mouseIdMemory;
 					state.mouseState = mouseState;
 					state.keyboardState = keyboardState;
 					Editor->AddSelectionState(state);

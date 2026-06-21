@@ -53,7 +53,7 @@ namespace CrMaterialShaderVariant
 {
 	enum T
 	{
-		Depth,   // Used for Z prepass + shadows
+		Depth,   // Used for Z-Only (depth, shadows)
 		GBuffer, // Used in GBuffer pass
 		Forward, // Used for transparency/UI
 		Debug,   // Used for debug visualization or tools

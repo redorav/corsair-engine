@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CrEntity.h"
+#include "World/CrEntity.h"
 
 #include "Math/CrHlslppMatrixFloatType.h"
 

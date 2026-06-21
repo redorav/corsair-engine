@@ -39,8 +39,6 @@ CrEditor::CrEditor(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 {
 	CrImGuiViewports::Initialize(mainWindow);
 
-	CrRenderMeshHandle dummyDebugMesh = CrShapeBuilder::CreateSphere({ 12 });
-
 	CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
 	basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForward->GetShader();
 	basicMaterial->m_shaders[CrMaterialShaderVariant::GBuffer] = BuiltinPipelines->BasicUbershaderGBuffer->GetShader();
@@ -270,78 +268,77 @@ void CrEditor::Update()
 		{
 			const SelectionState& selectionState = m_selectionStateQueue[i];
 
+			CrEntityID entityID(selectionState.uniqueInstanceId);
+
 			// If we have a valid entity, we can start seeing how to react
-			if (selectionState.modelInstanceId != 0xffffffff)
+			if (selectionState.uniqueInstanceId != 0xffffffff)
 			{
-				if (selectionState.modelInstanceId != 65535) // TODO Why this double check?
+				CrModelInstanceID instanceId = CrModelInstanceID(selectionState.uniqueInstanceId);
+				const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
+
+				bool isEditorBuiltin = modelInstance.GetIsEditorBuiltin();
+
+				if (selectionState.mouseState.buttonPressed[MouseButton::Left])
 				{
-					CrModelInstanceId instanceId = CrModelInstanceId(selectionState.modelInstanceId);
-					const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
-
-					bool isEditorBuiltin = modelInstance.GetIsEditorBuiltin();
-
-					if (selectionState.mouseState.buttonPressed[MouseButton::Left])
+					if (isEditorBuiltin)
 					{
-						if (isEditorBuiltin)
+						m_manipulatorSelected = true;
+
+						if (instanceId == m_manipulator->xAxis)
 						{
-							m_manipulatorSelected = true;
+							m_selectedAxis = CrEditorAxis::AxisX;
+						}
+						else if (instanceId == m_manipulator->yAxis)
+						{
+							m_selectedAxis = CrEditorAxis::AxisY;
+						}
+						else if (instanceId == m_manipulator->zAxis)
+						{
+							m_selectedAxis = CrEditorAxis::AxisZ;
+						}
+						else if (instanceId == m_manipulator->xzPlane)
+						{
+							m_selectedAxis = CrEditorAxis::PlaneXZ;
+						}
+						else if (instanceId == m_manipulator->xyPlane)
+						{
+							m_selectedAxis = CrEditorAxis::PlaneXY;
+						}
+						else if (instanceId == m_manipulator->yzPlane)
+						{
+							m_selectedAxis = CrEditorAxis::PlaneYZ;
+						}
 
-							if (instanceId == m_manipulator->xAxis)
-							{
-								m_selectedAxis = CrEditorAxis::AxisX;
-							}
-							else if (instanceId == m_manipulator->yAxis)
-							{
-								m_selectedAxis = CrEditorAxis::AxisY;
-							}
-							else if (instanceId == m_manipulator->zAxis)
-							{
-								m_selectedAxis = CrEditorAxis::AxisZ;
-							}
-							else if (instanceId == m_manipulator->xzPlane)
-							{
-								m_selectedAxis = CrEditorAxis::PlaneXZ;
-							}
-							else if (instanceId == m_manipulator->xyPlane)
-							{
-								m_selectedAxis = CrEditorAxis::PlaneXY;
-							}
-							else if (instanceId == m_manipulator->yzPlane)
-							{
-								m_selectedAxis = CrEditorAxis::PlaneYZ;
-							}
+						CrAssertMsg(m_selectedAxis != CrEditorAxis::None, "Incorrect axis selected");
 
-							CrAssertMsg(m_selectedAxis != CrEditorAxis::None, "Incorrect axis selected");
+						m_manipulatorInitialMouseState = selectionState.mouseState;
+						m_manipulatorInitialTransform = m_manipulator->transformMtx;
+						m_manipulatorInitialClosestPoint = ComputeClosestPointMouseToManipulator(selectionState.mouseState);
+					}
+					else
+					{
+						if (selectionState.keyboardState.keyHeld[KeyboardKey::LeftShift])
+						{
+							ToggleSelected(instanceId);
 
-							m_manipulatorInitialMouseState = selectionState.mouseState;
-							m_manipulatorInitialTransform = m_manipulator->transformMtx;
-							m_manipulatorInitialClosestPoint = ComputeClosestPointMouseToManipulator(selectionState.mouseState);
+							// TODO when deselecting, don't spawn the manipulator there
+							SpawnManipulator(modelInstance.GetTransform());
 						}
 						else
 						{
-							if (selectionState.keyboardState.keyHeld[KeyboardKey::LeftShift])
-							{
-								ToggleSelected(instanceId);
+							SetSelected(CrModelInstanceID(selectionState.uniqueInstanceId));
 
-								// TODO when deselecting, don't spawn the manipulator there
-								SpawnManipulator(modelInstance.GetTransform());
-							}
-							else
-							{
-								SetSelected(CrModelInstanceId(selectionState.modelInstanceId));
-
-								SpawnManipulator(modelInstance.GetTransform());
-							}
+							SpawnManipulator(modelInstance.GetTransform());
 						}
 					}
-					else if (selectionState.mouseState.buttonHeld[MouseButton::Left])
-					{
+				}
+				else if (selectionState.mouseState.buttonHeld[MouseButton::Left])
+				{
 
-					}
-					else if (selectionState.mouseState.buttonClicked[MouseButton::Left])
-					{
+				}
+				else if (selectionState.mouseState.buttonClicked[MouseButton::Left])
+				{
 
-					}
 				}
 			}
 		}
@@ -623,13 +620,13 @@ void CrEditor::SetManipulatorTransform(const float4x4& transform)
 	yzPlaneModelInstance.SetTransform(transform);
 }
 
-void CrEditor::SetSelected(CrModelInstanceId instanceId)
+void CrEditor::SetSelected(CrModelInstanceID instanceId)
 {
 	ClearSelectedInstances();
 	AddSelected(instanceId);
 }
 
-void CrEditor::ToggleSelected(CrModelInstanceId instanceId)
+void CrEditor::ToggleSelected(CrModelInstanceID instanceId)
 {
 	const CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
 
@@ -646,12 +643,12 @@ void CrEditor::ToggleSelected(CrModelInstanceId instanceId)
 	}
 }
 
-bool CrEditor::GetIsSelected(CrModelInstanceId instanceId)
+bool CrEditor::GetIsSelected(CrModelInstanceID instanceId)
 {
 	return m_selectedInstances.find(instanceId.id) != m_selectedInstances.end();
 }
 
-void CrEditor::AddSelected(CrModelInstanceId instanceId)
+void CrEditor::AddSelected(CrModelInstanceID instanceId)
 {
 	CrModelInstance& modelInstance = m_renderWorld->GetModelInstance(instanceId);
 
@@ -663,7 +660,7 @@ void CrEditor::AddSelected(CrModelInstanceId instanceId)
 	m_selectedInstances.insert(instanceId.id, state);
 }
 
-void CrEditor::RemoveSelected(CrModelInstanceId instanceId)
+void CrEditor::RemoveSelected(CrModelInstanceID instanceId)
 {
 	m_renderWorld->GetModelInstance(instanceId).SetIsEdgeHighlight(false);
 	m_selectedInstances.erase(instanceId.id);

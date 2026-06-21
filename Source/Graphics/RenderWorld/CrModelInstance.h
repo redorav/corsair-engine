@@ -6,10 +6,12 @@
 
 #include "Math/CrHlslppMatrixFloatType.h"
 
+#include "World/CrEntity.h"
+
 #include "crstl/intrusive_ptr.h"
 
 class CrModelInstance;
-using CrModelInstanceId = CrTypedId<CrModelInstance, uint32_t>;
+using CrModelInstanceID = CrTypedID<CrModelInstance, uint32_t>;
 
 // Properties that only the editor is allowed to modify and won't be available in-game
 struct CrEditorProperties
@@ -24,14 +26,18 @@ struct CrEditorProperties
 	bool isEdgeHighlight = false;
 };
 
-class CrModelInstance
+class CrModelInstance final : public CrEntity
 {
 public:
 
-	CrModelInstance() 
+	CrModelInstance() {}
+
+	CrModelInstance(CrModelInstanceID modelInstanceID)
 		: m_transform(float4x4::identity())
-		, m_visibilityId(0xffffffff)
-	{}
+	{
+		m_entityID.type = EntityType::ModelInstance;
+		m_entityID.instanceID = modelInstanceID.id;
+	}
 
 	void SetTransform(const float4x4& transform) { m_transform = transform; }
 	const float4x4& GetTransform() const { return m_transform; }
@@ -41,8 +47,6 @@ public:
 
 	void SetRenderModel(const CrRenderModelHandle& renderModel) { m_renderModel = renderModel; }
 	const CrRenderModelHandle& GetRenderModel() const { return m_renderModel; }
-
-	void SetVisibilityId(uint32_t visibilityId) { m_visibilityId = visibilityId; }
 
 #if defined(CR_EDITOR)
 	
@@ -65,8 +69,6 @@ private:
 	CrRenderModelHandle m_renderModel;
 
 	CrBoundingBox m_boundingBox;
-
-	uint32_t m_visibilityId;
 
 #if defined(CR_EDITOR)
 	CrEditorProperties m_editorProperties;

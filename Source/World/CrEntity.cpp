@@ -1,7 +1,5 @@
 #include "CrEntity.h"
 
-#include "Math/CrTransform.h"
-
 //void GameObject::UpdateTransform()
 //{
 	//m_worldMatrix = Matrix4::Identity();
@@ -28,11 +26,4 @@ void CrEntity::SetParent(CrEntity* const parent)
 	m_parent = parent;
 
 	// Update matrix to be parented
-}
-
-void CrEntity::SetLocalTransform(const CrTransform& localTransform)
-{
-	*m_localTransform = localTransform;
-
-	// Update world matrix
 }

@@ -182,9 +182,9 @@ void EditorMouseSelectionResolveCS(CSInput csInput)
 {
 	int2 mouseCoordinates = MouseSelectionCB.mouseCoordinates.xy;
 
-	float instanceID = EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x * 65535.0 + 0.5;
+	uint instanceID = asuint(EditorInstanceIDTexture.Load(int3(mouseCoordinates, 0)).x);
 	
-	EditorSelectedInstanceID.Store(0, (uint) instanceID);
+	EditorSelectedInstanceID.Store(0, instanceID);
 }
 
 #endif

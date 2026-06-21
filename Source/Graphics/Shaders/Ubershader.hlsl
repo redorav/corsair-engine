@@ -105,8 +105,8 @@ UbershaderPixelOutput UbershaderPS(VSOutput psInput)
 
 	if (debugShaderMode == DebugShaderModeInstanceID)
 	{
-		float normalizedInstanceId = DebugShaderCB.debugProperties.y / 65535.0;
-		finalColor = float4(normalizedInstanceId, normalizedInstanceId, normalizedInstanceId, 1.0);
+		float entityInstanceId = DebugShaderCB.debugProperties.y;
+		finalColor = float4(entityInstanceId, entityInstanceId, entityInstanceId, 1.0);
 	}
 	else if (debugShaderMode == DebugShaderModeFlatColor)
 	{

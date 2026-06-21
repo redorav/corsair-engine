@@ -142,7 +142,7 @@ namespace crgfx
 
 class CrGPUStackAllocator;
 
-using CrGPUQueryId = CrTypedId<struct CrGPUQueryDummy, uint32_t>;
+using CrGPUQueryId = CrTypedID<struct CrGPUQueryDummy, uint32_t>;
 class CrGPUTimingQueryTracker;
 
 struct CrShaderReflectionHeader;
@@ -174,13 +174,13 @@ using CrRenderMeshHandle = crstl::intrusive_ptr<CrRenderMesh>;
 class CrRenderGraph;
 
 struct CrRenderGraphPass;
-using CrRenderPassId = CrTypedId<CrRenderGraphPass, uint32_t>;
+using CrRenderPassId = CrTypedID<CrRenderGraphPass, uint32_t>;
 
 struct CrRenderGraphTextureResource;
-using CrRenderGraphTextureId = CrTypedId<CrRenderGraphTextureResource, uint16_t>;
+using CrRenderGraphTextureId = CrTypedID<CrRenderGraphTextureResource, uint16_t>;
 
 struct CrRenderGraphBufferResource;
-using CrRenderGraphBufferId = CrTypedId<CrRenderGraphBufferResource, uint16_t>;
+using CrRenderGraphBufferId = CrTypedID<CrRenderGraphBufferResource, uint16_t>;
 
 // Forward declare shader resources
 namespace ConstantBuffers { enum T : uint8_t; }

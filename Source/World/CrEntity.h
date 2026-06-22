@@ -6,38 +6,39 @@
 #include "crstl/string.h"
 #include "crstl/vector.h"
 
-class CrTransform;
-
-namespace EntityType
+namespace crntt
 {
-	enum T : uint32_t
+	namespace EntityType
 	{
-		ModelInstance,
-		Light,
-		Camera,
-		Count
-	};
-}
-
-struct CrEntityID
-{
-	CrEntityID() : type(EntityType::Count), instanceID(0) {}
-
-	explicit CrEntityID(uint32_t key) : key(key) {}
-
-	union
-	{
-		struct
+		enum T : uint32_t
 		{
-			EntityType::T type : 8;
-			uint32_t instanceID : 24;
+			ModelInstance,
+			Light,
+			Camera,
+			Count
 		};
+	}
 
-		uint32_t key;
+	struct EntityID
+	{
+		EntityID() : type(EntityType::Count), instanceID(0) {}
+
+		explicit EntityID(uint32_t key) : key(key) {}
+
+		union
+		{
+			struct
+			{
+				uint32_t instanceID : 24;
+				EntityType::T type : 8;
+			};
+
+			uint32_t key;
+		};
 	};
-};
 
-static_assert(sizeof(CrEntityID) == sizeof(uint32_t), "");
+	static_assert(sizeof(EntityID) == sizeof(uint32_t), "");
+};
 
 class CrEntity
 {
@@ -62,16 +63,16 @@ public:
 
 	void SetParent(CrEntity* const parent);
 
-	void SetEntityID(CrEntityID entityID) { m_entityID = entityID; }
+	void SetEntityID(crntt::EntityID entityID) { m_entityID = entityID; }
 
-	CrEntityID GetEntityID() const { return m_entityID; }
+	crntt::EntityID GetEntityID() const { return m_entityID; }
 
 protected:
 
 	crstl::string m_name;
 
 	// Contains the type and unique ID
-	CrEntityID m_entityID;
+	crntt::EntityID m_entityID;
 
 	CrEntity* m_parent;
 };

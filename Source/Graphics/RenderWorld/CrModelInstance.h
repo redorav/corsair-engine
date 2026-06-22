@@ -35,7 +35,7 @@ public:
 	CrModelInstance(CrModelInstanceID modelInstanceID)
 		: m_transform(float4x4::identity())
 	{
-		m_entityID.type = EntityType::ModelInstance;
+		m_entityID.type = crntt::EntityType::ModelInstance;
 		m_entityID.instanceID = modelInstanceID.id;
 	}
 

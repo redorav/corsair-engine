@@ -1,14 +1,5 @@
 #include "CrEntity.h"
 
-//void GameObject::UpdateTransform()
-//{
-	//m_worldMatrix = Matrix4::Identity();
-	//Matrix3 scaleM = Matrix3::ScaleMatrix(scale.x, scale.y, scale.z);
-	//Matrix3 RS = rotation * scaleM;
-	//m_worldMatrix.CopyAffineTransform(RS);
-	//m_worldMatrix.Translate(position);
-//}  
-
 CrEntity::CrEntity() : CrEntity("")
 {
 

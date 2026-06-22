@@ -69,7 +69,7 @@ CrRenderWorld::CrRenderWorld()
 	m_modelInstanceIdToIndex.resize(10000);
 	m_modelInstanceIndexToId.resize(10000);
 
-	m_maxModelInstanceId = CrModelInstanceId(0);
+	m_maxModelInstanceId = CrModelInstanceID(0);
 	m_numModelInstances = CrModelInstanceIndex(0);
 }
 
@@ -101,9 +101,6 @@ CrModelInstanceID CrRenderWorld::CreateModelInstance()
 	m_modelInstanceIndexToId[m_numModelInstances.id] = CrModelInstanceID(availableId.id);
 
 	m_numModelInstances++;
-
-	return availableId;
-}
 
 	return availableId;
 }

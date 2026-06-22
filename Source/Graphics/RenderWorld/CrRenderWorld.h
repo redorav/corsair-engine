@@ -106,13 +106,13 @@ public:
 	~CrRenderWorld();
 
 	// Allocate model instance in the world
-	CrModelInstanceId CreateModelInstance();
+	CrModelInstanceID CreateModelInstance();
 
 	// Frees model instance from the world, with all its resources
 	// Only the ModelInstance class can call this (when it goes out of scope)
-	void DestroyModelInstance(CrModelInstanceId instanceId);
+	void DestroyModelInstance(CrModelInstanceID instanceId);
 
-	CrModelInstance& GetModelInstance(CrModelInstanceId instanceId) { return m_modelInstances[instanceId.id]; }
+	CrModelInstance& GetModelInstance(CrModelInstanceID instanceId) { return m_modelInstances[instanceId.id]; }
 	CrModelInstance& GetModelInstance(CrModelInstanceIndex instanceIndex) { return m_modelInstances[instanceIndex.id]; }
 
 	void SetCamera(const CrCameraHandle& camera);
@@ -151,10 +151,10 @@ public:
 
 private:
 
-	CrModelInstanceIndex GetModelInstanceIndex(CrModelInstanceId instanceId) const
+	CrModelInstanceIndex GetModelInstanceIndex(CrModelInstanceID instanceId) const
 	{ return m_modelInstanceIdToIndex[instanceId.id]; }
 
-	CrModelInstanceId GetModelInstanceId(CrModelInstanceIndex instanceIndex) const
+	CrModelInstanceID GetModelInstanceId(CrModelInstanceIndex instanceIndex) const
 	{ return m_modelInstanceIndexToId[instanceIndex.id]; }
 
 	// Model Instance Data
@@ -163,13 +163,13 @@ private:
 
 	crstl::vector<CrModelInstanceIndex> m_modelInstanceIdToIndex;
 
-	crstl::vector<CrModelInstanceId>    m_modelInstanceIndexToId;
+	crstl::vector<CrModelInstanceID>    m_modelInstanceIndexToId;
 
-	CrModelInstanceId                   m_maxModelInstanceId;
+	CrModelInstanceID                   m_maxModelInstanceId;
 
 	CrModelInstanceIndex                m_numModelInstances;
 
-	CrModelInstanceId                   m_lastAvailableModelInstanceId;
+	CrModelInstanceID                   m_lastAvailableModelInstanceId;
 
 	// Lights Data
 	crstl::vector<CrLight> m_lights;

@@ -206,7 +206,7 @@ void CrRenderWorld::ComputeVisibilityAndRenderPackets()
 
 		CrModelInstanceID instanceId = GetModelInstanceId(instanceIndex);
 
-		CrEntityID entityID = modelInstance.GetEntityID();
+		crntt::EntityID entityID = modelInstance.GetEntityID();
 
 		bool isEditorEdgeHighlight = modelInstance.GetIsEdgeHighlight();
 

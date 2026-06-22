@@ -40,6 +40,19 @@ namespace crntt
 	static_assert(sizeof(EntityID) == sizeof(uint32_t), "");
 };
 
+// Properties that only the editor is allowed to modify and won't be available in-game
+struct EditorProperties
+{
+	// Instance belongs to the editor (doesn't do edge highlight, is not selectable, etc)
+	bool isEditorBuiltin = false;
+
+	// Mesh has a constant size on screen
+	bool isConstantSizeOnScreen = false;
+
+	// Mesh needs to go through the editor edge highlight
+	bool isEdgeHighlight = false;
+};
+
 class CrEntity
 {
 public:
@@ -67,6 +80,20 @@ public:
 
 	crntt::EntityID GetEntityID() const { return m_entityID; }
 
+#if defined(CR_EDITOR)
+
+	// By default all entities are selectable in the editor, so we need to exclude manipulators, icons and other editor entities
+	void SetIsEditorBuiltin(bool isEditorBuiltin) { m_editorProperties.isEditorBuiltin = isEditorBuiltin; }
+	bool GetIsEditorBuiltin() const { return m_editorProperties.isEditorBuiltin; }
+
+	void SetIsConstantSizeOnScreen(bool isConstantSizeOnScreen) { m_editorProperties.isConstantSizeOnScreen = isConstantSizeOnScreen; }
+	bool GetIsConstantSizeOnScreen() const { return m_editorProperties.isConstantSizeOnScreen; }
+
+	void SetIsEdgeHighlight(bool isEdgeHighlight) { m_editorProperties.isEdgeHighlight = isEdgeHighlight; }
+	bool GetIsEdgeHighlight() const { return m_editorProperties.isEdgeHighlight; }
+
+#endif
+
 protected:
 
 	crstl::string m_name;
@@ -75,4 +102,10 @@ protected:
 	crntt::EntityID m_entityID;
 
 	CrEntity* m_parent;
+
+#if defined(CR_EDITOR)
+
+	EditorProperties m_editorProperties;
+
+#endif
 };

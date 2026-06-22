@@ -21,6 +21,9 @@ namespace KeyboardKey
 		Keypad1, Keypad2, Keypad3, Keypad4, Keypad5, Keypad6, Keypad7, Keypad8, Keypad9, Keypad0,
 		LeftWindowsCmd, RightWindowsCmd,
 
+		// There's a set of keys that don't map to characters but physical keys on the keyboard. Follow the Windows naming
+		OEM102, // "<>" or "\|" on RT 102-key Keyboard
+
 		Count
 	};
 };

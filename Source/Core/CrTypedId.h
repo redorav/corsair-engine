@@ -3,7 +3,7 @@
 #include "Core/CrNumericLimits.h"
 
 template<typename T, typename U, U DefaultValueT = CrNumericLimits<U>::max()>
-class CrTypedId
+class CrTypedID
 {
 public:
 
@@ -13,19 +13,19 @@ public:
 
 	static const U MaxId = CrNumericLimits<U>::max();
 
-	CrTypedId() : id(DefaultValue) {}
-	explicit CrTypedId(U id) : id(id) {}
+	CrTypedID() : id(DefaultValue) {}
+	explicit CrTypedID(U id) : id(id) {}
 
-	CrTypedId operator - (CrTypedId otherId) { return CrTypedId(id - otherId.id); }
-	CrTypedId operator - (U otherId) { return CrTypedId(id - otherId); }
+	CrTypedID operator - (CrTypedID otherId) { return CrTypedID(id - otherId.id); }
+	CrTypedID operator - (U otherId) { return CrTypedID(id - otherId); }
 
-	bool operator < (CrTypedId otherId) { return id < otherId.id; }
-	bool operator > (CrTypedId otherId) { return id > otherId.id; }
-	bool operator == (CrTypedId otherId) { return id == otherId.id; }
-	bool operator != (CrTypedId otherId) { return id != otherId.id; }
+	bool operator < (CrTypedID otherId) { return id < otherId.id; }
+	bool operator > (CrTypedID otherId) { return id > otherId.id; }
+	bool operator == (CrTypedID otherId) { return id == otherId.id; }
+	bool operator != (CrTypedID otherId) { return id != otherId.id; }
 
-	CrTypedId& operator ++ () { id++; return *this; } // Pre-increment
-	CrTypedId operator ++ (int) { CrTypedId temp = *this; id++; return temp; } // Post-increment
+	CrTypedID& operator ++ () { id++; return *this; } // Pre-increment
+	CrTypedID operator ++ (int) { CrTypedID temp = *this; id++; return temp; } // Post-increment
 
 	U id;
 };

@@ -13,8 +13,7 @@
 
 #include "crstl/intrusive_ptr.h"
 
-class CrModelInstanceIndexDummy;
-using CrModelInstanceIndex = CrTypedId<CrModelInstanceIndexDummy, uint32_t>;
+using CrModelInstanceIndex = CrTypedID<struct CrModelInstanceIndexDummy, uint32_t>;
 
 class CrCPUStackAllocator;
 

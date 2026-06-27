@@ -268,7 +268,7 @@ void CrEditor::Update()
 		{
 			const SelectionState& selectionState = m_selectionStateQueue[i];
 
-			CrEntityID entityID(selectionState.uniqueInstanceId);
+			crntt::EntityID entityID(selectionState.uniqueInstanceId);
 
 			// If we have a valid entity, we can start seeing how to react
 			if (selectionState.uniqueInstanceId != 0xffffffff)

@@ -153,27 +153,30 @@ void CrImGuiRenderer::NewFrame(const crstl::intrusive_ptr<CrOSWindow>& mainWindo
 
 	// Update Mouse Cursor (perhaps this needs to be in ImguiViewports?)
 
-	if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
+	if (io.WantCaptureMouse)
 	{
-		ImGuiMouseCursor imguiMouseCursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
-
-		CursorType::T cursorType = CursorType::Count;
-
-		switch (imguiMouseCursor)
+		if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
 		{
-			case ImGuiMouseCursor_None:       cursorType = CursorType::None; break;
-			case ImGuiMouseCursor_Arrow:      cursorType = CursorType::Arrow; break;
-			case ImGuiMouseCursor_TextInput:  cursorType = CursorType::TextInput; break;
-			case ImGuiMouseCursor_ResizeAll:  cursorType = CursorType::ResizeAll; break;
-			case ImGuiMouseCursor_ResizeEW:   cursorType = CursorType::ResizeEW; break;
-			case ImGuiMouseCursor_ResizeNS:   cursorType = CursorType::ResizeNS; break;
-			case ImGuiMouseCursor_ResizeNESW: cursorType = CursorType::ResizeNESW; break;
-			case ImGuiMouseCursor_ResizeNWSE: cursorType = CursorType::ResizeNWSE; break;
-			case ImGuiMouseCursor_Hand:       cursorType = CursorType::Hand; break;
-			case ImGuiMouseCursor_NotAllowed: cursorType = CursorType::NotAllowed; break;
-		}
+			ImGuiMouseCursor imguiMouseCursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
 
-		CrOSWindow::SetCursor(cursorType);
+			CursorType::T cursorType = CursorType::Count;
+
+			switch (imguiMouseCursor)
+			{
+				case ImGuiMouseCursor_None:       cursorType = CursorType::None; break;
+				case ImGuiMouseCursor_Arrow:      cursorType = CursorType::Arrow; break;
+				case ImGuiMouseCursor_TextInput:  cursorType = CursorType::TextInput; break;
+				case ImGuiMouseCursor_ResizeAll:  cursorType = CursorType::ResizeAll; break;
+				case ImGuiMouseCursor_ResizeEW:   cursorType = CursorType::ResizeEW; break;
+				case ImGuiMouseCursor_ResizeNS:   cursorType = CursorType::ResizeNS; break;
+				case ImGuiMouseCursor_ResizeNESW: cursorType = CursorType::ResizeNESW; break;
+				case ImGuiMouseCursor_ResizeNWSE: cursorType = CursorType::ResizeNWSE; break;
+				case ImGuiMouseCursor_Hand:       cursorType = CursorType::Hand; break;
+				case ImGuiMouseCursor_NotAllowed: cursorType = CursorType::NotAllowed; break;
+			}
+
+			CrOSWindow::SetCursor(cursorType);
+		}
 	}
 
 	ImGui::NewFrame();

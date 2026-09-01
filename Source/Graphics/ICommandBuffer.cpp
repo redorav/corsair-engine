@@ -135,11 +135,11 @@ namespace crgfx
 		ResolveGPUQueriesPS(queryPool, start, count);
 	}
 
-	CrGPUBufferView ICommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
+	GPUBufferView ICommandBuffer::AllocateConstantBuffer(uint32_t sizeBytes)
 	{
 		CrStackAllocation<void> allocation = m_bufferGPUStack->AllocateAligned(sizeBytes, 256);
 
-		CrGPUBufferView constantBufferView
+		GPUBufferView constantBufferView
 		(
 			m_bufferGPUStack->GetHardwareGPUBuffer(),
 			1,
@@ -151,14 +151,14 @@ namespace crgfx
 		return constantBufferView;
 	}
 
-	CrGPUBufferView ICommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride)
+	GPUBufferView ICommandBuffer::AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride)
 	{
 		uint32_t sizeBytes = vertexCount * stride;
 
 		// TODO Fix alignment
 		CrStackAllocation<void> allocation = m_vertexBufferGPUStack->AllocateAligned(sizeBytes, 256);
 
-		CrGPUBufferView vertexBufferView
+		GPUBufferView vertexBufferView
 		(
 			m_vertexBufferGPUStack->GetHardwareGPUBuffer(),
 			vertexCount,
@@ -170,14 +170,14 @@ namespace crgfx
 		return vertexBufferView;
 	}
 
-	CrGPUBufferView ICommandBuffer::AllocateIndexBuffer(uint32_t indexCount, crgfx::DataFormat::T indexFormat)
+	GPUBufferView ICommandBuffer::AllocateIndexBuffer(uint32_t indexCount, crgfx::DataFormat::T indexFormat)
 	{
 		uint32_t sizeBytes = indexCount * crgfx::DataFormats[indexFormat].dataOrBlockSize;
 
 		// TODO Fix alignment
 		CrStackAllocation<void> allocation = m_indexBufferGPUStack->AllocateAligned(sizeBytes, 256);
 
-		CrGPUBufferView indexBufferView
+		GPUBufferView indexBufferView
 		(
 			m_indexBufferGPUStack->GetHardwareGPUBuffer(),
 			indexCount,

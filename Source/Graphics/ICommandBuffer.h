@@ -126,7 +126,7 @@ namespace crgfx
 
 		void BindIndexBuffer(const IHardwareGPUBuffer* indexBuffer, uint32_t byteOffset, uint32_t sizeBytes, DataFormat::T indexFormat);
 
-		void BindIndexBuffer(const CrGPUBufferView& indexBufferView);
+		void BindIndexBuffer(const GPUBufferView& indexBufferView);
 
 		void BindIndexBuffer(const IndexBuffer* indexBuffer, uint32_t elementOffset = 0);
 
@@ -134,7 +134,7 @@ namespace crgfx
 
 		void BindVertexBuffer(const IHardwareGPUBuffer* vertexBuffer, uint32_t streamId, uint32_t byteOffset, uint32_t vertexCount, uint32_t stride);
 
-		void BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId);
+		void BindVertexBuffer(const GPUBufferView& vertexBufferView, uint32_t streamId);
 
 		void BindVertexBuffer(const VertexBuffer* vertexBuffer, uint32_t streamId, uint32_t elementOffset = 0);
 
@@ -142,7 +142,7 @@ namespace crgfx
 
 		void BindConstantBuffer(ConstantBuffers::T constantBufferIndex, const IHardwareGPUBuffer* constantBuffer, uint32_t size, uint32_t offset);
 
-		void BindConstantBuffer(const CrGPUBufferView& constantBufferView);
+		void BindConstantBuffer(const GPUBufferView& constantBufferView);
 
 		// Textures and Samplers
 
@@ -158,7 +158,7 @@ namespace crgfx
 
 		void BindStorageBuffer(StorageBuffers::T storageBufferIndex, const IHardwareGPUBuffer* buffer);
 
-		void BindStorageBuffer(const CrGPUBufferView& storageBufferView);
+		void BindStorageBuffer(const GPUBufferView& storageBufferView);
 
 		// RW Storage Buffers
 
@@ -235,14 +235,14 @@ namespace crgfx
 		template<typename MetaType>
 		CrGPUBufferViewT<MetaType> AllocateConstantBuffer(uint32_t instanceSizeBytes, uint32_t instanceCount);
 
-		CrGPUBufferView AllocateConstantBuffer(uint32_t sizeBytes);
+		GPUBufferView AllocateConstantBuffer(uint32_t sizeBytes);
 
 		template<typename MetaType>
 		inline CrGPUBufferViewT<MetaType> AllocateStorageBuffer(uint32_t instanceCount);
 
-		CrGPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
+		GPUBufferView AllocateVertexBuffer(uint32_t vertexCount, uint32_t stride);
 
-		CrGPUBufferView AllocateIndexBuffer(uint32_t indexCount, DataFormat::T indexFormat);
+		GPUBufferView AllocateIndexBuffer(uint32_t indexCount, DataFormat::T indexFormat);
 
 	protected:
 
@@ -399,7 +399,7 @@ namespace crgfx
 		}
 	}
 
-	inline void ICommandBuffer::BindIndexBuffer(const CrGPUBufferView& indexBufferView)
+	inline void ICommandBuffer::BindIndexBuffer(const GPUBufferView& indexBufferView)
 	{
 		BindIndexBuffer(indexBufferView.GetHardwareBuffer(), indexBufferView.GetByteOffset(), indexBufferView.GetSizeBytes(), indexBufferView.GetFormat());
 	}
@@ -426,7 +426,7 @@ namespace crgfx
 		}
 	}
 
-	inline void ICommandBuffer::BindVertexBuffer(const CrGPUBufferView& vertexBufferView, uint32_t streamId)
+	inline void ICommandBuffer::BindVertexBuffer(const GPUBufferView& vertexBufferView, uint32_t streamId)
 	{
 		BindVertexBuffer(vertexBufferView.GetHardwareBuffer(), streamId, vertexBufferView.GetByteOffset(), vertexBufferView.GetNumElements(), vertexBufferView.GetStride());
 	}
@@ -583,7 +583,7 @@ namespace crgfx
 		m_currentState.m_constantBuffers[constantBufferIndex] = ConstantBufferBinding(constantBuffer, size, offset);
 	}
 
-	inline void ICommandBuffer::BindConstantBuffer(const CrGPUBufferView& constantBufferView)
+	inline void ICommandBuffer::BindConstantBuffer(const GPUBufferView& constantBufferView)
 	{
 		BindConstantBuffer((ConstantBuffers::T)constantBufferView.GetBindingIndex(), constantBufferView.GetHardwareBuffer(), constantBufferView.GetSizeBytes(), constantBufferView.GetByteOffset());
 	}
@@ -630,7 +630,7 @@ namespace crgfx
 		BindStorageBuffer(storageBufferIndex, buffer, buffer->GetNumElements(), buffer->GetStrideBytes(), 0);
 	}
 
-	inline void ICommandBuffer::BindStorageBuffer(const CrGPUBufferView& structuredBufferView)
+	inline void ICommandBuffer::BindStorageBuffer(const GPUBufferView& structuredBufferView)
 	{
 		BindStorageBuffer((StorageBuffers::T)structuredBufferView.GetBindingIndex(), structuredBufferView.GetHardwareBuffer(), structuredBufferView.GetNumElements(), structuredBufferView.GetStride(), structuredBufferView.GetByteOffset());
 	}

@@ -3,7 +3,7 @@
 #include "Core/CrTypedId.h"
 
 class CrLight;
-using CrLightId = CrTypedId<CrLight, uint32_t>;
+using CrLightID = CrTypedID<CrLight, uint32_t>;
 
 namespace LightType
 {

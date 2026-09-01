@@ -61,12 +61,12 @@ namespace crgfx
 		}
 
 		// Allocate a GPU query id. We can use this to begin or end a query on a command buffer
-		CrGPUQueryId Allocate()
+		CrGPUQueryID Allocate()
 		{
 			// TODO Check bounds
 			uint32_t currentQuery = m_currentQuery;
 			m_currentQuery++;
-			return CrGPUQueryId(currentQuery);
+			return CrGPUQueryID(currentQuery);
 		}
 
 		// Resolve all pending queries using this command buffer to copy data across

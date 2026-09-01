@@ -206,10 +206,10 @@ namespace crgfx
 
 		void InsertDebugMarker(const char* markerName, const float4& color);
 
-		void BeginTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryId query);
+		void BeginTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryID query);
 
 		// This function is here to cater for Vulkan where we can specify the point in the pipeline the timestamp should be taken
-		void EndTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryId query);
+		void EndTimestampQuery(const IGPUQueryPool* queryPool, CrGPUQueryID query);
 
 		void ResetGPUQueries(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count);
 
@@ -270,9 +270,9 @@ namespace crgfx
 
 		virtual void InsertDebugMarkerPS(const char* markerName, const float4& color) = 0;
 
-		virtual void BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+		virtual void BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryID query) = 0;
 
-		virtual void EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryId query) = 0;
+		virtual void EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryID query) = 0;
 
 		virtual void ResetGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count) = 0;
 

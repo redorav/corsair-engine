@@ -10,8 +10,8 @@
 
 struct CrGPUTimingRequest
 {
-	CrGPUQueryId startQuery;
-	CrGPUQueryId endQuery;
+	CrGPUQueryID startQuery;
+	CrGPUQueryID endQuery;
 };
 
 struct CrGPUInterval

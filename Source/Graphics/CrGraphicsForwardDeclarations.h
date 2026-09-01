@@ -142,7 +142,7 @@ namespace crgfx
 
 class CrGPUStackAllocator;
 
-using CrGPUQueryId = CrTypedID<struct CrGPUQueryDummy, uint32_t>;
+using CrGPUQueryID = CrTypedID<struct CrGPUQueryDummy, uint32_t>;
 class CrGPUTimingQueryTracker;
 
 struct CrShaderReflectionHeader;

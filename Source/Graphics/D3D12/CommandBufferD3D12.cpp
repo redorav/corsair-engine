@@ -37,7 +37,7 @@ namespace crgfx
 		m_d3d12GraphicsCommandList->Close();
 
 		{
-			CrDescriptorHeapDescriptor dynamicDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 dynamicDescriptorHeapDescriptor;
 			dynamicDescriptorHeapDescriptor.name = "Dynamic Descriptor Heap";
 			dynamicDescriptorHeapDescriptor.numDescriptors = 16 * 1024;
 			dynamicDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -45,7 +45,7 @@ namespace crgfx
 		}
 
 		{
-			CrDescriptorHeapDescriptor shaderResourceShaderVisibleDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 shaderResourceShaderVisibleDescriptorHeapDescriptor;
 			shaderResourceShaderVisibleDescriptorHeapDescriptor.name = "Shader Resource Shader Visible Streaming Heap";
 			shaderResourceShaderVisibleDescriptorHeapDescriptor.numDescriptors = 32 * 1024;
 			shaderResourceShaderVisibleDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -54,7 +54,7 @@ namespace crgfx
 		}
 
 		{
-			CrDescriptorHeapDescriptor samplerShaderVisibleDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 samplerShaderVisibleDescriptorHeapDescriptor;
 			samplerShaderVisibleDescriptorHeapDescriptor.name = "Sampler Shader Visible Streaming Heap";
 			samplerShaderVisibleDescriptorHeapDescriptor.numDescriptors = 2048;
 			samplerShaderVisibleDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
@@ -70,7 +70,7 @@ namespace crgfx
 	void CommandBufferD3D12::ProcessTextureBarriers
 	(
 		const crgfx::RenderPassDescriptor::TextureTransitionVector& textures,
-		CrTextureBarrierVectorD3D12& d3d12TextureBarriers
+		TextureBarrierVectorD3D12& d3d12TextureBarriers
 	)
 	{
 		for (const RenderPassTextureDescriptor& descriptor : textures)
@@ -99,7 +99,7 @@ namespace crgfx
 		}
 	}
 
-	void CommandBufferD3D12::ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers)
+	void CommandBufferD3D12::ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, BufferBarrierVectorD3D12& d3d12BufferBarriers)
 	{
 		for (const RenderPassBufferDescriptor& descriptor : buffers)
 		{
@@ -124,7 +124,7 @@ namespace crgfx
 		const RenderTargetDescriptor& renderTargetDescriptor,
 		const crgfx::TextureState& initialState,
 		const crgfx::TextureState& finalState,
-		CrTextureBarrierVectorD3D12& d3d12TextureBarriers
+		TextureBarrierVectorD3D12& d3d12TextureBarriers
 	)
 	{
 		const crgfx::TextureD3D12* d3d12Texture = static_cast<const crgfx::TextureD3D12*>(renderTargetDescriptor.texture);
@@ -154,8 +154,8 @@ namespace crgfx
 
 	void CommandBufferD3D12::BeginRenderPassPS(const crgfx::RenderPassDescriptor& renderPassDescriptor)
 	{
-		CrTextureBarrierVectorD3D12 textureBarriers;
-		CrBufferBarrierVectorD3D12 bufferBarriers;
+		TextureBarrierVectorD3D12 textureBarriers;
+		BufferBarrierVectorD3D12 bufferBarriers;
 
 		const RenderTargetDescriptor& depthDescriptor = renderPassDescriptor.depth;
 
@@ -257,8 +257,8 @@ namespace crgfx
 
 	void CommandBufferD3D12::EndRenderPassPS()
 	{
-		CrTextureBarrierVectorD3D12 textureBarriers;
-		CrBufferBarrierVectorD3D12 bufferBarriers;
+		TextureBarrierVectorD3D12 textureBarriers;
+		BufferBarrierVectorD3D12 bufferBarriers;
 		const crgfx::RenderPassDescriptor& renderPassDescriptor = m_currentState.m_currentRenderPass;
 
 		if (renderPassDescriptor.type == crgfx::RenderPassType::Graphics)

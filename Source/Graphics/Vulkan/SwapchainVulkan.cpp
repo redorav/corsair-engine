@@ -247,7 +247,7 @@ namespace crgfx
 		vkDestroyFence(vkDevice, m_swapchainRecreationFence, nullptr);
 	}
 
-	crgfx::CrSwapchainResult SwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseconds)
+	crgfx::SwapchainResult SwapchainVulkan::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 	{
 		if (!m_acquired)
 		{
@@ -268,7 +268,7 @@ namespace crgfx
 			m_acquired = true;
 		}
 
-		return crgfx::CrSwapchainResult::Success;
+		return crgfx::SwapchainResult::Success;
 	}
 
 	void SwapchainVulkan::PresentPS()

@@ -280,7 +280,7 @@ namespace crgfx
 
 		// Descriptor pool for render target views
 		{
-			CrDescriptorHeapDescriptor rtvDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 rtvDescriptorHeapDescriptor;
 			rtvDescriptorHeapDescriptor.name = "RTV Descriptor Heap";
 			rtvDescriptorHeapDescriptor.numDescriptors = 1024;
 			rtvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -289,7 +289,7 @@ namespace crgfx
 
 		// Descriptor pool for depth stencil views
 		{
-			CrDescriptorHeapDescriptor dsvDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 dsvDescriptorHeapDescriptor;
 			dsvDescriptorHeapDescriptor.name = "DSV Descriptor Heap";
 			dsvDescriptorHeapDescriptor.numDescriptors = 512;
 			dsvDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
@@ -298,7 +298,7 @@ namespace crgfx
 
 		// Descriptor pool for samplers
 		{
-			CrDescriptorHeapDescriptor samplerDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 samplerDescriptorHeapDescriptor;
 			samplerDescriptorHeapDescriptor.name = "Sampler Descriptor Heap";
 			samplerDescriptorHeapDescriptor.numDescriptors = 2048;
 			samplerDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
@@ -307,7 +307,7 @@ namespace crgfx
 
 		// Descriptor pool for shader resources
 		{
-			CrDescriptorHeapDescriptor shaderResourceDescriptorHeapDescriptor;
+			DescriptorHeapDescriptorD3D12 shaderResourceDescriptorHeapDescriptor;
 			shaderResourceDescriptorHeapDescriptor.name = "Shader Resource Heap";
 			shaderResourceDescriptorHeapDescriptor.numDescriptors = 16384;
 			shaderResourceDescriptorHeapDescriptor.type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;

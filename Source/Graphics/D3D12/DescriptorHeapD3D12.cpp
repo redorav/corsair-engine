@@ -7,146 +7,149 @@
 
 #include "Math/CrMath.h"
 
-uint32_t CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const CrDescriptorHeapDescriptor& descriptor)
+namespace crgfx
 {
-	// https://docs.microsoft.com/en-us/windows/win32/direct3d12/hardware-support?redirectedfrom=MSDN
-	if (descriptor.flags == D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+	uint32_t DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const DescriptorHeapDescriptorD3D12& descriptor)
 	{
-		// Only samplers and CBV_SRV_UAV can go into shader visible heaps
-		if (descriptor.type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
+		// https://docs.microsoft.com/en-us/windows/win32/direct3d12/hardware-support?redirectedfrom=MSDN
+		if (descriptor.flags == D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
 		{
-			return 2048;
+			// Only samplers and CBV_SRV_UAV can go into shader visible heaps
+			if (descriptor.type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
+			{
+				return 2048;
+			}
+			else
+			{
+				return 1000000;
+			}
 		}
 		else
 		{
-			return 1000000;
+			return 0xffffffff; // No limit if heap is non shader visible
 		}
 	}
-	else
+
+	void DescriptorHeapD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& heapDescriptor)
 	{
-		return 0xffffffff; // No limit if heap is non shader visible
+		m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
+
+		m_descriptorStride = m_d3d12Device->GetDescriptorHandleIncrementSize(heapDescriptor.type);
+
+		// We have an array of heaps, because heaps have a maximum amount of descriptors they can hold depending on the type
+		// That way, if we request N descriptors and there is a maximum M < N per heap, we'll need to create ceil(N / M) heaps
+
+		D3D12_DESCRIPTOR_HEAP_DESC d3d12HeapDescriptor = {};
+		d3d12HeapDescriptor.Type = heapDescriptor.type;
+		d3d12HeapDescriptor.NumDescriptors = heapDescriptor.numDescriptors;
+		d3d12HeapDescriptor.Flags = heapDescriptor.flags;
+		d3d12HeapDescriptor.NodeMask = 0; // TODO Multi-GPU
+		HRESULT hResult = m_d3d12Device->CreateDescriptorHeap(&d3d12HeapDescriptor, IID_PPV_ARGS(&m_descriptorHeap));
+		CrAssertMsg(SUCCEEDED(hResult), "Error creating descriptor heap");
+
+		d3d12RenderDevice->SetD3D12ObjectName(m_descriptorHeap, heapDescriptor.name);
+
+		m_heapStartCPU = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+		if (heapDescriptor.flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+		{
+			m_heapStartGPU = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		}
+		else
+		{
+			m_heapStartGPU.ptr = (UINT64)-1;
+		}
 	}
-}
 
-void CrDescriptorHeapD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& heapDescriptor)
-{
-	m_d3d12Device = d3d12RenderDevice->GetD3D12Device();
-
-	m_descriptorStride = m_d3d12Device->GetDescriptorHandleIncrementSize(heapDescriptor.type);
-
-	// We have an array of heaps, because heaps have a maximum amount of descriptors they can hold depending on the type
-	// That way, if we request N descriptors and there is a maximum M < N per heap, we'll need to create ceil(N / M) heaps
-
-	D3D12_DESCRIPTOR_HEAP_DESC d3d12HeapDescriptor = {};
-	d3d12HeapDescriptor.Type = heapDescriptor.type;
-	d3d12HeapDescriptor.NumDescriptors = heapDescriptor.numDescriptors;
-	d3d12HeapDescriptor.Flags = heapDescriptor.flags;
-	d3d12HeapDescriptor.NodeMask = 0; // TODO Multi-GPU
-	HRESULT hResult = m_d3d12Device->CreateDescriptorHeap(&d3d12HeapDescriptor, IID_PPV_ARGS(&m_descriptorHeap));
-	CrAssertMsg(SUCCEEDED(hResult), "Error creating descriptor heap");
-
-	d3d12RenderDevice->SetD3D12ObjectName(m_descriptorHeap, heapDescriptor.name);
-
-	m_heapStartCPU = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-	if (heapDescriptor.flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+	void CPUDescriptorPoolD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor)
 	{
-		m_heapStartGPU = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+
+		CrAssertMsg(descriptor.numDescriptors <= maxDescriptors, "Exceeded maximum numbers of descriptors");
+
+		DescriptorHeapDescriptorD3D12 heapDescriptor;
+		heapDescriptor.name = descriptor.name;
+		heapDescriptor.numDescriptors = maxDescriptors;
+		heapDescriptor.type = descriptor.type;
+		heapDescriptor.flags = descriptor.flags;
+		m_descriptorHeap.Initialize(d3d12RenderDevice, heapDescriptor);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE heapStartCPU = m_descriptorHeap.GetHeapStartCPU();
+
+		m_availableCPUDescriptors.resize(maxDescriptors);
+
+		for (uint32_t j = 0; j < maxDescriptors; ++j)
+		{
+			m_availableCPUDescriptors[j].ptr = heapStartCPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
+		}
 	}
-	else
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CPUDescriptorPoolD3D12::Allocate()
 	{
-		m_heapStartGPU.ptr = (UINT64)-1;
+		D3D12_CPU_DESCRIPTOR_HANDLE descriptor = m_availableCPUDescriptors.back();
+		m_availableCPUDescriptors.pop_back();
+		return descriptor;
 	}
-}
 
-void CrCPUDescriptorPoolD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
-{
-	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
-
-	CrAssertMsg(descriptor.numDescriptors <= maxDescriptors, "Exceeded maximum numbers of descriptors");
-
-	CrDescriptorHeapDescriptor heapDescriptor;
-	heapDescriptor.name = descriptor.name;
-	heapDescriptor.numDescriptors = maxDescriptors;
-	heapDescriptor.type = descriptor.type;
-	heapDescriptor.flags = descriptor.flags;
-	m_descriptorHeap.Initialize(d3d12RenderDevice, heapDescriptor);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE heapStartCPU = m_descriptorHeap.GetHeapStartCPU();
-
-	m_availableCPUDescriptors.resize(maxDescriptors);
-
-	for (uint32_t j = 0; j < maxDescriptors; ++j)
+	void CPUDescriptorPoolD3D12::Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
 	{
-		m_availableCPUDescriptors[j].ptr = heapStartCPU.ptr + j * m_descriptorHeap.GetDescriptorStride();
+		m_availableCPUDescriptors.push_back(descriptor);
 	}
-}
 
-D3D12_CPU_DESCRIPTOR_HANDLE CrCPUDescriptorPoolD3D12::Allocate()
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE descriptor = m_availableCPUDescriptors.back();
-	m_availableCPUDescriptors.pop_back();
-	return descriptor;
-}
+	void CPUDescriptorScratchD3D12::Initialize(size_t count)
+	{
+		m_descriptors.resize(count);
+		m_currentOffset = 0;
+	}
 
-void CrCPUDescriptorPoolD3D12::Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
-{
-	m_availableCPUDescriptors.push_back(descriptor);
-}
+	size_t CPUDescriptorScratchD3D12::Allocate(size_t count)
+	{
+		size_t currentOffset = m_currentOffset;
+		m_currentOffset += count;
+		return currentOffset;
+	}
 
-void CrCPUDescriptorScratchD3D12::Initialize(size_t count)
-{
-	m_descriptors.resize(count);
-	m_currentOffset = 0;
-}
+	void CPUDescriptorScratchD3D12::Reset()
+	{
+		m_currentOffset = 0;
+	}
 
-size_t CrCPUDescriptorScratchD3D12::Allocate(size_t count)
-{
-	size_t currentOffset = m_currentOffset;
-	m_currentOffset += count;
-	return currentOffset;
-}
+	DescriptorStreamD3D12::DescriptorStreamD3D12()
+		: m_currentDescriptor(0)
+	{
 
-void CrCPUDescriptorScratchD3D12::Reset()
-{
-	m_currentOffset = 0;
-}
+	}
 
-CrDescriptorStreamD3D12::CrDescriptorStreamD3D12()
-	: m_currentDescriptor(0)
-{
-	
-}
+	void DescriptorStreamD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor)
+	{
+		uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
-void CrDescriptorStreamD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor)
-{
-	uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, CrDescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+		DescriptorHeapDescriptorD3D12 heapDescriptor;
+		heapDescriptor.name = descriptor.name;
+		heapDescriptor.numDescriptors = maxDescriptors;
+		heapDescriptor.type = descriptor.type;
+		heapDescriptor.flags = descriptor.flags;
+		m_descriptorHeap.Initialize(d3d12RenderDevice, heapDescriptor);
+	}
 
-	CrDescriptorHeapDescriptor heapDescriptor;
-	heapDescriptor.name           = descriptor.name;
-	heapDescriptor.numDescriptors = maxDescriptors;
-	heapDescriptor.type           = descriptor.type;
-	heapDescriptor.flags          = descriptor.flags;
-	m_descriptorHeap.Initialize(d3d12RenderDevice, heapDescriptor);
-}
+	crd3d::DescriptorD3D12 DescriptorStreamD3D12::Allocate(uint32_t count)
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE descriptorCPU = m_descriptorHeap.GetHeapStartCPU();
+		D3D12_GPU_DESCRIPTOR_HANDLE descriptorGPU = m_descriptorHeap.GetHeapStartGPU();
 
-crd3d::DescriptorD3D12 CrDescriptorStreamD3D12::Allocate(uint32_t count)
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE descriptorCPU = m_descriptorHeap.GetHeapStartCPU();
-	D3D12_GPU_DESCRIPTOR_HANDLE descriptorGPU = m_descriptorHeap.GetHeapStartGPU();
+		descriptorCPU.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
+		descriptorGPU.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
+		m_currentDescriptor += count;
 
-	descriptorCPU.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
-	descriptorGPU.ptr += m_currentDescriptor * m_descriptorHeap.GetDescriptorStride();
-	m_currentDescriptor += count;
+		crd3d::DescriptorD3D12 result;
+		result.cpuHandle = descriptorCPU;
+		result.gpuHandle = descriptorGPU;
 
-	crd3d::DescriptorD3D12 result;
-	result.cpuHandle = descriptorCPU;
-	result.gpuHandle = descriptorGPU;
+		return result;
+	}
 
-	return result;
-}
-
-void CrDescriptorStreamD3D12::Reset()
-{
-	m_currentDescriptor = 0;
-}
+	void DescriptorStreamD3D12::Reset()
+	{
+		m_currentDescriptor = 0;
+	}
+};

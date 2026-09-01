@@ -7,124 +7,124 @@
 namespace crgfx
 {
 	class DeviceD3D12;
-};
 
-struct CrDescriptorHeapDescriptor
-{
-	const char* name = "";
-	uint32_t numDescriptors = 0;
-	D3D12_DESCRIPTOR_HEAP_TYPE type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
-	D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-};
-
-class CrDescriptorHeapD3D12
-{
-public:
-
-	static uint32_t GetMaxDescriptorsPerHeap(const CrDescriptorHeapDescriptor& descriptor);
-
-	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE GetHeapStartCPU() const
+	struct DescriptorHeapDescriptorD3D12
 	{
-		return m_heapStartCPU;
-	}
+		const char* name = "";
+		uint32_t numDescriptors = 0;
+		D3D12_DESCRIPTOR_HEAP_TYPE type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
+		D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	};
 
-	D3D12_GPU_DESCRIPTOR_HANDLE GetHeapStartGPU() const
+	class DescriptorHeapD3D12
 	{
-		return m_heapStartGPU;
-	}
+	public:
 
-	uint32_t GetDescriptorStride() const { return m_descriptorStride; }
+		static uint32_t GetMaxDescriptorsPerHeap(const DescriptorHeapDescriptorD3D12& descriptor);
 
-	ID3D12DescriptorHeap* GetD3D12DescriptorHeap() const { return m_descriptorHeap; }
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor);
 
-private:
+		D3D12_CPU_DESCRIPTOR_HANDLE GetHeapStartCPU() const
+		{
+			return m_heapStartCPU;
+		}
 
-	ID3D12Device* m_d3d12Device;
+		D3D12_GPU_DESCRIPTOR_HANDLE GetHeapStartGPU() const
+		{
+			return m_heapStartGPU;
+		}
 
-	// Size of each descriptor
-	uint32_t m_descriptorStride;
+		uint32_t GetDescriptorStride() const { return m_descriptorStride; }
 
-	D3D12_CPU_DESCRIPTOR_HANDLE m_heapStartCPU;
+		ID3D12DescriptorHeap* GetD3D12DescriptorHeap() const { return m_descriptorHeap; }
 
-	D3D12_GPU_DESCRIPTOR_HANDLE m_heapStartGPU;
+	private:
 
-	ID3D12DescriptorHeap* m_descriptorHeap;
-};
+		ID3D12Device* m_d3d12Device;
 
-// Pool of descriptors that can be reused. Putting a descriptor back in the pool implicitly assumes that the descriptor can
-// be reused, which is often the case for non-shader-visible descriptors. Therefore this caters well for the resource view
-// use case, e.g. we create a render target view associated to a resource, and its lifetime is the same as that of the resource
-class CrCPUDescriptorPoolD3D12
-{
-public:
+		// Size of each descriptor
+		uint32_t m_descriptorStride;
 
-	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
+		D3D12_CPU_DESCRIPTOR_HANDLE m_heapStartCPU;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Allocate();
+		D3D12_GPU_DESCRIPTOR_HANDLE m_heapStartGPU;
 
-	void Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+		ID3D12DescriptorHeap* m_descriptorHeap;
+	};
 
-	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
-
-private:
-
-	CrDescriptorHeapD3D12 m_descriptorHeap;
-
-	crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_availableCPUDescriptors;
-};
-
-// A vector of CPU descriptors that we'll copy into from different sources. At the end we do the entire copy from CPU-visible to shader visible descriptors
-// This is faster than trying to copy them in place as we create them
-class CrCPUDescriptorScratchD3D12
-{
-public:
-
-	void Initialize(size_t count);
-
-	size_t Allocate(size_t count);
-
-	void Reset();
-
-	size_t Size()
+	// Pool of descriptors that can be reused. Putting a descriptor back in the pool implicitly assumes that the descriptor can
+	// be reused, which is often the case for non-shader-visible descriptors. Therefore this caters well for the resource view
+	// use case, e.g. we create a render target view associated to a resource, and its lifetime is the same as that of the resource
+	class CPUDescriptorPoolD3D12
 	{
-		return m_currentOffset;
-	}
+	public:
 
-	D3D12_CPU_DESCRIPTOR_HANDLE& operator [] (size_t i)
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE Allocate();
+
+		void Free(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
+
+		const DescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+
+	private:
+
+		DescriptorHeapD3D12 m_descriptorHeap;
+
+		crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_availableCPUDescriptors;
+	};
+
+	// A vector of CPU descriptors that we'll copy into from different sources. At the end we do the entire copy from CPU-visible to shader visible descriptors
+	// This is faster than trying to copy them in place as we create them
+	class CPUDescriptorScratchD3D12
 	{
-		return m_descriptors[i];
-	}
+	public:
 
-private:
+		void Initialize(size_t count);
 
-	size_t m_currentOffset;
+		size_t Allocate(size_t count);
 
-	crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_descriptors;
-};
+		void Reset();
 
-// Stream of descriptors that one never returns descriptors to. This is meant to be used throughout the frame, and it's where
-// shader-visible descriptors go. Once the frame has been consumed by the GPU, all those descriptors can be reused
-class CrDescriptorStreamD3D12
-{
-public:
+		size_t Size()
+		{
+			return m_currentOffset;
+		}
 
-	void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const CrDescriptorHeapDescriptor& descriptor);
+		D3D12_CPU_DESCRIPTOR_HANDLE& operator [] (size_t i)
+		{
+			return m_descriptors[i];
+		}
 
-	CrDescriptorStreamD3D12();
+	private:
 
-	crd3d::DescriptorD3D12 Allocate(uint32_t count);
+		size_t m_currentOffset;
 
-	void Reset();
+		crstl::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_descriptors;
+	};
 
-	const CrDescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+	// Stream of descriptors that one never returns descriptors to. This is meant to be used throughout the frame, and it's where
+	// shader-visible descriptors go. Once the frame has been consumed by the GPU, all those descriptors can be reused
+	class DescriptorStreamD3D12
+	{
+	public:
 
-	uint32_t GetNumDescriptors() const { return m_currentDescriptor; }
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor);
 
-private:
+		DescriptorStreamD3D12();
 
-	CrDescriptorHeapD3D12 m_descriptorHeap;
+		crd3d::DescriptorD3D12 Allocate(uint32_t count);
 
-	uint32_t m_currentDescriptor;
+		void Reset();
+
+		const DescriptorHeapD3D12& GetDescriptorHeap() const { return m_descriptorHeap; }
+
+		uint32_t GetNumDescriptors() const { return m_currentDescriptor; }
+
+	private:
+
+		DescriptorHeapD3D12 m_descriptorHeap;
+
+		uint32_t m_currentDescriptor;
+	};
 };

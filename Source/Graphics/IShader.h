@@ -16,10 +16,10 @@
 #include "crstl/intrusive_ptr.h"
 #include "crstl/unique_ptr.h"
 
-using bindpoint_t = uint8_t;
-
 namespace crgfx
 {
+	using bindpoint_t = uint8_t;
+
 	struct ShaderBinding
 	{
 		ShaderBinding() {}

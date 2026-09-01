@@ -12,7 +12,7 @@ class CrOSWindow;
 
 namespace crgfx
 {
-	enum class CrSwapchainResult : uint32_t
+	enum class SwapchainResult : uint32_t
 	{
 		Success,
 		Invalid
@@ -55,7 +55,7 @@ namespace crgfx
 
 		uint32_t GetCurrentFrameIndex() const;
 
-		crgfx::CrSwapchainResult AcquireNextImage(uint64_t timeoutNanoseconds = UINT64_MAX);
+		crgfx::SwapchainResult AcquireNextImage(uint64_t timeoutNanoseconds = UINT64_MAX);
 
 		void Present();
 
@@ -69,7 +69,7 @@ namespace crgfx
 
 		virtual void ResizePS(uint32_t width, uint32_t height) = 0;
 
-		virtual crgfx::CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
+		virtual crgfx::SwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) = 0;
 
 		crstl::vector<crgfx::TextureHandle> m_textures;
 

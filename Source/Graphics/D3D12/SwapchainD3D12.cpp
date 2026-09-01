@@ -82,7 +82,7 @@ namespace crgfx
 		CloseHandle(m_fenceEvent);
 	}
 
-	crgfx::CrSwapchainResult SwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
+	crgfx::SwapchainResult SwapchainD3D12::AcquireNextImagePS(uint64_t timeoutNanoseconds)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(crgfx::GetDevice().get());
 		ID3D12CommandQueue* commandQueue = d3d12RenderDevice->GetD3D12GraphicsCommandQueue();
@@ -104,7 +104,7 @@ namespace crgfx
 		// Set the fence value for the next frame.
 		m_fenceValues[m_currentBufferIndex] = currentFenceValue + 1;
 
-		return crgfx::CrSwapchainResult::Success;
+		return crgfx::SwapchainResult::Success;
 	}
 
 	// https://docs.microsoft.com/en-us/windows/win32/direct3ddxgi/dxgi-present

@@ -13,8 +13,8 @@ namespace crgfx
 {
 	class TextureD3D12;
 
-	typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> CrTextureBarrierVectorD3D12;
-	typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount> CrBufferBarrierVectorD3D12;
+	typedef crstl::fixed_vector<D3D12_TEXTURE_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount + crgfx::MaxRenderTargets> TextureBarrierVectorD3D12;
+	typedef crstl::fixed_vector<D3D12_BUFFER_BARRIER, crgfx::RenderPassDescriptor::MaxTransitionCount> BufferBarrierVectorD3D12;
 
 	class CommandBufferD3D12 final : public ICommandBuffer
 	{
@@ -68,16 +68,16 @@ namespace crgfx
 
 		virtual void EndRenderPassPS() override;
 
-		void ProcessTextureBarriers(const crgfx::RenderPassDescriptor::TextureTransitionVector& textures, CrTextureBarrierVectorD3D12& d3d12TextureBarriers);
+		void ProcessTextureBarriers(const crgfx::RenderPassDescriptor::TextureTransitionVector& textures, TextureBarrierVectorD3D12& d3d12TextureBarriers);
 
-		void ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, CrBufferBarrierVectorD3D12& d3d12BufferBarriers);
+		void ProcessBufferBarriers(const crgfx::RenderPassDescriptor::BufferTransitionVector& buffers, BufferBarrierVectorD3D12& d3d12BufferBarriers);
 
 		void ProcessRenderTargetBarrier
 		(
 			const RenderTargetDescriptor& renderTargetDescriptor,
 			const crgfx::TextureState& initialState,
 			const crgfx::TextureState& finalState,
-			CrTextureBarrierVectorD3D12& textureBarriers
+			TextureBarrierVectorD3D12& textureBarriers
 		);
 
 		void WriteCBV(const ConstantBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& cpuDescriptorHandle);
@@ -94,18 +94,18 @@ namespace crgfx
 
 		D3D12_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 
-		CrDescriptorStreamD3D12 m_shaderResourceShaderVisibleDescriptorStream;
+		DescriptorStreamD3D12 m_shaderResourceShaderVisibleDescriptorStream;
 
-		CrDescriptorStreamD3D12 m_samplerShaderVisibleDescriptorStream;
+		DescriptorStreamD3D12 m_samplerShaderVisibleDescriptorStream;
 
 		// Allocate dynamic descriptors from here. This typically applies to buffers
-		CrDescriptorStreamD3D12 m_dynamicDescriptorStream;
+		DescriptorStreamD3D12 m_dynamicDescriptorStream;
 
 		// Descriptors used for this command buffer before submitting. They are a copy of either the static descriptor coming from a resource (samplers, textures, RW textures)
 		// or a dynamic descriptor generated for buffers via an offset
-		CrCPUDescriptorScratchD3D12 m_shaderResourceCPUDescriptors;
+		CPUDescriptorScratchD3D12 m_shaderResourceCPUDescriptors;
 
-		CrCPUDescriptorScratchD3D12 m_samplerCPUDescriptors;
+		CPUDescriptorScratchD3D12 m_samplerCPUDescriptors;
 
 		ID3D12DescriptorHeap* m_shaderResourceDescriptorHeap;
 

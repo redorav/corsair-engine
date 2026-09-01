@@ -122,16 +122,16 @@ namespace crgfx
 		virtual void SubmitCommandBufferPS(const crgfx::ICommandBuffer* commandBuffer, const IGPUSemaphore* waitSemaphore, const IGPUSemaphore* signalSemaphore, const IGPUFence* signalFence) override;
 
 		// Heap for Render Target Views
-		CrCPUDescriptorPoolD3D12 m_rtvPool;
+		CPUDescriptorPoolD3D12 m_rtvPool;
 
 		// Heap for Depth Stencil Views
-		CrCPUDescriptorPoolD3D12 m_dsvPool;
+		CPUDescriptorPoolD3D12 m_dsvPool;
 
 		// Heap for Samplers
-		CrCPUDescriptorPoolD3D12 m_samplerPool;
+		CPUDescriptorPoolD3D12 m_samplerPool;
 
 		// Heap for SRVs, CBVs, UAVs
-		CrCPUDescriptorPoolD3D12 m_shaderResourcePool;
+		CPUDescriptorPoolD3D12 m_shaderResourcePool;
 
 		GPUFenceHandle m_waitIdleFence;
 

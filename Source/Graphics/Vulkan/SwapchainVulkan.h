@@ -15,7 +15,7 @@ namespace crgfx
 
 		VkSwapchainKHR GetVkSwapchain() const;
 
-		virtual crgfx::CrSwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) override;
+		virtual crgfx::SwapchainResult AcquireNextImagePS(uint64_t timeoutNanoseconds = UINT64_MAX) override;
 
 		virtual void PresentPS() override;
 

@@ -43,7 +43,7 @@ namespace crgfx
 		return m_currentBufferIndex;
 	}
 
-	crgfx::CrSwapchainResult ISwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
+	crgfx::SwapchainResult ISwapchain::AcquireNextImage(uint64_t timeoutNanoseconds)
 	{
 		return AcquireNextImagePS(timeoutNanoseconds);
 	}

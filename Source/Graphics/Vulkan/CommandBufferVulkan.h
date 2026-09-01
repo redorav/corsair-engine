@@ -153,13 +153,13 @@ namespace crgfx
 
 	inline void CommandBufferVulkan::BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryID query)
 	{
-		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+		const GPUQueryPoolVulkan* vulkanQueryPool = static_cast<const GPUQueryPoolVulkan*>(queryPool);
 		vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), query.id);
 	}
 
 	inline void CommandBufferVulkan::EndTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryID query)
 	{
-		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+		const GPUQueryPoolVulkan* vulkanQueryPool = static_cast<const GPUQueryPoolVulkan*>(queryPool);
 		vkCmdWriteTimestamp(m_vkCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, vulkanQueryPool->GetVkQueryPool(), query.id);
 	}
 };

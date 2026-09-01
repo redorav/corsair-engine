@@ -18,7 +18,7 @@ D3D12_QUERY_HEAP_TYPE GetD3D12QueryType(crgfx::QueryType queryType)
 
 namespace crgfx
 {
-	CrGPUQueryPoolD3D12::CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
+	GPUQueryPoolD3D12::GPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(renderDevice);
 
@@ -39,12 +39,12 @@ namespace crgfx
 		m_timestampPeriod = (double)(1000000000 / d3d12RenderDevice->GetD3D12TimestampFrequency());
 	}
 
-	CrGPUQueryPoolD3D12::~CrGPUQueryPoolD3D12()
+	GPUQueryPoolD3D12::~GPUQueryPoolD3D12()
 	{
 		m_d3d12QueryHeap->Release();
 	}
 
-	void CrGPUQueryPoolD3D12::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
+	void GPUQueryPoolD3D12::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
 	{
 		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{
@@ -53,7 +53,7 @@ namespace crgfx
 		m_queryBuffer->Unlock();
 	}
 
-	void CrGPUQueryPoolD3D12::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
+	void GPUQueryPoolD3D12::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
 	{
 		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{

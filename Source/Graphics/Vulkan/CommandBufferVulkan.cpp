@@ -119,7 +119,7 @@ namespace crgfx
 		bindingLayout.ForEachConstantBuffer([&](crgfx::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
 		{
 			const ConstantBufferBinding& binding = m_currentState.m_constantBuffers[id];
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+			const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(binding.buffer);
 
 			// There are two ways to set buffers in Vulkan, a descriptor offset and a dynamic offset. Both are equivalent
 			// in terms of functionality
@@ -207,7 +207,7 @@ namespace crgfx
 		bindingLayout.ForEachStorageBuffer([&](crgfx::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
 		{
 			const StorageBufferBinding& binding = m_currentState.m_storageBuffers[id];
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+			const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(binding.buffer);
 
 			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
@@ -224,7 +224,7 @@ namespace crgfx
 		bindingLayout.ForEachRWStorageBuffer([&](crgfx::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
 		{
 			const StorageBufferBinding& binding = m_currentState.m_rwStorageBuffers[id];
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(binding.buffer);
+			const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(binding.buffer);
 
 			VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
 			bufferInfo.buffer = vulkanGPUBuffer->GetVkBuffer();
@@ -240,7 +240,7 @@ namespace crgfx
 
 		bindingLayout.ForEachRWTypedBuffer([&](crgfx::ShaderStage::T, RWTypedBuffers::T id, bindpoint_t bindPoint)
 		{
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
+			const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(m_currentState.m_rwTypedBuffers[id].buffer);
 
 			bufferViews[texelBufferCount] = vulkanGPUBuffer->GetVkBufferView();
 
@@ -262,14 +262,14 @@ namespace crgfx
 
 	void CommandBufferVulkan::ResetGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
-		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
+		const GPUQueryPoolVulkan* vulkanQueryPool = static_cast<const GPUQueryPoolVulkan*>(queryPool);
 		vkCmdResetQueryPool(m_vkCommandBuffer, vulkanQueryPool->GetVkQueryPool(), start, count);
 	}
 
 	void CommandBufferVulkan::ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
-		const CrGPUQueryPoolVulkan* vulkanQueryPool = static_cast<const CrGPUQueryPoolVulkan*>(queryPool);
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(vulkanQueryPool->GetResultsBuffer());
+		const GPUQueryPoolVulkan* vulkanQueryPool = static_cast<const GPUQueryPoolVulkan*>(queryPool);
+		const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(vulkanQueryPool->GetResultsBuffer());
 
 		// The wait flag here doesn't wait on the CPU, rather the GPU will ensure query results are all ready before resolving. In practice this means
 		// it won't try to reorder the copy on the GPU to a point before the query was actually finished
@@ -284,7 +284,7 @@ namespace crgfx
 
 		if (m_currentState.m_indexBufferDirty)
 		{
-			const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer);
+			const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(m_currentState.m_indexBuffer);
 			VkIndexType indexType = crvk::GetVkIndexType(m_currentState.m_indexBufferFormat);
 			vkCmdBindIndexBuffer(m_vkCommandBuffer, vulkanGPUBuffer->GetVkBuffer(), m_currentState.m_indexBufferOffset, indexType);
 			m_currentState.m_indexBufferDirty = false;
@@ -303,7 +303,7 @@ namespace crgfx
 				{
 					const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
 					vkOffsets[streamId] = binding.offset;
-					vkBuffers[streamId] = static_cast<const CrHardwareGPUBufferVulkan*>(binding.vertexBuffer)->GetVkBuffer();
+					vkBuffers[streamId] = static_cast<const HardwareGPUBufferVulkan*>(binding.vertexBuffer)->GetVkBuffer();
 				}
 
 				// Assume we always start at binding 0
@@ -376,7 +376,7 @@ namespace crgfx
 	void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,
 		const RenderPassBufferDescriptor& bufferDescriptor, crgfx::BufferState::T sourceState, crgfx::BufferState::T destinationState)
 	{
-		const CrHardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(bufferDescriptor.hardwareBuffer);
+		const HardwareGPUBufferVulkan* vulkanGPUBuffer = static_cast<const HardwareGPUBufferVulkan*>(bufferDescriptor.hardwareBuffer);
 
 		bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 		bufferMemoryBarrier.pNext = nullptr;
@@ -384,8 +384,8 @@ namespace crgfx
 		bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-		bufferMemoryBarrier.srcAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(sourceState).accessMask;
-		bufferMemoryBarrier.dstAccessMask = CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
+		bufferMemoryBarrier.srcAccessMask = HardwareGPUBufferVulkan::GetVkBufferStateInfo(sourceState).accessMask;
+		bufferMemoryBarrier.dstAccessMask = HardwareGPUBufferVulkan::GetVkBufferStateInfo(destinationState).accessMask;
 
 		bufferMemoryBarrier.buffer = vulkanGPUBuffer->GetVkBuffer();
 		bufferMemoryBarrier.offset = bufferDescriptor.offset;
@@ -557,8 +557,8 @@ namespace crgfx
 		{
 			VkBufferMemoryBarrier& bufferMemoryBarrier = m_bufferMemoryBarriers.push_back();
 			PopulateVkBufferBarrier(bufferMemoryBarrier, bufferDescriptor, bufferDescriptor.sourceState, bufferDescriptor.destinationState);
-			m_srcStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
-			m_destStageMask |= CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
+			m_srcStageMask |= HardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.sourceState, bufferDescriptor.sourceShaderStages);
+			m_destStageMask |= HardwareGPUBufferVulkan::GetVkPipelineStageFlags(bufferDescriptor.destinationState, bufferDescriptor.destinationShaderStages);
 		}
 
 		for (const RenderPassTextureDescriptor& textureDescriptor : textures)
@@ -651,19 +651,19 @@ namespace crgfx
 
 	void CommandBufferVulkan::DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
-		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+		VkBuffer vkIndirectBuffer = static_cast<const HardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDrawIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndirectCommand));
 	}
 
 	void CommandBufferVulkan::DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
-		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+		VkBuffer vkIndirectBuffer = static_cast<const HardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDrawIndexedIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset, count, sizeof(VkDrawIndexedIndirectCommand));
 	}
 
 	void CommandBufferVulkan::DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 	{
-		VkBuffer vkIndirectBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
+		VkBuffer vkIndirectBuffer = static_cast<const HardwareGPUBufferVulkan*>(indirectBuffer)->GetVkBuffer();
 		vkCmdDispatchIndirect(m_vkCommandBuffer, vkIndirectBuffer, offset);
 	}
 

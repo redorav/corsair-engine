@@ -8,7 +8,7 @@
 
 namespace crgfx
 {
-	CrHardwareGPUBufferVulkan::CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const HardwareGPUBufferDescriptor& descriptor)
+	HardwareGPUBufferVulkan::HardwareGPUBufferVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const HardwareGPUBufferDescriptor& descriptor)
 		: IHardwareGPUBuffer(vulkanRenderDevice, descriptor)
 	{
 		VkResult vkResult = VK_SUCCESS;
@@ -105,7 +105,7 @@ namespace crgfx
 		}
 	}
 
-	CrHardwareGPUBufferVulkan::~CrHardwareGPUBufferVulkan()
+	HardwareGPUBufferVulkan::~HardwareGPUBufferVulkan()
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 
@@ -117,7 +117,7 @@ namespace crgfx
 		vmaDestroyBuffer(vulkanRenderDevice->GetVmaAllocator(), m_vkBuffer, m_vmaAllocation);
 	}
 
-	VkBufferUsageFlags CrHardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access)
+	VkBufferUsageFlags HardwareGPUBufferVulkan::GetVkBufferUsageFlagBits(crgfx::BufferUsage::T usage, crgfx::MemoryAccess::T access)
 	{
 		VkBufferUsageFlags usageFlags = 0;
 
@@ -171,7 +171,7 @@ namespace crgfx
 		return usageFlags;
 	}
 
-	VkPipelineStageFlags CrHardwareGPUBufferVulkan::GetVkPipelineStageFlags(crgfx::BufferState::T bufferState, crgfx::ShaderStageFlags::T shaderStages)
+	VkPipelineStageFlags HardwareGPUBufferVulkan::GetVkPipelineStageFlags(crgfx::BufferState::T bufferState, crgfx::ShaderStageFlags::T shaderStages)
 	{
 		VkPipelineStageFlags pipelineFlags = 0;
 
@@ -185,7 +185,7 @@ namespace crgfx
 		return pipelineFlags;
 	}
 
-	void* CrHardwareGPUBufferVulkan::LockPS()
+	void* HardwareGPUBufferVulkan::LockPS()
 	{
 		void* data = nullptr;
 
@@ -195,7 +195,7 @@ namespace crgfx
 		return data;
 	}
 
-	void CrHardwareGPUBufferVulkan::UnlockPS()
+	void HardwareGPUBufferVulkan::UnlockPS()
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 		vmaUnmapMemory(vulkanRenderDevice->GetVmaAllocator(), m_vmaAllocation);
@@ -222,7 +222,7 @@ namespace crgfx
 
 	static bool DummyPopulateVkBufferResourceTable = PopulateVkBufferResourceTable();
 
-	const CrVkBufferStateInfo& CrHardwareGPUBufferVulkan::GetVkBufferStateInfo(crgfx::BufferState::T bufferState)
+	const CrVkBufferStateInfo& HardwareGPUBufferVulkan::GetVkBufferStateInfo(crgfx::BufferState::T bufferState)
 	{
 		return CrVkBufferResourceStateTable[bufferState];
 	}

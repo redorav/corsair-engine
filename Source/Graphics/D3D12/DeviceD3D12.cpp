@@ -419,7 +419,7 @@ namespace crgfx
 
 	IHardwareGPUBuffer* DeviceD3D12::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)
 	{
-		return new CrHardwareGPUBufferD3D12(this, descriptor);
+		return new HardwareGPUBufferD3D12(this, descriptor);
 	}
 
 	ISampler* DeviceD3D12::CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor)
@@ -452,7 +452,7 @@ namespace crgfx
 
 	IGPUQueryPool* DeviceD3D12::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
-		return new CrGPUQueryPoolD3D12(this, queryPoolDescriptor);
+		return new GPUQueryPoolD3D12(this, queryPoolDescriptor);
 	}
 
 	void DeviceD3D12::FinalizeDeletionPS()
@@ -560,7 +560,7 @@ namespace crgfx
 		// Add to the open uploads for when we end the texture upload
 		m_openTextureUploads.insert(textureHash, textureUpload);
 
-		return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get())->Lock();
+		return (uint8_t*)static_cast<HardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get())->Lock();
 	}
 
 	void DeviceD3D12::EndTextureUploadPS(const crgfx::ITexture* destinationTexture)
@@ -572,7 +572,7 @@ namespace crgfx
 		const TextureUpload& textureUpload = textureUploadIter->second;
 
 		const TextureD3D12* d3d12DestinationTexture = static_cast<const TextureD3D12*>(destinationTexture);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get());
+		HardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<HardwareGPUBufferD3D12*>(textureUpload.stagingBuffer.get());
 
 		d3d12StagingBuffer->Unlock();
 
@@ -673,7 +673,7 @@ namespace crgfx
 		// Add to the open uploads for when we end the texture upload
 		m_openBufferUploads.insert(bufferHash, bufferUpload);
 
-		return (uint8_t*)static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get())->Lock();
+		return (uint8_t*)static_cast<HardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get())->Lock();
 	}
 
 	void DeviceD3D12::EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
@@ -684,8 +684,8 @@ namespace crgfx
 
 		const BufferUpload& bufferUpload = bufferUploadIter->second;
 
-		const CrHardwareGPUBufferD3D12* d3d12DestinationBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(destinationBuffer);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get());
+		const HardwareGPUBufferD3D12* d3d12DestinationBuffer = static_cast<const HardwareGPUBufferD3D12*>(destinationBuffer);
+		HardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<HardwareGPUBufferD3D12*>(bufferUpload.stagingBuffer.get());
 
 		d3d12StagingBuffer->Unlock();
 
@@ -706,7 +706,7 @@ namespace crgfx
 
 	HardwareGPUBufferHandle DeviceD3D12::DownloadBufferPS(const IHardwareGPUBuffer* sourceBuffer)
 	{
-		const CrHardwareGPUBufferD3D12* d3d12SourceBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(sourceBuffer);
+		const HardwareGPUBufferD3D12* d3d12SourceBuffer = static_cast<const HardwareGPUBufferD3D12*>(sourceBuffer);
 
 		D3D12_RESOURCE_DESC resourceDescriptor = d3d12SourceBuffer->GetD3D12Resource()->GetDesc();
 
@@ -717,7 +717,7 @@ namespace crgfx
 
 		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, (uint32_t)stagingBufferSizeBytes);
 		HardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-		CrHardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<CrHardwareGPUBufferD3D12*>(stagingBuffer.get());
+		HardwareGPUBufferD3D12* d3d12StagingBuffer = static_cast<HardwareGPUBufferD3D12*>(stagingBuffer.get());
 
 		CommandBufferD3D12* d3d12CommandBuffer = static_cast<CommandBufferD3D12*>(GetAuxiliaryCommandBuffer().get());
 		{

@@ -18,7 +18,7 @@ VkQueryType GetVkQueryType(crgfx::QueryType queryType)
 
 namespace crgfx
 {
-	CrGPUQueryPoolVulkan::CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
+	GPUQueryPoolVulkan::GPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : IGPUQueryPool(renderDevice, descriptor)
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(renderDevice);
 
@@ -48,13 +48,13 @@ namespace crgfx
 		m_timestampPeriod = vulkanRenderDevice->GetVkPhysicalDeviceProperties().limits.timestampPeriod;
 	}
 
-	CrGPUQueryPoolVulkan::~CrGPUQueryPoolVulkan()
+	GPUQueryPoolVulkan::~GPUQueryPoolVulkan()
 	{
 		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
 		vkDestroyQueryPool(vulkanRenderDevice->GetVkDevice(), m_vkQueryPool, nullptr);
 	}
 
-	void CrGPUQueryPoolVulkan::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
+	void GPUQueryPoolVulkan::GetTimingDataPS(GPUTimestamp* timingData, uint32_t timingCount)
 	{
 		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{
@@ -63,7 +63,7 @@ namespace crgfx
 		m_queryBuffer->Unlock();
 	}
 
-	void CrGPUQueryPoolVulkan::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
+	void GPUQueryPoolVulkan::GetOcclusionDataPS(GPUOcclusion* occlusionData, uint32_t occlusionCount)
 	{
 		uint64_t* memory = (uint64_t*)m_queryBuffer->Lock();
 		{

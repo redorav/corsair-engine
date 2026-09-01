@@ -14,13 +14,13 @@ namespace crgfx
 {
 	class DeviceVulkan;
 
-	class CrHardwareGPUBufferVulkan final : public IHardwareGPUBuffer
+	class HardwareGPUBufferVulkan final : public IHardwareGPUBuffer
 	{
 	public:
 
-		CrHardwareGPUBufferVulkan(crgfx::DeviceVulkan* renderDevice, const HardwareGPUBufferDescriptor& descriptor);
+		HardwareGPUBufferVulkan(crgfx::DeviceVulkan* renderDevice, const HardwareGPUBufferDescriptor& descriptor);
 
-		virtual ~CrHardwareGPUBufferVulkan() override;
+		virtual ~HardwareGPUBufferVulkan() override;
 
 		static const CrVkBufferStateInfo& GetVkBufferStateInfo(crgfx::BufferState::T bufferState);
 
@@ -45,12 +45,12 @@ namespace crgfx
 		VmaAllocation m_vmaAllocation;
 	};
 
-	inline VkBuffer CrHardwareGPUBufferVulkan::GetVkBuffer() const
+	inline VkBuffer HardwareGPUBufferVulkan::GetVkBuffer() const
 	{
 		return m_vkBuffer;
 	}
 
-	inline VkBufferView CrHardwareGPUBufferVulkan::GetVkBufferView() const
+	inline VkBufferView HardwareGPUBufferVulkan::GetVkBufferView() const
 	{
 		return m_vkBufferView;
 	}

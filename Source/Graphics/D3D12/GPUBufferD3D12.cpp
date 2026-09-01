@@ -8,7 +8,7 @@
 
 namespace crgfx
 {
-	CrHardwareGPUBufferD3D12::CrHardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const HardwareGPUBufferDescriptor& descriptor)
+	HardwareGPUBufferD3D12::HardwareGPUBufferD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const HardwareGPUBufferDescriptor& descriptor)
 		: IHardwareGPUBuffer(d3d12RenderDevice, descriptor)
 	{
 		ID3D12Device10* d3d12Device10 = d3d12RenderDevice->GetD3D12Device10();
@@ -102,12 +102,12 @@ namespace crgfx
 		d3d12RenderDevice->SetD3D12ObjectName(m_d3d12Resource, descriptor.name);
 	}
 
-	CrHardwareGPUBufferD3D12::~CrHardwareGPUBufferD3D12()
+	HardwareGPUBufferD3D12::~HardwareGPUBufferD3D12()
 	{
 		m_d3d12Resource->Release();
 	}
 
-	void* CrHardwareGPUBufferD3D12::LockPS()
+	void* HardwareGPUBufferD3D12::LockPS()
 	{
 		void* data = nullptr;
 		HRESULT hResult = m_d3d12Resource->Map(0, nullptr, &data);
@@ -115,7 +115,7 @@ namespace crgfx
 		return data;
 	}
 
-	void CrHardwareGPUBufferD3D12::UnlockPS()
+	void HardwareGPUBufferD3D12::UnlockPS()
 	{
 		m_d3d12Resource->Unmap(0, nullptr);
 	}

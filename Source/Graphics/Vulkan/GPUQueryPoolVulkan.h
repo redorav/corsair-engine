@@ -7,13 +7,13 @@ namespace crgfx
 {
 	class IDevice;
 
-	class CrGPUQueryPoolVulkan final : public IGPUQueryPool
+	class GPUQueryPoolVulkan final : public IGPUQueryPool
 	{
 	public:
 
-		CrGPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
+		GPUQueryPoolVulkan(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
 
-		~CrGPUQueryPoolVulkan();
+		~GPUQueryPoolVulkan();
 
 		VkQueryPool GetVkQueryPool() const { return m_vkQueryPool; }
 

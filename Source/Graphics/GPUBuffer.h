@@ -59,7 +59,7 @@ namespace crgfx
 		const char* name = nullptr;
 	};
 
-	// A ICrHardwareGPUBuffer represents a real buffer on the GPU, with allocated memory and
+	// An IHardwareGPUBuffer represents a real buffer on the GPU, with allocated memory and
 	// properties. It can only be created from the render device. Because it is more efficient
 	// to allocate a relatively big buffer and suballocate from there, it is not intended to
 	// be created other than by lower level systems. From there one can reserve an offset and
@@ -233,7 +233,7 @@ namespace crgfx
 		}
 	};
 
-	// A CrGPUBuffer holds an actual hardware buffer. It can have other convenient data in the derived classes,
+	// A GPUBuffer owns an actual hardware buffer. It can have other convenient data in the derived classes,
 	// such as vertex descriptors, index sizes, binding indices, etc. It exists so we don't burden the hardware
 	// buffer with metadata that varies depending on usage
 	class GPUBuffer : public crstl::intrusive_ptr_interface_delete

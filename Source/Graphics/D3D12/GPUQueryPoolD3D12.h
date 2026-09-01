@@ -6,13 +6,13 @@ namespace crgfx
 {
 	class IDevice;
 
-	class CrGPUQueryPoolD3D12 final : public IGPUQueryPool
+	class GPUQueryPoolD3D12 final : public IGPUQueryPool
 	{
 	public:
 
-		CrGPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
+		GPUQueryPoolD3D12(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor);
 
-		~CrGPUQueryPoolD3D12();
+		~GPUQueryPoolD3D12();
 
 		ID3D12QueryHeap* GetD3D12QueryHeap() const { return m_d3d12QueryHeap; }
 

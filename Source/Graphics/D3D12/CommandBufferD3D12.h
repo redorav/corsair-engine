@@ -135,7 +135,7 @@ namespace crgfx
 
 	inline void CommandBufferD3D12::BeginTimestampQueryPS(const IGPUQueryPool* queryPool, CrGPUQueryID query)
 	{
-		const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
+		const GPUQueryPoolD3D12* d3d12QueryPool = static_cast<const GPUQueryPoolD3D12*>(queryPool);
 		m_d3d12GraphicsCommandList->EndQuery(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, query.id);
 	}
 

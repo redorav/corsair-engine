@@ -207,7 +207,7 @@ namespace crgfx
 		// Add to the open uploads for when we end the texture upload
 		m_openTextureUploads.insert(textureHash, textureUpload);
 
-		return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get())->Lock();
+		return (uint8_t*)static_cast<HardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get())->Lock();
 	}
 
 	void DeviceVulkan::EndTextureUploadPS(const crgfx::ITexture* texture)
@@ -219,7 +219,7 @@ namespace crgfx
 		const TextureUpload& textureUpload = textureUploadIter->second;
 
 		const TextureVulkan* vulkanTexture = static_cast<const TextureVulkan*>(texture);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get());
+		HardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<HardwareGPUBufferVulkan*>(textureUpload.stagingBuffer.get());
 
 		vulkanStagingBuffer->Unlock();
 
@@ -310,7 +310,7 @@ namespace crgfx
 		// Add to the open uploads for when we end the texture upload
 		m_openBufferUploads.insert(bufferHash, bufferUpload);
 
-		return (uint8_t*)static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get())->Lock();
+		return (uint8_t*)static_cast<HardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get())->Lock();
 	}
 
 	void DeviceVulkan::EndBufferUploadPS(const IHardwareGPUBuffer* destinationBuffer)
@@ -321,8 +321,8 @@ namespace crgfx
 
 		const BufferUpload& bufferUpload = bufferUploadIter->second;
 
-		const CrHardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(destinationBuffer);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());
+		const HardwareGPUBufferVulkan* vulkanDestinationBuffer = static_cast<const HardwareGPUBufferVulkan*>(destinationBuffer);
+		HardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<HardwareGPUBufferVulkan*>(bufferUpload.stagingBuffer.get());
 
 		vulkanStagingBuffer->Unlock();
 
@@ -370,11 +370,11 @@ namespace crgfx
 
 		HardwareGPUBufferDescriptor stagingBufferDescriptor(crgfx::BufferUsage::TransferDst, crgfx::MemoryAccess::StagingDownload, stagingBufferSizeBytes);
 		HardwareGPUBufferHandle stagingBuffer = CreateHardwareGPUBuffer(stagingBufferDescriptor);
-		CrHardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<CrHardwareGPUBufferVulkan*>(stagingBuffer.get());
+		HardwareGPUBufferVulkan* vulkanStagingBuffer = static_cast<HardwareGPUBufferVulkan*>(stagingBuffer.get());
 
 		CommandBufferVulkan* vulkanCommandBuffer = static_cast<CommandBufferVulkan*>(GetAuxiliaryCommandBuffer().get());
 		{
-			const CrHardwareGPUBufferVulkan* vulkanSourceBuffer = static_cast<const CrHardwareGPUBufferVulkan*>(sourceBuffer);
+			const HardwareGPUBufferVulkan* vulkanSourceBuffer = static_cast<const HardwareGPUBufferVulkan*>(sourceBuffer);
 
 			VkBufferCopy copyRegions;
 			copyRegions.srcOffset = 0;
@@ -705,7 +705,7 @@ namespace crgfx
 
 	IHardwareGPUBuffer* DeviceVulkan::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)
 	{
-		return new CrHardwareGPUBufferVulkan(this, descriptor);
+		return new HardwareGPUBufferVulkan(this, descriptor);
 	}
 
 	ISampler* DeviceVulkan::CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor)
@@ -740,7 +740,7 @@ namespace crgfx
 
 	IGPUQueryPool* DeviceVulkan::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)
 	{
-		return new CrGPUQueryPoolVulkan(this, queryPoolDescriptor);
+		return new GPUQueryPoolVulkan(this, queryPoolDescriptor);
 	}
 
 	void DeviceVulkan::RetrieveQueueFamilies()

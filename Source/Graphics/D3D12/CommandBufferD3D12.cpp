@@ -103,7 +103,7 @@ namespace crgfx
 	{
 		for (const RenderPassBufferDescriptor& descriptor : buffers)
 		{
-			const CrHardwareGPUBufferD3D12* d3d12Buffer = static_cast<const CrHardwareGPUBufferD3D12*>(descriptor.hardwareBuffer);
+			const HardwareGPUBufferD3D12* d3d12Buffer = static_cast<const HardwareGPUBufferD3D12*>(descriptor.hardwareBuffer);
 
 			crd3d::BufferBarrierInfoD3D12 sourceBufferBarrierInfo = crd3d::GetD3D12BufferBarrierInfo(descriptor.sourceState, descriptor.sourceShaderStages);
 			crd3d::BufferBarrierInfoD3D12 destinationBufferBarrierInfo = crd3d::GetD3D12BufferBarrierInfo(descriptor.destinationState, descriptor.destinationShaderStages);
@@ -319,8 +319,8 @@ namespace crgfx
 
 	void CommandBufferD3D12::ResolveGPUQueriesPS(const IGPUQueryPool* queryPool, uint32_t start, uint32_t count)
 	{
-		const CrGPUQueryPoolD3D12* d3d12QueryPool = static_cast<const CrGPUQueryPoolD3D12*>(queryPool);
-		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(d3d12QueryPool->GetResultsBuffer());
+		const GPUQueryPoolD3D12* d3d12QueryPool = static_cast<const GPUQueryPoolD3D12*>(queryPool);
+		const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(d3d12QueryPool->GetResultsBuffer());
 
 		m_d3d12GraphicsCommandList->ResolveQueryData(d3d12QueryPool->GetD3D12QueryHeap(), D3D12_QUERY_TYPE_TIMESTAMP, start, count, d3d12GPUBuffer->GetD3D12Resource(), start * sizeof(uint64_t));
 	}
@@ -328,7 +328,7 @@ namespace crgfx
 	void CommandBufferD3D12::WriteCBV(const ConstantBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& cbvHandle)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
-		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.buffer);
+		const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(binding.buffer);
 
 		// Allocate a single temporary descriptor from the stream. We don't store persistent constant buffer views due to the offset
 		crd3d::DescriptorD3D12 cbvDescriptorD3D12 = m_dynamicDescriptorStream.Allocate(1);
@@ -379,7 +379,7 @@ namespace crgfx
 	void CommandBufferD3D12::WriteStorageBufferSRV(const StorageBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
-		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.buffer);
+		const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(binding.buffer);
 
 		crd3d::DescriptorD3D12 srvDescriptorD3D12 = m_dynamicDescriptorStream.Allocate(1);
 
@@ -407,7 +407,7 @@ namespace crgfx
 	void CommandBufferD3D12::WriteRWStorageBufferUAV(const StorageBufferBinding& binding, D3D12_CPU_DESCRIPTOR_HANDLE& uavHandle)
 	{
 		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
-		const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.buffer);
+		const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(binding.buffer);
 
 		crd3d::DescriptorD3D12 uavDescriptorD3D12 = m_dynamicDescriptorStream.Allocate(1);
 
@@ -440,7 +440,7 @@ namespace crgfx
 
 		if (m_currentState.m_indexBufferDirty)
 		{
-			const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(m_currentState.m_indexBuffer);
+			const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(m_currentState.m_indexBuffer);
 			ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Resource();
 
 			D3D12_INDEX_BUFFER_VIEW d3d12IndexBufferView;
@@ -463,7 +463,7 @@ namespace crgfx
 				for (uint32_t streamId = 0; streamId < usedVertexStreamCount; ++streamId)
 				{
 					const VertexBufferBinding& binding = m_currentState.m_vertexBuffers[streamId];
-					const CrHardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const CrHardwareGPUBufferD3D12*>(binding.vertexBuffer);
+					const HardwareGPUBufferD3D12* d3d12GPUBuffer = static_cast<const HardwareGPUBufferD3D12*>(binding.vertexBuffer);
 					ID3D12Resource* d3d12Resource = d3d12GPUBuffer->GetD3D12Resource();
 					d3d12Views[streamId].BufferLocation = d3d12Resource->GetGPUVirtualAddress() + binding.offset;
 					d3d12Views[streamId].SizeInBytes = binding.vertexCount * binding.stride;
@@ -804,21 +804,21 @@ namespace crgfx
 	void CommandBufferD3D12::DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndirectCommandSignature();
-		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
+		ID3D12Resource* resource = static_cast<const HardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 		m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 	}
 
 	void CommandBufferD3D12::DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DrawIndexedIndirectCommandSignature();
-		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
+		ID3D12Resource* resource = static_cast<const HardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 		m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, count, resource, offset, nullptr, 0);
 	}
 
 	void CommandBufferD3D12::DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset)
 	{
 		ID3D12CommandSignature* commandSignature = static_cast<const crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12DispatchIndirectCommandSignature();
-		ID3D12Resource* resource = static_cast<const CrHardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
+		ID3D12Resource* resource = static_cast<const HardwareGPUBufferD3D12*>(indirectBuffer)->GetD3D12Resource();
 		m_d3d12GraphicsCommandList->ExecuteIndirect(commandSignature, 1, resource, offset, nullptr, 0);
 	}
 

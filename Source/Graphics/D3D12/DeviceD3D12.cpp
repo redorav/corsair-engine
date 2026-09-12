@@ -620,9 +620,9 @@ namespace crgfx
 					textureCopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 					textureCopySource.PlacedFootprint.Offset = mipmapLayout.offsetBytes;
 					textureCopySource.PlacedFootprint.Footprint.Format = crd3d::GetDXGIFormat(format);
-					textureCopySource.PlacedFootprint.Footprint.Width = CrMax(blockWidth, destinationTexture->GetWidth() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Height = CrMax(blockHeight, destinationTexture->GetHeight() >> mip);
-					textureCopySource.PlacedFootprint.Footprint.Depth = CrMax(1u, destinationTexture->GetDepth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Width = max(blockWidth, destinationTexture->GetWidth() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Height = max(blockHeight, destinationTexture->GetHeight() >> mip);
+					textureCopySource.PlacedFootprint.Footprint.Depth = max(1u, destinationTexture->GetDepth() >> mip);
 					textureCopySource.PlacedFootprint.Footprint.RowPitch = mipmapLayout.rowPitchBytes;
 
 					D3D12_TEXTURE_COPY_LOCATION textureCopyDestination = {};

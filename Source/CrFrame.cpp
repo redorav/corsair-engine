@@ -83,7 +83,7 @@ struct CrRenderPacketBatcher
 
 	void SetMaximumBatchSize(uint32_t batchSize)
 	{
-		m_maxBatchSize = CrMin(batchSize, (uint32_t)m_matrices.size());
+		m_maxBatchSize = min(batchSize, (uint32_t)m_matrices.size());
 	}
 
 	// Adds a render packet to the batcher and tries to batch it with preceding packets

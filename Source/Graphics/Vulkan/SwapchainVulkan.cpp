@@ -181,10 +181,10 @@ namespace crgfx
 		}
 
 		// Determine the number of images
-		uint32_t desiredNumberOfSwapchainImages = CrMax(surfaceCapabilities.minImageCount, swapchainDescriptor.requestedBufferCount);
+		uint32_t desiredNumberOfSwapchainImages = max(surfaceCapabilities.minImageCount, swapchainDescriptor.requestedBufferCount);
 		if (surfaceCapabilities.maxImageCount > 0)
 		{
-			desiredNumberOfSwapchainImages = CrMin(desiredNumberOfSwapchainImages, surfaceCapabilities.maxImageCount);
+			desiredNumberOfSwapchainImages = min(desiredNumberOfSwapchainImages, surfaceCapabilities.maxImageCount);
 		}
 
 		VkSurfaceTransformFlagsKHR preTransform;

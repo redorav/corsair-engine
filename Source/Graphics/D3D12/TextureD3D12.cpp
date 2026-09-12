@@ -323,7 +323,7 @@ namespace crgfx
 			const uint32_t MaxSubresources = 2 * crgfx::MaxMipmaps;
 			D3D12_PLACED_SUBRESOURCE_FOOTPRINT subresourceFootprints[MaxSubresources];
 			UINT numRows[MaxSubresources];
-			d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints((D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor, 0, CrMin(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
+			d3d12RenderDevice->GetD3D12Device()->GetCopyableFootprints((D3D12_RESOURCE_DESC*)&d3d12ResourceDescriptor, 0, min(m_d3d12SubresourceCount, MaxSubresources), 0, subresourceFootprints, numRows, nullptr, nullptr);
 
 			for (uint32_t mip = 0; mip < m_mipmapCount; ++mip)
 			{

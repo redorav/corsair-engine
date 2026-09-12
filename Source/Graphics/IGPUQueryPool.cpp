@@ -27,7 +27,7 @@ namespace crgfx
 
 		if (m_resolved)
 		{
-			uint32_t resolveCount = CrMin(m_currentQuery, timingCount);
+			uint32_t resolveCount = min(m_currentQuery, timingCount);
 			GetTimingDataPS(timingData, resolveCount);
 		}
 	}

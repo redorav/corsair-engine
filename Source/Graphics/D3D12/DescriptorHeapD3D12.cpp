@@ -63,7 +63,7 @@ namespace crgfx
 
 	void CPUDescriptorPoolD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor)
 	{
-		uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+		uint32_t maxDescriptors = min(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
 		CrAssertMsg(descriptor.numDescriptors <= maxDescriptors, "Exceeded maximum numbers of descriptors");
 
@@ -122,7 +122,7 @@ namespace crgfx
 
 	void DescriptorStreamD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const DescriptorHeapDescriptorD3D12& descriptor)
 	{
-		uint32_t maxDescriptors = CrMin(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
+		uint32_t maxDescriptors = min(descriptor.numDescriptors, DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(descriptor));
 
 		DescriptorHeapDescriptorD3D12 heapDescriptor;
 		heapDescriptor.name = descriptor.name;

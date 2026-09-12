@@ -4,9 +4,6 @@
 #include "Graphics/CrGraphics.h"
 #include "Graphics/RenderWorld/CrModelInstance.h"
 
-#include "Math/CrHlslppMatrixFloatType.h"
-#include "Math/CrHlslppVectorFloatType.h"
-#include "Math/CrHlslppVectorIntType.h"
 
 #include "Core/Input/CrInputManager.h"
 

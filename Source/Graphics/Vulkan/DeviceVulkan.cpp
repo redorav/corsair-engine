@@ -264,7 +264,7 @@ namespace crgfx
 				bufferCopyRegion.imageSubresource.mipLevel = mip;
 				bufferCopyRegion.imageSubresource.baseArrayLayer = textureUpload.sliceStart;
 				bufferCopyRegion.imageSubresource.layerCount = textureUpload.sliceCount;
-				bufferCopyRegion.imageExtent = { CrMax(texture->GetWidth() >> mip, 1u), CrMax(texture->GetHeight() >> mip, 1u), CrMax(texture->GetDepth() >> mip, 1u) };
+				bufferCopyRegion.imageExtent = { max(texture->GetWidth() >> mip, 1u), max(texture->GetHeight() >> mip, 1u), max(texture->GetDepth() >> mip, 1u) };
 				bufferCopyRegion.imageOffset = { 0, 0, 0 };
 
 				bufferCopyRegion.bufferOffset = texture->GetDDSMipSliceLayout(mip, 0).offsetBytes;

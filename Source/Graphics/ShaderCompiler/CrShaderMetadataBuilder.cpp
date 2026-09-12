@@ -200,14 +200,16 @@ bool CrShaderMetadataBuilder::BuildSPIRVMetadata
 
 	// Maybe there is a better way of not writing these headers directly. They depend on the physical
 	// structure of the code which can change
-	metadataHeader += "#include \"crstl/array.h\"\n";
-	metadataHeader += "#include \"crstl/fixed_open_hashmap.h\"\n";
-	metadataHeader += "#include \"crstl/vector.h\"\n";
-	metadataHeader += "#include \"crstl/string.h\"\n";
 	metadataHeader += "#include \"hlsl++/vector_float.h\"\n";
 	metadataHeader += "#include \"hlsl++/vector_int.h\"\n";
 	metadataHeader += "#include \"hlsl++/matrix_float.h\"\n";
 	metadataHeader += "#include \"hlsl++/dependent.h\"\n";
+	
+	metadataHeader += "#include \"crstl/array.h\"\n";
+	metadataHeader += "#include \"crstl/fixed_open_hashmap.h\"\n";
+	metadataHeader += "#include \"crstl/vector.h\"\n";
+	metadataHeader += "#include \"crstl/string.h\"\n";
+	
 	metadataHeader += "\n";
 
 	metadataHeader += BuildConstantBufferMetadataHeader(resources);

@@ -22,8 +22,8 @@ namespace crgfx
 	{
 		m_width = descriptor.width;
 		m_height = descriptor.height;
-		m_depth = CrMax(descriptor.depth, 1u);
-		m_mipmapCount = CrMax(descriptor.mipmapCount, 1u);
+		m_depth = max(descriptor.depth, 1u);
+		m_mipmapCount = max(descriptor.mipmapCount, 1u);
 		m_type = descriptor.type;
 		m_sampleCount = descriptor.sampleCount;
 		m_arraySize = descriptor.arraySize;
@@ -133,7 +133,7 @@ namespace crgfx
 		crgfx::MipmapLayout sourceMipLayout = GetDDSMipSliceLayout(mip, slice);
 		crgfx::MipmapLayout destinationMipLayout = GetHardwareMipSliceLayout(mip, slice);
 
-		uint32_t mipDepth = CrMax(1u, GetDepth() >> mip);
+		uint32_t mipDepth = max(1u, GetDepth() >> mip);
 
 		// Mipmaps are considered to include depth. Slice in this context only refers to arrays of textures
 		// If the mip size is equal, we can copy the entire mipmap in one memcpy

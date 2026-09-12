@@ -31,7 +31,7 @@ namespace crgfx
 
 		if (descriptor.enableAnisotropy)
 		{
-			createInfo.maxAnisotropy = (float)CrMax(1u, descriptor.maxAnisotropy); // TODO Clamp to hardware max limit
+			createInfo.maxAnisotropy = (float)max(1u, descriptor.maxAnisotropy); // TODO Clamp to hardware max limit
 		}
 
 		createInfo.compareEnable = descriptor.enableCompare;

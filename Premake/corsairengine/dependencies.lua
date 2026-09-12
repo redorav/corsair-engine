@@ -82,7 +82,7 @@ HlslppLibrary =
 	includeDirs = LibHlslpp..IncludeDirectory..'include',
 	files = LibHlslpp..IncludeDirectory..'include/**.h',
 	natvis = LibHlslpp..IncludeDirectory..'include/**.natvis',
-	defines = 'HLSLPP_FEATURE_TRANSFORM'
+	defines = 'HLSLPP_USE_IN_GLOBAL_NAMESPACE'
 }
 
 ImguiLibrary =

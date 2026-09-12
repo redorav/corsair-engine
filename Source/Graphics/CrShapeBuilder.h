@@ -3,7 +3,9 @@
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/CrRenderMesh.h"
 
-#include "Math/CrHlslppVectorFloatType.h"
+
+#include "hlsl++/vector_float_type.h"
+#include "hlsl++/matrix_float_type.h"
 
 class CrShapeBuilder
 {

@@ -2,9 +2,9 @@
 
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 
-#include "Math/CrHlslppVectorFloatType.h"
-
 #include "crstl/fixed_vector.h"
+
+#include "hlsl++/vector_float_type.h"
 
 namespace crgfx
 {

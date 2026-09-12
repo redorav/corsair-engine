@@ -41,11 +41,11 @@
 #include "GeneratedShaders/BuiltinShaders.h"
 
 #include "Math/CrMath.h"
-#include "Math/CrHalf.h"
 
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"
 
+#include "hlsl++/half.h"
 #include "Graphics/Shaders/DirectLightingShared.hlsl"
 
 #include <imgui.h>

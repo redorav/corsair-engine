@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/CrHalf.h"
+#include "hlsl++/half.h"
 
 namespace crgfx
 {

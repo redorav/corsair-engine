@@ -12,11 +12,12 @@
 #include "Graphics/CrMaterial.h"
 #include "Graphics/IShader.h"
 
-#include "Math/CrHlslppQuaternion.h"
-#include "Math/CrHlslppMatrixFloat.h"
 
 #include "CrOSWindow.h"
 #include "CrImGuiViewports.h"
+
+#include "hlsl++/quaternion.h"
+#include "hlsl++/matrix_float.h"
 
 #include <imgui.h>
 

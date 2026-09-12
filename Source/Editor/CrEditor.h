@@ -15,6 +15,10 @@
 #include "crstl/unique_ptr.h"
 #include "crstl/vector.h"
 
+#include "hlsl++/matrix_float_type.h"
+#include "hlsl++/vector_float_type.h"
+#include "hlsl++/vector_int_type.h"
+
 // Stores state when we selected or clicked something so that we're able to
 // determine the appropriate action from that
 struct SelectionState

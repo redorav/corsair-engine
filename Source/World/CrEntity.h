@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Math/CrHlslppVectorFloatType.h"
-#include "Math/CrHlslppQuaternionType.h"
-
 #include "crstl/string.h"
 #include "crstl/vector.h"
+
+#include "hlsl++/vector_float_type.h"
+#include "hlsl++/quaternion_type.h"
+#include "hlsl++/matrix_float_type.h"
 
 namespace crntt
 {

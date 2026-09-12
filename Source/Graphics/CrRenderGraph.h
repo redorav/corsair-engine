@@ -6,12 +6,12 @@
 
 #include "Core/CrHash.h"
 
-#include "Math/CrHlslppVectorFloatType.h"
-
 #include "crstl/fixed_function.h"
 #include "crstl/fixed_open_hashmap.h"
 #include "crstl/fixed_string.h"
 #include "crstl/fixed_vector.h"
+
+#include "hlsl++/vector_float_type.h"
 
 // Objectives
 // 

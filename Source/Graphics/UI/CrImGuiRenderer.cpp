@@ -30,7 +30,7 @@
 #include "Core/CrGlobalPaths.h"
 #include "GeneratedShaders/BuiltinShaders.h"
 
-#include "Math/CrHlslppMatrixFloat.h"
+#include "hlsl++/matrix_float.h"
 
 // Based on ImDrawVert
 struct UIVertex

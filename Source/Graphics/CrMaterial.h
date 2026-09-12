@@ -7,10 +7,10 @@
 #include "Graphics/ITexture.h"
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 
-#include "Math/CrHlslppVectorFloatType.h"
-
 #include "crstl/intrusive_ptr.h"
 #include "crstl/vector.h"
+
+#include "hlsl++/vector_float_type.h"
 
 namespace CrMaterialBlendMode
 {

@@ -478,7 +478,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCylinder(const CrCylinderDescriptor& de
 
 			for (uint32_t v = 0; v <= vertexCountRingLogical; ++v)
 			{
-				float theta = (2.0f * CrMath::Pi * v) / vertexCountRingLogical;
+				float theta = (2.0f * hlslpp::constants_float::pi * v) / vertexCountRingLogical;
 				float fw = (float)v / vertexCountRingLogical;
 
 				float x = cosf(theta);
@@ -623,7 +623,7 @@ CrRenderMeshHandle CrShapeBuilder::CreateCone(const CrConeDescriptor& descriptor
 
 		for (uint32_t v = 0; v <= vertexCountRingLogical; ++v)
 		{
-			float theta = (2.0f * CrMath::Pi * v) / vertexCountRingLogical;
+			float theta = (2.0f * hlslpp::constants_float::pi * v) / vertexCountRingLogical;
 			float fw = (float)v / vertexCountRingLogical;
 
 			float x = cosf(theta);

@@ -399,8 +399,8 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		float4 transparentGreen(0.07f, 1.0f, 0.07f, 0.5f);
 		float4 transparentBlue(0.07f, 0.07f, 1.0f, 0.5f);
 
-		float4x4 rotXMtx = float4x4::rotation_x(CrMath::Pi / 2.0f);
-		float4x4 rotZMtx = float4x4::rotation_z(-CrMath::Pi / 2.0f);
+		float4x4 rotXMtx = float4x4::rotation_x(hlslpp::constants_float::pi / 2.0f);
+		float4x4 rotZMtx = float4x4::rotation_z(-hlslpp::constants_float::pi / 2.0f);
 
 		float cylinderWidth = 0.02f;
 		float coneWidth = cylinderWidth * 3.0f;

@@ -430,20 +430,22 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		zAxisConeMtx[3] = float4(0.0f, 0.0f, 1.0f, 1.0f);
 		CrRenderMeshHandle zAxisCone = CrShapeBuilder::CreateCone({ 12, 0, zAxisConeMtx, blue });
 
+		float planeScale = 0.2f;
+
 		// We want the plane to be a quarter of the size of the axis, so we divide by 2.0 (to get to the unit)
 		// and then divide by 4 (to get to a quarter)
-		float4x4 xzPlaneMtx = float4x4::scale(0.125f);
-		xzPlaneMtx[3] = float4(0.125f, 0.0f, 0.125f, 1.0f);
+		float4x4 xzPlaneMtx = float4x4::scale(planeScale);
+		xzPlaneMtx[3] = float4(planeScale, 0.0f, planeScale, 1.0f);
 		CrRenderMeshHandle xzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xzPlaneMtx, transparentGreen });
 		xzPlaneQuad->SetIsDoubleSided(true);
 
-		float4x4 xyPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_x(1.570796f));
-		xyPlaneMtx[3] = float4(0.125f, 0.125f, 0.0f, 1.0f);
+		float4x4 xyPlaneMtx = mul(float4x4::scale(planeScale), float4x4::rotation_x(1.570796f));
+		xyPlaneMtx[3] = float4(planeScale, planeScale, 0.0f, 1.0f);
 		CrRenderMeshHandle xyPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, xyPlaneMtx, transparentBlue });
 		xyPlaneQuad->SetIsDoubleSided(true);
 
-		float4x4 yzPlaneMtx = mul(float4x4::scale(0.125f), float4x4::rotation_z(1.570796f));
-		yzPlaneMtx[3] = float4(0.0f, 0.125f, 0.125f, 1.0f);
+		float4x4 yzPlaneMtx = mul(float4x4::scale(planeScale), float4x4::rotation_z(1.570796f));
+		yzPlaneMtx[3] = float4(0.0f, planeScale, planeScale, 1.0f);
 		CrRenderMeshHandle yzPlaneQuad = CrShapeBuilder::CreateQuad({ 0, 0, yzPlaneMtx, transparentRed });
 		yzPlaneQuad->SetIsDoubleSided(true);
 

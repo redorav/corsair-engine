@@ -67,19 +67,19 @@ public:
 
 	uint32_t GetResolutionHeight() const { return m_resolutionHeight; }
 
-	const float3& GetForwardVector() const { return m_forwardWorldSpace; }
+	const float3 GetRightVector() const { return m_transform[0].xyz; }
 
-	const float3& GetRightVector() const { return m_rightWorldSpace; }
+	const float3 GetUpVector() const { return m_transform[1].xyz; }
 
-	const float3& GetUpVector() const { return m_upWorldSpace; }
+	const float3 GetForwardVector() const { return m_transform[2].xyz; }
 
 	const float4x4& GetWorld2ViewMatrix() const { return m_world2ViewMatrix; }
 
 	const float3x3& GetWorld2ViewRotation() const { return reinterpret_cast<const float3x3&>(m_world2ViewMatrix); }
 
-	const float4x4& GetView2WorldMatrix() const { return m_view2WorldMatrix; }
+	const float4x4& GetView2WorldMatrix() const { return m_transform; }
 
-	const float3x3& GetView2WorldRotation() const { return reinterpret_cast<const float3x3&>(m_view2WorldMatrix); }
+	const float3x3& GetView2WorldRotation() const { return reinterpret_cast<const float3x3&>(m_transform); }
 
 	const float4x4& GetView2ProjectionMatrix() const { return m_view2ProjectionMatrix; }
 
@@ -117,13 +117,6 @@ private:
 
 	uint32_t m_resolutionHeight;
 
-	// Camera vectors in world space
-	float3 m_forwardWorldSpace;
-
-	float3 m_upWorldSpace;
-
-	float3 m_rightWorldSpace;
-
 	// Matrices used in forward projection (from world or view space into NDC space)
 	float4x4 m_world2ViewMatrix;
 
@@ -132,8 +125,6 @@ private:
 	float4x4 m_world2ProjectionMatrix;
 
 	// Matrices used in back projection (taking from NDC space back to view or world space)
-	float4x4 m_view2WorldMatrix;
-
 	float4x4 m_projection2ViewMatrix;
 
 	float4x4 m_projection2WorldMatrix;

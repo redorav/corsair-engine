@@ -14,16 +14,16 @@ CrCamera::CrCamera() : CrEntity()
 	, m_nearPlane(0.1f)
 	, m_farPlane(100.0f)
 	, m_aspectRatio(1.0f)
+	, m_fovY(60.0f)
 	, m_reverseDepth(true)
 	, m_resolutionWidth(1)
 	, m_resolutionHeight(1)
 	, m_world2ViewMatrix(float4x4::identity())
 	, m_view2ProjectionMatrix(float4x4::identity())
-	, m_view2WorldMatrix(float4x4::identity())
 {
-	m_forwardWorldSpace = float3(0, 0, 1);
-	m_upWorldSpace     = float3(0, 1, 0);
-	m_rightWorldSpace  = float3(1, 0, 0);
+	m_transform[0].xyz = float3(0, 0, 1);
+	m_transform[1].xyz = float3(0, 1, 0);
+	m_transform[2].xyz = float3(1, 0, 0);
 }
 
 CrCamera::CrCamera(uint32_t resolutionWidth, uint32_t resolutionHeight, float nearPlane, float farPlane) : CrEntity()
@@ -65,17 +65,13 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 
 void CrCamera::UpdateMatrices()
 {
-	m_view2WorldMatrix = float4x4::identity();
-	m_view2WorldMatrix[0].xyz = m_rightWorldSpace;
-	m_view2WorldMatrix[1].xyz = m_upWorldSpace;
-	m_view2WorldMatrix[2].xyz = m_forwardWorldSpace;
-	m_view2WorldMatrix[3].xyz = m_position;
+	const float4x4& view2WorldMatrix = m_transform;
 
-	m_world2ViewMatrix = inverse(m_view2WorldMatrix);
+	m_world2ViewMatrix = inverse(view2WorldMatrix);
 
 	m_world2ProjectionMatrix = mul(m_world2ViewMatrix, m_view2ProjectionMatrix);
 
-	m_projection2WorldMatrix = mul(m_projection2ViewMatrix, m_view2WorldMatrix);
+	m_projection2WorldMatrix = mul(m_projection2ViewMatrix, view2WorldMatrix);
 }
 
 float4 CrCamera::ComputeLinearizationParams() const
@@ -119,19 +115,19 @@ float4 CrCamera::ComputeBackprojectionParams(const float4x4& view2ProjectionMatr
 
 void CrCamera::Translate(const float3& t)
 {
-	m_position += t;
+	m_transform[3].xyz += t;
 }
 
 void CrCamera::SetPosition(const float3& p)
 {
-	m_position = p;
+	m_transform[3].xyz = p;
 }
 
 void CrCamera::SetCameraRotationVectors(float3 forwardVector, float3 rightVector, float3 upVector)
 {
-	m_rightWorldSpace = rightVector;
-	m_upWorldSpace = upVector;
-	m_forwardWorldSpace = forwardVector;
+	m_transform[0].xyz = rightVector;
+	m_transform[1].xyz = upVector;
+	m_transform[2].xyz = forwardVector;
 }
 
 void CrCamera::SetNearPlaneWidth(float filmWidth)

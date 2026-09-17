@@ -4,8 +4,6 @@
 
 #include "Graphics/CrVisibility.h"
 
-#include "Math/CrHlslppMatrixFloatType.h"
-
 #include "World/CrEntity.h"
 
 #include "crstl/intrusive_ptr.h"

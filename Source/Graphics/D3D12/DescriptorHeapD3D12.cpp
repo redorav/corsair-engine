@@ -5,8 +5,6 @@
 #include "Core/Logging/ICrDebug.h"
 #include "Core/CrAlignment.h"
 
-#include "Math/CrMath.h"
-
 namespace crgfx
 {
 	uint32_t DescriptorHeapD3D12::GetMaxDescriptorsPerHeap(const DescriptorHeapDescriptorD3D12& descriptor)

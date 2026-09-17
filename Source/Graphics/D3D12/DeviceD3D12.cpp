@@ -16,8 +16,6 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-#include "Math/CrMath.h"
-
 #if defined(CR_PLATFORM_WINDOWS)
 #define USE_AGILITY_SDK
 #endif

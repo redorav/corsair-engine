@@ -2,9 +2,9 @@
 
 #include "World/CrEntity.h"
 
-#include "Math/CrHlslppMatrixFloatType.h"
-
 #include "crstl/intrusive_ptr.h"
+
+#include "hlsl++/matrix_float_type.h"
 
 enum class CameraProjection : uint32_t
 {

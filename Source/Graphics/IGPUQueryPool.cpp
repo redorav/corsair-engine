@@ -3,8 +3,6 @@
 #include "Graphics/IGPUQueryPool.h"
 #include "Graphics/ICommandBuffer.h"
 
-#include "Math/CrMath.h"
-
 namespace crgfx
 {
 	IGPUQueryPool::IGPUQueryPool(crgfx::IDevice* renderDevice, const GPUQueryPoolDescriptor& descriptor) : GPUAutoDeletable(renderDevice)

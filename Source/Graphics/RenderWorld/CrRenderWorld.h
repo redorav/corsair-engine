@@ -9,9 +9,9 @@
 #include "Graphics/CrLight.h"
 #include "Graphics/RenderWorld/CrModelInstance.h"
 
-#include "Math/CrHlslppMatrixFloatType.h"
-
 #include "crstl/intrusive_ptr.h"
+
+#include "hlsl++/matrix_float_type.h"
 
 using CrModelInstanceIndex = CrTypedID<struct CrModelInstanceIndexDummy, uint32_t>;
 

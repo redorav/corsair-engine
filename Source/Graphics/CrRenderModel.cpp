@@ -7,6 +7,8 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 
+#include "hlsl++/vector_float.h"
+
 uint32_t CrRenderModelDescriptor::AddMaterial(const CrMaterialHandle& material)
 {
 	uint32_t currentIndex = (uint32_t)m_materials.size();

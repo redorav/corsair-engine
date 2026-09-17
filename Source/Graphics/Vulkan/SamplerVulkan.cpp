@@ -3,8 +3,6 @@
 #include "DeviceVulkan.h"
 #include "CrVulkan.h"
 
-#include "Math/CrMath.h"
-
 namespace crgfx
 {
 	// See https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkSamplerCreateInfo.html

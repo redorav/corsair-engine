@@ -7,8 +7,6 @@
 #include "Graphics/IGraphicsSystem.h"
 #include "Graphics/IDevice.h"
 
-#include "Math/CrMath.h"
-
 CrRenderMeshHandle CrShapeBuilder::CreateQuad(const CrQuadDescriptor& descriptor)
 {
 	// XZ Plane: Quad faces up

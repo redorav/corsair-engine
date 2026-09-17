@@ -8,8 +8,6 @@
 #include "Core/CrAlignment.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Math/CrMath.h"
-
 namespace crgfx
 {
 	TextureD3D12::TextureD3D12(crgfx::IDevice* renderDevice, const crgfx::TextureDescriptor& descriptor)

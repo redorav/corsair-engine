@@ -8,8 +8,6 @@
 
 #include "Core/Logging/ICrDebug.h"
 
-#include "Math/CrMath.h"
-
 #include "CrOSWindow.h"
 
 namespace crgfx

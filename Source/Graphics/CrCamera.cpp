@@ -1,14 +1,13 @@
 #include "Graphics/CrRendering_pch.h"
 
-#include "Graphics/CrCamera.h"
+#include "CrCamera.h"
 
 #include "Graphics/CrGraphics.h"
 #include "Graphics/CrRendererConfig.h"
 
-#include "Math/CrMath.h"
-#include "Math/CrHlslppVectorFloat.h"
-#include "Math/CrHlslppQuaternion.h"
-#include "Math/CrHlslppMatrixFloat.h"
+#include "hlsl++/vector_float.h"
+#include "hlsl++/quaternion.h"
+#include "hlsl++/matrix_float.h"
 
 CrCamera::CrCamera() : CrEntity()
 	, m_projection(CameraProjection::Perspective)
@@ -53,7 +52,7 @@ void CrCamera::SetupPerspective(uint32_t resolutionWidth, uint32_t resolutionHei
 
 	m_farPlane = farPlane;
 
-	frustum cameraFrustum = frustum::field_of_view_y(fovY * CrMath::Deg2Rad, m_aspectRatio, nearPlane, farPlane);
+	frustum cameraFrustum = frustum::field_of_view_y(radians(fovY), m_aspectRatio, nearPlane, farPlane);
 
 	m_nearPlaneWidth = cameraFrustum.width();
 

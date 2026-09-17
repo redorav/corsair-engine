@@ -4,8 +4,6 @@
 #include "Core/CrMacros.h"
 #include "Core/Logging/ICrDebug.h"
 
-#include "Math/CrMath.h"
-
 #include "ddspp.h"
 
 enum DXGI_FORMAT;

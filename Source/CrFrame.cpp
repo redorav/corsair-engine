@@ -40,7 +40,6 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
-#include "Math/CrMath.h"
 
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"

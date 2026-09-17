@@ -9,9 +9,12 @@
 #include "Graphics/CrCPUStackAllocator.h"
 #include "Graphics/CrBuiltinPipelines.h"
 
-#include "crstl/sort.h"
 
 #include "Core/Logging/ICrDebug.h"
+
+#include "hlsl++/matrix_float.h"
+
+#include "crstl/sort.h"
 
 #define RENDER_WORLD_VALIDATION
 

@@ -58,22 +58,26 @@ class CrEntity
 {
 public:
 
-	// TODO Put in transform
-	float3 m_position;
-	float3 m_scale;
-	quaternion m_qrotation;
-
 	crstl::vector<CrEntity*> m_entities;
 
 	CrEntity();
 
 	CrEntity(const crstl::string& name);
 
-	const float3& GetPosition() const { return m_position; }
+	const float3 GetPosition() const
+	{
+		return m_transform[3].xyz;
+	}
 
-	const float3& GetScale() const { return m_scale; }
+	void SetTransform(const float4x4& transform)
+	{
+		m_transform = transform;
+	}
 
-	const quaternion& GetRotation() const { return m_qrotation; }
+	const float4x4& GetTransform() const
+	{
+		return m_transform;
+	}
 
 	void SetParent(CrEntity* const parent);
 
@@ -96,6 +100,8 @@ public:
 #endif
 
 protected:
+
+	float4x4 m_transform;
 
 	crstl::string m_name;
 

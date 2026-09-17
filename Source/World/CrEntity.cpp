@@ -6,7 +6,7 @@ CrEntity::CrEntity() : CrEntity("")
 }
 
 CrEntity::CrEntity(const crstl::string& name)
-	: m_qrotation(quaternion::identity())
+	: m_transform(float4x4::identity())
 	, m_name(name)
 {
 

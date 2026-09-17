@@ -13,7 +13,6 @@
 #include "Graphics/UI/CrImGuiRenderer.h"
 #include "Graphics/CrGPUTimingQueryTracker.h"
 
-#include "Graphics/CrCamera.h"
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrRenderMesh.h"
 #include "Graphics/CrMaterialCompiler.h"
@@ -40,6 +39,7 @@
 
 #include "GeneratedShaders/BuiltinShaders.h"
 
+#include "World/CrCamera.h"
 
 #include "CrOSWindow.h"
 #include "Editor/CrImGuiViewports.h"

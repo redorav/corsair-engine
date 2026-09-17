@@ -4,8 +4,6 @@
 #include "Graphics/CrGraphicsForwardDeclarations.h"
 #include "Graphics/DataFormats.h"
 
-#include "Math/CrMath.h"
-
 #include "crstl/intrusive_ptr.h"
 
 struct CrOSWindowDescriptor

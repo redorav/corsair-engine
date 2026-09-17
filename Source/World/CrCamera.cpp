@@ -1,5 +1,3 @@
-#include "Graphics/CrRendering_pch.h"
-
 #include "CrCamera.h"
 
 #include "Graphics/CrGraphics.h"

@@ -4,12 +4,12 @@
 #include "Core/CrFrameTime.h"
 
 #include "Graphics/RenderWorld/CrRenderWorld.h"
-#include "Graphics/CrCamera.h"
 #include "Graphics/CrBuiltinPipelines.h"
 #include "Graphics/CrShapeBuilder.h"
 #include "Graphics/CrMaterial.h"
 #include "Graphics/IShader.h"
 
+#include "World/CrCamera.h"
 
 #include "CrOSWindow.h"
 #include "CrImGuiViewports.h"

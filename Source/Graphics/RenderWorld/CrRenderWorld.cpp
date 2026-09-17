@@ -3,12 +3,12 @@
 #include "Graphics/RenderWorld/CrRenderWorld.h"
 #include "Graphics/CrRenderModel.h"
 #include "Graphics/CrRenderMesh.h"
-#include "Graphics/CrCamera.h"
 #include "Graphics/CrShapeBuilder.h"
 
 #include "Graphics/CrCPUStackAllocator.h"
 #include "Graphics/CrBuiltinPipelines.h"
 
+#include "World/CrCamera.h"
 
 #include "Core/Logging/ICrDebug.h"
 

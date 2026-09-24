@@ -57,7 +57,8 @@ static const char* GBufferDebugString[] =
 	"Roughness",
 	"F0",
 	"Depth",
-	"Depth Linear"
+	"Depth Linear",
+	"World Camera Position",
 };
 
 static_assert(sizeof_array(GBufferDebugString) == GBufferDebugMode::Count, "");

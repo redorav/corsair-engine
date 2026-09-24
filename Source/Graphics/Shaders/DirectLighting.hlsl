@@ -104,6 +104,10 @@ float4 GBufferDebugPS(VSOutputFullscreen psInput) : SV_Target0
 	{
 		debugColor = surface.F0;
 	}
+	else if (gbufferDebugMode == GBufferDebugMode::WorldCameraPosition)
+	{
+		debugColor = surface.positionCameraWorld;
+	}
 
 	return float4(debugColor, 1.0);
 }

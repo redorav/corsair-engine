@@ -16,12 +16,12 @@ RWTexture2D<float2> RWLinearDepthMinMaxMip5;
 // Can linearize both perspective and orthographic projections
 float LinearizeDepth(float rawDepth, float4 projectionParams)
 {
-	return rawDepth * projectionParams.z + projectionParams.x / (1.0 - rawDepth * projectionParams.y);
+	return rawDepth * projectionParams.w + projectionParams.x / (rawDepth * projectionParams.y + projectionParams.z);
 }
 
 float4 LinearizeDepth(float4 rawDepth, float4 projectionParams)
 {
-	return rawDepth * projectionParams.z + projectionParams.x / (1.0 - rawDepth * projectionParams.y);
+	return float4(LinearizeDepth(rawDepth.x, projectionParams), LinearizeDepth(rawDepth.y, projectionParams), LinearizeDepth(rawDepth.z, projectionParams), LinearizeDepth(rawDepth.w, projectionParams));
 }
 
 static const int DEPTH_DOWNSAMPLE_GROUP_SIZE = 16;

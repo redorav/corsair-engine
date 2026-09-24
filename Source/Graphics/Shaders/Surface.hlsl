@@ -15,9 +15,6 @@ struct Surface
 	// Position in world space, relative to the camera position
 	float3 positionCameraWorld;
 	
-	// View vector in view space
-	float3 viewView;
-
 	// View vector in world space
 	float3 viewWorld;
 	

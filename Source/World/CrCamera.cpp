@@ -76,21 +76,39 @@ float4 CrCamera::ComputeLinearizationParams() const
 {
 	float projectionParamsX = 1.0f;
 	float projectionParamsY = 1.0f;
+	float projectionParamsZ = 1.0f;
+	float projectionParamsW = 0.0f;
 
-	// TODO Fix and extract from the projection matrix instead
-	if (m_reverseDepth)
+	if (m_projection == CameraProjection::Orthographic)
 	{
-		projectionParamsX = m_farPlane;
-		projectionParamsY = (m_nearPlane - m_farPlane) / m_nearPlane;
+		if (m_reverseDepth)
+		{
+			projectionParamsX = m_farPlane;
+			projectionParamsW = (m_farPlane - m_nearPlane);
+		}
+		else
+		{
+			projectionParamsX = m_nearPlane;
+			projectionParamsW = (m_nearPlane - m_farPlane);
+		}
 	}
 	else
 	{
-		projectionParamsX = m_nearPlane;
-		projectionParamsY = (m_farPlane - m_nearPlane) / m_farPlane;
+		// This is the most stable set of parameters that can reconstruct the depth with very large far planes
+		// Other implementations fail due to catastrophic cancellation or other floating point inaccuracies
+		if (m_reverseDepth)
+		{
+			projectionParamsX = m_farPlane * m_nearPlane;
+			projectionParamsY = m_farPlane - m_nearPlane;
+			projectionParamsZ = m_nearPlane;
+		}
+		else
+		{
+			projectionParamsX = m_farPlane * m_nearPlane;
+			projectionParamsY = m_nearPlane - m_farPlane;
+			projectionParamsZ = m_farPlane;
+		}
 	}
-
-	float projectionParamsZ = (m_nearPlane - m_farPlane) * (m_projection == CameraProjection::Orthographic ? 1.0f : 0.0f); // Orthographic camera
-	float projectionParamsW = 0.0f; // Stereo rendering offset
 
 	return float4(projectionParamsX, projectionParamsY, projectionParamsZ, projectionParamsW);
 }

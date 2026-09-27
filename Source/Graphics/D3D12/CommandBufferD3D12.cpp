@@ -715,34 +715,34 @@ namespace crgfx
 		size_t uavOffset = shaderResourceOffset;
 
 		bindingLayout.ForEachConstantBuffer([&](crgfx::ShaderStage::T, ConstantBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffset + bindPoint]);
-			});
+		{
+			WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffset + bindPoint]);
+		});
 
 		bindingLayout.ForEachSampler([&](crgfx::ShaderStage::T, Samplers::T id, bindpoint_t bindPoint)
-			{
-				WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffset + bindPoint]);
-			});
+		{
+			WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffset + bindPoint]);
+		});
 
 		bindingLayout.ForEachTexture([&](crgfx::ShaderStage::T, Textures::T id, bindpoint_t bindPoint)
-			{
-				WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
-			});
+		{
+			WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
+		});
 
 		bindingLayout.ForEachRWTexture([&](crgfx::ShaderStage::T, RWTextures::T id, bindpoint_t bindPoint)
-			{
-				WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
-			});
+		{
+			WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
+		});
 
 		bindingLayout.ForEachStorageBuffer([&](crgfx::ShaderStage::T, StorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
-			});
+		{
+			WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffset + bindPoint]);
+		});
 
 		bindingLayout.ForEachRWStorageBuffer([&](crgfx::ShaderStage::T, RWStorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
-			});
+		{
+			WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffset + bindPoint]);
+		});
 
 		// Bind shader visible heaps to the command buffer
 		ID3D12DescriptorHeap* shaderResourceShaderVisibleDescriptorHeap = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();

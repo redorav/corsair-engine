@@ -108,7 +108,7 @@ namespace crgfx
 
 		CreateVkDescriptorSetLayout(static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
-		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
+		m_bindingLayout = ShaderBindingLayout(resources);
 	}
 
 	GraphicsShaderVulkan::~GraphicsShaderVulkan()
@@ -144,21 +144,21 @@ namespace crgfx
 		ShaderBindingLayoutResources resources;
 
 		ShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](crgfx::ShaderStage::T stage, const CrShaderReflectionResource& resource)
-			{
-				VkDescriptorSetLayoutBinding layoutBinding;
-				layoutBinding.binding = resource.bindPoint;
-				layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
-				layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
-				layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
-				layoutBinding.pImmutableSamplers = nullptr;
+		{
+			VkDescriptorSetLayoutBinding layoutBinding;
+			layoutBinding.binding = resource.bindPoint;
+			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+			layoutBinding.pImmutableSamplers = nullptr;
 
-				layoutBindings.push_back(layoutBinding);
-			});
+			layoutBindings.push_back(layoutBinding);
+		});
 
 		CreateVkDescriptorSetLayout(static_cast<crgfx::DeviceVulkan*>(renderDevice)->GetVkDevice(), layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
 
 		// Create the optimized shader resource table
-		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
+		m_bindingLayout = ShaderBindingLayout(resources);
 	}
 
 	ComputeShaderVulkan::~ComputeShaderVulkan()

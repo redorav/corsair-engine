@@ -22,7 +22,7 @@ namespace crgfx
 			ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
 		}
 
-		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
+		m_bindingLayout = ShaderBindingLayout(resources);
 	}
 
 	GraphicsShaderD3D12::~GraphicsShaderD3D12()
@@ -36,6 +36,6 @@ namespace crgfx
 		ShaderBindingLayoutResources resources;
 		const CrShaderReflectionHeader& reflectionHeader = computeShaderDescriptor.m_bytecode->GetReflection();
 		ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&){});
-		m_bindingLayout = crstl::unique_ptr<ShaderBindingLayout>(new ShaderBindingLayout(resources));
+		m_bindingLayout = ShaderBindingLayout(resources);
 	}
 };

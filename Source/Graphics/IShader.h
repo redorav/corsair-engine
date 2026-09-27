@@ -86,14 +86,14 @@ namespace crgfx
 		crstl::fixed_vector<ShaderBinding, 32> rwTypedBuffers;
 	};
 
-	// Represents the resources needed by every stage. It is designed to be 
-	// fast iterate in order to rebuild tables quickly. Resources are sorted
-	// according to type. This is not a resource table, just the binding points,
-	// owned by the shader. It also doesn't contain any names, but points to the 
+	// Represents the resources needed by every stage. It is designed to be fast to iterate in order to rebuild tables quickly. Resources are sorted
+	// according to type. This is not a resource table, just the binding points, owned by the shader. It also doesn't contain any names, but points to the 
 	// builtins that the engine knows about
-	class ShaderBindingLayout final
+	class ShaderBindingLayout
 	{
 	public:
+
+		ShaderBindingLayout() {}
 
 		ShaderBindingLayout(const ShaderBindingLayoutResources& resources);
 
@@ -237,8 +237,8 @@ namespace crgfx
 		{
 			switch (stage)
 			{
-			case crgfx::ShaderStage::Compute: return 0;
-			default: return (uint32_t)stage;
+				case crgfx::ShaderStage::Compute: return 0;
+				default: return (uint32_t)stage;
 			}
 		}
 
@@ -351,7 +351,7 @@ namespace crgfx
 
 		const ShaderBindingLayout& GetBindingLayout() const
 		{
-			return *m_bindingLayout.get();
+			return m_bindingLayout;
 		}
 
 		const char* GetDebugName() const
@@ -363,7 +363,7 @@ namespace crgfx
 
 		ShaderDebugString m_debugName;
 
-		crstl::unique_ptr<ShaderBindingLayout> m_bindingLayout;
+		ShaderBindingLayout m_bindingLayout;
 
 		// Hash produced from the bytecodes belonging to this shader
 		CrHash m_hash;

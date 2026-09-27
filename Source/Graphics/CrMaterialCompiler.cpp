@@ -101,6 +101,19 @@ crgfx::ShaderBytecodeHandle CrMaterialCompiler::GetDiskCachedOrCompileShaderByte
 	return shaderBytecode;
 }
 
+const char* GetUbershaderEntryPoint(crgfx::ShaderStage::T shaderStage)
+{
+	switch (shaderStage)
+	{
+		case crgfx::ShaderStage::Vertex:   return "UbershaderVS";
+		case crgfx::ShaderStage::Pixel:    return "UbershaderPS";
+		case crgfx::ShaderStage::Hull:     return "UbershaderHS";
+		case crgfx::ShaderStage::Domain:   return "UbershaderDS";
+		case crgfx::ShaderStage::Geometry: return "UbershaderGS";
+		default: return "Invalid";
+	}
+}
+
 CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor& descriptor)
 {
 	unused_parameter(descriptor); // TODO
@@ -139,15 +152,6 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 	baseShaderDescriptor.platform = platform;
 	baseShaderDescriptor.graphicsApi = graphicsApi;
 
-	crstl::string entryPoints[crgfx::ShaderStage::GraphicsStageCount] =
-	{
-		"UbershaderVS",
-		"UbershaderPS",
-		"UbershaderHS",
-		"UbershaderDS",
-		"UbershaderGS",
-	};
-
 	for (CrMaterialShaderVariant::T variant = CrMaterialShaderVariant::First; variant < CrMaterialShaderVariant::Count; ++variant)
 	{
 		crgfx::GraphicsShaderDescriptor shaderDescriptor;
@@ -162,7 +166,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 			crgfx::ShaderBytecodeHandle bytecode = GetDiskCachedOrCompileShaderBytecode
 			(
 				patchedShaderSourcePath, 
-				entryPoints[stage], 
+				GetUbershaderEntryPoint(stage),
 				materialShaderDescriptor.ComputeHash(), 
 				materialShaderDescriptor
 			);

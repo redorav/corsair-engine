@@ -331,13 +331,6 @@ namespace crgfx
 
 	typedef crstl::fixed_string64 ShaderDebugString;
 
-	struct GraphicsShaderDescriptor
-	{
-		ShaderDebugString m_debugName;
-
-		crstl::vector<ShaderBytecodeHandle> m_bytecodes;
-	};
-
 	class IShader : public crstl::intrusive_ptr_interface_delete
 	{
 	public:
@@ -369,13 +362,20 @@ namespace crgfx
 		CrHash m_hash;
 	};
 
+	struct GraphicsShaderDescriptor
+	{
+		ShaderDebugString m_debugName;
+
+		crstl::vector<ShaderBytecodeHandle> m_bytecodes;
+	};
+
 	// This shader represents a full linked shader. Therefore it knows about number of stages,
 	// and what these specific stages are. This is important to be able to pass it on to the PSO later on.
 	class IGraphicsShader : public IShader
 	{
 	public:
 
-		IGraphicsShader(crgfx::IDevice* /*renderDevice*/, const GraphicsShaderDescriptor& graphicsShaderDescriptor);
+		IGraphicsShader(IDevice* /*device*/, const GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 		virtual ~IGraphicsShader() {}
 
@@ -407,7 +407,7 @@ namespace crgfx
 	{
 	public:
 
-		IComputeShader(crgfx::IDevice* /*renderDevice*/, const crgfx::ComputeShaderDescriptor& computeShaderDescriptor)
+		IComputeShader(IDevice* /*device*/, const ComputeShaderDescriptor& computeShaderDescriptor)
 		{
 			m_bytecode = computeShaderDescriptor.m_bytecode;
 			m_hash = computeShaderDescriptor.m_bytecode->GetHash();

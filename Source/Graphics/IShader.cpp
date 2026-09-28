@@ -49,13 +49,14 @@ namespace crgfx
 		ProcessResourceArray(crgfx::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 	}
 
-	IGraphicsShader::IGraphicsShader(crgfx::IDevice* /*renderDevice*/, const crgfx::GraphicsShaderDescriptor& graphicsShaderDescriptor)
+	IGraphicsShader::IGraphicsShader(IDevice* /*device*/, const GraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
-		for (const crgfx::ShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
+		m_debugName = graphicsShaderDescriptor.m_debugName;
+
+		for (const ShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
 		{
 			m_bytecodes.push_back(bytecode);
 			m_hash << bytecode->GetHash();
-			m_debugName = graphicsShaderDescriptor.m_debugName;
 		}
 	}
 };

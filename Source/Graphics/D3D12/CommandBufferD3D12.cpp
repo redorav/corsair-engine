@@ -573,34 +573,34 @@ namespace crgfx
 		samplerOffsets[crgfx::ShaderStage::Pixel] = samplerOffset;
 
 		bindingLayout.ForEachConstantBuffer([=](crgfx::ShaderStage::T stage, ConstantBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteCBV(m_currentState.m_constantBuffers[id], m_shaderResourceCPUDescriptors[cbvOffsets[stage] + bindPoint]);
+		});
 
 		bindingLayout.ForEachSampler([=](crgfx::ShaderStage::T stage, Samplers::T id, bindpoint_t bindPoint)
-			{
-				WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteSamplerView(m_currentState.m_samplers[id], m_samplerCPUDescriptors[samplerOffsets[stage] + bindPoint]);
+		});
 
 		bindingLayout.ForEachTexture([=](crgfx::ShaderStage::T stage, Textures::T id, bindpoint_t bindPoint)
-			{
-				WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteTextureSRV(m_currentState.m_textures[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
+		});
 
 		bindingLayout.ForEachRWTexture([=](crgfx::ShaderStage::T stage, RWTextures::T id, bindpoint_t bindPoint)
-			{
-				WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteRWTextureUAV(m_currentState.m_rwTextures[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
+		});
 
 		bindingLayout.ForEachStorageBuffer([=](crgfx::ShaderStage::T stage, StorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteStorageBufferSRV(m_currentState.m_storageBuffers[id], m_shaderResourceCPUDescriptors[srvOffsets[stage] + bindPoint]);
+		});
 
 		bindingLayout.ForEachRWStorageBuffer([=](crgfx::ShaderStage::T stage, RWStorageBuffers::T id, bindpoint_t bindPoint)
-			{
-				WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
-			});
+		{
+			WriteRWStorageBufferUAV(m_currentState.m_rwStorageBuffers[id], m_shaderResourceCPUDescriptors[uavOffsets[stage] + bindPoint]);
+		});
 
 		// Bind shader visible heaps to the command buffer
 		ID3D12DescriptorHeap* shaderResourceShaderVisibleDescriptorHeap = m_shaderResourceShaderVisibleDescriptorStream.GetDescriptorHeap().GetD3D12DescriptorHeap();

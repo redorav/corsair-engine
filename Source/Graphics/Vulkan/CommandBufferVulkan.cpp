@@ -4,7 +4,6 @@
 #include "DeviceVulkan.h"
 #include "TextureVulkan.h"
 #include "SamplerVulkan.h"
-#include "ShaderVulkan.h"
 #include "GPUBufferVulkan.h"
 
 #include "Graphics/RenderPassDescriptor.h"
@@ -279,8 +278,6 @@ namespace crgfx
 	void CommandBufferVulkan::FlushGraphicsRenderStatePS()
 	{
 		const GraphicsPipelineVulkan* vulkanGraphicsPipeline = static_cast<const GraphicsPipelineVulkan*>(m_currentState.m_graphicsPipeline);
-		const crgfx::GraphicsShaderHandle& graphicsShader = vulkanGraphicsPipeline->GetShader();
-		const GraphicsShaderVulkan* vulkanGraphicsShader = static_cast<GraphicsShaderVulkan*>(graphicsShader.get());
 
 		if (m_currentState.m_indexBufferDirty)
 		{
@@ -354,23 +351,21 @@ namespace crgfx
 			m_currentState.m_stencilRefDirty = false;
 		}
 
-		UpdateResourceTableVulkan(graphicsShader->GetBindingLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsShader->GetVkDescriptorSetLayout(), vulkanGraphicsPipeline->GetVkPipelineLayout());
+		UpdateResourceTableVulkan(vulkanGraphicsPipeline->GetBindingLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanGraphicsPipeline->GetVkDescriptorSetLayout(), vulkanGraphicsPipeline->GetVkPipelineLayout());
 	}
 
 	void CommandBufferVulkan::FlushComputeRenderStatePS()
 	{
 		const ComputePipelineVulkan* vulkanComputePipeline = static_cast<const ComputePipelineVulkan*>(m_currentState.m_computePipeline);
-		const ComputeShaderHandle& computeShader = vulkanComputePipeline->GetShader();
-		const ComputeShaderVulkan* vulkanComputeShader = static_cast<ComputeShaderVulkan*>(computeShader.get());
 
 		if (m_currentState.m_computePipelineDirty)
 		{
 			// In Vulkan we specify the type of pipeline. In D3D12 for instance they are separate objects
-			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, static_cast<const ComputePipelineVulkan*>(m_currentState.m_computePipeline)->GetVkPipeline());
+			vkCmdBindPipeline(m_vkCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->GetVkPipeline());
 			m_currentState.m_computePipelineDirty = false;
 		}
 
-		UpdateResourceTableVulkan(computeShader->GetBindingLayout(), VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputeShader->GetVkDescriptorSetLayout(), vulkanComputePipeline->GetVkPipelineLayout());
+		UpdateResourceTableVulkan(vulkanComputePipeline->GetBindingLayout(), VK_PIPELINE_BIND_POINT_COMPUTE, vulkanComputePipeline->GetVkDescriptorSetLayout(), vulkanComputePipeline->GetVkPipelineLayout());
 	}
 
 	void PopulateVkBufferBarrier(VkBufferMemoryBarrier& bufferMemoryBarrier,

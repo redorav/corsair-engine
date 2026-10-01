@@ -335,16 +335,9 @@ namespace crgfx
 	{
 	public:
 
-		virtual ~IShader() {}
-
 		CrHash GetHash() const
 		{
 			return m_hash;
-		}
-
-		const ShaderBindingLayout& GetBindingLayout() const
-		{
-			return m_bindingLayout;
 		}
 
 		const char* GetDebugName() const
@@ -355,8 +348,6 @@ namespace crgfx
 	protected:
 
 		ShaderDebugString m_debugName;
-
-		ShaderBindingLayout m_bindingLayout;
 
 		// Hash produced from the bytecodes belonging to this shader
 		CrHash m_hash;
@@ -371,27 +362,18 @@ namespace crgfx
 
 	// This shader represents a full linked shader. Therefore it knows about number of stages,
 	// and what these specific stages are. This is important to be able to pass it on to the PSO later on.
-	class IGraphicsShader : public IShader
+	class IGraphicsShader final : public IShader
 	{
 	public:
 
-		IGraphicsShader(IDevice* /*device*/, const GraphicsShaderDescriptor& graphicsShaderDescriptor);
-
-		virtual ~IGraphicsShader() {}
+		IGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor);
 
 		const crstl::vector<ShaderBytecodeHandle>& GetBytecodes() const
 		{
 			return m_bytecodes;
 		}
 
-		const InputSignature& GetInputSignature() const
-		{
-			return m_inputSignature;
-		}
-
 	protected:
-
-		InputSignature m_inputSignature;
 
 		crstl::vector<ShaderBytecodeHandle> m_bytecodes;
 	};
@@ -407,7 +389,7 @@ namespace crgfx
 	{
 	public:
 
-		IComputeShader(IDevice* /*device*/, const ComputeShaderDescriptor& computeShaderDescriptor)
+		IComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor)
 		{
 			m_bytecode = computeShaderDescriptor.m_bytecode;
 			m_hash = computeShaderDescriptor.m_bytecode->GetHash();

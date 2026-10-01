@@ -4,8 +4,9 @@
 
 #include "PipelineD3D12.h"
 #include "DeviceD3D12.h"
-#include "ShaderD3D12.h"
 #include "CrD3D12.h"
+
+#include "Graphics/IShader.inl"
 
 #include "Graphics/Extensions/CrNVAPIHeader.h"
 
@@ -13,16 +14,26 @@ namespace crgfx
 {
 	GraphicsPipelineD3D12::GraphicsPipelineD3D12
 	(
-		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
+		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
 	)
-		: IGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
+		: IGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, vertexDescriptor)
 	{
 		Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
 	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
+		ShaderBindingLayoutResources resources;
+
+		// Create the shader modules and parse reflection information
+		for (const ShaderBytecodeHandle& shaderBytecode : graphicsShader->GetBytecodes())
+		{
+			const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
+			ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&) {});
+		}
+
+		m_bindingLayout = ShaderBindingLayout(resources);
+
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 
 		d3d12PipelineStateDescriptor.SampleMask = 0xffffffff;
@@ -219,6 +230,15 @@ namespace crgfx
 
 	void ComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
+		ShaderBindingLayoutResources resources;
+
+		// Create the shader modules and parse reflection information
+		const ShaderBytecodeHandle& shaderBytecode = computeShader->GetBytecode();
+		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
+		ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&) {});
+
+		m_bindingLayout = ShaderBindingLayout(resources);
+
 		D3D12_COMPUTE_PIPELINE_STATE_DESC d3d12PipelineStateDescriptor;
 		d3d12PipelineStateDescriptor.NodeMask = 0;
 		d3d12PipelineStateDescriptor.CachedPSO = {};

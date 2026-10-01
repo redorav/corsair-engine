@@ -6,6 +6,8 @@
 #include "Graphics/GPUDeletable.h"
 #include "Graphics/VertexDescriptor.h"
 
+#include "Graphics/IShader.h"
+
 #include "Core/CrHash.h"
 
 #include "crstl/array.h"
@@ -206,25 +208,25 @@ namespace crgfx
 		crgfx::RenderTargetFormatDescriptor renderTargets = {};
 	};
 
-	static_assert(sizeof(GraphicsPipelineDescriptor) == 128, "CrGraphicsPipelineDescriptor size mismatch");
+	static_assert(sizeof(GraphicsPipelineDescriptor) == 128, "GraphicsPipelineDescriptor size mismatch");
 
 	class IGraphicsPipeline : public GPUAutoDeletable
 	{
 	public:
 
-		IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
+		IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const VertexDescriptor& vertexDescriptor);
 
 		virtual ~IGraphicsPipeline();
 
-		const GraphicsShaderHandle& GetShader() const { return m_shader; }
-
 		uint32_t GetVertexStreamCount() const { return m_usedVertexStreamCount; }
 
-	private:
+		const ShaderBindingLayout& GetBindingLayout() const { return m_bindingLayout; }
 
-		GraphicsShaderHandle m_shader;
+	protected:
 
 		uint32_t m_usedVertexStreamCount = 0;
+
+		ShaderBindingLayout m_bindingLayout;
 
 #if !defined(CR_CONFIG_FINAL)
 
@@ -265,7 +267,7 @@ namespace crgfx
 
 		virtual ~IComputePipeline();
 
-		const ComputeShaderHandle& GetShader() const { return m_shader; }
+		const ShaderBindingLayout& GetBindingLayout() const { return m_bindingLayout; }
 
 		uint32_t GetGroupSizeX() const { return m_threadGroupSizeX; }
 
@@ -273,7 +275,7 @@ namespace crgfx
 
 		uint32_t GetGroupSizeZ() const { return m_threadGroupSizeZ; }
 
-	private:
+	protected:
 
 		uint32_t m_threadGroupSizeX;
 
@@ -281,7 +283,7 @@ namespace crgfx
 
 		uint32_t m_threadGroupSizeZ;
 
-		ComputeShaderHandle m_shader;
+		ShaderBindingLayout m_bindingLayout;
 
 #if !defined(CR_CONFIG_FINAL)
 

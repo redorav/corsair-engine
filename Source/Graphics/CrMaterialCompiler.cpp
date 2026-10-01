@@ -176,7 +176,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 			shaderDescriptor.m_bytecodes.push_back(bytecode);
 		}
 
-		material->m_shaders[variant] = crgfx::GetDevice()->CreateGraphicsShader(shaderDescriptor);
+		material->m_shaders[variant] = new crgfx::IGraphicsShader(shaderDescriptor);
 	}
 
 	return material;

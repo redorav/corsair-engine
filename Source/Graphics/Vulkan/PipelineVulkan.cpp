@@ -1,7 +1,11 @@
 #include "Graphics/CrRendering_pch.h"
 #include "PipelineVulkan.h"
 #include "DeviceVulkan.h"
-#include "ShaderVulkan.h"
+
+#include "Graphics/IShader.inl"
+
+// We need it to set the PDB path for Renderdoc
+#include "renderdoc_app.h"
 
 namespace crgfx
 {
@@ -10,13 +14,102 @@ namespace crgfx
 		crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
 		const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
 	)
-		: IGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor)
+		: IGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, vertexDescriptor)
 	{
 		Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}
 
+	static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, const CrShaderReflectionHeader& reflectionHeader)
+	{
+		if (vkSetDebugUtilsObjectTag)
+		{
+			VkDebugUtilsObjectTagInfoEXT tagInfo = {};
+			tagInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT;
+			tagInfo.objectType = VK_OBJECT_TYPE_SHADER_MODULE;
+			tagInfo.objectHandle = (uint64_t)vkShaderModule;
+			tagInfo.tagName = RENDERDOC_ShaderDebugMagicValue_truncated;
+
+			crstl::string tagName = crstl::string(reflectionHeader.bytecodeHash) + ".pdb";
+
+			tagInfo.pTag = tagName.c_str();
+			tagInfo.tagSize = tagName.length();
+
+			vkSetDebugUtilsObjectTag(vkDevice, &tagInfo);
+		}
+	}
+
+	static void CreateVkDescriptorSetLayout(VkDevice vkDevice, VkDescriptorSetLayoutBinding* layoutBindings, uint32_t layoutBindingCount, VkDescriptorSetLayout* vkDescriptorSetLayout)
+	{
+		VkDescriptorSetLayoutCreateInfo descriptorLayout;
+		descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		descriptorLayout.pNext = nullptr;
+		descriptorLayout.flags = 0;
+		descriptorLayout.bindingCount = layoutBindingCount;
+		descriptorLayout.pBindings = layoutBindings;
+
+		VkResult vkResult = vkCreateDescriptorSetLayout(vkDevice, &descriptorLayout, nullptr, vkDescriptorSetLayout);
+		CrAssert(vkResult == VK_SUCCESS);
+	}
+
 	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
+		VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+
+		// Create vkShaderModules
+		crstl::fixed_vector<VkShaderModule, crgfx::ShaderStage::GraphicsStageCount> vkShaderModules;
+		crstl::fixed_vector<crgfx::ShaderStage::T, crgfx::ShaderStage::GraphicsStageCount> shaderStages;
+		crstl::fixed_vector<const char*, crgfx::ShaderStage::GraphicsStageCount> entryPointNames;
+		{
+			crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
+			
+			ShaderBindingLayoutResources resources;
+
+			// Create the shader modules and parse reflection information
+			for (const ShaderBytecodeHandle& shaderBytecode : graphicsShader->GetBytecodes())
+			{
+				// Modify the reflection and the bytecode itself. We need to do this to get consecutive
+				// binding points once different shader stages are brought together
+				const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
+
+				// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
+				const crstl::vector<uint8_t>& bytecode = shaderBytecode->GetBytecode();
+
+				// Create shader modules from the modified bytecode
+				VkShaderModuleCreateInfo moduleCreateInfo;
+				moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+				moduleCreateInfo.pNext = nullptr;
+				moduleCreateInfo.codeSize = bytecode.size();
+				moduleCreateInfo.pCode = (uint32_t*)bytecode.data();
+				moduleCreateInfo.flags = 0;
+
+				VkShaderModule vkShaderModule;
+				VkResult vkResult = vkCreateShaderModule(vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
+				CrAssert(vkResult == VK_SUCCESS);
+
+				SetVulkanPDBPath(vkDevice, vkShaderModule, reflectionHeader);
+
+				vkShaderModules.push_back(vkShaderModule);
+				shaderStages.push_back(shaderBytecode->GetShaderStage());
+				entryPointNames.push_back(shaderBytecode->GetEntryPoint().c_str());
+
+				ShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](crgfx::ShaderStage::T stage, const CrShaderReflectionResource& resource)
+				{
+					VkDescriptorSetLayoutBinding layoutBinding;
+					layoutBinding.binding = resource.bindPoint;
+					layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+					layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+					layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+					layoutBinding.pImmutableSamplers = nullptr;
+
+					layoutBindings.push_back(layoutBinding);
+				});
+
+				CreateVkDescriptorSetLayout(vkDevice, layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
+
+				m_bindingLayout = ShaderBindingLayout(resources);
+			}
+		}
+
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
 		inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssemblyState.pNext = nullptr;
@@ -164,15 +257,11 @@ namespace crgfx
 		VkResult vkResult;
 
 		// Shader information
-		VkPipelineShaderStageCreateInfo shaderStages[crgfx::ShaderStage::GraphicsStageCount] = {};
+		VkPipelineShaderStageCreateInfo shaderStageCreateInfos[crgfx::ShaderStage::GraphicsStageCount] = {};
 		VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 		shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
-		const crgfx::GraphicsShaderVulkan* vulkanGraphicsShader = static_cast<const crgfx::GraphicsShaderVulkan*>(graphicsShader.get());
-
-		const crstl::vector<VkShaderModule>& vkShaderModules = vulkanGraphicsShader->GetVkShaderModules();
-
-		const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = vulkanGraphicsShader->GetBytecodes();
+		const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
 
 		uint32_t usedShaderStages = 0;
 
@@ -182,12 +271,12 @@ namespace crgfx
 			const VkShaderModule vkShaderModule = vkShaderModules[i];
 
 			shaderStageCreateInfo.module = vkShaderModule;
-			shaderStageCreateInfo.stage = crvk::GetVkShaderStage(bytecode->GetShaderStage());
+			shaderStageCreateInfo.stage = crvk::GetVkShaderStage(shaderStages[i]);
 			shaderStageCreateInfo.pName = bytecode->GetEntryPoint().c_str();
-			shaderStages[usedShaderStages++] = shaderStageCreateInfo;
+			shaderStageCreateInfos[usedShaderStages++] = shaderStageCreateInfo;
 		}
 
-		VkDescriptorSetLayout descriptorSetLayouts[] = { vulkanGraphicsShader->GetVkDescriptorSetLayout() };
+		VkDescriptorSetLayout vkDescriptorSetLayouts[] = { m_vkDescriptorSetLayout };
 
 		// Pipeline Resource Layout
 		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -195,7 +284,7 @@ namespace crgfx
 		pipelineLayoutCreateInfo.pNext = nullptr;
 		pipelineLayoutCreateInfo.flags = 0;
 		pipelineLayoutCreateInfo.setLayoutCount = 1; // TODO Handle when we have more than one layout
-		pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts;
+		pipelineLayoutCreateInfo.pSetLayouts = vkDescriptorSetLayouts;
 		pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
 		pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
 		// TODO Push constants? Need to be part of the psoDescriptor?
@@ -281,7 +370,7 @@ namespace crgfx
 		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		graphicsPipelineCreateInfo.pNext = &vkPipelineRenderingInfo;
 		graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShader->GetBytecodes().size();
-		graphicsPipelineCreateInfo.pStages = shaderStages;
+		graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos;
 
 		graphicsPipelineCreateInfo.layout = m_vkPipelineLayout;
 		graphicsPipelineCreateInfo.pVertexInputState = &vertexInputState;
@@ -298,6 +387,11 @@ namespace crgfx
 		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
 		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShader->GetDebugName());
+
+		for (VkShaderModule vkShaderModule : vkShaderModules)
+		{
+			vkDestroyShaderModule(vkDevice, vkShaderModule, nullptr);
+		}
 	}
 
 	GraphicsPipelineVulkan::~GraphicsPipelineVulkan()
@@ -307,11 +401,13 @@ namespace crgfx
 
 	void GraphicsPipelineVulkan::Deinitialize()
 	{
-		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
+		VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
-		vkDestroyPipeline(vulkanRenderDevice->GetVkDevice(), m_vkPipeline, nullptr);
+		vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
 
-		vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
+		vkDestroyPipelineLayout(vkDevice, m_vkPipelineLayout, nullptr);
+
+		vkDestroyDescriptorSetLayout(vkDevice, m_vkDescriptorSetLayout, nullptr);
 	}
 
 	ComputePipelineVulkan::ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
@@ -322,17 +418,51 @@ namespace crgfx
 
 	void ComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
-		const crgfx::ComputeShaderVulkan* vulkanComputeShader = static_cast<const crgfx::ComputeShaderVulkan*>(computeShader.get());
+		VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
+
+		// Create vkShaderModule
+		const CrShaderReflectionHeader& reflectionHeader = computeShader->GetBytecode()->GetReflection();
+
+		VkShaderModuleCreateInfo moduleCreateInfo;
+		moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.codeSize = computeShader->GetBytecode()->GetBytecode().size();
+		moduleCreateInfo.pCode = (uint32_t*)computeShader->GetBytecode()->GetBytecode().data();
+		moduleCreateInfo.flags = 0;
+
+		VkShaderModule vkShaderModule;
+		VkResult vkResult = vkCreateShaderModule(vkDevice, &moduleCreateInfo, nullptr, &vkShaderModule);
+		CrAssert(vkResult == VK_SUCCESS);
+
+		SetVulkanPDBPath(vkDevice, vkShaderModule, reflectionHeader);
+
+		crstl::vector<VkDescriptorSetLayoutBinding> layoutBindings;
+		ShaderBindingLayoutResources resources;
+
+		ShaderBindingLayout::AddResources(reflectionHeader, resources, [&layoutBindings](crgfx::ShaderStage::T stage, const CrShaderReflectionResource& resource)
+		{
+			VkDescriptorSetLayoutBinding layoutBinding;
+			layoutBinding.binding = resource.bindPoint;
+			layoutBinding.descriptorType = crvk::GetVkDescriptorType(resource.type);
+			layoutBinding.descriptorCount = 1; // TODO Get array size from reflection
+			layoutBinding.stageFlags = crvk::GetVkShaderStage(stage);
+			layoutBinding.pImmutableSamplers = nullptr;
+
+			layoutBindings.push_back(layoutBinding);
+		});
+
+		CreateVkDescriptorSetLayout(vkDevice, layoutBindings.data(), (uint32_t)layoutBindings.size(), &m_vkDescriptorSetLayout);
+
+		// Create the optimized shader resource table
+		m_bindingLayout = ShaderBindingLayout(resources);
 
 		VkPipelineShaderStageCreateInfo shaderStage = {};
 		shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		shaderStage.module = static_cast<const crgfx::ComputeShaderVulkan*>(computeShader.get())->GetVkShaderModule();
+		shaderStage.module = vkShaderModule;
 		shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
 
-		VkResult vkResult;
-
-		VkDescriptorSetLayout descriptorSetLayouts[] = { vulkanComputeShader->GetVkDescriptorSetLayout() };
+		VkDescriptorSetLayout descriptorSetLayouts[] = { m_vkDescriptorSetLayout };
 
 		// Pipeline Resource Layout
 		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
@@ -357,6 +487,8 @@ namespace crgfx
 		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
 		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShader->GetDebugName());
+
+		vkDestroyShaderModule(vkDevice, vkShaderModule, nullptr);
 	}
 
 	ComputePipelineVulkan::~ComputePipelineVulkan()
@@ -366,11 +498,13 @@ namespace crgfx
 
 	void ComputePipelineVulkan::Deinitialize()
 	{
-		crgfx::DeviceVulkan* vulkanRenderDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice);
+		VkDevice vkDevice = static_cast<crgfx::DeviceVulkan*>(m_renderDevice)->GetVkDevice();
 
-		vkDestroyPipeline(vulkanRenderDevice->GetVkDevice(), m_vkPipeline, nullptr);
+		vkDestroyPipeline(vkDevice, m_vkPipeline, nullptr);
 
-		vkDestroyPipelineLayout(vulkanRenderDevice->GetVkDevice(), m_vkPipelineLayout, nullptr);
+		vkDestroyPipelineLayout(vkDevice, m_vkPipelineLayout, nullptr);
+
+		vkDestroyDescriptorSetLayout(vkDevice, m_vkDescriptorSetLayout, nullptr);
 	}
 
 #if !defined(CR_CONFIG_FINAL)

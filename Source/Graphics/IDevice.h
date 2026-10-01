@@ -144,10 +144,6 @@ namespace crgfx
 
 		TypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
 
-		IGraphicsShader* CreateGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor);
-
-		IComputeShader* CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor);
-
 		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
 
 		ComputePipelineHandle CreateComputePipeline(const ComputeShaderHandle& computeShader);
@@ -210,10 +206,6 @@ namespace crgfx
 		virtual IGPUFence* CreateGPUFencePS(bool signaled) = 0;
 
 		virtual IGPUSemaphore* CreateGPUSemaphorePS() = 0;
-
-		virtual IGraphicsShader* CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor) = 0;
-
-		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) = 0;
 
 		virtual IHardwareGPUBuffer* CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& params) = 0;
 

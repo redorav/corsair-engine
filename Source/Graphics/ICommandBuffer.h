@@ -186,17 +186,17 @@ namespace crgfx
 
 		void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance);
 
-		void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ);
-
 		void DrawIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+
+		void DrawIndexedIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
+
+		void Dispatch(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ);
 
 		void DispatchTexture1D(uint32_t textureWidth);
 
 		void DispatchTexture2D(uint32_t textureWidth, uint32_t textureHeight);
 
 		void DispatchTexture3D(uint32_t textureWidth, uint32_t textureHeight, uint32_t textureDepth);
-
-		void DrawIndexedIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count);
 
 		void DispatchIndirect(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset);
 
@@ -256,11 +256,11 @@ namespace crgfx
 
 		virtual void DrawIndexedPS(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) = 0;
 
-		virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) = 0;
-
 		virtual void DrawIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
 
 		virtual void DrawIndexedIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset, uint32_t count) = 0;
+
+		virtual void DispatchPS(uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCountZ) = 0;
 
 		virtual void DispatchIndirectPS(const IHardwareGPUBuffer* indirectBuffer, uint32_t offset) = 0;
 

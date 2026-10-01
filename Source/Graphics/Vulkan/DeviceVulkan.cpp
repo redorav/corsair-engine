@@ -9,7 +9,6 @@
 #include "SwapchainVulkan.h"
 #include "GPUBufferVulkan.h"
 #include "GPUSynchronizationVulkan.h"
-#include "ShaderVulkan.h"
 #include "GPUQueryPoolVulkan.h"
 
 #include "Core/CrCommandLine.h"
@@ -689,16 +688,6 @@ namespace crgfx
 	IGPUSemaphore* DeviceVulkan::CreateGPUSemaphorePS()
 	{
 		return new GPUSemaphoreVulkan(this);
-	}
-
-	IGraphicsShader* DeviceVulkan::CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
-	{
-		return new GraphicsShaderVulkan(this, graphicsShaderDescriptor);
-	}
-
-	IComputeShader* DeviceVulkan::CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor)
-	{
-		return new ComputeShaderVulkan(this, computeShaderDescriptor);
 	}
 
 	IHardwareGPUBuffer* DeviceVulkan::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)

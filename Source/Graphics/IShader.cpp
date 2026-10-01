@@ -49,7 +49,7 @@ namespace crgfx
 		ProcessResourceArray(crgfx::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 	}
 
-	IGraphicsShader::IGraphicsShader(IDevice* /*device*/, const GraphicsShaderDescriptor& graphicsShaderDescriptor)
+	IGraphicsShader::IGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
 	{
 		m_debugName = graphicsShaderDescriptor.m_debugName;
 

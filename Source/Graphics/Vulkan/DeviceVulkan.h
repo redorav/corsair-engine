@@ -61,10 +61,6 @@ namespace crgfx
 
 		virtual IGPUSemaphore* CreateGPUSemaphorePS() override;
 
-		virtual IGraphicsShader* CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor) override;
-
-		virtual IComputeShader* CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor) override;
-
 		virtual IHardwareGPUBuffer* CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor) override;
 
 		virtual ISampler* CreateSamplerPS(const crgfx::SamplerDescriptor& descriptor) override;

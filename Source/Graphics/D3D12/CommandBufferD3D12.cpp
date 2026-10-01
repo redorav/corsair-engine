@@ -5,7 +5,6 @@
 #include "PipelineD3D12.h"
 #include "TextureD3D12.h"
 #include "SamplerD3D12.h"
-#include "ShaderD3D12.h"
 
 #include "Graphics/Extensions/CrPIXHeader.h"
 
@@ -436,7 +435,6 @@ namespace crgfx
 	void CommandBufferD3D12::FlushGraphicsRenderStatePS()
 	{
 		const GraphicsPipelineD3D12* d3d12GraphicsPipeline = static_cast<const GraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
-		const crgfx::GraphicsShaderHandle& currentGraphicsShader = d3d12GraphicsPipeline->GetShader();
 
 		if (m_currentState.m_indexBufferDirty)
 		{
@@ -503,9 +501,10 @@ namespace crgfx
 			m_currentState.m_viewportDirty = false;
 		}
 
+		const GraphicsPipelineD3D12* d3dGraphicsPipeline = static_cast<const GraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
+
 		if (m_currentState.m_graphicsPipelineDirty)
 		{
-			const GraphicsPipelineD3D12* d3dGraphicsPipeline = static_cast<const GraphicsPipelineD3D12*>(m_currentState.m_graphicsPipeline);
 			m_d3d12GraphicsCommandList->SetPipelineState(d3dGraphicsPipeline->GetD3D12PipelineState());
 			m_d3d12GraphicsCommandList->SetGraphicsRootSignature(d3dGraphicsPipeline->GetD3D12RootSignature()); // TODO Cache
 
@@ -525,7 +524,7 @@ namespace crgfx
 			m_currentState.m_stencilRefDirty = false;
 		}
 
-		const ShaderBindingLayout& bindingLayout = currentGraphicsShader->GetBindingLayout();
+		const ShaderBindingLayout& bindingLayout = d3dGraphicsPipeline->GetBindingLayout();
 
 		// Samplers go in a different descriptor heap
 		uint32_t totalShaderResourceCount = bindingLayout.GetTotalResourceCount() - bindingLayout.GetSamplerCount();
@@ -682,7 +681,6 @@ namespace crgfx
 	void CommandBufferD3D12::FlushComputeRenderStatePS()
 	{
 		const ComputePipelineD3D12* d3dComputePipeline = static_cast<const ComputePipelineD3D12*>(m_currentState.m_computePipeline);
-		const ComputeShaderHandle& currentComputeShader = d3dComputePipeline->GetShader();
 
 		if (m_currentState.m_computePipelineDirty)
 		{
@@ -691,7 +689,7 @@ namespace crgfx
 			m_currentState.m_computePipelineDirty = false;
 		}
 
-		const ShaderBindingLayout& bindingLayout = currentComputeShader->GetBindingLayout();
+		const ShaderBindingLayout& bindingLayout = d3dComputePipeline->GetBindingLayout();
 
 		// Samplers go in a different descriptor heap
 		uint32_t shaderResourceCount = bindingLayout.GetTotalResourceCount() - bindingLayout.GetSamplerCount();

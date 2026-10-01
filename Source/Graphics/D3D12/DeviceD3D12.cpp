@@ -8,7 +8,6 @@
 #include "SwapchainD3D12.h"
 #include "GPUBufferD3D12.h"
 #include "GPUSynchronizationD3D12.h"
-#include "ShaderD3D12.h"
 #include "PipelineD3D12.h"
 #include "CrD3D12.h"
 
@@ -405,16 +404,6 @@ namespace crgfx
 		return nullptr;
 	}
 
-	IGraphicsShader* DeviceD3D12::CreateGraphicsShaderPS(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
-	{
-		return new GraphicsShaderD3D12(this, graphicsShaderDescriptor);
-	}
-
-	IComputeShader* DeviceD3D12::CreateComputeShaderPS(const ComputeShaderDescriptor& computeShaderDescriptor)
-	{
-		return new ComputeShaderD3D12(this, computeShaderDescriptor);
-	}
-
 	IHardwareGPUBuffer* DeviceD3D12::CreateHardwareGPUBufferPS(const HardwareGPUBufferDescriptor& descriptor)
 	{
 		return new HardwareGPUBufferD3D12(this, descriptor);
@@ -435,10 +424,7 @@ namespace crgfx
 		return new TextureD3D12(this, params);
 	}
 
-	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS
-	(
-		const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
-	)
+	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
 		return new GraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
 	}

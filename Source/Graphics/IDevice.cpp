@@ -236,16 +236,6 @@ namespace crgfx
 		m_gpuDeletionQueue->AddToQueue(resource);
 	}
 
-	IGraphicsShader* IDevice::CreateGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
-	{
-		return CreateGraphicsShaderPS(graphicsShaderDescriptor);
-	}
-
-	IComputeShader* IDevice::CreateComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor)
-	{
-		return CreateComputeShaderPS(computeShaderDescriptor);
-	}
-
 	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
 	{
 		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");

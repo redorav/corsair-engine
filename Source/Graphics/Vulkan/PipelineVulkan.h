@@ -22,6 +22,8 @@ namespace crgfx
 
 		VkPipelineLayout GetVkPipelineLayout() const { return m_vkPipelineLayout; }
 
+		VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
+
 #if !defined(CR_CONFIG_FINAL)
 
 		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader) override;
@@ -34,9 +36,13 @@ namespace crgfx
 
 		void Deinitialize();
 
-		// Describes the resource binding layout for this pipeline
-		// This is later used to bind the descriptor sets
+		// Describes the resource binding layout for this pipeline This is later used to bind the descriptor sets
 		VkPipelineLayout m_vkPipelineLayout;
+
+		// The layout is needed when allocating descriptor sets from a pool.
+		// TODO There is only one at the moment but we should allow for more
+		// TODO The descriptor set layout will probably move to the resource descriptor table
+		VkDescriptorSetLayout m_vkDescriptorSetLayout;
 
 		VkPipeline m_vkPipeline;
 	};
@@ -53,6 +59,8 @@ namespace crgfx
 
 		VkPipelineLayout GetVkPipelineLayout() const { return m_vkPipelineLayout; }
 
+		VkDescriptorSetLayout GetVkDescriptorSetLayout() const { return m_vkDescriptorSetLayout; }
+
 #if !defined(CR_CONFIG_FINAL)
 
 		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) override;
@@ -66,6 +74,8 @@ namespace crgfx
 		void Deinitialize();
 
 		VkPipelineLayout m_vkPipelineLayout;
+
+		VkDescriptorSetLayout m_vkDescriptorSetLayout;
 
 		VkPipeline m_vkPipeline;
 	};

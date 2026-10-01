@@ -42,7 +42,7 @@ crgfx::GraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShade
 		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
 	}
 
-	crgfx::GraphicsShaderHandle graphicsShader = crgfx::GetDevice()->CreateGraphicsShader(graphicsShaderDescriptor);
+	crgfx::GraphicsShaderHandle graphicsShader = new crgfx::IGraphicsShader(graphicsShaderDescriptor);;
 
 	return graphicsShader;
 }
@@ -53,7 +53,7 @@ crgfx::ComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderC
 	crgfx::ComputeShaderDescriptor computeShaderDescriptor;
 	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
-	crgfx::ComputeShaderHandle computeShader = crgfx::GetDevice()->CreateComputeShader(computeShaderDescriptor);
+	crgfx::ComputeShaderHandle computeShader = new crgfx::IComputeShader(computeShaderDescriptor);
 
 	return computeShader;
 }

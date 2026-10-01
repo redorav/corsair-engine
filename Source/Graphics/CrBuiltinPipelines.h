@@ -30,17 +30,19 @@ public:
 
 	void RecompileBuiltinPipelines();
 
-	// Ubershader builtin pipelines
+	// Ubershader builtin shaders
 
-	crgfx::GraphicsPipelineHandle BasicUbershaderForward;
+	crgfx::GraphicsShaderHandle BasicUbershaderForwardShader;
 
-	crgfx::GraphicsPipelineHandle BasicUbershaderGBuffer;
+	crgfx::GraphicsShaderHandle BasicUbershaderGBufferShader;
 
-	crgfx::GraphicsPipelineHandle BasicUbershaderDebug;
+	crgfx::GraphicsShaderHandle BasicUbershaderDebugShader;
 
 private:
 
 	CrBuiltinPipelines();
+
+	crgfx::GraphicsShaderDescriptor GetGraphicsShaderDescriptor(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex);
 
 	crstl::open_hashmap<uint64_t, crgfx::GraphicsPipelineHandle> m_builtinGraphicsPipelines;
 

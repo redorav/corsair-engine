@@ -30,9 +30,8 @@ crgfx::RenderTargetBlendDescriptor CrStandardPipelineStates::AlphaBlend
 
 namespace crgfx
 {
-	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
+	IGraphicsPipeline::IGraphicsPipeline(crgfx::IDevice* renderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const VertexDescriptor& vertexDescriptor)
 		: GPUAutoDeletable(renderDevice)
-		, m_shader(graphicsShader)
 #if !defined(CR_CONFIG_FINAL)
 		, m_pipelineDescriptor(pipelineDescriptor)
 		, m_vertexDescriptor(vertexDescriptor)
@@ -48,13 +47,11 @@ namespace crgfx
 	void IGraphicsPipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
 	{
 		RecompilePS(renderDevice, graphicsShader);
-		m_shader = graphicsShader;
 	}
 
 #endif
 
-	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
-		: GPUAutoDeletable(renderDevice), m_shader(computeShader)
+	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) : GPUAutoDeletable(renderDevice)
 	{
 		const CrShaderReflectionHeader& reflection = computeShader->GetBytecode()->GetReflection();
 		m_threadGroupSizeX = reflection.threadGroupSizeX;
@@ -69,7 +66,6 @@ namespace crgfx
 	void IComputePipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
 	{
 		RecompilePS(renderDevice, computeShader);
-		m_shader = computeShader;
 	}
 
 #endif

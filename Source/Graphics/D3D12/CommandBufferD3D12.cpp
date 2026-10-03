@@ -849,7 +849,7 @@ namespace crgfx
 	{
 		m_d3d12GraphicsCommandList->Close();
 
-		crgfx::DeviceD3D12* d3d12RenderDevice = static_cast<crgfx::DeviceD3D12*>(m_renderDevice);
+		ID3D12Device* d3d12Device = static_cast<crgfx::DeviceD3D12*>(m_renderDevice)->GetD3D12Device();
 
 		// Copy shader resource descriptors
 		{
@@ -863,7 +863,7 @@ namespace crgfx
 				D3D12_CPU_DESCRIPTOR_HANDLE shaderVisibleDescriptor = shaderResourceShaderVisibleHeap;
 				shaderVisibleDescriptor.ptr += i * shaderResourceDescriptorStride;
 
-				d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(1, shaderVisibleDescriptor, m_shaderResourceCPUDescriptors[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				d3d12Device->CopyDescriptorsSimple(1, shaderVisibleDescriptor, m_shaderResourceCPUDescriptors[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			}
 		}
 
@@ -878,7 +878,7 @@ namespace crgfx
 				D3D12_CPU_DESCRIPTOR_HANDLE shaderVisibleDescriptor = samplerShaderVisibleHeap;
 				shaderVisibleDescriptor.ptr += i * samplerDescriptorStride;
 
-				d3d12RenderDevice->GetD3D12Device()->CopyDescriptorsSimple(1, shaderVisibleDescriptor, m_samplerCPUDescriptors[i], D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+				d3d12Device->CopyDescriptorsSimple(1, shaderVisibleDescriptor, m_samplerCPUDescriptors[i], D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 			}
 		}
 	}

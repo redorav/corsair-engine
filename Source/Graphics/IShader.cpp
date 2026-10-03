@@ -48,15 +48,4 @@ namespace crgfx
 		ProcessResourceArray(crgfx::ShaderResourceType::RWStorageBuffer, resources.rwStorageBuffers);
 		ProcessResourceArray(crgfx::ShaderResourceType::RWTypedBuffer, resources.rwTypedBuffers);
 	}
-
-	IGraphicsShader::IGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor)
-	{
-		m_debugName = graphicsShaderDescriptor.m_debugName;
-
-		for (const ShaderBytecodeHandle& bytecode : graphicsShaderDescriptor.m_bytecodes)
-		{
-			m_bytecodes.push_back(bytecode);
-			m_hash << bytecode->GetHash();
-		}
-	}
 };

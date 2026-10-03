@@ -44,6 +44,8 @@ StreamT& operator << (StreamT& stream, CrShaderInterfaceVariable& resource)
 	return stream;
 }
 
+// This reflection header is very unoptimized. It creates a lot of temporary memory and the serialization makes it opaque
+// and complicated in trying to be too clever. It does work correctly and does what it should. Rework at some point
 struct CrShaderReflectionHeader
 {
 	template<typename FunctionT>

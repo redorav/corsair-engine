@@ -44,16 +44,16 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void IGraphicsPipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
+	void IGraphicsPipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode)
 	{
-		RecompilePS(renderDevice, graphicsShader);
+		RecompilePS(renderDevice, graphicsShaderBytecode);
 	}
 
 #endif
 
-	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) : GPUAutoDeletable(renderDevice)
+	IComputePipeline::IComputePipeline(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode) : GPUAutoDeletable(renderDevice)
 	{
-		const CrShaderReflectionHeader& reflection = computeShader->GetBytecode()->GetReflection();
+		const CrShaderReflectionHeader& reflection = computeShaderBytecode.GetBytecode()->GetReflection();
 		m_threadGroupSizeX = reflection.threadGroupSizeX;
 		m_threadGroupSizeY = reflection.threadGroupSizeY;
 		m_threadGroupSizeZ = reflection.threadGroupSizeZ;
@@ -63,9 +63,9 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void IComputePipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
+	void IComputePipeline::Recompile(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode)
 	{
-		RecompilePS(renderDevice, computeShader);
+		RecompilePS(renderDevice, computeShaderBytecode);
 	}
 
 #endif

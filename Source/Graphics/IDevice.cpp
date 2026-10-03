@@ -236,13 +236,13 @@ namespace crgfx
 		m_gpuDeletionQueue->AddToQueue(resource);
 	}
 
-	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
+	GraphicsPipelineHandle IDevice::CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 	{
-		CrAssertMsg(graphicsShader != nullptr, "Invalid graphics shader passed to pipeline creation");
+		CrAssertMsg(graphicsShaderBytecode.GetBytecodes().size() > 0, "No graphics shader bytecode passed to pipeline creation");
 		CrAssertMsg(pipelineDescriptor.rasterizerState.conservativeRasterization ? SupportsConservativeRasterization() : true, "Must support conservative rasterization");
 
 		const CrHash pipelineHash = pipelineDescriptor.ComputeHash();
-		const CrHash graphicsShaderHash = graphicsShader->GetHash();
+		const CrHash graphicsShaderHash = graphicsShaderBytecode.GetHash();
 		const CrHash vertexDescriptorHash = vertexDescriptor.ComputeHash();
 
 		const CrHash combinedHash = pipelineHash + graphicsShaderHash + vertexDescriptorHash;
@@ -259,12 +259,12 @@ namespace crgfx
 		{
 			crstl::timer pipelineCreationTime;
 
-			graphicsPipeline = GraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShader, vertexDescriptor));
+			graphicsPipeline = GraphicsPipelineHandle(CreateGraphicsPipelinePS(pipelineDescriptor, graphicsShaderBytecode, vertexDescriptor));
 
 #if defined(RENDER_DEVICE_LOGS)
 
 			// Print out a message that includes meaningful information
-			const crstl::vector<ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+			const crstl::span<const ShaderBytecodeHandle>& bytecodes = graphicsShaderBytecode.GetBytecodes();
 
 			// Add entry point names
 			crstl::fixed_string128 entryPoints("(");
@@ -291,11 +291,11 @@ namespace crgfx
 		return graphicsPipeline;
 	}
 
-	ComputePipelineHandle IDevice::CreateComputePipeline(const ComputeShaderHandle& computeShader)
+	ComputePipelineHandle IDevice::CreateComputePipeline(const ComputeShaderBytecode& computeShaderBytecode)
 	{
-		CrAssertMsg(computeShader != nullptr, "Invalid compute shader passed to pipeline creation");
+		CrAssertMsg(computeShaderBytecode.GetBytecode() != nullptr, "No compute shader bytecode passed to pipeline creation");
 
-		const CrHash computeShaderHash = computeShader->GetHash();
+		const CrHash computeShaderHash = computeShaderBytecode.GetHash();
 
 		const auto& pipelineIter = m_computePipelines.find(computeShaderHash.GetHash());
 		ComputePipelineHandle computePipeline;
@@ -308,12 +308,12 @@ namespace crgfx
 		{
 			crstl::timer pipelineCreationTime;
 
-			computePipeline = ComputePipelineHandle(CreateComputePipelinePS(computeShader));
+			computePipeline = ComputePipelineHandle(CreateComputePipelinePS(computeShaderBytecode));
 
 #if defined(RENDER_DEVICE_LOGS)
 
 			crstl::fixed_string128 entryPoint("(");
-			entryPoint.append(computeShader->GetBytecode()->GetEntryPoint().c_str());
+			entryPoint.append(computeShaderBytecode.GetBytecode()->GetEntryPoint().c_str());
 			entryPoint.append(")");
 
 			CrLog("Compute Pipeline %s created (%f ms)", entryPoint.c_str(), (float)pipelineCreationTime.elapsed().milliseconds());

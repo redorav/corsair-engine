@@ -154,7 +154,7 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 	for (CrMaterialShaderVariant::T variant = CrMaterialShaderVariant::First; variant < CrMaterialShaderVariant::Count; ++variant)
 	{
-		crgfx::GraphicsShaderDescriptor shaderDescriptor;
+		crgfx::GraphicsShaderBytecode shaderBytecode;
 
 		CrMaterialShaderDescriptor materialShaderDescriptor = baseShaderDescriptor;
 		materialShaderDescriptor.shaderVariant = variant;
@@ -173,10 +173,10 @@ CrMaterialHandle CrMaterialCompiler::CompileMaterial(const CrMaterialDescriptor&
 
 			CrAssertMsg(bytecode != nullptr, "Bytecode is null. Compilation failed");
 
-			shaderDescriptor.m_bytecodes.push_back(bytecode);
+			shaderBytecode.AddBytecode(bytecode);
 		}
 
-		material->m_shaders[variant] = new crgfx::IGraphicsShader(shaderDescriptor);
+		material->m_shaderBytecodes[variant] = shaderBytecode;
 	}
 
 	return material;

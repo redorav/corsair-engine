@@ -10,11 +10,7 @@ namespace crgfx
 	{
 	public:
 
-		GraphicsPipelineD3D12
-		(
-			crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-			const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
-		);
+		GraphicsPipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor);
 
 		~GraphicsPipelineD3D12();
 
@@ -26,13 +22,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor);
 
 		void Deinitialize();
 
@@ -47,7 +43,7 @@ namespace crgfx
 	{
 	public:
 
-		ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader);
+		ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode);
 
 		~ComputePipelineD3D12();
 
@@ -57,13 +53,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader);
+		void Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode);
 
 		void Deinitialize();
 

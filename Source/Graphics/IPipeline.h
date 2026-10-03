@@ -232,9 +232,9 @@ namespace crgfx
 
 	public:
 
-		void Recompile(IDevice* renderDevice, const GraphicsShaderHandle& graphicsShader);
+		void Recompile(IDevice* renderDevice, const GraphicsShaderBytecode& graphicsShader);
 
-		virtual void RecompilePS(IDevice* renderDevice, const GraphicsShaderHandle& graphicsShader) = 0;
+		virtual void RecompilePS(IDevice* renderDevice, const GraphicsShaderBytecode& graphicsShader) = 0;
 
 		CrBuiltinShaders::T GetVertexShaderIndex() const { return m_vertexShaderIndex; }
 
@@ -263,7 +263,7 @@ namespace crgfx
 	{
 	public:
 
-		IComputePipeline(IDevice* renderDevice, const ComputeShaderHandle& computeShader);
+		IComputePipeline(IDevice* renderDevice, const ComputeShaderBytecode& computeShaderBytecode);
 
 		virtual ~IComputePipeline();
 
@@ -289,9 +289,9 @@ namespace crgfx
 
 	public:
 
-		void Recompile(IDevice* renderDevice, const ComputeShaderHandle& computeShader);
+		void Recompile(IDevice* renderDevice, const ComputeShaderBytecode& computeShaderBytecode);
 
-		virtual void RecompilePS(IDevice* renderDevice, const ComputeShaderHandle& computeShader) = 0;
+		virtual void RecompilePS(IDevice* renderDevice, const ComputeShaderBytecode& computeShaderBytecode) = 0;
 
 		CrBuiltinCompute::T GetComputeShaderIndex() const { return m_computeShaderIndex; }
 

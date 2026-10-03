@@ -14,19 +14,19 @@ namespace crgfx
 {
 	GraphicsPipelineD3D12::GraphicsPipelineD3D12
 	(
-		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
+		crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor
 	)
 		: IGraphicsPipeline(d3d12RenderDevice, pipelineDescriptor, vertexDescriptor)
 	{
-		Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		Initialize(d3d12RenderDevice, pipelineDescriptor, graphicsShaderBytecode, vertexDescriptor);
 	}
 
-	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 	{
 		ShaderBindingLayoutResources resources;
 
 		// Create the shader modules and parse reflection information
-		for (const ShaderBytecodeHandle& shaderBytecode : graphicsShader->GetBytecodes())
+		for (const ShaderBytecodeHandle& shaderBytecode : graphicsShaderBytecode.GetBytecodes())
 		{
 			const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 			ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&) {});
@@ -143,7 +143,7 @@ namespace crgfx
 		d3d12PipelineStateDescriptor.CachedPSO = {};
 		d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-		const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+		const crstl::span<const ShaderBytecodeHandle>& bytecodes = graphicsShaderBytecode.GetBytecodes();
 
 		d3d12PipelineStateDescriptor.VS = {};
 		d3d12PipelineStateDescriptor.PS = {};
@@ -210,6 +210,8 @@ namespace crgfx
 
 		HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateGraphicsPipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
 		CrAssertMsg(hResult == S_OK, "Failed to create graphics pipeline");
+
+		d3d12RenderDevice->SetD3D12ObjectName(m_d3d12PipelineState, graphicsShaderBytecode.GetDebugName());
 	}
 
 	GraphicsPipelineD3D12::~GraphicsPipelineD3D12()
@@ -222,18 +224,18 @@ namespace crgfx
 		m_d3d12PipelineState->Release();
 	}
 
-	ComputePipelineD3D12::ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader)
-		: IComputePipeline(d3d12RenderDevice, computeShader)
+	ComputePipelineD3D12::ComputePipelineD3D12(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode)
+		: IComputePipeline(d3d12RenderDevice, computeShaderBytecode)
 	{
-		Initialize(d3d12RenderDevice, computeShader);
+		Initialize(d3d12RenderDevice, computeShaderBytecode);
 	}
 
-	void ComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderHandle& computeShader)
+	void ComputePipelineD3D12::Initialize(crgfx::DeviceD3D12* d3d12RenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode)
 	{
 		ShaderBindingLayoutResources resources;
 
 		// Create the shader modules and parse reflection information
-		const ShaderBytecodeHandle& shaderBytecode = computeShader->GetBytecode();
+		const ShaderBytecodeHandle& shaderBytecode = computeShaderBytecode.GetBytecode();
 		const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 		ShaderBindingLayout::AddResources(reflectionHeader, resources, [](crgfx::ShaderStage::T, const CrShaderReflectionResource&) {});
 
@@ -244,13 +246,14 @@ namespace crgfx
 		d3d12PipelineStateDescriptor.CachedPSO = {};
 		d3d12PipelineStateDescriptor.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-		const crgfx::ShaderBytecodeHandle& bytecode = computeShader->GetBytecode();
-		d3d12PipelineStateDescriptor.CS = { bytecode->GetBytecode().data(), bytecode->GetBytecode().size() };
+		d3d12PipelineStateDescriptor.CS = { shaderBytecode->GetBytecode().data(), shaderBytecode->GetBytecode().size() };
 
 		m_d3d12RootSignature = d3d12PipelineStateDescriptor.pRootSignature = d3d12RenderDevice->GetD3D12ComputeRootSignature();
 
 		HRESULT hResult = d3d12RenderDevice->GetD3D12Device()->CreateComputePipelineState(&d3d12PipelineStateDescriptor, IID_PPV_ARGS(&m_d3d12PipelineState));
 		CrAssertMsg(hResult == S_OK, "Failed to create compute pipeline");
+
+		d3d12RenderDevice->SetD3D12ObjectName(m_d3d12PipelineState, computeShaderBytecode.GetDebugName());
 	}
 
 	ComputePipelineD3D12::~ComputePipelineD3D12()
@@ -265,16 +268,16 @@ namespace crgfx
 
 	#if !defined(CR_CONFIG_FINAL)
 
-	void GraphicsPipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
+	void GraphicsPipelineD3D12::RecompilePS(IDevice* renderDevice, const GraphicsShaderBytecode& graphicsShaderBytecode)
 	{
 		Deinitialize();
-		Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
+		Initialize(static_cast<DeviceD3D12*>(renderDevice), m_pipelineDescriptor, graphicsShaderBytecode, m_vertexDescriptor);
 	}
 
-	void ComputePipelineD3D12::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
+	void ComputePipelineD3D12::RecompilePS(IDevice* renderDevice, const ComputeShaderBytecode& computeShaderBytecode)
 	{
 		Deinitialize();
-		Initialize(static_cast<crgfx::DeviceD3D12*>(renderDevice), computeShader);
+		Initialize(static_cast<DeviceD3D12*>(renderDevice), computeShaderBytecode);
 	}
 
 	#endif

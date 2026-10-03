@@ -30,18 +30,15 @@ CrBuiltinPipelines::CrBuiltinPipelines()
 {
 	// Builtin ubershaders
 	{
-		crgfx::GraphicsShaderDescriptor basicUbershaderForwardDescriptor = CrBuiltinPipelines::GetGraphicsShaderDescriptor(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicForwardUbershaderPS);
-		BasicUbershaderForwardShader = new crgfx::IGraphicsShader(basicUbershaderForwardDescriptor);
+		BasicUbershaderForwardShader = CrBuiltinPipelines::GetGraphicsShaderBytecode(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicForwardUbershaderPS);
 
-		crgfx::GraphicsShaderDescriptor basicUbershaderGBufferDescriptor = CrBuiltinPipelines::GetGraphicsShaderDescriptor(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicGBufferUbershaderPS);
-		BasicUbershaderGBufferShader = new crgfx::IGraphicsShader(basicUbershaderGBufferDescriptor);
+		BasicUbershaderGBufferShader = CrBuiltinPipelines::GetGraphicsShaderBytecode(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicGBufferUbershaderPS);
 
-		crgfx::GraphicsShaderDescriptor basicUbershaderDebugDescriptor = CrBuiltinPipelines::GetGraphicsShaderDescriptor(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicDebugUbershaderPS);
-		BasicUbershaderDebugShader = new crgfx::IGraphicsShader(basicUbershaderDebugDescriptor);
+		BasicUbershaderDebugShader = CrBuiltinPipelines::GetGraphicsShaderBytecode(CrBuiltinShaders::BasicUbershaderVS, CrBuiltinShaders::BasicDebugUbershaderPS);
 	}
 }
 
-crgfx::GraphicsShaderDescriptor CrBuiltinPipelines::GetGraphicsShaderDescriptor(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex)
+crgfx::GraphicsShaderBytecode CrBuiltinPipelines::GetGraphicsShaderBytecode(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex)
 {
 	crgfx::IDevice* device = crgfx::GetDevice().get();
 
@@ -50,13 +47,15 @@ crgfx::GraphicsShaderDescriptor CrBuiltinPipelines::GetGraphicsShaderDescriptor(
 	const crgfx::ShaderBytecodeHandle& vertexShaderBytecode = crgfx::GetBuiltinShaderBytecode(vertexShaderIndex);
 	const crgfx::ShaderBytecodeHandle& pixelShaderBytecode = crgfx::GetBuiltinShaderBytecode(pixelShaderIndex);
 
-	crgfx::GraphicsShaderDescriptor graphicsShaderDescriptor;
-	graphicsShaderDescriptor.m_debugName += CrBuiltinShaders::GetMetadata(vertexShaderIndex, properties.graphicsApi).name.c_str();
-	graphicsShaderDescriptor.m_debugName += "_";
-	graphicsShaderDescriptor.m_debugName += CrBuiltinShaders::GetMetadata(pixelShaderIndex, properties.graphicsApi).name.c_str();
-	graphicsShaderDescriptor.m_bytecodes.push_back(vertexShaderBytecode);
-	graphicsShaderDescriptor.m_bytecodes.push_back(pixelShaderBytecode);
-	return graphicsShaderDescriptor;
+	crgfx::ShaderDebugString debugName;
+	debugName += CrBuiltinShaders::GetMetadata(vertexShaderIndex, properties.graphicsApi).name.c_str();
+	debugName += "_";
+	debugName += CrBuiltinShaders::GetMetadata(pixelShaderIndex, properties.graphicsApi).name.c_str();
+
+	crgfx::GraphicsShaderBytecode bytecode(debugName);
+	bytecode.AddBytecode(vertexShaderBytecode);
+	bytecode.AddBytecode(pixelShaderBytecode);
+	return bytecode;
 }
 
 crgfx::GraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
@@ -83,9 +82,8 @@ crgfx::GraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	}
 	else
 	{
-		crgfx::GraphicsShaderDescriptor graphicsShaderDescriptor = GetGraphicsShaderDescriptor(vertexShaderIndex, pixelShaderIndex);
 
-		crgfx::GraphicsShaderHandle shader = new crgfx::IGraphicsShader(graphicsShaderDescriptor);
+		crgfx::GraphicsShaderBytecode shader = GetGraphicsShaderBytecode(vertexShaderIndex, pixelShaderIndex);
 
 		crgfx::GraphicsPipelineHandle graphicsPipeline = device->CreateGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
@@ -111,11 +109,7 @@ crgfx::ComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinCom
 
 		const crgfx::DeviceProperties& properties = renderDevice->GetProperties();
 
-		crgfx::ComputeShaderDescriptor computeShaderDescriptor;
-		computeShaderDescriptor.m_debugName = CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str();
-		computeShaderDescriptor.m_bytecode = crgfx::GetBuiltinComputeBytecode(computeShaderIndex);
-
-		crgfx::ComputeShaderHandle shader = new crgfx::IComputeShader(computeShaderDescriptor);
+		crgfx::ComputeShaderBytecode shader = crgfx::ComputeShaderBytecode(CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str(), crgfx::GetBuiltinComputeBytecode(computeShaderIndex));
 
 		crgfx::ComputePipelineHandle computePipeline = renderDevice->CreateComputePipeline(shader);
 		computePipeline->SetComputeShaderIndex(computeShaderIndex);
@@ -185,13 +179,9 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 					const crgfx::ShaderBytecodeHandle& bytecode = crgfx::ShaderBytecodeHandle(new crgfx::ShaderBytecode());
 					shaderBytecodeStream << *bytecode.get();
 
-					crgfx::ComputeShaderDescriptor computeShaderDescriptor;
-					computeShaderDescriptor.m_debugName = builtinShaderMetadata.name.c_str();
-					computeShaderDescriptor.m_bytecode = bytecode;
+					crgfx::ComputeShaderBytecode computeShaderBytecode = crgfx::ComputeShaderBytecode(builtinShaderMetadata.name.c_str(), bytecode);
 
-					crgfx::ComputeShaderHandle shader = new crgfx::IComputeShader(computeShaderDescriptor);
-
-					computePipeline->Recompile(device, shader);
+					computePipeline->Recompile(device, computeShaderBytecode);
 				}
 			}
 
@@ -202,10 +192,12 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 				const CrBuiltinShaderMetadata& vertexShaderMetadata = CrBuiltinShaders::GetMetadata(graphicsPipeline->GetVertexShaderIndex(), deviceProperties.graphicsApi);
 				const CrBuiltinShaderMetadata& pixelShaderMetadata = CrBuiltinShaders::GetMetadata(graphicsPipeline->GetPixelShaderIndex(), deviceProperties.graphicsApi);
 
-				crgfx::GraphicsShaderDescriptor graphicsShaderDescriptor;
-				graphicsShaderDescriptor.m_debugName += vertexShaderMetadata.name.c_str();
-				graphicsShaderDescriptor.m_debugName += "_";
-				graphicsShaderDescriptor.m_debugName += pixelShaderMetadata.name.c_str();
+				crgfx::ShaderDebugString debugName;
+				debugName += vertexShaderMetadata.name.c_str();
+				debugName += "_";
+				debugName += pixelShaderMetadata.name.c_str();
+
+				crgfx::GraphicsShaderBytecode shaderBytecode(debugName);
 
 				CrFixedPath vertexBinaryPath = outputPath;
 				vertexBinaryPath /= vertexShaderMetadata.uniqueBinaryName;
@@ -216,7 +208,7 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 				{
 					const crgfx::ShaderBytecodeHandle& bytecode = crgfx::ShaderBytecodeHandle(new crgfx::ShaderBytecode());
 					vertexShaderBytecodeStream << *bytecode.get();
-					graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
+					shaderBytecode.AddBytecode(bytecode);
 				}
 
 				CrFixedPath pixelBinaryPath = outputPath;
@@ -228,19 +220,16 @@ void CrBuiltinPipelines::RecompileBuiltinPipelines()
 				{
 					const crgfx::ShaderBytecodeHandle& bytecode = crgfx::ShaderBytecodeHandle(new crgfx::ShaderBytecode());
 					pixelShaderBytecodeStream << *bytecode.get();
-					graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
+					shaderBytecode.AddBytecode(bytecode);
 				}
 
-				crgfx::GraphicsShaderHandle shader = new crgfx::IGraphicsShader(graphicsShaderDescriptor);
-
-				graphicsPipeline->Recompile(device, shader);
+				graphicsPipeline->Recompile(device, shaderBytecode);
 			}
 		}
 		else
 		{
 			crstl::string processOutput;
 			processOutput.resize_uninitialized(2048);
-			//process.ReadStdOut(processOutput.data(), processOutput.size());
 			process.read_stdout(processOutput.data(), processOutput.size());
 			CrLog("%s", processOutput.c_str());
 		}

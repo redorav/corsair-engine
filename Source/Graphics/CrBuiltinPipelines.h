@@ -32,17 +32,17 @@ public:
 
 	// Ubershader builtin shaders
 
-	crgfx::GraphicsShaderHandle BasicUbershaderForwardShader;
+	crgfx::GraphicsShaderBytecode BasicUbershaderForwardShader;
 
-	crgfx::GraphicsShaderHandle BasicUbershaderGBufferShader;
+	crgfx::GraphicsShaderBytecode BasicUbershaderGBufferShader;
 
-	crgfx::GraphicsShaderHandle BasicUbershaderDebugShader;
+	crgfx::GraphicsShaderBytecode BasicUbershaderDebugShader;
 
 private:
 
 	CrBuiltinPipelines();
 
-	crgfx::GraphicsShaderDescriptor GetGraphicsShaderDescriptor(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex);
+	crgfx::GraphicsShaderBytecode GetGraphicsShaderBytecode(CrBuiltinShaders::T vertexShaderIndex, CrBuiltinShaders::T pixelShaderIndex);
 
 	crstl::open_hashmap<uint64_t, crgfx::GraphicsPipelineHandle> m_builtinGraphicsPipelines;
 

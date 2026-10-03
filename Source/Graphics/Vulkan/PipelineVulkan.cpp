@@ -9,14 +9,10 @@
 
 namespace crgfx
 {
-	GraphicsPipelineVulkan::GraphicsPipelineVulkan
-	(
-		crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-		const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
-	)
+	GraphicsPipelineVulkan::GraphicsPipelineVulkan(DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 		: IGraphicsPipeline(vulkanRenderDevice, pipelineDescriptor, vertexDescriptor)
 	{
-		Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		Initialize(vulkanRenderDevice, pipelineDescriptor, graphicsShaderBytecode, vertexDescriptor);
 	}
 
 	static void SetVulkanPDBPath(VkDevice vkDevice, VkShaderModule vkShaderModule, const CrShaderReflectionHeader& reflectionHeader)
@@ -51,7 +47,7 @@ namespace crgfx
 		CrAssert(vkResult == VK_SUCCESS);
 	}
 
-	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
+	void GraphicsPipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 	{
 		VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
@@ -65,14 +61,14 @@ namespace crgfx
 			ShaderBindingLayoutResources resources;
 
 			// Create the shader modules and parse reflection information
-			for (const ShaderBytecodeHandle& shaderBytecode : graphicsShader->GetBytecodes())
+			for (const ShaderBytecodeHandle& shaderBytecode : graphicsShaderBytecode.GetBytecodes())
 			{
 				// Modify the reflection and the bytecode itself. We need to do this to get consecutive
 				// binding points once different shader stages are brought together
 				const CrShaderReflectionHeader& reflectionHeader = shaderBytecode->GetReflection();
 
 				// Copy bytecode too. The bytecode gets discarded later as the shader module takes ownership
-				const crstl::vector<uint8_t>& bytecode = shaderBytecode->GetBytecode();
+				const crstl::span<uint8_t>& bytecode = shaderBytecode->GetBytecode();
 
 				// Create shader modules from the modified bytecode
 				VkShaderModuleCreateInfo moduleCreateInfo;
@@ -261,7 +257,7 @@ namespace crgfx
 		VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
 		shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
-		const crstl::vector<crgfx::ShaderBytecodeHandle>& bytecodes = graphicsShader->GetBytecodes();
+		const crstl::span<const ShaderBytecodeHandle>& bytecodes = graphicsShaderBytecode.GetBytecodes();
 
 		uint32_t usedShaderStages = 0;
 
@@ -369,7 +365,7 @@ namespace crgfx
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		graphicsPipelineCreateInfo.pNext = &vkPipelineRenderingInfo;
-		graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShader->GetBytecodes().size();
+		graphicsPipelineCreateInfo.stageCount = (uint32_t)graphicsShaderBytecode.GetBytecodes().size();
 		graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos;
 
 		graphicsPipelineCreateInfo.layout = m_vkPipelineLayout;
@@ -386,7 +382,7 @@ namespace crgfx
 		vkResult = vkCreateGraphicsPipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &graphicsPipelineCreateInfo, nullptr, &m_vkPipeline);
 		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create graphics pipeline");
 
-		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShader->GetDebugName());
+		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, graphicsShaderBytecode.GetDebugName());
 
 		for (VkShaderModule vkShaderModule : vkShaderModules)
 		{
@@ -410,24 +406,23 @@ namespace crgfx
 		vkDestroyDescriptorSetLayout(vkDevice, m_vkDescriptorSetLayout, nullptr);
 	}
 
-	ComputePipelineVulkan::ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
-		: IComputePipeline(vulkanRenderDevice, computeShader)
+	ComputePipelineVulkan::ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode) : IComputePipeline(vulkanRenderDevice, computeShaderBytecode)
 	{
-		Initialize(vulkanRenderDevice, computeShader);
+		Initialize(vulkanRenderDevice, computeShaderBytecode);
 	}
 
-	void ComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader)
+	void ComputePipelineVulkan::Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode)
 	{
 		VkDevice vkDevice = vulkanRenderDevice->GetVkDevice();
 
 		// Create vkShaderModule
-		const CrShaderReflectionHeader& reflectionHeader = computeShader->GetBytecode()->GetReflection();
+		const CrShaderReflectionHeader& reflectionHeader = computeShaderBytecode.GetBytecode()->GetReflection();
 
 		VkShaderModuleCreateInfo moduleCreateInfo;
 		moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		moduleCreateInfo.pNext = nullptr;
-		moduleCreateInfo.codeSize = computeShader->GetBytecode()->GetBytecode().size();
-		moduleCreateInfo.pCode = (uint32_t*)computeShader->GetBytecode()->GetBytecode().data();
+		moduleCreateInfo.codeSize = computeShaderBytecode.GetBytecode()->GetBytecode().size();
+		moduleCreateInfo.pCode = (uint32_t*)computeShaderBytecode.GetBytecode()->GetBytecode().data();
 		moduleCreateInfo.flags = 0;
 
 		VkShaderModule vkShaderModule;
@@ -460,7 +455,7 @@ namespace crgfx
 		shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
 		shaderStage.module = vkShaderModule;
-		shaderStage.pName = computeShader->GetBytecode()->GetEntryPoint().c_str();
+		shaderStage.pName = computeShaderBytecode.GetBytecode()->GetEntryPoint().c_str();
 
 		VkDescriptorSetLayout descriptorSetLayouts[] = { m_vkDescriptorSetLayout };
 
@@ -486,7 +481,7 @@ namespace crgfx
 		vkResult = vkCreateComputePipelines(vulkanRenderDevice->GetVkDevice(), vulkanRenderDevice->GetVkPipelineCache(), 1, &computePipelineCreateInfo, nullptr, &m_vkPipeline);
 		CrAssertMsg(vkResult == VK_SUCCESS, "Failed to create compute pipeline");
 
-		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShader->GetDebugName());
+		vulkanRenderDevice->SetVkObjectName((uint64_t)m_vkPipeline, VK_OBJECT_TYPE_PIPELINE, computeShaderBytecode.GetDebugName());
 
 		vkDestroyShaderModule(vkDevice, vkShaderModule, nullptr);
 	}
@@ -509,16 +504,16 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-	void GraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader)
+	void GraphicsPipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode)
 	{
 		Deinitialize();
-		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShader, m_vertexDescriptor);
+		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), m_pipelineDescriptor, graphicsShaderBytecode, m_vertexDescriptor);
 	}
 
-	void ComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader)
+	void ComputePipelineVulkan::RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode)
 	{
 		Deinitialize();
-		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), computeShader);
+		Initialize(static_cast<crgfx::DeviceVulkan*>(renderDevice), computeShaderBytecode);
 	}
 
 #endif

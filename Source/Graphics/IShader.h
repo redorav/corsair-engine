@@ -15,6 +15,7 @@
 #include "crstl/fixed_vector.h"
 #include "crstl/intrusive_ptr.h"
 #include "crstl/unique_ptr.h"
+#include "crstl/span.h"
 
 namespace crgfx
 {
@@ -252,6 +253,8 @@ namespace crgfx
 		// than trying to pack resources indexed by stage count directly. There is a size and an offset for 
 		// every resource type, for every stage. Some resource stages overlap, such as compute and graphics, 
 		// so we don't take up unnecessary space
+
+		// TODO GraphicsStageCount means too much these days and this array grows if we add more stages. How to improve this
 		crstl::array<crstl::array<ShaderResourceOffset, crgfx::ShaderStage::GraphicsStageCount>, crgfx::ShaderResourceType::Count> m_stageResourceOffsets = {};
 
 		crstl::fixed_vector<ShaderBinding, 64> m_bindings;
@@ -270,14 +273,16 @@ namespace crgfx
 		crstl::fixed_vector<VertexInput, crgfx::MaxVertexStreams> inputs;
 	};
 
-	// Bytecode represents a shader code, e.g. vertex, pixel, etc
+	// Bytecode represents shader code from a particular stage, e.g. vertex, pixel, etc
+	// TODO This duplicates the bytecode contained in the executable. We need a way to make this class
+	// both own bytecode and point to existing bytecode to avoid duplication
 	class ShaderBytecode : public crstl::intrusive_ptr_interface_delete
 	{
 	public:
 
 		ShaderBytecode() {}
 
-		const crstl::vector<uint8_t>& GetBytecode() const
+		const crstl::span<uint8_t> GetBytecode() const
 		{
 			return m_bytecode;
 		}
@@ -331,9 +336,27 @@ namespace crgfx
 
 	typedef crstl::fixed_string64 ShaderDebugString;
 
-	class IShader : public crstl::intrusive_ptr_interface_delete
+	class GraphicsShaderBytecode
 	{
 	public:
+
+		GraphicsShaderBytecode() {}
+
+		GraphicsShaderBytecode(const ShaderDebugString& debugName)
+		{
+			m_debugName = debugName;
+		}
+
+		const crstl::span<const ShaderBytecodeHandle> GetBytecodes() const
+		{
+			return crstl::span<const ShaderBytecodeHandle>(m_bytecodes.data(), m_bytecodes.size());
+		}
+
+		void AddBytecode(const ShaderBytecodeHandle& bytecode)
+		{
+			m_bytecodes.push_back(bytecode);
+			m_hash << bytecode->GetHash();
+		}
 
 		CrHash GetHash() const
 		{
@@ -349,51 +372,30 @@ namespace crgfx
 
 		ShaderDebugString m_debugName;
 
+		crstl::fixed_vector<ShaderBytecodeHandle, crgfx::ShaderStage::GraphicsStageCount> m_bytecodes;
+
 		// Hash produced from the bytecodes belonging to this shader
 		CrHash m_hash;
 	};
 
-	struct GraphicsShaderDescriptor
-	{
-		ShaderDebugString m_debugName;
-
-		crstl::vector<ShaderBytecodeHandle> m_bytecodes;
-	};
-
-	// This shader represents a full linked shader. Therefore it knows about number of stages,
-	// and what these specific stages are. This is important to be able to pass it on to the PSO later on.
-	class IGraphicsShader final : public IShader
+	class ComputeShaderBytecode
 	{
 	public:
 
-		IGraphicsShader(const GraphicsShaderDescriptor& graphicsShaderDescriptor);
-
-		const crstl::vector<ShaderBytecodeHandle>& GetBytecodes() const
+		ComputeShaderBytecode(const ShaderDebugString& debugName, const ShaderBytecodeHandle& bytecode)
 		{
-			return m_bytecodes;
+			m_debugName = debugName;
+			m_bytecode = bytecode;
 		}
 
-	protected:
-
-		crstl::vector<ShaderBytecodeHandle> m_bytecodes;
-	};
-
-	struct ComputeShaderDescriptor
-	{
-		ShaderDebugString m_debugName;
-
-		ShaderBytecodeHandle m_bytecode;
-	};
-
-	class IComputeShader : public IShader
-	{
-	public:
-
-		IComputeShader(const ComputeShaderDescriptor& computeShaderDescriptor)
+		CrHash GetHash() const
 		{
-			m_bytecode = computeShaderDescriptor.m_bytecode;
-			m_hash = computeShaderDescriptor.m_bytecode->GetHash();
-			m_debugName = computeShaderDescriptor.m_debugName;
+			return m_bytecode->GetHash();
+		}
+
+		const char* GetDebugName() const
+		{
+			return m_debugName.c_str();
 		}
 
 		const ShaderBytecodeHandle& GetBytecode() const
@@ -401,9 +403,9 @@ namespace crgfx
 			return m_bytecode;
 		}
 
-		virtual ~IComputeShader() {}
-
 	private:
+
+		ShaderDebugString m_debugName;
 
 		ShaderBytecodeHandle m_bytecode;
 	};

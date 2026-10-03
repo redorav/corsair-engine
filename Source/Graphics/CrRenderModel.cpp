@@ -48,11 +48,12 @@ CrRenderModel::CrRenderModel(const CrRenderModelDescriptor& descriptor)
 		{
 			const CrMaterialPassProperties& passProperties = CrMaterialPassProperties::GetMaterialPassProperties(mesh, pipelineVariant);
 
-			const crgfx::GraphicsShaderHandle& graphicsShader = material->GetShader(passProperties.shaderVariant);
+			const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode = material->GetShaderBytecode(passProperties.shaderVariant);
 
-			if (graphicsShader)
+			// TODO Is it correct for a material to have no bytecode for a specific shader variant?
+			if (graphicsShaderBytecode.GetBytecodes().size() > 0)
 			{
-				crgfx::GraphicsPipelineHandle pipeline = crgfx::GetDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShader, mesh->GetVertexDescriptor());
+				crgfx::GraphicsPipelineHandle pipeline = crgfx::GetDevice()->CreateGraphicsPipeline(passProperties.pipelineDescriptor, graphicsShaderBytecode, mesh->GetVertexDescriptor());
 
 				m_pipelines[meshIndex][pipelineVariant] = pipeline;
 			}

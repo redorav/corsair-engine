@@ -710,19 +710,14 @@ namespace crgfx
 		return new TextureVulkan(this, descriptor);
 	}
 
-	IGraphicsPipeline* DeviceVulkan::CreateGraphicsPipelinePS
-	(
-		const GraphicsPipelineDescriptor& pipelineDescriptor,
-		const GraphicsShaderHandle& graphicsShader,
-		const VertexDescriptor& vertexDescriptor
-	)
+	IGraphicsPipeline* DeviceVulkan::CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 	{
-		return new GraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		return new GraphicsPipelineVulkan(this, pipelineDescriptor, graphicsShaderBytecode, vertexDescriptor);
 	}
 
-	IComputePipeline* DeviceVulkan::CreateComputePipelinePS(const ComputeShaderHandle& computeShader)
+	IComputePipeline* DeviceVulkan::CreateComputePipelinePS(const ComputeShaderBytecode& computeShaderBytecode)
 	{
-		return new ComputePipelineVulkan(this, computeShader);
+		return new ComputePipelineVulkan(this, computeShaderBytecode);
 	}
 
 	IGPUQueryPool* DeviceVulkan::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)

@@ -28,34 +28,29 @@ const char* CrShaderManager::GetShaderBytecodeExtension(crgfx::GraphicsApi::T gr
 	}
 }
 
-crgfx::GraphicsShaderHandle CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
+crgfx::GraphicsShaderBytecode CrShaderManager::CompileGraphicsShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
-	// Create the graphics shader descriptor
-	crgfx::GraphicsShaderDescriptor graphicsShaderDescriptor;
-	graphicsShaderDescriptor.m_bytecodes.reserve(shaderCompilationDescriptor.GetBytecodeDescriptors().size());
+	crgfx::GraphicsShaderBytecode graphicsShaderBytecode;
 
 	// Load all the relevant shader bytecodes
 	for (const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor : shaderCompilationDescriptor.GetBytecodeDescriptors())
 	{
 		crgfx::ShaderBytecodeHandle bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
-		graphicsShaderDescriptor.m_bytecodes.push_back(bytecode);
+		graphicsShaderBytecode.AddBytecode(bytecode);
 	}
 
-	crgfx::GraphicsShaderHandle graphicsShader = new crgfx::IGraphicsShader(graphicsShaderDescriptor);;
-
-	return graphicsShader;
+	return graphicsShaderBytecode;
 }
-crgfx::ComputeShaderHandle CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
+crgfx::ComputeShaderBytecode CrShaderManager::CompileComputeShader(const CrShaderCompilationDescriptor& shaderCompilationDescriptor) const
 {
 	const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor = shaderCompilationDescriptor.GetBytecodeDescriptors()[0];
 
-	crgfx::ComputeShaderDescriptor computeShaderDescriptor;
-	computeShaderDescriptor.m_bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
+	const crgfx::ShaderBytecodeHandle& bytecode = CompileShaderBytecode(bytecodeDescriptor, shaderCompilationDescriptor.GetDefines());
 
-	crgfx::ComputeShaderHandle computeShader = new crgfx::IComputeShader(computeShaderDescriptor);
+	crgfx::ComputeShaderBytecode computeShaderBytecode("", bytecode);
 
-	return computeShader;
+	return computeShaderBytecode;
 }
 
 CrFixedPath CrShaderManager::GetCompiledShadersPath(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi) const

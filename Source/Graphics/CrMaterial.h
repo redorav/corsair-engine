@@ -144,7 +144,7 @@ public:
 
 	~CrMaterial();
 
-	const crgfx::GraphicsShaderHandle& GetShader(CrMaterialShaderVariant::T variant) const { return m_shaders[variant]; }
+	const crgfx::GraphicsShaderBytecode& GetShaderBytecode(CrMaterialShaderVariant::T variant) const { return m_shaderBytecodes[variant]; }
 
 	void AddTexture(const crgfx::TextureHandle& texture, Textures::T semantic);
 
@@ -158,7 +158,7 @@ public:
 
 	crstl::vector<TextureBinding> m_textures;
 
-	crgfx::GraphicsShaderHandle m_shaders[CrMaterialShaderVariant::Count];
+	crgfx::GraphicsShaderBytecode m_shaderBytecodes[CrMaterialShaderVariant::Count];
 
 	float4 m_color;
 

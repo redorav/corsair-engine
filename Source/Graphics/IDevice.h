@@ -144,9 +144,9 @@ namespace crgfx
 
 		TypedBuffer* CreateTypedBuffer(crgfx::MemoryAccess::T access, crgfx::DataFormat::T dataFormat, uint32_t numElements);
 
-		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
+		GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor);
 
-		ComputePipelineHandle CreateComputePipeline(const ComputeShaderHandle& computeShader);
+		ComputePipelineHandle CreateComputePipeline(const ComputeShaderBytecode& computeShaderBytecode);
 
 		IGPUQueryPool* CreateGPUQueryPool(const GPUQueryPoolDescriptor& queryPoolDescriptor);
 
@@ -215,9 +215,9 @@ namespace crgfx
 
 		virtual ITexture* CreateTexturePS(const crgfx::TextureDescriptor& descriptor) = 0;
 
-		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& psoDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor) = 0;
+		virtual IGraphicsPipeline* CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& psoDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderByecode, const VertexDescriptor& vertexDescriptor) = 0;
 
-		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderHandle& computeShader) = 0;
+		virtual IComputePipeline* CreateComputePipelinePS(const ComputeShaderBytecode& computeShaderBytecode) = 0;
 
 		virtual IGPUQueryPool* CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor) = 0;
 

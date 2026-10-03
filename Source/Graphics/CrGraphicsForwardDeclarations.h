@@ -91,13 +91,8 @@ namespace crgfx
 	using GPUQueryPoolHandle = crstl::intrusive_ptr<IGPUQueryPool>;
 
 	// Shaders & Pipeline Objects
-	class IGraphicsShader;
-	using GraphicsShaderHandle = crstl::intrusive_ptr<IGraphicsShader>;
-	struct GraphicsShaderDescriptor;
-
-	class IComputeShader;
-	using ComputeShaderHandle = crstl::intrusive_ptr<IComputeShader>;
-	struct ComputeShaderDescriptor;
+	class GraphicsShaderBytecode;
+	class ComputeShaderBytecode;
 
 	// Shader Bytecode
 	class ShaderBytecode;

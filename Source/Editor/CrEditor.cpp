@@ -39,9 +39,9 @@ CrEditor::CrEditor(const crstl::intrusive_ptr<CrOSWindow>& mainWindow)
 	CrImGuiViewports::Initialize(mainWindow);
 
 	CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
-	basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForwardShader;
-	basicMaterial->m_shaders[CrMaterialShaderVariant::GBuffer] = BuiltinPipelines->BasicUbershaderGBufferShader;
-	basicMaterial->m_shaders[CrMaterialShaderVariant::Debug]   = BuiltinPipelines->BasicUbershaderDebugShader;
+	basicMaterial->m_shaderBytecodes[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForwardShader;
+	basicMaterial->m_shaderBytecodes[CrMaterialShaderVariant::GBuffer] = BuiltinPipelines->BasicUbershaderGBufferShader;
+	basicMaterial->m_shaderBytecodes[CrMaterialShaderVariant::Debug]   = BuiltinPipelines->BasicUbershaderDebugShader;
 
 	m_cameraState.defaultFocusDistance = 4.0f;
 	m_cameraState.focusDistance = m_cameraState.defaultFocusDistance;
@@ -453,8 +453,8 @@ void CrEditor::SpawnManipulator(const float4x4& initialTransform)
 		// the ubershader actually needs in terms of vertex format and render target formats
 		// We don't have an opaque shader here. We probably don't need them for editor meshes
 		CrMaterialHandle basicMaterial = CrMaterialHandle(new CrMaterial());
-		basicMaterial->m_shaders[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForwardShader;
-		basicMaterial->m_shaders[CrMaterialShaderVariant::Debug]   = BuiltinPipelines->BasicUbershaderDebugShader;
+		basicMaterial->m_shaderBytecodes[CrMaterialShaderVariant::Forward] = BuiltinPipelines->BasicUbershaderForwardShader;
+		basicMaterial->m_shaderBytecodes[CrMaterialShaderVariant::Debug]   = BuiltinPipelines->BasicUbershaderDebugShader;
 
 		CrRenderModelDescriptor xAxisDescriptor;
 		xAxisDescriptor.AddMaterial(basicMaterial);

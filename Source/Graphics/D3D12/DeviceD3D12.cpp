@@ -380,12 +380,14 @@ namespace crgfx
 
 	void DeviceD3D12::SetD3D12ObjectName(ID3D12Object* object, const char* name)
 	{
+#if !defined(CR_CONFIG_FINAL)
 		if (name && name[0] != 0)
 		{
 			crstl::fixed_wstring128 wName;
 			wName.append_convert<char>(name);
 			object->SetName(wName.c_str());
 		}
+#endif
 	}
 
 	crgfx::ICommandBuffer* DeviceD3D12::CreateCommandBufferPS(const crgfx::CommandBufferDescriptor& descriptor)
@@ -424,14 +426,14 @@ namespace crgfx
 		return new TextureD3D12(this, params);
 	}
 
-	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor)
+	IGraphicsPipeline* DeviceD3D12::CreateGraphicsPipelinePS(const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor)
 	{
-		return new GraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShader, vertexDescriptor);
+		return new GraphicsPipelineD3D12(this, pipelineDescriptor, graphicsShaderBytecode, vertexDescriptor);
 	}
 
-	IComputePipeline* DeviceD3D12::CreateComputePipelinePS(const ComputeShaderHandle& computeShader)
+	IComputePipeline* DeviceD3D12::CreateComputePipelinePS(const ComputeShaderBytecode& computeShaderBytecode)
 	{
-		return new ComputePipelineD3D12(this, computeShader);
+		return new ComputePipelineD3D12(this, computeShaderBytecode);
 	}
 
 	IGPUQueryPool* DeviceD3D12::CreateGPUQueryPoolPS(const GPUQueryPoolDescriptor& queryPoolDescriptor)

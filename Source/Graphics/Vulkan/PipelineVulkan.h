@@ -10,11 +10,7 @@ namespace crgfx
 	{
 	public:
 
-		GraphicsPipelineVulkan
-		(
-			crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor,
-			const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor
-		);
+		GraphicsPipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor);
 
 		~GraphicsPipelineVulkan();
 
@@ -26,13 +22,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderHandle& graphicsShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderHandle& graphicsShader, const VertexDescriptor& vertexDescriptor);
+		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const GraphicsPipelineDescriptor& pipelineDescriptor, const crgfx::GraphicsShaderBytecode& graphicsShaderBytecode, const VertexDescriptor& vertexDescriptor);
 
 		void Deinitialize();
 
@@ -51,7 +47,7 @@ namespace crgfx
 	{
 	public:
 
-		ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader);
+		ComputePipelineVulkan(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode);
 
 		~ComputePipelineVulkan();
 
@@ -63,13 +59,13 @@ namespace crgfx
 
 #if !defined(CR_CONFIG_FINAL)
 
-		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderHandle& computeShader) override;
+		virtual void RecompilePS(crgfx::IDevice* renderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode) override;
 
 #endif
 
 	private:
 
-		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderHandle& computeShader);
+		void Initialize(crgfx::DeviceVulkan* vulkanRenderDevice, const crgfx::ComputeShaderBytecode& computeShaderBytecode);
 
 		void Deinitialize();
 

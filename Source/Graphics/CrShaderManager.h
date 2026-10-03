@@ -23,9 +23,9 @@ public:
 
 	crgfx::ShaderBytecodeHandle CompileShaderBytecode(const CrShaderBytecodeCompilationDescriptor& bytecodeDescriptor, const CrShaderCompilerDefines& defines) const;
 
-	crgfx::GraphicsShaderHandle CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
+	crgfx::GraphicsShaderBytecode CompileGraphicsShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
-	crgfx::ComputeShaderHandle CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
+	crgfx::ComputeShaderBytecode CompileComputeShader(const CrShaderCompilationDescriptor& bytecodeLoadDescriptor) const;
 
 	CrFixedPath GetCompiledShadersPath(cr::Platform::T platform, crgfx::GraphicsApi::T graphicsApi) const;
 };

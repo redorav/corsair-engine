@@ -14,5 +14,5 @@ public:
 
 	static bool HLSLtoDXIL(const CompilationDescriptor& compilationDescriptor, crstl::string& compilationStatus);
 
-	static bool PreprocessHLSL(const crstl::string& shaderSource, const crstl::string& rootPath, crstl::string& preprocessedSource);
+	static bool PreprocessHLSL(const crstl::string& shaderSource, const crstl::fixed_path512& rootPath, crstl::string& preprocessedSource);
 };

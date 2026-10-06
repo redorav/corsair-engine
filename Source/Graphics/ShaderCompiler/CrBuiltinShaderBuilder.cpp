@@ -92,18 +92,20 @@ void CrBuiltinShaderBuilder::ProcessBuiltinShaders(const CrBuiltinShadersDescrip
 				if (stageNode.is_keyval())
 				{
 					c4::csubstr stageValue = stageNode.val();
-					if (stageValue == "Vertex")        { shaderStage = crgfx::ShaderStage::Vertex; }
-					else if (stageValue == "Pixel")    { shaderStage = crgfx::ShaderStage::Pixel; }
-					else if (stageValue == "Geometry") { shaderStage = crgfx::ShaderStage::Geometry; }
-					else if (stageValue == "Hull")     { shaderStage = crgfx::ShaderStage::Hull; }
-					else if (stageValue == "Domain")   { shaderStage = crgfx::ShaderStage::Domain; }
-					else if (stageValue == "Compute")  { shaderStage = crgfx::ShaderStage::Compute; }
+					if (stageValue == "Vertex")             { shaderStage = crgfx::ShaderStage::Vertex; }
+					else if (stageValue == "Pixel")         { shaderStage = crgfx::ShaderStage::Pixel; }
+					else if (stageValue == "Geometry")      { shaderStage = crgfx::ShaderStage::Geometry; }
+					else if (stageValue == "Hull")          { shaderStage = crgfx::ShaderStage::Hull; }
+					else if (stageValue == "Domain")        { shaderStage = crgfx::ShaderStage::Domain; }
+					else if (stageValue == "Compute")       { shaderStage = crgfx::ShaderStage::Compute; }
+					else if (stageValue == "Amplification") { shaderStage = crgfx::ShaderStage::Amplification; }
+					else if (stageValue == "Mesh")          { shaderStage = crgfx::ShaderStage::Mesh; }
 					else if (stageValue == "RootSignature") { shaderStage = crgfx::ShaderStage::RootSignature; }
 					else
 					{
 						crstl::string errorMessage;
 						crstl::string invalidStageString(stageValue.str, stageValue.len);
-						errorMessage.append_sprintf("Invalid shader stage '%s' in shader %s. Remember that stage must be upper case", invalidStageString.c_str(), shaderName.c_str());
+						errorMessage.append_sprintf("Error: Invalid shader stage '%s' in shader %s. Remember that stage must be upper case", invalidStageString.c_str(), shaderName.c_str());
 						CrShaderCompilerUtilities::QuitWithMessage(errorMessage.c_str());
 					}
 

@@ -48,12 +48,14 @@ const wchar_t* GetDXCShaderProfile(crgfx::ShaderStage::T shaderStage)
 {
 	switch (shaderStage)
 	{
-		case crgfx::ShaderStage::Vertex:   return L"vs_6_6";
-		case crgfx::ShaderStage::Geometry: return L"gs_6_6";
-		case crgfx::ShaderStage::Hull:     return L"hs_6_6";
-		case crgfx::ShaderStage::Domain:   return L"ds_6_6";
-		case crgfx::ShaderStage::Pixel:    return L"ps_6_6";
-		case crgfx::ShaderStage::Compute:  return L"cs_6_6";
+		case crgfx::ShaderStage::Vertex:         return L"vs_6_6";
+		case crgfx::ShaderStage::Geometry:       return L"gs_6_6";
+		case crgfx::ShaderStage::Hull:           return L"hs_6_6";
+		case crgfx::ShaderStage::Domain:         return L"ds_6_6";
+		case crgfx::ShaderStage::Pixel:          return L"ps_6_6";
+		case crgfx::ShaderStage::Compute:        return L"cs_6_6";
+		case crgfx::ShaderStage::Amplification:  return L"as_6_6";
+		case crgfx::ShaderStage::Mesh:           return L"ms_6_6";
 		case crgfx::ShaderStage::RootSignature:  return L"rootsig_1_0";
 		default: return L"";
 	}
@@ -252,12 +254,13 @@ bool SpvStripDebugData(crstl::vector<uint32_t>& spirvData)
 }
 
 // Compile a given shader using the dxcompiler API
-HRESULT CompileShaderDXC
+bool CompileShaderDXC
 (
 	const CompilationDescriptor& compilationDescriptor,
 	const CComPtr<IDxcCompiler3>& dxcCompiler,
 	const CComPtr<CrDxcIncludeHandler>& dxcIncludeHandler,
-	CComPtr<IDxcResult>& dxcCompilationResult
+	CComPtr<IDxcResult>& dxcCompilationResult,
+	crstl::string& compilationStatus
 )
 {
 	if (crstl::file sourceCodeFile = crstl::file(compilationDescriptor.inputPath.c_str(), crstl::file_flags::read))
@@ -333,11 +336,46 @@ HRESULT CompileShaderDXC
 			arguments.push_back(wDefines[i].c_str());
 		}
 
-		return dxcCompiler->Compile(&sourceCodeBuffer, arguments.data(), (uint32_t)arguments.size(), dxcIncludeHandler, IID_PPV_ARGS(&dxcCompilationResult));
+		HRESULT compileHResult = dxcCompiler->Compile(&sourceCodeBuffer, arguments.data(), (uint32_t)arguments.size(), dxcIncludeHandler, IID_PPV_ARGS(&dxcCompilationResult));
+
+		if (dxcCompilationResult)
+		{
+			HRESULT statusHResult;
+			dxcCompilationResult->GetStatus(&statusHResult);
+
+			if (compileHResult != S_OK || statusHResult != S_OK)
+			{
+				IDxcBlobUtf8* errorMessage = nullptr;
+				dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
+
+				if (errorMessage)
+				{
+					compilationStatus += errorMessage->GetStringPointer();
+				}
+
+				if (compilationStatus.find("missing entry point") != crstl::string::npos)
+				{
+					compilationStatus.erase_all('\n');
+					compilationStatus.append_sprintf(" (%s)", compilationDescriptor.entryPoint.c_str());
+				}
+
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			compilationStatus.append("Unknown compilation error\n");
+			return false;
+		}
 	}
 	else
 	{
-		return E_FAIL;
+		compilationStatus.append_sprintf("Error: Could not find file %s\n", compilationDescriptor.inputPath.c_str());
+		return false;
 	}
 }
 
@@ -437,27 +475,9 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 	CComPtr<IDxcResult> dxcCompilationResult;
 	const_cast<CompilationDescriptor&>(compilationDescriptor).graphicsApi = crgfx::GraphicsApi::Vulkan;
-	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
+	bool compilationResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult, compilationStatus);
 
-	if (compilationHResult != S_OK)
-	{
-		HRESULT hResult;
-		dxcCompilationResult->GetStatus(&hResult);
-
-		if (hResult != S_OK)
-		{
-			IDxcBlobUtf8* errorMessage = nullptr;
-			dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
-
-			if (errorMessage)
-			{
-				compilationStatus += errorMessage->GetStringPointer();
-			}
-		}
-
-		return false;
-	}
-	else
+	if (compilationResult)
 	{
 		CComPtr<IDxcBlob> compilationResultBlob;
 		dxcCompilationResult->GetResult(&compilationResultBlob);
@@ -469,6 +489,10 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 		);
 
 		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -652,24 +676,9 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 	CComPtr<CrDxcIncludeHandler> dxcIncludeHandler = new CrDxcIncludeHandler(dxcUtils);
 	
 	CComPtr<IDxcResult> dxcCompilationResult;
-	HRESULT compilationHResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult);
+	bool compilationResult = CompileShaderDXC(compilationDescriptor, dxcCompiler, dxcIncludeHandler, dxcCompilationResult, compilationStatus);
 
-	HRESULT hResult;
-	dxcCompilationResult->GetStatus(&hResult);
-
-	if (compilationHResult != S_OK || hResult != S_OK)
-	{
-		IDxcBlobUtf8* errorMessage = nullptr;
-		dxcCompilationResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errorMessage), nullptr);
-
-		if (errorMessage)
-		{
-			compilationStatus += errorMessage->GetStringPointer();
-		}
-
-		return false;
-	}
-	else
+	if(compilationResult)
 	{
 		CComPtr<IDxcBlob> shaderBlob = nullptr;
 		CComPtr<IDxcBlobUtf16> shaderName = nullptr;
@@ -710,9 +719,9 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 			DxcBuffer buffer = { bytecode.data(), bytecode.size(), 0 };
 
 			CComPtr<ID3D12ShaderReflection> pReflection;
-			hResult = dxcUtils->CreateReflection(&buffer, IID_PPV_ARGS(&pReflection));
+			HRESULT reflectionHResult = dxcUtils->CreateReflection(&buffer, IID_PPV_ARGS(&pReflection));
 
-			if (hResult != S_OK)
+			if (reflectionHResult != S_OK)
 			{
 				compilationStatus += "Error creating reflection data\n";
 				return false;
@@ -777,6 +786,10 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 		writeFileStream << bytecode;
 
 		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

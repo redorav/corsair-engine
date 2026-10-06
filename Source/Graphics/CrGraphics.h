@@ -117,9 +117,13 @@ namespace crgfx
 			Domain   = 3,
 			Geometry = 4,
 			Compute  = 5,
-			RootSignature = 6, // D3D12 only
-			GraphicsStageCount = Geometry + 1,
-			Count = Compute + 1,
+			Amplification = 6,
+			Mesh = 7,
+
+			RootSignature = 8, // D3D12 only
+			GraphicsStageCount = 5, // Vertex + Hull + Domain + Geometry + Pixel
+			MeshStageCount = 3, // Amplification + Mesh + Pixel
+			Count = Mesh + 1,
 		};
 
 		inline T& operator++(T& e) { e = static_cast<T>(static_cast<uint32_t>(e) + 1u); return e; }
@@ -131,12 +135,14 @@ namespace crgfx
 		{
 			switch (stage)
 			{
-				case crgfx::ShaderStage::Vertex:   return lowercase ? "vertex"   : "Vertex";
-				case crgfx::ShaderStage::Pixel:    return lowercase ? "pixel"    : "Pixel";
-				case crgfx::ShaderStage::Hull:     return lowercase ? "hull"     : "Hull";
-				case crgfx::ShaderStage::Domain:   return lowercase ? "domain"   : "Domain";
-				case crgfx::ShaderStage::Geometry: return lowercase ? "geometry" : "Geometry";
-				case crgfx::ShaderStage::Compute:  return lowercase ? "compute"  : "Compute";
+				case crgfx::ShaderStage::Vertex:         return lowercase ? "vertex"   : "Vertex";
+				case crgfx::ShaderStage::Pixel:          return lowercase ? "pixel"    : "Pixel";
+				case crgfx::ShaderStage::Hull:           return lowercase ? "hull"     : "Hull";
+				case crgfx::ShaderStage::Domain:         return lowercase ? "domain"   : "Domain";
+				case crgfx::ShaderStage::Geometry:       return lowercase ? "geometry" : "Geometry";
+				case crgfx::ShaderStage::Compute:        return lowercase ? "compute"  : "Compute";
+				case crgfx::ShaderStage::Amplification:  return lowercase ? "amplification" : "Amplification";
+				case crgfx::ShaderStage::Mesh:           return lowercase ? "mesh" : "Mesh";
 				case crgfx::ShaderStage::RootSignature:  return lowercase ? "rootsignature" : "RootSignature";
 				default: return lowercase ? "invalid" : "Invalid";
 			}

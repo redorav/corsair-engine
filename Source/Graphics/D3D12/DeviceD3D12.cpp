@@ -228,12 +228,12 @@ namespace crgfx
 		}
 
 		D3D12_FEATURE_DATA_D3D12_OPTIONS6 d3d12Options6 = {};
-		if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options6, sizeof(d3d12Options6)) == S_OK)
+		if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &d3d12Options6, sizeof(d3d12Options6)) == S_OK)
 		{
 		}
 
 		D3D12_FEATURE_DATA_D3D12_OPTIONS7 d3d12Options7 = {};
-		if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &d3d12Options7, sizeof(d3d12Options7)) == S_OK)
+		if (m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS7, &d3d12Options7, sizeof(d3d12Options7)) == S_OK)
 		{
 			m_deviceProperties.features.meshShaders = d3d12Options7.MeshShaderTier >= D3D12_MESH_SHADER_TIER_1;
 		}

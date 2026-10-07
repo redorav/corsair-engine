@@ -119,6 +119,12 @@ namespace crgfx
 
 	struct BlendStateDescriptor
 	{
+		BlendStateDescriptor()
+			: logicOpEnable(false)
+			, logicOp(crgfx::LogicOp::Clear)
+			, padding(0)
+		{}
+
 		crstl::array<crgfx::RenderTargetBlendDescriptor, crgfx::MaxRenderTargets> renderTargetBlends;
 
 		// See https://msdn.microsoft.com/en-us/library/windows/desktop/dn770339(v=vs.85).aspx for why logicOps is 
@@ -126,7 +132,7 @@ namespace crgfx
 		uint32_t logicOpEnable : 1;
 		crgfx::LogicOp logicOp : 4;
 		uint32_t padding : 27;
-		float blendConstants[4];
+		float blendConstants[4] = {};
 	};
 
 	static_assert(sizeof(BlendStateDescriptor) == 52, "BlendStateDescriptor size mismatch");

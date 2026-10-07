@@ -21,6 +21,20 @@ namespace crgfx
 {
 	struct RasterizerStateDescriptor
 	{
+		RasterizerStateDescriptor()
+			: fillMode(crgfx::PolygonFillMode::Fill)
+			, frontFace(crgfx::FrontFace::Clockwise)
+			, cullMode(crgfx::PolygonCullMode::Back)
+			, depthClipEnable(true)
+			, multisampleEnable(false)
+			, antialiasedLineEnable(false)
+			, conservativeRasterization(false)
+			, padding(0)
+			, depthBias(0.0f)
+			, depthBiasClamp(0.0f)
+			, slopeScaledDepthBias(0.0f)
+		{}
+
 		crgfx::PolygonFillMode fillMode : 2;
 		crgfx::PolygonCullMode cullMode : 2;
 		crgfx::FrontFace frontFace : 1;
@@ -119,17 +133,44 @@ namespace crgfx
 
 	struct DepthStencilStateDescriptor
 	{
+		DepthStencilStateDescriptor()
+			: depthCompareOp(crgfx::CompareOp::Greater) // Reverse depth by default
+			, depthTestEnable(true)
+			, depthWriteEnable(true)
+			, depthBoundsTestEnable(false)
+			, stencilTestEnable(false)
+			, padding(0)
+
+			, stencilReadMask(0)
+			, stencilWriteMask(0)
+			, reference(0)
+
+			, frontStencilFailOp(crgfx::StencilOp::Keep)
+			, frontDepthFailOp(crgfx::StencilOp::Keep)
+			, frontStencilPassOp(crgfx::StencilOp::Keep)
+			, frontStencilCompareOp(crgfx::CompareOp::Never)
+			 
+			, backStencilFailOp(crgfx::StencilOp::Keep)
+			, backDepthFailOp(crgfx::StencilOp::Keep)
+			, backStencilPassOp(crgfx::StencilOp::Keep)
+			, backStencilCompareOp(crgfx::CompareOp::Never)
+			 
+			, padding2(0)
+
+			, minDepthBounds(0.0f)
+			, maxDepthBounds(0.0f)
+		{}
+
 		crgfx::CompareOp      depthCompareOp : 3;
 		uint32_t              depthTestEnable : 1;
 		uint32_t              depthWriteEnable : 1;
 		uint32_t              depthBoundsTestEnable : 1;
 		uint32_t              stencilTestEnable : 1;
+		uint32_t              padding : 1;
 
 		uint32_t              stencilReadMask : 8;
 		uint32_t              stencilWriteMask : 8;
 		uint32_t              reference : 8;
-
-		uint32_t              padding : 1;
 
 		crgfx::StencilOp      frontStencilFailOp : 3;
 		crgfx::StencilOp      frontDepthFailOp : 3;
@@ -170,27 +211,7 @@ namespace crgfx
 		{
 			primitiveTopology = crgfx::PrimitiveTopology::TriangleList;
 			sampleCount = crgfx::SampleCount::S1;
-
-			rasterizerState.fillMode = crgfx::PolygonFillMode::Fill;
-			rasterizerState.frontFace = crgfx::FrontFace::Clockwise;
-			rasterizerState.cullMode = crgfx::PolygonCullMode::Back;
-			rasterizerState.depthClipEnable = true;
-
 			padding = 0;
-
-			// Don't put a loop here to initialize the color write masks
-			blendState.renderTargetBlends[0].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[1].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[2].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[3].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[4].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[5].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[6].colorWriteMask = crgfx::ColorWriteComponent::All;
-			blendState.renderTargetBlends[7].colorWriteMask = crgfx::ColorWriteComponent::All;
-
-			depthStencilState.depthTestEnable = true;
-			depthStencilState.depthWriteEnable = true;
-			depthStencilState.depthCompareOp = crgfx::CompareOp::Greater; // Reverse depth by default
 		}
 
 		CrHash ComputeHash() const
@@ -202,10 +223,10 @@ namespace crgfx
 		crgfx::SampleCount              sampleCount : 4;
 		uint32_t                        padding : 24;
 
-		crgfx::RasterizerStateDescriptor    rasterizerState = {};
-		crgfx::BlendStateDescriptor         blendState = {};
-		crgfx::DepthStencilStateDescriptor  depthStencilState = {};
-		crgfx::RenderTargetFormatDescriptor renderTargets = {};
+		crgfx::RasterizerStateDescriptor    rasterizerState;
+		crgfx::BlendStateDescriptor         blendState;
+		crgfx::DepthStencilStateDescriptor  depthStencilState;
+		crgfx::RenderTargetFormatDescriptor renderTargets;
 	};
 
 	static_assert(sizeof(GraphicsPipelineDescriptor) == 128, "GraphicsPipelineDescriptor size mismatch");

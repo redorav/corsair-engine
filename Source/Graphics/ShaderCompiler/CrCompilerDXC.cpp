@@ -569,12 +569,10 @@ bool CrCompilerDXC::HLSLtoSPIRV(const CompilationDescriptor& compilationDescript
 
 		ProcessInterfaceVariables(shaderModule.output_variable_count, shaderModule.output_variables, reflectionHeader.stageOutputs);
 
-		if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
-		{
-			reflectionHeader.threadGroupSizeX = shaderModule.entry_points[0].local_size.x;
-			reflectionHeader.threadGroupSizeY = shaderModule.entry_points[0].local_size.y;
-			reflectionHeader.threadGroupSizeZ = shaderModule.entry_points[0].local_size.z;
-		}
+		// It's fine to do this all the time as they are properly initialized to 0 for shaders that don't care about it
+		reflectionHeader.threadGroupSizeX = shaderModule.entry_points[0].local_size.x;
+		reflectionHeader.threadGroupSizeY = shaderModule.entry_points[0].local_size.y;
+		reflectionHeader.threadGroupSizeZ = shaderModule.entry_points[0].local_size.z;
 
 		// The PDB mechanism for SPIR-V is not the same as DXIL because SPIR-V doesn't have a defined PDB format
 		// Renderdoc recommends having two copies, one with debug information, the other without, and creating an

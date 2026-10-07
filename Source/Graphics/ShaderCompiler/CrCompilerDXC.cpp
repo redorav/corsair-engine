@@ -772,7 +772,6 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				ProcessInterfaceVariable(outputParameterDescriptor, reflectionHeader.stageOutputs);
 			}
 
-
 			pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);
 		}
 

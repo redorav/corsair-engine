@@ -772,10 +772,8 @@ bool CrCompilerDXC::HLSLtoDXIL(const CompilationDescriptor& compilationDescripto
 				ProcessInterfaceVariable(outputParameterDescriptor, reflectionHeader.stageOutputs);
 			}
 
-			if (compilationDescriptor.shaderStage == crgfx::ShaderStage::Compute)
-			{
-				pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);
-			}
+
+			pReflection->GetThreadGroupSize(&reflectionHeader.threadGroupSizeX, &reflectionHeader.threadGroupSizeY, &reflectionHeader.threadGroupSizeZ);
 		}
 
 		// Write reflection header out

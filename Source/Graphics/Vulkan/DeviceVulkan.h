@@ -125,13 +125,13 @@ namespace crgfx
 
 		VkPipelineCache m_vkPipelineCache; // Centralized pipeline cache
 
-		crstl::open_hashset<crstl::string> m_supportedDeviceExtensions;
+		crstl::fixed_open_hashset<crstl::string, 512> m_supportedDeviceExtensions;
 
 		// TODO Make this platform-independent
-		crstl::vector<VkFormat> m_supportedRenderTargetFormats;
-		crstl::vector<VkFormat> m_supportedTextureFormats;
-		crstl::vector<VkFormat> m_supportedDepthStencilFormats;
-		crstl::vector<VkFormat> m_supportedVertexBufferFormats;
+		crstl::fixed_vector<VkFormat, 64> m_supportedRenderTargetFormats;
+		crstl::fixed_vector<VkFormat, 128> m_supportedTextureFormats;
+		crstl::fixed_vector<VkFormat, 8> m_supportedDepthStencilFormats;
+		crstl::fixed_vector<VkFormat, 96> m_supportedVertexBufferFormats;
 
 		// Stores all available memory (type) properties for the physical device
 

@@ -82,10 +82,9 @@ crgfx::GraphicsPipelineHandle CrBuiltinPipelines::GetGraphicsPipeline
 	}
 	else
 	{
+		crgfx::GraphicsShaderBytecode graphicsShaderBytecode = GetGraphicsShaderBytecode(vertexShaderIndex, pixelShaderIndex);
 
-		crgfx::GraphicsShaderBytecode shader = GetGraphicsShaderBytecode(vertexShaderIndex, pixelShaderIndex);
-
-		crgfx::GraphicsPipelineHandle graphicsPipeline = device->CreateGraphicsPipeline(graphicsPipelineDescriptor, shader, vertexDescriptor);
+		crgfx::GraphicsPipelineHandle graphicsPipeline = device->CreateGraphicsPipeline(graphicsPipelineDescriptor, graphicsShaderBytecode, vertexDescriptor);
 		graphicsPipeline->SetShaderIndices(vertexShaderIndex, pixelShaderIndex);
 
 		m_builtinGraphicsPipelines.insert(finalHash.GetHash(), graphicsPipeline);
@@ -109,9 +108,9 @@ crgfx::ComputePipelineHandle CrBuiltinPipelines::GetComputePipeline(CrBuiltinCom
 
 		const crgfx::DeviceProperties& properties = renderDevice->GetProperties();
 
-		crgfx::ComputeShaderBytecode shader = crgfx::ComputeShaderBytecode(CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str(), crgfx::GetBuiltinComputeBytecode(computeShaderIndex));
+		crgfx::ComputeShaderBytecode computeShaderBytecode = crgfx::ComputeShaderBytecode(CrBuiltinCompute::GetMetadata(computeShaderIndex, properties.graphicsApi).name.c_str(), crgfx::GetBuiltinComputeBytecode(computeShaderIndex));
 
-		crgfx::ComputePipelineHandle computePipeline = renderDevice->CreateComputePipeline(shader);
+		crgfx::ComputePipelineHandle computePipeline = renderDevice->CreateComputePipeline(computeShaderBytecode);
 		computePipeline->SetComputeShaderIndex(computeShaderIndex);
 
 		m_builtinComputePipelines.insert(hash.GetHash(), computePipeline);

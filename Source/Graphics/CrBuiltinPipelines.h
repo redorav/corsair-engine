@@ -18,13 +18,7 @@ public:
 
 	static void Deinitialize();
 
-	crgfx::GraphicsPipelineHandle GetGraphicsPipeline
-	(
-		const crgfx::GraphicsPipelineDescriptor& graphicsPipelineDescriptor,
-		const crgfx::VertexDescriptor& vertexDescriptor,
-		CrBuiltinShaders::T vertexShader,
-		CrBuiltinShaders::T pixelShader
-	);
+	crgfx::GraphicsPipelineHandle GetGraphicsPipeline(const crgfx::GraphicsPipelineDescriptor& graphicsPipelineDescriptor, const crgfx::VertexDescriptor& vertexDescriptor, CrBuiltinShaders::T vertexShader, CrBuiltinShaders::T pixelShader);
 
 	crgfx::ComputePipelineHandle GetComputePipeline(CrBuiltinCompute::T computeShader);
 

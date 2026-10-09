@@ -277,7 +277,7 @@ void CrFrame::Initialize(crstl::intrusive_ptr<CrOSWindow> mainWindow)
 		crgfx::GraphicsPipelineDescriptor copyTextureGraphicsPipelineDescriptor;
 		copyTextureGraphicsPipelineDescriptor.renderTargets.colorFormats[0] = crgfx::DataFormat::BGRA8_Unorm;
 		copyTextureGraphicsPipelineDescriptor.depthStencilState.depthTestEnable = false;
-		m_copyTexturePipeline = BuiltinPipelines->GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColor);
+		m_copyTexturePipeline = BuiltinPipelines->GetGraphicsPipeline(copyTextureGraphicsPipelineDescriptor, NullVertexDescriptor, CrBuiltinShaders::FullscreenTriangle, CrBuiltinShaders::CopyTextureColorPS);
 	}
 
 	m_createIndirectArguments = BuiltinPipelines->GetComputePipeline(CrBuiltinCompute::CreateIndirectArguments);

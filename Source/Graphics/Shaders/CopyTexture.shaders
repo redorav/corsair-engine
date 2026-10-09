@@ -2,7 +2,7 @@ FullscreenTriangle:
   entrypoint: CopyTextureVS
   stage: Vertex
 
-CopyTextureColor:
+CopyTextureColorPS:
   entrypoint: CopyTexturePS
   stage: Pixel
 
